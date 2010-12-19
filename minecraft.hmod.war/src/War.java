@@ -13,7 +13,9 @@ public class War extends Plugin {
     String name = "War";
     String version = "0.1";
     
-    private final List<Team> teams = new ArrayList<Team>();
+    
+    private final List<Warzone> warzones = new ArrayList<Warzone>();
+    //private final WarMessenger messenger = new WarMessenger();
 
 	public void initialize() {
 		this.log = Logger.getLogger("Minecraft");
@@ -47,23 +49,54 @@ public class War extends Plugin {
 		
 	}
 
-	public List<Team> getTeams() {
-		return teams;
-	}
-	
 	public Team getPlayerTeam(String playerName) {
-		for(Team team : teams) {
-			for(Player player : team.getPlayers()) {
-				if(player.getName().equals(playerName)) {
-					return team;
-				}
-			}
+		for(Warzone warzone : warzones) {
+			return warzone.getPlayerTeam(playerName);
 		}
 		return null;
 	}
+	
 
 	public Logger getLogger() {
 		return log;
 	}
+	
+	public Warzone warzone(Location location) {
+		for(Warzone warzone : warzones) {
+			if(warzone.contains(location)) return warzone;
+		}
+		return null;
+	}
+
+	public boolean inAnyWarzone(Location location) {
+		if(warzone(location) == null) {
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean inWarzone(String warzoneName, Location location) {
+		Warzone currentZone = warzone(location);
+		if(currentZone == null) {
+			return false;
+		} else if (warzoneName.equals(currentZone.getName())){
+			return true;
+		}
+		return false;
+	}
+
+	public void addWarzone(Warzone zone) {
+		warzones.add(zone);
+	}
+
+	public Server getServer() {
+		// TODO Auto-generated method stub
+		return etc.getServer();
+	}
+
+	public List<Warzone> getWarzones() {
+		return warzones;
+	}
+	
 
 }
