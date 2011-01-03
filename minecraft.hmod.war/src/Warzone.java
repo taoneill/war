@@ -67,45 +67,6 @@ public class Warzone {
 		}
 	}
 
-	public void saveState() {
-		if(ready()){
-			int northSouth = (int)(southeast.x - northwest.x);
-			int eastWest = (int)(northwest.z - southeast.z);
-			initialState = new int[northSouth][128][eastWest];
-			for(int x = 0; x < northSouth; x++){
-				for(int y = 0; y < 128; y++) {
-					for(int z = 0; z < eastWest; z++) {
-						initialState[x][y][z] = server.getBlockAt(x, y, z).getType();
-					}
-				}
-			}
-		}
-	}
-	
-	public void resetState() {
-		if(ready() && initialState != null){
-			// reset blocks
-			int northSouth = (int)(southeast.x - northwest.x);
-			int eastWest = (int)(northwest.z - southeast.z);
-			initialState = new int[northSouth][128][eastWest];
-			for(int x = 0; x < northSouth; x++){
-				for(int y = 0; y < 128; y++) {
-					for(int z = 0; z < eastWest; z++) {
-						server.setBlockAt(initialState[x][y][z],x, y, z);
-					}
-				}
-			}
-			
-			// everyone back to team spawn with full health
-			for(Team team : teams) {
-				for(Player player : team.getPlayers()) {
-					player.setHealth(20);
-					player.teleportTo(team.getTeamSpawn());
-				}
-			}
-		}
-	}
-
 	public Location getNorthwest() {
 		return northwest;
 	}
@@ -129,5 +90,75 @@ public class Warzone {
 		return this.teleport;
 	}
 	
+	public int saveState() {
+		if(ready()){
+			int northSouth = ((int)(southeast.x)) - ((int)(northwest.x));
+			int eastWest = ((int)(northwest.z)) - ((int)(southeast.z));
+			initialState = new int[northSouth][128][eastWest];
+			int noOfSavedBlocks = 0;
+			int x = (int)northwest.x;
+			int minY = 0;
+			int maxY = 128;
+			for(int i = 0; i < northSouth; i++){
+				int y = minY;
+				for(int j = 0; j < maxY - minY; j++) {
+					int z = (int)southeast.z;
+					for(int k = 0; k < eastWest; k++) {
+						initialState[i][j][k] = server.getBlockIdAt(x, y, z);
+						noOfSavedBlocks++;
+						z++;
+					}
+					y++;
+				}
+				x++;
+			}
+			return noOfSavedBlocks;
+		}
+		return 0;
+	}
+	
+	public int resetState() {
+		if(ready() && initialState != null){
+			// reset blocks
+			int northSouth = ((int)(southeast.x)) - ((int)(northwest.x));
+			int eastWest = ((int)(northwest.z)) - ((int)(southeast.z));
+			int noOfResetBlocks = 0;
+			int noOfFailures = 0;
+			int x = (int)northwest.x;
+			int minY = 0;
+			int maxY = 128;
+			for(int i = 0; i < northSouth; i++){
+				int y = minY;
+				for(int j = 0; j < maxY - minY; j++) {
+					int z = (int)southeast.z;
+					for(int k = 0; k < eastWest; k++) {
+						int currentType = server.getBlockIdAt(x, y, z);
+						int initialType = initialState[i][j][k];
+						if(currentType != initialType) {
+							if(server.setBlockAt(initialType,x, y, z)) {
+								noOfResetBlocks++;
+							} else {
+								noOfFailures++;
+							}
+						}
+						z++;
+					}
+					y++;					
+				}
+				x++;
+			}
+			
+			// everyone back to team spawn with full health
+			for(Team team : teams) {
+				for(Player player : team.getPlayers()) {
+					player.setHealth(20);
+					player.teleportTo(team.getTeamSpawn());
+				}
+			}
+			
+			return noOfResetBlocks;
+		}
+		return 0;
+	}
 	
 }

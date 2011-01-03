@@ -16,7 +16,6 @@ public class War extends Plugin {
     
     
     private final List<Warzone> warzones = new ArrayList<Warzone>();
-    //private final WarMessenger messenger = new WarMessenger();
 
 	public void initialize() {
 		this.log = Logger.getLogger("Minecraft");
@@ -39,6 +38,10 @@ public class War extends Plugin {
 				listener,
 				this,
 				PluginListener.Priority.HIGH);
+		etc.getLoader().addListener( PluginLoader.Hook.PLAYER_MOVE,  
+				listener,
+				this,
+				PluginListener.Priority.MEDIUM);
 		
 //        etc.getLoader().addListener(
 //                PluginLoader.Hook.BLOCK_CREATED,
@@ -109,63 +112,10 @@ public class War extends Plugin {
 	}
 	
 	public String str(String str) {
-		String out = "[war] " + str;
-		out = str(Colors.LightGray, out);
-		if(out.length() > 120) {
-			out = out.substring(0, 119);
-		}
-		log.log(Level.INFO, "Out: " + out);
+		String out = Colors.LightGray + "[war] " + Colors.White + str;
 		return out;
 	}
 	
-	public String str(String color, String str) {
-		
-		if(str.length() > 60) {
-			String out = "";
-			List<String> subStrs = toSubStrings(str);
-			List<String> coloredSubStrs = new ArrayList<String>();
-			for(String sub : subStrs) {
-				String colored = "";
-				if(sub.length() < 60) {
-					colored = color + sub;
-				}
-				else {
-//					colored = color + sub.charAt(0) + color + sub.charAt(1) + color + sub.charAt(2) + color + sub.charAt(3) + color + sub.charAt(4) +
-//							sub.substring(5);
-					//if(sub.length() > 10) {
-						colored = color + sub;
-						//.substring(5, sub.length() - 5);
-						//colored += color + sub.charAt(sub.length() - 5) + color + sub.charAt(sub.length() - 4) + color + sub.charAt(sub.length() - 3) 
-						//			+ color + sub.charAt(sub.length() - 2) + color + sub.charAt(sub.length() - 1); 
-					//}
-				}
-				coloredSubStrs.add(colored);
-			}
-			for(String sub : coloredSubStrs) {
-				out += sub;
-			}
-			
-			return out;
-		} else {
-			return color + str;
-		}
-	}
-	
-	private List<String> toSubStrings(String str) {
-		List<String> subStrings = new ArrayList<String>();
-		int start = 0;
-		int end = 60;
-		while(end < str.length()) {
-			subStrings.add(str.substring(start, end));
-			start += 60;
-			end += 60;
-		}
-		if(start < str.length()) {
-			subStrings.add(str.substring(start));
-		}
-		return subStrings;
-	}
-
 	public Warzone findWarzone(String warzoneName) {
 		for(Warzone warzone : warzones) {
 			if(warzone.getName().equals(warzoneName)) {

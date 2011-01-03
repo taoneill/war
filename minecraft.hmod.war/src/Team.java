@@ -41,4 +41,18 @@ public class Team {
 		return name;
 	}
 
+	public boolean removePlayer(String name) {
+		Player thePlayer = null;
+		for(Player player : players) {
+			if(player.getName().equals(name)) {
+				thePlayer = player; 
+			}
+		}
+		if(thePlayer != null) {
+			players.remove(thePlayer);
+			return true;
+		}
+		return false;
+	}
+
 }

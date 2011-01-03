@@ -18,12 +18,15 @@ public class WarListener extends PluginListener {
 	public boolean onCommand(Player player, java.lang.String[] split) {
 		String command = split[0];
 		
-		// Player commands: /warzones, /warzone, /teams, /join
+		// Player commands: /warzones, /warzone, /teams, /join, /leave
 		
 		// warzones
 		if(command.equals("/warzones")){
 			
 			String warzonesMessage = "Warzones: ";
+			if(war.getWarzones().isEmpty()){
+				warzonesMessage += "none.";
+			}
 			for(Warzone warzone : war.getWarzones()) {
 				
 				warzonesMessage += warzone.getName() + " ("
@@ -35,7 +38,7 @@ public class WarListener extends PluginListener {
 				warzonesMessage += playerTotal + " players)  ";
 			}
 			player.sendMessage(war.str(warzonesMessage + "  Use /warzone <zone-name> to " +
-					"teleport to warzone, " +
+					"teleport to a warzone, " +
 					"then use /teams and /join <team-name>."));
 			return true;
 		}
@@ -46,21 +49,21 @@ public class WarListener extends PluginListener {
 				player.sendMessage(war.str("Usage: /warzone <warzone-name>."));
 			} else {
 				for(Warzone warzone : war.getWarzones()) {
-					if(warzone.getName().equals(split[2])){
+					if(warzone.getName().equals(split[1])){
 						player.teleportTo(warzone.getTeleport());
-						player.sendMessage(war.str("You've landed in the " + warzone.getName() +
-								" warzone. Use the /join command. " + getAllTeamsMsg(player)));
+						player.sendMessage(war.str("You've landed in warzone " + warzone.getName() +
+								". Use the /join command. " + getAllTeamsMsg(player)));
 						return true;
 					}
 				}
-				player.sendMessage("So such warzone.");
+				player.sendMessage("No such warzone.");
 			}
 			return true;
 		}
 		
 		// /teams
-		if(command.equals("/teams")){
-			if(split.length < 2 || !war.inAnyWarzone(player.getLocation())) {
+		else if(command.equals("/teams")){
+			if(!war.inAnyWarzone(player.getLocation())) {
 				player.sendMessage(war.str("Usage: /teams. " +
 						"Must be in a warzone (try /warzones and /warzone)."));
 			} else {
@@ -76,17 +79,30 @@ public class WarListener extends PluginListener {
 						" Teams are warzone specific." +
 						" You must be inside a warzone to join a team."));
 			} else {
+				// drop from old team if any
+				Team previousTeam = war.getPlayerTeam(player.getName());
+				if(previousTeam != null) {
+					if(!previousTeam.removePlayer(player.getName())){
+						war.getLogger().log(Level.WARNING, "Could not remove player " + player.getName() + " from team " + previousTeam.getName());
+					}
+						
+				}
+				
+				// join new team
 				String name = split[1];
 				List<Team> teams = war.warzone(player.getLocation()).getTeams();
 				boolean foundTeam = false;
 				for(Team team : teams) {
 					if(team.getName().equals(name)) {
 						team.addPlayer(player);
+						player.teleportTo(team.getTeamSpawn());
 						foundTeam = true;
 					}
 				}
 				if(foundTeam) {
-					etc.getServer().messageAll(war.str("" + player.getName() + " joined " + name));
+					for(Team team : teams){
+						team.teamcast(war.str("" + player.getName() + " joined " + name));
+					}
 				} else {
 					player.sendMessage(war.str("No such team. Try /teams."));
 				}
@@ -94,20 +110,33 @@ public class WarListener extends PluginListener {
 			return true;
 		}
 		
+		// /leave
+		else if(command.equals("/leave")) {
+			if(!war.inAnyWarzone(player.getLocation()) || war.getPlayerTeam(player.getName()) == null) {
+				player.sendMessage(war.str("Usage: /leave <message>. " +
+						"Must be in a team already."));
+			} else {
+				Team playerTeam = war.getPlayerTeam(player.getName());
+				playerTeam.removePlayer(player.getName());
+				player.sendMessage(war.str("Left the team. You can now exit the warzone."));
+			}
+			return true;
+		}
+		
 		
 		// /team <msg>
 		else if(command.equals("/team")) {
-			if(split.length < 2) {
+			if(!war.inAnyWarzone(player.getLocation())) {
 				player.sendMessage(war.str("Usage: /team <message>. " +
 						"Sends a message only to your teammates."));
 			} else {
 				Team playerTeam = war.getPlayerTeam(player.getName());
-				String teamMessage = "<"+ player.getName() + ":> ";
+				String teamMessage = player.getName();
 				for(int j = 1 ; j<split.length; j++) {
 					String part = split[j];
 					teamMessage += part + " ";
 				}
-				playerTeam.teamcast(war.str(Colors.LightBlue, teamMessage));
+				playerTeam.teamcast(war.str(teamMessage));
 			}
 			return true;
 		}
@@ -123,14 +152,14 @@ public class WarListener extends PluginListener {
 				for(Team team: warzone.getTeams()) {
 					team.teamcast(war.str("Resetting warzone."));
 				}
-				warzone.resetState();
-				player.sendMessage(war.str("Warzone reset."));
+				int resetBlocks = warzone.resetState();
+				player.sendMessage(war.str("Warzone reset. " + resetBlocks + " blocks reset."));
 			}
 			return true;
 		}
 		
 		
-		// Warzone maker commands: /setwarzone, /setwarzonestart, /resetwarzone, /newteam, /setteamspawn, .. /setmonument
+		// Warzone maker commands: /setwarzone, /setwarzonestart, /resetwarzone, /newteam, /setteamspawn, .. /setmonument?
 		
 		// /newteam <teamname>
 		else if(command.equals("/newteam")) {
@@ -162,7 +191,8 @@ public class WarListener extends PluginListener {
 		
 		// /setwarzone
 		else if(command.equals("/setwarzone")) {
-			if(split.length < 3 || (split.length == 3 && (!split[2].equals("southeast") && !split[2].equals("northwest")))) {
+			if(split.length < 3 || (split.length == 3 && (!split[2].equals("southeast") && !split[2].equals("northwest")
+															&& !split[2].equals("se") && !split[2].equals("nw")))) {
 				player.sendMessage(war.str("Usage: /setwarzone <warzone-name> <'southeast'/'northwest'>. " +
 						"Defines the battleground boundary. " +
 						"The warzone is reset at the start of every battle. " +
@@ -175,21 +205,21 @@ public class WarListener extends PluginListener {
 					// create the warzone
 					Warzone newZone = new Warzone(war.getServer(), split[1]);
 					war.addWarzone(newZone);
-					if(split[2].equals("northwest")) {
+					if(split[2].equals("northwest") || split[2].equals("nw")) {
 						newZone.setNorthwest(player.getLocation());
-						player.sendMessage(war.str("Warzone added. Northwesternmost point set."));
+						player.sendMessage(war.str("Warzone added. Northwesternmost point set at x=" + (int)newZone.getNorthwest().x + " z=" + (int)newZone.getNorthwest().z + "."));
 					} else {
 						newZone.setSoutheast(player.getLocation());
-						player.sendMessage(war.str("Warzone added. Southeasternmost point set."));
+						player.sendMessage(war.str("Warzone added. Southeasternmost point set at x=" + (int)newZone.getSoutheast().x + " z=" + (int)newZone.getSoutheast().z + "."));
 					}
 				} else {
 					String message = "";
-					if(split[2].equals("northwest")) {
+					if(split[2].equals("northwest") || split[2].equals("nw")) {
 						warzone.setNorthwest(player.getLocation());
-						message += "Northwesternmost point set." ;
+						message += "Northwesternmost point set at x=" + (int)warzone.getNorthwest().x + " z=" + (int)warzone.getNorthwest().z + ".";
 					} else {
 						warzone.setSoutheast(player.getLocation());
-						message += "Southeasternmost point set.";
+						message += "Southeasternmost point set at x=" + (int)warzone.getSoutheast().x + " z=" + (int)warzone.getSoutheast().z + ".";
 					}
 					
 					if(warzone.getNorthwest() == null) {
@@ -216,7 +246,7 @@ public class WarListener extends PluginListener {
 		}
 		
 
-		// /setwarzonestate
+		// /setwarzonestart
 		else if(command.equals("/setwarzonestart")) {
 			if(!war.inAnyWarzone(player.getLocation())) {
 				player.sendMessage(war.str("Usage: /setwarzonestart. Must be in warzone. " +
@@ -228,9 +258,9 @@ public class WarListener extends PluginListener {
 						"or /resetwarzone before changing start state). "));
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
-				warzone.saveState();
+				int savedBlocks = warzone.saveState();
 				warzone.setTeleport(player.getLocation());
-				player.sendMessage(war.str("Warzone initial state and teleport location changed."));
+				player.sendMessage(war.str("Warzone initial state and teleport location changed. Saved " + savedBlocks + " blocks."));
 			}
 			return true;
 		}
@@ -244,8 +274,9 @@ public class WarListener extends PluginListener {
 				for(Team team: warzone.getTeams()) {
 					team.teamcast(war.str("Resetting warzone..."));
 				}
-				warzone.resetState();
-				player.sendMessage(war.str("Warzone reset."));
+				int resetBlocks = warzone.resetState();
+				Location playerLoc = player.getLocation();
+				player.sendMessage(war.str("Warzone reset. " + resetBlocks + " blocks reset."));
 			}
 			return true;
 		}
@@ -281,21 +312,31 @@ public class WarListener extends PluginListener {
 
 	public boolean onHealthChange(Player player, int before, int after) {
 		
-		if(after < 0) {
+		if(after <= 0) {
 			Team team = war.getPlayerTeam(player.getName());
 			if(team != null){
 				// teleport to team spawn upon death
-				player.setHealth(20);
 				player.teleportTo(team.getTeamSpawn());
+				after = 20;
 				war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
-				return true;
 			}
 		}
 		return false;
 	}
 	
+	public void onPlayerMove(Player player, Location from, Location to) {
+		if(player != null && from != null && to != null && 
+				war.getPlayerTeam(player.getName()) != null && !war.warzone(from).contains(to)) {
+			player.sendMessage(war.str("Can't go outside the warzone boundary! Use /leave to exit the battle."));
+			player.teleportTo(from);
+		}
+    }
+	
 	private String getAllTeamsMsg(Player player){
 		String teamsMessage = "Teams: ";
+		if(war.warzone(player.getLocation()).getTeams().isEmpty()){
+			teamsMessage += "none.";
+		}
 		for(Team team : war.warzone(player.getLocation()).getTeams()) {
 			teamsMessage += team.getName() + " (";
 			for(Player member : team.getPlayers()) {
