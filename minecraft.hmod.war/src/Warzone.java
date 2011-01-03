@@ -117,6 +117,11 @@ public class Warzone {
 		return 0;
 	}
 	
+	/**
+	 * Goes back to the saved state of the warzone (resets only block types, not physics).
+	 * Also teleports all players back to their respective spawns.
+	 * @return
+	 */
 	public int resetState() {
 		if(ready() && initialState != null){
 			// reset blocks
@@ -154,11 +159,16 @@ public class Warzone {
 					player.setHealth(20);
 					player.teleportTo(team.getTeamSpawn());
 				}
+				team.setRemainingTickets(War.LIFEPOOL);
 			}
 			
 			return noOfResetBlocks;
 		}
 		return 0;
+	}
+
+	public void endRound() {
+		
 	}
 	
 }

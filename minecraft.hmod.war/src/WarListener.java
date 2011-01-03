@@ -113,7 +113,7 @@ public class WarListener extends PluginListener {
 		// /leave
 		else if(command.equals("/leave")) {
 			if(!war.inAnyWarzone(player.getLocation()) || war.getPlayerTeam(player.getName()) == null) {
-				player.sendMessage(war.str("Usage: /leave <message>. " +
+				player.sendMessage(war.str("Usage: /leave. " +
 						"Must be in a team already."));
 			} else {
 				Team playerTeam = war.getPlayerTeam(player.getName());
@@ -150,7 +150,7 @@ public class WarListener extends PluginListener {
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
 				for(Team team: warzone.getTeams()) {
-					team.teamcast(war.str("Resetting warzone."));
+					team.teamcast(war.str("The battle has ended. " + getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + "..."));
 				}
 				int resetBlocks = warzone.resetState();
 				player.sendMessage(war.str("Warzone reset. " + resetBlocks + " blocks reset."));
@@ -170,7 +170,7 @@ public class WarListener extends PluginListener {
 			} else {
 				String name = split[1];
 				war.warzone(player.getLocation()).getTeams().add(new Team(name, player.getLocation()));
-				player.sendMessage(war.str("Team created with spawn here."));
+				player.sendMessage(war.str("Team " + name + " created with spawn here."));
 			}
 			return true;
 		}
@@ -184,7 +184,7 @@ public class WarListener extends PluginListener {
 			} else {
 				Team playerTeam = war.getPlayerTeam(player.getName());
 				playerTeam.setTeamSpawn(player.getLocation());
-				player.sendMessage(war.str("Team spawn relocated."));
+				player.sendMessage(war.str("Team " + playerTeam + " spawn relocated."));
 			}
 			return true;
 		}
@@ -207,19 +207,19 @@ public class WarListener extends PluginListener {
 					war.addWarzone(newZone);
 					if(split[2].equals("northwest") || split[2].equals("nw")) {
 						newZone.setNorthwest(player.getLocation());
-						player.sendMessage(war.str("Warzone added. Northwesternmost point set at x=" + (int)newZone.getNorthwest().x + " z=" + (int)newZone.getNorthwest().z + "."));
+						player.sendMessage(war.str("Warzone " + newZone.getName() + " added. Northwesternmost point set at x=" + (int)newZone.getNorthwest().x + " z=" + (int)newZone.getNorthwest().z + "."));
 					} else {
 						newZone.setSoutheast(player.getLocation());
-						player.sendMessage(war.str("Warzone added. Southeasternmost point set at x=" + (int)newZone.getSoutheast().x + " z=" + (int)newZone.getSoutheast().z + "."));
+						player.sendMessage(war.str("Warzone " + newZone.getName() + " added. Southeasternmost point set at x=" + (int)newZone.getSoutheast().x + " z=" + (int)newZone.getSoutheast().z + "."));
 					}
 				} else {
 					String message = "";
 					if(split[2].equals("northwest") || split[2].equals("nw")) {
 						warzone.setNorthwest(player.getLocation());
-						message += "Northwesternmost point set at x=" + (int)warzone.getNorthwest().x + " z=" + (int)warzone.getNorthwest().z + ".";
+						message += "Northwesternmost point set at x=" + (int)warzone.getNorthwest().x + " z=" + (int)warzone.getNorthwest().z + " on warzone " + warzone.getName() + ".";
 					} else {
 						warzone.setSoutheast(player.getLocation());
-						message += "Southeasternmost point set at x=" + (int)warzone.getSoutheast().x + " z=" + (int)warzone.getSoutheast().z + ".";
+						message += "Southeasternmost point set at x=" + (int)warzone.getSoutheast().x + " z=" + (int)warzone.getSoutheast().z + " on warzone " + warzone.getName() + ".";
 					}
 					
 					if(warzone.getNorthwest() == null) {
@@ -230,12 +230,12 @@ public class WarListener extends PluginListener {
 					}
 					if(warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
 						if(warzone.ready()) {
-							message += " Warzone ready. Use /newteam while inside the warzone to create new teams. Make sure to use /setwarzonestart to " +
+							message += " Warzone " + warzone.getName() + " almost ready. Use /newteam while inside the warzone to create new teams. Make sure to use /setwarzonestart to " +
 									"set the warzone teleport point and initial state.";
 						} else if (warzone.tooSmall()) {
-							message += " Warzone is too small. Min north-south size: 20. Min east-west size: 20.";
+							message += " Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.";
 						} else if (warzone.tooBig()) {
-							message += " Warzone is too Big. Max north-south size: 1000. Max east-west size: 1000.";
+							message += " Warzone " + warzone.getName() + " is too Big. Max north-south size: 1000. Max east-west size: 1000.";
 						}
 					}
 					player.sendMessage(war.str(message));
@@ -260,7 +260,7 @@ public class WarListener extends PluginListener {
 				Warzone warzone = war.warzone(player.getLocation());
 				int savedBlocks = warzone.saveState();
 				warzone.setTeleport(player.getLocation());
-				player.sendMessage(war.str("Warzone initial state and teleport location changed. Saved " + savedBlocks + " blocks."));
+				player.sendMessage(war.str("Warzone " + warzone.getName() + " initial state and teleport location changed. Saved " + savedBlocks + " blocks."));
 			}
 			return true;
 		}
@@ -272,7 +272,7 @@ public class WarListener extends PluginListener {
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
 				for(Team team: warzone.getTeams()) {
-					team.teamcast(war.str("Resetting warzone..."));
+					team.teamcast(war.str("Resetting warzone " + warzone.getName() + "..."));
 				}
 				int resetBlocks = warzone.resetState();
 				Location playerLoc = player.getLocation();
@@ -287,8 +287,8 @@ public class WarListener extends PluginListener {
 	public boolean onDamage(PluginLoader.DamageType damageType, BaseEntity attacker, BaseEntity defender, int damageAmount) {
 		if(attacker != null && defender != null && attacker.isPlayer() && defender.isPlayer()) {
 			// only let adversaries (same warzone, different team) attack each other
-			Player a = (Player) attacker;
-			Player d = (Player) defender;
+			Player a = attacker.getPlayer();
+			Player d = defender.getPlayer();
 			Warzone attackerWarzone = war.warzone(a.getLocation());
 			Team attackerTeam = war.getPlayerTeam(a.getName());
 			Warzone defenderWarzone = war.warzone(d.getLocation());
@@ -299,10 +299,18 @@ public class WarListener extends PluginListener {
 				war.getLogger().log(Level.INFO, a.getName() + " hit " + d.getName() + " for " + damageAmount);
 				return false;	// adversaries!
 			} else {
-				a.sendMessage(war.str("Your attack was blocked!" +
-						" You must join a team " +
+				a.sendMessage(war.str("Your attack missed!"));
+				if(attackerTeam == null) {
+					a.sendMessage(war.str(" You must join a team " +
 						", then you'll be able to damage people " +
 						"in the other teams in that warzone."));
+				} else if (defenderTeam == null) {
+					a.sendMessage(war.str("Your target is not in a team."));
+				} else if (attackerTeam == defenderTeam) {
+					a.sendMessage(war.str("Your target is on your team."));
+				} else if (attackerWarzone != defenderWarzone) {
+					a.sendMessage(war.str("Your target is playing in another warzone."));
+				}
 				return true; // no pvp outside of the war battles, no friendly fire either
 			}
 		}
@@ -316,19 +324,53 @@ public class WarListener extends PluginListener {
 			Team team = war.getPlayerTeam(player.getName());
 			if(team != null){
 				// teleport to team spawn upon death
-				player.teleportTo(team.getTeamSpawn());
-				after = 20;
-				war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
+				Warzone zone = war.warzone(player.getLocation());
+				boolean roundOver = false;
+				synchronized(zone) {
+					int remaining = team.getRemainingTickets();
+					if(remaining == 0) { // your death caused your team to lose
+						player.sendMessage(war.str("You died and your team's life pool was empty!"));
+						List<Team> teams = zone.getTeams();
+						for(Team t : teams) {
+							t.teamcast(war.str(player.getName() + " died but team " + team.getName() + "'s lifepool was empty. The battle is over."));
+						}
+						zone.resetState();
+						roundOver = true;
+					} else {
+						team.setRemainingTickets(remaining - 1);
+					}
+				}
+				if(!roundOver) {
+					player.teleportTo(team.getTeamSpawn());
+					player.setHealth(20);
+					player.sendMessage(war.str("You died!"));
+					war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
+				} else {
+					war.getLogger().log(Level.INFO, player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");
+				}
+				
+				
+				
+				
+				return true;
 			}
 		}
 		return false;
 	}
 	
 	public void onPlayerMove(Player player, Location from, Location to) {
+		Warzone playerWarzone = war.getPlayerWarzone(player.getName());
+		Team playerTeam = war.getPlayerTeam(player.getName());
 		if(player != null && from != null && to != null && 
-				war.getPlayerTeam(player.getName()) != null && !war.warzone(from).contains(to)) {
+				playerTeam != null && !playerWarzone.contains(to)) {
 			player.sendMessage(war.str("Can't go outside the warzone boundary! Use /leave to exit the battle."));
-			player.teleportTo(from);
+			if(playerWarzone.contains(from)){
+				player.teleportTo(from);
+			} else {
+				// somehow the player made it out of the zone
+				player.teleportTo(playerTeam.getTeamSpawn());
+				player.sendMessage(war.str("Brought you back to your team spawn. Use /leave to exit the battle."));
+			}
 		}
     }
 	
@@ -338,7 +380,7 @@ public class WarListener extends PluginListener {
 			teamsMessage += "none.";
 		}
 		for(Team team : war.warzone(player.getLocation()).getTeams()) {
-			teamsMessage += team.getName() + " (";
+			teamsMessage += team.getName() + " (" + team.getRemainingTickets() + "/" + War.LIFEPOOL + " lives left. ";
 			for(Player member : team.getPlayers()) {
 				teamsMessage += member.getName() + " ";
 			}

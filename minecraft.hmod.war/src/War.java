@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 public class War extends Plugin {
 	
+	public static final int LIFEPOOL = 3;
 	private WarListener listener = new WarListener(this);
     private Logger log;
     String name = "War";
@@ -64,7 +65,16 @@ public class War extends Plugin {
 
 	public Team getPlayerTeam(String playerName) {
 		for(Warzone warzone : warzones) {
-			return warzone.getPlayerTeam(playerName);
+			Team team = warzone.getPlayerTeam(playerName);
+			if(team != null) return team;
+		}
+		return null;
+	}
+	
+	public Warzone getPlayerWarzone(String playerName) {
+		for(Warzone warzone : warzones) {
+			Team team = warzone.getPlayerTeam(playerName);
+			if(team != null) return warzone;
 		}
 		return null;
 	}

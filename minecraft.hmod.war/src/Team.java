@@ -5,6 +5,7 @@ public class Team {
 	private List<Player> players = new ArrayList<Player>();
 	private Location teamSpawn = null;
 	private String name;
+	private int remainingTickets;
 	
 	public Team(String name, Location teamSpawn) {
 		this.setName(name);
@@ -53,6 +54,14 @@ public class Team {
 			return true;
 		}
 		return false;
+	}
+
+	public void setRemainingTickets(int remainingTickets) {
+		this.remainingTickets = remainingTickets;
+	}
+
+	public int getRemainingTickets() {
+		return remainingTickets;
 	}
 
 }
