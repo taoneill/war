@@ -177,7 +177,7 @@ public class WarListener extends PluginListener {
 				warzone.getTeams().add(newTeam);
 				addSpawnArea(newTeam, player.getLocation(), 41);				
 				player.sendMessage(war.str("Team " + name + " created with spawn here."));
-				WarzoneMapper.save(warzone);
+				WarzoneMapper.save(warzone, false);
 			}
 			return true;
 		}
@@ -208,7 +208,7 @@ public class WarListener extends PluginListener {
 							"Must be in warzone and team must already exist."));
 				}
 				
-				WarzoneMapper.save(warzone);
+				WarzoneMapper.save(warzone, false);
 			}
 			return true;
 		}
@@ -269,7 +269,7 @@ public class WarListener extends PluginListener {
 					}
 					player.sendMessage(war.str(message));
 				}
-				WarzoneMapper.save(warzone);
+				WarzoneMapper.save(warzone, false);
 				
 			}
 			return true;
@@ -291,7 +291,7 @@ public class WarListener extends PluginListener {
 				int savedBlocks = warzone.saveState();
 				warzone.setTeleport(player.getLocation());
 				player.sendMessage(war.str("Warzone " + warzone.getName() + " initial state and teleport location changed. Saved " + savedBlocks + " blocks."));
-				WarzoneMapper.save(warzone);
+				WarzoneMapper.save(warzone, true);
 			}
 			return true;
 		}
@@ -305,7 +305,7 @@ public class WarListener extends PluginListener {
 				Monument monument = new Monument(split[1], war, player.getLocation());
 				warzone.getMonuments().add(monument);
 				player.sendMessage(war.str("Monument " + monument.getName() + " created."));
-				WarzoneMapper.save(warzone);
+				WarzoneMapper.save(warzone, false);
 			}
 			return true;
 		}
@@ -386,6 +386,19 @@ public class WarListener extends PluginListener {
 					&& attackerWarzone == defenderWarzone) {
 				war.getLogger().log(Level.INFO, a.getName() + " hit " + d.getName() + " for " + damageAmount);
 				return false;	// adversaries!
+			} else if (attackerTeam != null && defenderTeam != null 
+					&& attackerTeam == defenderTeam 			
+					&& attackerWarzone == defenderWarzone) {
+				// same team
+				if(attackerWarzone.getFriendlyFire()) {
+					a.sendMessage(war.str("Friendly fire!"));
+					return false;	// if ff is on, let the attack go through
+				} else {
+					return true;	// ff is off
+				}
+			} else if (attackerTeam == null && defenderTeam == null){
+				// normal PVP
+				return false;
 			} else {
 				a.sendMessage(war.str("Your attack missed!"));
 				if(attackerTeam == null) {
@@ -419,9 +432,9 @@ public class WarListener extends PluginListener {
 					if(remaining == 0) { // your death caused your team to lose
 						List<Team> teams = zone.getTeams();
 						for(Team t : teams) {
-							t.teamcast(war.str(player.getName() + " died but team " + team.getName() + "'s life pool was empty. "));
-							t.teamcast(war.str("The battle is over. Team " + team.getName() + " lost. "));
-							t.teamcast(war.str("A new battle begins. Team life pools are being reset..."));
+							t.teamcast(war.str("The battle is over. Team " + team.getName() + " lost: " 
+									+ player.getName() + " hit the bottom of their life pool." ));
+							t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
 							if(!t.getName().equals(team.getName())) {
 								// all other teams get a point
 								t.addPoint();
@@ -437,20 +450,18 @@ public class WarListener extends PluginListener {
 					zone.respawnPlayer(team, player);
 					player.sendMessage(war.str("You died!"));
 					List<Team> teams = zone.getTeams();
-					for(Team t : teams) {
-						t.teamcast(war.str(player.getName() + " died. Team " + team.getName() + " has " + team.getRemainingTickets() + "/" + War.LIFEPOOL + " lives left."));
-						if(team.getRemainingTickets() == 0) {
-							t.teamcast(war.str("Team " + team.getName() + "'s life pool is empty. One more death and they will lose!"));
-						}
-					}
+					
+//					for(Team t : teams) {
+//						//t.teamcast(war.str(player.getName() + " died. Team " + team.getName() + " has " + team.getRemainingTickets() + "/" + War.LIFEPOOL + " lives left."));
+//						if(team.getRemainingTickets() == 0) {
+//							t.teamcast(war.str("Team " + team.getName() + "'s life pool is empty. One more death and they will lose!"));
+//						}
+//					}
 					war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
 				} else {
 					war.getLogger().log(Level.INFO, player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");
 				}
-				
-				
-				
-				
+
 				//return true;
 			}
 		}
@@ -472,12 +483,30 @@ public class WarListener extends PluginListener {
 			}
 		}
 		
+		if(player != null && from != null && to != null && 
+				playerTeam == null 
+				&& war.inAnyWarzone(from) 
+				&& !war.inAnyWarzone(to)) {
+			// leaving
+			Warzone zone = war.warzone(from);
+			player.sendMessage(war.str("Leaving warzone " + zone.getName() + "."));
+		}
+		
+		if(player != null && from != null && to != null && 
+				playerTeam == null 
+				&& !war.inAnyWarzone(from) 
+				&& war.inAnyWarzone(to)) {
+			// entering
+			Warzone zone = war.warzone(to);
+			player.sendMessage(war.str("Entering warzone " + zone.getName() + ". Tip: use /teams."));
+		}
+		
 		if(to != null && playerTeam != null
 				&& playerWarzone.nearAnyOwnedMonument(to, playerTeam) 
-				&& player.getHealth() < 30
+				&& player.getHealth() < 20
 				&& random.nextInt(42) == 3 ) {	// one chance out of many of getting healed
-			player.setHealth(30);
-			player.sendMessage(war.str("Your dance has awakened the monument's voodoo. You were granted full health!"));
+			player.setHealth(20);
+			player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
 		}
 		
     }

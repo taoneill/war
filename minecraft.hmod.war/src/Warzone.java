@@ -144,7 +144,7 @@ public class Warzone {
 		if(ready()){
 			int northSouth = ((int)(southeast.x)) - ((int)(northwest.x));
 			int eastWest = ((int)(northwest.z)) - ((int)(southeast.z));
-			initialState = new int[northSouth][128][eastWest];
+			setInitialState(new int[northSouth][128][eastWest]);
 			int noOfSavedBlocks = 0;
 			int x = (int)northwest.x;
 			int minY = 0;
@@ -154,7 +154,7 @@ public class Warzone {
 				for(int j = 0; j < maxY - minY; j++) {
 					int z = (int)southeast.z;
 					for(int k = 0; k < eastWest; k++) {
-						initialState[i][j][k] = server.getBlockIdAt(x, y, z);
+						getInitialState()[i][j][k] = server.getBlockIdAt(x, y, z);
 						noOfSavedBlocks++;
 						z++;
 					}
@@ -173,7 +173,7 @@ public class Warzone {
 	 * @return
 	 */
 	public int resetState() {
-		if(ready() && initialState != null){
+		if(ready() && getInitialState() != null){
 			// reset blocks
 			int northSouth = ((int)(southeast.x)) - ((int)(northwest.x));
 			int eastWest = ((int)(northwest.z)) - ((int)(southeast.z));
@@ -188,7 +188,7 @@ public class Warzone {
 					int z = (int)southeast.z;
 					for(int k = 0; k < eastWest; k++) {
 						int currentType = server.getBlockIdAt(x, y, z);
-						int initialType = initialState[i][j][k];
+						int initialType = getInitialState()[i][j][k];
 						if(currentType != initialType) {
 							if(server.setBlockAt(initialType,x, y, z)) {
 								noOfResetBlocks++;
@@ -301,6 +301,14 @@ public class Warzone {
 
 	public void setFriendlyFire(boolean ffOn) {
 		this.friendlyFire = ffOn;
+	}
+
+	public void setInitialState(int[][][] initialState) {
+		this.initialState = initialState;
+	}
+
+	public int[][][] getInitialState() {
+		return initialState;
 	}
 
 	

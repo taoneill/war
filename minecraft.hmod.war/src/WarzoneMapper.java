@@ -10,7 +10,7 @@ public class WarzoneMapper {
 		
 		// Create file if needed 
 		if(!warzoneConfig.containsKey("name")) {
-			WarzoneMapper.save(warzone);
+			WarzoneMapper.save(warzone, false);
 			war.getLogger().info("Warzone " + name + " config file created.");
 		}
 				
@@ -93,11 +93,36 @@ public class WarzoneMapper {
 			}
 		}
 		
+		// zone blocks 
+		PropertiesFile warzoneBlocksFile = new PropertiesFile("warzone-" + warzone.getName() + ".dat");
+		int northSouth = ((int)(warzone.getSoutheast().x)) - ((int)(warzone.getNorthwest().x));
+		int eastWest = ((int)(warzone.getNorthwest().z)) - ((int)(warzone.getSoutheast().z));
+		int minY = 0;
+		int maxY = 128;
+		int[][][] state = new int[northSouth][128][eastWest];
+		String stateStr = warzoneBlocksFile.getString("zoneBlocks");
+		String[] stateStrSplit = stateStr.split(",");
+		int splitIndex = 0;
+		if(stateStrSplit.length > 1) {
+			for(int i = 0; i < northSouth; i++){
+				for(int j = 0; j < maxY - minY; j++) {
+					for(int k = 0; k < eastWest; k++) {
+						String currentBlockType = stateStrSplit[splitIndex];
+						if(currentBlockType != null && !currentBlockType.equals("")) {
+							state[i][j][k] = Integer.parseInt(currentBlockType);
+						}
+						splitIndex++;
+					}
+				}
+			}
+		}
+		warzoneBlocksFile.setString("zoneBlocks", stateStr);
+		
 		return warzone;
 		
 	}
 	
-	public static void save(Warzone warzone) {
+	public static void save(Warzone warzone, boolean saveBlocks) {
 		PropertiesFile warzoneConfig = new PropertiesFile("warzone-" + warzone.getName() + ".txt");
 		
 		// name
@@ -158,8 +183,31 @@ public class WarzoneMapper {
 			monumentsStr += monument.getName() + "," + (int)monumentLoc.x + "," + (int)monumentLoc.y + "," + (int)monumentLoc.z + ";";
 		}
 		warzoneConfig.setString("monuments", monumentsStr);
-		
 		warzoneConfig.save();
+		
+		if(saveBlocks) {
+			// zone blocks
+			PropertiesFile warzoneBlocksFile = new PropertiesFile("warzone-" + warzone.getName() + ".dat");
+			int northSouth = ((int)(warzone.getSoutheast().x)) - ((int)(warzone.getNorthwest().x));
+			int eastWest = ((int)(warzone.getNorthwest().z)) - ((int)(warzone.getSoutheast().z));
+			int x = (int)warzone.getNorthwest().x;
+			int minY = 0;
+			int maxY = 128;
+			int[][][] state = warzone.getInitialState();
+			StringBuilder stateBuilder = new StringBuilder();
+			if(state.length > 1) {
+				for(int i = 0; i < northSouth; i++){
+					for(int j = 0; j < maxY - minY; j++) {
+						for(int k = 0; k < eastWest; k++) {
+							stateBuilder.append(state[i][j][k] + ",");
+						}
+					}
+				}
+			}
+			warzoneBlocksFile.setString("zoneBlocks", stateBuilder.toString());
+			warzoneBlocksFile.save();
+		}
+		
 	}
 	
 	public static void delete(String name) {
