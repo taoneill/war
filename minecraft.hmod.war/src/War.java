@@ -2,14 +2,13 @@
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 
 public class War extends Plugin {
 	
-	public static final int LIFEPOOL = 3;
+	public static final int LIFEPOOL = 5;
 	private WarListener listener = new WarListener(this);
     private Logger log;
     String name = "War";
