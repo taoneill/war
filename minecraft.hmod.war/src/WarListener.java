@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 
 
@@ -6,9 +7,11 @@ import java.util.logging.Level;
 public class WarListener extends PluginListener {
 
 	private final War war;
+	private Random random = null;
 
 	public WarListener(War war) {
 		this.war = war;
+		random = new Random(war.getServer().getTime());
 	}
 	
 	public void onLogin(Player player) {    
@@ -95,7 +98,8 @@ public class WarListener extends PluginListener {
 				for(Team team : teams) {
 					if(team.getName().equals(name)) {
 						team.addPlayer(player);
-						player.teleportTo(team.getTeamSpawn());
+						Warzone zone = war.warzone(player.getLocation());
+						zone.respawnPlayer(team, player);
 						foundTeam = true;
 					}
 				}
@@ -169,7 +173,9 @@ public class WarListener extends PluginListener {
 						"Must be in a warzone (try /warzones and /warzone). "));
 			} else {
 				String name = split[1];
-				war.warzone(player.getLocation()).getTeams().add(new Team(name, player.getLocation()));
+				Team newTeam = new Team(name, player.getLocation());
+				war.warzone(player.getLocation()).getTeams().add(newTeam);
+				addSpawnArea(newTeam, player.getLocation(), 41);				
 				player.sendMessage(war.str("Team " + name + " created with spawn here."));
 			}
 			return true;
@@ -177,14 +183,28 @@ public class WarListener extends PluginListener {
 				
 		// /setteamspawn 
 		else if(command.equals("/setteamspawn")) {
-			if(split.length < 2 || war.getPlayerTeam(player.getName()) == null) {
+			if(split.length < 2 || !war.inAnyWarzone(player.getLocation())) {
 				player.sendMessage(war.str("Usage: /setteamspawn <team-name>. " +
 						"Sets the team spawn. " +
 						"Must be in warzone and team must already exist."));
 			} else {
-				Team playerTeam = war.getPlayerTeam(player.getName());
-				playerTeam.setTeamSpawn(player.getLocation());
-				player.sendMessage(war.str("Team " + playerTeam + " spawn relocated."));
+				List<Team> teams = war.warzone(player.getLocation()).getTeams();
+				Team team = null;
+				for(Team t : teams) {
+					if(t.getName().equals(split[1])) {
+						team = t;
+					}
+				}
+				if(team != null) {
+					removeSpawnArea(team);
+					addSpawnArea(team, player.getLocation(), 41);
+					team.setTeamSpawn(player.getLocation());
+					player.sendMessage(war.str("Team " + team.getName() + " spawn relocated."));
+				} else {
+					player.sendMessage(war.str("Usage: /setteamspawn <team-name>. " +
+							"Sets the team spawn. " +
+							"Must be in warzone and team must already exist."));
+				}
 			}
 			return true;
 		}
@@ -281,9 +301,81 @@ public class WarListener extends PluginListener {
 			return true;
 		}
 		
+		// /monument
+		else if(command.equals("/monument")) {
+			if(!war.inAnyWarzone(player.getLocation())) {
+				player.sendMessage(war.str("Usage: /monument <name>. Must be in warzone."));
+			} else {
+				Warzone warzone = war.warzone(player.getLocation());
+				Monument monument = new Monument(split[1], war, player.getLocation());
+				warzone.getMomuments().add(monument);
+				player.sendMessage(war.str("Monument " + monument.getName() + " created."));
+			}
+			return true;
+		}
+		
         return false;
     }
 	
+	private void removeSpawnArea(Team team) {
+		// Reset spawn to what it was before the gold blocks
+		int[] spawnState = team.getOldSpawnState();
+		int x = (int)team.getTeamSpawn().x;
+		int y = (int)team.getTeamSpawn().y;
+		int z = (int)team.getTeamSpawn().z;
+		war.getServer().setBlockAt(spawnState[0], x+1, y-1, z+1);
+		war.getServer().setBlockAt(spawnState[1], x+1, y-1, z);
+		war.getServer().setBlockAt(spawnState[2], x+1, y-1, z-1);
+		war.getServer().setBlockAt(spawnState[3], x, y-1, z+1);
+		war.getServer().setBlockAt(spawnState[4], x, y-1, z);
+		war.getServer().setBlockAt(spawnState[5], x, y-1, z-1);
+		war.getServer().setBlockAt(spawnState[6], x-1, y-1, z+1);
+		war.getServer().setBlockAt(spawnState[7], x-1, y-1, z);
+		war.getServer().setBlockAt(spawnState[8], x-1, y-1, z-1);
+		war.getServer().setBlockAt(spawnState[9], x, y, z);
+		
+	}
+
+	private void addSpawnArea(Team team, Location location, int blockType) {
+		// Save the spawn state (i.e. the nine block under the player spawn)
+		int[] spawnState = new int[10];
+		int x = (int)location.x;
+		int y = (int)location.y;
+		int z = (int)location.z;
+		spawnState[0] = war.getServer().getBlockIdAt(x+1, y-1, z+1);
+		spawnState[1] = war.getServer().getBlockIdAt(x+1, y-1, z);
+		spawnState[2] = war.getServer().getBlockIdAt(x+1, y-1, z-1);
+		spawnState[3] = war.getServer().getBlockIdAt(x, y-1, z+1);
+		spawnState[4] = war.getServer().getBlockIdAt(x, y-1, z);
+		spawnState[5] = war.getServer().getBlockIdAt(x, y-1, z-1);
+		spawnState[6] = war.getServer().getBlockIdAt(x-1, y-1, z+1);
+		spawnState[7] = war.getServer().getBlockIdAt(x-1, y-1, z);
+		spawnState[8] = war.getServer().getBlockIdAt(x-1, y-1, z-1);
+		spawnState[9] = war.getServer().getBlockIdAt(x, y, z);
+		team.setTeamSpawn(location);
+		team.setOldSpawnState(spawnState);
+		// Set the spawn as gold blocks
+		war.getServer().setBlockAt(blockType, x+1, y-1, z+1);
+		war.getServer().setBlockAt(blockType, x+1, y-1, z);
+		war.getServer().setBlockAt(blockType, x+1, y-1, z-1);
+		war.getServer().setBlockAt(blockType, x, y-1, z+1);
+		war.getServer().setBlockAt(blockType, x, y-1, z);
+		war.getServer().setBlockAt(blockType, x, y-1, z-1);
+		war.getServer().setBlockAt(blockType, x-1, y-1, z+1);
+		war.getServer().setBlockAt(blockType, x-1, y-1, z);
+		war.getServer().setBlockAt(blockType, x-1, y-1, z-1);
+		
+		Block block = new Block(63, x, y, z, 8);
+		war.getServer().setBlock(block);
+		block = war.getServer().getBlockAt(x, y, z);
+		ComplexBlock complexBlock = war.getServer().getComplexBlock(x, y, z);
+		Sign sign = (Sign)complexBlock;
+		sign.setText(0, "Team");
+		sign.setText(1, team.getName());
+		sign.setText(2, "spawn");
+		sign.update();
+	}
+
 	public boolean onDamage(PluginLoader.DamageType damageType, BaseEntity attacker, BaseEntity defender, int damageAmount) {
 		if(attacker != null && defender != null && attacker.isPlayer() && defender.isPlayer()) {
 			// only let adversaries (same warzone, different team) attack each other
@@ -329,10 +421,15 @@ public class WarListener extends PluginListener {
 				synchronized(zone) {
 					int remaining = team.getRemainingTickets();
 					if(remaining == 0) { // your death caused your team to lose
-						player.sendMessage(war.str("You died and your team's life pool was empty!"));
 						List<Team> teams = zone.getTeams();
 						for(Team t : teams) {
-							t.teamcast(war.str(player.getName() + " died but team " + team.getName() + "'s lifepool was empty. The battle is over."));
+							t.teamcast(war.str(player.getName() + " died but team " + team.getName() + "'s life pool was empty. "));
+							t.teamcast(war.str("The battle is over. Team " + team.getName() + " lost. "));
+							t.teamcast(war.str("A new battle begins. Team life pools are being reset..."));
+							if(!t.getName().equals(team.getName())) {
+								// all other teams get a point
+								t.addPoint();
+							}
 						}
 						zone.resetState();
 						roundOver = true;
@@ -341,9 +438,15 @@ public class WarListener extends PluginListener {
 					}
 				}
 				if(!roundOver) {
-					player.teleportTo(team.getTeamSpawn());
-					player.setHealth(20);
+					zone.respawnPlayer(team, player);
 					player.sendMessage(war.str("You died!"));
+					List<Team> teams = zone.getTeams();
+					for(Team t : teams) {
+						t.teamcast(war.str(player.getName() + " died. Team " + team.getName() + " has " + team.getRemainingTickets() + "/" + War.LIFEPOOL + " lives left."));
+						if(team.getRemainingTickets() == 0) {
+							t.teamcast(war.str("Team " + team.getName() + "'s life pool is empty. One more death and they will lose!"));
+						}
+					}
 					war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
 				} else {
 					war.getLogger().log(Level.INFO, player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");
@@ -352,7 +455,7 @@ public class WarListener extends PluginListener {
 				
 				
 				
-				return true;
+				//return true;
 			}
 		}
 		return false;
@@ -372,15 +475,23 @@ public class WarListener extends PluginListener {
 				player.sendMessage(war.str("Brought you back to your team spawn. Use /leave to exit the battle."));
 			}
 		}
+		
+		if(to != null && playerTeam != null
+				&& playerWarzone.nearAnyOwnedMonument(to, playerTeam) 
+				&& random.nextInt(42) == 3 ) {	// one chance out of many of getting healed
+			player.setHealth(30);
+			player.sendMessage(war.str("Your dance has awakened the monument's voodoo. You were granted full health!"));
+		}
+		
     }
-	
+
 	private String getAllTeamsMsg(Player player){
 		String teamsMessage = "Teams: ";
 		if(war.warzone(player.getLocation()).getTeams().isEmpty()){
 			teamsMessage += "none.";
 		}
 		for(Team team : war.warzone(player.getLocation()).getTeams()) {
-			teamsMessage += team.getName() + " (" + team.getRemainingTickets() + "/" + War.LIFEPOOL + " lives left. ";
+			teamsMessage += team.getName() + " (" + team.getPoints() + " points, "+ team.getRemainingTickets() + "/" + War.LIFEPOOL + " lives left. ";
 			for(Player member : team.getPlayers()) {
 				teamsMessage += member.getName() + " ";
 			}
@@ -388,4 +499,60 @@ public class WarListener extends PluginListener {
 		}
 		return teamsMessage;
 	}
+	
+	public void onDisconnect(Player player) {
+		Team team = war.getPlayerTeam(player.getName());
+		if(team != null) {
+			team.removePlayer(player.getName());
+		}
+	}
+	
+	public boolean onIgnite(Block block, Player player) {
+		if(player != null) {
+			Team team = war.getPlayerTeam(player.getName()); 
+			Warzone zone = war.getPlayerWarzone(player.getName());
+			if(team != null && block != null && zone != null && zone.isMonumentFirestone(block)) {
+				Monument monument = zone.getMonumentForFirestone(block);
+				if(!monument.hasOwner()) {
+					monument.ignite(team);
+					List<Team> teams = zone.getTeams();
+					for(Team t : teams) {
+						t.teamcast(war.str("Monument " + monument.getName() + " has been ignited by team " + team.getName() + "."));
+					}
+				} else {
+					player.sendMessage(war.str("Monument must be smothered first."));
+				}
+			}
+		}
+        return false;
+    }
+	
+	public boolean onFlow(Block blockFrom, Block blockTo) {
+		Block block = null;
+		if(blockTo != null) {
+			block = blockTo;
+		} else if (blockFrom != null) {
+			block = blockFrom;
+		}
+		
+		if(block != null) {
+			Warzone zone = war.warzone(new Location(block.getX(), block.getY(), block.getZ()));
+			if(zone != null && 
+					((blockTo != null && zone.isMonumentFirestone(blockTo)
+						|| (blockFrom != null && zone.isMonumentFirestone(blockFrom))))) {
+				Monument monument = null;
+				if(blockTo != null) monument = zone.getMonumentForFirestone(blockTo);
+				if(monument == null && blockFrom != null) monument = zone.getMonumentForFirestone(blockFrom);
+				if(monument.hasOwner()) {
+					monument.setOwnerTeam(null);
+					List<Team> teams = zone.getTeams();
+					for(Team team : teams) {
+						team.teamcast(war.str("Monument " + monument.getName() + " has been smothered."));
+					}
+				}
+			}
+		}
+		
+        return false;
+    }
 }

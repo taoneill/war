@@ -43,6 +43,19 @@ public class War extends Plugin {
 				listener,
 				this,
 				PluginListener.Priority.MEDIUM);
+		etc.getLoader().addListener( PluginLoader.Hook.DISCONNECT,  
+				listener,
+				this,
+				PluginListener.Priority.MEDIUM);
+		etc.getLoader().addListener( PluginLoader.Hook.IGNITE,  
+				listener,
+				this,
+				PluginListener.Priority.MEDIUM);
+		etc.getLoader().addListener( PluginLoader.Hook.FLOW,  
+				listener,
+				this,
+				PluginListener.Priority.MEDIUM);
+		
 		
 //        etc.getLoader().addListener(
 //                PluginLoader.Hook.BLOCK_CREATED,

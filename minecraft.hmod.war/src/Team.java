@@ -6,10 +6,13 @@ public class Team {
 	private Location teamSpawn = null;
 	private String name;
 	private int remainingTickets;
+	private int[] oldSpawnState = new int[10];
+	private int points = 0;
 	
 	public Team(String name, Location teamSpawn) {
 		this.setName(name);
 		this.teamSpawn = teamSpawn;
+		this.remainingTickets = War.LIFEPOOL;
 	}
 	
 	public void setTeamSpawn(Location teamSpawn) {
@@ -62,6 +65,22 @@ public class Team {
 
 	public int getRemainingTickets() {
 		return remainingTickets;
+	}
+
+	public int[] getOldSpawnState() {
+		return oldSpawnState;
+	}
+
+	public void setOldSpawnState(int[] oldSpawnState) {
+		this.oldSpawnState = oldSpawnState;
+	}
+	
+	public void addPoint() {
+		points++;
+	}
+
+	public int getPoints() {
+		return points;
 	}
 
 }
