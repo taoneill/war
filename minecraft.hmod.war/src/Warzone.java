@@ -10,11 +10,19 @@ public class Warzone {
 	private final Server server;
 	
 	private int[][][] initialState = null;
-	private Location teleport; 
+	private Location teleport;
+	private boolean friendlyFire;
+	private War war;
+	private int lifePool;
+	private List<Item> loadout; 
 	
-	public Warzone(Server server, String name) {
-		this.server = server;
+	public Warzone(War war, String name) {
+		this.war = war;
+		this.server = war.getServer();
 		this.name = name;
+		this.friendlyFire = war.getDefaultFriendlyFire();
+		this.setLifePool(war.getDefaultLifepool());
+		this.setLoadout(war.getDefaultLoadout());
 	}
 	
 	public boolean ready() {
@@ -224,16 +232,9 @@ public class Warzone {
 		Inventory playerInv = player.getInventory();
 		playerInv.clearContents();
 		playerInv.update();
-		playerInv.setSlot(new Item(Item.Type.StoneSword), 0);
-		playerInv.setSlot(new Item(Item.Type.Bow), 1);
-		playerInv.setSlot(new Item(Item.Type.Arrow, 12), 2);
-		playerInv.setSlot(new Item(Item.Type.StonePickaxe), 3);
-		playerInv.setSlot(new Item(Item.Type.StoneSpade), 4);
-		playerInv.addItem(new Item(Item.Type.Bread, 3));
-		playerInv.setSlot(new Item(Item.Type.LeatherBoots), 100);
-		playerInv.setSlot(new Item(Item.Type.LeatherLeggings), 101);
-		playerInv.setSlot(new Item(Item.Type.LeatherChestplate), 102);
-		playerInv.setSlot(new Item(Item.Type.LeatherHelmet), 103);
+		for(Item loadoutItem : loadout) {
+			playerInv.addItem(loadoutItem);
+		}
 		playerInv.update();
 		player.setHealth(30);
 		player.setFireTicks(0);
@@ -273,8 +274,33 @@ public class Warzone {
 		return false;
 	}
 
-	public List<Monument> getMomuments() {
+	public List<Monument> getMonuments() {
 		return monuments;
+	}
+
+	public boolean getFriendlyFire() {
+		// TODO Auto-generated method stub
+		return this.friendlyFire;
+	}
+
+	public void setLoadout(List<Item> loadout) {
+		this.loadout = loadout;
+	}
+
+	public List<Item> getLoadout() {
+		return loadout;
+	}
+
+	public void setLifePool(int lifePool) {
+		this.lifePool = lifePool;
+	}
+
+	public int getLifePool() {
+		return lifePool;
+	}
+
+	public void setFriendlyFire(boolean ffOn) {
+		this.friendlyFire = ffOn;
 	}
 
 	

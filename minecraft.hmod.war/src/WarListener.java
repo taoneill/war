@@ -162,7 +162,6 @@ public class WarListener extends PluginListener {
 			return true;
 		}
 		
-		
 		// Warzone maker commands: /setwarzone, /setwarzonestart, /resetwarzone, /newteam, /setteamspawn, .. /setmonument?
 		
 		// /newteam <teamname>
@@ -174,9 +173,11 @@ public class WarListener extends PluginListener {
 			} else {
 				String name = split[1];
 				Team newTeam = new Team(name, player.getLocation());
-				war.warzone(player.getLocation()).getTeams().add(newTeam);
+				Warzone warzone = war.warzone(player.getLocation());
+				warzone.getTeams().add(newTeam);
 				addSpawnArea(newTeam, player.getLocation(), 41);				
 				player.sendMessage(war.str("Team " + name + " created with spawn here."));
+				WarzoneMapper.save(warzone);
 			}
 			return true;
 		}
@@ -188,7 +189,8 @@ public class WarListener extends PluginListener {
 						"Sets the team spawn. " +
 						"Must be in warzone and team must already exist."));
 			} else {
-				List<Team> teams = war.warzone(player.getLocation()).getTeams();
+				Warzone warzone = war.warzone(player.getLocation());
+				List<Team> teams = warzone.getTeams();
 				Team team = null;
 				for(Team t : teams) {
 					if(t.getName().equals(split[1])) {
@@ -205,6 +207,8 @@ public class WarListener extends PluginListener {
 							"Sets the team spawn. " +
 							"Must be in warzone and team must already exist."));
 				}
+				
+				WarzoneMapper.save(warzone);
 			}
 			return true;
 		}
@@ -223,23 +227,28 @@ public class WarListener extends PluginListener {
 				Warzone warzone = war.findWarzone(split[1]);
 				if(warzone == null) {
 					// create the warzone
-					Warzone newZone = new Warzone(war.getServer(), split[1]);
-					war.addWarzone(newZone);
+					warzone = new Warzone(war, split[1]);
+					war.addWarzone(warzone);
+					WarMapper.save(war);
 					if(split[2].equals("northwest") || split[2].equals("nw")) {
-						newZone.setNorthwest(player.getLocation());
-						player.sendMessage(war.str("Warzone " + newZone.getName() + " added. Northwesternmost point set at x=" + (int)newZone.getNorthwest().x + " z=" + (int)newZone.getNorthwest().z + "."));
+						warzone.setNorthwest(player.getLocation());
+						player.sendMessage(war.str("Warzone " + warzone.getName() + " added. Northwesternmost point set at x=" 
+								+ (int)warzone.getNorthwest().x + " z=" + (int)warzone.getNorthwest().z + "."));
 					} else {
-						newZone.setSoutheast(player.getLocation());
-						player.sendMessage(war.str("Warzone " + newZone.getName() + " added. Southeasternmost point set at x=" + (int)newZone.getSoutheast().x + " z=" + (int)newZone.getSoutheast().z + "."));
+						warzone.setSoutheast(player.getLocation());
+						player.sendMessage(war.str("Warzone " + warzone.getName() + " added. Southeasternmost point set at x=" 
+								+ (int)warzone.getSoutheast().x + " z=" + (int)warzone.getSoutheast().z + "."));
 					}
 				} else {
 					String message = "";
 					if(split[2].equals("northwest") || split[2].equals("nw")) {
 						warzone.setNorthwest(player.getLocation());
-						message += "Northwesternmost point set at x=" + (int)warzone.getNorthwest().x + " z=" + (int)warzone.getNorthwest().z + " on warzone " + warzone.getName() + ".";
+						message += "Northwesternmost point set at x=" + (int)warzone.getNorthwest().x 
+										+ " z=" + (int)warzone.getNorthwest().z + " on warzone " + warzone.getName() + ".";
 					} else {
 						warzone.setSoutheast(player.getLocation());
-						message += "Southeasternmost point set at x=" + (int)warzone.getSoutheast().x + " z=" + (int)warzone.getSoutheast().z + " on warzone " + warzone.getName() + ".";
+						message += "Southeasternmost point set at x=" + (int)warzone.getSoutheast().x 
+										+ " z=" + (int)warzone.getSoutheast().z + " on warzone " + warzone.getName() + ".";
 					}
 					
 					if(warzone.getNorthwest() == null) {
@@ -260,16 +269,17 @@ public class WarListener extends PluginListener {
 					}
 					player.sendMessage(war.str(message));
 				}
+				WarzoneMapper.save(warzone);
 				
 			}
 			return true;
 		}
 		
 
-		// /setwarzonestart
-		else if(command.equals("/setwarzonestart")) {
+		// /savewarzone
+		else if(command.equals("/savewarzone")) {
 			if(!war.inAnyWarzone(player.getLocation())) {
-				player.sendMessage(war.str("Usage: /setwarzonestart. Must be in warzone. " +
+				player.sendMessage(war.str("Usage: /savewarzone. Must be in warzone. " +
 						"Changes the warzone state at the beginning of every battle. " +
 						"Also sets the teleport point for this warzone " +
 						"(i.e. make sure to use /warzone or the warzone tp point will change). " +
@@ -281,22 +291,7 @@ public class WarListener extends PluginListener {
 				int savedBlocks = warzone.saveState();
 				warzone.setTeleport(player.getLocation());
 				player.sendMessage(war.str("Warzone " + warzone.getName() + " initial state and teleport location changed. Saved " + savedBlocks + " blocks."));
-			}
-			return true;
-		}
-		
-		// /resetwarzone
-		else if(command.equals("/resetwarzone")) {
-			if(!war.inAnyWarzone(player.getLocation())) {
-				player.sendMessage(war.str("Usage: /resetwarzone. Must be in warzone."));
-			} else {
-				Warzone warzone = war.warzone(player.getLocation());
-				for(Team team: warzone.getTeams()) {
-					team.teamcast(war.str("Resetting warzone " + warzone.getName() + "..."));
-				}
-				int resetBlocks = warzone.resetState();
-				Location playerLoc = player.getLocation();
-				player.sendMessage(war.str("Warzone reset. " + resetBlocks + " blocks reset."));
+				WarzoneMapper.save(warzone);
 			}
 			return true;
 		}
@@ -308,8 +303,9 @@ public class WarListener extends PluginListener {
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
 				Monument monument = new Monument(split[1], war, player.getLocation());
-				warzone.getMomuments().add(monument);
+				warzone.getMonuments().add(monument);
 				player.sendMessage(war.str("Monument " + monument.getName() + " created."));
+				WarzoneMapper.save(warzone);
 			}
 			return true;
 		}
@@ -478,6 +474,7 @@ public class WarListener extends PluginListener {
 		
 		if(to != null && playerTeam != null
 				&& playerWarzone.nearAnyOwnedMonument(to, playerTeam) 
+				&& player.getHealth() < 30
 				&& random.nextInt(42) == 3 ) {	// one chance out of many of getting healed
 			player.setHealth(30);
 			player.sendMessage(war.str("Your dance has awakened the monument's voodoo. You were granted full health!"));

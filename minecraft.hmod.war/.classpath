@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="C:/dev/war/minecraft.hmod.war/lib/Minecraft_Mod133.jar" sourcepath="/hmod"/>
+	<classpathentry kind="lib" path="C:/dev/war/minecraft.hmod.war/lib/Minecraft_Mod133.jar" sourcepath="/hmod133"/>
 	<classpathentry kind="lib" path="C:/dev/war/minecraft.hmod.war/lib/minecraft_server-beta1.1_02.jar"/>
 	<classpathentry kind="lib" path="C:/dev/war/minecraft.hmod.war/lib/mysql-connector-java-bin133.jar"/>
 	<classpathentry kind="output" path="bin"/>

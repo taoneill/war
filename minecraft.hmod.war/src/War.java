@@ -1,5 +1,6 @@
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -14,12 +15,16 @@ public class War extends Plugin {
     String name = "War";
     String version = "0.1";
     
-    
     private final List<Warzone> warzones = new ArrayList<Warzone>();
+    private final List<Item> defaultLoadout = new ArrayList<Item>();
+    private int defaultLifepool = 7;
+    private boolean defaultFriendlyFire = false;    
 
 	public void initialize() {
 		this.log = Logger.getLogger("Minecraft");
-		getLogger().info(name + " " + version + " initialized");
+		
+		
+		// Register hMod hooks
 		
 		etc.getLoader().addListener(
                 PluginLoader.Hook.COMMAND,
@@ -55,12 +60,22 @@ public class War extends Plugin {
 				this,
 				PluginListener.Priority.MEDIUM);
 		
+		// Load files from disk or create them
+		this.defaultLoadout.add(new Item(272, 1, 0));
+		this.defaultLoadout.add(new Item(261, 1, 1));
+		this.defaultLoadout.add(new Item(262, 12, 2));
+		this.defaultLoadout.add(new Item(274, 1, 3));
+		this.defaultLoadout.add(new Item(273, 1, 4));
+		this.defaultLoadout.add(new Item(275, 1, 4));
+		this.defaultLoadout.add(new Item(259, 1, 5));
+		this.defaultLoadout.add(new Item(297, 1, 6));
+		this.defaultLoadout.add(new Item(301, 1, 100));
+		this.defaultLoadout.add(new Item(300, 1, 101));
+		this.defaultLoadout.add(new Item(299, 1, 102));
+		this.defaultLoadout.add(new Item(298, 1, 103));
+		WarMapper.load(this);
 		
-//        etc.getLoader().addListener(
-//                PluginLoader.Hook.BLOCK_CREATED,
-//                listener,
-//                this,
-//                PluginListener.Priority.MEDIUM);
+		getLogger().info(name + " " + version + " initialized.");
 	}
 	
 	@Override
@@ -89,8 +104,7 @@ public class War extends Plugin {
 			if(team != null) return warzone;
 		}
 		return null;
-	}
-	
+	}	
 
 	public Logger getLogger() {
 		return log;
@@ -145,6 +159,26 @@ public class War extends Plugin {
 			}
 		}
 		return null;
+	}
+
+	public List<Item> getDefaultLoadout() {
+		return defaultLoadout;
+	}
+
+	public void setDefaultLifepool(int defaultLifepool) {
+		this.defaultLifepool = defaultLifepool;
+	}
+
+	public int getDefaultLifepool() {
+		return defaultLifepool;
+	}
+
+	public void setDefaultFriendlyFire(boolean defaultFriendlyFire) {
+		this.defaultFriendlyFire = defaultFriendlyFire;
+	}
+
+	public boolean getDefaultFriendlyFire() {
+		return defaultFriendlyFire;
 	}
 
 }
