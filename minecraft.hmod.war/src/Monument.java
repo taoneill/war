@@ -13,16 +13,16 @@ public class Monument {
 		int x = (int)location.x;
 		int y = (int)location.y;
 		int z = (int)location.z;
-		initialState[0] = war.getServer().getBlockIdAt(x+1, y-1, z+1);
-		initialState[1] = war.getServer().getBlockIdAt(x+1, y-1, z);
-		initialState[2] = war.getServer().getBlockIdAt(x+1, y-1, z-1);
-		initialState[3] = war.getServer().getBlockIdAt(x, y-1, z+1);
-		initialState[4] = war.getServer().getBlockIdAt(x, y-1, z);
-		initialState[5] = war.getServer().getBlockIdAt(x, y-1, z-1);
-		initialState[6] = war.getServer().getBlockIdAt(x-1, y-1, z+1);
-		initialState[7] = war.getServer().getBlockIdAt(x-1, y-1, z);
-		initialState[8] = war.getServer().getBlockIdAt(x-1, y-1, z-1);
-		initialState[9] = war.getServer().getBlockIdAt(x, y, z);
+		getInitialState()[0] = war.getServer().getBlockIdAt(x+1, y-1, z+1);
+		getInitialState()[1] = war.getServer().getBlockIdAt(x+1, y-1, z);
+		getInitialState()[2] = war.getServer().getBlockIdAt(x+1, y-1, z-1);
+		getInitialState()[3] = war.getServer().getBlockIdAt(x, y-1, z+1);
+		getInitialState()[4] = war.getServer().getBlockIdAt(x, y-1, z);
+		getInitialState()[5] = war.getServer().getBlockIdAt(x, y-1, z-1);
+		getInitialState()[6] = war.getServer().getBlockIdAt(x-1, y-1, z+1);
+		getInitialState()[7] = war.getServer().getBlockIdAt(x-1, y-1, z);
+		getInitialState()[8] = war.getServer().getBlockIdAt(x-1, y-1, z-1);
+		getInitialState()[9] = war.getServer().getBlockIdAt(x, y, z);
 		this.reset();
 	}
 	
@@ -82,16 +82,16 @@ public class Monument {
 		int x = (int)getLocation().x;
 		int y = (int)getLocation().y;
 		int z = (int)getLocation().z;
-		war.getServer().setBlockAt(initialState[0], x+1, y-1, z+1);
-		war.getServer().setBlockAt(initialState[1], x+1, y-1, z);
-		war.getServer().setBlockAt(initialState[2], x+1, y-1, z-1);
-		war.getServer().setBlockAt(initialState[3], x, y-1, z+1);
-		war.getServer().setBlockAt(initialState[4], x, y-1, z);
-		war.getServer().setBlockAt(initialState[5], x, y-1, z-1);
-		war.getServer().setBlockAt(initialState[6], x-1, y-1, z+1);
-		war.getServer().setBlockAt(initialState[7], x-1, y-1, z);
-		war.getServer().setBlockAt(initialState[8], x-1, y-1, z-1);
-		war.getServer().setBlockAt(initialState[9], x, y, z);
+		war.getServer().setBlockAt(getInitialState()[0], x+1, y-1, z+1);
+		war.getServer().setBlockAt(getInitialState()[1], x+1, y-1, z);
+		war.getServer().setBlockAt(getInitialState()[2], x+1, y-1, z-1);
+		war.getServer().setBlockAt(getInitialState()[3], x, y-1, z+1);
+		war.getServer().setBlockAt(getInitialState()[4], x, y-1, z);
+		war.getServer().setBlockAt(getInitialState()[5], x, y-1, z-1);
+		war.getServer().setBlockAt(getInitialState()[6], x-1, y-1, z+1);
+		war.getServer().setBlockAt(getInitialState()[7], x-1, y-1, z);
+		war.getServer().setBlockAt(getInitialState()[8], x-1, y-1, z-1);
+		war.getServer().setBlockAt(getInitialState()[9], x, y, z);
 	}
 
 	public Location getLocation() {
@@ -105,6 +105,54 @@ public class Monument {
 
 	public String getName() {
 		return name;
+	}
+
+	public void setInitialState(int[] initialState) {
+		this.initialState = initialState;
+	}
+
+	public int[] getInitialState() {
+		return initialState;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+		int x = (int)location.x;
+		int y = (int)location.y;
+		int z = (int)location.z;
+		getInitialState()[0] = war.getServer().getBlockIdAt(x+1, y-1, z+1);
+		getInitialState()[1] = war.getServer().getBlockIdAt(x+1, y-1, z);
+		getInitialState()[2] = war.getServer().getBlockIdAt(x+1, y-1, z-1);
+		getInitialState()[3] = war.getServer().getBlockIdAt(x, y-1, z+1);
+		getInitialState()[4] = war.getServer().getBlockIdAt(x, y-1, z);
+		getInitialState()[5] = war.getServer().getBlockIdAt(x, y-1, z-1);
+		getInitialState()[6] = war.getServer().getBlockIdAt(x-1, y-1, z+1);
+		getInitialState()[7] = war.getServer().getBlockIdAt(x-1, y-1, z);
+		getInitialState()[8] = war.getServer().getBlockIdAt(x-1, y-1, z-1);
+		getInitialState()[9] = war.getServer().getBlockIdAt(x, y, z);
+		this.reset();
+	}
+
+	public boolean contains(Block block) {
+		int x = (int)location.x;
+		int y = (int)location.y;
+		int z = (int)location.z;
+		int bx = block.getX();
+		int by = block.getY();
+		int bz = block.getZ();
+		if((bx == x && by == y && bz == z) || 
+				(bx == x+1 && by == y-1 && bz == z+1) ||
+				(bx == x+1 && by == y-1 && bz == z) ||
+				(bx == x+1 && by == y-1 && bz == z-1) ||
+				(bx == x && by == y-1 && bz == z+1) ||
+				(bx == x && by == y-1 && bz == z) ||
+				(bx == x && by == y-1 && bz == z-1) ||
+				(bx == x-1 && by == y-1 && bz == z+1) ||
+				(bx == x-1 && by == y-1 && bz == z) ||
+				(bx == x-1 && by == y-1 && bz == z-1) ) {
+			return true;
+		}
+		return false;
 	}
 	
 	

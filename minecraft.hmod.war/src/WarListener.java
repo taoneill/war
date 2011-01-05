@@ -81,7 +81,7 @@ public class WarListener extends PluginListener {
 				player.sendMessage(war.str("Usage: /join <team-name>." +
 						" Teams are warzone specific." +
 						" You must be inside a warzone to join a team."));
-			} else {
+			} else {				
 				// drop from old team if any
 				Team previousTeam = war.getPlayerTeam(player.getName());
 				if(previousTeam != null) {
@@ -93,7 +93,8 @@ public class WarListener extends PluginListener {
 				
 				// join new team
 				String name = split[1];
-				List<Team> teams = war.warzone(player.getLocation()).getTeams();
+				Warzone warzone = war.warzone(player.getLocation());
+				List<Team> teams = warzone.getTeams();
 				boolean foundTeam = false;
 				for(Team team : teams) {
 					if(team.getName().equals(name)) {
@@ -110,6 +111,11 @@ public class WarListener extends PluginListener {
 				} else {
 					player.sendMessage(war.str("No such team. Try /teams."));
 				}
+				
+				if(!warzone.hasPlayerInventory(player.getName())) {
+					warzone.keepPlayerInventory(player);
+					player.sendMessage(war.str("Your inventory has been stored until you /leave."));
+				}
 			}
 			return true;
 		}
@@ -123,6 +129,9 @@ public class WarListener extends PluginListener {
 				Team playerTeam = war.getPlayerTeam(player.getName());
 				playerTeam.removePlayer(player.getName());
 				player.sendMessage(war.str("Left the team. You can now exit the warzone."));
+				Warzone zone = war.warzone(player.getLocation());
+				zone.restorePlayerInventory(player);
+				player.sendMessage(war.str("Your inventory has (hopefully) been restored."));
 			}
 			return true;
 		}
@@ -162,7 +171,7 @@ public class WarListener extends PluginListener {
 			return true;
 		}
 		
-		// Warzone maker commands: /setwarzone, /setwarzonestart, /resetwarzone, /newteam, /setteamspawn, .. /setmonument?
+		// Warzone maker commands: /setwarzone, /savewarzone, /newteam, /setteamspawn, .. /monument?
 		
 		// /newteam <teamname>
 		else if(command.equals("/newteam")) {
@@ -175,7 +184,7 @@ public class WarListener extends PluginListener {
 				Team newTeam = new Team(name, player.getLocation());
 				Warzone warzone = war.warzone(player.getLocation());
 				warzone.getTeams().add(newTeam);
-				addSpawnArea(newTeam, player.getLocation(), 41);				
+				warzone.addSpawnArea(newTeam, player.getLocation(), 41);				
 				player.sendMessage(war.str("Team " + name + " created with spawn here."));
 				WarzoneMapper.save(warzone, false);
 			}
@@ -183,7 +192,7 @@ public class WarListener extends PluginListener {
 		}
 				
 		// /setteamspawn 
-		else if(command.equals("/setteamspawn")) {
+		else if(command.equals("/teamspawn")) {
 			if(split.length < 2 || !war.inAnyWarzone(player.getLocation())) {
 				player.sendMessage(war.str("Usage: /setteamspawn <team-name>. " +
 						"Sets the team spawn. " +
@@ -198,8 +207,8 @@ public class WarListener extends PluginListener {
 					}
 				}
 				if(team != null) {
-					removeSpawnArea(team);
-					addSpawnArea(team, player.getLocation(), 41);
+					warzone.removeSpawnArea(team);
+					warzone.addSpawnArea(team, player.getLocation(), 41);
 					team.setTeamSpawn(player.getLocation());
 					player.sendMessage(war.str("Team " + team.getName() + " spawn relocated."));
 				} else {
@@ -209,6 +218,34 @@ public class WarListener extends PluginListener {
 				}
 				
 				WarzoneMapper.save(warzone, false);
+			}
+			return true;
+		}
+		
+		// /deleteteam <teamname>
+		else if(command.equals("/deleteteam")) {
+			if(split.length < 2 || !war.inAnyWarzone(player.getLocation())) {
+				player.sendMessage(war.str("Usage: /deleteteam <team-name>." +
+						" Deletes the team and its spawn. " +
+						"Must be in a warzone (try /warzones and /warzone). "));
+			} else {
+				String name = split[1];
+				Warzone warzone = war.warzone(player.getLocation());
+				List<Team> teams = warzone.getTeams();
+				Team team = null;
+				for(Team t : teams) {
+					if(name.equals(t.getName())) {
+						team = t;
+					}
+				}
+				if(team != null) {
+					warzone.removeSpawnArea(team);	
+					warzone.getTeams().remove(team);
+					WarzoneMapper.save(warzone, false);
+					player.sendMessage(war.str("Team " + name + " removed."));
+				} else {
+					player.sendMessage(war.str("No such team."));
+				}
 			}
 			return true;
 		}
@@ -273,8 +310,7 @@ public class WarListener extends PluginListener {
 				
 			}
 			return true;
-		}
-		
+		}		
 
 		// /savewarzone
 		else if(command.equals("/savewarzone")) {
@@ -296,16 +332,70 @@ public class WarListener extends PluginListener {
 			return true;
 		}
 		
+		// /deletewarzone
+		else if(command.equals("/deletewarzone")) {
+			if(!war.inAnyWarzone(player.getLocation())) {
+				player.sendMessage(war.str("Usage: /deletewarzone." +
+						" Deletes the warzone. " +
+						"Must be in the warzone (try /warzones and /warzone). "));
+			} else {
+				Warzone warzone = war.warzone(player.getLocation());
+				for(Team t : warzone.getTeams()) {
+					warzone.removeSpawnArea(t);
+				}
+				for(Monument m : warzone.getMonuments()) {
+					m.remove();
+				}
+				war.getWarzones().remove(warzone);
+				WarMapper.save(war);
+				WarzoneMapper.delete(warzone.getName());
+				player.sendMessage(war.str("Warzone " + warzone.getName() + " removed."));
+			}
+			return true;
+		}
+		
 		// /monument
 		else if(command.equals("/monument")) {
 			if(!war.inAnyWarzone(player.getLocation())) {
 				player.sendMessage(war.str("Usage: /monument <name>. Must be in warzone."));
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
-				Monument monument = new Monument(split[1], war, player.getLocation());
-				warzone.getMonuments().add(monument);
-				player.sendMessage(war.str("Monument " + monument.getName() + " created."));
+				String monumentName = split[1];
+				if(warzone.hasMonument(monumentName)) {
+					// move the existing monument
+					Monument monument = warzone.getMonument(monumentName);
+					monument.remove();
+					monument.setLocation(player.getLocation());
+					player.sendMessage(war.str("Monument " + monument.getName() + " was moved."));
+				} else {
+					// create a new monument
+					Monument monument = new Monument(split[1], war, player.getLocation());
+					warzone.getMonuments().add(monument);
+					player.sendMessage(war.str("Monument " + monument.getName() + " created."));
+				}
 				WarzoneMapper.save(warzone, false);
+			}
+			return true;
+		}
+		
+		// /deletemonument <name>
+		else if(command.equals("/deletemonument")) {
+			if(split.length < 2 || !war.inAnyWarzone(player.getLocation())) {
+				player.sendMessage(war.str("Usage: /deletemonument <team-name>." +
+						" Deletes the monument. " +
+						"Must be in a warzone (try /warzones and /warzone). "));
+			} else {
+				String name = split[1];
+				Warzone warzone = war.warzone(player.getLocation());
+				Monument monument = warzone.getMonument(name);
+				if(monument != null) {
+					monument.remove();
+					warzone.getMonuments().remove(monument);
+					WarzoneMapper.save(warzone, false);
+					player.sendMessage(war.str("Monument " + name + " removed."));
+				} else {
+					player.sendMessage(war.str("No such monument."));
+				}
 			}
 			return true;
 		}
@@ -313,64 +403,7 @@ public class WarListener extends PluginListener {
         return false;
     }
 	
-	private void removeSpawnArea(Team team) {
-		// Reset spawn to what it was before the gold blocks
-		int[] spawnState = team.getOldSpawnState();
-		int x = (int)team.getTeamSpawn().x;
-		int y = (int)team.getTeamSpawn().y;
-		int z = (int)team.getTeamSpawn().z;
-		war.getServer().setBlockAt(spawnState[0], x+1, y-1, z+1);
-		war.getServer().setBlockAt(spawnState[1], x+1, y-1, z);
-		war.getServer().setBlockAt(spawnState[2], x+1, y-1, z-1);
-		war.getServer().setBlockAt(spawnState[3], x, y-1, z+1);
-		war.getServer().setBlockAt(spawnState[4], x, y-1, z);
-		war.getServer().setBlockAt(spawnState[5], x, y-1, z-1);
-		war.getServer().setBlockAt(spawnState[6], x-1, y-1, z+1);
-		war.getServer().setBlockAt(spawnState[7], x-1, y-1, z);
-		war.getServer().setBlockAt(spawnState[8], x-1, y-1, z-1);
-		war.getServer().setBlockAt(spawnState[9], x, y, z);
-		
-	}
-
-	private void addSpawnArea(Team team, Location location, int blockType) {
-		// Save the spawn state (i.e. the nine block under the player spawn)
-		int[] spawnState = new int[10];
-		int x = (int)location.x;
-		int y = (int)location.y;
-		int z = (int)location.z;
-		spawnState[0] = war.getServer().getBlockIdAt(x+1, y-1, z+1);
-		spawnState[1] = war.getServer().getBlockIdAt(x+1, y-1, z);
-		spawnState[2] = war.getServer().getBlockIdAt(x+1, y-1, z-1);
-		spawnState[3] = war.getServer().getBlockIdAt(x, y-1, z+1);
-		spawnState[4] = war.getServer().getBlockIdAt(x, y-1, z);
-		spawnState[5] = war.getServer().getBlockIdAt(x, y-1, z-1);
-		spawnState[6] = war.getServer().getBlockIdAt(x-1, y-1, z+1);
-		spawnState[7] = war.getServer().getBlockIdAt(x-1, y-1, z);
-		spawnState[8] = war.getServer().getBlockIdAt(x-1, y-1, z-1);
-		spawnState[9] = war.getServer().getBlockIdAt(x, y, z);
-		team.setTeamSpawn(location);
-		team.setOldSpawnState(spawnState);
-		// Set the spawn as gold blocks
-		war.getServer().setBlockAt(blockType, x+1, y-1, z+1);
-		war.getServer().setBlockAt(blockType, x+1, y-1, z);
-		war.getServer().setBlockAt(blockType, x+1, y-1, z-1);
-		war.getServer().setBlockAt(blockType, x, y-1, z+1);
-		war.getServer().setBlockAt(blockType, x, y-1, z);
-		war.getServer().setBlockAt(blockType, x, y-1, z-1);
-		war.getServer().setBlockAt(blockType, x-1, y-1, z+1);
-		war.getServer().setBlockAt(blockType, x-1, y-1, z);
-		war.getServer().setBlockAt(blockType, x-1, y-1, z-1);
-		
-		Block block = new Block(63, x, y, z, 8);
-		war.getServer().setBlock(block);
-		block = war.getServer().getBlockAt(x, y, z);
-		ComplexBlock complexBlock = war.getServer().getComplexBlock(x, y, z);
-		Sign sign = (Sign)complexBlock;
-		sign.setText(0, "Team");
-		sign.setText(1, team.getName());
-		sign.setText(2, "spawn");
-		sign.update();
-	}
+	
 
 	public boolean onDamage(PluginLoader.DamageType damageType, BaseEntity attacker, BaseEntity defender, int damageAmount) {
 		if(attacker != null && defender != null && attacker.isPlayer() && defender.isPlayer()) {
@@ -412,7 +445,7 @@ public class WarListener extends PluginListener {
 				} else if (attackerWarzone != defenderWarzone) {
 					a.sendMessage(war.str("Your target is playing in another warzone."));
 				}
-				return true; // no pvp outside of the war battles, no friendly fire either
+				return true; // can't attack someone inside awarzone if you're not in a team
 			}
 		}
 		// mobs are always dangerous
@@ -438,6 +471,17 @@ public class WarListener extends PluginListener {
 							if(!t.getName().equals(team.getName())) {
 								// all other teams get a point
 								t.addPoint();
+								int x = (int)t.getTeamSpawn().x;
+								int y = (int)t.getTeamSpawn().y;
+								int z = (int)t.getTeamSpawn().z;
+								Block block = war.getServer().getBlockAt(x, y, z);
+								ComplexBlock complexBlock = war.getServer().getComplexBlock(x, y, z);
+								Sign sign = (Sign)complexBlock;
+								sign.setText(0, "Team " + team.getName());
+								sign.setText(1, "spawn");
+								sign.setText(2, team.getPoints() + " pts");
+								sign.setText(3, team.getRemainingTickets() + "/" + zone.getLifePool() + " lives left");
+								sign.update();
 							}
 						}
 						zone.resetState();
@@ -450,6 +494,18 @@ public class WarListener extends PluginListener {
 					zone.respawnPlayer(team, player);
 					player.sendMessage(war.str("You died!"));
 					List<Team> teams = zone.getTeams();
+					
+					int x = (int)team.getTeamSpawn().x;
+					int y = (int)team.getTeamSpawn().y;
+					int z = (int)team.getTeamSpawn().z;
+					Block block = war.getServer().getBlockAt(x, y, z);
+					ComplexBlock complexBlock = war.getServer().getComplexBlock(x, y, z);
+					Sign sign = (Sign)complexBlock;
+					sign.setText(0, "Team " + team.getName());
+					sign.setText(1, "spawn");
+					sign.setText(2, team.getPoints() + " pts");
+					sign.setText(3, team.getRemainingTickets()+ "/" + zone.getLifePool() + " lives left");
+					sign.update();
 					
 //					for(Team t : teams) {
 //						//t.teamcast(war.str(player.getName() + " died. Team " + team.getName() + " has " + team.getRemainingTickets() + "/" + War.LIFEPOOL + " lives left."));
@@ -510,14 +566,47 @@ public class WarListener extends PluginListener {
 		}
 		
     }
+	
+    public boolean onBlockDestroy(Player player, Block block) {
+        return false;
+    }
+
+    public boolean onBlockBreak(Player player, Block block) {
+    	if(player != null && block != null) {
+	    	Warzone warzone = war.warzone(player.getLocation());
+	    	if(warzone != null && war.getPlayerTeam(player.getName()) == null) {
+	    		// can't actually destroy blocks in a warzone if not part of a team
+	    		player.sendMessage(war.str("Can't destroy part of a warzone if you're not in a team."));
+	    		return true;
+	    	}
+	    	
+	    	if(warzone != null && warzone.isImportantBlock(block)) {
+	    		player.sendMessage(war.str("Can't destroy this."));
+	    		return true;
+	    	}
+    	}
+        return false;
+    }
+    
+    public boolean onBlockPlace(Player player, Block blockPlaced, Block blockClicked, Item itemInHand) {
+    	Warzone warzone = war.warzone(player.getLocation());
+    	if(warzone != null) {
+    		if(warzone.isImportantBlock(blockPlaced) || warzone.isImportantBlock(blockClicked)) {
+    			player.sendMessage(war.str("Can't build here."));
+	    		return true;
+    		}
+    	}
+        return false;
+    }
 
 	private String getAllTeamsMsg(Player player){
 		String teamsMessage = "Teams: ";
 		if(war.warzone(player.getLocation()).getTeams().isEmpty()){
 			teamsMessage += "none.";
 		}
-		for(Team team : war.warzone(player.getLocation()).getTeams()) {
-			teamsMessage += team.getName() + " (" + team.getPoints() + " points, "+ team.getRemainingTickets() + "/" + War.LIFEPOOL + " lives left. ";
+		Warzone warzone = war.warzone(player.getLocation());
+		for(Team team :warzone.getTeams()) {
+			teamsMessage += team.getName() + " (" + team.getPoints() + " points, "+ team.getRemainingTickets() + "/" + warzone.getLifePool() + " lives left. ";
 			for(Player member : team.getPlayers()) {
 				teamsMessage += member.getName() + " ";
 			}

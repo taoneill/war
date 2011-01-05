@@ -12,7 +12,6 @@ public class Team {
 	public Team(String name, Location teamSpawn) {
 		this.setName(name);
 		this.teamSpawn = teamSpawn;
-		this.remainingTickets = War.LIFEPOOL;
 	}
 	
 	public void setTeamSpawn(Location teamSpawn) {
@@ -61,6 +60,7 @@ public class Team {
 
 	public void setRemainingTickets(int remainingTickets) {
 		this.remainingTickets = remainingTickets;
+		
 	}
 
 	public int getRemainingTickets() {
@@ -81,6 +81,28 @@ public class Team {
 
 	public int getPoints() {
 		return points;
+	}
+
+	public boolean contains(Block block) {
+		int x = (int)this.teamSpawn.x;
+		int y = (int)this.teamSpawn.y;
+		int z = (int)this.teamSpawn.z;
+		int bx = block.getX();
+		int by = block.getY();
+		int bz = block.getZ();
+		if((bx == x && by == y && bz == z) || 
+				(bx == x+1 && by == y-1 && bz == z+1) ||
+				(bx == x+1 && by == y-1 && bz == z) ||
+				(bx == x+1 && by == y-1 && bz == z-1) ||
+				(bx == x && by == y-1 && bz == z+1) ||
+				(bx == x && by == y-1 && bz == z) ||
+				(bx == x && by == y-1 && bz == z-1) ||
+				(bx == x-1 && by == y-1 && bz == z+1) ||
+				(bx == x-1 && by == y-1 && bz == z) ||
+				(bx == x-1 && by == y-1 && bz == z-1) ) {
+			return true;
+		}
+		return false;
 	}
 
 }

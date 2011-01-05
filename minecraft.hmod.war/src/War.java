@@ -59,6 +59,14 @@ public class War extends Plugin {
 				listener,
 				this,
 				PluginListener.Priority.MEDIUM);
+		etc.getLoader().addListener( PluginLoader.Hook.BLOCK_BROKEN,  
+				listener,
+				this,
+				PluginListener.Priority.MEDIUM);
+		etc.getLoader().addListener( PluginLoader.Hook.BLOCK_PLACE,  
+				listener,
+				this,
+				PluginListener.Priority.MEDIUM);
 		
 		// Load files from disk or create them
 		this.defaultLoadout.add(new Item(272, 1, 0));

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Warzone {
@@ -15,6 +16,8 @@ public class Warzone {
 	private War war;
 	private int lifePool;
 	private List<Item> loadout; 
+	
+	private HashMap<String, Item[]> inventories = new HashMap<String, Item[]>();
 	
 	public Warzone(War war, String name) {
 		this.war = war;
@@ -205,10 +208,13 @@ public class Warzone {
 			
 			// everyone back to team spawn with full health
 			for(Team team : teams) {
+				Location spawn = team.getTeamSpawn();
+				removeSpawnArea(team);	// reset spawn
+				addSpawnArea(team, spawn, 41);
 				for(Player player : team.getPlayers()) {
 					respawnPlayer(team, player);
 				}
-				team.setRemainingTickets(War.LIFEPOOL);
+				team.setRemainingTickets(lifePool);
 			}
 			
 			// reset monuments
@@ -273,6 +279,66 @@ public class Warzone {
 		}
 		return false;
 	}
+	
+	public void removeSpawnArea(Team team) {
+		// Reset spawn to what it was before the gold blocks
+		int[] spawnState = team.getOldSpawnState();
+		int x = (int)team.getTeamSpawn().x;
+		int y = (int)team.getTeamSpawn().y;
+		int z = (int)team.getTeamSpawn().z;
+		war.getServer().setBlockAt(spawnState[0], x+1, y-1, z+1);
+		war.getServer().setBlockAt(spawnState[1], x+1, y-1, z);
+		war.getServer().setBlockAt(spawnState[2], x+1, y-1, z-1);
+		war.getServer().setBlockAt(spawnState[3], x, y-1, z+1);
+		war.getServer().setBlockAt(spawnState[4], x, y-1, z);
+		war.getServer().setBlockAt(spawnState[5], x, y-1, z-1);
+		war.getServer().setBlockAt(spawnState[6], x-1, y-1, z+1);
+		war.getServer().setBlockAt(spawnState[7], x-1, y-1, z);
+		war.getServer().setBlockAt(spawnState[8], x-1, y-1, z-1);
+		war.getServer().setBlockAt(spawnState[9], x, y, z);
+		
+	}
+
+	public void addSpawnArea(Team team, Location location, int blockType) {
+		// Save the spawn state (i.e. the nine block under the player spawn)
+		int[] spawnState = new int[10];
+		int x = (int)location.x;
+		int y = (int)location.y;
+		int z = (int)location.z;
+		spawnState[0] = war.getServer().getBlockIdAt(x+1, y-1, z+1);
+		spawnState[1] = war.getServer().getBlockIdAt(x+1, y-1, z);
+		spawnState[2] = war.getServer().getBlockIdAt(x+1, y-1, z-1);
+		spawnState[3] = war.getServer().getBlockIdAt(x, y-1, z+1);
+		spawnState[4] = war.getServer().getBlockIdAt(x, y-1, z);
+		spawnState[5] = war.getServer().getBlockIdAt(x, y-1, z-1);
+		spawnState[6] = war.getServer().getBlockIdAt(x-1, y-1, z+1);
+		spawnState[7] = war.getServer().getBlockIdAt(x-1, y-1, z);
+		spawnState[8] = war.getServer().getBlockIdAt(x-1, y-1, z-1);
+		spawnState[9] = war.getServer().getBlockIdAt(x, y, z);
+		team.setTeamSpawn(location);
+		team.setOldSpawnState(spawnState);
+		// Set the spawn as gold blocks
+		war.getServer().setBlockAt(blockType, x+1, y-1, z+1);
+		war.getServer().setBlockAt(blockType, x+1, y-1, z);
+		war.getServer().setBlockAt(blockType, x+1, y-1, z-1);
+		war.getServer().setBlockAt(blockType, x, y-1, z+1);
+		war.getServer().setBlockAt(blockType, x, y-1, z);
+		war.getServer().setBlockAt(blockType, x, y-1, z-1);
+		war.getServer().setBlockAt(blockType, x-1, y-1, z+1);
+		war.getServer().setBlockAt(blockType, x-1, y-1, z);
+		war.getServer().setBlockAt(blockType, x-1, y-1, z-1);
+		
+		Block block = new Block(63, x, y, z, 8);
+		war.getServer().setBlock(block);
+		block = war.getServer().getBlockAt(x, y, z);
+		ComplexBlock complexBlock = war.getServer().getComplexBlock(x, y, z);
+		Sign sign = (Sign)complexBlock;
+		sign.setText(0, "Team " + team.getName());
+		sign.setText(1, "spawn");
+		sign.setText(2, "0 pts");
+		sign.setText(3, lifePool + "/" + lifePool + " lives left");
+		sign.update();
+	}
 
 	public List<Monument> getMonuments() {
 		return monuments;
@@ -311,5 +377,80 @@ public class Warzone {
 		return initialState;
 	}
 
+	public boolean hasPlayerInventory(String playerName) {
+		return inventories.containsKey(playerName);
+	}
+
+	public void keepPlayerInventory(Player player) {
+		inventories.put(player.getName(), player.getInventory().getContents());
+	}
+
+	public void restorePlayerInventory(Player player) {
+		Item[] contents = inventories.get(player.getName());
+		player.getInventory().clearContents();
+		player.getInventory().setContents(contents);
+		player.getInventory().update();
+		inventories.remove(player.getName());
+	}
+
+	public boolean hasMonument(String monumentName) {
+		boolean hasIt = false;
+		for(Monument monument: monuments) {
+			if(monument.getName().equals(monumentName)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
+	public Monument getMonument(String monumentName) {
+		boolean hasIt = false;
+		for(Monument monument: monuments) {
+			if(monument.getName().equals(monumentName)) {
+				return monument;
+			}
+		}
+		return null;
+	}
+	
+	public boolean isImportantBlock(Block block) {
+		block.getX();
+		for(Monument m : monuments) {
+			if(m.contains(block)){
+				return true;
+			}
+		}
+		for(Team t : teams) {
+			if(t.contains(block)){
+				return true;
+			}
+		}
+		if(teleportNear(block)) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean teleportNear(Block block) {
+		int x = (int)this.teleport.x;
+		int y = (int)this.teleport.y;
+		int z = (int)this.teleport.z;
+		int bx = block.getX();
+		int by = block.getY();
+		int bz = block.getZ();
+		if((bx == x && by == y && bz == z) || 
+				(bx == x+1 && by == y-1 && bz == z+1) ||
+				(bx == x+1 && by == y-1 && bz == z) ||
+				(bx == x+1 && by == y-1 && bz == z-1) ||
+				(bx == x && by == y-1 && bz == z+1) ||
+				(bx == x && by == y-1 && bz == z) ||
+				(bx == x && by == y-1 && bz == z-1) ||
+				(bx == x-1 && by == y-1 && bz == z+1) ||
+				(bx == x-1 && by == y-1 && bz == z) ||
+				(bx == x-1 && by == y-1 && bz == z-1) ) {
+			return true;
+		}
+		return false;
+	}
+
 }

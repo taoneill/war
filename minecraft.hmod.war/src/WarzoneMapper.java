@@ -116,7 +116,34 @@ public class WarzoneMapper {
 				}
 			}
 		}
-		warzoneBlocksFile.setString("zoneBlocks", stateStr);
+		
+		// monument blocks
+		for(Monument monument: warzone.getMonuments()) {
+			String monumentBlocksStr = warzoneBlocksFile.getString("monument"+monument.getName()+"Blocks");
+			String[] monumentBlocksSplit = monumentBlocksStr.split(",");
+			int[] monumentState = new int[10];
+			for(int i = 0; i < monumentBlocksSplit.length; i++) {
+				String split = monumentBlocksSplit[i];
+				if(split != null && !split.equals("")) {
+					monumentState[i] = Integer.parseInt(split);
+				}
+			}
+			monument.setInitialState(monumentState);
+		}
+		
+		// team spawn blocks
+		for(Team team : warzone.getTeams()) {
+			String teamBlocksStr = warzoneBlocksFile.getString("team"+team.getName()+"Blocks");
+			String[] teamBlocksSplit = teamBlocksStr.split(",");
+			int[] teamState = new int[10];
+			for(int i = 0; i < teamBlocksSplit.length; i++) {
+				String split = teamBlocksSplit[i];
+				if(split != null && !split.equals("")) {
+					teamState[i] = Integer.parseInt(split);
+				}
+			}
+			team.setOldSpawnState(teamState);
+		}
 		
 		return warzone;
 		
@@ -205,6 +232,26 @@ public class WarzoneMapper {
 				}
 			}
 			warzoneBlocksFile.setString("zoneBlocks", stateBuilder.toString());
+			
+			
+			// monument blocks
+			for(Monument monument: monuments) {
+				String monumentBlocksStr = "";
+				for(int type : monument.getInitialState()) {
+					monumentBlocksStr += type + ",";
+				}
+				warzoneBlocksFile.setString("monument"+monument.getName()+"Blocks", monumentBlocksStr);
+			}
+			
+			// team spawn blocks
+			for(Team team : teams) {
+				String teamBlocksStr = "";
+				for(int type : team.getOldSpawnState()) {
+					teamBlocksStr += type + ",";
+				}
+				warzoneBlocksFile.setString("team"+team.getName()+"Blocks", teamBlocksStr);
+			}
+			
 			warzoneBlocksFile.save();
 		}
 		
@@ -213,6 +260,8 @@ public class WarzoneMapper {
 	public static void delete(String name) {
 		File warzoneConfig = new File("warzone-" + name + ".txt");
 		warzoneConfig.delete();
+		File warzoneBlocksFile = new File("warzone-" + name + ".dat");
+		warzoneBlocksFile.delete();
 	}
 
 }
