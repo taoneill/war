@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 
@@ -6,12 +7,24 @@ public class WarzoneMapper {
 
 	public static Warzone load(War war, String name) {
 		PropertiesFile warzoneConfig = new PropertiesFile("warzone-" + name + ".txt");
+		try {
+			warzoneConfig.load();
+		} catch (IOException e) {
+			war.getLogger().info("Failed to load warzone-" + name + ".txt file.");
+			e.printStackTrace();
+		}
 		Warzone warzone = new Warzone(war, name);
 		
 		// Create file if needed 
 		if(!warzoneConfig.containsKey("name")) {
 			WarzoneMapper.save(warzone, false);
 			war.getLogger().info("Warzone " + name + " config file created.");
+			try {
+				warzoneConfig.load();
+			} catch (IOException e) {
+				war.getLogger().info("Failed to reload warzone-" + name + ".txt file after creating it.");
+				e.printStackTrace();
+			}
 		}
 				
 		// northwest
@@ -54,6 +67,7 @@ public class WarzoneMapper {
 				int teamZ = Integer.parseInt(teamStrSplit[3]);
 				Team team = new Team(teamStrSplit[0], 
 									new Location(teamX, teamY, teamZ));
+				team.setRemainingTickets(warzone.getLifePool());
 				warzone.getTeams().add(team);
 			}
 		}
@@ -116,6 +130,7 @@ public class WarzoneMapper {
 				}
 			}
 		}
+		warzone.setInitialState(state);
 		
 		// monument blocks
 		for(Monument monument: warzone.getMonuments()) {

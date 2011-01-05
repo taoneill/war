@@ -74,13 +74,16 @@ public class War extends Plugin {
 		this.defaultLoadout.add(new Item(262, 12, 2));
 		this.defaultLoadout.add(new Item(274, 1, 3));
 		this.defaultLoadout.add(new Item(273, 1, 4));
-		this.defaultLoadout.add(new Item(275, 1, 4));
-		this.defaultLoadout.add(new Item(259, 1, 5));
+		this.defaultLoadout.add(new Item(275, 1, 5));
+		this.defaultLoadout.add(new Item(259, 1, 27));
 		this.defaultLoadout.add(new Item(297, 1, 6));
+		this.defaultLoadout.add(new Item(3, 12, 8));
 		this.defaultLoadout.add(new Item(301, 1, 100));
 		this.defaultLoadout.add(new Item(300, 1, 101));
 		this.defaultLoadout.add(new Item(299, 1, 102));
 		this.defaultLoadout.add(new Item(298, 1, 103));
+		this.defaultLifepool = 7;
+		this.defaultFriendlyFire = false;
 		WarMapper.load(this);
 		
 		getLogger().info(name + " " + version + " initialized.");

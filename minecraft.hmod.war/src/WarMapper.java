@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.List;
 
 
@@ -5,11 +6,23 @@ public class WarMapper {
 	
 	public static void load(War war) {
 		PropertiesFile warConfig = new PropertiesFile("war.txt");
+		try {
+			warConfig.load();
+		} catch (IOException e) {
+			war.getLogger().info("Failed to load war.txt file.");
+			e.printStackTrace();
+		}
 		
 		// Create file if need be
 		if(!warConfig.containsKey("warzones")) {
 			WarMapper.save(war);
-			war.getLogger().info("War config file created.");			
+			war.getLogger().info("War config file created.");
+			try {
+				warConfig.load();
+			} catch (IOException e) {
+				war.getLogger().info("Failed to reload war.txt file after creating it.");
+				e.printStackTrace();
+			}
 		}
 		
 		// warzones
@@ -37,8 +50,8 @@ public class WarMapper {
 			}
 		}
 		
-		// defaultLifepool
-		war.setDefaultLifepool(warConfig.getInt("defaultLifepool"));
+		// defaultLifePool
+		war.setDefaultLifepool(warConfig.getInt("defaultLifePool"));
 		
 		// defaultFriendlyFire
 		war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));

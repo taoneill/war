@@ -98,6 +98,13 @@ public class Warzone {
 		
 		saveState();
 	}
+	
+	public void removeNorthwest() {
+		int x = (int)northwest.x;
+		int y = (int)northwest.y;
+		int z = (int)northwest.z;
+		server.setBlockAt(0, x, y, z);
+	}
 
 	public Location getNorthwest() {
 		return northwest;
@@ -129,6 +136,13 @@ public class Warzone {
 		sign.update();
 		
 		saveState();
+	}
+	
+	public void removeSoutheast() {
+		int x = (int)southeast.x;
+		int y = (int)southeast.y;
+		int z = (int)southeast.z;
+		server.setBlockAt(0, x, y, z);
 	}
 
 	public Location getSoutheast() {
@@ -177,6 +191,7 @@ public class Warzone {
 	 */
 	public int resetState() {
 		if(ready() && getInitialState() != null){
+			
 			// reset blocks
 			int northSouth = ((int)(southeast.x)) - ((int)(northwest.x));
 			int eastWest = ((int)(northwest.z)) - ((int)(southeast.z));
@@ -209,12 +224,13 @@ public class Warzone {
 			// everyone back to team spawn with full health
 			for(Team team : teams) {
 				Location spawn = team.getTeamSpawn();
-				removeSpawnArea(team);	// reset spawn
-				addSpawnArea(team, spawn, 41);
+//				removeSpawnArea(team);	// reset spawn
+//				addSpawnArea(team, spawn, 41);
 				for(Player player : team.getPlayers()) {
 					respawnPlayer(team, player);
 				}
 				team.setRemainingTickets(lifePool);
+				resetSign(team, spawn);
 			}
 			
 			// reset monuments
@@ -328,15 +344,23 @@ public class Warzone {
 		war.getServer().setBlockAt(blockType, x-1, y-1, z);
 		war.getServer().setBlockAt(blockType, x-1, y-1, z-1);
 		
+		resetSign(team, location);
+	}
+	
+	public void resetSign(Team team, Location location){
+		int x = (int)location.x;
+		int y = (int)location.y;
+		int z = (int)location.z;
+		
 		Block block = new Block(63, x, y, z, 8);
 		war.getServer().setBlock(block);
 		block = war.getServer().getBlockAt(x, y, z);
 		ComplexBlock complexBlock = war.getServer().getComplexBlock(x, y, z);
 		Sign sign = (Sign)complexBlock;
-		sign.setText(0, "Team " + team.getName());
-		sign.setText(1, "spawn");
-		sign.setText(2, "0 pts");
-		sign.setText(3, lifePool + "/" + lifePool + " lives left");
+		sign.setText(0, "Team");
+		sign.setText(1, team.getName());
+		sign.setText(2, team.getPoints() + " pts");
+		sign.setText(3, team.getRemainingTickets() + "/" + lifePool + " lives left");
 		sign.update();
 	}
 
@@ -386,11 +410,15 @@ public class Warzone {
 	}
 
 	public void restorePlayerInventory(Player player) {
-		Item[] contents = inventories.get(player.getName());
-		player.getInventory().clearContents();
-		player.getInventory().setContents(contents);
+		Item[] originalContents = inventories.remove(player.getName());
+		Inventory playerInv = player.getInventory(); 
+		playerInv.clearContents();
+		playerInv.update();
+		for(Item item : originalContents) {
+			playerInv.addItem(item);
+		}
+		playerInv.update();
 		player.getInventory().update();
-		inventories.remove(player.getName());
 	}
 
 	public boolean hasMonument(String monumentName) {
@@ -452,5 +480,7 @@ public class Warzone {
 		}
 		return false;
 	}
+
+	
 
 }

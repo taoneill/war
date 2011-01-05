@@ -98,6 +98,10 @@ public class WarListener extends PluginListener {
 				boolean foundTeam = false;
 				for(Team team : teams) {
 					if(team.getName().equals(name)) {
+						if(!warzone.hasPlayerInventory(player.getName())) {
+							warzone.keepPlayerInventory(player);
+							player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+						}
 						team.addPlayer(player);
 						Warzone zone = war.warzone(player.getLocation());
 						zone.respawnPlayer(team, player);
@@ -110,11 +114,6 @@ public class WarListener extends PluginListener {
 					}
 				} else {
 					player.sendMessage(war.str("No such team. Try /teams."));
-				}
-				
-				if(!warzone.hasPlayerInventory(player.getName())) {
-					warzone.keepPlayerInventory(player);
-					player.sendMessage(war.str("Your inventory has been stored until you /leave."));
 				}
 			}
 			return true;
@@ -163,7 +162,7 @@ public class WarListener extends PluginListener {
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
 				for(Team team: warzone.getTeams()) {
-					team.teamcast(war.str("The battle has ended. " + getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + "..."));
+					team.teamcast(war.str("The battle has ended. " + getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and life pools..."));
 				}
 				int resetBlocks = warzone.resetState();
 				player.sendMessage(war.str("Warzone reset. " + resetBlocks + " blocks reset."));
@@ -183,6 +182,7 @@ public class WarListener extends PluginListener {
 				String name = split[1];
 				Team newTeam = new Team(name, player.getLocation());
 				Warzone warzone = war.warzone(player.getLocation());
+				newTeam.setRemainingTickets(warzone.getLifePool());
 				warzone.getTeams().add(newTeam);
 				warzone.addSpawnArea(newTeam, player.getLocation(), 41);				
 				player.sendMessage(war.str("Team " + name + " created with spawn here."));
@@ -332,6 +332,34 @@ public class WarListener extends PluginListener {
 			return true;
 		}
 		
+		// /resetwarzone
+		else if(command.equals("/resetwarzone")) {
+			if(!war.inAnyWarzone(player.getLocation())) {
+				player.sendMessage(war.str("Usage: /resetwarzone <life pool size (optional)>. Must be in warzone."));
+			} else {
+				Warzone warzone = war.warzone(player.getLocation());
+				int resetBlocks = warzone.resetState();
+				for(Team team: warzone.getTeams()) {
+					team.teamcast(war.str("The war has ended. " + getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams..."));
+					for(Player p : team.getPlayers()) {
+						p.teleportTo(warzone.getTeleport());
+						warzone.restorePlayerInventory(p);
+						player.sendMessage(war.str("You are now teamless. Your inventory has (hopefully) been restored."));
+					}
+				}
+				war.getWarzones().remove(warzone);
+				Warzone resetWarzone = WarzoneMapper.load(war, warzone.getName());
+				war.getWarzones().add(resetWarzone);
+				if(split.length > 1) {
+					int overideLifepool = Integer.parseInt(split[1]);
+					resetWarzone.setLifePool(overideLifepool);
+				}
+				resetWarzone.resetState();
+				player.sendMessage(war.str("Warzone and teams reset. " + resetBlocks + " blocks reset."));
+			}
+			return true;
+		}
+		
 		// /deletewarzone
 		else if(command.equals("/deletewarzone")) {
 			if(!war.inAnyWarzone(player.getLocation())) {
@@ -340,6 +368,8 @@ public class WarListener extends PluginListener {
 						"Must be in the warzone (try /warzones and /warzone). "));
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
+				warzone.removeSoutheast();
+				warzone.removeNorthwest();
 				for(Team t : warzone.getTeams()) {
 					warzone.removeSpawnArea(t);
 				}
@@ -477,10 +507,10 @@ public class WarListener extends PluginListener {
 								Block block = war.getServer().getBlockAt(x, y, z);
 								ComplexBlock complexBlock = war.getServer().getComplexBlock(x, y, z);
 								Sign sign = (Sign)complexBlock;
-								sign.setText(0, "Team " + team.getName());
-								sign.setText(1, "spawn");
-								sign.setText(2, team.getPoints() + " pts");
-								sign.setText(3, team.getRemainingTickets() + "/" + zone.getLifePool() + " lives left");
+								sign.setText(0, "Team");
+								sign.setText(1, t.getName());
+								sign.setText(2, t.getPoints() + " pts");
+								sign.setText(3, t.getRemainingTickets() + "/" + zone.getLifePool() + " lives left");
 								sign.update();
 							}
 						}
