@@ -162,11 +162,11 @@ public class Warzone {
 			int x = (int)northwest.getBlockX() - 2;
 			int minY = 0;
 			int maxY = 128;
-			for(int i = 0; i < northSouth + 3 && i < getInitialState().length; i++){
+			for(int i = 0; i < northSouth + 3; i++){
 				int y = minY;
-				for(int j = 0; j < 128 && j < getInitialState()[i].length; j++) {
+				for(int j = 0; j < 128; j++) {
 					int z = (int)southeast.getBlockZ() - 2;
-					for(int k = 0; k < eastWest + 3 && k < getInitialState()[i][j].length; k++) {
+					for(int k = 0; k < eastWest + 3; k++) {
 						getInitialState()[i][j][k] = world.getBlockAt(x, y, z).getTypeID();
 						noOfSavedBlocks++;
 						z++;
@@ -196,18 +196,18 @@ public class Warzone {
 			int x = northwest.getBlockX() - 2;
 			int minY = 0;
 			int maxY = 128;
-			for(int i = 0; i < northSouth + 3 && i < getInitialState().length; i++){
+			for(int i = 0; i < northSouth + 3; i++){
 				int y = minY;
-				for(int j = 0; j < 128 && j < getInitialState()[i].length; j++) {
+				for(int j = 0; j < 128; j++) {
 					int z = (int)southeast.getBlockZ() - 2;
-					for(int k = 0; k < eastWest + 3 && k < getInitialState()[i][j].length; k++) {
+					for(int k = 0; k < eastWest + 3; k++) {
 						Block currentBlock = world.getBlockAt(x, y, z);
 						int currentType = currentBlock.getTypeID();
 						int initialType = getInitialState()[i][j][k];
 						if(currentType != initialType) {	// skip block if nothing changed
 							currentBlock.setTypeID(initialType);
+							noOfResetBlocks++;
 						}
-						noOfResetBlocks++;
 						z++;
 					}
 					y++;					

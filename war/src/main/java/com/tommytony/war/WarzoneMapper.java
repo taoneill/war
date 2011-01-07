@@ -133,13 +133,9 @@ public class WarzoneMapper {
 			String[] stateStrSplit = stateStr.split(",");
 			int splitIndex = 0;
 			if(stateStrSplit.length > 1000) {
-				for(int i = 0; i < northSouth + 3
-								&& i < state.length; i++){
-					for(int j = 0; j < maxY - minY 
-									&& j < state[i].length; j++) {
-						for(int k = 0; k < eastWest + 3 
-										&& k < state[k].length 
-										&& splitIndex < stateStrSplit.length; k++) {
+				for(int i = 0; i < northSouth + 3; i++){
+					for(int j = 0; j < 128; j++) {
+						for(int k = 0; k < eastWest + 3; k++) {
 							String currentBlockType = stateStrSplit[splitIndex];
 							if(currentBlockType != null && !currentBlockType.equals("")) {
 								state[i][j][k] = Integer.parseInt(currentBlockType);
@@ -260,15 +256,15 @@ public class WarzoneMapper {
 		if(saveBlocks) {
 			// zone blocks
 			PropertiesFile warzoneBlocksFile = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + ".dat");
-			int northSouth = ((int)(warzone.getSoutheast().getBlockX())) - ((int)(warzone.getNorthwest().getBlockX()));
-			int eastWest = ((int)(warzone.getNorthwest().getBlockZ())) - ((int)(warzone.getSoutheast().getBlockZ()));
+			int northSouth = warzone.getSoutheast().getBlockX() - warzone.getNorthwest().getBlockX();
+			int eastWest = warzone.getNorthwest().getBlockZ() - warzone.getSoutheast().getBlockZ();
 			int[][][] state = warzone.getInitialState();
 			StringBuilder stateBuilder = new StringBuilder();
 			int savedBlocks = 0;
 			if(state.length > 1) {
-				for(int i = 0; i < northSouth + 3 && i < state.length; i++){
-					for(int j = 0; j < 128 && j < state[i].length; j++) {
-						for(int k = 0; k < eastWest + 3 && k < state[i][j].length && savedBlocks < state.length; k++) {
+				for(int i = 0; i < northSouth + 3; i++){
+					for(int j = 0; j < 128; j++) {
+						for(int k = 0; k < eastWest + 3; k++) {
 							stateBuilder.append(state[i][j][k] + ",");
 							savedBlocks++;
 						}
