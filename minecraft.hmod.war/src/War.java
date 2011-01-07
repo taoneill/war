@@ -1,6 +1,5 @@
 
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -13,7 +12,7 @@ public class War extends Plugin {
 	private WarListener listener = new WarListener(this);
     private Logger log;
     String name = "War";
-    String version = "0.1";
+    String version = "0.2";
     
     private final List<Warzone> warzones = new ArrayList<Warzone>();
     private final List<Item> defaultLoadout = new ArrayList<Item>();
