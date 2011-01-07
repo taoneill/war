@@ -69,14 +69,18 @@ public class WarPlayerListener extends PlayerListener {
 			if(split.length < 2) {
 				player.sendMessage(war.str("Usage: /warzone <warzone-name>."));
 			} else {
+				boolean warped = false;
 				for(Warzone warzone : war.getWarzones()) {
 					if(warzone.getName().equals(split[1])){
 						player.teleportTo(warzone.getTeleport());
+						warped = true;
 						player.sendMessage(war.str("You've landed in warzone " + warzone.getName() +
 								". Use the /join command. " + getAllTeamsMsg(player)));
 					}
 				}
-				player.sendMessage("No such warzone.");
+				if(!warped) {
+					player.sendMessage("No such warzone.");
+				}
 			}
 			event.setCancelled(true); // do i need this?
 		}
