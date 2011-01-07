@@ -157,16 +157,16 @@ public class Warzone {
 		if(ready()){
 			int northSouth = ((int)(southeast.getBlockX())) - ((int)(northwest.getBlockX()));
 			int eastWest = ((int)(northwest.getBlockZ())) - ((int)(southeast.getBlockZ()));
-			setInitialState(new int[northSouth][128][eastWest]);
+			setInitialState(new int[northSouth + 6][128][eastWest + 6]);
 			int noOfSavedBlocks = 0;
-			int x = (int)northwest.getBlockX();
+			int x = (int)northwest.getBlockX() - 2;
 			int minY = 0;
 			int maxY = 128;
-			for(int i = 0; i < northSouth; i++){
+			for(int i = 0; i < northSouth + 3 && i < getInitialState().length; i++){
 				int y = minY;
-				for(int j = 0; j < maxY - minY; j++) {
-					int z = (int)southeast.getBlockZ();
-					for(int k = 0; k < eastWest; k++) {
+				for(int j = 0; j < 128 && j < getInitialState()[i].length; j++) {
+					int z = (int)southeast.getBlockZ() - 2;
+					for(int k = 0; k < eastWest + 3 && k < getInitialState()[i][j].length; k++) {
 						getInitialState()[i][j][k] = world.getBlockAt(x, y, z).getTypeID();
 						noOfSavedBlocks++;
 						z++;
@@ -193,20 +193,21 @@ public class Warzone {
 			int eastWest = ((int)(northwest.getBlockZ())) - ((int)(southeast.getBlockZ()));
 			int noOfResetBlocks = 0;
 			int noOfFailures = 0;
-			int x = northwest.getBlockX();
+			int x = northwest.getBlockX() - 2;
 			int minY = 0;
 			int maxY = 128;
-			for(int i = 0; i < northSouth; i++){
+			for(int i = 0; i < northSouth + 3 && i < getInitialState().length; i++){
 				int y = minY;
-				for(int j = 0; j < maxY - minY; j++) {
-					int z = (int)southeast.getBlockZ();
-					for(int k = 0; k < eastWest; k++) {
+				for(int j = 0; j < 128 && j < getInitialState()[i].length; j++) {
+					int z = (int)southeast.getBlockZ() - 2;
+					for(int k = 0; k < eastWest + 3 && k < getInitialState()[i][j].length; k++) {
 						Block currentBlock = world.getBlockAt(x, y, z);
 						int currentType = currentBlock.getTypeID();
 						int initialType = getInitialState()[i][j][k];
 						if(currentType != initialType) {	// skip block if nothing changed
 							currentBlock.setTypeID(initialType);
 						}
+						noOfResetBlocks++;
 						z++;
 					}
 					y++;					

@@ -128,14 +128,18 @@ public class WarzoneMapper {
 			int eastWest = ((int)(warzone.getNorthwest().getBlockZ())) - ((int)(warzone.getSoutheast().getBlockZ()));
 			int minY = 0;
 			int maxY = 128;
-			int[][][] state = new int[northSouth][128][eastWest];
+			int[][][] state = new int[northSouth + 6][128][eastWest + 6];
 			String stateStr = warzoneBlocksFile.getString("zoneBlocks");
 			String[] stateStrSplit = stateStr.split(",");
 			int splitIndex = 0;
-			if(stateStrSplit.length > 1) {
-				for(int i = 0; i < northSouth; i++){
-					for(int j = 0; j < maxY - minY; j++) {
-						for(int k = 0; k < eastWest; k++) {
+			if(stateStrSplit.length > 1000) {
+				for(int i = 0; i < northSouth + 3
+								&& i < state.length; i++){
+					for(int j = 0; j < maxY - minY 
+									&& j < state[i].length; j++) {
+						for(int k = 0; k < eastWest + 3 
+										&& k < state[k].length 
+										&& splitIndex < stateStrSplit.length; k++) {
 							String currentBlockType = stateStrSplit[splitIndex];
 							if(currentBlockType != null && !currentBlockType.equals("")) {
 								state[i][j][k] = Integer.parseInt(currentBlockType);
@@ -258,16 +262,15 @@ public class WarzoneMapper {
 			PropertiesFile warzoneBlocksFile = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + ".dat");
 			int northSouth = ((int)(warzone.getSoutheast().getBlockX())) - ((int)(warzone.getNorthwest().getBlockX()));
 			int eastWest = ((int)(warzone.getNorthwest().getBlockZ())) - ((int)(warzone.getSoutheast().getBlockZ()));
-			int x = warzone.getNorthwest().getBlockX();
-			int minY = 0;
-			int maxY = 128;
 			int[][][] state = warzone.getInitialState();
 			StringBuilder stateBuilder = new StringBuilder();
+			int savedBlocks = 0;
 			if(state.length > 1) {
-				for(int i = 0; i < northSouth; i++){
-					for(int j = 0; j < maxY - minY; j++) {
-						for(int k = 0; k < eastWest; k++) {
+				for(int i = 0; i < northSouth + 3 && i < state.length; i++){
+					for(int j = 0; j < 128 && j < state[i].length; j++) {
+						for(int k = 0; k < eastWest + 3 && k < state[i][j].length && savedBlocks < state.length; k++) {
 							stateBuilder.append(state[i][j][k] + ",");
+							savedBlocks++;
 						}
 					}
 				}
