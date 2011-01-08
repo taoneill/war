@@ -4,7 +4,7 @@ import org.bukkit.*;
 
 public class Monument {
 	private Location location;
-	private int[] initialState = new int[10];
+	private int[] initialState = new int[26];
 	private World world = null;
 	private Team ownerTeam = null;
 	private final String name;
@@ -16,16 +16,45 @@ public class Monument {
 		int x = location.getBlockX();
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
-		getInitialState()[0] = world.getBlockAt(x+1, y-1, z+1).getTypeID();
-		getInitialState()[1] = world.getBlockAt(x+1, y-1, z).getTypeID();
-		getInitialState()[2] = world.getBlockAt(x+1, y-1, z-1).getTypeID();
-		getInitialState()[3] = world.getBlockAt(x, y-1, z+1).getTypeID();
-		getInitialState()[4] = world.getBlockAt(x, y-1, z).getTypeID();
-		getInitialState()[5] = world.getBlockAt(x, y-1, z-1).getTypeID();
-		getInitialState()[6] = world.getBlockAt(x-1, y-1, z+1).getTypeID();
-		getInitialState()[7] = world.getBlockAt(x-1, y-1, z).getTypeID();
-		getInitialState()[8] = world.getBlockAt(x-1, y-1, z-1).getTypeID();
-		getInitialState()[9] = world.getBlockAt(x, y, z).getTypeID();
+		
+		// center
+		getInitialState()[0] = world.getBlockAt(x, y, z).getTypeID();
+		getInitialState()[1] = world.getBlockAt(x, y-1, z).getTypeID();
+		
+		// inner ring
+		getInitialState()[2] = world.getBlockAt(x+1, y-1, z+1).getTypeID();
+		getInitialState()[3] = world.getBlockAt(x+1, y-1, z).getTypeID();
+		getInitialState()[4] = world.getBlockAt(x+1, y-1, z-1).getTypeID();
+		
+		getInitialState()[5] = world.getBlockAt(x, y-1, z+1).getTypeID();
+		getInitialState()[6] = world.getBlockAt(x, y-1, z-1).getTypeID();
+		
+		getInitialState()[7] = world.getBlockAt(x-1, y-1, z+1).getTypeID();
+		getInitialState()[9] = world.getBlockAt(x-1, y-1, z).getTypeID();
+		getInitialState()[9] = world.getBlockAt(x-1, y-1, z-1).getTypeID();
+		
+		// outer ring
+		getInitialState()[10] = world.getBlockAt(x+2, y-1, z+2).getTypeID();
+		getInitialState()[11] = world.getBlockAt(x+2, y-1, z+1).getTypeID();
+		getInitialState()[12] = world.getBlockAt(x+2, y-1, z).getTypeID();
+		getInitialState()[13] = world.getBlockAt(x+2, y-1, z-1).getTypeID();
+		getInitialState()[14] = world.getBlockAt(x+2, y-1, z-2).getTypeID();
+		
+		getInitialState()[15] = world.getBlockAt(x-1, y-1, z+2).getTypeID();
+		getInitialState()[16] = world.getBlockAt(x-1, y-1, z-2).getTypeID();
+		
+		getInitialState()[17] = world.getBlockAt(x, y-1, z+2).getTypeID();
+		getInitialState()[18] = world.getBlockAt(x, y-1, z-2).getTypeID();
+		
+		getInitialState()[19] = world.getBlockAt(x+1, y-1, z+2).getTypeID();
+		getInitialState()[20] = world.getBlockAt(x+1, y-1, z-2).getTypeID();
+		
+		getInitialState()[21] = world.getBlockAt(x-2, y-1, z+2).getTypeID();
+		getInitialState()[22] = world.getBlockAt(x-2, y-1, z+1).getTypeID();
+		getInitialState()[23] = world.getBlockAt(x-2, y-1, z).getTypeID();
+		getInitialState()[24] = world.getBlockAt(x-2, y-1, z-1).getTypeID();
+		getInitialState()[25] = world.getBlockAt(x-2, y-1, z-2).getTypeID();
+		
 		this.reset();
 	}
 	
@@ -58,10 +87,38 @@ public class Monument {
 	
 	public void ignite(Team team) {
 		ownerTeam = team;
+		int x = location.getBlockX();
+		int y = location.getBlockY();
+		int z = location.getBlockZ();
+		
+		world.getBlockAt(x+1, y-1, z+1).setType(Material.GlowingRedstoneOre);
+		world.getBlockAt(x+1, y-1, z).setType(Material.GlowingRedstoneOre);
+		world.getBlockAt(x+1, y-1, z-1).setType(Material.GlowingRedstoneOre);
+		
+		world.getBlockAt(x, y-1, z+1).setType(Material.GlowingRedstoneOre);		
+		world.getBlockAt(x, y-1, z-1).setType(Material.GlowingRedstoneOre);
+		
+		world.getBlockAt(x-1, y-1, z+1).setType(Material.GlowingRedstoneOre);
+		world.getBlockAt(x-1, y-1, z).setType(Material.GlowingRedstoneOre);
+		world.getBlockAt(x-1, y-1, z-1).setType(Material.GlowingRedstoneOre);
 	}
 	
 	public void smother() {
 		ownerTeam = null;
+		int x = location.getBlockX();
+		int y = location.getBlockY();
+		int z = location.getBlockZ();
+		world.getBlockAt(x+1, y-1, z+1).setType(Material.CoalOre);
+		world.getBlockAt(x+1, y-1, z).setType(Material.CoalOre);
+		world.getBlockAt(x+1, y-1, z-1).setType(Material.CoalOre);
+		
+		world.getBlockAt(x, y-1, z+1).setType(Material.CoalOre);		
+		world.getBlockAt(x, y-1, z-1).setType(Material.CoalOre);
+		
+		world.getBlockAt(x-1, y-1, z+1).setType(Material.CoalOre);
+		world.getBlockAt(x-1, y-1, z).setType(Material.CoalOre);
+		world.getBlockAt(x-1, y-1, z-1).setType(Material.CoalOre);
+		
 	}
 
 	public void reset() {
@@ -69,32 +126,88 @@ public class Monument {
 		int x = location.getBlockX();
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
-		world.getBlockAt(x+1, y-1, z+1).setTypeID(49);
-		world.getBlockAt(x+1, y-1, z).setTypeID(49);
-		world.getBlockAt(x+1, y-1, z-1).setTypeID(49);
-		world.getBlockAt(x, y-1, z+1).setTypeID(49);
-		world.getBlockAt(x, y-1, z).setTypeID(87);
-		world.getBlockAt(x, y-1, z-1).setTypeID(49);
-		world.getBlockAt(x-1, y-1, z+1).setTypeID(49);
-		world.getBlockAt(x-1, y-1, z).setTypeID(49);
-		world.getBlockAt(x-1, y-1, z-1).setTypeID(49);
-		world.getBlockAt(x, y, z).setTypeID(0);
+		
+		// center
+		world.getBlockAt(x, y, z).setType(Material.Air);
+		world.getBlockAt(x, y-1, z).setType(Material.Soil);
+		
+		// inner ring
+		world.getBlockAt(x+1, y-1, z+1).setType(Material.CoalOre);
+		world.getBlockAt(x+1, y-1, z).setType(Material.CoalOre);
+		world.getBlockAt(x+1, y-1, z-1).setType(Material.CoalOre);
+		
+		world.getBlockAt(x, y-1, z+1).setType(Material.CoalOre);		
+		world.getBlockAt(x, y-1, z-1).setType(Material.CoalOre);
+		
+		world.getBlockAt(x-1, y-1, z+1).setType(Material.CoalOre);
+		world.getBlockAt(x-1, y-1, z).setType(Material.CoalOre);
+		world.getBlockAt(x-1, y-1, z-1).setType(Material.CoalOre);
+		
+		// outer ring
+		//world.getBlockAt(x+2, y-1, z+2).setType(Material.Obsidian);
+		world.getBlockAt(x+2, y-1, z+1).setType(Material.Obsidian);
+		world.getBlockAt(x+2, y-1, z).setType(Material.Obsidian);
+		world.getBlockAt(x+2, y-1, z-1).setType(Material.Obsidian);
+		//world.getBlockAt(x+2, y-1, z-2).setType(Material.Obsidian);
+		
+		world.getBlockAt(x-1, y-1, z+2).setType(Material.Obsidian);
+		world.getBlockAt(x-1, y-1, z-2).setType(Material.Obsidian);
+		
+		world.getBlockAt(x, y-1, z+2).setType(Material.Obsidian);
+		world.getBlockAt(x, y-1, z-2).setType(Material.Obsidian);
+		
+		world.getBlockAt(x+1, y-1, z+2).setType(Material.Obsidian);
+		world.getBlockAt(x+1, y-1, z-2).setType(Material.Obsidian);
+		
+		//world.getBlockAt(x-2, y-1, z+2).setType(Material.Obsidian);
+		world.getBlockAt(x-2, y-1, z+1).setType(Material.Obsidian);
+		world.getBlockAt(x-2, y-1, z).setType(Material.Obsidian);
+		world.getBlockAt(x-2, y-1, z-1).setType(Material.Obsidian);
+		//world.getBlockAt(x-2, y-1, z-2).setType(Material.Obsidian);
 	}
 	
 	public void remove() {
 		int x = location.getBlockX();
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
-		world.getBlockAt(x+1, y-1, z+1).setTypeID(getInitialState()[0]);
-		world.getBlockAt(x+1, y-1, z).setTypeID(getInitialState()[1]);
-		world.getBlockAt(x+1, y-1, z-1).setTypeID(getInitialState()[2]);
-		world.getBlockAt(x, y-1, z+1).setTypeID(getInitialState()[3]);
-		world.getBlockAt(x, y-1, z).setTypeID(getInitialState()[4]);
-		world.getBlockAt(x, y-1, z-1).setTypeID(getInitialState()[5]);
-		world.getBlockAt(x-1, y-1, z+1).setTypeID(getInitialState()[6]);
-		world.getBlockAt(x-1, y-1, z).setTypeID(getInitialState()[7]);
-		world.getBlockAt(x-1, y-1, z-1).setTypeID(getInitialState()[8]);
-		world.getBlockAt(x, y, z).setTypeID(getInitialState()[9]);
+		
+		// center
+		world.getBlockAt(x, y, z).setTypeID(getInitialState()[0]);
+		world.getBlockAt(x, y - 1, z).setTypeID(getInitialState()[1]);
+
+		// inner ring
+		world.getBlockAt(x+1, y-1, z+1).setTypeID(getInitialState()[2]);
+		world.getBlockAt(x+1, y-1, z).setTypeID(getInitialState()[3]);
+		world.getBlockAt(x+1, y-1, z-1).setTypeID(getInitialState()[4]);
+		
+		world.getBlockAt(x, y-1, z+1).setTypeID(getInitialState()[5]);
+		world.getBlockAt(x, y-1, z-1).setTypeID(getInitialState()[6]);
+		
+		world.getBlockAt(x-1, y-1, z+1).setTypeID(getInitialState()[7]);
+		world.getBlockAt(x-1, y-1, z).setTypeID(getInitialState()[8]);
+		world.getBlockAt(x-1, y-1, z-1).setTypeID(getInitialState()[9]);
+		
+		// outer ring
+		world.getBlockAt(x+2, y-1, z+2).setTypeID(getInitialState()[10]);
+		world.getBlockAt(x+2, y-1, z+1).setTypeID(getInitialState()[11]);
+		world.getBlockAt(x+2, y-1, z).setTypeID(getInitialState()[12]);
+		world.getBlockAt(x+2, y-1, z-1).setTypeID(getInitialState()[13]);
+		world.getBlockAt(x+2, y-1, z-2).setTypeID(getInitialState()[14]);
+		
+		world.getBlockAt(x-1, y-1, z+2).setTypeID(getInitialState()[15]);
+		world.getBlockAt(x-1, y-1, z-2).setTypeID(getInitialState()[16]);
+		
+		world.getBlockAt(x, y-1, z+2).setTypeID(getInitialState()[17]);
+		world.getBlockAt(x, y-1, z-2).setTypeID(getInitialState()[18]);
+		
+		world.getBlockAt(x+1, y-1, z+2).setTypeID(getInitialState()[19]);
+		world.getBlockAt(x+1, y-1, z-2).setTypeID(getInitialState()[20]);
+		
+		world.getBlockAt(x-2, y-1, z+2).setTypeID(getInitialState()[21]);
+		world.getBlockAt(x-2, y-1, z+1).setTypeID(getInitialState()[22]);
+		world.getBlockAt(x-2, y-1, z).setTypeID(getInitialState()[23]);
+		world.getBlockAt(x-2, y-1, z-1).setTypeID(getInitialState()[24]);
+		world.getBlockAt(x-2, y-1, z-2).setTypeID(getInitialState()[25]);
 	}
 
 	public Location getLocation() {
@@ -143,7 +256,7 @@ public class Monument {
 		int bx = block.getX();
 		int by = block.getY();
 		int bz = block.getZ();
-		if((bx == x && by == y && bz == z) || 
+		if(/*(bx == x && by == y && bz == z) ||*/ 
 				(bx == x+1 && by == y-1 && bz == z+1) ||
 				(bx == x+1 && by == y-1 && bz == z) ||
 				(bx == x+1 && by == y-1 && bz == z-1) ||

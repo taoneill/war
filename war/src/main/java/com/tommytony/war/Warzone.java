@@ -257,7 +257,7 @@ public class Warzone {
 		player.teleportTo(team.getTeamSpawn());
 	}
 
-	public boolean isMonumentFirestone(Block block) {
+	public boolean isMonumentCenterBlock(Block block) {
 		for(Monument monument : monuments) {
 			int x = monument.getLocation().getBlockX();
 			int y = monument.getLocation().getBlockY();
@@ -269,7 +269,7 @@ public class Warzone {
 		return false;
 	}
 	
-	public Monument getMonumentForFirestone(Block block) {
+	public Monument getMonumentFromCenterBlock(Block block) {
 		for(Monument monument : monuments) {
 			int x = monument.getLocation().getBlockX();
 			int y = monument.getLocation().getBlockY();
@@ -296,47 +296,128 @@ public class Warzone {
 		int x = (int)team.getTeamSpawn().getBlockX();
 		int y = (int)team.getTeamSpawn().getBlockY();
 		int z = (int)team.getTeamSpawn().getBlockZ();
-		world.getBlockAt(x+1, y-1, z+1).setTypeID(spawnState[0]);
-		world.getBlockAt(x+1, y-1, z).setTypeID(spawnState[1]);
-		world.getBlockAt(x+1, y-1, z-1).setTypeID(spawnState[2]);
-		world.getBlockAt(x, y-1, z+1).setTypeID(spawnState[3]);
-		world.getBlockAt(x, y-1, z).setTypeID(spawnState[4]);
-		world.getBlockAt(x, y-1, z-1).setTypeID(spawnState[5]);
-		world.getBlockAt(x-1, y-1, z+1).setTypeID(spawnState[6]);
-		world.getBlockAt(x-1, y-1, z).setTypeID(spawnState[7]);
-		world.getBlockAt(x-1, y-1, z-1).setTypeID(spawnState[8]);
-		world.getBlockAt(x, y, z).setTypeID(spawnState[9]);
+		
+		// center
+		world.getBlockAt(x, y, z).setTypeID(spawnState[0]);
+		world.getBlockAt(x, y-1, z).setTypeID(spawnState[1]);
+		
+		// inner ring
+		world.getBlockAt(x+1, y-1, z+1).setTypeID(spawnState[2]);
+		world.getBlockAt(x+1, y-1, z).setTypeID(spawnState[3]);
+		world.getBlockAt(x+1, y-1, z-1).setTypeID(spawnState[4]);
+		
+		world.getBlockAt(x, y-1, z+1).setTypeID(spawnState[5]);		
+		world.getBlockAt(x, y-1, z-1).setTypeID(spawnState[6]);
+		
+		world.getBlockAt(x-1, y-1, z+1).setTypeID(spawnState[7]);
+		world.getBlockAt(x-1, y-1, z).setTypeID(spawnState[8]);
+		world.getBlockAt(x-1, y-1, z-1).setTypeID(spawnState[9]);
+		
+		// outer ring 
+		world.getBlockAt(x+2, y-1, z+2).setTypeID(spawnState[10]);
+		world.getBlockAt(x+2, y-1, z+1).setTypeID(spawnState[11]);
+		world.getBlockAt(x+2, y-1, z).setTypeID(spawnState[12]);
+		world.getBlockAt(x+2, y-1, z-1).setTypeID(spawnState[13]);
+		world.getBlockAt(x+2, y-1, z-2).setTypeID(spawnState[14]);
+		
+		world.getBlockAt(x-1, y-1, z+2).setTypeID(spawnState[15]);
+		world.getBlockAt(x-1, y-1, z-2).setTypeID(spawnState[16]);
+		
+		world.getBlockAt(x, y-1, z+2).setTypeID(spawnState[17]);
+		world.getBlockAt(x, y-1, z-2).setTypeID(spawnState[18]);
+		
+		world.getBlockAt(x+1, y-1, z+2).setTypeID(spawnState[19]);
+		world.getBlockAt(x+1, y-1, z-2).setTypeID(spawnState[20]);
+		
+		world.getBlockAt(x-2, y-1, z+2).setTypeID(spawnState[21]);
+		world.getBlockAt(x-2, y-1, z+1).setTypeID(spawnState[22]);
+		world.getBlockAt(x-2, y-1, z).setTypeID(spawnState[23]);
+		world.getBlockAt(x-2, y-1, z-1).setTypeID(spawnState[24]);
+		world.getBlockAt(x-2, y-1, z-2).setTypeID(spawnState[25]);
 		
 	}
 
 	public void addSpawnArea(Team team, Location location, int blockType) {
 		// Save the spawn state (i.e. the nine block under the player spawn)
-		int[] spawnState = new int[10];
+		int[] spawnState = new int[26];
 		int x = location.getBlockX();
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
-		spawnState[0] = world.getBlockAt(x+1, y-1, z+1).getTypeID();
-		spawnState[1] = world.getBlockAt(x+1, y-1, z).getTypeID();
-		spawnState[2] = world.getBlockAt(x+1, y-1, z-1).getTypeID();
-		spawnState[3] = world.getBlockAt(x, y-1, z+1).getTypeID();
-		spawnState[4] = world.getBlockAt(x, y-1, z).getTypeID();
-		spawnState[5] = world.getBlockAt(x, y-1, z-1).getTypeID();
-		spawnState[6] = world.getBlockAt(x-1, y-1, z+1).getTypeID();
-		spawnState[7] = world.getBlockAt(x-1, y-1, z).getTypeID();
-		spawnState[8] = world.getBlockAt(x-1, y-1, z-1).getTypeID();
-		spawnState[9] = world.getBlockAt(x, y, z).getTypeID();
+		// center
+		spawnState[0] = world.getBlockAt(x, y, z).getTypeID();
+		spawnState[1] = world.getBlockAt(x, y-1, z).getTypeID();
+		
+		// inner ring
+		spawnState[2] = world.getBlockAt(x+1, y-1, z+1).getTypeID();
+		spawnState[3] = world.getBlockAt(x+1, y-1, z).getTypeID();
+		spawnState[4] = world.getBlockAt(x+1, y-1, z-1).getTypeID();
+		
+		spawnState[5] = world.getBlockAt(x, y-1, z+1).getTypeID();		
+		spawnState[6] = world.getBlockAt(x, y-1, z-1).getTypeID();
+		
+		spawnState[7] = world.getBlockAt(x-1, y-1, z+1).getTypeID();
+		spawnState[8] = world.getBlockAt(x-1, y-1, z).getTypeID();
+		spawnState[9] = world.getBlockAt(x-1, y-1, z-1).getTypeID();
+		
+		// outer ring
+		spawnState[10] = world.getBlockAt(x+2, y-1, z+2).getTypeID();
+		spawnState[11] = world.getBlockAt(x+2, y-1, z+1).getTypeID();
+		spawnState[12] = world.getBlockAt(x+2, y-1, z).getTypeID();
+		spawnState[13] = world.getBlockAt(x+2, y-1, z-1).getTypeID();
+		spawnState[14] = world.getBlockAt(x+2, y-1, z-2).getTypeID();
+		
+		spawnState[15] = world.getBlockAt(x-1, y-1, z+2).getTypeID();
+		spawnState[16] = world.getBlockAt(x-1, y-1, z-2).getTypeID();
+		
+		spawnState[17] = world.getBlockAt(x, y-1, z+2).getTypeID();
+		spawnState[18] = world.getBlockAt(x, y-1, z-2).getTypeID();
+		
+		spawnState[19] = world.getBlockAt(x+1, y-1, z+2).getTypeID();
+		spawnState[20] = world.getBlockAt(x+1, y-1, z-2).getTypeID();
+		
+		spawnState[21] = world.getBlockAt(x-2, y-1, z+2).getTypeID();
+		spawnState[22] = world.getBlockAt(x-2, y-1, z+1).getTypeID();
+		spawnState[23] = world.getBlockAt(x-2, y-1, z).getTypeID();
+		spawnState[24] = world.getBlockAt(x-2, y-1, z-1).getTypeID();
+		spawnState[25] = world.getBlockAt(x-2, y-1, z-2).getTypeID();
+		
 		team.setTeamSpawn(location);
 		team.setOldSpawnState(spawnState);
-		// Set the spawn as gold blocks
-		world.getBlockAt(x+1, y-1, z+1);
-		world.getBlockAt(x+1, y-1, z);
-		world.getBlockAt(x+1, y-1, z-1);
-		world.getBlockAt(x, y-1, z+1);
-		world.getBlockAt(x, y-1, z);
-		world.getBlockAt(x, y-1, z-1);
-		world.getBlockAt(x-1, y-1, z+1);
-		world.getBlockAt(x-1, y-1, z);
-		world.getBlockAt(x-1, y-1, z-1);
+		
+		// Set the spawn 
+		
+		// first ring
+		world.getBlockAt(x+1, y-1, z+1).setType(Material.LightStone);
+		world.getBlockAt(x+1, y-1, z).setType(Material.LightStone);
+		world.getBlockAt(x+1, y-1, z-1).setType(Material.LightStone);
+		world.getBlockAt(x, y-1, z+1).setType(Material.LightStone);
+		world.getBlockAt(x, y-1, z).setType(Material.Stone);
+		world.getBlockAt(x, y-1, z-1).setType(Material.LightStone);
+		world.getBlockAt(x-1, y-1, z+1).setType(Material.LightStone);
+		world.getBlockAt(x-1, y-1, z).setType(Material.LightStone);
+		world.getBlockAt(x-1, y-1, z-1).setType(Material.LightStone);
+		
+		// outer ring
+		//world.getBlockAt(x+2, y-1, z+2).setType(Material.Stone);
+		world.getBlockAt(x+2, y-1, z+1).setType(Material.Stone);
+		world.getBlockAt(x+2, y-1, z).setType(Material.Stone);
+		world.getBlockAt(x+2, y-1, z-1).setType(Material.Stone);
+		//world.getBlockAt(x+2, y-1, z-2).setType(Material.Stone);
+		
+		world.getBlockAt(x-1, y-1, z+2).setType(Material.Stone);
+		world.getBlockAt(x-1, y-1, z-2).setType(Material.Stone);
+		
+		world.getBlockAt(x, y-1, z+2).setType(Material.Stone);
+		world.getBlockAt(x, y-1, z-2).setType(Material.Stone);
+		
+		world.getBlockAt(x+1, y-1, z+2).setType(Material.Stone);
+		world.getBlockAt(x+1, y-1, z-2).setType(Material.Stone);
+		
+		//world.getBlockAt(x-2, y-1, z+2).setType(Material.Stone);
+		world.getBlockAt(x-2, y-1, z+1).setType(Material.Stone);
+		world.getBlockAt(x-2, y-1, z).setType(Material.Stone);
+		world.getBlockAt(x-2, y-1, z-1).setType(Material.Stone);
+		//world.getBlockAt(x-2, y-1, z-2).setType(Material.Stone);
 		
 		resetSign(team);
 	}

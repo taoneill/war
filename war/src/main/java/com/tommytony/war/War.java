@@ -8,6 +8,8 @@ import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.tommytony.war.mappers.WarMapper;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +56,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this); //HEALTH_CHANGE
 		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal, this); //DAMAGE
 		
+		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_IGNITE, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_FLOW, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_CANBUILD, blockListener, Priority.Normal, this);	// BLOCK_PLACE

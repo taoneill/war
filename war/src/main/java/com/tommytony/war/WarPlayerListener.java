@@ -10,6 +10,9 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import com.tommytony.war.mappers.WarMapper;
+import com.tommytony.war.mappers.WarzoneMapper;
+
 
 
 public class WarPlayerListener extends PlayerListener {
