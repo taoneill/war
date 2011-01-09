@@ -1,4 +1,4 @@
-package com.tommytony.war;
+package com.tommytony.war.mappers;
 
 import java.io.File;
 import java.io.FileOutputStream;

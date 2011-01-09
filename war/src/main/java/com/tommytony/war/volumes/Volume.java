@@ -263,4 +263,13 @@ public class Volume {
 				z <= getMaxZ() && z >= getMinZ();
 	}
 
+	public boolean contains(Block block) {
+		int x = block.getX();
+		int y = block.getY();
+		int z = block.getZ();
+		return x <= getMaxX() && x >= getMinX() && 
+				y <= getMaxY() && y >= getMinY() &&
+				z <= getMaxZ() && z >= getMinZ();
+	}
+
 }

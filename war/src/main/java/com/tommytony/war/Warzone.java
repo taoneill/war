@@ -331,12 +331,12 @@ public class Warzone {
 	public boolean isImportantBlock(Block block) {
 		block.getX();
 		for(Monument m : monuments) {
-			if(m.contains(block)){
+			if(m.getVolume().contains(block)){
 				return true;
 			}
 		}
 		for(Team t : teams) {
-			if(t.contains(block)){
+			if(t.getVolume().contains(block)){
 				return true;
 			}
 		}

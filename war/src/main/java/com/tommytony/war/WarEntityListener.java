@@ -9,6 +9,7 @@ import org.bukkit.event.entity.EntityDamagedByBlockEvent;
 import org.bukkit.event.entity.EntityDamagedByEntityEvent;
 import org.bukkit.event.entity.EntityListener;
 
+
 public class WarEntityListener extends EntityListener {
 
 	private final War war;

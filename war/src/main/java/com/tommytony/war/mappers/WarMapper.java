@@ -2,7 +2,6 @@ package com.tommytony.war.mappers;
 import java.io.File;
 import java.io.IOException;
 
-import com.tommytony.war.PropertiesFile;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 

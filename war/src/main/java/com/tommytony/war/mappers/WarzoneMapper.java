@@ -3,10 +3,10 @@ package com.tommytony.war.mappers;
 import org.bukkit.*;
 
 import com.tommytony.war.Monument;
-import com.tommytony.war.PropertiesFile;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.volumes.CenteredVolume;
 import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
 
@@ -143,23 +143,14 @@ public class WarzoneMapper {
 			
 			// monument blocks
 			for(Monument monument: warzone.getMonuments()) {
-				Volume monumentVolume = new Volume(monument.getName(), war, warzone);
 				String monumentBlocksStr = warzoneBlocksFile.getString("monument"+monument.getName()+"Blocks");
-				monumentVolume.blocksFromString(monumentBlocksStr);
+				monument.getVolume().blocksFromString(monumentBlocksStr);
 			}
 			
 			// team spawn blocks
 			for(Team team : warzone.getTeams()) {
 				String teamBlocksStr = warzoneBlocksFile.getString("team"+team.getName()+"Blocks");
-				String[] teamBlocksSplit = teamBlocksStr.split(",");
-				int[] teamState = new int[10];
-				for(int i = 0; i < teamBlocksSplit.length; i++) {
-					String split = teamBlocksSplit[i];
-					if(split != null && !split.equals("")) {
-						teamState[i] = Integer.parseInt(split);
-					}
-				}
-				team.setOldSpawnState(teamState);
+				team.getVolume().blocksFromString(teamBlocksStr);
 			}
 			
 			warzoneBlocksFile.close();
@@ -248,19 +239,13 @@ public class WarzoneMapper {
 			
 			// monument blocks
 			for(Monument monument: monuments) {
-				String monumentBlocksStr = "";
-				for(int type : monument.getInitialState()) {
-					monumentBlocksStr += type + ",";
-				}
+				String monumentBlocksStr = monument.getVolume().blocksToString();
 				warzoneBlocksFile.setString("monument"+monument.getName()+"Blocks", monumentBlocksStr);
 			}
 			
 			// team spawn blocks
 			for(Team team : teams) {
-				String teamBlocksStr = "";
-				for(int type : team.getOldSpawnState()) {
-					teamBlocksStr += type + ",";
-				}
+				String teamBlocksStr = team.getVolume().blocksToString();
 				warzoneBlocksFile.setString("team"+team.getName()+"Blocks", teamBlocksStr);
 			}
 			

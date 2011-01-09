@@ -16,7 +16,6 @@ public class Team {
 	private String name;
 	private int remainingTickets;
 	private int startTickets;
-	private int[] oldSpawnState = new int[10];
 	private int points = 0;
 	private CenteredVolume volume;
 	private final War war;
@@ -126,14 +125,6 @@ public class Team {
 	public int getRemainingTickets() {
 		return remainingTickets;
 	}
-
-	public int[] getOldSpawnState() {
-		return oldSpawnState;
-	}
-
-	public void setOldSpawnState(int[] oldSpawnState) {
-		this.oldSpawnState = oldSpawnState;
-	}
 	
 	public void addPoint() {
 		points++;
@@ -141,28 +132,6 @@ public class Team {
 
 	public int getPoints() {
 		return points;
-	}
-
-	public boolean contains(Block block) {
-		int x = teamSpawn.getBlockX();
-		int y = teamSpawn.getBlockY();
-		int z = teamSpawn.getBlockZ();
-		int bx = block.getX();
-		int by = block.getY();
-		int bz = block.getZ();
-		if((bx == x && by == y && bz == z) || 
-				(bx == x+1 && by == y-1 && bz == z+1) ||
-				(bx == x+1 && by == y-1 && bz == z) ||
-				(bx == x+1 && by == y-1 && bz == z-1) ||
-				(bx == x && by == y-1 && bz == z+1) ||
-				(bx == x && by == y-1 && bz == z) ||
-				(bx == x && by == y-1 && bz == z-1) ||
-				(bx == x-1 && by == y-1 && bz == z+1) ||
-				(bx == x-1 && by == y-1 && bz == z) ||
-				(bx == x-1 && by == y-1 && bz == z-1) ) {
-			return true;
-		}
-		return false;
 	}
 
 	public CenteredVolume getVolume() {

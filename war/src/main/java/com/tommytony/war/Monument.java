@@ -132,45 +132,20 @@ public class Monument {
 		return name;
 	}
 
-	public void setInitialState(int[] initialState) {
-		this.initialState = initialState;
-	}
-
-	public int[] getInitialState() {
-		return initialState;
-	}
-
 	public void setLocation(Location location) {
 		this.location = location;
 		int x = location.getBlockX();
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
-		volume.setCenter(warzone.getWorld().getBlockAt(x, y, z)); // resets the volume blocks
+		
+		((CenteredVolume)volume).setCenter(warzone.getWorld().getBlockAt(x, y, z)); // resets the volume blocks
 		this.addMonumentBlocks();
 	}
 
-	public boolean contains(Block block) {
-		int x = location.getBlockX();
-		int y = location.getBlockY();
-		int z = location.getBlockZ();
-		int bx = block.getX();
-		int by = block.getY();
-		int bz = block.getZ();
-		if(/*(bx == x && by == y && bz == z) ||*/ 
-				(bx == x+1 && by == y-1 && bz == z+1) ||
-				(bx == x+1 && by == y-1 && bz == z) ||
-				(bx == x+1 && by == y-1 && bz == z-1) ||
-				(bx == x && by == y-1 && bz == z+1) ||
-				(bx == x && by == y-1 && bz == z) ||
-				(bx == x && by == y-1 && bz == z-1) ||
-				(bx == x-1 && by == y-1 && bz == z+1) ||
-				(bx == x-1 && by == y-1 && bz == z) ||
-				(bx == x-1 && by == y-1 && bz == z-1) ) {
-			return true;
-		}
-		return false;
+	public Volume getVolume() {
+		// TODO Auto-generated method stub
+		return volume;
 	}
-	
-	
+
 	
 }

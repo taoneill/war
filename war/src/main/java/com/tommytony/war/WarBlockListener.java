@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlacedEvent;
 
+
 public class WarBlockListener extends BlockListener {
 
 	private War war;
