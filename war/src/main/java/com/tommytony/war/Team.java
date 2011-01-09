@@ -1,21 +1,22 @@
 package com.tommytony.war;
 
-import org.bukkit.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.Block;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Player;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
 import com.tommytony.war.volumes.CenteredVolume;
-import com.tommytony.war.volumes.Volume;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
 	private Location teamSpawn = null;
 	private String name;
 	private int remainingTickets;
-	private int startTickets;
 	private int points = 0;
 	private CenteredVolume volume;
 	private final War war;
@@ -26,14 +27,16 @@ public class Team {
 		this.warzone = warzone;
 		this.setName(name);
 		this.teamSpawn = teamSpawn;
-		this.volume = new CenteredVolume(name, teamSpawn, war, warzone);
+		this.volume = new CenteredVolume(name, teamSpawn, 5, war, warzone);
 	}
 	
 	public void setTeamSpawn(Location teamSpawn) {
 		
-		if(teamSpawn != null) volume.resetBlocks();
 		this.teamSpawn = teamSpawn;
-		Volume newTeamSpawn = new CenteredVolume(name, teamSpawn, war, warzone);
+		
+		// this resets the block to old state
+		volume.setCenter(warzone.getWorld().getBlockAt(teamSpawn.getBlockX(), teamSpawn.getBlockY(), teamSpawn.getBlockZ()));
+		volume.setSideSize(5);
 		volume.saveBlocks();
 		
 		// Set the spawn 

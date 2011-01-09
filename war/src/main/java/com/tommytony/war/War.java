@@ -105,7 +105,7 @@ public class War extends JavaPlugin {
 	
 	public Warzone warzone(Location location) {
 		for(Warzone warzone : warzones) {
-			if(warzone.getVolume().contains(location)) return warzone;
+			if(warzone.getVolume() != null && warzone.getVolume().contains(location)) return warzone;
 		}
 		return null;
 	}

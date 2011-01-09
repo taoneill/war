@@ -74,7 +74,7 @@ public class WarPlayerListener extends PlayerListener {
 			} else {
 				boolean warped = false;
 				for(Warzone warzone : war.getWarzones()) {
-					if(warzone.getName().equals(split[1])){
+					if(warzone.getName().equals(split[1]) && warzone.getTeleport() != null){
 						player.teleportTo(warzone.getTeleport());
 						warped = true;
 						player.sendMessage(war.str("You've landed in warzone " + warzone.getName() +
@@ -209,7 +209,7 @@ public class WarPlayerListener extends PlayerListener {
 				Team newTeam = new Team(name, player.getLocation(), war, warzone);
 				newTeam.setRemainingTickets(warzone.getLifePool());
 				warzone.getTeams().add(newTeam);
-				newTeam.setTeamSpawn(player.getLocation());				
+				newTeam.setTeamSpawn(player.getLocation());
 				player.sendMessage(war.str("Team " + name + " created with spawn here."));
 				WarzoneMapper.save(war, warzone, false);
 			}
@@ -232,8 +232,6 @@ public class WarPlayerListener extends PlayerListener {
 					}
 				}
 				if(team != null) {
-					team.getVolume().resetBlocks();
-					team.setTeamSpawn(player.getLocation());
 					team.setTeamSpawn(player.getLocation());
 					player.sendMessage(war.str("Team " + team.getName() + " spawn relocated."));
 				} else {
@@ -463,43 +461,45 @@ public class WarPlayerListener extends PlayerListener {
 		Location to = event.getTo();
 		
 		Warzone playerWarzone = war.getPlayerWarzone(player.getName());
-		Team playerTeam = war.getPlayerTeam(player.getName());
-		if(player != null && from != null && to != null && 
-				playerTeam != null && !playerWarzone.getVolume().contains(to)) {
-			player.sendMessage(war.str("Can't go outside the warzone boundary! Use /leave to exit the battle."));
-			if(playerWarzone.getVolume().contains(from)){
-				player.teleportTo(from);
-			} else {
-				// somehow the player made it out of the zone
-				player.teleportTo(playerTeam.getTeamSpawn());
-				player.sendMessage(war.str("Brought you back to your team spawn. Use /leave to exit the battle."));
+		if(playerWarzone != null) {
+			Team playerTeam = war.getPlayerTeam(player.getName());
+			if(player != null && from != null && to != null && 
+					playerTeam != null && !playerWarzone.getVolume().contains(to)) {
+				player.sendMessage(war.str("Can't go outside the warzone boundary! Use /leave to exit the battle."));
+				if(playerWarzone.getVolume().contains(from)){
+					player.teleportTo(from);
+				} else {
+					// somehow the player made it out of the zone
+					player.teleportTo(playerTeam.getTeamSpawn());
+					player.sendMessage(war.str("Brought you back to your team spawn. Use /leave to exit the battle."));
+				}
 			}
-		}
-		
-		if(player != null && from != null && to != null && 
-				playerTeam == null 
-				&& war.inAnyWarzone(from) 
-				&& !war.inAnyWarzone(to)) {
-			// leaving
-			Warzone zone = war.warzone(from);
-			player.sendMessage(war.str("Leaving warzone " + zone.getName() + "."));
-		}
-		
-		if(player != null && from != null && to != null && 
-				playerTeam == null 
-				&& !war.inAnyWarzone(from) 
-				&& war.inAnyWarzone(to)) {
-			// entering
-			Warzone zone = war.warzone(to);
-			player.sendMessage(war.str("Entering warzone " + zone.getName() + ". Tip: use /teams."));
-		}
-		
-		if(to != null && playerTeam != null
-				&& playerWarzone.nearAnyOwnedMonument(to, playerTeam) 
-				&& player.getHealth() < 20
-				&& random.nextInt(42) == 3 ) {	// one chance out of many of getting healed
-			player.setHealth(20);
-			player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
+			
+			if(player != null && from != null && to != null && 
+					playerTeam == null 
+					&& war.inAnyWarzone(from) 
+					&& !war.inAnyWarzone(to)) {
+				// leaving
+				Warzone zone = war.warzone(from);
+				player.sendMessage(war.str("Leaving warzone " + zone.getName() + "."));
+			}
+			
+			if(player != null && from != null && to != null && 
+					playerTeam == null 
+					&& !war.inAnyWarzone(from) 
+					&& war.inAnyWarzone(to)) {
+				// entering
+				Warzone zone = war.warzone(to);
+				player.sendMessage(war.str("Entering warzone " + zone.getName() + ". Tip: use /teams."));
+			}
+			
+			if(to != null && playerTeam != null
+					&& playerWarzone.nearAnyOwnedMonument(to, playerTeam) 
+					&& player.getHealth() < 20
+					&& random.nextInt(42) == 3 ) {	// one chance out of many of getting healed
+				player.setHealth(20);
+				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
+			}
 		}
 		
     }

@@ -6,6 +6,7 @@ import org.bukkit.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
 import com.tommytony.war.War;
@@ -86,11 +87,13 @@ public class Volume {
 								currentBlock.setType(oldBlockInfo.getType());
 								currentBlock.setData(oldBlockInfo.getData());
 								if(oldBlockInfo.is(Material.Sign) || oldBlockInfo.is(Material.SignPost)) {
-									Sign currentSign = (Sign) currentBlock;
+									BlockState state = currentBlock.getState();
+									Sign currentSign = (Sign) state;
 									currentSign.setLine(0, oldBlockInfo.getSignLines()[0]);
 									currentSign.setLine(1, oldBlockInfo.getSignLines()[0]);
 									currentSign.setLine(2, oldBlockInfo.getSignLines()[0]);
 									currentSign.setLine(3, oldBlockInfo.getSignLines()[0]);
+									state.update();
 								}
 								noOfResetBlocks++;
 							}
@@ -258,7 +261,7 @@ public class Volume {
 		int x = location.getBlockX();
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
-		return x <= getMaxX() && x >= getMinX() && 
+		return hasTwoCorners() && x <= getMaxX() && x >= getMinX() && 
 				y <= getMaxY() && y >= getMinY() &&
 				z <= getMaxZ() && z >= getMinZ();
 	}
@@ -267,7 +270,7 @@ public class Volume {
 		int x = block.getX();
 		int y = block.getY();
 		int z = block.getZ();
-		return x <= getMaxX() && x >= getMinX() && 
+		return hasTwoCorners() && x <= getMaxX() && x >= getMinX() && 
 				y <= getMaxY() && y >= getMinY() &&
 				z <= getMaxZ() && z >= getMinZ();
 	}

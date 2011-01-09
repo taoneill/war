@@ -21,8 +21,7 @@ public class Monument {
 		int x = location.getBlockX();
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
-		volume = new CenteredVolume("name", location, war, warzone);
-		volume.setSideSize(5);
+		volume = new CenteredVolume("name", location, 5, war, warzone);
 		volume.saveBlocks();
 		
 		this.addMonumentBlocks();

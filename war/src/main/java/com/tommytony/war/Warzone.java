@@ -1,14 +1,19 @@
 package com.tommytony.war;
-import org.bukkit.*;
-import org.bukkit.block.Sign;
-
-import com.tommytony.war.volumes.CenteredVolume;
-import com.tommytony.war.volumes.VerticalVolume;
-import com.tommytony.war.volumes.Volume;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.bukkit.Block;
+import org.bukkit.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Player;
+import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
+
+import com.tommytony.war.volumes.VerticalVolume;
+import com.tommytony.war.volumes.Volume;
 
 public class Warzone {
 	private String name;
@@ -34,6 +39,7 @@ public class Warzone {
 		this.friendlyFire = war.getDefaultFriendlyFire();
 		this.setLifePool(war.getDefaultLifepool());
 		this.setLoadout(war.getDefaultLoadout());
+		this.volume = new VerticalVolume(name, war, this);
 	}
 	
 	public boolean ready() {
@@ -90,11 +96,13 @@ public class Warzone {
 		block.setType(Material.SignPost);
 		block.setData((byte)10); // towards southeast
 		
-		Sign sign = (Sign)block;
+		BlockState state = block.getState();
+		Sign sign = (Sign)state;
 		sign.setLine(0, "Northwest");
 		sign.setLine(1, "corner of");
 		sign.setLine(2, "warzone");
 		sign.setLine(3, name);
+		state.update();
 	
 		saveState();
 	}
@@ -116,7 +124,7 @@ public class Warzone {
 			removeSoutheast();
 		}
 		this.southeast = southeast;
-		this.volume.setCornerOne(world.getBlockAt(southeast.getBlockX(), southeast.getBlockY(), southeast.getBlockZ()));
+		this.volume.setCornerTwo(world.getBlockAt(southeast.getBlockX(), southeast.getBlockY(), southeast.getBlockZ()));
 		// add sign
 		int x = southeast.getBlockX();
 		int y = southeast.getBlockY();
@@ -125,11 +133,13 @@ public class Warzone {
 		block.setType(Material.SignPost);
 		block.setData((byte)2);;
 	
-		Sign sign = (Sign)block;
+		BlockState state = block.getState();
+		Sign sign = (Sign)state;
 		sign.setLine(0, "Southeast");
 		sign.setLine(1, "corner of");
 		sign.setLine(2, "warzone");
 		sign.setLine(3, name);
+		state.update();
 		
 		saveState();
 	}
@@ -175,6 +185,7 @@ public class Warzone {
 					respawnPlayer(team, player);
 				}
 				team.setRemainingTickets(lifePool);
+				team.getVolume().resetBlocks();
 				team.resetSign();
 			}
 			
