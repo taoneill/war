@@ -7,6 +7,8 @@ import com.tommytony.war.PropertiesFile;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.volumes.VerticalVolume;
+import com.tommytony.war.volumes.Volume;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,8 +86,9 @@ public class WarzoneMapper {
 				int teamX = Integer.parseInt(teamStrSplit[1]);
 				int teamY = Integer.parseInt(teamStrSplit[2]);
 				int teamZ = Integer.parseInt(teamStrSplit[3]);
-				Team team = new Team(teamStrSplit[0], 
-									new Location(world, teamX, teamY, teamZ));
+				Team team = new Team(teamStrSplit[0],
+									new Location(world, teamX, teamY, teamZ),
+									war, warzone );
 				team.setRemainingTickets(warzone.getLifePool());
 				warzone.getTeams().add(team);
 			}
@@ -120,7 +123,7 @@ public class WarzoneMapper {
 				int monumentX = Integer.parseInt(monumentStrSplit[1]);
 				int monumentY = Integer.parseInt(monumentStrSplit[2]);
 				int monumentZ = Integer.parseInt(monumentStrSplit[3]);
-				Monument monument = new Monument(monumentStrSplit[0], world, 
+				Monument monument = new Monument(monumentStrSplit[0], war, warzone, 
 										new Location(world, monumentX, monumentY, monumentZ));
 				warzone.getMonuments().add(monument);
 			}
@@ -129,43 +132,20 @@ public class WarzoneMapper {
 		warzoneConfig.close();
 		
 		if(loadBlocks) {
-			// zone blocks 
+
 			PropertiesFile warzoneBlocksFile = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + ".dat");
-			int northSouth = ((int)(warzone.getSoutheast().getBlockX())) - ((int)(warzone.getNorthwest().getBlockX()));
-			int eastWest = ((int)(warzone.getNorthwest().getBlockZ())) - ((int)(warzone.getSoutheast().getBlockZ()));
-			int minY = 0;
-			int maxY = 128;
-			int[][][] state = new int[northSouth + 6][128][eastWest + 6];
+			
+			// zone blocks 
+			VerticalVolume zoneVolume = new VerticalVolume("zone", war, warzone);
 			String stateStr = warzoneBlocksFile.getString("zoneBlocks");
-			String[] stateStrSplit = stateStr.split(",");
-			int splitIndex = 0;
-			if(stateStrSplit.length > 1000) {
-				for(int i = 0; i < northSouth + 3; i++){
-					for(int j = 0; j < 128; j++) {
-						for(int k = 0; k < eastWest + 3; k++) {
-							String currentBlockType = stateStrSplit[splitIndex];
-							if(currentBlockType != null && !currentBlockType.equals("")) {
-								state[i][j][k] = Integer.parseInt(currentBlockType);
-							}
-							splitIndex++;
-						}
-					}
-				}
-			}
-			warzone.setInitialState(state);
+			zoneVolume.blocksFromString(stateStr);
+			warzone.setVolume(zoneVolume);
 			
 			// monument blocks
 			for(Monument monument: warzone.getMonuments()) {
+				Volume monumentVolume = new Volume(monument.getName(), war, warzone);
 				String monumentBlocksStr = warzoneBlocksFile.getString("monument"+monument.getName()+"Blocks");
-				String[] monumentBlocksSplit = monumentBlocksStr.split(",");
-				int[] monumentState = new int[10];
-				for(int i = 0; i < monumentBlocksSplit.length; i++) {
-					String split = monumentBlocksSplit[i];
-					if(split != null && !split.equals("")) {
-						monumentState[i] = Integer.parseInt(split);
-					}
-				}
-				monument.setInitialState(monumentState);
+				monumentVolume.blocksFromString(monumentBlocksStr);
 			}
 			
 			// team spawn blocks
@@ -263,23 +243,8 @@ public class WarzoneMapper {
 		if(saveBlocks) {
 			// zone blocks
 			PropertiesFile warzoneBlocksFile = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + ".dat");
-			int northSouth = warzone.getSoutheast().getBlockX() - warzone.getNorthwest().getBlockX();
-			int eastWest = warzone.getNorthwest().getBlockZ() - warzone.getSoutheast().getBlockZ();
-			int[][][] state = warzone.getInitialState();
-			StringBuilder stateBuilder = new StringBuilder();
-			int savedBlocks = 0;
-			if(state.length > 1) {
-				for(int i = 0; i < northSouth + 3; i++){
-					for(int j = 0; j < 128; j++) {
-						for(int k = 0; k < eastWest + 3; k++) {
-							stateBuilder.append(state[i][j][k] + ",");
-							savedBlocks++;
-						}
-					}
-				}
-			}
-			warzoneBlocksFile.setString("zoneBlocks", stateBuilder.toString());
-			
+			StringBuilder zoneBlocksBuilder = new StringBuilder();
+			warzoneBlocksFile.setString("zoneBlocks", warzone.getVolume().blocksToString());	// oh boy			
 			
 			// monument blocks
 			for(Monument monument: monuments) {

@@ -59,8 +59,6 @@ public class WarEntityListener extends EntityListener {
 					handleDeath(d);
 					event.setCancelled(true); // Don't let the killing blow fall down.
 				}
-				
-				war.getLogger().log(Level.INFO, a.getName() + " hit " + d.getName() + " for " + event.getDamage());
 			} else if (attackerTeam != null && defenderTeam != null 
 					&& attackerTeam == defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
@@ -109,7 +107,7 @@ public class WarEntityListener extends EntityListener {
 						if(!t.getName().equals(team.getName())) {
 							// all other teams get a point
 							t.addPoint();
-							zone.resetSign(t);
+							t.resetSign();
 						}
 					}
 					zone.resetState();
@@ -121,7 +119,7 @@ public class WarEntityListener extends EntityListener {
 			if(!roundOver) {
 				zone.respawnPlayer(team, player);
 				player.sendMessage(war.str("You died!"));
-				zone.resetSign(team);
+				team.resetSign();
 				war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
 			} else {
 				war.getLogger().log(Level.INFO, player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");

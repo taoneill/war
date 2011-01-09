@@ -447,7 +447,6 @@ public class WarListener extends PluginListener {
 			if(attackerTeam != null && defenderTeam != null 
 					&& attackerTeam != defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
-				war.getLogger().log(Level.INFO, a.getName() + " hit " + d.getName() + " for " + damageAmount);
 				return false;	// adversaries!
 			} else if (attackerTeam != null && defenderTeam != null 
 					&& attackerTeam == defenderTeam 			
@@ -475,7 +474,7 @@ public class WarListener extends PluginListener {
 				} else if (attackerWarzone != defenderWarzone) {
 					a.sendMessage(war.str("Your target is playing in another warzone."));
 				}
-				return true; // can't attack someone inside awarzone if you're not in a team
+				return true; // can't attack someone inside a warzone if you're not in a team
 			}
 		}
 		// mobs are always dangerous

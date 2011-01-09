@@ -205,11 +205,11 @@ public class WarPlayerListener extends PlayerListener {
 						"Must be in a warzone (try /warzones and /warzone). "));
 			} else {
 				String name = split[1];
-				Team newTeam = new Team(name, player.getLocation());
 				Warzone warzone = war.warzone(player.getLocation());
+				Team newTeam = new Team(name, player.getLocation(), war, warzone);
 				newTeam.setRemainingTickets(warzone.getLifePool());
 				warzone.getTeams().add(newTeam);
-				warzone.addSpawnArea(newTeam, player.getLocation(), 41);				
+				newTeam.setTeamSpawn(player.getLocation());				
 				player.sendMessage(war.str("Team " + name + " created with spawn here."));
 				WarzoneMapper.save(war, warzone, false);
 			}
@@ -232,8 +232,8 @@ public class WarPlayerListener extends PlayerListener {
 					}
 				}
 				if(team != null) {
-					warzone.removeSpawnArea(team);
-					warzone.addSpawnArea(team, player.getLocation(), 41);
+					team.getVolume().resetBlocks();
+					team.setTeamSpawn(player.getLocation());
 					team.setTeamSpawn(player.getLocation());
 					player.sendMessage(war.str("Team " + team.getName() + " spawn relocated."));
 				} else {
@@ -264,7 +264,7 @@ public class WarPlayerListener extends PlayerListener {
 					}
 				}
 				if(team != null) {
-					warzone.removeSpawnArea(team);	
+					team.getVolume().resetBlocks();	
 					warzone.getTeams().remove(team);
 					WarzoneMapper.save(war, warzone, false);
 					player.sendMessage(war.str("Team " + name + " removed."));
@@ -397,7 +397,7 @@ public class WarPlayerListener extends PlayerListener {
 				warzone.removeSoutheast();
 				warzone.removeNorthwest();
 				for(Team t : warzone.getTeams()) {
-					warzone.removeSpawnArea(t);
+					t.getVolume().resetBlocks();
 				}
 				for(Monument m : warzone.getMonuments()) {
 					m.remove();
@@ -425,7 +425,7 @@ public class WarPlayerListener extends PlayerListener {
 					player.sendMessage(war.str("Monument " + monument.getName() + " was moved."));
 				} else {
 					// create a new monument
-					Monument monument = new Monument(split[1], warzone.getWorld(), player.getLocation());
+					Monument monument = new Monument(split[1], war, warzone, player.getLocation());
 					warzone.getMonuments().add(monument);
 					player.sendMessage(war.str("Monument " + monument.getName() + " created."));
 				}
@@ -465,9 +465,9 @@ public class WarPlayerListener extends PlayerListener {
 		Warzone playerWarzone = war.getPlayerWarzone(player.getName());
 		Team playerTeam = war.getPlayerTeam(player.getName());
 		if(player != null && from != null && to != null && 
-				playerTeam != null && !playerWarzone.contains(to)) {
+				playerTeam != null && !playerWarzone.getVolume().contains(to)) {
 			player.sendMessage(war.str("Can't go outside the warzone boundary! Use /leave to exit the battle."));
-			if(playerWarzone.contains(from)){
+			if(playerWarzone.getVolume().contains(from)){
 				player.teleportTo(from);
 			} else {
 				// somehow the player made it out of the zone
