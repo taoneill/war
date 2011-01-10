@@ -104,7 +104,8 @@ public final class PropertiesFile {
      * @return <code>map</code> - Simple Map HashMap of the entire <code>key=value</code> as <code>&lt;key (java.lang.String), value (java.lang.String)></code>
      * @throws Exception If the properties file doesn't exist.
      */
-    public Map<String, String> returnMap() throws Exception {
+    @SuppressWarnings("unchecked")
+	public Map<String, String> returnMap() throws Exception {
         return (Map<String, String>) props.clone();
     }
 

@@ -1,6 +1,7 @@
 package com.tommytony.war;
 
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
 
 import com.tommytony.war.volumes.CenteredVolume;
 import com.tommytony.war.volumes.Volume;
@@ -27,7 +28,6 @@ public class Monument {
 	}
 	
 	public void addMonumentBlocks() {
-		// TODO Auto-generated method stub
 		this.ownerTeam = null;
 		int x = location.getBlockX();
 		int y = location.getBlockY();
@@ -113,11 +113,11 @@ public class Monument {
 		return ownerTeam != null;
 	}
 	
-	public void ignite(Team team) {
+	public void capture(Team team) {
 		ownerTeam = team;
 	}
 	
-	public void smother() {
+	public void uncapture() {
 		ownerTeam = null;
 
 		
@@ -149,7 +149,6 @@ public class Monument {
 	}
 
 	public Volume getVolume() {
-		// TODO Auto-generated method stub
 		return volume;
 	}
 

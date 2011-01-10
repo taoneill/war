@@ -26,7 +26,6 @@ public class Warzone {
 	
 	private Location teleport;
 	private boolean friendlyFire;
-	private War war;
 	private int lifePool;
 	private HashMap<Integer, ItemStack> loadout; 
 	
@@ -34,7 +33,6 @@ public class Warzone {
 	private World world;
 	
 	public Warzone(War war, World world, String name) {
-		this.war = war;
 		this.world = world;
 		this.name = name;
 		this.friendlyFire = war.getDefaultFriendlyFire();

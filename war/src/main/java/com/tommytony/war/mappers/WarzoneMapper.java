@@ -1,19 +1,20 @@
 package com.tommytony.war.mappers;
 
-import org.bukkit.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+
+import org.bukkit.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.volumes.CenteredVolume;
 import com.tommytony.war.volumes.VerticalVolume;
-import com.tommytony.war.volumes.Volume;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 
 public class WarzoneMapper {
@@ -45,8 +46,7 @@ public class WarzoneMapper {
 		}
 		
 		// world
-		String worldStr = warzoneConfig.getProperty("world");
-		
+		//String worldStr = warzoneConfig.getProperty("world");
 		warzone.setWorld(world);	// default world for now
 				
 		// northwest
@@ -100,17 +100,17 @@ public class WarzoneMapper {
 		warzone.setFriendlyFire(warzoneConfig.getBoolean("friendlyFire"));
 		
 		// loadout
-//		String loadoutStr = warzoneConfig.getString("loadout");
-//		String[] loadoutStrSplit = loadoutStr.split(";");
-//		warzone.getLoadout().clear();
-//		for(String itemStr : loadoutStrSplit) {
-//			if(itemStr != null && !itemStr.equals("")) {
-//				String[] itemStrSplit = itemStr.split(",");
-//				Item item = new Item(Integer.parseInt(itemStrSplit[0]),
-//						Integer.parseInt(itemStrSplit[1]), Integer.parseInt(itemStrSplit[2]));
-//				warzone.getLoadout().add(item);
-//			}
-//		}
+		String loadoutStr = warzoneConfig.getString("loadout");
+		String[] loadoutStrSplit = loadoutStr.split(";");
+		warzone.getLoadout().clear();
+		for(String itemStr : loadoutStrSplit) {
+			if(itemStr != null && !itemStr.equals("")) {
+				String[] itemStrSplit = itemStr.split(",");
+				ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
+						Integer.parseInt(itemStrSplit[1]));
+				warzone.getLoadout().put(Integer.parseInt(itemStrSplit[2]), item);
+			}
+		}
 		
 		// life pool
 		warzone.setLifePool(warzoneConfig.getInt("lifePool"));
@@ -212,12 +212,13 @@ public class WarzoneMapper {
 		warzoneConfig.setBoolean("firendlyFire", warzone.getFriendlyFire());
 		
 		// loadout
-//		String loadoutStr = "";
-//		List<Item> items = warzone.getLoadout();
-//		for(Item item : items) {
-//			loadoutStr += item.getItemId() + "," + item.getAmount() + "," + item.getSlot() + ";";
-//		}
-//		warzoneConfig.setString("loadout", loadoutStr);
+		String loadoutStr = "";
+		HashMap<Integer, ItemStack> items = warzone.getLoadout();
+		for(Integer slot : items.keySet()) {
+			ItemStack item = items.get(slot);
+			loadoutStr += item.getTypeID() + "," + item.getAmount() + "," + slot + ";";
+		}
+		warzoneConfig.setString("loadout", loadoutStr);
 		
 		// life pool
 		warzoneConfig.setInt("lifePool", warzone.getLifePool());
@@ -236,7 +237,6 @@ public class WarzoneMapper {
 		if(saveBlocks) {
 			// zone blocks
 			PropertiesFile warzoneBlocksFile = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + ".dat");
-			StringBuilder zoneBlocksBuilder = new StringBuilder();
 			warzoneBlocksFile.setString("zoneBlocks", warzone.getVolume().blocksToString());	// oh boy			
 			
 			// monument blocks

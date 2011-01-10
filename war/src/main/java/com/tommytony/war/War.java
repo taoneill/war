@@ -170,7 +170,6 @@ public class War extends JavaPlugin {
 	}
 
 	public String getName() {
-		// TODO Auto-generated method stub
 		return name;
 	}
 

@@ -19,12 +19,10 @@ public class Team {
 	private int remainingTickets;
 	private int points = 0;
 	private Volume volume;
-	private final War war;
 	private final Warzone warzone;
 	private Material material;
 	
 	public Team(String name, Material material, Location teamSpawn, War war, Warzone warzone) {
-		this.war = war;
 		this.warzone = warzone;
 		this.setName(name);
 		this.teamSpawn = teamSpawn;
