@@ -169,15 +169,15 @@ public class Volume {
 	}
 	
 	public int getSizeX() {
-		return getMaxX() - getMinX();
+		return getMaxX() - getMinX() + 1;
 	}
 	
 	public int getSizeY() {
-		return getMaxY() - getMinY();
+		return getMaxY() - getMinY() + 1;
 	}
 	
 	public int getSizeZ() {
-		return getMaxZ() - getMinZ();
+		return getMaxZ() - getMinZ() + 1;
 	}	
 
 	public boolean isSaved() {

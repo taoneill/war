@@ -137,7 +137,7 @@ public class Monument {
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
 		
-		((CenteredVolume)volume).setCenter(warzone.getWorld().getBlockAt(x, y, z)); // resets the volume blocks
+		volume.changeCenter(location);
 		this.addMonumentBlocks();
 	}
 

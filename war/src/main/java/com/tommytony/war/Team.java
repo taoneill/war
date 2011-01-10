@@ -35,8 +35,7 @@ public class Team {
 		this.teamSpawn = teamSpawn;
 		
 		// this resets the block to old state
-		volume.setCenter(warzone.getWorld().getBlockAt(teamSpawn.getBlockX(), teamSpawn.getBlockY(), teamSpawn.getBlockZ()));
-		volume.setSideSize(5);
+		volume.changeCenter(teamSpawn);
 		volume.saveBlocks();
 		
 		// Set the spawn 

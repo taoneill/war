@@ -18,7 +18,7 @@ import java.util.List;
 public class WarzoneMapper {
 
 	public static Warzone load(War war, String name, boolean loadBlocks) {
-		war.getLogger().info("Loading warzone " + name + " config and blocks...");
+		//war.getLogger().info("Loading warzone " + name + " config and blocks...");
 		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + name + ".txt");
 		try {
 			warzoneConfig.load();
@@ -38,7 +38,7 @@ public class WarzoneMapper {
 			try {
 				warzoneConfig.load();
 			} catch (IOException e) {
-				war.getLogger().info("Failed to reload warzone-" + name + ".txt file after creating it.");
+				//war.getLogger().info("Failed to reload warzone-" + name + ".txt file after creating it.");
 				e.printStackTrace();
 			}
 		}
@@ -154,9 +154,9 @@ public class WarzoneMapper {
 			}
 			
 			warzoneBlocksFile.close();
-			war.getLogger().info("Loaded warzone " + name + " config and blocks.");
+			//war.getLogger().info("Loaded warzone " + name + " config and blocks.");
 		} else {
-			war.getLogger().info("Loaded warzone " + name + " config.");
+			//war.getLogger().info("Loaded warzone " + name + " config.");
 		}
 		
 		return warzone;
@@ -165,7 +165,7 @@ public class WarzoneMapper {
 	
 	public static void save(War war, Warzone warzone, boolean saveBlocks) {
 		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + ".txt");
-		war.getLogger().info("Saving warzone " + warzone.getName() + "...");
+		//war.getLogger().info("Saving warzone " + warzone.getName() + "...");
 		
 		// name
 		warzoneConfig.setString("name", warzone.getName());
@@ -253,11 +253,11 @@ public class WarzoneMapper {
 			warzoneBlocksFile.close();
 		}
 		
-		if(saveBlocks) {
-			war.getLogger().info("Saved warzone " + warzone.getName() + " config and blocks.");
-		} else {
-			war.getLogger().info("Saved warzone " + warzone.getName() + " config.");
-		}
+//		if(saveBlocks) {
+//			war.getLogger().info("Saved warzone " + warzone.getName() + " config and blocks.");
+//		} else {
+//			war.getLogger().info("Saved warzone " + warzone.getName() + " config.");
+//		}
 	}
 	
 	public static void delete(War war, String name) {

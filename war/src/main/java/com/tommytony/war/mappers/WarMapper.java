@@ -9,7 +9,7 @@ import com.tommytony.war.Warzone;
 public class WarMapper {
 	
 	public static void load(War war) {
-		war.getLogger().info("Loading war config...");
+		//war.getLogger().info("Loading war config...");
 		(new File(war.getName())).mkdir();
 		PropertiesFile warConfig = new PropertiesFile(war.getName() + "/war.txt");
 		try {
@@ -69,7 +69,7 @@ public class WarMapper {
 	}
 	
 	public static void save(War war) {
-		war.getLogger().info("Saving war config...");
+		//war.getLogger().info("Saving war config...");
 		PropertiesFile warConfig = new PropertiesFile(war.getName() + "/war.txt");
 		String warzonesStr = "";
 		
@@ -95,6 +95,6 @@ public class WarMapper {
 		
 		warConfig.save();
 		warConfig.close();
-		war.getLogger().info("Saved war config.");
+		//war.getLogger().info("Saved war config.");
 	}
 }

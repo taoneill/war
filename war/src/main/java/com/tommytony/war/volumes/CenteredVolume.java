@@ -17,12 +17,22 @@ public class CenteredVolume extends Volume {
 		setSideSize(sideSize);
 	}
 	
-	public void setCenter(Block block) {
+	public void changeCenter(Location newCenter) {
+		changeCenter(getWarzone().getWorld().getBlockAt(newCenter.getBlockX(), 
+														newCenter.getBlockY(), 
+														newCenter.getBlockZ()), 
+															this.sideSize);
+	}
+	
+	public void changeCenter(Block newCenter, int sideSize) {
 		this.resetBlocks();
+		this.center = newCenter;
+		this.sideSize = sideSize;
+		this.calculateCorners();
+	}
+	
+	private void setCenter(Block block) {
 		this.center = block;
-		if(sideSize != -1) {
-			calculateCorners();
-		}
 	}
 	
 	private void calculateCorners() {
@@ -34,20 +44,24 @@ public class CenteredVolume extends Volume {
 		Block cornerOne = getWarzone().getWorld().getBlockAt(x, y, z);
 		setCornerOne(cornerOne);
 		
-		int bottomHalfOfSide = sideSize - topHalfOfSide;
-		x = center.getX() - bottomHalfOfSide;
-		y = center.getY() - bottomHalfOfSide;
-		z = center.getZ() - bottomHalfOfSide;
-		Block cornerTwo = getWarzone().getWorld().getBlockAt(x, y, z);
-		setCornerTwo(cornerTwo);
+		if(sideSize % 2 == 0) {	// not a real center, bottom half is larger by 1
+			int bottomHalfOfSide = sideSize - topHalfOfSide;
+			x = center.getX() - bottomHalfOfSide;
+			y = center.getY() - bottomHalfOfSide;
+			z = center.getZ() - bottomHalfOfSide;
+			Block cornerTwo = getWarzone().getWorld().getBlockAt(x, y, z);
+			setCornerTwo(cornerTwo);
+		} else {
+			x = center.getX() - topHalfOfSide;
+			y = center.getY() - topHalfOfSide;
+			z = center.getZ() - topHalfOfSide;
+			Block cornerTwo = getWarzone().getWorld().getBlockAt(x, y, z);
+			setCornerTwo(cornerTwo);
+		}
 	}
 
-	public void setSideSize(int sideSize) {
-		this.resetBlocks();
+	private void setSideSize(int sideSize) {
 		this.sideSize = sideSize;
-		if(center != null) {
-			calculateCorners();
-		}
 	}
 
 }
