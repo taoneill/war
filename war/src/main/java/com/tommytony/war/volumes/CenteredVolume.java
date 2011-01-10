@@ -11,9 +11,9 @@ public class CenteredVolume extends Volume {
 	private Block center;
 	private int sideSize = -1;
 
-	public CenteredVolume(String name, Location center, int sideSize, War war, Warzone warzone) {
+	public CenteredVolume(String name, Block center, int sideSize, War war, Warzone warzone) {
 		super(name, war, warzone);
-		setCenter(warzone.getWorld().getBlockAt(center.getBlockX(), center.getBlockY(), center.getBlockZ()));
+		setCenter(center);
 		setSideSize(sideSize);
 	}
 	

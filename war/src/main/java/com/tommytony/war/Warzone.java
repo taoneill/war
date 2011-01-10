@@ -395,6 +395,15 @@ public class Warzone {
 	public void setVolume(VerticalVolume zoneVolume) {
 		this.volume = zoneVolume;
 	}
+	
+	public Team getTeamByMaterial(Material material) {
+		for(Team t : teams) {
+			if(t.getMaterial().getID() == material.getID()) {
+				return t;
+			}
+		}
+		return null;
+	}
 
 	
 

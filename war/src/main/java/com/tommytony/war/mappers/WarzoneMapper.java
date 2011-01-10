@@ -4,6 +4,7 @@ import org.bukkit.*;
 
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
+import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.volumes.CenteredVolume;
@@ -86,7 +87,8 @@ public class WarzoneMapper {
 				int teamX = Integer.parseInt(teamStrSplit[1]);
 				int teamY = Integer.parseInt(teamStrSplit[2]);
 				int teamZ = Integer.parseInt(teamStrSplit[3]);
-				Team team = new Team(teamStrSplit[0],
+				Team team = new Team(teamStrSplit[0], 
+									TeamMaterials.teamMaterialFromString(teamStrSplit[0]),
 									new Location(world, teamX, teamY, teamZ),
 									war, warzone );
 				team.setRemainingTickets(warzone.getLifePool());

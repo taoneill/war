@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Player;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerEvent;
@@ -62,30 +63,27 @@ public class WarPlayerListener extends PlayerListener {
 				warzonesMessage += playerTotal + " players)  ";
 			}
 			player.sendMessage(war.str(warzonesMessage + "  Use /warzone <zone-name> to " +
-					"teleport to a warzone, " +
-					"then use /teams and /join <team-name>."));
-			event.setCancelled(true); // do i need this?
+					"teleport to a warzone. "));
+			event.setCancelled(true); 
 		}
 		
 		// warzone
-		else if(command.equals("/warzone")) {
+		else if(command.equals("/zone") || command.equals("/warzone")) {
 			if(split.length < 2) {
-				player.sendMessage(war.str("Usage: /warzone <warzone-name>."));
+				player.sendMessage(war.str("Usage: /zone <warzone-name>."));
 			} else {
 				boolean warped = false;
 				for(Warzone warzone : war.getWarzones()) {
 					if(warzone.getName().equals(split[1]) && warzone.getTeleport() != null){
 						player.teleportTo(warzone.getTeleport());
 						warped = true;
-						player.sendMessage(war.str("You've landed in warzone " + warzone.getName() +
-								". Use the /join command. " + getAllTeamsMsg(player)));
 					}
 				}
 				if(!warped) {
 					player.sendMessage("No such warzone.");
 				}
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
 		// /teams
@@ -96,13 +94,13 @@ public class WarPlayerListener extends PlayerListener {
 			} else {
 				player.sendMessage(war.str("" + getAllTeamsMsg(player)));
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
 		// /join <teamname>
 		else if(command.equals("/join")) {
-			if(split.length < 2 || !war.inAnyWarzone(player.getLocation())) {
-				player.sendMessage(war.str("Usage: /join <team-name>." +
+			if(split.length < 2 || !war.inAnyWarzone(player.getLocation()) || (split.length > 2 && TeamMaterials.teamMaterialFromString(split[1]) == null)) {
+				player.sendMessage(war.str("Usage: /join <diamond/iron/gold/d/i/g>." +
 						" Teams are warzone specific." +
 						" You must be inside a warzone to join a team."));
 			} else {				
@@ -140,7 +138,7 @@ public class WarPlayerListener extends PlayerListener {
 					player.sendMessage(war.str("No such team. Try /teams."));
 				}
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
 		// /leave
@@ -156,7 +154,7 @@ public class WarPlayerListener extends PlayerListener {
 				zone.restorePlayerInventory(player);
 				player.sendMessage(war.str("Your inventory has (hopefully) been restored."));
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
 		
@@ -174,75 +172,58 @@ public class WarPlayerListener extends PlayerListener {
 				}
 				playerTeam.teamcast(war.str(teamMessage));
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
-		// Mod commands : /restartbattle
+		// Mod commands : /nextbattle
 		
 		// /restartbattle
-		else if(command.equals("/restartbattle")) {
+		else if(command.equals("/nextbattle") || command.equals("/restartbattle")) {
 			if(!war.inAnyWarzone(player.getLocation())) {
-				player.sendMessage(war.str("Usage: /restartbattle. Must be in warzone."));
+				player.sendMessage(war.str("Usage: /nextbattle. Resets the zone blocks and all teams' life pools. Must be in warzone."));
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
 				for(Team team: warzone.getTeams()) {
-					team.teamcast(war.str("The battle has ended. " + getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and life pools..."));
+					team.teamcast(war.str("The battle was interrupted. " + getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and life pools..."));
 				}
 				int resetBlocks = warzone.resetState();
 				player.sendMessage(war.str("Warzone reset. " + resetBlocks + " blocks reset."));
 				war.getLogger().info(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true);
 		}
 		
-		// Warzone maker commands: /setwarzone, /savewarzone, /newteam, /setteamspawn, .. /monument?
+		// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
 		
-		// /newteam <teamname>
-		else if(command.equals("/newteam")) {
-			if(split.length < 2 || !war.inAnyWarzone(player.getLocation())) {
-				player.sendMessage(war.str("Usage: /newteam <team-name>." +
+		// /setteam <diamond/iron/gold/d/i/g>
+		else if(command.equals("/setteam") || command.equals("/newteam") || command.equals("/teamspawn")) {
+			if(split.length < 2 || !war.inAnyWarzone(player.getLocation()) || (split.length > 2 && TeamMaterials.teamMaterialFromString(split[1]) == null)) {
+				player.sendMessage(war.str("Usage: /setteam <diamond/iron/gold/d/i/g>." +
 						" Sets the team spawn to the current location. " +
-						"Must be in a warzone (try /warzones and /warzone). "));
+						"Must be in a warzone (try /zones and /zone). "));
 			} else {
 				String name = split[1];
+				Material teamMaterial = TeamMaterials.teamMaterialFromString(name);
 				Warzone warzone = war.warzone(player.getLocation());
-				Team newTeam = new Team(name, player.getLocation(), war, warzone);
-				newTeam.setRemainingTickets(warzone.getLifePool());
-				warzone.getTeams().add(newTeam);
-				newTeam.setTeamSpawn(player.getLocation());
-				player.sendMessage(war.str("Team " + name + " created with spawn here."));
-				WarzoneMapper.save(war, warzone, false);
-			}
-			event.setCancelled(true); // do i need this?
-		}
-				
-		// /setteamspawn 
-		else if(command.equals("/teamspawn")) {
-			if(split.length < 2 || !war.inAnyWarzone(player.getLocation())) {
-				player.sendMessage(war.str("Usage: /setteamspawn <team-name>. " +
-						"Sets the team spawn. " +
-						"Must be in warzone and team must already exist."));
-			} else {
-				Warzone warzone = war.warzone(player.getLocation());
-				List<Team> teams = warzone.getTeams();
-				Team team = null;
-				for(Team t : teams) {
-					if(t.getName().equals(split[1])) {
-						team = t;
-					}
-				}
-				if(team != null) {
-					team.setTeamSpawn(player.getLocation());
-					player.sendMessage(war.str("Team " + team.getName() + " spawn relocated."));
+				Team existingTeam = warzone.getTeamByMaterial(teamMaterial);
+				if(existingTeam != null) {
+					// relocate
+					existingTeam.setTeamSpawn(player.getLocation());
+					player.sendMessage(war.str("Team " + existingTeam.getName() + " spawn relocated."));
 				} else {
-					player.sendMessage(war.str("Usage: /setteamspawn <team-name>. " +
-							"Sets the team spawn. " +
-							"Must be in warzone and team must already exist."));
+					// new team
+					Team newTeam = new Team(name, teamMaterial, player.getLocation(), war, warzone);
+					newTeam.setRemainingTickets(warzone.getLifePool());
+					warzone.getTeams().add(newTeam);
+					newTeam.setTeamSpawn(player.getLocation());
+					player.sendMessage(war.str("Team " + name + " created with spawn here."));
 				}
+				
+				
 				
 				WarzoneMapper.save(war, warzone, false);
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
 		// /deleteteam <teamname>
@@ -250,7 +231,7 @@ public class WarPlayerListener extends PlayerListener {
 			if(split.length < 2 || !war.inAnyWarzone(player.getLocation())) {
 				player.sendMessage(war.str("Usage: /deleteteam <team-name>." +
 						" Deletes the team and its spawn. " +
-						"Must be in a warzone (try /warzones and /warzone). "));
+						"Must be in a warzone (try /zones and /zone). "));
 			} else {
 				String name = split[1];
 				Warzone warzone = war.warzone(player.getLocation());
@@ -270,14 +251,14 @@ public class WarPlayerListener extends PlayerListener {
 					player.sendMessage(war.str("No such team."));
 				}
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
 		// /setwarzone
-		else if(command.equals("/setwarzone")) {
+		else if(command.equals("/setzone") || command.equals("/setwarzone")) {
 			if(split.length < 3 || (split.length == 3 && (!split[2].equals("southeast") && !split[2].equals("northwest")
 															&& !split[2].equals("se") && !split[2].equals("nw")))) {
-				player.sendMessage(war.str("Usage: /setwarzone <warzone-name> <'southeast'/'northwest'>. " +
+				player.sendMessage(war.str("Usage: /setzone <warzone-name> <'southeast'/'northwest'/'se'/'nw'>. " +
 						"Defines the battleground boundary. " +
 						"The warzone is reset at the start of every battle. " +
 						"This command overwrites any previously saved blocks " +
@@ -319,7 +300,7 @@ public class WarPlayerListener extends PlayerListener {
 					}
 					if(warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
 						if(warzone.ready()) {
-							message += " Warzone " + warzone.getName() + " almost ready. Use /newteam while inside the warzone to create new teams. Make sure to use /setwarzonestart to " +
+							message += " Warzone " + warzone.getName() + " almost ready. Use /setteam while inside the warzone to create new teams. Make sure to use /savezone to " +
 									"set the warzone teleport point and initial state.";
 						} else if (warzone.tooSmall()) {
 							message += " Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.";
@@ -332,19 +313,19 @@ public class WarPlayerListener extends PlayerListener {
 				WarzoneMapper.save(war, warzone, false);
 				
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}		
 
 		// /savewarzone
-		else if(command.equals("/savewarzone")) {
+		else if(command.equals("/savezone") || command.equals("/savewarzone")) {
 			if(!war.inAnyWarzone(player.getLocation())) {
-				player.sendMessage(war.str("Usage: /savewarzone. Must be in warzone. " +
-						"Changes the warzone state at the beginning of every battle. " +
-						"Also sets the teleport point for this warzone " +
-						"(i.e. make sure to use /warzone or the warzone tp point will change). " +
-						"Just like /setwarzone, this command overwrites any previously saved blocks " +
+				player.sendMessage(war.str("Usage: /savezone. Must be in warzone. " +
+						"Changes the warzone state loaded at the beginning of every battle. " +
+						"Also sets the teleport point for this warzone where you're standing." +
+						"(i.e. make sure to use /zone or the warzone tp point will change). " +
+						"Just like /setzone, this command overwrites any previously saved blocks " +
 						"(i.e. make sure you reset with /restartbattle " +
-						"or /resetwarzone before changing start state). "));
+						"or /resetzone before changing start state). "));
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
 				int savedBlocks = warzone.saveState();
@@ -352,13 +333,13 @@ public class WarPlayerListener extends PlayerListener {
 				player.sendMessage(war.str("Warzone " + warzone.getName() + " initial state and teleport location changed. Saved " + savedBlocks + " blocks."));
 				WarzoneMapper.save(war, warzone, true);
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
 		// /resetwarzone
-		else if(command.equals("/resetwarzone")) {
+		else if(command.equals("/resetzone") || command.equals("/resetwarzone")) {
 			if(!war.inAnyWarzone(player.getLocation())) {
-				player.sendMessage(war.str("Usage: /resetwarzone <life pool size (optional)>. Must be in warzone."));
+				player.sendMessage(war.str("Usage: /resetzone pool=10 maxScore=5. Reloads the zone. All named parameter are optional. Defaults: pool=7 maxScore=-1 (infinite). Must be in warzone."));
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
 				int resetBlocks = warzone.resetState();
@@ -367,7 +348,7 @@ public class WarPlayerListener extends PlayerListener {
 					for(Player p : team.getPlayers()) {
 						p.teleportTo(warzone.getTeleport());
 						warzone.restorePlayerInventory(p);
-						player.sendMessage(war.str("You are now teamless. Your inventory has (hopefully) been restored."));
+						player.sendMessage(war.str("You have left the warzone. Your inventory has (hopefully) been restored."));
 					}
 				}
 				war.getWarzones().remove(warzone);
@@ -381,7 +362,7 @@ public class WarPlayerListener extends PlayerListener {
 				player.sendMessage(war.str("Warzone and teams reset. " + resetBlocks + " blocks reset."));
 				war.getLogger().info(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
 		// /deletewarzone
@@ -405,13 +386,13 @@ public class WarPlayerListener extends PlayerListener {
 				WarzoneMapper.delete(war, warzone.getName());
 				player.sendMessage(war.str("Warzone " + warzone.getName() + " removed."));
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
 		// /monument
-		else if(command.equals("/monument")) {
+		else if(command.equals("/setmonument")) {
 			if(!war.inAnyWarzone(player.getLocation())) {
-				player.sendMessage(war.str("Usage: /monument <name>. Must be in warzone."));
+				player.sendMessage(war.str("Usage: /setmonument <name>. Creates or moves a monument. Must be in warzone."));
 			} else {
 				Warzone warzone = war.warzone(player.getLocation());
 				String monumentName = split[1];
@@ -429,7 +410,7 @@ public class WarPlayerListener extends PlayerListener {
 				}
 				WarzoneMapper.save(war, warzone, false);
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
 		
 		// /deletemonument <name>
@@ -451,7 +432,7 @@ public class WarPlayerListener extends PlayerListener {
 					player.sendMessage(war.str("No such monument."));
 				}
 			}
-			event.setCancelled(true); // do i need this?
+			event.setCancelled(true); 
 		}
     }
 	

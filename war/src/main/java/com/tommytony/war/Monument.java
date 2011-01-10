@@ -7,7 +7,6 @@ import com.tommytony.war.volumes.Volume;
 
 public class Monument {
 	private Location location;
-	private int[] initialState = new int[26];
 	private CenteredVolume volume;
 	
 	private Team ownerTeam = null;
@@ -18,12 +17,12 @@ public class Monument {
 		this.name = name;
 		this.location = location;
 		this.warzone = warzone;
-		int x = location.getBlockX();
-		int y = location.getBlockY();
-		int z = location.getBlockZ();
-		volume = new CenteredVolume("name", location, 5, war, warzone);
+		volume = new CenteredVolume("name", 
+						warzone.getWorld().getBlockAt(location.getBlockX(), 
+												location.getBlockY() + 2, 
+												location.getBlockZ()), 
+						5, war, warzone);
 		volume.saveBlocks();
-		
 		this.addMonumentBlocks();
 	}
 	
@@ -35,20 +34,56 @@ public class Monument {
 		int z = location.getBlockZ();
 		
 		// center
-		warzone.getWorld().getBlockAt(x, y, z).setType(Material.Air);
+		warzone.getWorld().getBlockAt(x, y, z).getState().setType(Material.Air);
 		warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.Soil);
 		
 		// inner ring
-		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.CoalOre);
-		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.CoalOre);
-		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.CoalOre);
+		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.Obsidian);
 		
-		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.CoalOre);		
-		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.CoalOre);
+		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.Obsidian);
 		
-		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.CoalOre);
-		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.CoalOre);
-		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.CoalOre);
+		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.Obsidian);
+		
+		// outer ring
+		
+		warzone.getWorld().getBlockAt(x+2, y-1, z+2).setType(Material.LightStone);
+		warzone.getWorld().getBlockAt(x+2, y-1, z+1).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x+2, y-1, z).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x+2, y-1, z-1).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x+2, y-1, z-2).setType(Material.LightStone);
+		
+		warzone.getWorld().getBlockAt(x-1, y-1, z+2).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x-1, y-1, z-2).setType(Material.Obsidian);
+		
+		warzone.getWorld().getBlockAt(x, y-1, z+2).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x, y-1, z-2).setType(Material.Obsidian);
+		
+		warzone.getWorld().getBlockAt(x+1, y-1, z+2).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x+1, y-1, z-2).setType(Material.Obsidian);
+		
+		warzone.getWorld().getBlockAt(x-2, y-1, z+2).setType(Material.LightStone);
+		warzone.getWorld().getBlockAt(x-2, y-1, z+1).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x-2, y-1, z).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x-2, y-1, z-1).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x-2, y-1, z-2).setType(Material.LightStone);
+		
+		// center block level ring
+		warzone.getWorld().getBlockAt(x+1, y, z+1).setType(Material.Step);
+		warzone.getWorld().getBlockAt(x+1, y, z).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x+1, y, z-1).setType(Material.Step);
+		
+		warzone.getWorld().getBlockAt(x, y, z+1).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x, y, z-1).setType(Material.Obsidian);
+		
+		warzone.getWorld().getBlockAt(x-1, y, z+1).setType(Material.Step);
+		warzone.getWorld().getBlockAt(x-1, y, z).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x-1, y, z-1).setType(Material.Step);
 	}
 
 	public boolean isNear(Location playerLocation) {
@@ -80,37 +115,11 @@ public class Monument {
 	
 	public void ignite(Team team) {
 		ownerTeam = team;
-		int x = location.getBlockX();
-		int y = location.getBlockY();
-		int z = location.getBlockZ();
-		
-		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.GlowingRedstoneOre);
-		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.GlowingRedstoneOre);
-		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.GlowingRedstoneOre);
-		
-		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.GlowingRedstoneOre);		
-		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.GlowingRedstoneOre);
-		
-		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.GlowingRedstoneOre);
-		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.GlowingRedstoneOre);
-		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.GlowingRedstoneOre);
 	}
 	
 	public void smother() {
 		ownerTeam = null;
-		int x = location.getBlockX();
-		int y = location.getBlockY();
-		int z = location.getBlockZ();
-		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.CoalOre);
-		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.CoalOre);
-		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.CoalOre);
-		
-		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.CoalOre);		
-		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.CoalOre);
-		
-		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.CoalOre);
-		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.CoalOre);
-		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.CoalOre);
+
 		
 	}
 	
@@ -133,10 +142,8 @@ public class Monument {
 
 	public void setLocation(Location location) {
 		this.location = location;
-		int x = location.getBlockX();
-		int y = location.getBlockY();
-		int z = location.getBlockZ();
 		
+		volume.resetBlocks();
 		volume.changeCenter(location);
 		this.addMonumentBlocks();
 	}

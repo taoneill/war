@@ -10,7 +10,7 @@ import org.bukkit.Player;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
-import com.tommytony.war.volumes.CenteredVolume;
+import com.tommytony.war.volumes.Volume;
 
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
@@ -18,16 +18,32 @@ public class Team {
 	private String name;
 	private int remainingTickets;
 	private int points = 0;
-	private CenteredVolume volume;
+	private Volume volume;
 	private final War war;
 	private final Warzone warzone;
+	private Material material;
 	
-	public Team(String name, Location teamSpawn, War war, Warzone warzone) {
+	public Team(String name, Material material, Location teamSpawn, War war, Warzone warzone) {
 		this.war = war;
 		this.warzone = warzone;
 		this.setName(name);
 		this.teamSpawn = teamSpawn;
-		this.volume = new CenteredVolume(name, teamSpawn, 5, war, warzone);
+		this.volume = new Volume(name, war, warzone);
+		this.material = material;
+		
+	}
+	
+	public Material getMaterial() {
+		return material;
+	}
+	
+	private void setVolume() {
+		if(volume.isSaved()) volume.resetBlocks();
+		int x = teamSpawn.getBlockX();
+		int y = teamSpawn.getBlockY();
+		int z = teamSpawn.getBlockZ();
+		this.volume.setCornerOne(warzone.getWorld().getBlockAt(x-2, y-1, z-2));
+		this.volume.setCornerTwo(warzone.getWorld().getBlockAt(x+2, y+5, z+2));
 	}
 	
 	public void setTeamSpawn(Location teamSpawn) {
@@ -35,7 +51,7 @@ public class Team {
 		this.teamSpawn = teamSpawn;
 		
 		// this resets the block to old state
-		volume.changeCenter(teamSpawn);
+		this.setVolume();
 		volume.saveBlocks();
 		
 		// Set the spawn 
@@ -44,37 +60,65 @@ public class Team {
 		int z = teamSpawn.getBlockZ();
 		
 		// first ring
-		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.LightStone);
-		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.LightStone);
-		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.LightStone);
-		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.LightStone);
-		warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.Stone);
-		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.LightStone);
-		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.LightStone);
-		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.LightStone);
-		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.LightStone);
+		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(material);
+		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(material);
+		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(material);
+		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(material);
+		warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.LightStone);
+		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(material);
+		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(material);
+		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(material);
+		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(material);
 		
 		// outer ring
-		//world.getBlockAt(x+2, y-1, z+2).setType(Material.Stone);
-		warzone.getWorld().getBlockAt(x+2, y-1, z+1).setType(Material.Stone);
-		warzone.getWorld().getBlockAt(x+2, y-1, z).setType(Material.Stone);
-		warzone.getWorld().getBlockAt(x+2, y-1, z-1).setType(Material.Stone);
-		//world.getBlockAt(x+2, y-1, z-2).setType(Material.Stone);
+		warzone.getWorld().getBlockAt(x+2, y-1, z+2).setType(material);
+		warzone.getWorld().getBlockAt(x+2, y-1, z+1).setType(material);
+		warzone.getWorld().getBlockAt(x+2, y-1, z).setType(material);
+		warzone.getWorld().getBlockAt(x+2, y-1, z-1).setType(material);
+		warzone.getWorld().getBlockAt(x+2, y-1, z-2).setType(material);
 		
-		warzone.getWorld().getBlockAt(x-1, y-1, z+2).setType(Material.Stone);
-		warzone.getWorld().getBlockAt(x-1, y-1, z-2).setType(Material.Stone);
+		warzone.getWorld().getBlockAt(x-1, y-1, z+2).setType(material);
+		warzone.getWorld().getBlockAt(x-1, y-1, z-2).setType(material);
 		
-		warzone.getWorld().getBlockAt(x, y-1, z+2).setType(Material.Stone);
-		warzone.getWorld().getBlockAt(x, y-1, z-2).setType(Material.Stone);
+		warzone.getWorld().getBlockAt(x, y-1, z+2).setType(material);
+		warzone.getWorld().getBlockAt(x, y-1, z-2).setType(material);
 		
-		warzone.getWorld().getBlockAt(x+1, y-1, z+2).setType(Material.Stone);
-		warzone.getWorld().getBlockAt(x+1, y-1, z-2).setType(Material.Stone);
+		warzone.getWorld().getBlockAt(x+1, y-1, z+2).setType(material);
+		warzone.getWorld().getBlockAt(x+1, y-1, z-2).setType(material);
 		
-		//world.getBlockAt(x-2, y-1, z+2).setType(Material.Stone);
-		warzone.getWorld().getBlockAt(x-2, y-1, z+1).setType(Material.Stone);
-		warzone.getWorld().getBlockAt(x-2, y-1, z).setType(Material.Stone);
-		warzone.getWorld().getBlockAt(x-2, y-1, z-1).setType(Material.Stone);
-		//world.getBlockAt(x-2, y-1, z-2).setType(Material.Stone);
+		warzone.getWorld().getBlockAt(x-2, y-1, z+2).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y-1, z+1).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y-1, z).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y-1, z-1).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y-1, z-2).setType(material);
+		
+		// rim
+		warzone.getWorld().getBlockAt(x-1, y, z+2).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y, z+2).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y, z+1).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y, z).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y, z-1).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y, z-2).setType(material);
+		warzone.getWorld().getBlockAt(x-1, y, z-2).setType(material);
+		warzone.getWorld().getBlockAt(x, y, z-2).setType(material);
+		warzone.getWorld().getBlockAt(x+1, y, z-2).setType(material);
+		warzone.getWorld().getBlockAt(x+2, y, z-2).setType(material);
+		warzone.getWorld().getBlockAt(x+2, y, z-1).setType(material);
+		
+		// tower
+		warzone.getWorld().getBlockAt(x-2, y+1, z).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y+1, z-1).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y+1, z-2).setType(material);
+		warzone.getWorld().getBlockAt(x-1, y+1, z-2).setType(material);
+		warzone.getWorld().getBlockAt(x, y+1, z-2).setType(material);
+		
+		warzone.getWorld().getBlockAt(x-2, y+2, z-1).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y+2, z-2).setType(material);
+		warzone.getWorld().getBlockAt(x-1, y+2, z-2).setType(material);
+		
+		warzone.getWorld().getBlockAt(x-2, y+3, z-2).setType(material);
+		warzone.getWorld().getBlockAt(x-2, y+4, z-2).setType(Material.LightStone);
+		warzone.getWorld().getBlockAt(x-2, y+4, z-2).setType(material);
 		
 		resetSign();
 
@@ -136,7 +180,7 @@ public class Team {
 		return points;
 	}
 
-	public CenteredVolume getVolume() {
+	public Volume getVolume() {
 		
 		return volume;
 	}
