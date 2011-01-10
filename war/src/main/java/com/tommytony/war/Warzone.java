@@ -8,6 +8,7 @@ import org.bukkit.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Player;
+import org.bukkit.PlayerInventory;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -29,7 +30,7 @@ public class Warzone {
 	private int lifePool;
 	private HashMap<Integer, ItemStack> loadout; 
 	
-	private HashMap<String, HashMap<Integer, ItemStack>> inventories = new HashMap<String, HashMap<Integer, ItemStack>>();
+	private HashMap<String, List<ItemStack>> inventories = new HashMap<String, List<ItemStack>>();
 	private World world;
 	
 	public Warzone(War war, World world, String name) {
@@ -208,18 +209,16 @@ public class Warzone {
 	}
 
 	public void respawnPlayer(Team team, Player player) {
-//		BUKKIT
-//		Inventory playerInv = player.getInventory();
-//		playerInv.getContents().clear();
-//		for(Integer slot : loadout.keySet()) {
-//			playerInv.getContents().add(loadout.get(slot));
-//			// TODO set the proper slot index
-//		}
+		// Reset inventory to loadout
+		PlayerInventory playerInv = player.getInventory();
+		for(int i = 0; i < playerInv.getSize(); i++){
+			playerInv.setItem(i, new ItemStack(Material.Air));	
+		}
+		for(Integer slot : loadout.keySet()) {
+			playerInv.setItem(slot, loadout.get(slot));
+		}
 		
 		player.setHealth(20);
-		
-//		BUKKIT
-//		player.setFireTicks(0);
 		player.teleportTo(team.getTeamSpawn());
 	}
 
@@ -256,23 +255,11 @@ public class Warzone {
 		return false;
 	}
 	
-//	public void removeSpawnArea(Team team) {
-//		// Reset spawn to what it was before the gold blocks
-//		team.getVolume().resetBlocks();
-//	}
-
-//	public void addSpawnArea(Team team, Location location) {
-//		// Save the spawn state
-//		team.setTeamSpawn(location);
-//	}
-		
-
 	public List<Monument> getMonuments() {
 		return monuments;
 	}
 
 	public boolean getFriendlyFire() {
-		// TODO Auto-generated method stub
 		return this.friendlyFire;
 	}
 
@@ -301,26 +288,26 @@ public class Warzone {
 	}
 
 	public void keepPlayerInventory(Player player) {
-		// BUKKIT
-//		Inventory inventory = player.getInventory();
-//		
-//		inventories.put(player.getName(), inventory.getContents());
+		PlayerInventory inventory = player.getInventory();
+		List<ItemStack> invToStore = new ArrayList<ItemStack>();
+		for(int i=0; i < inventory.getSize(); i++) {
+			invToStore.set(i, inventory.getItem(i));
+		}
+		inventories.put(player.getName(), invToStore);
 	}
 
 	public void restorePlayerInventory(Player player) {
-//		HashMap<Integer,ItemStack> originalContents = inventories.remove((player.getName());
-//		Inventory playerInv = player.getInventory(); 
-//		playerInv.clearContents();
-//		playerInv.update();
-//		for(Item item : originalContents) {
-//			playerInv.addItem(item);
-//		}
-//		playerInv.update();
-//		player.getInventory().update();
+		List<ItemStack> originalContents = inventories.remove(player.getName());
+		PlayerInventory playerInv = player.getInventory();
+		for(int i = 0; i < playerInv.getSize(); i++) {
+			playerInv.setItem(i, new ItemStack(Material.Air));
+		}
+		for(int i = 0; i < playerInv.getSize(); i++) {
+			playerInv.setItem(i, originalContents.get(i));
+		}
 	}
 
 	public boolean hasMonument(String monumentName) {
-		boolean hasIt = false;
 		for(Monument monument: monuments) {
 			if(monument.getName().equals(monumentName)) {
 				return true;
@@ -330,7 +317,6 @@ public class Warzone {
 	}
 	
 	public Monument getMonument(String monumentName) {
-		boolean hasIt = false;
 		for(Monument monument: monuments) {
 			if(monument.getName().equals(monumentName)) {
 				return monument;

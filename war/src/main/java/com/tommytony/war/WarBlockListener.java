@@ -5,8 +5,8 @@ import java.util.List;
 import org.bukkit.Block;
 import org.bukkit.Material;
 import org.bukkit.Player;
-import org.bukkit.event.block.BlockBrokenEvent;
 import org.bukkit.event.block.BlockCanBuildEvent;
+import org.bukkit.event.block.BlockDamagedEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockListener;
@@ -45,7 +45,7 @@ public class WarBlockListener extends BlockListener {
     }
 
 	
-    public void onBlockBroken(BlockBrokenEvent event) {
+    public void onBlockDamaged(BlockDamagedEvent event) {
     	Player player = event.getPlayer();
     	Block block = event.getBlock();
     	if(player != null && block != null) {

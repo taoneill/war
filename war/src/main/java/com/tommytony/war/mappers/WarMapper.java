@@ -1,6 +1,9 @@
 package com.tommytony.war.mappers;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+
+import org.bukkit.ItemStack;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
@@ -46,17 +49,17 @@ public class WarMapper {
 		}
 		
 		// defaultLoadout
-//		String defaultLoadoutStr = warConfig.getString("defaultLoadout");
-//		String[] defaultLoadoutSplit = defaultLoadoutStr.split(";");
-//		war.getDefaultLoadout().clear();
-//		for(String itemStr : defaultLoadoutSplit) {
-//			if(itemStr != null && !itemStr.equals("")) {
-//				String[] itemStrSplit = itemStr.split(",");
-//				ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-//						Integer.parseInt(itemStrSplit[1]));
-//				war.getDefaultLoadout().add(item);
-//			}
-//		}
+		String defaultLoadoutStr = warConfig.getString("defaultLoadout");
+		String[] defaultLoadoutSplit = defaultLoadoutStr.split(";");
+		war.getDefaultLoadout().clear();
+		for(String itemStr : defaultLoadoutSplit) {
+			if(itemStr != null && !itemStr.equals("")) {
+				String[] itemStrSplit = itemStr.split(",");
+				ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
+						Integer.parseInt(itemStrSplit[1]));
+				war.getDefaultLoadout().put(Integer.parseInt(itemStrSplit[2]), item);
+			}
+		}
 		
 		// defaultLifePool
 		war.setDefaultLifepool(warConfig.getInt("defaultLifePool"));
@@ -80,12 +83,13 @@ public class WarMapper {
 		warConfig.setString("warzones", warzonesStr);
 		
 		// defaultLoadout
-//		String defaultLoadoutStr = "";
-//		List<Item> items = war.getDefaultLoadout();
-//		for(Item item : items) {
-//			defaultLoadoutStr += item.getItemId() + "," + item.getAmount() + "," + item.getSlot() + ";";
-//		}
-//		warConfig.setString("defaultLoadout", defaultLoadoutStr);
+		String defaultLoadoutStr = "";
+		HashMap<Integer, ItemStack> items = war.getDefaultLoadout();
+		for(Integer slot : items.keySet()) {
+			ItemStack item = items.get(slot);
+			defaultLoadoutStr += item.getTypeID() + "," + item.getAmount() + "," + slot + ";";
+		}
+		warConfig.setString("defaultLoadout", defaultLoadoutStr);
 		
 		// defaultLifepool
 		warConfig.setInt("defaultLifePool", war.getDefaultLifepool());
