@@ -4,18 +4,24 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Block;
+import org.bukkit.BlockFace;
 import org.bukkit.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Player;
 import org.bukkit.PlayerInventory;
 import org.bukkit.World;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
+
+import bukkit.tommytony.war.War;
 
 import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
 
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class Warzone {
 	private String name;
 	private VerticalVolume volume;
@@ -79,77 +85,20 @@ public class Warzone {
 	}
 
 	public void setNorthwest(Location northwest) {
-		// remove old nw sign, if any (replace with air)
-		if(this.northwest != null) {
-			removeNorthwest();
-		}
 		this.northwest = northwest;
 		this.volume.setCornerOne(world.getBlockAt(northwest.getBlockX(), northwest.getBlockY(), northwest.getBlockZ()));
-		
-		// add sign
-		int x = northwest.getBlockX();
-		int y = northwest.getBlockY();
-		int z = northwest.getBlockZ();
-		
-		Block block = world.getBlockAt(x, y, z); 
-		block.setType(Material.SignPost);
-		block.setData((byte)10); // towards southeast
-		
-		BlockState state = block.getState();
-		Sign sign = (Sign)state;
-		sign.setLine(0, "Northwest");
-		sign.setLine(1, "corner of");
-		sign.setLine(2, "warzone");
-		sign.setLine(3, name);
-		state.update();
-	
-		saveState();
 	}
-	
-	public void removeNorthwest() {
-		int x = northwest.getBlockX();
-		int y = northwest.getBlockY();
-		int z = northwest.getBlockZ();
-		world.getBlockAt(x, y, z).setTypeID(0);
-	}
+
 
 	public Location getNorthwest() {
 		return northwest;
 	}
 
 	public void setSoutheast(Location southeast) {
-		// remove old se sign, if any (replace with air)
-		if(this.southeast != null) {
-			removeSoutheast();
-		}
 		this.southeast = southeast;
-		this.volume.setCornerTwo(world.getBlockAt(southeast.getBlockX(), southeast.getBlockY(), southeast.getBlockZ()));
-		// add sign
-		int x = southeast.getBlockX();
-		int y = southeast.getBlockY();
-		int z = southeast.getBlockZ();
-		Block block = world.getBlockAt(x, y, z);	// towards northwest
-		block.setType(Material.SignPost);
-		block.setData((byte)2);;
-	
-		BlockState state = block.getState();
-		Sign sign = (Sign)state;
-		sign.setLine(0, "Southeast");
-		sign.setLine(1, "corner of");
-		sign.setLine(2, "warzone");
-		sign.setLine(3, name);
-		state.update();
-		
-		saveState();
+		this.volume.setCornerTwo(world.getBlockAt(southeast.getBlockX(), southeast.getBlockY(), southeast.getBlockZ()));		
 	}
 	
-	public void removeSoutheast() {
-		int x = southeast.getBlockX();
-		int y = southeast.getBlockY();
-		int z = southeast.getBlockZ();
-		world.getBlockAt(x, y, z).setTypeID(0);
-	}
-
 	public Location getSoutheast() {
 		return southeast;
 	}
@@ -174,9 +123,41 @@ public class Warzone {
 	 * Also teleports all players back to their respective spawns.
 	 * @return
 	 */
-	public int resetState() {
-		if(ready() && volume.isSaved()){
-			int reset = volume.resetBlocks();
+	public void initializeZone() {
+		if(ready() && volume.isSaved()){			
+			// get surface corners
+			volume.getMinX();
+			volume.getMinZ();
+			volume.getMinY();
+			int c1maxY = world.getHighestBlockYAt(volume.getMinX(), volume.getMinZ());
+			int c2maxY = world.getHighestBlockYAt(volume.getMaxX(), volume.getMaxZ());
+			Block ne = world.getBlockAt(volume.getMinX(), c1maxY, volume.getMinZ());
+			Block nw = world.getBlockAt(volume.getMinX(), c2maxY, volume.getMaxZ());
+			Block sw = world.getBlockAt(volume.getMinX(), c1maxY, volume.getMaxZ());
+			Block se = world.getBlockAt(volume.getMaxX(), c2maxY, volume.getMinZ());
+			
+			// add north wall, ne - nw
+			Block lastBlock = null;
+			for(int z = volume.getMinZ(); z < volume.getMaxZ(); z++) {
+				lastBlock = highestBlockToGlass(ne.getX(), z, lastBlock);
+			}
+			
+			// add east, ne - se
+			lastBlock = null;
+			for(int x = volume.getMinX(); x < volume.getMaxX(); x++) {
+				lastBlock = highestBlockToGlass(x, ne.getZ(), lastBlock);
+			}
+			
+			// add south, se - sw
+			lastBlock = null;
+			for(int z = volume.getMinZ(); z < volume.getMaxZ(); z++) {
+				lastBlock = highestBlockToGlass(se.getX(), z, lastBlock);
+			}
+			
+			// add west, nw - sw
+			for(int x = volume.getMinX(); x < volume.getMaxX(); x++) {
+				lastBlock = highestBlockToGlass(x, nw.getZ(), lastBlock);
+			}
 			
 			// everyone back to team spawn with full health
 			for(Team team : teams) {
@@ -196,10 +177,47 @@ public class Warzone {
 			
 			this.setNorthwest(this.getNorthwest());
 			this.setSoutheast(this.getSoutheast());
-			
-			return reset;
 		}
-		return 0;
+	}
+
+	private Block highestBlockToGlass(int x, int z, Block lastBlock) {
+		int highest = world.getHighestBlockYAt(x, z);
+		Block block = world.getBlockAt(x, highest -1 , z);
+		
+		if(block.getType() == Material.Leaves) { // top of tree, lets find some dirt
+			Block over = block.getFace(BlockFace.Down);
+			Block under = over.getFace(BlockFace.Down);
+			int treeHeight = 0;
+			while(!((over.getType() == Material.Air || over.getType() == Material.Leaves || over.getType() == Material.Wood)
+					&& (under.getType() == Material.Grass || under.getType() == Material.Dirt || under.getType() == Material.Stone))
+				  && treeHeight < 40) {
+				over = under;
+				under = over.getFace(BlockFace.Down);
+				treeHeight++;
+			}
+			block = under; // found the ground
+		}
+		
+		block.setType(Material.Glass);
+
+		if(lastBlock != null) {
+			// link the new block and the old vertically if there's a big drop or rise
+			if(block.getY() - lastBlock.getY() > 2) {  // new block too high 
+				Block under = block.getFace(BlockFace.Down);
+				while(under.getY() != lastBlock.getY() - 1) {
+					block.setType(Material.Glass);
+					under = under.getFace(BlockFace.Down);
+				}
+			} else if (block.getY() - lastBlock.getY() < -2) { // new block too low
+				Block over = block.getFace(BlockFace.Up);
+				while(over.getY() != lastBlock.getY() + 1) {
+					block.setType(Material.Glass);
+					over = over.getFace(BlockFace.Up);
+				}
+			}
+		}
+
+		return block;
 	}
 
 	public void endRound() {
@@ -207,23 +225,35 @@ public class Warzone {
 	}
 
 	public void respawnPlayer(Team team, Player player) {
+		player.teleportTo(team.getTeamSpawn());
+		
 		// Reset inventory to loadout
 		PlayerInventory playerInv = player.getInventory();
 		for(int i = 0; i < playerInv.getSize(); i++){
-			playerInv.setItem(i, new ItemStack(Material.Air));	
+			playerInv.setItem(i, null);	
 		}
 		for(Integer slot : loadout.keySet()) {
-			playerInv.setItem(slot, loadout.get(slot));
+			if(slot == 100) {
+				playerInv.setBoots(loadout.get(slot));
+			} else if(slot == 101) {
+				playerInv.setLeggings(loadout.get(slot));
+			} else if(slot == 102) {
+				playerInv.setChestplate(loadout.get(slot));
+			} else if(slot == 103) {
+				playerInv.setHelmet(loadout.get(slot));
+			} else { 
+				playerInv.setItem(slot, loadout.get(slot));
+			}
 		}
 		
 		player.setHealth(20);
-		player.teleportTo(team.getTeamSpawn());
+		
 	}
 
 	public boolean isMonumentCenterBlock(Block block) {
 		for(Monument monument : monuments) {
 			int x = monument.getLocation().getBlockX();
-			int y = monument.getLocation().getBlockY();
+			int y = monument.getLocation().getBlockY() - 1;
 			int z = monument.getLocation().getBlockZ();
 			if(x == block.getX() && y == block.getY() && z == block.getZ()) {
 				return true;
@@ -289,7 +319,7 @@ public class Warzone {
 		PlayerInventory inventory = player.getInventory();
 		List<ItemStack> invToStore = new ArrayList<ItemStack>();
 		for(int i=0; i < inventory.getSize(); i++) {
-			invToStore.set(i, inventory.getItem(i));
+			invToStore.add(i, inventory.getItem(i));
 		}
 		inventories.put(player.getName(), invToStore);
 	}
@@ -342,23 +372,25 @@ public class Warzone {
 	}
 
 	private boolean teleportNear(Block block) {
-		int x = (int)this.teleport.getBlockX();
-		int y = (int)this.teleport.getBlockY();
-		int z = (int)this.teleport.getBlockZ();
-		int bx = block.getX();
-		int by = block.getY();
-		int bz = block.getZ();
-		if((bx == x && by == y && bz == z) || 
-				(bx == x+1 && by == y-1 && bz == z+1) ||
-				(bx == x+1 && by == y-1 && bz == z) ||
-				(bx == x+1 && by == y-1 && bz == z-1) ||
-				(bx == x && by == y-1 && bz == z+1) ||
-				(bx == x && by == y-1 && bz == z) ||
-				(bx == x && by == y-1 && bz == z-1) ||
-				(bx == x-1 && by == y-1 && bz == z+1) ||
-				(bx == x-1 && by == y-1 && bz == z) ||
-				(bx == x-1 && by == y-1 && bz == z-1) ) {
-			return true;
+		if(teleport != null) {
+			int x = (int)this.teleport.getBlockX();
+			int y = (int)this.teleport.getBlockY();
+			int z = (int)this.teleport.getBlockZ();
+			int bx = block.getX();
+			int by = block.getY();
+			int bz = block.getZ();
+			if((bx == x && by == y && bz == z) || 
+					(bx == x+1 && by == y-1 && bz == z+1) ||
+					(bx == x+1 && by == y-1 && bz == z) ||
+					(bx == x+1 && by == y-1 && bz == z-1) ||
+					(bx == x && by == y-1 && bz == z+1) ||
+					(bx == x && by == y-1 && bz == z) ||
+					(bx == x && by == y-1 && bz == z-1) ||
+					(bx == x-1 && by == y-1 && bz == z+1) ||
+					(bx == x-1 && by == y-1 && bz == z) ||
+					(bx == x-1 && by == y-1 && bz == z-1) ) {
+				return true;
+			}
 		}
 		return false;
 	}

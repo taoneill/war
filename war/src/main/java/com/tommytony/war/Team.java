@@ -10,8 +10,15 @@ import org.bukkit.Player;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
+import bukkit.tommytony.war.War;
+
 import com.tommytony.war.volumes.Volume;
 
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
 	private Location teamSpawn = null;
@@ -104,19 +111,22 @@ public class Team {
 		warzone.getWorld().getBlockAt(x+2, y, z-1).setType(material);
 		
 		// tower
+		//warzone.getWorld().getBlockAt(x-2, y+1, z+1).setType(material);
 		warzone.getWorld().getBlockAt(x-2, y+1, z).setType(material);
 		warzone.getWorld().getBlockAt(x-2, y+1, z-1).setType(material);
 		warzone.getWorld().getBlockAt(x-2, y+1, z-2).setType(material);
 		warzone.getWorld().getBlockAt(x-1, y+1, z-2).setType(material);
 		warzone.getWorld().getBlockAt(x, y+1, z-2).setType(material);
+		//warzone.getWorld().getBlockAt(x+1, y+1, z-2).setType(material);
 		
+		//warzone.getWorld().getBlockAt(x-2, y+2, z).setType(material);
 		warzone.getWorld().getBlockAt(x-2, y+2, z-1).setType(material);
 		warzone.getWorld().getBlockAt(x-2, y+2, z-2).setType(material);
 		warzone.getWorld().getBlockAt(x-1, y+2, z-2).setType(material);
+		//warzone.getWorld().getBlockAt(x, y+2, z-2).setType(material);
 		
+		//warzone.getWorld().getBlockAt(x-2, y+3, z-2).setType(Material.LightStone);
 		warzone.getWorld().getBlockAt(x-2, y+3, z-2).setType(material);
-		warzone.getWorld().getBlockAt(x-2, y+4, z-2).setType(Material.LightStone);
-		warzone.getWorld().getBlockAt(x-2, y+4, z-2).setType(material);
 		
 		resetSign();
 
@@ -198,7 +208,7 @@ public class Team {
 		sign.setLine(1, name);
 		sign.setLine(2, points + " pts");
 		sign.setLine(3, remainingTickets + "/" + warzone.getLifePool() + " lives left");
-	
+		state.update(true);	
 	}
 
 }

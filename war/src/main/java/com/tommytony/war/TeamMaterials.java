@@ -2,6 +2,11 @@ package com.tommytony.war;
 
 import org.bukkit.Material;
 
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class TeamMaterials {
 	public static final Material TEAMDIAMOND = Material.DiamondBlock;
 	public static final Material TEAMIRON = Material.IronBlock;

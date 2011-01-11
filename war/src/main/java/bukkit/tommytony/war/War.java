@@ -1,4 +1,4 @@
-package com.tommytony.war;
+package bukkit.tommytony.war;
 
 import org.bukkit.*;
 import org.bukkit.event.Event;
@@ -8,6 +8,8 @@ import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.tommytony.war.Team;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.WarMapper;
 
 import java.io.File;
@@ -16,6 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class War extends JavaPlugin {
 	
 	public War(PluginLoader pluginLoader, Server instance,

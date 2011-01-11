@@ -1,4 +1,4 @@
-package com.tommytony.war;
+package bukkit.tommytony.war;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -9,7 +9,14 @@ import org.bukkit.event.entity.EntityDamagedByBlockEvent;
 import org.bukkit.event.entity.EntityDamagedByEntityEvent;
 import org.bukkit.event.entity.EntityListener;
 
+import com.tommytony.war.Team;
+import com.tommytony.war.Warzone;
 
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class WarEntityListener extends EntityListener {
 
 	private final War war;
@@ -111,7 +118,9 @@ public class WarEntityListener extends EntityListener {
 							t.resetSign();
 						}
 					}
-					zone.resetState();
+					zone.endRound();
+					zone.getVolume().resetBlocks();
+					zone.initializeZone();
 					roundOver = true;
 				} else {
 					team.setRemainingTickets(remaining - 1);

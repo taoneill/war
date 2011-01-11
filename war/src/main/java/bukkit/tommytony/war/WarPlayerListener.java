@@ -1,4 +1,4 @@
-package com.tommytony.war;
+package bukkit.tommytony.war;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -11,11 +11,19 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import com.tommytony.war.Monument;
+import com.tommytony.war.Team;
+import com.tommytony.war.TeamMaterials;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
 
 
-
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class WarPlayerListener extends PlayerListener {
 
 	private final War war;
@@ -53,7 +61,7 @@ public class WarPlayerListener extends PlayerListener {
 					arguments[i-1] = split[i];
 				}
 			} else {
-				command = command.substring(1, command.length()-1);
+				command = command.substring(1, command.length());
 				arguments = new String[split.length - 1];
 				for(int i = 1; i <= arguments.length; i++) {
 					arguments[i-1] = split[i];
@@ -63,7 +71,7 @@ public class WarPlayerListener extends PlayerListener {
 			// Player commands: /warzones, /warzone, /teams, /join, /leave
 			
 			// warzones
-			if(command.equals("/warzones")){
+			if(command.equals("zones") || command.equals("warzones")){
 				
 				String warzonesMessage = "Warzones: ";
 				if(war.getWarzones().isEmpty()){
@@ -79,13 +87,13 @@ public class WarPlayerListener extends PlayerListener {
 					}
 					warzonesMessage += playerTotal + " players)  ";
 				}
-				player.sendMessage(war.str(warzonesMessage + "  Use /warzone <zone-name> to " +
+				player.sendMessage(war.str(warzonesMessage + "  Use /zone <zone-name> to " +
 						"teleport to a warzone. "));
 				event.setCancelled(true); 
 			}
 			
 			// warzone
-			else if(command.equals("/zone") || command.equals("/warzone")) {
+			else if(command.equals("zone") || command.equals("warzone")) {
 				if(arguments.length < 1) {
 					player.sendMessage(war.str("Usage: /zone <warzone-name>."));
 				} else {
@@ -104,7 +112,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 			
 			// /teams
-			else if(command.equals("/teams")){
+			else if(command.equals("teams")){
 				if(!war.inAnyWarzone(player.getLocation())) {
 					player.sendMessage(war.str("Usage: /teams. " +
 							"Must be in a warzone (try /warzones and /warzone)."));
@@ -115,7 +123,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 			
 			// /join <teamname>
-			else if(command.equals("/join")) {
+			else if(command.equals("join")) {
 				if(arguments.length < 1 || !war.inAnyWarzone(player.getLocation())
 						|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
 					player.sendMessage(war.str("Usage: /join <diamond/iron/gold/d/i/g>." +
@@ -160,7 +168,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 			
 			// /leave
-			else if(command.equals("/leave")) {
+			else if(command.equals("leave")) {
 				if(!war.inAnyWarzone(player.getLocation()) || war.getPlayerTeam(player.getName()) == null) {
 					player.sendMessage(war.str("Usage: /leave. " +
 							"Must be in a team already."));
@@ -177,7 +185,7 @@ public class WarPlayerListener extends PlayerListener {
 			
 			
 			// /team <msg>
-			else if(command.equals("/team")) {
+			else if(command.equals("team")) {
 				if(!war.inAnyWarzone(player.getLocation())) {
 					player.sendMessage(war.str("Usage: /team <message>. " +
 							"Sends a message only to your teammates."));
@@ -196,7 +204,7 @@ public class WarPlayerListener extends PlayerListener {
 			// Mod commands : /nextbattle
 			
 			// /restartbattle
-			else if(command.equals("/nextbattle") || command.equals("/restartbattle")) {
+			else if(command.equals("nextbattle") || command.equals("restartbattle")) {
 				if(!war.inAnyWarzone(player.getLocation())) {
 					player.sendMessage(war.str("Usage: /nextbattle. Resets the zone blocks and all teams' life pools. Must be in warzone."));
 				} else {
@@ -204,17 +212,166 @@ public class WarPlayerListener extends PlayerListener {
 					for(Team team: warzone.getTeams()) {
 						team.teamcast(war.str("The battle was interrupted. " + getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and life pools..."));
 					}
-					int resetBlocks = warzone.resetState();
+					int resetBlocks = warzone.getVolume().resetBlocks();
+					warzone.initializeZone();
 					player.sendMessage(war.str("Warzone reset. " + resetBlocks + " blocks reset."));
 					war.getLogger().info(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
 				}
 				event.setCancelled(true);
 			}
 			
+			
 			// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
 			
+			// /setzone
+			else if(command.equals("setzone") || command.equals("setwarzone")) {
+				if(arguments.length < 2 || arguments.length > 2 
+						|| (arguments.length == 2 && (!arguments[1].equals("southeast") && !arguments[1].equals("northwest")
+																&& !arguments[1].equals("se") && !arguments[1].equals("nw")))) {
+					player.sendMessage(war.str("Usage: /setzone <warzone-name> <'southeast'/'northwest'/'se'/'nw'>. " +
+							"Defines the battleground boundary. " +
+							"The warzone is reset at the start of every battle. " +
+							"This command overwrites any previously saved blocks " +
+							"(i.e. make sure you reset with /restartbattle " +
+							"or /resetwarzone before changing the boundary). "));
+				} else {
+					Warzone warzone = war.findWarzone(arguments[0]);
+					if(warzone == null) {
+						// create the warzone
+						warzone = new Warzone(war, player.getLocation().getWorld(), arguments[0]);
+						war.addWarzone(warzone);
+						WarMapper.save(war);
+						if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
+							warzone.setNorthwest(player.getLocation());
+							player.sendMessage(war.str("Warzone " + warzone.getName() + " added. Northwesternmost point set at x=" 
+									+ (int)warzone.getNorthwest().getBlockX() + " z=" + (int)warzone.getNorthwest().getBlockZ() + "."));
+						} else {
+							warzone.setSoutheast(player.getLocation());
+							player.sendMessage(war.str("Warzone " + warzone.getName() + " added. Southeasternmost point set at x=" 
+									+ (int)warzone.getSoutheast().getBlockX() + " z=" + (int)warzone.getSoutheast().getBlockZ() + "."));
+						}
+					} else {
+						String message = "";
+						if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
+							int reset = warzone.getVolume().resetBlocks();
+							warzone.setNorthwest(player.getLocation());
+							warzone.saveState();
+							warzone.initializeZone();
+							message += "Northwesternmost point set at x=" + (int)warzone.getNorthwest().getBlockX() 
+											+ " z=" + (int)warzone.getNorthwest().getBlockZ() + " on warzone " + warzone.getName() + ". " +
+											reset + " blocks reset. New zone saved.";
+						} else {
+							int reset = warzone.getVolume().resetBlocks();
+							warzone.setSoutheast(player.getLocation());
+							warzone.saveState();
+							warzone.initializeZone();
+							message += "Southeasternmost point set at x=" + (int)warzone.getSoutheast().getBlockX()
+											+ " z=" + (int)warzone.getSoutheast().getBlockZ() + " on warzone " + warzone.getName() + ". " +
+											reset + " blocks reset. New zone saved.";
+						}
+						
+						if(warzone.getNorthwest() == null) {
+							message += " Still missing northwesternmost point.";
+						}
+						if(warzone.getSoutheast() == null) {
+							message += " Still missing southeasternmost point.";
+						}
+						if(warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
+							if(warzone.ready()) {
+								message += " Warzone " + warzone.getName() + " almost ready. Use /setteam while inside the warzone to create new teams. Make sure to use /savezone to " +
+										"set the warzone teleport point and initial state.";
+							} else if (warzone.tooSmall()) {
+								message += " Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.";
+							} else if (warzone.tooBig()) {
+								message += " Warzone " + warzone.getName() + " is too Big. Max north-south size: 1000. Max east-west size: 1000.";
+							}
+						}
+						player.sendMessage(war.str(message));
+					}
+					WarzoneMapper.save(war, warzone, false);
+					
+				}
+				event.setCancelled(true); 
+			}		
+	
+			// /savewarzone
+			else if(command.equals("savezone") || command.equals("savewarzone")) {
+				if(!war.inAnyWarzone(player.getLocation())) {
+					player.sendMessage(war.str("Usage: /savezone. Must be in warzone. " +
+							"Changes the warzone state loaded at the beginning of every battle. " +
+							"Also sets the teleport point for this warzone where you're standing." +
+							"(i.e. make sure to use /zone or the warzone tp point will change). " +
+							"Just like /setzone, this command overwrites any previously saved blocks " +
+							"(i.e. make sure you reset with /restartbattle " +
+							"or /resetzone before changing start state). "));
+				} else {
+					Warzone warzone = war.warzone(player.getLocation());
+					int savedBlocks = warzone.saveState();
+					warzone.setTeleport(player.getLocation());
+					player.sendMessage(war.str("Warzone " + warzone.getName() + " initial state and teleport location changed. Saved " + savedBlocks + " blocks."));
+					WarzoneMapper.save(war, warzone, true);
+				}
+				event.setCancelled(true); 
+			}
+			
+			// /resetwarzone
+			else if(command.equals("resetzone") || command.equals("resetwarzone")) {
+				if(!war.inAnyWarzone(player.getLocation())) {
+					player.sendMessage(war.str("Usage: /resetzone pool=10. Reloads the zone. All named parameter are optional. Defaults: pool=7 maxScore=-1 (infinite). Must be in warzone."));
+				} else {
+					Warzone warzone = war.warzone(player.getLocation());
+					int resetBlocks = warzone.getVolume().resetBlocks();
+					warzone.initializeZone();
+					for(Team team: warzone.getTeams()) {
+						team.teamcast(war.str("The war has ended. " + getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams..."));
+						for(Player p : team.getPlayers()) {
+							p.teleportTo(warzone.getTeleport());
+							warzone.restorePlayerInventory(p);
+							player.sendMessage(war.str("You have left the warzone. Your inventory has (hopefully) been restored."));
+						}
+					}
+					war.getWarzones().remove(warzone);
+					Warzone resetWarzone = WarzoneMapper.load(war, warzone.getName(), true);
+					war.getWarzones().add(resetWarzone);
+					if(arguments.length > 0) {
+						for(String arg : arguments) {
+							if(arg.startsWith("pool=")){
+								int overrideLifepool = Integer.parseInt(arg.substring(5));
+								resetWarzone.setLifePool(overrideLifepool);
+							}
+						}
+					}
+					resetWarzone.initializeZone();
+					player.sendMessage(war.str("Warzone and teams reset. " + resetBlocks + " blocks reset."));
+					war.getLogger().info(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
+				}
+				event.setCancelled(true); 
+			}
+			
+			// /deletewarzone
+			else if(command.equals("deletezone") || command.equals("deletewarzone")) {
+				if(!war.inAnyWarzone(player.getLocation())) {
+					player.sendMessage(war.str("Usage: /deletewarzone." +
+							" Deletes the warzone. " +
+							"Must be in the warzone (try /warzones and /warzone). "));
+				} else {
+					Warzone warzone = war.warzone(player.getLocation());
+					for(Team t : warzone.getTeams()) {
+						t.getVolume().resetBlocks();
+					}
+					for(Monument m : warzone.getMonuments()) {
+						m.remove();
+					}
+					war.getWarzones().remove(warzone);
+					WarMapper.save(war);
+					WarzoneMapper.delete(war, warzone.getName());
+					player.sendMessage(war.str("Warzone " + warzone.getName() + " removed."));
+				}
+				event.setCancelled(true); 
+			}
+			
 			// /setteam <diamond/iron/gold/d/i/g>
-			else if(command.equals("/setteam") || command.equals("/newteam") || command.equals("/teamspawn")) {
+			else if(command.equals("setteam") || command.equals("newteam") || command.equals("teamspawn")) {
 				if(arguments.length < 1 || !war.inAnyWarzone(player.getLocation()) 
 						|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
 					player.sendMessage(war.str("Usage: /setteam <diamond/iron/gold/d/i/g>." +
@@ -246,7 +403,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 			
 			// /deleteteam <teamname>
-			else if(command.equals("/deleteteam")) {
+			else if(command.equals("deleteteam")) {
 				if(arguments.length < 1 || !war.inAnyWarzone(player.getLocation())) {
 					player.sendMessage(war.str("Usage: /deleteteam <team-name>." +
 							" Deletes the team and its spawn. " +
@@ -273,149 +430,13 @@ public class WarPlayerListener extends PlayerListener {
 				event.setCancelled(true); 
 			}
 			
-			// /setwarzone
-			else if(command.equals("/setzone") || command.equals("/setwarzone")) {
-				if(arguments.length < 2 || arguments.length > 2 
-						|| (arguments.length == 2 && (!arguments[1].equals("southeast") && !arguments[1].equals("northwest")
-																&& !arguments[1].equals("se") && !arguments[1].equals("nw")))) {
-					player.sendMessage(war.str("Usage: /setzone <warzone-name> <'southeast'/'northwest'/'se'/'nw'>. " +
-							"Defines the battleground boundary. " +
-							"The warzone is reset at the start of every battle. " +
-							"This command overwrites any previously saved blocks " +
-							"(i.e. make sure you reset with /restartbattle " +
-							"or /resetwarzone before changing the boundary). "));
-				} else {
-					Warzone warzone = war.findWarzone(arguments[0]);
-					if(warzone == null) {
-						// create the warzone
-						warzone = new Warzone(war, player.getLocation().getWorld(), arguments[0]);
-						war.addWarzone(warzone);
-						WarMapper.save(war);
-						if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
-							warzone.setNorthwest(player.getLocation());
-							player.sendMessage(war.str("Warzone " + warzone.getName() + " added. Northwesternmost point set at x=" 
-									+ (int)warzone.getNorthwest().getBlockX() + " z=" + (int)warzone.getNorthwest().getBlockZ() + "."));
-						} else {
-							warzone.setSoutheast(player.getLocation());
-							player.sendMessage(war.str("Warzone " + warzone.getName() + " added. Southeasternmost point set at x=" 
-									+ (int)warzone.getSoutheast().getBlockX() + " z=" + (int)warzone.getSoutheast().getBlockZ() + "."));
-						}
-					} else {
-						String message = "";
-						if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
-							warzone.setNorthwest(player.getLocation());
-							message += "Northwesternmost point set at x=" + (int)warzone.getNorthwest().getBlockX() 
-											+ " z=" + (int)warzone.getNorthwest().getBlockZ() + " on warzone " + warzone.getName() + ".";
-						} else {
-							warzone.setSoutheast(player.getLocation());
-							message += "Southeasternmost point set at x=" + (int)warzone.getSoutheast().getBlockX()
-											+ " z=" + (int)warzone.getSoutheast().getBlockZ() + " on warzone " + warzone.getName() + ".";
-						}
-						
-						if(warzone.getNorthwest() == null) {
-							message += " Still missing northwesternmost point.";
-						}
-						if(warzone.getSoutheast() == null) {
-							message += " Still missing southeasternmost point.";
-						}
-						if(warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
-							if(warzone.ready()) {
-								message += " Warzone " + warzone.getName() + " almost ready. Use /setteam while inside the warzone to create new teams. Make sure to use /savezone to " +
-										"set the warzone teleport point and initial state.";
-							} else if (warzone.tooSmall()) {
-								message += " Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.";
-							} else if (warzone.tooBig()) {
-								message += " Warzone " + warzone.getName() + " is too Big. Max north-south size: 1000. Max east-west size: 1000.";
-							}
-						}
-						player.sendMessage(war.str(message));
-					}
-					WarzoneMapper.save(war, warzone, false);
-					
-				}
-				event.setCancelled(true); 
-			}		
-	
-			// /savewarzone
-			else if(command.equals("/savezone") || command.equals("/savewarzone")) {
-				if(!war.inAnyWarzone(player.getLocation())) {
-					player.sendMessage(war.str("Usage: /savezone. Must be in warzone. " +
-							"Changes the warzone state loaded at the beginning of every battle. " +
-							"Also sets the teleport point for this warzone where you're standing." +
-							"(i.e. make sure to use /zone or the warzone tp point will change). " +
-							"Just like /setzone, this command overwrites any previously saved blocks " +
-							"(i.e. make sure you reset with /restartbattle " +
-							"or /resetzone before changing start state). "));
-				} else {
-					Warzone warzone = war.warzone(player.getLocation());
-					int savedBlocks = warzone.saveState();
-					warzone.setTeleport(player.getLocation());
-					player.sendMessage(war.str("Warzone " + warzone.getName() + " initial state and teleport location changed. Saved " + savedBlocks + " blocks."));
-					WarzoneMapper.save(war, warzone, true);
-				}
-				event.setCancelled(true); 
-			}
-			
-			// /resetwarzone
-			else if(command.equals("/resetzone") || command.equals("/resetwarzone")) {
-				if(!war.inAnyWarzone(player.getLocation())) {
-					player.sendMessage(war.str("Usage: /resetzone pool=10 maxScore=5. Reloads the zone. All named parameter are optional. Defaults: pool=7 maxScore=-1 (infinite). Must be in warzone."));
-				} else {
-					Warzone warzone = war.warzone(player.getLocation());
-					int resetBlocks = warzone.resetState();
-					for(Team team: warzone.getTeams()) {
-						team.teamcast(war.str("The war has ended. " + getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams..."));
-						for(Player p : team.getPlayers()) {
-							p.teleportTo(warzone.getTeleport());
-							warzone.restorePlayerInventory(p);
-							player.sendMessage(war.str("You have left the warzone. Your inventory has (hopefully) been restored."));
-						}
-					}
-					war.getWarzones().remove(warzone);
-					Warzone resetWarzone = WarzoneMapper.load(war, warzone.getName(), true);
-					war.getWarzones().add(resetWarzone);
-					if(split.length > 1) {
-						int overrideLifepool = Integer.parseInt(split[1]);
-						resetWarzone.setLifePool(overrideLifepool);
-					}
-					resetWarzone.resetState();
-					player.sendMessage(war.str("Warzone and teams reset. " + resetBlocks + " blocks reset."));
-					war.getLogger().info(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
-				}
-				event.setCancelled(true); 
-			}
-			
-			// /deletewarzone
-			else if(command.equals("/deletewarzone")) {
-				if(!war.inAnyWarzone(player.getLocation())) {
-					player.sendMessage(war.str("Usage: /deletewarzone." +
-							" Deletes the warzone. " +
-							"Must be in the warzone (try /warzones and /warzone). "));
-				} else {
-					Warzone warzone = war.warzone(player.getLocation());
-					warzone.removeSoutheast();
-					warzone.removeNorthwest();
-					for(Team t : warzone.getTeams()) {
-						t.getVolume().resetBlocks();
-					}
-					for(Monument m : warzone.getMonuments()) {
-						m.remove();
-					}
-					war.getWarzones().remove(warzone);
-					WarMapper.save(war);
-					WarzoneMapper.delete(war, warzone.getName());
-					player.sendMessage(war.str("Warzone " + warzone.getName() + " removed."));
-				}
-				event.setCancelled(true); 
-			}
-			
 			// /monument
-			else if(command.equals("/setmonument")) {
+			else if(command.equals("setmonument")) {
 				if(!war.inAnyWarzone(player.getLocation())) {
 					player.sendMessage(war.str("Usage: /setmonument <name>. Creates or moves a monument. Must be in warzone."));
 				} else {
 					Warzone warzone = war.warzone(player.getLocation());
-					String monumentName = split[1];
+					String monumentName = arguments[0];
 					if(warzone.hasMonument(monumentName)) {
 						// move the existing monument
 						Monument monument = warzone.getMonument(monumentName);
@@ -424,7 +445,7 @@ public class WarPlayerListener extends PlayerListener {
 						player.sendMessage(war.str("Monument " + monument.getName() + " was moved."));
 					} else {
 						// create a new monument
-						Monument monument = new Monument(split[1], war, warzone, player.getLocation());
+						Monument monument = new Monument(arguments[0], war, warzone, player.getLocation());
 						warzone.getMonuments().add(monument);
 						player.sendMessage(war.str("Monument " + monument.getName() + " created."));
 					}
@@ -434,7 +455,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 			
 			// /deletemonument <name>
-			else if(command.equals("/deletemonument")) {
+			else if(command.equals("deletemonument")) {
 				if(arguments.length < 1 || !war.inAnyWarzone(player.getLocation())) {
 					player.sendMessage(war.str("Usage: /deletemonument <team-name>." +
 							" Deletes the monument. " +

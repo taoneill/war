@@ -9,9 +9,15 @@ import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
-import com.tommytony.war.War;
+import bukkit.tommytony.war.War;
+
 import com.tommytony.war.Warzone;
 
+/**
+ * 
+ * @author tao
+ *
+ */
 public class Volume {
 	private final String name;
 	private final World world;

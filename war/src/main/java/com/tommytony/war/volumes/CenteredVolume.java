@@ -3,7 +3,8 @@ package com.tommytony.war.volumes;
 import org.bukkit.Block;
 import org.bukkit.Location;
 
-import com.tommytony.war.War;
+import bukkit.tommytony.war.War;
+
 import com.tommytony.war.Warzone;
 
 public class CenteredVolume extends Volume {

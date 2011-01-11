@@ -5,10 +5,15 @@ import java.util.HashMap;
 
 import org.bukkit.ItemStack;
 
-import com.tommytony.war.War;
+import bukkit.tommytony.war.War;
+
 import com.tommytony.war.Warzone;
 
-
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class WarMapper {
 	
 	public static void load(War war) {
@@ -44,7 +49,8 @@ public class WarMapper {
 			if(warzoneName != null && !warzoneName.equals("")){
 				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWar);		// cascade load, only load blocks if warzone exists
 				war.getWarzones().add(zone);
-				zone.resetState();			// is this wise?
+				zone.getVolume().resetBlocks();
+				zone.initializeZone();			// is this wise?
 			}
 		}
 		
