@@ -15,6 +15,7 @@ import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.ZoneWallGuard;
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
 
@@ -140,7 +141,7 @@ public class WarPlayerListener extends PlayerListener {
 					}
 					
 					// join new team
-					String name = arguments[0];
+					String name = TeamMaterials.teamMaterialToString(TeamMaterials.teamMaterialFromString(arguments[0]));
 					Warzone warzone = war.warzone(player.getLocation());
 					List<Team> teams = warzone.getTeams();
 					boolean foundTeam = false;
@@ -378,8 +379,8 @@ public class WarPlayerListener extends PlayerListener {
 							" Sets the team spawn to the current location. " +
 							"Must be in a warzone (try /zones and /zone). "));
 				} else {
-					String name = arguments[0];
-					Material teamMaterial = TeamMaterials.teamMaterialFromString(name);
+					Material teamMaterial = TeamMaterials.teamMaterialFromString(arguments[0]);
+					String name = TeamMaterials.teamMaterialToString(teamMaterial);					
 					Warzone warzone = war.warzone(player.getLocation());
 					Team existingTeam = warzone.getTeamByMaterial(teamMaterial);
 					if(existingTeam != null) {
@@ -395,8 +396,6 @@ public class WarPlayerListener extends PlayerListener {
 						player.sendMessage(war.str("Team " + name + " created with spawn here."));
 					}
 					
-					
-					
 					WarzoneMapper.save(war, warzone, false);
 				}
 				event.setCancelled(true); 
@@ -409,7 +408,7 @@ public class WarPlayerListener extends PlayerListener {
 							" Deletes the team and its spawn. " +
 							"Must be in a warzone (try /zones and /zone). "));
 				} else {
-					String name = arguments[1];
+					String name = TeamMaterials.teamMaterialToString(TeamMaterials.teamMaterialFromString(arguments[1]));
 					Warzone warzone = war.warzone(player.getLocation());
 					List<Team> teams = warzone.getTeams();
 					Team team = null;
@@ -483,39 +482,25 @@ public class WarPlayerListener extends PlayerListener {
 		Location from = event.getFrom();
 		Location to = event.getTo();
 		
+		// Zone walls
+		if(to != null) {
+			Warzone nearbyZone = war.zoneOfTooCloseZoneWall(to);
+			if(nearbyZone != null) {
+				nearbyZone.protectZoneWallAgainstPlayer(player);
+			} else {
+				// make sure to delete any wall guards as you leave
+				for(Warzone zone : war.getWarzones()) {
+					zone.dropZoneWallGuardIfAny(player);
+				}
+			}
+		}
+		
 		Warzone playerWarzone = war.getPlayerWarzone(player.getName());
 		if(playerWarzone != null) {
 			Team playerTeam = war.getPlayerTeam(player.getName());
-			if(player != null && from != null && to != null && 
-					playerTeam != null && !playerWarzone.getVolume().contains(to)) {
-				player.sendMessage(war.str("Can't go outside the warzone boundary! Use /leave to exit the battle."));
-				if(playerWarzone.getVolume().contains(from)){
-					player.teleportTo(from);
-				} else {
-					// somehow the player made it out of the zone
-					player.teleportTo(playerTeam.getTeamSpawn());
-					player.sendMessage(war.str("Brought you back to your team spawn. Use /leave to exit the battle."));
-				}
-			}
 			
-			if(player != null && from != null && to != null && 
-					playerTeam == null 
-					&& war.inAnyWarzone(from) 
-					&& !war.inAnyWarzone(to)) {
-				// leaving
-				Warzone zone = war.warzone(from);
-				player.sendMessage(war.str("Leaving warzone " + zone.getName() + "."));
-			}
 			
-			if(player != null && from != null && to != null && 
-					playerTeam == null 
-					&& !war.inAnyWarzone(from) 
-					&& war.inAnyWarzone(to)) {
-				// entering
-				Warzone zone = war.warzone(to);
-				player.sendMessage(war.str("Entering warzone " + zone.getName() + ". Tip: use /teams."));
-			}
-			
+			// Monuments
 			if(to != null && playerTeam != null
 					&& playerWarzone.nearAnyOwnedMonument(to, playerTeam) 
 					&& player.getHealth() < 20
@@ -523,6 +508,41 @@ public class WarPlayerListener extends PlayerListener {
 				player.setHealth(20);
 				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
 			}
+			
+			
+			
+			
+//			if(player != null && from != null && to != null && 
+//					playerTeam != null && !playerWarzone.getVolume().contains(to)) {
+//				player.sendMessage(war.str("Can't go outside the warzone boundary! Use /leave to exit the battle."));
+//				if(playerWarzone.getVolume().contains(from)){
+//					player.teleportTo(from);
+//				} else {
+//					// somehow the player made it out of the zone
+//					player.teleportTo(playerTeam.getTeamSpawn());
+//					player.sendMessage(war.str("Brought you back to your team spawn. Use /leave to exit the battle."));
+//				}
+//			}
+//			
+//			if(player != null && from != null && to != null && 
+//					playerTeam == null 
+//					&& war.inAnyWarzone(from) 
+//					&& !war.inAnyWarzone(to)) {
+//				// leaving
+//				Warzone zone = war.warzone(from);
+//				player.sendMessage(war.str("Leaving warzone " + zone.getName() + "."));
+//			}
+//			
+//			if(player != null && from != null && to != null && 
+//					playerTeam == null 
+//					&& !war.inAnyWarzone(from) 
+//					&& war.inAnyWarzone(to)) {
+//				// entering
+//				Warzone zone = war.warzone(to);
+//				player.sendMessage(war.str("Entering warzone " + zone.getName() + ". Tip: use /teams."));
+//			}
+			
+			
 		}
 		
     }

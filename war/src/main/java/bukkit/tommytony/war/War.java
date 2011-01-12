@@ -180,5 +180,12 @@ public class War extends JavaPlugin {
 		return name;
 	}
 
+	public Warzone zoneOfTooCloseZoneWall(Location location) {
+		for(Warzone zone : warzones) {
+			if(zone.isNearWall(location)) return zone;
+		}
+		return null;
+	}
+
 	
 }
