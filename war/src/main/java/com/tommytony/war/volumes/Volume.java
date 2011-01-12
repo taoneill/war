@@ -50,14 +50,14 @@ public class Volume {
 		int noOfSavedBlocks = 0;
 		try {
 			if(hasTwoCorners()) {
-				this.blockInfos = new BlockInfo[getSizeX()][getSizeY()][getSizeZ()];
+				this.setBlockInfos(new BlockInfo[getSizeX()][getSizeY()][getSizeZ()]);
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMinY();
 					for(int j = 0; j < getSizeY(); j++){
 						int z = getMinZ();
 						for(int k = 0;k < getSizeZ(); k++) {
-							this.blockInfos[i][j][k] = new BlockInfo(world.getBlockAt(x, y, z));
+							this.getBlockInfos()[i][j][k] = new BlockInfo(getWorld().getBlockAt(x, y, z));
 							z++;
 							noOfSavedBlocks++;
 						}
@@ -67,7 +67,7 @@ public class Volume {
 				}
 			}		
 		} catch (Exception e) {
-			this.war.getLogger().warning(war.str("Failed to save volume " + name + " blocks. " + e.getMessage()));
+			this.getWar().getLogger().warning(getWar().str("Failed to save volume " + getName() + " blocks. " + e.getMessage()));
 		}
 		return noOfSavedBlocks;
 	}
@@ -75,15 +75,15 @@ public class Volume {
 	public int resetBlocks() {
 		int noOfResetBlocks = 0;
 		try {
-			if(hasTwoCorners() && blockInfos != null) {
+			if(hasTwoCorners() && getBlockInfos() != null) {
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMinY();
 					for(int j = 0; j < getSizeY(); j++){
 						int z = getMinZ();
 						for(int k = 0;k < getSizeZ(); k++) {
-							BlockInfo oldBlockInfo = blockInfos[i][j][k];
-							Block currentBlock = world.getBlockAt(x, y, z);
+							BlockInfo oldBlockInfo = getBlockInfos()[i][j][k];
+							Block currentBlock = getWorld().getBlockAt(x, y, z);
 							if(currentBlock.getTypeID() != oldBlockInfo.getTypeID() ||
 								(currentBlock.getTypeID() == oldBlockInfo.getTypeID() && currentBlock.getData() != oldBlockInfo.getData()) ||
 								(currentBlock.getTypeID() == oldBlockInfo.getTypeID() && currentBlock.getData() == oldBlockInfo.getData() &&
@@ -111,7 +111,7 @@ public class Volume {
 				}
 			}		
 		} catch (Exception e) {
-			this.war.getLogger().warning(war.str("Failed to reset volume " + name + " blocks. " + e.getMessage()));
+			this.getWar().getLogger().warning(getWar().str("Failed to reset volume " + getName() + " blocks. " + e.getMessage()));
 		}
 		return noOfResetBlocks;
 	}
@@ -187,7 +187,7 @@ public class Volume {
 	}	
 
 	public boolean isSaved() {
-		return blockInfos != null;
+		return getBlockInfos() != null;
 	}
 
 	public BlockInfo[][][] getBlockInfos() {
@@ -226,16 +226,16 @@ public class Volume {
 		scanner.next(",");
 		int z1 = scanner.nextInt();
 		scanner.next(";");
-		cornerOne = world.getBlockAt(x1, y1, z1);
+		cornerOne = getWorld().getBlockAt(x1, y1, z1);
 		int x2 = scanner.nextInt();
 		scanner.next(",");
 		int y2 = scanner.nextInt();
 		scanner.next(",");
 		int z2 = scanner.nextInt();
 		scanner.next(";");
-		cornerOne = world.getBlockAt(x2, y2, z2);
+		cornerOne = getWorld().getBlockAt(x2, y2, z2);
 		
-		blockInfos = new BlockInfo[getSizeX()][getSizeY()][getSizeZ()];
+		setBlockInfos(new BlockInfo[getSizeX()][getSizeY()][getSizeZ()]);
 		for(int i = 0; i < getSizeX(); i++){
 			for(int j = 0; j < getSizeY(); j++) {
 				for(int k = 0; k < getSizeZ(); k++) {
@@ -279,6 +279,18 @@ public class Volume {
 		return hasTwoCorners() && x <= getMaxX() && x >= getMinX() && 
 				y <= getMaxY() && y >= getMinY() &&
 				z <= getMaxZ() && z >= getMinZ();
+	}
+
+	public void setBlockInfos(BlockInfo[][][] blockInfos) {
+		this.blockInfos = blockInfos;
+	}
+
+	public War getWar() {
+		return war;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 }

@@ -15,8 +15,8 @@ public class ZoneWallGuard {
 	private Player player;
 	private Warzone warzone;
 	private Location playerLocation;
-	private CenteredVolume volume;
 	private final War war; 
+	private BlockFace wall; 
 	
 	private final int radius = 3;
 	
@@ -32,12 +32,15 @@ public class ZoneWallGuard {
 	private void activate() {
 		// save current blocks
 		Block nearestWallBlock = warzone.getNearestWallBlock(playerLocation);
-		if(volume == null) {
-			volume = new CenteredVolume("zoneGuard-" + warzone.getName() + "-" + player.getName(), nearestWallBlock, radius, war, warzone);
-		} else {
-			volume.changeCenter(nearestWallBlock, radius);
-			volume.saveBlocks();
-		}
+//		if(volume == null) {
+//			volume = new CenteredVolume("zoneGuard-" + warzone.getName() + "-" + player.getName(), nearestWallBlock, radius, war, warzone);
+//			int saved = volume.saveBlocks();
+//			war.getLogger().info("Warzone wall guard created: " + saved + " blocks saved for " + player.getName());
+//		} else {
+//			volume.changeCenter(nearestWallBlock, radius);
+//			int saved = volume.saveBlocks();
+//			war.getLogger().info("Warzone wall guard updated: " + saved + " blocks saved for " + player.getName());
+//		}
 		// add wall guard blocks
 		nearestWallBlock.setType(Material.Glass);
 		nearestWallBlock.getFace(BlockFace.Up).setType(Material.Glass);
@@ -45,6 +48,7 @@ public class ZoneWallGuard {
 		if(warzone.getVolume().isNorthWallBlock(nearestWallBlock.getFace(BlockFace.East)) && 
 			warzone.getVolume().isNorthWallBlock(nearestWallBlock.getFace(BlockFace.West))) {
 			// north wall guard
+			this.wall = BlockFace.North;
 			toGlass(nearestWallBlock.getFace(BlockFace.East), BlockFace.North);
 			toGlass(nearestWallBlock.getFace(BlockFace.East).getFace(BlockFace.Up), BlockFace.North);
 			toGlass(nearestWallBlock.getFace(BlockFace.East).getFace(BlockFace.Down), BlockFace.North);
@@ -54,6 +58,7 @@ public class ZoneWallGuard {
 		} else if (warzone.getVolume().isSouthWallBlock(nearestWallBlock.getFace(BlockFace.East)) && 
 			warzone.getVolume().isSouthWallBlock(nearestWallBlock.getFace(BlockFace.West))) {
 			// south wall guard
+			this.wall = BlockFace.South;
 			toGlass(nearestWallBlock.getFace(BlockFace.East), BlockFace.South);
 			toGlass(nearestWallBlock.getFace(BlockFace.East).getFace(BlockFace.Up), BlockFace.South);
 			toGlass(nearestWallBlock.getFace(BlockFace.East).getFace(BlockFace.Down), BlockFace.South);
@@ -64,6 +69,7 @@ public class ZoneWallGuard {
 		} else if (warzone.getVolume().isEastWallBlock(nearestWallBlock.getFace(BlockFace.North)) && 
 				warzone.getVolume().isEastWallBlock(nearestWallBlock.getFace(BlockFace.South))) {
 			//east wall guard
+			this.wall = BlockFace.East;
 			toGlass(nearestWallBlock.getFace(BlockFace.North), BlockFace.East);
 			toGlass(nearestWallBlock.getFace(BlockFace.North).getFace(BlockFace.Up), BlockFace.East);
 			toGlass(nearestWallBlock.getFace(BlockFace.North).getFace(BlockFace.Down), BlockFace.East);
@@ -73,6 +79,7 @@ public class ZoneWallGuard {
 		} else if (warzone.getVolume().isWestWallBlock(nearestWallBlock.getFace(BlockFace.North)) && 
 				warzone.getVolume().isWestWallBlock(nearestWallBlock.getFace(BlockFace.South))) {
 			//west wall guard
+			this.wall = BlockFace.West;
 			toGlass(nearestWallBlock.getFace(BlockFace.North), BlockFace.West);
 			toGlass(nearestWallBlock.getFace(BlockFace.North).getFace(BlockFace.Up), BlockFace.West);
 			toGlass(nearestWallBlock.getFace(BlockFace.North).getFace(BlockFace.Down), BlockFace.West);
@@ -102,23 +109,23 @@ public class ZoneWallGuard {
 			}
 		}
 	}
-
-	private void deactivate() {
-		// restore old blocks
-		volume.resetBlocks();
-	}
 	
 	public void updatePlayerPosition(Location location) {
 		if(warzone.isNearWall(location)) {
-			deactivate();
 			this.playerLocation = location;
 			activate();
-		} else {
-			deactivate();
 		}
 	}
 
 	public Player getPlayer() {
 		return player;
+	}
+
+	public void setWall(BlockFace wall) {
+		this.wall = wall;
+	}
+
+	public BlockFace getWall() {
+		return wall;
 	}
 }

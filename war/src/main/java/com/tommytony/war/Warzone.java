@@ -39,7 +39,7 @@ public class Warzone {
 	private World world;
 	private Material originalSouthEastBlock;
 	private Material originalNorthWestBlock;
-	private final int minSafeDistanceFromWall = 5;
+	private final int minSafeDistanceFromWall = 4;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private War war;
 	
@@ -91,10 +91,10 @@ public class Warzone {
 	}
 
 	public void setNorthwest(Location northwest) {
-		if(this.northwest != null) {
+		if(this.northwest != null && originalNorthWestBlock != null) {
 			// reset old corner
-			int highest = this.world.getHighestBlockYAt(this.northwest.getBlockX(), this.southeast.getBlockZ()) - 1;
-			Block oldTopNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), highest, this.southeast.getBlockZ());
+			int highest = this.world.getHighestBlockYAt(this.northwest.getBlockX(), this.northwest.getBlockZ()) - 1;
+			Block oldTopNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), highest, this.northwest.getBlockZ());
 			oldTopNWBlock.setType(originalNorthWestBlock);
 		}
 		this.northwest = northwest;
@@ -111,7 +111,7 @@ public class Warzone {
 	}
 
 	public void setSoutheast(Location southeast) {
-		if(this.southeast != null) {
+		if(this.southeast != null && originalSouthEastBlock != null) {
 			// reset old corner
 			int highest = this.world.getHighestBlockYAt(this.southeast.getBlockX(), this.southeast.getBlockZ()) - 1;
 			Block oldTopSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), highest, this.southeast.getBlockZ());
@@ -140,7 +140,22 @@ public class Warzone {
 	
 	public int saveState() {
 		if(ready()){
-			return volume.saveBlocks();
+			// removed everything to keep save clean
+			volume.resetWallBlocks(BlockFace.East);
+			volume.resetWallBlocks(BlockFace.West);
+			volume.resetWallBlocks(BlockFace.North);
+			volume.resetWallBlocks(BlockFace.South);
+			
+			for(Team team : teams) {
+				team.getVolume().resetBlocks();
+			}
+			
+			for(Monument monument : monuments) {
+				monument.remove();
+			}
+			int saved = volume.saveBlocks();
+			initializeZone();	// bring back stuff
+			return saved;
 		}
 		return 0;
 	}
@@ -192,7 +207,7 @@ public class Warzone {
 					respawnPlayer(team, player);
 				}
 				team.setRemainingTickets(lifePool);
-				team.getVolume().resetBlocks();
+				team.setTeamSpawn(team.getTeamSpawn());
 				team.resetSign();
 			}
 			
@@ -449,22 +464,24 @@ public class Warzone {
 	}
 
 	public boolean isNearWall(Location latestPlayerLocation) {
-		if(Math.abs(southeast.getBlockZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall 
-				&& latestPlayerLocation.getBlockX() <= southeast.getBlockX()
-				&& latestPlayerLocation.getBlockX() >= northwest.getBlockX()) {
-			return true; 	// near east wall
-		} else if (Math.abs(southeast.getBlockX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockZ() <= northwest.getBlockZ()
-				&& latestPlayerLocation.getBlockZ() >= southeast.getBlockZ()) {
-			return true;	// near south wall
-		} else if (Math.abs(northwest.getBlockX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockZ() <= northwest.getBlockZ()
-				&& latestPlayerLocation.getBlockZ() >= southeast.getBlockZ()) {
-			return true;	// near north wall
-		} else if (Math.abs(northwest.getBlockZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockX() <= southeast.getBlockX()
-				&& latestPlayerLocation.getBlockX() >= northwest.getBlockX()) {
-			return true;	// near west wall
+		if(volume.hasTwoCorners()) {
+			if(Math.abs(southeast.getBlockZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall 
+					&& latestPlayerLocation.getBlockX() < southeast.getBlockX()
+					&& latestPlayerLocation.getBlockX() > northwest.getBlockX()) {
+				return true; 	// near east wall
+			} else if (Math.abs(southeast.getBlockX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
+					&& latestPlayerLocation.getBlockZ() < northwest.getBlockZ()
+					&& latestPlayerLocation.getBlockZ() > southeast.getBlockZ()) {
+				return true;	// near south wall
+			} else if (Math.abs(northwest.getBlockX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
+					&& latestPlayerLocation.getBlockZ() < northwest.getBlockZ()
+					&& latestPlayerLocation.getBlockZ() > southeast.getBlockZ()) {
+				return true;	// near north wall
+			} else if (Math.abs(northwest.getBlockZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall
+					&& latestPlayerLocation.getBlockX() < southeast.getBlockX()
+					&& latestPlayerLocation.getBlockX() > northwest.getBlockX()) {
+				return true;	// near west wall
+			}
 		}
 		return false;
 	}
@@ -499,9 +516,34 @@ public class Warzone {
 		// note: y + 1 to line up 3 sided square with player eyes
 	}
 	
-	public ZoneWallGuard getPlayerZoneWallGuard(String name) {
+	public BlockFace getNearestWall(Location latestPlayerLocation) {
+		if(Math.abs(southeast.getBlockZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall 
+				&& latestPlayerLocation.getBlockX() <= southeast.getBlockX()
+				&& latestPlayerLocation.getBlockX() >= northwest.getBlockX()) {
+			// near east wall
+			return BlockFace.East; 	
+		} else if (Math.abs(southeast.getBlockX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
+				&& latestPlayerLocation.getBlockZ() <= northwest.getBlockZ()
+				&& latestPlayerLocation.getBlockZ() >= southeast.getBlockZ()) {
+			// near south wall
+			return BlockFace.South; 	
+		} else if (Math.abs(northwest.getBlockX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
+				&& latestPlayerLocation.getBlockZ() <= northwest.getBlockZ()
+				&& latestPlayerLocation.getBlockZ() >= southeast.getBlockZ()) {
+			// near north wall
+			return BlockFace.North; 
+		} else if (Math.abs(northwest.getBlockZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall
+				&& latestPlayerLocation.getBlockX() <= southeast.getBlockX()
+				&& latestPlayerLocation.getBlockX() >= northwest.getBlockX()) {
+			// near west wall
+			return BlockFace.West; 	
+		}
+		return null;
+	}
+	
+	public ZoneWallGuard getPlayerZoneWallGuard(String name, BlockFace wall) {
 		for(ZoneWallGuard guard : zoneWallGuards) {
-			if(guard.getPlayer().getName().equals(name)) {
+			if(guard.getPlayer().getName().equals(name) && wall == guard.getWall()) {
 				return guard;
 			}
 		}
@@ -510,20 +552,32 @@ public class Warzone {
 	}
 
 	public void protectZoneWallAgainstPlayer(Player player) {
-		ZoneWallGuard guard = getPlayerZoneWallGuard(player.getName());
+		BlockFace nearestWall = getNearestWall(player.getLocation());
+		ZoneWallGuard guard = getPlayerZoneWallGuard(player.getName(), nearestWall);
 		if(guard != null) { 
 			// already protected, need to move the guard
 			guard.updatePlayerPosition(player.getLocation());
 		} else {
 			// new guard
 			guard = new ZoneWallGuard(player, war, this);
+			zoneWallGuards.add(guard);
 		}
 	}
 	
 	public void dropZoneWallGuardIfAny(Player player) {
-		ZoneWallGuard guard = getPlayerZoneWallGuard(player.getName());
-		guard.updatePlayerPosition(player.getLocation()); // should restore old blocks
-		zoneWallGuards.remove(guard);
+		List<ZoneWallGuard> playerGuards = new ArrayList<ZoneWallGuard>();
+		for(ZoneWallGuard guard : zoneWallGuards) {
+			if(guard.getPlayer().getName().equals(player.getName())){
+				playerGuards.add(guard);
+				int reset = volume.resetWallBlocks(guard.getWall()); // this should restore old blocks
+				war.getLogger().info("Reset " + reset + " blocks in " + guard.getWall() + "wall of warzone " + name);
+			}
+		}
+		// now remove those zone guards
+		for(ZoneWallGuard playerGuard : playerGuards) {
+			zoneWallGuards.remove(playerGuard);
+		}
+		playerGuards.clear();
 	}
 
 	

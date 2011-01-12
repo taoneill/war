@@ -47,7 +47,7 @@ public class WarBlockListener extends BlockListener {
 					event.setCancelled(true);
 				}
 			}
-			if(zone.isImportantBlock(block)){
+			if(zone != null && zone.isImportantBlock(block)){
 				player.sendMessage(war.str("Can't build here."));
 				event.setCancelled(true);
 			}

@@ -51,14 +51,7 @@ public class Team {
 		this.volume.setCornerTwo(warzone.getWorld().getBlockAt(x+2, y+5, z+2));
 	}
 	
-	public void setTeamSpawn(Location teamSpawn) {
-		
-		this.teamSpawn = teamSpawn;
-		
-		// this resets the block to old state
-		this.setVolume();
-		volume.saveBlocks();
-		
+	private void initializeTeamSpawn(Location teamSpawn) {
 		// Set the spawn 
 		int x = teamSpawn.getBlockX();
 		int y = teamSpawn.getBlockY();
@@ -129,7 +122,17 @@ public class Team {
 		warzone.getWorld().getBlockAt(x-2, y+3, z-2).setType(material);
 		
 		resetSign();
-
+	}
+	
+	public void setTeamSpawn(Location teamSpawn) {
+		
+		this.teamSpawn = teamSpawn;
+		
+		// this resets the block to old state
+		this.setVolume();
+		volume.saveBlocks();
+		
+		initializeTeamSpawn(teamSpawn);
 	}
 	
 	public Location getTeamSpawn() {
