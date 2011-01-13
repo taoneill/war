@@ -54,6 +54,16 @@ public class WarMapper {
 			}
 		}
 		
+		// zone makers
+		String makersStr = warConfig.getString("zoneMakers");
+		String[] makersSplit = makersStr.split(",");
+		war.getZoneMakerNames().clear();
+		for(String makerName : makersSplit) {
+			if(makerName != null && !makerName.equals("")){
+				war.getZoneMakerNames().add(makerName);
+			}
+		}
+		
 		// defaultLoadout
 		String defaultLoadoutStr = warConfig.getString("defaultLoadout");
 		String[] defaultLoadoutSplit = defaultLoadoutStr.split(";");
@@ -73,6 +83,9 @@ public class WarMapper {
 		// defaultFriendlyFire
 		war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));
 		
+		// defaultDrawZoneOutline
+		war.setDefaultFriendlyFire(warConfig.getBoolean("defaultDrawZoneOutline"));
+		
 		warConfig.close();
 		war.getLogger().info("Loaded war config.");
 	}
@@ -88,6 +101,13 @@ public class WarMapper {
 		}
 		warConfig.setString("warzones", warzonesStr);
 		
+		// zone makers: default is none and it means everyone can use /setzone
+		String makersStr = "";	// everyone
+		for(String name : war.getZoneMakerNames()) {
+			makersStr += name + ",";
+		}
+		warConfig.setString("zoneMakers", makersStr);
+		
 		// defaultLoadout
 		String defaultLoadoutStr = "";
 		HashMap<Integer, ItemStack> items = war.getDefaultLoadout();
@@ -102,6 +122,9 @@ public class WarMapper {
 		
 		// defaultFriendlyFire
 		warConfig.setBoolean("defaultFriendlyFire", war.getDefaultFriendlyFire());
+		
+		// defaultFriendlyFire
+		warConfig.setBoolean("defaultDrawZoneOutline", war.getDefaultDrawZoneOutline());
 		
 		warConfig.save();
 		warConfig.close();

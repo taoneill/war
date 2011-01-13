@@ -15,7 +15,6 @@ import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.ZoneWallGuard;
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
 
@@ -439,7 +438,6 @@ public class WarPlayerListener extends PlayerListener {
 					if(warzone.hasMonument(monumentName)) {
 						// move the existing monument
 						Monument monument = warzone.getMonument(monumentName);
-						monument.remove();
 						monument.setLocation(player.getLocation());
 						player.sendMessage(war.str("Monument " + monument.getName() + " was moved."));
 					} else {
@@ -508,10 +506,7 @@ public class WarPlayerListener extends PlayerListener {
 				player.setHealth(20);
 				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
 			}
-			
-			
-			
-			
+					
 //			if(player != null && from != null && to != null && 
 //					playerTeam != null && !playerWarzone.getVolume().contains(to)) {
 //				player.sendMessage(war.str("Can't go outside the warzone boundary! Use /leave to exit the battle."));

@@ -146,9 +146,7 @@ public class Monument {
 		return name;
 	}
 
-	public void setLocation(Location location) {
-		this.location = location;
-		
+	public void setLocation(Location location) {		
 		volume.changeCenter(location);
 		this.addMonumentBlocks();
 	}

@@ -39,9 +39,11 @@ public class War extends JavaPlugin {
     String version = "0.3";
     
     private final List<Warzone> warzones = new ArrayList<Warzone>();
+    private final List<String> zoneMakerNames = new ArrayList<String>();
     private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
     private int defaultLifepool = 7;
-    private boolean defaultFriendlyFire = false;    
+    private boolean defaultFriendlyFire = false;
+	private boolean defaultDrawZoneOutline = true;    
 	
 	
 	public void onDisable() {
@@ -70,19 +72,13 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);	// BROKEN
 		
 		// Load files from disk or create them
-		this.defaultLoadout.put(0, new ItemStack(272, 1));
-		this.defaultLoadout.put(1, new ItemStack(261, 1));
-		this.defaultLoadout.put(2, new ItemStack(262, 12));
-		this.defaultLoadout.put(3, new ItemStack(274, 1));
-		this.defaultLoadout.put(4, new ItemStack(273, 1));
-		this.defaultLoadout.put(5, new ItemStack(275, 1));
-		this.defaultLoadout.put(27, new ItemStack(259, 1));
-		this.defaultLoadout.put(6, new ItemStack(297, 1));
-		this.defaultLoadout.put(8, new ItemStack(3, 12));
-		this.defaultLoadout.put(100, new ItemStack(301, 1));
-		this.defaultLoadout.put(101, new ItemStack(300, 1));
-		this.defaultLoadout.put(102, new ItemStack(299, 1));
-		this.defaultLoadout.put(103, new ItemStack(298, 1));
+		this.defaultLoadout.put(0, new ItemStack(Material.StoneSword));
+		this.defaultLoadout.put(1, new ItemStack(Material.Bow));
+		this.defaultLoadout.put(2, new ItemStack(Material.Arrow, 7));
+		this.defaultLoadout.put(3, new ItemStack(Material.StonePickaxe));
+		this.defaultLoadout.put(4, new ItemStack(Material.StoneSpade));
+		this.defaultLoadout.put(5, new ItemStack(Material.StoneAxe));
+		this.defaultLoadout.put(6, new ItemStack(Material.Bread, 2));
 		this.defaultLifepool = 7;
 		this.defaultFriendlyFire = false;
 		WarMapper.load(this);
@@ -185,6 +181,14 @@ public class War extends JavaPlugin {
 			if(zone.isNearWall(location)) return zone;
 		}
 		return null;
+	}
+
+	public List<String> getZoneMakerNames() {
+		return zoneMakerNames;
+	}
+
+	public boolean getDefaultDrawZoneOutline() {
+		return defaultDrawZoneOutline ;
 	}
 
 	

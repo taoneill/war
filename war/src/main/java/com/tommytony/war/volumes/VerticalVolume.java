@@ -83,10 +83,12 @@ public class VerticalVolume extends Volume{
 						int x = getMinX();
 						for(int i = 0; i < getSizeX(); i++) {
 							BlockInfo oldBlockInfo = getBlockInfos()[i][j][k];
-							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockInfo, currentBlock)) {
-								noOfResetBlocks++;
-							}							
+							if(oldBlockInfo != null) {
+								Block currentBlock = getWorld().getBlockAt(x, y, z);
+								if(resetBlock(oldBlockInfo, currentBlock)) {
+									noOfResetBlocks++;
+								}							
+							}
 							x++;
 						}
 						y++;
@@ -99,10 +101,12 @@ public class VerticalVolume extends Volume{
 						int x = getMinX();
 						for(int i = 0; i < getSizeX(); i++) {
 							BlockInfo oldBlockInfo = getBlockInfos()[i][j][k];
-							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockInfo, currentBlock)) {
-								noOfResetBlocks++;
-							}							
+							if(oldBlockInfo != null) {
+								Block currentBlock = getWorld().getBlockAt(x, y, z);
+								if(resetBlock(oldBlockInfo, currentBlock)) {
+									noOfResetBlocks++;
+								}							
+							}
 							x++;
 						}
 						y++;
@@ -115,10 +119,12 @@ public class VerticalVolume extends Volume{
 						int z = getMinZ();
 						for(int k = 0; k < getSizeZ(); k++) {
 							BlockInfo oldBlockInfo = getBlockInfos()[i][j][k];
-							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockInfo, currentBlock)) {
-								noOfResetBlocks++;
-							}							
+							if(oldBlockInfo != null) {
+								Block currentBlock = getWorld().getBlockAt(x, y, z);
+								if(resetBlock(oldBlockInfo, currentBlock)) {
+									noOfResetBlocks++;
+								}			
+							}
 							z++;
 						}
 						y++;
@@ -131,10 +137,12 @@ public class VerticalVolume extends Volume{
 						int z = getMinZ();
 						for(int k = 0; k < getSizeZ(); k++) {
 							BlockInfo oldBlockInfo = getBlockInfos()[i][j][k];
-							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockInfo, currentBlock)) {
-								noOfResetBlocks++;
-							}							
+							if(oldBlockInfo != null) {
+								Block currentBlock = getWorld().getBlockAt(x, y, z);
+								if(resetBlock(oldBlockInfo, currentBlock)) {
+									noOfResetBlocks++;
+								}							
+							}
 							z++;
 						}
 						y++;
@@ -142,7 +150,7 @@ public class VerticalVolume extends Volume{
 				}
 			}		
 		} catch (Exception e) {
-			this.getWar().getLogger().warning(getWar().str("Failed to reset wall " + wall + " in volume " + getName() + ". " + e.getMessage()));
+			this.getWar().getLogger().warning("Failed to reset wall " + wall + " in volume " + getName() + ". " + e.getClass().toString() + " " + e.getMessage());
 		}
 		return noOfResetBlocks;
 	}

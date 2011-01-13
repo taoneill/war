@@ -149,31 +149,40 @@ public class WarzoneMapper {
 		
 		warzoneConfig.close();
 		
-		if(loadBlocks) {
-
-			PropertiesFile warzoneBlocksFile = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + ".dat");
+		if(loadBlocks && warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
 			
 			// zone blocks 
 			VerticalVolume zoneVolume = new VerticalVolume("zone", war, warzone);
-			String stateStr = warzoneBlocksFile.getString("zoneBlocks");
-			if(stateStr != null && !stateStr.equals("")) {
-				zoneVolume.blocksFromString(stateStr);
-				warzone.setVolume(zoneVolume);
+			try {
+				zoneVolume.fromDisk();
+			} catch (IOException e) {
+				war.getLogger().warning("Failed to read volume file " + warzone.getVolume().getName() + 
+						" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				e.printStackTrace();
 			}
 			
 			// monument blocks
 			for(Monument monument: warzone.getMonuments()) {
-				String monumentBlocksStr = warzoneBlocksFile.getString("monument"+monument.getName()+"Blocks");
-				monument.getVolume().blocksFromString(monumentBlocksStr);
+				try {
+					monument.getVolume().fromDisk();
+				} catch (IOException e) {
+					war.getLogger().warning("Failed to read volume file " + warzone.getVolume().getName() + 
+							" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+					e.printStackTrace();
+				}
 			}
 			
 			// team spawn blocks
 			for(Team team : warzone.getTeams()) {
-				String teamBlocksStr = warzoneBlocksFile.getString("team"+team.getName()+"Blocks");
-				team.getVolume().blocksFromString(teamBlocksStr);
+				try {
+					team.getVolume().fromDisk();
+				} catch (IOException e) {
+					war.getLogger().warning("Failed to read volume file " + warzone.getVolume().getName() + 
+							" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+					e.printStackTrace();
+				}
 			}
 			
-			warzoneBlocksFile.close();
 			//war.getLogger().info("Loaded warzone " + name + " config and blocks.");
 		} else {
 			//war.getLogger().info("Loaded warzone " + name + " config.");
@@ -253,24 +262,37 @@ public class WarzoneMapper {
 		warzoneConfig.close();
 		
 		if(saveBlocks) {
+			(new File(war.getName()+"/"+warzone.getName())).mkdir();
 			// zone blocks
-			PropertiesFile warzoneBlocksFile = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + ".dat");
-			warzoneBlocksFile.setString("zoneBlocks", warzone.getVolume().blocksToString());	// oh boy			
+			try {
+				warzone.getVolume().toDisk();
+			} catch (IOException e) {
+				war.getLogger().warning("Failed to write volume file " + warzone.getVolume().getName() + 
+						" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				e.printStackTrace();
+			}
 			
 			// monument blocks
 			for(Monument monument: monuments) {
-				String monumentBlocksStr = monument.getVolume().blocksToString();
-				warzoneBlocksFile.setString("monument"+monument.getName()+"Blocks", monumentBlocksStr);
+				try {
+					monument.getVolume().toDisk();
+				} catch (IOException e) {
+					war.getLogger().warning("Failed to write volume file " + warzone.getVolume().getName() + 
+							" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+					e.printStackTrace();
+				}
 			}
 			
 			// team spawn blocks
 			for(Team team : teams) {
-				String teamBlocksStr = team.getVolume().blocksToString();
-				warzoneBlocksFile.setString("team"+team.getName()+"Blocks", teamBlocksStr);
+				try {
+					team.getVolume().toDisk();
+				} catch (IOException e) {
+					war.getLogger().warning("Failed to write volume file " + warzone.getVolume().getName() + 
+							" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+					e.printStackTrace();
+				}
 			}
-			
-			warzoneBlocksFile.save();
-			warzoneBlocksFile.close();
 		}
 		
 //		if(saveBlocks) {
@@ -286,12 +308,16 @@ public class WarzoneMapper {
 		if(!deletedConfig) {
 			war.getLogger().warning("Failed to delete file " + war.getName() + "/warzone-"+name+".txt");
 		}
-		File warzoneBlocksFile = new File(war.getName() + "/warzone-" + name + ".dat");
-		boolean deletedData = warzoneBlocksFile.delete();
-		if(!deletedData) {
-			war.getLogger().warning("Failed to delete file " + war.getName() + "/warzone-"+name+".dat");
-		}
 		
+		File zoneFolder = new File(war.getName() + "/warzone-" + name);
+		File[] files = zoneFolder.listFiles();
+		for(File file : files) {
+			boolean deletedData = file.delete();
+			if(!deletedData) {
+				war.getLogger().warning(file.getName());
+			}
+		}
+		zoneFolder.delete();
 	}
 
 }
