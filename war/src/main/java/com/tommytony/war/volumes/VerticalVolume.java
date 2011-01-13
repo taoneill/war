@@ -3,17 +3,16 @@ package com.tommytony.war.volumes;
 import org.bukkit.Block;
 import org.bukkit.BlockFace;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
 import bukkit.tommytony.war.War;
 
-import com.tommytony.war.Warzone;
-
 public class VerticalVolume extends Volume{
 
-	public VerticalVolume(String name, War war, Warzone warzone) {
-		super(name, war, warzone);
+	public VerticalVolume(String name, War war, World world) {
+		super(name, war, world);
 
 	}
 	

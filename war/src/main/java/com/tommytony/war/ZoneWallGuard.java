@@ -4,15 +4,17 @@ import java.util.List;
 
 import org.bukkit.Block;
 import org.bukkit.BlockFace;
-import org.bukkit.HumanEntity;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Player;
 
 import bukkit.tommytony.war.War;
 
-import com.tommytony.war.volumes.CenteredVolume;
-
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class ZoneWallGuard {
 	private Player player;
 	private Warzone warzone;

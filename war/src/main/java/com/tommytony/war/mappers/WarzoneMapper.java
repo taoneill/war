@@ -16,6 +16,7 @@ import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.volumes.VerticalVolume;
+import com.tommytony.war.volumes.Volume;
 
 /**
  * 
@@ -26,7 +27,7 @@ public class WarzoneMapper {
 
 	public static Warzone load(War war, String name, boolean loadBlocks) {
 		//war.getLogger().info("Loading warzone " + name + " config and blocks...");
-		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + name + ".txt");
+		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + name + "/warzone-" + name + ".txt");
 		try {
 			warzoneConfig.load();
 		} catch (IOException e) {
@@ -152,17 +153,11 @@ public class WarzoneMapper {
 		if(loadBlocks && warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
 			
 			// zone blocks 
-			VerticalVolume zoneVolume = new VerticalVolume("zone", war, warzone);
-			try {
-				zoneVolume.fromDisk();
-			} catch (IOException e) {
-				war.getLogger().warning("Failed to read volume file " + warzone.getVolume().getName() + 
-						" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
-				e.printStackTrace();
-			}
+			VerticalVolume zoneVolume = VolumeMapper.load(warzone.getName(), "zone", war, warzone.getWorld());
 			
 			// monument blocks
 			for(Monument monument: warzone.getMonuments()) {
+				monument.setVolume(VolumeMapper.load(warzone.getName(), monument.getName(), war, world));
 				try {
 					monument.getVolume().fromDisk();
 				} catch (IOException e) {
@@ -193,7 +188,7 @@ public class WarzoneMapper {
 	}
 	
 	public static void save(War war, Warzone warzone, boolean saveBlocks) {
-		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + ".txt");
+		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + "/warzone-" + warzone.getName() + ".txt");
 		//war.getLogger().info("Saving warzone " + warzone.getName() + "...");
 		
 		// name
@@ -264,34 +259,16 @@ public class WarzoneMapper {
 		if(saveBlocks) {
 			(new File(war.getName()+"/"+warzone.getName())).mkdir();
 			// zone blocks
-			try {
-				warzone.getVolume().toDisk();
-			} catch (IOException e) {
-				war.getLogger().warning("Failed to write volume file " + warzone.getVolume().getName() + 
-						" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
-				e.printStackTrace();
-			}
+			VolumeMapper.save(warzone.getVolume(), "zone", war);
 			
 			// monument blocks
 			for(Monument monument: monuments) {
-				try {
-					monument.getVolume().toDisk();
-				} catch (IOException e) {
-					war.getLogger().warning("Failed to write volume file " + warzone.getVolume().getName() + 
-							" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
-					e.printStackTrace();
-				}
+				VolumeMapper.save(monument.getVolume(), warzone.getName(), war);
 			}
 			
 			// team spawn blocks
 			for(Team team : teams) {
-				try {
-					team.getVolume().toDisk();
-				} catch (IOException e) {
-					war.getLogger().warning("Failed to write volume file " + warzone.getVolume().getName() + 
-							" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
-					e.printStackTrace();
-				}
+				VolumeMapper.save(team.getVolume(), warzone.getName(), war);
 			}
 		}
 		
@@ -303,12 +280,6 @@ public class WarzoneMapper {
 	}
 	
 	public static void delete(War war, String name) {
-		File warzoneConfig = new File(war.getName() + "/warzone-" + name + ".txt");
-		boolean deletedConfig = warzoneConfig.delete();
-		if(!deletedConfig) {
-			war.getLogger().warning("Failed to delete file " + war.getName() + "/warzone-"+name+".txt");
-		}
-		
 		File zoneFolder = new File(war.getName() + "/warzone-" + name);
 		File[] files = zoneFolder.listFiles();
 		for(File file : files) {

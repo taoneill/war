@@ -32,17 +32,16 @@ import com.tommytony.war.Warzone;
 public class Volume {
 	private final String name;
 	private final World world;
-	private final Warzone warzone;
+	//private final Warzone warzone;
 	private Block cornerOne;
 	private Block cornerTwo;
 	private BlockInfo[][][] blockInfos = null;
 	private final War war;	
 
-	public Volume(String name, War war, Warzone warzone) {
+	public Volume(String name, War war, World world) {
 		this.name = name;
 		this.war = war;
-		this.warzone = warzone;
-		this.world = warzone.getWorld();
+		this.world = world;
 	}
 	
 	public World getWorld() {
@@ -280,100 +279,13 @@ public class Volume {
 //		}
 //	}
 	
-	public void fromDisk() throws IOException {
-		BufferedReader in = null;
-		try {
-			in = new BufferedReader(new FileReader(new File(war.getName() + "/warzone-" + warzone.getName() + "/" + name)));
-			;
-			String firstLine = in.readLine();
-			if(firstLine != null && !firstLine.equals("")) {
-				int x1 = Integer.parseInt(in.readLine());
-				int y1 = Integer.parseInt(in.readLine());
-				int z1 = Integer.parseInt(in.readLine());
-				int x2 = Integer.parseInt(in.readLine());
-				int y2 = Integer.parseInt(in.readLine());
-				int z2 = Integer.parseInt(in.readLine());
-				cornerOne = getWorld().getBlockAt(x1, y1, z1);
-				cornerTwo = getWorld().getBlockAt(x2, y2, z2);
-				
-				setBlockInfos(new BlockInfo[getSizeX()][getSizeY()][getSizeZ()]);
-				for(int i = 0; i < getSizeX(); i++){
-					for(int j = 0; j < getSizeY(); j++) {
-						for(int k = 0; k < getSizeZ(); k++) {
-							String blockLine = in.readLine();
-							String[] blockSplit = blockLine.split(",");
-							
-							int typeID = Integer.parseInt(blockSplit[0]);
-							byte data = Byte.parseByte(blockSplit[1]);
-							String[] lines = null;
-							if(typeID == Material.Sign.getID() || typeID == Material.SignPost.getID()) {
-								String signLines = blockSplit[2];
-								if(blockSplit.length > 3) {
-									// sign includes commas
-									for(int splitI = 3; splitI < blockSplit.length; splitI++) {
-										signLines.concat(blockSplit[splitI]);
-									}
-								}
-								String[] signLinesSplit = signLines.split("[line]");
-								lines = new String[4];
-								lines[0] = signLinesSplit[0];
-								lines[1] = signLinesSplit[1];
-								lines[2] = signLinesSplit[2];
-								lines[3] = signLinesSplit[3];
-							}
-							getBlockInfos()[i][j][k] = new BlockInfo(typeID, data, lines);
-						}
-					}
-				}
-			}
-		} finally {
-			if(in != null) in.close();
-		}
+	
+	public Block getCornerOne() {
+		return cornerOne;
 	}
 	
-	public void toDisk() throws IOException {
-		if(isSaved() && getBlockInfos() != null) {
-			BufferedWriter out = null;
-			try {
-				out = new BufferedWriter(new FileWriter(new File(war.getName() + "/warzone-" + warzone.getName() + "/" + name)));
-				out.write("corner1"); out.newLine();
-				out.write(cornerOne.getX()); out.newLine();
-				out.write(cornerOne.getY()); out.newLine();
-				out.write(cornerOne.getZ()); out.newLine();
-				out.write("corner2"); out.newLine();
-				out.write(cornerTwo.getX()); out.newLine();
-				out.write(cornerTwo.getY()); out.newLine();
-				out.write(cornerTwo.getZ()); out.newLine();
-				
-				for(int i = 0; i < getSizeX(); i++){
-					for(int j = 0; j < getSizeY(); j++) {
-						for(int k = 0; k < getSizeZ(); k++) {
-							BlockInfo info = getBlockInfos()[i][j][k];
-							if(info == null) {
-								out.write("0,0,"); out.newLine();
-							} else {
-								if(info.getType() == Material.Sign || info.getType() == Material.SignPost) {
-									String[] lines = info.getSignLines();
-									out.write(info.getTypeID() + "," + info.getData() + "," + lines[0] + "[line]" + lines[1] + "[line]" + lines[2] + "[line]"+ lines[3]);
-									
-								} else {
-									out.write(info.getTypeID() + "," + info.getData() + ","); 
-								}
-							}
-						}
-					}
-				}
-			} finally {
-				if(out != null) out.close();	
-			}
-			
-			
-			
-		}
-	}
-
-	public Warzone getWarzone() {
-		return warzone;
+	public Block getCornerTwo() {
+		return cornerOne;
 	}
 
 	public boolean contains(Location location) {

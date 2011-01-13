@@ -2,24 +2,25 @@ package com.tommytony.war.volumes;
 
 import org.bukkit.Block;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import bukkit.tommytony.war.War;
-
-import com.tommytony.war.Warzone;
 
 public class CenteredVolume extends Volume {
 
 	private Block center;
 	private int sideSize = -1;
+	private final World world;
 
-	public CenteredVolume(String name, Block center, int sideSize, War war, Warzone warzone) {
-		super(name, war, warzone);
+	public CenteredVolume(String name, Block center, int sideSize, War war, World world) {
+		super(name, war, world);
+		this.world = world;
 		setCenter(center);
 		setSideSize(sideSize);
 	}
 	
 	public void changeCenter(Location newCenter) {
-		changeCenter(getWarzone().getWorld().getBlockAt(newCenter.getBlockX(), 
+		changeCenter(world.getBlockAt(newCenter.getBlockX(), 
 														newCenter.getBlockY(), 
 														newCenter.getBlockZ()), 
 															this.sideSize);
@@ -42,7 +43,7 @@ public class CenteredVolume extends Volume {
 		int x = center.getX() + topHalfOfSide;
 		int y = center.getY() + topHalfOfSide;
 		int z = center.getZ() + topHalfOfSide;
-		Block cornerOne = getWarzone().getWorld().getBlockAt(x, y, z);
+		Block cornerOne = world.getBlockAt(x, y, z);
 		setCornerOne(cornerOne);
 		
 		if(sideSize % 2 == 0) {	// not a real center, bottom half is larger by 1
@@ -50,13 +51,13 @@ public class CenteredVolume extends Volume {
 			x = center.getX() - bottomHalfOfSide;
 			y = center.getY() - bottomHalfOfSide;
 			z = center.getZ() - bottomHalfOfSide;
-			Block cornerTwo = getWarzone().getWorld().getBlockAt(x, y, z);
+			Block cornerTwo = world.getBlockAt(x, y, z);
 			setCornerTwo(cornerTwo);
 		} else {
 			x = center.getX() - topHalfOfSide;
 			y = center.getY() - topHalfOfSide;
 			z = center.getZ() - topHalfOfSide;
-			Block cornerTwo = getWarzone().getWorld().getBlockAt(x, y, z);
+			Block cornerTwo = world.getBlockAt(x, y, z);
 			setCornerTwo(cornerTwo);
 		}
 	}

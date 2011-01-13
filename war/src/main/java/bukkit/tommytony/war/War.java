@@ -186,6 +186,13 @@ public class War extends JavaPlugin {
 	public List<String> getZoneMakerNames() {
 		return zoneMakerNames;
 	}
+	
+	public boolean isZoneMaker(String playerName) {
+		for(String zoneMaker : zoneMakerNames) {
+			if(zoneMaker.equals(playerName)) return true;
+		}
+		return false;			
+	}
 
 	public boolean getDefaultDrawZoneOutline() {
 		return defaultDrawZoneOutline ;
