@@ -53,8 +53,7 @@ public class War extends JavaPlugin {
 	public void onEnable() {
 		this.log = Logger.getLogger("Minecraft");
 		
-		// Register hMod hooks
-		
+		// Register hooks		
 		PluginManager pm = getServer().getPluginManager();
 		
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
@@ -71,7 +70,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.BLOCK_CANBUILD, blockListener, Priority.Normal, this);	// BLOCK_PLACE
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);	// BROKEN
 		
-		// Load files from disk or create them
+		// Load files from disk or create them (using these defaults)
 		this.defaultLoadout.put(0, new ItemStack(Material.StoneSword));
 		this.defaultLoadout.put(1, new ItemStack(Material.Bow));
 		this.defaultLoadout.put(2, new ItemStack(Material.Arrow, 7));
@@ -176,7 +175,7 @@ public class War extends JavaPlugin {
 		return name;
 	}
 
-	public Warzone zoneOfTooCloseZoneWall(Location location) {
+	public Warzone zoneOfZoneWallAtProximity(Location location) {
 		for(Warzone zone : warzones) {
 			if(zone.isNearWall(location)) return zone;
 		}

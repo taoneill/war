@@ -16,7 +16,6 @@ import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.volumes.VerticalVolume;
-import com.tommytony.war.volumes.Volume;
 
 /**
  * 
@@ -153,29 +152,16 @@ public class WarzoneMapper {
 		if(loadBlocks && warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
 			
 			// zone blocks 
-			VerticalVolume zoneVolume = VolumeMapper.load(warzone.getName(), "zone", war, warzone.getWorld());
+			VerticalVolume zoneVolume = VolumeMapper.loadVerticalVolume(warzone.getName(), "zone", war, warzone.getWorld());
 			
 			// monument blocks
 			for(Monument monument: warzone.getMonuments()) {
-				monument.setVolume(VolumeMapper.load(warzone.getName(), monument.getName(), war, world));
-				try {
-					monument.getVolume().fromDisk();
-				} catch (IOException e) {
-					war.getLogger().warning("Failed to read volume file " + warzone.getVolume().getName() + 
-							" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
-					e.printStackTrace();
-				}
+				monument.setVolume(VolumeMapper.loadCenteredVolume(warzone.getName(), monument.getName(), 7, war, world));
 			}
 			
 			// team spawn blocks
 			for(Team team : warzone.getTeams()) {
-				try {
-					team.getVolume().fromDisk();
-				} catch (IOException e) {
-					war.getLogger().warning("Failed to read volume file " + warzone.getVolume().getName() + 
-							" for warzone " + warzone.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
-					e.printStackTrace();
-				}
+				team.setVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), war, world));
 			}
 			
 			//war.getLogger().info("Loaded warzone " + name + " config and blocks.");

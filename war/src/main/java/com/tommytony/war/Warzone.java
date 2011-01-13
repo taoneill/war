@@ -39,7 +39,7 @@ public class Warzone {
 	private World world;
 	private Material originalSouthEastBlock;
 	private Material originalNorthWestBlock;
-	private final int minSafeDistanceFromWall = 4;
+	private final int minSafeDistanceFromWall = 5;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private War war;
 	
@@ -52,7 +52,7 @@ public class Warzone {
 		this.setLifePool(war.getDefaultLifepool());
 		this.setLoadout(war.getDefaultLoadout());
 		this.drawZoneOutline = war.getDefaultDrawZoneOutline();
-		this.volume = new VerticalVolume(name, war, this);
+		this.volume = new VerticalVolume(name, war, this.getWorld());
 	}
 	
 	public boolean ready() {

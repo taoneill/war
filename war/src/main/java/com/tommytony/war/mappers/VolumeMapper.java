@@ -13,14 +13,37 @@ import org.bukkit.World;
 import bukkit.tommytony.war.War;
 
 import com.tommytony.war.volumes.BlockInfo;
+import com.tommytony.war.volumes.CenteredVolume;
+import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
 
 public class VolumeMapper {
-	public static Volume load(String zoneName, String volumeName, War war, World world) {
+	
+	public static Volume loadVolume(String volumeName, String zoneName,
+			War war, World world) {
+		Volume volume = new Volume(volumeName, war, world);
+		load(volume, zoneName, war, world);
+		return volume;
+	}
+
+	public static VerticalVolume loadVerticalVolume(String volumeName, String zoneName,
+			War war, World world) {
+		VerticalVolume volume = new VerticalVolume(volumeName, war, world);
+		load(volume, zoneName, war, world);
+		return volume;
+	}
+	
+	public static CenteredVolume loadCenteredVolume(String volumeName, String zoneName, int sideSize,
+			War war, World world) {
+		CenteredVolume volume = new CenteredVolume(volumeName, null, sideSize, war, world);
+		load(volume, zoneName, war, world);
+		return volume;
+	}
+	
+	public static void load(Volume volume, String zoneName, War war, World world) {
 		BufferedReader in = null;
-		Volume volume = null;
 		try {
-			in = new BufferedReader(new FileReader(new File("War/warzone-" + zoneName + "/volume-" + volumeName)));
+			in = new BufferedReader(new FileReader(new File("War/warzone-" + zoneName + "/volume-" + volume.getName())));
 			String firstLine = in.readLine();
 			if(firstLine != null && !firstLine.equals("")) {
 				int x1 = Integer.parseInt(in.readLine());
@@ -30,9 +53,13 @@ public class VolumeMapper {
 				int y2 = Integer.parseInt(in.readLine());
 				int z2 = Integer.parseInt(in.readLine());
 				
-				volume = new Volume(volumeName, war, world);
-				volume.setCornerOne(world.getBlockAt(x1, y1, z1));
-				volume.setCornerTwo(world.getBlockAt(x2, y2, z2));
+				if(volume instanceof CenteredVolume) {
+					((CenteredVolume)volume).setCenter(world.getBlockAt(x1, y1, z1));
+					((CenteredVolume)volume).calculateCorners();
+				} else {
+					volume.setCornerOne(world.getBlockAt(x1, y1, z1));
+					volume.setCornerTwo(world.getBlockAt(x2, y2, z2));	
+				}
 				
 				volume.setBlockInfos(new BlockInfo[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
 				for(int i = 0; i < volume.getSizeX(); i++){
@@ -65,7 +92,7 @@ public class VolumeMapper {
 				}
 			}
 		} catch (IOException e) {
-			war.getLogger().warning("Failed to read volume file " + volumeName + 
+			war.getLogger().warning("Failed to read volume file " + volume.getName() + 
 					" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -73,12 +100,11 @@ public class VolumeMapper {
 				try {
 					in.close();
 				} catch (IOException e) {
-					war.getLogger().warning("Failed to close file reader for volume " + volumeName +
+					war.getLogger().warning("Failed to close file reader for volume " + volume.getName() +
 							" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 					e.printStackTrace();
 				}
 		}
-		return volume;
 	}
 	
 	public static void save(Volume volume, String zoneName, War war) {
@@ -131,5 +157,6 @@ public class VolumeMapper {
 			}
 		}
 	}
+
 
 }

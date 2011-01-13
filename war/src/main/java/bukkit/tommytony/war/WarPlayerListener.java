@@ -483,7 +483,7 @@ public class WarPlayerListener extends PlayerListener {
 		
 		// Zone walls
 		if(to != null) {
-			Warzone nearbyZone = war.zoneOfTooCloseZoneWall(to);
+			Warzone nearbyZone = war.zoneOfZoneWallAtProximity(to);
 			if(nearbyZone != null) {
 				nearbyZone.protectZoneWallAgainstPlayer(player);
 			} else {

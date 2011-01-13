@@ -17,7 +17,7 @@ public class WarHub {
 		this.war = war;
 		this.world = world;
 		this.location = location;
-		this.volume = new Volume("warHub", war, warzone);
+		this.volume = new Volume("warHub", war, world);
 	}
 
 }

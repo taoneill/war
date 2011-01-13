@@ -33,7 +33,7 @@ public class Team {
 		this.warzone = warzone;
 		this.setName(name);
 		this.teamSpawn = teamSpawn;
-		this.volume = new Volume(name, war, warzone);
+		this.setVolume(new Volume(name, war, warzone.getWorld()));
 		this.material = material;
 		
 	}
@@ -130,7 +130,7 @@ public class Team {
 		
 		// this resets the block to old state
 		this.setVolume();
-		volume.saveBlocks();
+		getVolume().saveBlocks();
 		
 		initializeTeamSpawn(teamSpawn);
 	}
@@ -212,6 +212,10 @@ public class Team {
 		sign.setLine(2, points + " pts");
 		sign.setLine(3, remainingTickets + "/" + warzone.getLifePool() + " lives left");
 		state.update(true);	
+	}
+
+	public void setVolume(Volume volume) {
+		this.volume = volume;
 	}
 
 }

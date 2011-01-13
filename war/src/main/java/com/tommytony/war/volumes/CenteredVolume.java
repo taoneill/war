@@ -33,11 +33,11 @@ public class CenteredVolume extends Volume {
 		this.calculateCorners();
 	}
 	
-	private void setCenter(Block block) {
+	public void setCenter(Block block) {
 		this.center = block;
 	}
 	
-	private void calculateCorners() {
+	public void calculateCorners() {
 		int topHalfOfSide = sideSize / 2;
 		
 		int x = center.getX() + topHalfOfSide;

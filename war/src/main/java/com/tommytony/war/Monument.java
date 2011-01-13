@@ -15,7 +15,7 @@ import com.tommytony.war.volumes.Volume;
  */
 public class Monument {
 	private Location location;
-	private Volume volume;
+	private CenteredVolume volume;
 	
 	private Team ownerTeam = null;
 	private final String name;
@@ -151,11 +151,11 @@ public class Monument {
 		this.addMonumentBlocks();
 	}
 
-	public Volume getVolume() {
+	public CenteredVolume getVolume() {
 		return volume;
 	}
 
-	public void setVolume(Volume newVolume) {
+	public void setVolume(CenteredVolume newVolume) {
 		this.volume = newVolume;
 		
 	}	
