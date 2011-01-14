@@ -48,7 +48,7 @@ public class VolumeMapper {
 	public static void load(Volume volume, String zoneName, War war, World world) {
 		BufferedReader in = null;
 		try {
-			if(zoneName.equals("")) in = new BufferedReader(new FileReader(new File("War/volume-" + volume.getName() + ".dat")));
+			if(zoneName.equals("")) in = new BufferedReader(new FileReader(new File("War/volume-" + volume.getName() + ".dat"))); // for the warhub
 			else in = new BufferedReader(new FileReader(new File("War/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 			String firstLine = in.readLine();
 			if(firstLine != null && !firstLine.equals("")) {
@@ -74,26 +74,27 @@ public class VolumeMapper {
 						for(int k = 0; k < volume.getSizeZ(); k++) {
 							String blockLine = in.readLine();
 							String[] blockSplit = blockLine.split(",");
-							
-							int typeID = Integer.parseInt(blockSplit[0]);
-							byte data = Byte.parseByte(blockSplit[1]);
-							String[] lines = null;
-							if(typeID == Material.SIGN.getID() || typeID == Material.SIGN_POST.getID()) {
-								String signLines = blockSplit[2];
-								if(blockSplit.length > 3) {
-									// sign includes commas
-									for(int splitI = 3; splitI < blockSplit.length; splitI++) {
-										signLines.concat(blockSplit[splitI]);
+							if(blockLine != null && !blockLine.equals("")) {
+								int typeID = Integer.parseInt(blockSplit[0]);
+								byte data = Byte.parseByte(blockSplit[1]);
+								String[] lines = null;
+								if(typeID == Material.SIGN.getID() || typeID == Material.SIGN_POST.getID()) {
+									String signLines = blockSplit[2];
+									if(blockSplit.length > 3) {
+										// sign includes commas
+										for(int splitI = 3; splitI < blockSplit.length; splitI++) {
+											signLines.concat(blockSplit[splitI]);
+										}
 									}
+									String[] signLinesSplit = signLines.split("[line]");
+									lines = new String[4];
+									lines[0] = signLinesSplit[0];
+									lines[1] = signLinesSplit[1];
+									lines[2] = signLinesSplit[2];
+									lines[3] = signLinesSplit[3];
 								}
-								String[] signLinesSplit = signLines.split("[line]");
-								lines = new String[4];
-								lines[0] = signLinesSplit[0];
-								lines[1] = signLinesSplit[1];
-								lines[2] = signLinesSplit[2];
-								lines[3] = signLinesSplit[3];
+								volume.getBlockInfos()[i][j][k] = new BlockInfo(typeID, data, lines);
 							}
-							volume.getBlockInfos()[i][j][k] = new BlockInfo(typeID, data, lines);
 						}
 					}
 				}

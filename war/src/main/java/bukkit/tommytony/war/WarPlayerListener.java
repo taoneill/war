@@ -379,8 +379,9 @@ public class WarPlayerListener extends PlayerListener {
 							lobby.initialize();
 							player.sendMessage(war.str("Default lobby created on south side of zone."));
 						}
-						player.sendMessage(war.str("Warzone " + warzone.getName() + " initial state changed. Saved " + savedBlocks + " blocks."));
 						WarzoneMapper.save(war, warzone, true);
+						warzone.initializeZone();	// bring back team spawns etc
+						player.sendMessage(war.str("Warzone " + warzone.getName() + " initial state changed. Saved " + savedBlocks + " blocks."));
 					}
 					event.setCancelled(true); 
 				}
@@ -431,8 +432,12 @@ public class WarPlayerListener extends PlayerListener {
 							t.getVolume().resetBlocks();
 						}
 						for(Monument m : warzone.getMonuments()) {
-							m.remove();
+							m.getVolume().resetBlocks();
 						}
+						if(warzone.getLobby() != null) {
+							warzone.getLobby().getVolume().resetBlocks();
+						}
+						warzone.getVolume().resetBlocks();
 						war.getWarzones().remove(warzone);
 						WarMapper.save(war);
 						WarzoneMapper.delete(war, warzone.getName());
@@ -509,6 +514,7 @@ public class WarPlayerListener extends PlayerListener {
 						if(warzone.hasMonument(monumentName)) {
 							// move the existing monument
 							Monument monument = warzone.getMonument(monumentName);
+							monument.getVolume().resetBlocks();
 							monument.setLocation(player.getLocation());
 							player.sendMessage(war.str("Monument " + monument.getName() + " was moved."));
 						} else {
@@ -533,7 +539,7 @@ public class WarPlayerListener extends PlayerListener {
 						Warzone warzone = war.warzone(player.getLocation());
 						Monument monument = warzone.getMonument(name);
 						if(monument != null) {
-							monument.remove();
+							monument.getVolume().resetBlocks();
 							warzone.getMonuments().remove(monument);
 							WarzoneMapper.save(war, warzone, false);
 							player.sendMessage(war.str("Monument " + name + " removed."));

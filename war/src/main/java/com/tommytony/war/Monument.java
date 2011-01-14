@@ -25,11 +25,12 @@ public class Monument {
 		this.name = name;
 		this.location = location;
 		this.warzone = warzone;
-		volume = new CenteredVolume("name", 
+		volume = new CenteredVolume(name, 
 						warzone.getWorld().getBlockAt(location.getBlockX(), 
 												location.getBlockY() + 2, 
 												location.getBlockZ()), 
 						7, war, warzone.getWorld());
+		volume.calculateCorners();
 		volume.saveBlocks();
 		this.addMonumentBlocks();
 	}
@@ -44,16 +45,16 @@ public class Monument {
 		warzone.getWorld().getBlockAt(x, y-1, z).getState().setType(Material.OBSIDIAN);
 		
 		// inner ring
-		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.GLOWSTONE);
+		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.OBSIDIAN);
 		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.GLOWSTONE);
+		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.OBSIDIAN);
 		
 		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.OBSIDIAN);
 		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.OBSIDIAN);
 		
-		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.GLOWSTONE);
+		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.OBSIDIAN);
 		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.GLOWSTONE);
+		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.OBSIDIAN);
 		
 		// outer ring
 		
@@ -129,10 +130,6 @@ public class Monument {
 		warzone.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ()).setType(Material.OBSIDIAN);
 		
 	}
-	
-	public void remove() {
-		volume.resetBlocks();		
-	}
 
 	public Location getLocation() {
 		return location;
@@ -150,6 +147,7 @@ public class Monument {
 	public void setLocation(Location location) {		
 		volume.changeCenter(location);
 		this.addMonumentBlocks();
+		this.location = location;
 	}
 
 	public CenteredVolume getVolume() {

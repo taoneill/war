@@ -156,8 +156,9 @@ public class Warzone {
 			}
 			
 			for(Monument monument : monuments) {
-				monument.remove();
+				monument.getVolume().resetBlocks();
 			}
+			
 			int saved = volume.saveBlocks();
 			initializeZone();	// bring back stuff
 			return saved;
@@ -193,7 +194,7 @@ public class Warzone {
 			
 			// reset monuments
 			for(Monument monument : monuments) {
-				monument.remove();
+				monument.getVolume().resetBlocks();
 				monument.addMonumentBlocks();
 			}
 

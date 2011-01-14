@@ -271,7 +271,7 @@ public class Volume {
 	}
 	
 	public Block getCornerTwo() {
-		return cornerOne;
+		return cornerTwo;
 	}
 
 	public boolean contains(Location location) {

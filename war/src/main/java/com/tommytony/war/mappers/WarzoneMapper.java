@@ -317,10 +317,14 @@ public class WarzoneMapper {
 		for(File file : files) {
 			boolean deletedData = file.delete();
 			if(!deletedData) {
-				war.getLogger().warning(file.getName());
+				war.getLogger().warning("Failed to delete file " + file.getName());
 			}
 		}
-		zoneFolder.delete();
+		;
+		boolean deletedData = zoneFolder.delete();
+		if(!deletedData) {
+			war.getLogger().warning("Failed to delete file " + zoneFolder.getName());
+		}
 	}
 
 }
