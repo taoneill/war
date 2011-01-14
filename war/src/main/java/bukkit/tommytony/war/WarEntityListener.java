@@ -7,6 +7,8 @@ import org.bukkit.Entity;
 import org.bukkit.Player;
 import org.bukkit.event.entity.EntityDamagedByBlockEvent;
 import org.bukkit.event.entity.EntityDamagedByEntityEvent;
+import org.bukkit.event.entity.EntityDamagedEvent;
+import org.bukkit.event.entity.EntityDamagedEvent.DamageCause;
 import org.bukkit.event.entity.EntityListener;
 
 import com.tommytony.war.Team;
@@ -26,12 +28,35 @@ public class WarEntityListener extends EntityListener {
 		// TODO Auto-generated constructor stub
 	}
 	
+	public void onEntityDamaged(EntityDamagedEvent event) {
+		Entity damaged = event.getEntity();
+		DamageCause cause = event.getCause();
+		if(damaged != null && damaged instanceof Player){  
+			Player player = (Player)damaged;
+			int damage = event.getDamage();
+			int currentPlayerHp = player.getHealth();
+			if(damage >= currentPlayerHp) {
+				Warzone zone = war.warzone(player.getLocation());
+				if(war.getPlayerTeam(player.getName()) != null) {
+					// player on a team killed himself
+					handleDeath(((Player)damaged));
+					
+				} else if (zone != null ) {
+					player.teleportTo(zone.getTeleport());
+				}
+				event.setCancelled(true);	// Don't totally kill the player
+			}
+		}
+	}
+	
 	public void onEntityDamagedByBlock(EntityDamagedByBlockEvent event) {
 		Entity damaged = event.getEntity();
 		
 		if(damaged != null && damaged instanceof Player){  
 			Player player = (Player)damaged;
-			if(event.getDamage() >= player.getHealth()) {
+			int damage = event.getDamage();
+			int currentPlayerHp = player.getHealth();
+			if(damage >= currentPlayerHp) {
 				Warzone zone = war.warzone(player.getLocation());
 				if(war.getPlayerTeam(player.getName()) != null) {
 					// player on a team killed himself

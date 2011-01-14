@@ -57,7 +57,7 @@ public class ZoneLobby {
 			int wallEnd = zoneVolume.getMaxZ();
 			int x = zoneVolume.getMinX();
 			int wallLength = wallEnd - wallStart + 1;
-			int wallCenterPos = wallLength / 2;
+			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x, wallCenterPos);
 			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter+1, wallCenterPos);
 			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter+1, wallCenterPos + lobbyHalfSide);
@@ -68,7 +68,7 @@ public class ZoneLobby {
 			int wallEnd = zoneVolume.getMaxX();
 			int z = zoneVolume.getMinZ();
 			int wallLength = wallEnd - wallStart + 1;
-			int wallCenterPos = wallLength / 2;
+			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z);
 			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter + 1, z);
 			corner1 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter+1, z);
@@ -79,7 +79,7 @@ public class ZoneLobby {
 			int wallEnd = zoneVolume.getMaxZ();
 			int x = zoneVolume.getMaxX();
 			int wallLength = wallEnd - wallStart + 1;
-			int wallCenterPos = wallLength / 2;
+			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x, wallCenterPos);
 			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter + 1, wallCenterPos);
 			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter+1, wallCenterPos - lobbyHalfSide);
@@ -90,7 +90,7 @@ public class ZoneLobby {
 			int wallEnd = zoneVolume.getMaxX();
 			int z = zoneVolume.getMaxZ();
 			int wallLength = wallEnd - wallStart + 1;
-			int wallCenterPos = wallLength / 2;
+			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z);
 			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter + 1, z);
 			corner1 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, highestNonAirBlockAtCenter+1, z);

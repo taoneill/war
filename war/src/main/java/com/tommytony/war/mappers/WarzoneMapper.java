@@ -214,7 +214,7 @@ public class WarzoneMapper {
 		String nwStr = "";
 		Location nw = warzone.getNorthwest();
 		if(nw != null) {
-			nwStr = (int)nw.getBlockX() + "," + (int)nw.getBlockY() + "," + (int)nw.getBlockZ();
+			nwStr = nw.getBlockX() + "," + nw.getBlockY() + "," + nw.getBlockZ();
 		}
 		warzoneConfig.setString("northWest", nwStr);
 		
@@ -222,7 +222,7 @@ public class WarzoneMapper {
 		String seStr = "";
 		Location se = warzone.getSoutheast();
 		if(se != null) {
-			seStr = (int)se.getBlockX() + "," + (int)se.getBlockY() + "," + (int)se.getBlockZ();
+			seStr = se.getBlockX() + "," + se.getBlockY() + "," + se.getBlockZ();
 		}
 		warzoneConfig.setString("southEast", seStr);
 		
@@ -230,7 +230,7 @@ public class WarzoneMapper {
 		String teleportStr = "";
 		Location tele = warzone.getTeleport();
 		if(tele != null) {
-			teleportStr = (int)tele.getBlockX() + "," + (int)tele.getBlockY() + "," + (int)tele.getBlockZ();
+			teleportStr = tele.getBlockX() + "," + tele.getBlockY() + "," + tele.getBlockZ();
 		}
 		warzoneConfig.setString("teleport", teleportStr);
 		
@@ -239,7 +239,7 @@ public class WarzoneMapper {
 		List<Team> teams = warzone.getTeams();
 		for(Team team : teams) {
 			Location spawn = team.getTeamSpawn();
-			teamsStr += team.getName() + "," + (int)spawn.getBlockX() + "," + (int)spawn.getBlockY() + "," + (int)spawn.getBlockZ() + ";";
+			teamsStr += team.getName() + "," + spawn.getBlockX() + "," + spawn.getBlockY() + "," + spawn.getBlockZ() + ";";
 		}
 		warzoneConfig.setString("teams", teamsStr);
 		
@@ -263,7 +263,7 @@ public class WarzoneMapper {
 		List<Monument> monuments = warzone.getMonuments();
 		for(Monument monument : monuments) {
 			Location monumentLoc = monument.getLocation();
-			monumentsStr += monument.getName() + "," + (int)monumentLoc.getBlockX() + "," + (int)monumentLoc.getBlockY() + "," + (int)monumentLoc.getBlockZ() + ";";
+			monumentsStr += monument.getName() + "," + monumentLoc.getBlockX() + "," + monumentLoc.getBlockY() + "," + monumentLoc.getBlockZ() + ";";
 		}
 		warzoneConfig.setString("monuments", monumentsStr);
 		
