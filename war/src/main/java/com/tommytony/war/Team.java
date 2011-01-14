@@ -62,7 +62,7 @@ public class Team {
 		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(material);
 		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(material);
 		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(material);
-		warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.LightStone);
+		warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.GLOWSTONE);
 		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(material);
 		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(material);
 		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(material);
@@ -203,7 +203,7 @@ public class Team {
 		int z = teamSpawn.getBlockZ();
 		
 		Block block = warzone.getWorld().getBlockAt(x, y, z);
-		block.setType(Material.SignPost);
+		block.setType(Material.SIGN_POST);
 		
 		BlockState state = block.getState();
 		Sign sign = (Sign) state; 

@@ -49,9 +49,9 @@ public class ZoneWallGuard {
 		// add wall guard blocks
 		
 		for(Block block : nearestWallBlocks) {
-			block.setType(Material.Glass);
-			block.getFace(BlockFace.Up).setType(Material.Glass);
-			block.getFace(BlockFace.Down).setType(Material.Glass);
+			block.setType(Material.GLASS);
+			block.getFace(BlockFace.Up).setType(Material.GLASS);
+			block.getFace(BlockFace.Down).setType(Material.GLASS);
 			if(this.wall == BlockFace.North && warzone.getVolume().isNorthWallBlock(block)) {
 				toGlass(block.getFace(BlockFace.East), BlockFace.North);
 				toGlass(block.getFace(BlockFace.East).getFace(BlockFace.Up), BlockFace.North);
@@ -133,19 +133,19 @@ public class ZoneWallGuard {
 		// face here means which wall we are working on
 		if(wall == BlockFace.North) {
 			if(warzone.getVolume().isNorthWallBlock(block)) {
-				block.setType(Material.Glass);
+				block.setType(Material.GLASS);
 			}
 		} else if (wall == BlockFace.South) {
 			if(warzone.getVolume().isSouthWallBlock(block)) {
-				block.setType(Material.Glass);
+				block.setType(Material.GLASS);
 			}
 		} else if (wall == BlockFace.East) {
 			if(warzone.getVolume().isEastWallBlock(block)) {
-				block.setType(Material.Glass);
+				block.setType(Material.GLASS);
 			}
 		} else if (wall == BlockFace.West) {
 			if(warzone.getVolume().isWestWallBlock(block)) {
-				block.setType(Material.Glass);
+				block.setType(Material.GLASS);
 			}
 		}
 	}

@@ -42,6 +42,7 @@ public class Warzone {
 	private final int minSafeDistanceFromWall = 5;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private War war;
+	private boolean autoAssignOnly;
 	
 	
 	public Warzone(War war, World world, String name) {
@@ -52,6 +53,7 @@ public class Warzone {
 		this.setLifePool(war.getDefaultLifepool());
 		this.setLoadout(war.getDefaultLoadout());
 		this.drawZoneOutline = war.getDefaultDrawZoneOutline();
+		this.autoAssignOnly = war.getDefaultAutoAssignOnly();
 		this.volume = new VerticalVolume(name, war, this.getWorld());
 	}
 	
@@ -103,7 +105,7 @@ public class Warzone {
 		int newHighest = this.world.getHighestBlockYAt(this.northwest.getBlockX(), this.northwest.getBlockZ()) - 1;
 		Block topNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), newHighest, this.northwest.getBlockZ());
 		originalNorthWestBlock = topNWBlock.getType();	// save block for reset
-		topNWBlock.setType(Material.Glass);
+		topNWBlock.setType(Material.GLASS);
 		this.volume.setCornerOne(world.getBlockAt(northwest.getBlockX(), northwest.getBlockY(), northwest.getBlockZ()));
 	}
 
@@ -124,7 +126,7 @@ public class Warzone {
 		int newHighest = this.world.getHighestBlockYAt(this.southeast.getBlockX(), this.southeast.getBlockZ()) - 1;
 		Block topSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), newHighest, this.southeast.getBlockZ());
 		originalSouthEastBlock = topSEBlock.getType();	// save block for reset
-		topSEBlock.setType(Material.Glass);
+		topSEBlock.setType(Material.GLASS);
 		this.volume.setCornerTwo(world.getBlockAt(southeast.getBlockX(), southeast.getBlockY(), southeast.getBlockZ()));		
 	}
 	
@@ -229,12 +231,12 @@ public class Warzone {
 		int highest = world.getHighestBlockYAt(x, z);
 		Block block = world.getBlockAt(x, highest -1 , z);
 		
-		if(block.getType() == Material.Leaves) { // top of tree, lets find some dirt
+		if(block.getType() == Material.LEAVES) { // top of tree, lets find some dirt
 			Block over = block.getFace(BlockFace.Down);
 			Block under = over.getFace(BlockFace.Down);
 			int treeHeight = 0;
-			while(!((over.getType() == Material.Air || over.getType() == Material.Leaves || over.getType() == Material.Wood)
-					&& (under.getType() != Material.Air || under.getType() == Material.Leaves || under.getType() == Material.Leaves))
+			while(!((over.getType() == Material.AIR || over.getType() == Material.LEAVES || over.getType() == Material.WOOD)
+					&& (under.getType() != Material.AIR || under.getType() == Material.LEAVES || under.getType() == Material.LEAVES))
 				  && treeHeight < 40) {
 				over = under;
 				under = over.getFace(BlockFace.Down);
@@ -243,20 +245,20 @@ public class Warzone {
 			block = under; // found the ground
 		}
 		
-		block.setType(Material.Glass);
+		block.setType(Material.GLASS);
 
 		if(lastBlock != null) {
 			// link the new block and the old vertically if there's a big drop or rise
 			if(block.getY() - lastBlock.getY() > 1) {  // new block too high 
 				Block under = block.getFace(BlockFace.Down);
 				while(under.getY() != lastBlock.getY() - 1) {
-					under.setType(Material.Glass);
+					under.setType(Material.GLASS);
 					under = under.getFace(BlockFace.Down);
 				}
 			} else if (lastBlock.getY() - block.getY() > 1) { // new block too low
 				Block over = block.getFace(BlockFace.Up);
 				while(over.getY() != lastBlock.getY() + 1) {
-					over.setType(Material.Glass);
+					over.setType(Material.GLASS);
 					over = over.getFace(BlockFace.Up);
 				}
 			}
@@ -291,12 +293,12 @@ public class Warzone {
 			//}
 		}
 		
-		if(team.getMaterial() == Material.GoldBlock) {
-			playerInv.setHelmet(new ItemStack(Material.GoldBoots));
-		} else if (team.getMaterial() == Material.DiamondBlock) {
-			playerInv.setHelmet(new ItemStack(Material.DiamondBoots));
-		} else if (team.getMaterial() == Material.IronBlock) {
-			playerInv.setHelmet(new ItemStack(Material.IronBoots));
+		if(team.getMaterial() == Material.GOLD_BLOCK) {
+			playerInv.setHelmet(new ItemStack(Material.GOLD_BOOTS));
+		} else if (team.getMaterial() == Material.DIAMOND_BLOCK) {
+			playerInv.setHelmet(new ItemStack(Material.DIAMOND_BOOTS));
+		} else if (team.getMaterial() == Material.IRON_BLOCK) {
+			playerInv.setHelmet(new ItemStack(Material.IRON_BOOTS));
 		}
 		
 		player.setHealth(20);
@@ -381,7 +383,7 @@ public class Warzone {
 		List<ItemStack> originalContents = inventories.remove(player.getName());
 		PlayerInventory playerInv = player.getInventory();
 		for(int i = 0; i < playerInv.getSize(); i++) {
-			playerInv.setItem(i, new ItemStack(Material.Air));
+			playerInv.setItem(i, new ItemStack(Material.AIR));
 		}
 		for(int i = 0; i < playerInv.getSize(); i++) {
 			playerInv.setItem(i, originalContents.get(i));
@@ -608,6 +610,11 @@ public class Warzone {
 			zoneWallGuards.remove(playerGuard);
 		}
 		playerGuards.clear();
+	}
+
+	public boolean getAutoAssignOnly() {
+		
+		return autoAssignOnly;
 	}
 
 	

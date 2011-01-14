@@ -49,6 +49,7 @@ public class VolumeMapper {
 				int x1 = Integer.parseInt(in.readLine());
 				int y1 = Integer.parseInt(in.readLine());
 				int z1 = Integer.parseInt(in.readLine());
+				in.readLine();
 				int x2 = Integer.parseInt(in.readLine());
 				int y2 = Integer.parseInt(in.readLine());
 				int z2 = Integer.parseInt(in.readLine());
@@ -71,7 +72,7 @@ public class VolumeMapper {
 							int typeID = Integer.parseInt(blockSplit[0]);
 							byte data = Byte.parseByte(blockSplit[1]);
 							String[] lines = null;
-							if(typeID == Material.Sign.getID() || typeID == Material.SignPost.getID()) {
+							if(typeID == Material.SIGN.getID() || typeID == Material.SIGN_POST.getID()) {
 								String signLines = blockSplit[2];
 								if(blockSplit.length > 3) {
 									// sign includes commas
@@ -112,14 +113,25 @@ public class VolumeMapper {
 			BufferedWriter out = null;
 			try {
 				out = new BufferedWriter(new FileWriter(new File("War/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
-				out.write("corner1"); out.newLine();
-				out.write(volume.getCornerOne().getX()); out.newLine();
-				out.write(volume.getCornerOne().getY()); out.newLine();
-				out.write(volume.getCornerOne().getZ()); out.newLine();
-				out.write("corner2"); out.newLine();
-				out.write(volume.getCornerTwo().getX()); out.newLine();
-				out.write(volume.getCornerTwo().getY()); out.newLine();
-				out.write(volume.getCornerTwo().getZ()); out.newLine();
+				if(volume instanceof CenteredVolume) {
+					out.write("center"); out.newLine();
+					out.write(volume.getCornerOne().getX()); out.newLine();
+					out.write(volume.getCornerOne().getY()); out.newLine();
+					out.write(volume.getCornerOne().getZ()); out.newLine();
+					out.write("nothing"); out.newLine();
+					out.write(0); out.newLine();
+					out.write(0); out.newLine();
+					out.write(0); out.newLine();
+				} else {
+					out.write("corner1"); out.newLine();
+					out.write(volume.getCornerOne().getX()); out.newLine();
+					out.write(volume.getCornerOne().getY()); out.newLine();
+					out.write(volume.getCornerOne().getZ()); out.newLine();
+					out.write("corner2"); out.newLine();
+					out.write(volume.getCornerTwo().getX()); out.newLine();
+					out.write(volume.getCornerTwo().getY()); out.newLine();
+					out.write(volume.getCornerTwo().getZ()); out.newLine();
+				}
 				
 				for(int i = 0; i < volume.getSizeX(); i++){
 					for(int j = 0; j < volume.getSizeY(); j++) {
@@ -128,7 +140,7 @@ public class VolumeMapper {
 							if(info == null) {
 								out.write("0,0,"); out.newLine();
 							} else {
-								if(info.getType() == Material.Sign || info.getType() == Material.SignPost) {
+								if(info.getType() == Material.SIGN || info.getType() == Material.SIGN_POST) {
 									String[] lines = info.getSignLines();
 									out.write(info.getTypeID() + "," + info.getData() + "," + lines[0] + "[line]" + lines[1] 
 									          + "[line]" + lines[2] + "[line]"+ lines[3]);

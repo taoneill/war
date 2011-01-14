@@ -14,6 +14,7 @@ import java.util.Scanner;
 import javax.naming.BinaryRefAddr;
 
 import org.bukkit.Block;
+import org.bukkit.BlockFace;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -77,7 +78,7 @@ public class Volume {
 				}
 			}		
 		} catch (Exception e) {
-			this.getWar().getLogger().warning(getWar().str("Failed to save volume " + getName() + " blocks. " + e.getMessage()));
+			this.getWar().getLogger().warning("Failed to save volume " + getName() + " blocks. " + e.getMessage());
 		}
 		return noOfSavedBlocks;
 	}
@@ -97,12 +98,12 @@ public class Volume {
 							if(currentBlock.getTypeID() != oldBlockInfo.getTypeID() ||
 								(currentBlock.getTypeID() == oldBlockInfo.getTypeID() && currentBlock.getData() != oldBlockInfo.getData()) ||
 								(currentBlock.getTypeID() == oldBlockInfo.getTypeID() && currentBlock.getData() == oldBlockInfo.getData() &&
-										(oldBlockInfo.is(Material.Sign) || oldBlockInfo.is(Material.SignPost))
+										(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST))
 								)
 							) {
 								currentBlock.setType(oldBlockInfo.getType());
 								currentBlock.setData(oldBlockInfo.getData());
-								if(oldBlockInfo.is(Material.Sign) || oldBlockInfo.is(Material.SignPost)) {
+								if(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST)) {
 									BlockState state = currentBlock.getState();
 									Sign currentSign = (Sign) state;
 									currentSign.setLine(0, oldBlockInfo.getSignLines()[0]);
@@ -121,7 +122,7 @@ public class Volume {
 				}
 			}		
 		} catch (Exception e) {
-			this.getWar().getLogger().warning(getWar().str("Failed to reset volume " + getName() + " blocks. " + e.getClass().toString() + " " + e.getMessage()));
+			this.getWar().getLogger().warning("Failed to reset volume " + getName() + " blocks. " + e.getClass().toString() + " " + e.getMessage());
 		}
 		return noOfResetBlocks;
 	}
@@ -316,6 +317,59 @@ public class Volume {
 
 	public String getName() {
 		return name;
+	}
+
+	public void setToMaterial(Material material) {
+		try {
+			if(hasTwoCorners() && getBlockInfos() != null) {
+				int x = getMinX();
+				for(int i = 0; i < getSizeX(); i++){
+					int y = getMinY();
+					for(int j = 0; j < getSizeY(); j++){
+						int z = getMinZ();
+						for(int k = 0;k < getSizeZ(); k++) {
+							Block currentBlock = getWorld().getBlockAt(x, y, z);
+							currentBlock.setType(material);
+							z++;
+						}
+						y++;
+					}
+					x++;
+				}
+			}		
+		} catch (Exception e) {
+			this.getWar().getLogger().warning("Failed to set block to " + material + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
+		}
+	}
+	
+	public void setFaceMaterial(BlockFace face, Material material) {
+		try {
+			if(hasTwoCorners() && getBlockInfos() != null) {
+				int x = getMinX();
+				for(int i = 0; i < getSizeX(); i++){
+					int y = getMinY();
+					for(int j = 0; j < getSizeY(); j++){
+						int z = getMinZ();
+						for(int k = 0;k < getSizeZ(); k++) {
+							if((face == BlockFace.Down && y == getMinY()) 
+									|| (face == BlockFace.Up && y == getMaxY())
+									|| (face == BlockFace.North && x == getMinX())
+									|| (face == BlockFace.East && z == getMinZ())
+									|| (face == BlockFace.South && x == getMaxX())
+									|| (face == BlockFace.West && z == getMaxZ())) {
+								Block currentBlock = getWorld().getBlockAt(x, y, z);
+								currentBlock.setType(material);
+							}
+							z++;
+						}
+						y++;
+					}
+					x++;
+				}
+			}		
+		} catch (Exception e) {
+			this.getWar().getLogger().warning("Failed to set block to " + material + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
+		}
 	}
 
 }

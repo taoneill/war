@@ -8,9 +8,9 @@ import org.bukkit.Material;
  *
  */
 public class TeamMaterials {
-	public static final Material TEAMDIAMOND = Material.DiamondBlock;
-	public static final Material TEAMIRON = Material.IronBlock;
-	public static final Material TEAMGOLD = Material.GoldBlock;
+	public static final Material TEAMDIAMOND = Material.DIAMOND_BLOCK;
+	public static final Material TEAMIRON = Material.IRON_BLOCK;
+	public static final Material TEAMGOLD = Material.GOLD_BLOCK;
 	
 	public static Material teamMaterialFromString(String str) {
 		String lowered = str.toLowerCase();

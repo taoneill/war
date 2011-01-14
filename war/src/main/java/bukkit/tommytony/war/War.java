@@ -43,8 +43,8 @@ public class War extends JavaPlugin {
     private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
     private int defaultLifepool = 7;
     private boolean defaultFriendlyFire = false;
-	private boolean defaultDrawZoneOutline = true;    
-	
+	private boolean defaultDrawZoneOutline = true;
+	private boolean defaultAutoAssignOnly = false;
 	
 	public void onDisable() {
 		Logger.getLogger("Minecraft").info(name + " " + version + " disabled.");
@@ -71,15 +71,16 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);	// BROKEN
 		
 		// Load files from disk or create them (using these defaults)
-		this.defaultLoadout.put(0, new ItemStack(Material.StoneSword));
-		this.defaultLoadout.put(1, new ItemStack(Material.Bow));
-		this.defaultLoadout.put(2, new ItemStack(Material.Arrow, 7));
-		this.defaultLoadout.put(3, new ItemStack(Material.StonePickaxe));
-		this.defaultLoadout.put(4, new ItemStack(Material.StoneSpade));
-		this.defaultLoadout.put(5, new ItemStack(Material.StoneAxe));
-		this.defaultLoadout.put(6, new ItemStack(Material.Bread, 2));
+		this.defaultLoadout.put(0, new ItemStack(Material.STONE_SWORD));
+		this.defaultLoadout.put(1, new ItemStack(Material.BOW));
+		this.defaultLoadout.put(2, new ItemStack(Material.ARROW, 7));
+		this.defaultLoadout.put(3, new ItemStack(Material.STONE_PICKAXE));
+		this.defaultLoadout.put(4, new ItemStack(Material.STONE_SPADE));
+		this.defaultLoadout.put(5, new ItemStack(Material.STONE_AXE));
+		this.defaultLoadout.put(6, new ItemStack(Material.BREAD, 2));
 		this.defaultLifepool = 7;
 		this.defaultFriendlyFire = false;
+		this.defaultAutoAssignOnly = false;
 		WarMapper.load(this);
 		
 		getLogger().info(name + " " + version + " enabled.");
@@ -138,7 +139,7 @@ public class War extends JavaPlugin {
 	}
 	
 	public String str(String str) {
-		String out = Color.GRAY + "[war] " + Color.WHITE + str;
+		String out = ChatColor.GRAY + "[war] " + ChatColor.WHITE + str;
 		return out;
 	}
 	
@@ -195,6 +196,15 @@ public class War extends JavaPlugin {
 
 	public boolean getDefaultDrawZoneOutline() {
 		return defaultDrawZoneOutline ;
+	}
+
+	public boolean getDefaultAutoAssignOnly() {
+		
+		return defaultAutoAssignOnly;
+	}
+
+	public void setDefaultAutoAssignOnly(boolean autoAssign) {
+		this.defaultAutoAssignOnly = autoAssign;
 	}
 
 	

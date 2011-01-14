@@ -86,6 +86,9 @@ public class WarMapper {
 		// defaultDrawZoneOutline
 		war.setDefaultFriendlyFire(warConfig.getBoolean("defaultDrawZoneOutline"));
 		
+		// defaultAutoAssignOnly
+		war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
+		
 		warConfig.close();
 		war.getLogger().info("Loaded war config.");
 	}
@@ -125,6 +128,9 @@ public class WarMapper {
 		
 		// defaultFriendlyFire
 		warConfig.setBoolean("defaultDrawZoneOutline", war.getDefaultDrawZoneOutline());
+		
+		// defaultAutoAssignOnly
+		warConfig.setBoolean("defaultAutoAssignOnly", war.getDefaultAutoAssignOnly());
 		
 		warConfig.save();
 		warConfig.close();

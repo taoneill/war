@@ -27,7 +27,7 @@ public class BlockInfo {
 		this.z = blockState.getX();
 		this.type = blockState.getTypeID();
 		this.data = blockState.getData();
-		if(is(Material.Sign) || is(Material.SignPost)) {
+		if(is(Material.SIGN) || is(Material.SIGN_POST)) {
 			Sign sign = (Sign)blockState;
 			this.signLines = sign.getLines();
 		}
@@ -68,7 +68,7 @@ public class BlockInfo {
 	}
 	
 	public String[] getSignLines() {
-		if(is(Material.Sign) || is(Material.SignPost)){
+		if(is(Material.SIGN) || is(Material.SIGN_POST)){
 			return signLines;
 		}
 		return null;

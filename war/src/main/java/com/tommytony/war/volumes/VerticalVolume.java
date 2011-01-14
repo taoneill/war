@@ -158,12 +158,12 @@ public class VerticalVolume extends Volume{
 		if(currentBlock.getTypeID() != oldBlockInfo.getTypeID() ||
 				(currentBlock.getTypeID() == oldBlockInfo.getTypeID() && currentBlock.getData() != oldBlockInfo.getData()) ||
 				(currentBlock.getTypeID() == oldBlockInfo.getTypeID() && currentBlock.getData() == oldBlockInfo.getData() &&
-						(oldBlockInfo.is(Material.Sign) || oldBlockInfo.is(Material.SignPost))
+						(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST))
 				)
 			) {
 				currentBlock.setType(oldBlockInfo.getType());
 				currentBlock.setData(oldBlockInfo.getData());
-				if(oldBlockInfo.is(Material.Sign) || oldBlockInfo.is(Material.SignPost)) {
+				if(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST)) {
 					BlockState state = currentBlock.getState();
 					Sign currentSign = (Sign) state;
 					currentSign.setLine(0, oldBlockInfo.getSignLines()[0]);

@@ -41,54 +41,54 @@ public class Monument {
 		int z = location.getBlockZ();
 		
 		// center
-		warzone.getWorld().getBlockAt(x, y-1, z).getState().setType(Material.Air);
-		warzone.getWorld().getBlockAt(x, y-2, z).setType(Material.LightStone);
+		warzone.getWorld().getBlockAt(x, y-1, z).getState().setType(Material.AIR);
+		warzone.getWorld().getBlockAt(x, y-2, z).setType(Material.GLOWSTONE);
 		
 		// inner ring
-		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.LightStone);
-		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.LightStone);
+		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.GLOWSTONE);
+		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.GLOWSTONE);
 		
-		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.OBSIDIAN);
 		
-		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.LightStone);
-		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.LightStone);
+		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.GLOWSTONE);
+		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.GLOWSTONE);
 		
 		// outer ring
 		
-		warzone.getWorld().getBlockAt(x+2, y-1, z+2).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x+2, y-1, z+1).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x+2, y-1, z).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x+2, y-1, z-1).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x+2, y-1, z-2).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x+2, y-1, z+2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+2, y-1, z+1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+2, y-1, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+2, y-1, z-1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+2, y-1, z-2).setType(Material.OBSIDIAN);
 		
-		warzone.getWorld().getBlockAt(x-1, y-1, z+2).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x-1, y-1, z-2).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x-1, y-1, z+2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-1, y-1, z-2).setType(Material.OBSIDIAN);
 		
-		warzone.getWorld().getBlockAt(x, y-1, z+2).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x, y-1, z-2).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x, y-1, z+2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x, y-1, z-2).setType(Material.OBSIDIAN);
 		
-		warzone.getWorld().getBlockAt(x+1, y-1, z+2).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x+1, y-1, z-2).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x+1, y-1, z+2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+1, y-1, z-2).setType(Material.OBSIDIAN);
 		
-		warzone.getWorld().getBlockAt(x-2, y-1, z+2).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x-2, y-1, z+1).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x-2, y-1, z).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x-2, y-1, z-1).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x-2, y-1, z-2).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x-2, y-1, z+2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-2, y-1, z+1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-2, y-1, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-2, y-1, z-1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-2, y-1, z-2).setType(Material.OBSIDIAN);
 		
 		// towers
-		warzone.getWorld().getBlockAt(x-2, y, z-1).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x-2, y, z-2).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x-1, y, z-2).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x-2, y+1, z-2).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x-2, y, z-1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-2, y, z-2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-1, y, z-2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-2, y+1, z-2).setType(Material.OBSIDIAN);
 		
-		warzone.getWorld().getBlockAt(x+2, y, z+1).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x+2, y, z+2).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x+1, y, z+2).setType(Material.Obsidian);
-		warzone.getWorld().getBlockAt(x+2, y+1, z+2).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(x+2, y, z+1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+2, y, z+2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+1, y, z+2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+2, y+1, z+2).setType(Material.OBSIDIAN);
 	}
 
 	public boolean isNear(Location playerLocation) {
@@ -125,7 +125,7 @@ public class Monument {
 	
 	public void uncapture() {
 		ownerTeam = null;
-		warzone.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ()).setType(Material.Obsidian);
+		warzone.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ()).setType(Material.OBSIDIAN);
 		
 	}
 	
