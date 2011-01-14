@@ -103,7 +103,7 @@ public class ZoneLobby {
 			this.volume.setCornerOne(corner1);
 			this.volume.setCornerTwo(corner2);
 			this.volume.saveBlocks();
-			VolumeMapper.save(volume, "lobby", war);
+			VolumeMapper.save(volume, warzone.getName(), war);
 			
 			// flatten the area (set all but floor to air, then replace any floor air blocks with glass)
 			this.volume.setToMaterial(Material.AIR);

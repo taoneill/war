@@ -169,12 +169,12 @@ public class WarzoneMapper {
 		if(loadBlocks && warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
 			
 			// zone blocks 
-			VerticalVolume zoneVolume = VolumeMapper.loadVerticalVolume(warzone.getName(), "zone", war, warzone.getWorld());
+			VerticalVolume zoneVolume = VolumeMapper.loadVerticalVolume("zone", warzone.getName(), war, warzone.getWorld());
 			warzone.setVolume(zoneVolume);
 			
 			// monument blocks
 			for(Monument monument: warzone.getMonuments()) {
-				monument.setVolume(VolumeMapper.loadCenteredVolume(warzone.getName(), monument.getName(), 7, war, world));
+				monument.setVolume(VolumeMapper.loadCenteredVolume(monument.getName(),warzone.getName(), 7, war, world));
 			}
 			
 			// team spawn blocks
@@ -196,6 +196,7 @@ public class WarzoneMapper {
 	}
 	
 	public static void save(War war, Warzone warzone, boolean saveBlocks) {
+		(new File(war.getName()+"/warzone-"+warzone.getName())).mkdir();
 		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + "/warzone-" + warzone.getName() + ".txt");
 		//war.getLogger().info("Saving warzone " + warzone.getName() + "...");
 		
@@ -279,9 +280,8 @@ public class WarzoneMapper {
 		warzoneConfig.close();
 		
 		if(saveBlocks) {
-			(new File(war.getName()+"/"+warzone.getName())).mkdir();
 			// zone blocks
-			VolumeMapper.save(warzone.getVolume(), "zone", war);
+			VolumeMapper.save(warzone.getVolume(), warzone.getName(), war);
 			
 			// monument blocks
 			for(Monument monument: monuments) {
