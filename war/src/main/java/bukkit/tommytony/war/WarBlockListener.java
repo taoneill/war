@@ -32,6 +32,7 @@ public class WarBlockListener extends BlockListener {
     	if(player != null) {
 			Team team = war.getPlayerTeam(player.getName()); 
 			Warzone zone = war.getPlayerWarzone(player.getName());
+			boolean isZoneMaker = war.isZoneMaker(player.getName());
 			if(team != null && block != null && zone != null 
 					&& zone.isMonumentCenterBlock(block)
 					&& block.getType() == team.getMaterial()) {
@@ -44,18 +45,18 @@ public class WarBlockListener extends BlockListener {
 					}
 					return;	// important otherwise cancelled down a few line by isImportantblock
 				} else {
-					player.sendMessage(war.str("You can't capture a monument without team block. Get one from your team spawn."));
+					player.sendMessage(war.str("You can't capture a monument without a block of your team's material. Get one from your team spawn."));
 					event.setCancelled(true);
 				}
 			}
-			if(zone != null && zone.isImportantBlock(block)){
+			if(zone != null && zone.isImportantBlock(block) && !isZoneMaker){
 				player.sendMessage(war.str("Can't build here."));
 				event.setCancelled(true);
 			}
 			// protect warzone lobbies
 	    	if(block != null) {
 		    	for(Warzone wz: war.getWarzones()) {
-		    		if(wz.getLobby().getVolume().contains(block)) {
+		    		if(wz.getLobby().getVolume().contains(block) && !isZoneMaker) {
 		    			player.sendMessage(war.str("Can't build here."));
 			    		event.setCancelled(true);
 		    		}
@@ -70,12 +71,13 @@ public class WarBlockListener extends BlockListener {
     	if(player != null && block != null && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
 	    	Warzone warzone = war.warzone(player.getLocation());
 	    	Team team = war.getPlayerTeam(player.getName());
+	    	boolean isZoneMaker = war.isZoneMaker(player.getName());
 	    	
-	    	if(warzone != null && war.getPlayerTeam(player.getName()) == null) {
+	    	if(warzone != null && war.getPlayerTeam(player.getName()) == null && !isZoneMaker) {
 	    		// can't actually destroy blocks in a warzone if not part of a team
 	    		player.sendMessage(war.str("Can't destroy part of a warzone if you're not in a team."));
 	    		event.setCancelled(true);
-	    	} else if(warzone != null && warzone.isImportantBlock(block)) {
+	    	} else if(warzone != null && warzone.isImportantBlock(block) && !isZoneMaker) {
 	    		if(team != null && team.getVolume().contains(block)) {
 	    			if(player.getInventory().contains(team.getMaterial())) {
 	    				player.sendMessage(war.str("You already have a " + team.getName() + " block."));
