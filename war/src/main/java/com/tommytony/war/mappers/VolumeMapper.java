@@ -17,6 +17,11 @@ import com.tommytony.war.volumes.CenteredVolume;
 import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
 
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class VolumeMapper {
 	
 	public static Volume loadVolume(String volumeName, String zoneName,
@@ -43,7 +48,8 @@ public class VolumeMapper {
 	public static void load(Volume volume, String zoneName, War war, World world) {
 		BufferedReader in = null;
 		try {
-			in = new BufferedReader(new FileReader(new File("War/warzone-" + zoneName + "/volume-" + volume.getName())));
+			if(zoneName.equals("")) in = new BufferedReader(new FileReader(new File("War/volume-" + volume.getName() + ".dat")));
+			else in = new BufferedReader(new FileReader(new File("War/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 			String firstLine = in.readLine();
 			if(firstLine != null && !firstLine.equals("")) {
 				int x1 = Integer.parseInt(in.readLine());
@@ -112,7 +118,8 @@ public class VolumeMapper {
 		if(volume.isSaved() && volume.getBlockInfos() != null) {
 			BufferedWriter out = null;
 			try {
-				out = new BufferedWriter(new FileWriter(new File("War/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File("War/volume-" + volume.getName() + ".dat")));
+				else out = new BufferedWriter(new FileWriter(new File("War/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 				if(volume instanceof CenteredVolume) {
 					out.write("center"); out.newLine();
 					out.write(volume.getCornerOne().getX()); out.newLine();

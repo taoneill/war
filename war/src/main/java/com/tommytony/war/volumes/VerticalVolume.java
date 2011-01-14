@@ -9,6 +9,11 @@ import org.bukkit.block.Sign;
 
 import bukkit.tommytony.war.War;
 
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class VerticalVolume extends Volume{
 
 	public VerticalVolume(String name, War war, World world) {

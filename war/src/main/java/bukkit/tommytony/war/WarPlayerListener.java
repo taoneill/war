@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 
+import org.bukkit.BlockFace;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Player;
@@ -14,7 +15,9 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
+import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
 
@@ -175,8 +178,10 @@ public class WarPlayerListener extends PlayerListener {
 				} else {
 					Team playerTeam = war.getPlayerTeam(player.getName());
 					playerTeam.removePlayer(player.getName());
-					player.sendMessage(war.str("Left the team. You can now exit the warzone."));
+					
 					Warzone zone = war.warzone(player.getLocation());
+					player.teleportTo(zone.getTeleport());
+					player.sendMessage(war.str("Left the zone."));
 					zone.restorePlayerInventory(player);
 					player.sendMessage(war.str("Your inventory has (hopefully) been restored."));
 				}
@@ -222,6 +227,21 @@ public class WarPlayerListener extends PlayerListener {
 				}
 				
 				// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
+				
+				// /warhub
+				else if(command.equals("warhub")) {
+					WarHub hub = war.getWarHub();
+					if(hub != null) {
+						// reset existing hub
+						hub.getVolume().resetBlocks();
+						hub.setLocation(player.getLocation());
+						hub.initialize();
+					} else {
+						hub = new WarHub(war, player.getLocation());
+						hub.initialize();
+					}
+					WarMapper.save(war);
+				}
 				
 				// /setzone
 				else if(command.equals("setzone") || command.equals("setwarzone")) {
@@ -292,7 +312,33 @@ public class WarPlayerListener extends PlayerListener {
 						
 					}
 					event.setCancelled(true); 
-				}		
+				}
+				
+				else if(command.equals("setzonelobby")) {
+					if(!war.inAnyWarzone(player.getLocation()) || arguments.length < 2 || arguments.length > 2 
+							|| (arguments.length == 2 && (!arguments[0].equals("north") && !arguments[0].equals("n")
+																	&& !arguments[0].equals("east") && !arguments[0].equals("e")
+																	&& !arguments[0].equals("south") && !arguments[0].equals("s")
+																	&& !arguments[0].equals("west") && !arguments[0].equals("w")))) {
+						player.sendMessage(war.str("Usage: /setzonelobby <north/n/east/e/south/s/west/w>. Must be in warzone." +
+								"Defines on which side the zone lobby lies. " +
+								"Removes any previously set lobby."));
+					} else {
+						Warzone warzone = war.warzone(player.getLocation());
+						BlockFace wall = null;
+						if(arguments[0].equals("north") || arguments[0].equals("n")) {
+							
+						}
+						ZoneLobby lobby = warzone.getLobby();						
+						if(lobby != null) {
+							// reset existing lobby
+							lobby.getVolume().resetBlocks();
+							lobby.setWall(wall);
+							lobby.initialize();
+						}
+						WarzoneMapper.save(war, warzone, false);
+					}
+				}
 		
 				// /savewarzone
 				else if(command.equals("savezone") || command.equals("savewarzone")) {
@@ -307,8 +353,14 @@ public class WarPlayerListener extends PlayerListener {
 					} else {
 						Warzone warzone = war.warzone(player.getLocation());
 						int savedBlocks = warzone.saveState();
-						warzone.setTeleport(player.getLocation());
-						player.sendMessage(war.str("Warzone " + warzone.getName() + " initial state and teleport location changed. Saved " + savedBlocks + " blocks."));
+						if(warzone.getLobby() == null) {
+							// Set default lobby on south side
+							ZoneLobby lobby = new ZoneLobby(war, warzone, BlockFace.South);
+							warzone.setLobby(lobby);
+							lobby.initialize();
+							player.sendMessage(war.str("Default lobby created on south side of zone."));
+						}
+						player.sendMessage(war.str("Warzone " + warzone.getName() + " initial state changed. Saved " + savedBlocks + " blocks."));
 						WarzoneMapper.save(war, warzone, true);
 					}
 					event.setCancelled(true); 
@@ -498,7 +550,6 @@ public class WarPlayerListener extends PlayerListener {
 		if(playerWarzone != null) {
 			Team playerTeam = war.getPlayerTeam(player.getName());
 			
-			
 			// Monuments
 			if(to != null && playerTeam != null
 					&& playerWarzone.nearAnyOwnedMonument(to, playerTeam) 
@@ -507,41 +558,68 @@ public class WarPlayerListener extends PlayerListener {
 				player.setHealth(20);
 				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
 			}
-					
-//			if(player != null && from != null && to != null && 
-//					playerTeam != null && !playerWarzone.getVolume().contains(to)) {
-//				player.sendMessage(war.str("Can't go outside the warzone boundary! Use /leave to exit the battle."));
-//				if(playerWarzone.getVolume().contains(from)){
-//					player.teleportTo(from);
-//				} else {
-//					// somehow the player made it out of the zone
-//					player.teleportTo(playerTeam.getTeamSpawn());
-//					player.sendMessage(war.str("Brought you back to your team spawn. Use /leave to exit the battle."));
-//				}
-//			}
-//			
-//			if(player != null && from != null && to != null && 
-//					playerTeam == null 
-//					&& war.inAnyWarzone(from) 
-//					&& !war.inAnyWarzone(to)) {
-//				// leaving
-//				Warzone zone = war.warzone(from);
-//				player.sendMessage(war.str("Leaving warzone " + zone.getName() + "."));
-//			}
-//			
-//			if(player != null && from != null && to != null && 
-//					playerTeam == null 
-//					&& !war.inAnyWarzone(from) 
-//					&& war.inAnyWarzone(to)) {
-//				// entering
-//				Warzone zone = war.warzone(to);
-//				player.sendMessage(war.str("Entering warzone " + zone.getName() + ". Tip: use /teams."));
-//			}
-			
-			
 		}
 		
+		if(to != null) {
+			// Warzone lobby gates
+			for(Warzone zone : war.getWarzones()){
+				if(zone.getLobby().isAutoAssignGate(to)) {
+					dropFromOldTeamIfAny(player);
+					zone.autoAssign(player);
+				} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMDIAMOND, to)){
+					dropFromOldTeamIfAny(player);
+					Team diamondTeam = zone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND);
+					diamondTeam.addPlayer(player);
+					zone.keepPlayerInventory(player);
+					player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+					zone.respawnPlayer(diamondTeam, player);
+					for(Team team : zone.getTeams()){
+						team.teamcast(war.str("" + player.getName() + " joined team diamond."));
+					}
+				} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMIRON, to)){
+					dropFromOldTeamIfAny(player);
+					Team ironTeam = zone.getTeamByMaterial(TeamMaterials.TEAMIRON);
+					ironTeam.addPlayer(player);
+					zone.keepPlayerInventory(player);
+					player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+					zone.respawnPlayer(ironTeam, player);
+					for(Team team : zone.getTeams()){
+						team.teamcast(war.str("" + player.getName() + " joined team iron."));
+					}
+				} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMGOLD, to)){
+					dropFromOldTeamIfAny(player);
+					Team goldTeam = zone.getTeamByMaterial(TeamMaterials.TEAMGOLD);
+					goldTeam.addPlayer(player);
+					zone.keepPlayerInventory(player);
+					player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+					zone.respawnPlayer(goldTeam, player);
+					for(Team team : zone.getTeams()){
+						team.teamcast(war.str("" + player.getName() + " joined team gold."));
+					}
+				} else if (zone.getLobby().isInWarHubLinkGate(to)){
+					dropFromOldTeamIfAny(player);
+					player.teleportTo(war.getWarHub().getLocation());
+				}
+			}
+			// Warhub zone gates
+			WarHub hub = war.getWarHub();
+			Warzone zone = hub.getDestinationWarzoneForLocation(player.getLocation());
+			if(zone != null) {
+				player.teleportTo(zone.getTeleport());
+				player.sendMessage(war.str("Welcome to warzone " + zone.getName() + "."));
+			}
+		}
     }
+	
+	private void dropFromOldTeamIfAny(Player player) {
+		// drop from old team if any
+		Team previousTeam = war.getPlayerTeam(player.getName());
+		if(previousTeam != null) {
+			if(!previousTeam.removePlayer(player.getName())){
+				war.getLogger().log(Level.WARNING, "Could not remove player " + player.getName() + " from team " + previousTeam.getName());
+			}
+		}
+	}
 
 	private String getAllTeamsMsg(Player player){
 		String teamsMessage = "Teams: ";

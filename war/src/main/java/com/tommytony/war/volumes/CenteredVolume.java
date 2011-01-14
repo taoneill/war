@@ -6,6 +6,11 @@ import org.bukkit.World;
 
 import bukkit.tommytony.war.War;
 
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class CenteredVolume extends Volume {
 
 	private Block center;

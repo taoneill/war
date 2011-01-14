@@ -5,6 +5,11 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class BlockInfo {
 	private int x;
 	private int y;

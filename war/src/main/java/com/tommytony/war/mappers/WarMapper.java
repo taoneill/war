@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.bukkit.ItemStack;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.volumes.Volume;
 
 /**
  * 
@@ -16,7 +20,7 @@ import com.tommytony.war.Warzone;
  */
 public class WarMapper {
 	
-	public static void load(War war) {
+	public static void load(War war, World world) {
 		//war.getLogger().info("Loading war config...");
 		(new File(war.getName())).mkdir();
 		PropertiesFile warConfig = new PropertiesFile(war.getName() + "/war.txt");
@@ -89,6 +93,23 @@ public class WarMapper {
 		// defaultAutoAssignOnly
 		war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
 		
+		// warhub
+		String hubStr = warConfig.getString("warhub");
+		if(hubStr != null && !hubStr.equals("")) {
+			String[] nwStrSplit = hubStr.split(",");
+			
+			int hubX = Integer.parseInt(nwStrSplit[0]);
+			int hubY = Integer.parseInt(nwStrSplit[1]);
+			int hubZ = Integer.parseInt(nwStrSplit[2]);
+			Location hubLocation = new Location(world, hubX, hubY, hubZ);
+			WarHub hub = new WarHub(war, hubLocation);
+			war.setWarHub(hub);
+			Volume vol = VolumeMapper.loadVolume("warhub", "", war, world);
+			hub.setVolume(vol);
+			hub.getVolume().resetBlocks();
+			hub.initialize();
+		}
+		
 		warConfig.close();
 		war.getLogger().info("Loaded war config.");
 	}
@@ -131,6 +152,14 @@ public class WarMapper {
 		
 		// defaultAutoAssignOnly
 		warConfig.setBoolean("defaultAutoAssignOnly", war.getDefaultAutoAssignOnly());
+		
+		// warhub
+		String hubStr = "";
+		WarHub hub = war.getWarHub();
+		if(hub != null) {
+			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ();
+		}
+		warConfig.setString("warhub", hubStr);
 		
 		warConfig.save();
 		warConfig.close();

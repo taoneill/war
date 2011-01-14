@@ -35,19 +35,9 @@ public class ZoneWallGuard {
 	}
 	
 	private void activate() {
-		// save current blocks
 		List<Block> nearestWallBlocks = warzone.getNearestWallBlocks(playerLocation);
-//		if(volume == null) {
-//			volume = new CenteredVolume("zoneGuard-" + warzone.getName() + "-" + player.getName(), nearestWallBlock, radius, war, warzone);
-//			int saved = volume.saveBlocks();
-//			war.getLogger().info("Warzone wall guard created: " + saved + " blocks saved for " + player.getName());
-//		} else {
-//			volume.changeCenter(nearestWallBlock, radius);
-//			int saved = volume.saveBlocks();
-//			war.getLogger().info("Warzone wall guard updated: " + saved + " blocks saved for " + player.getName());
-//		}
+
 		// add wall guard blocks
-		
 		for(Block block : nearestWallBlocks) {
 			block.setType(Material.GLASS);
 			block.getFace(BlockFace.Up).setType(Material.GLASS);
@@ -82,51 +72,6 @@ public class ZoneWallGuard {
 				toGlass(block.getFace(BlockFace.South).getFace(BlockFace.Down), BlockFace.West);
 			}
 		}
-//		nearestWallBlock.setType(Material.Glass);
-//		nearestWallBlock.getFace(BlockFace.Up).setType(Material.Glass);
-//		nearestWallBlock.getFace(BlockFace.Down).setType(Material.Glass);
-//		if(warzone.getVolume().isNorthWallBlock(nearestWallBlock.getFace(BlockFace.East)) && 
-//			warzone.getVolume().isNorthWallBlock(nearestWallBlock.getFace(BlockFace.West))) {
-//			// north wall guard
-//			this.wall = BlockFace.North;
-//			toGlass(nearestWallBlock.getFace(BlockFace.East), BlockFace.North);
-//			toGlass(nearestWallBlock.getFace(BlockFace.East).getFace(BlockFace.Up), BlockFace.North);
-//			toGlass(nearestWallBlock.getFace(BlockFace.East).getFace(BlockFace.Down), BlockFace.North);
-//			toGlass(nearestWallBlock.getFace(BlockFace.West), BlockFace.North);
-//			toGlass(nearestWallBlock.getFace(BlockFace.West).getFace(BlockFace.Up), BlockFace.North);
-//			toGlass(nearestWallBlock.getFace(BlockFace.West).getFace(BlockFace.Down), BlockFace.North);
-//		} else if (warzone.getVolume().isSouthWallBlock(nearestWallBlock.getFace(BlockFace.East)) && 
-//			warzone.getVolume().isSouthWallBlock(nearestWallBlock.getFace(BlockFace.West))) {
-//			// south wall guard
-//			this.wall = BlockFace.South;
-//			toGlass(nearestWallBlock.getFace(BlockFace.East), BlockFace.South);
-//			toGlass(nearestWallBlock.getFace(BlockFace.East).getFace(BlockFace.Up), BlockFace.South);
-//			toGlass(nearestWallBlock.getFace(BlockFace.East).getFace(BlockFace.Down), BlockFace.South);
-//			toGlass(nearestWallBlock.getFace(BlockFace.West), BlockFace.South);
-//			toGlass(nearestWallBlock.getFace(BlockFace.West).getFace(BlockFace.Up), BlockFace.South);
-//			toGlass(nearestWallBlock.getFace(BlockFace.West).getFace(BlockFace.Down), BlockFace.South);
-//			// ..
-//		} else if (warzone.getVolume().isEastWallBlock(nearestWallBlock.getFace(BlockFace.North)) && 
-//				warzone.getVolume().isEastWallBlock(nearestWallBlock.getFace(BlockFace.South))) {
-//			//east wall guard
-//			this.wall = BlockFace.East;
-//			toGlass(nearestWallBlock.getFace(BlockFace.North), BlockFace.East);
-//			toGlass(nearestWallBlock.getFace(BlockFace.North).getFace(BlockFace.Up), BlockFace.East);
-//			toGlass(nearestWallBlock.getFace(BlockFace.North).getFace(BlockFace.Down), BlockFace.East);
-//			toGlass(nearestWallBlock.getFace(BlockFace.South), BlockFace.West);
-//			toGlass(nearestWallBlock.getFace(BlockFace.South).getFace(BlockFace.Up), BlockFace.West);
-//			toGlass(nearestWallBlock.getFace(BlockFace.South).getFace(BlockFace.Down), BlockFace.West);
-//		} else if (warzone.getVolume().isWestWallBlock(nearestWallBlock.getFace(BlockFace.North)) && 
-//				warzone.getVolume().isWestWallBlock(nearestWallBlock.getFace(BlockFace.South))) {
-//			//west wall guard
-//			this.wall = BlockFace.West;
-//			toGlass(nearestWallBlock.getFace(BlockFace.North), BlockFace.West);
-//			toGlass(nearestWallBlock.getFace(BlockFace.North).getFace(BlockFace.Up), BlockFace.West);
-//			toGlass(nearestWallBlock.getFace(BlockFace.North).getFace(BlockFace.Down), BlockFace.West);
-//			toGlass(nearestWallBlock.getFace(BlockFace.South), BlockFace.West);
-//			toGlass(nearestWallBlock.getFace(BlockFace.South).getFace(BlockFace.Up), BlockFace.West);
-//			toGlass(nearestWallBlock.getFace(BlockFace.South).getFace(BlockFace.Down), BlockFace.West);
-//		}
 	}
 	
 	private void toGlass(Block block, BlockFace wall) {

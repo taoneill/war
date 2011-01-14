@@ -9,6 +9,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.tommytony.war.Team;
+import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.WarMapper;
 
@@ -45,6 +46,7 @@ public class War extends JavaPlugin {
     private boolean defaultFriendlyFire = false;
 	private boolean defaultDrawZoneOutline = true;
 	private boolean defaultAutoAssignOnly = false;
+	private WarHub warHub;
 	
 	public void onDisable() {
 		Logger.getLogger("Minecraft").info(name + " " + version + " disabled.");
@@ -81,7 +83,7 @@ public class War extends JavaPlugin {
 		this.defaultLifepool = 7;
 		this.defaultFriendlyFire = false;
 		this.defaultAutoAssignOnly = false;
-		WarMapper.load(this);
+		WarMapper.load(this, this.getServer().getWorlds()[0]);
 		
 		getLogger().info(name + " " + version + " enabled.");
 	}
@@ -205,6 +207,15 @@ public class War extends JavaPlugin {
 
 	public void setDefaultAutoAssignOnly(boolean autoAssign) {
 		this.defaultAutoAssignOnly = autoAssign;
+	}
+
+	public WarHub getWarHub() {
+		// TODO Auto-generated method stub
+		return warHub;
+	}
+
+	public void setWarHub(WarHub warHub) {
+		this.warHub = warHub;
 	}
 
 	

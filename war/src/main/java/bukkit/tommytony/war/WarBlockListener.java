@@ -51,6 +51,15 @@ public class WarBlockListener extends BlockListener {
 				player.sendMessage(war.str("Can't build here."));
 				event.setCancelled(true);
 			}
+			// protect warzone lobbies
+	    	if(block != null) {
+		    	for(Warzone wz: war.getWarzones()) {
+		    		if(wz.getLobby().getVolume().contains(block)) {
+		    			player.sendMessage(war.str("Can't build here."));
+			    		event.setCancelled(true);
+		    		}
+		    	}
+	    	}
 		}
     }
 	
@@ -87,6 +96,16 @@ public class WarBlockListener extends BlockListener {
 						t.teamcast(war.str("Team " + team.getName() + " loses control of monument " + monument.getName()));
 					}
 				}
+	    	}
+	    	
+	    	// protect warzone lobbies
+	    	if(block != null) {
+		    	for(Warzone zone: war.getWarzones()) {
+		    		if(zone.getLobby().getVolume().contains(block)) {
+		    			player.sendMessage(war.str("Can't destroy this."));
+			    		event.setCancelled(true);
+		    		}
+		    	}
 	    	}
     	}
     }

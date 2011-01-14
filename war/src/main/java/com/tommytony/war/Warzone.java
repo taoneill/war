@@ -42,6 +42,7 @@ public class Warzone {
 	private final int minSafeDistanceFromWall = 5;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private War war;
+	private ZoneLobby lobby;
 	private boolean autoAssignOnly;
 	
 	
@@ -615,6 +616,35 @@ public class Warzone {
 	public boolean getAutoAssignOnly() {
 		
 		return autoAssignOnly;
+	}
+
+	public void setLobby(ZoneLobby lobby) {
+		this.lobby = lobby;
+	}
+
+	public ZoneLobby getLobby() {
+		return lobby;
+	}
+
+	public void autoAssign(Player player) {
+		Team lowestNoOfPlayers = null;
+		for(Team t : teams) {
+			if(lowestNoOfPlayers == null
+					|| (lowestNoOfPlayers != null && lowestNoOfPlayers.getPlayers().size() > t.getPlayers().size())) {
+				lowestNoOfPlayers = t;
+			}
+		}
+		if(lowestNoOfPlayers != null) {
+			lowestNoOfPlayers.addPlayer(player);
+			if(!hasPlayerInventory(player.getName())) {
+				keepPlayerInventory(player);
+			}
+			player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+			respawnPlayer(lowestNoOfPlayers, player);
+			for(Team team : teams){
+				team.teamcast(war.str("" + player.getName() + " joined team " + team.getName() + "."));
+			}
+		}
 	}
 
 	
