@@ -42,6 +42,7 @@ public class WarBlockListener extends BlockListener {
 					for(Team t : teams) {
 						t.teamcast(war.str("Monument " + monument.getName() + " has been captured by team " + team.getName() + "."));
 					}
+					return;	// important otherwise cancelled down a few line by isImportantblock
 				} else {
 					player.sendMessage(war.str("You can't capture a monument without team block. Get one from your team spawn."));
 					event.setCancelled(true);

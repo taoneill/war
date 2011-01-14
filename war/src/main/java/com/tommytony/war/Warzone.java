@@ -309,7 +309,7 @@ public class Warzone {
 	public boolean isMonumentCenterBlock(Block block) {
 		for(Monument monument : monuments) {
 			int x = monument.getLocation().getBlockX();
-			int y = monument.getLocation().getBlockY() - 1;
+			int y = monument.getLocation().getBlockY() + 1;
 			int z = monument.getLocation().getBlockZ();
 			if(x == block.getX() && y == block.getY() && z == block.getZ()) {
 				return true;
@@ -321,7 +321,7 @@ public class Warzone {
 	public Monument getMonumentFromCenterBlock(Block block) {
 		for(Monument monument : monuments) {
 			int x = monument.getLocation().getBlockX();
-			int y = monument.getLocation().getBlockY();
+			int y = monument.getLocation().getBlockY() + 1;
 			int z = monument.getLocation().getBlockZ();
 			if(x == block.getX() && y == block.getY() && z == block.getZ()) {
 				return monument;

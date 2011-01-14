@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.BlockFace;
 import org.bukkit.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -15,7 +16,9 @@ import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.volumes.VerticalVolume;
+import com.tommytony.war.volumes.Volume;
 
 /**
  * 
@@ -147,12 +150,27 @@ public class WarzoneMapper {
 			}
 		}
 		
+		// lobby
+		String lobbyStr = warzoneConfig.getString("lobby");
+		BlockFace lobbyFace = null;
+		if(lobbyStr.equals("south")) {
+			lobbyFace = BlockFace.South;
+		} else if(lobbyStr.equals("east")) {
+			lobbyFace = BlockFace.East;
+		} else if(lobbyStr.equals("north")) {
+			lobbyFace = BlockFace.North;
+		} else if(lobbyStr.equals("west")) {
+			lobbyFace = BlockFace.West;
+		} 
+		warzone.setLobby(new ZoneLobby(war, warzone, lobbyFace));
+		
 		warzoneConfig.close();
 		
 		if(loadBlocks && warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
 			
 			// zone blocks 
 			VerticalVolume zoneVolume = VolumeMapper.loadVerticalVolume(warzone.getName(), "zone", war, warzone.getWorld());
+			warzone.setVolume(zoneVolume);
 			
 			// monument blocks
 			for(Monument monument: warzone.getMonuments()) {
@@ -163,6 +181,10 @@ public class WarzoneMapper {
 			for(Team team : warzone.getTeams()) {
 				team.setVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), war, world));
 			}
+			
+			// lobby
+			Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), war, world);
+			warzone.getLobby().setVolume(lobbyVolume);
 			
 			//war.getLogger().info("Loaded warzone " + name + " config and blocks.");
 		} else {
@@ -239,6 +261,20 @@ public class WarzoneMapper {
 			monumentsStr += monument.getName() + "," + (int)monumentLoc.getBlockX() + "," + (int)monumentLoc.getBlockY() + "," + (int)monumentLoc.getBlockZ() + ";";
 		}
 		warzoneConfig.setString("monuments", monumentsStr);
+		
+		// lobby
+		String lobbyStr = "";
+		if(BlockFace.South == warzone.getLobby().getWall()) {
+			lobbyStr = "south";
+		} else if(BlockFace.East == warzone.getLobby().getWall()) {
+			lobbyStr = "east";
+		} else if(BlockFace.North == warzone.getLobby().getWall()) {
+			lobbyStr = "north";
+		} else if(BlockFace.West == warzone.getLobby().getWall()) {
+			lobbyStr = "west";
+		} 
+		warzoneConfig.setString("lobby", lobbyStr);
+		
 		warzoneConfig.save();
 		warzoneConfig.close();
 		
@@ -256,6 +292,8 @@ public class WarzoneMapper {
 			for(Team team : teams) {
 				VolumeMapper.save(team.getVolume(), warzone.getName(), war);
 			}
+			
+			VolumeMapper.save(warzone.getLobby().getVolume(), warzone.getName(), war);
 		}
 		
 //		if(saveBlocks) {
