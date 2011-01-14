@@ -54,7 +54,9 @@ public class WarMapper {
 				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWar);		// cascade load, only load blocks if warzone exists
 				war.getWarzones().add(zone);
 				zone.getVolume().resetBlocks();
-				zone.getLobby().getVolume().resetBlocks();
+				if(zone.getLobby() != null) {
+					zone.getLobby().getVolume().resetBlocks();
+				}
 				zone.initializeZone();			// is this wise?
 			}
 		}

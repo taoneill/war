@@ -196,6 +196,11 @@ public class Warzone {
 				monument.remove();
 				monument.addMonumentBlocks();
 			}
+
+			// reset lobby
+			if(lobby != null) {
+				lobby.initialize();
+			}
 			
 			this.setNorthwest(this.getNorthwest());
 			this.setSoutheast(this.getSoutheast());
@@ -237,7 +242,7 @@ public class Warzone {
 			Block under = over.getFace(BlockFace.Down);
 			int treeHeight = 0;
 			while(!((over.getType() == Material.AIR || over.getType() == Material.LEAVES || over.getType() == Material.WOOD)
-					&& (under.getType() != Material.AIR || under.getType() == Material.LEAVES || under.getType() == Material.LEAVES))
+					&& (under.getType() != Material.AIR || under.getType() != Material.LEAVES || under.getType() != Material.WOOD))
 				  && treeHeight < 40) {
 				over = under;
 				under = over.getFace(BlockFace.Down);

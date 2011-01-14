@@ -56,7 +56,7 @@ public class WarBlockListener extends BlockListener {
 			// protect warzone lobbies
 	    	if(block != null) {
 		    	for(Warzone wz: war.getWarzones()) {
-		    		if(wz.getLobby().getVolume().contains(block) && !isZoneMaker) {
+		    		if(wz.getLobby() != null && wz.getLobby().getVolume().contains(block) && !isZoneMaker) {
 		    			player.sendMessage(war.str("Can't build here."));
 			    		event.setCancelled(true);
 		    		}

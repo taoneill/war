@@ -171,7 +171,7 @@ public class WarzoneMapper {
 		if(loadBlocks && warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
 			
 			// zone blocks 
-			VerticalVolume zoneVolume = VolumeMapper.loadVerticalVolume("zone", warzone.getName(), war, warzone.getWorld());
+			VerticalVolume zoneVolume = VolumeMapper.loadVerticalVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld());
 			warzone.setVolume(zoneVolume);
 			
 			// monument blocks
@@ -185,8 +185,10 @@ public class WarzoneMapper {
 			}
 			
 			// lobby
-			Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), war, world);
-			warzone.getLobby().setVolume(lobbyVolume);
+			if(warzone.getLobby() != null) {
+				Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), war, world);
+				warzone.getLobby().setVolume(lobbyVolume);
+			}
 			
 			//war.getLogger().info("Loaded warzone " + name + " config and blocks.");
 		} else {
