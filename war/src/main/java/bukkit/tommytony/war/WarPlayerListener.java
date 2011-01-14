@@ -256,6 +256,7 @@ public class WarPlayerListener extends PlayerListener {
 								"or /resetwarzone before changing the boundary). "));
 					} else {
 						Warzone warzone = war.findWarzone(arguments[0]);
+						String message = "";
 						if(warzone == null) {
 							// create the warzone
 							warzone = new Warzone(war, player.getLocation().getWorld(), arguments[0]);
@@ -270,8 +271,9 @@ public class WarPlayerListener extends PlayerListener {
 								player.sendMessage(war.str("Warzone " + warzone.getName() + " added. Southeasternmost point set at x=" 
 										+ (int)warzone.getSoutheast().getBlockX() + " z=" + (int)warzone.getSoutheast().getBlockZ() + "."));
 							}
+							WarzoneMapper.save(war, warzone, false);
 						} else {
-							String message = "";
+							// change existing warzone
 							if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
 								int reset = warzone.getVolume().resetBlocks();
 								warzone.setNorthwest(player.getLocation());
@@ -279,37 +281,36 @@ public class WarPlayerListener extends PlayerListener {
 								warzone.initializeZone();
 								message += "Northwesternmost point set at x=" + (int)warzone.getNorthwest().getBlockX() 
 												+ " z=" + (int)warzone.getNorthwest().getBlockZ() + " on warzone " + warzone.getName() + ". " +
-												reset + " blocks reset. New zone saved.";
+												reset + " blocks reset. Zone saved.";
+								
 							} else {
 								int reset = warzone.getVolume().resetBlocks();
 								warzone.setSoutheast(player.getLocation());
 								warzone.saveState();
 								warzone.initializeZone();
+								
 								message += "Southeasternmost point set at x=" + (int)warzone.getSoutheast().getBlockX()
 												+ " z=" + (int)warzone.getSoutheast().getBlockZ() + " on warzone " + warzone.getName() + ". " +
-												reset + " blocks reset. New zone saved.";
+												reset + " blocks reset. Zone saved.";
 							}
-							
-							if(warzone.getNorthwest() == null) {
-								message += " Still missing northwesternmost point.";
-							}
-							if(warzone.getSoutheast() == null) {
-								message += " Still missing southeasternmost point.";
-							}
-							if(warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
-								if(warzone.ready()) {
-									message += " Warzone " + warzone.getName() + " almost ready. Use /setteam while inside the warzone to create new teams. Make sure to use /savezone to " +
-											"set the warzone teleport point and initial state.";
-								} else if (warzone.tooSmall()) {
-									message += " Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.";
-								} else if (warzone.tooBig()) {
-									message += " Warzone " + warzone.getName() + " is too Big. Max north-south size: 1000. Max east-west size: 1000.";
-								}
-							}
-							player.sendMessage(war.str(message));
+							WarzoneMapper.save(war, warzone, true);
 						}
-						WarzoneMapper.save(war, warzone, false);
-						
+						if(warzone.getNorthwest() == null) {
+							message += " Still missing northwesternmost point.";
+						}
+						if(warzone.getSoutheast() == null) {
+							message += " Still missing southeasternmost point.";
+						}
+						if(warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
+							if(warzone.ready()) {
+								message += " Warzone " + warzone.getName() + " outline done. Use /setteam, /setmonument and /savezone to complete the zone.";
+							} else if (warzone.tooSmall()) {
+								message += " Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.";
+							} else if (warzone.tooBig()) {
+								message += " Warzone " + warzone.getName() + " is too Big. Max north-south size: 1000. Max east-west size: 1000.";
+							}
+						}
+						player.sendMessage(war.str(message));
 					}
 					event.setCancelled(true); 
 				}

@@ -122,22 +122,22 @@ public class VolumeMapper {
 				else out = new BufferedWriter(new FileWriter(new File("War/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 				if(volume instanceof CenteredVolume) {
 					out.write("center"); out.newLine();
-					out.write(volume.getCornerOne().getX()); out.newLine();
-					out.write(volume.getCornerOne().getY()); out.newLine();
-					out.write(volume.getCornerOne().getZ()); out.newLine();
+					out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
+					out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
+					out.write(Integer.toString(volume.getCornerOne().getZ())); out.newLine();
 					out.write("nothing"); out.newLine();
-					out.write(0); out.newLine();
-					out.write(0); out.newLine();
-					out.write(0); out.newLine();
+					out.write(Integer.toString(0)); out.newLine();
+					out.write(Integer.toString(0)); out.newLine();
+					out.write(Integer.toString(0)); out.newLine();
 				} else {
 					out.write("corner1"); out.newLine();
-					out.write(volume.getCornerOne().getX()); out.newLine();
-					out.write(volume.getCornerOne().getY()); out.newLine();
-					out.write(volume.getCornerOne().getZ()); out.newLine();
+					out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
+					out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
+					out.write(Integer.toString(volume.getCornerOne().getZ())); out.newLine();
 					out.write("corner2"); out.newLine();
-					out.write(volume.getCornerTwo().getX()); out.newLine();
-					out.write(volume.getCornerTwo().getY()); out.newLine();
-					out.write(volume.getCornerTwo().getZ()); out.newLine();
+					out.write(Integer.toString(volume.getCornerTwo().getX())); out.newLine();
+					out.write(Integer.toString(volume.getCornerTwo().getY())); out.newLine();
+					out.write(Integer.toString(volume.getCornerTwo().getZ())); out.newLine();
 				}
 				
 				for(int i = 0; i < volume.getSizeX(); i++){
@@ -145,7 +145,7 @@ public class VolumeMapper {
 						for(int k = 0; k < volume.getSizeZ(); k++) {
 							BlockInfo info = volume.getBlockInfos()[i][j][k];
 							if(info == null) {
-								out.write("0,0,"); out.newLine();
+								out.write("0,0,");
 							} else {
 								if(info.getType() == Material.SIGN || info.getType() == Material.SIGN_POST) {
 									String[] lines = info.getSignLines();
@@ -156,6 +156,7 @@ public class VolumeMapper {
 									out.write(info.getTypeID() + "," + info.getData() + ","); 
 								}
 							}
+							out.newLine();
 						}
 					}
 				}

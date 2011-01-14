@@ -153,16 +153,18 @@ public class WarzoneMapper {
 		// lobby
 		String lobbyStr = warzoneConfig.getString("lobby");
 		BlockFace lobbyFace = null;
-		if(lobbyStr.equals("south")) {
-			lobbyFace = BlockFace.South;
-		} else if(lobbyStr.equals("east")) {
-			lobbyFace = BlockFace.East;
-		} else if(lobbyStr.equals("north")) {
-			lobbyFace = BlockFace.North;
-		} else if(lobbyStr.equals("west")) {
-			lobbyFace = BlockFace.West;
-		} 
-		warzone.setLobby(new ZoneLobby(war, warzone, lobbyFace));
+		if(lobbyStr != null && !lobbyStr.equals("")){
+			if(lobbyStr.equals("south")) {
+				lobbyFace = BlockFace.South;
+			} else if(lobbyStr.equals("east")) {
+				lobbyFace = BlockFace.East;
+			} else if(lobbyStr.equals("north")) {
+				lobbyFace = BlockFace.North;
+			} else if(lobbyStr.equals("west")) {
+				lobbyFace = BlockFace.West;
+			} 
+			warzone.setLobby(new ZoneLobby(war, warzone, lobbyFace));
+		}
 		
 		warzoneConfig.close();
 		
@@ -195,7 +197,7 @@ public class WarzoneMapper {
 		
 	}
 	
-	public static void save(War war, Warzone warzone, boolean saveBlocks) {
+	public static void save(War war, Warzone warzone, boolean saveAllBlocks) {
 		(new File(war.getName()+"/warzone-"+warzone.getName())).mkdir();
 		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + "/warzone-" + warzone.getName() + ".txt");
 		//war.getLogger().info("Saving warzone " + warzone.getName() + "...");
@@ -265,34 +267,38 @@ public class WarzoneMapper {
 		
 		// lobby
 		String lobbyStr = "";
-		if(BlockFace.South == warzone.getLobby().getWall()) {
-			lobbyStr = "south";
-		} else if(BlockFace.East == warzone.getLobby().getWall()) {
-			lobbyStr = "east";
-		} else if(BlockFace.North == warzone.getLobby().getWall()) {
-			lobbyStr = "north";
-		} else if(BlockFace.West == warzone.getLobby().getWall()) {
-			lobbyStr = "west";
-		} 
+		if(warzone.getLobby() != null) {
+			if(BlockFace.South == warzone.getLobby().getWall()) {
+				lobbyStr = "south";
+			} else if(BlockFace.East == warzone.getLobby().getWall()) {
+				lobbyStr = "east";
+			} else if(BlockFace.North == warzone.getLobby().getWall()) {
+				lobbyStr = "north";
+			} else if(BlockFace.West == warzone.getLobby().getWall()) {
+				lobbyStr = "west";
+			} 
+		}
 		warzoneConfig.setString("lobby", lobbyStr);
 		
 		warzoneConfig.save();
 		warzoneConfig.close();
 		
-		if(saveBlocks) {
+		if(saveAllBlocks) {
 			// zone blocks
 			VolumeMapper.save(warzone.getVolume(), warzone.getName(), war);
+		}
 			
-			// monument blocks
-			for(Monument monument: monuments) {
-				VolumeMapper.save(monument.getVolume(), warzone.getName(), war);
-			}
-			
-			// team spawn blocks
-			for(Team team : teams) {
-				VolumeMapper.save(team.getVolume(), warzone.getName(), war);
-			}
-			
+		// monument blocks
+		for(Monument monument: monuments) {
+			VolumeMapper.save(monument.getVolume(), warzone.getName(), war);
+		}
+		
+		// team spawn blocks
+		for(Team team : teams) {
+			VolumeMapper.save(team.getVolume(), warzone.getName(), war);
+		}
+		
+		if(warzone.getLobby() != null) {
 			VolumeMapper.save(warzone.getLobby().getVolume(), warzone.getName(), war);
 		}
 		
