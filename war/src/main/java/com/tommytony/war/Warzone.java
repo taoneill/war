@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.Player;
 import org.bukkit.PlayerInventory;
 import org.bukkit.World;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 import bukkit.tommytony.war.War;
 
@@ -280,7 +281,15 @@ public class Warzone {
 
 	public void respawnPlayer(Team team, Player player) {
 		player.teleportTo(team.getTeamSpawn());
-		
+		handleRespawn(team, player);
+	}
+	
+	public void respawnPlayer(PlayerMoveEvent event, Team team, Player player) {
+		event.setTo(team.getTeamSpawn());
+		handleRespawn(team, player);
+	}
+	
+	private void handleRespawn(Team team, Player player){
 		// Reset inventory to loadout
 		PlayerInventory playerInv = player.getInventory();
 		// BUKKIT
@@ -389,12 +398,13 @@ public class Warzone {
 	public void restorePlayerInventory(Player player) {
 		List<ItemStack> originalContents = inventories.remove(player.getName());
 		PlayerInventory playerInv = player.getInventory();
-		for(int i = 0; i < playerInv.getSize(); i++) {
-			playerInv.setItem(i, new ItemStack(Material.AIR));
-		}
-		for(int i = 0; i < playerInv.getSize(); i++) {
-			playerInv.setItem(i, originalContents.get(i));
-		}
+		// BUKKIT
+//		for(int i = 0; i < playerInv.getSize(); i++) {
+//			playerInv.setItem(i, new ItemStack(Material.AIR));
+//		}
+//		for(int i = 0; i < playerInv.getSize(); i++) {
+//			playerInv.setItem(i, originalContents.get(i));
+//		}
 	}
 
 	public boolean hasMonument(String monumentName) {
@@ -632,7 +642,7 @@ public class Warzone {
 		return lobby;
 	}
 
-	public void autoAssign(Player player) {
+	public void autoAssign(PlayerMoveEvent event, Player player) {
 		Team lowestNoOfPlayers = null;
 		for(Team t : teams) {
 			if(lowestNoOfPlayers == null
@@ -646,7 +656,7 @@ public class Warzone {
 				keepPlayerInventory(player);
 			}
 			player.sendMessage(war.str("Your inventory is is storage until you /leave."));
-			respawnPlayer(lowestNoOfPlayers, player);
+			respawnPlayer(event, lowestNoOfPlayers, player);
 			for(Team team : teams){
 				team.teamcast(war.str("" + player.getName() + " joined team " + team.getName() + "."));
 			}

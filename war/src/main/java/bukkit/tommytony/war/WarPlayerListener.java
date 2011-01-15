@@ -594,14 +594,14 @@ public class WarPlayerListener extends PlayerListener {
 						if(oldTeam == null) { // trying to counter spammy player move
 							if(zone.getLobby().isAutoAssignGate(to)) {
 								dropFromOldTeamIfAny(player);
-								zone.autoAssign(player);
-							} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMDIAMOND, to)){
+								zone.autoAssign(event, player);
+							} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMDIAMOND, from)){
 								dropFromOldTeamIfAny(player);
 								Team diamondTeam = zone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND);
 								diamondTeam.addPlayer(player);
 								zone.keepPlayerInventory(player);
 								player.sendMessage(war.str("Your inventory is is storage until you /leave."));
-								zone.respawnPlayer(diamondTeam, player);
+								zone.respawnPlayer(event, diamondTeam, player);
 								for(Team team : zone.getTeams()){
 									team.teamcast(war.str("" + player.getName() + " joined team diamond."));
 								}
@@ -611,7 +611,7 @@ public class WarPlayerListener extends PlayerListener {
 								ironTeam.addPlayer(player);
 								zone.keepPlayerInventory(player);
 								player.sendMessage(war.str("Your inventory is is storage until you /leave."));
-								zone.respawnPlayer(ironTeam, player);
+								zone.respawnPlayer(event, ironTeam, player);
 								for(Team team : zone.getTeams()){
 									team.teamcast(war.str("" + player.getName() + " joined team iron."));
 								}
@@ -621,12 +621,13 @@ public class WarPlayerListener extends PlayerListener {
 								goldTeam.addPlayer(player);
 								zone.keepPlayerInventory(player);
 								player.sendMessage(war.str("Your inventory is is storage until you /leave."));
-								zone.respawnPlayer(goldTeam, player);
+								zone.respawnPlayer(event, goldTeam, player);
 								for(Team team : zone.getTeams()){
 									team.teamcast(war.str("" + player.getName() + " joined team gold."));
 								}
 							} else if (zone.getLobby().isInWarHubLinkGate(to)){
 								dropFromOldTeamIfAny(player);
+								event.setTo(to);
 								player.teleportTo(war.getWarHub().getLocation());
 							}
 						}
@@ -639,11 +640,13 @@ public class WarPlayerListener extends PlayerListener {
 			if(hub != null) {
 				Warzone zone = hub.getDestinationWarzoneForLocation(player.getLocation());
 				synchronized(player) {
+					
 					if(zone != null
 							&& (zone.getTeleport().getBlockX() - player.getLocation().getBlockX() > 10
 									|| zone.getTeleport().getBlockZ() - player.getLocation().getBlockZ() > 10)	// trying to prevent effects of spammy player move 
 									) {
-						player.teleportTo(zone.getTeleport());
+						event.setTo(zone.getTeleport());
+						//player.teleportTo(zone.getTeleport());
 						player.sendMessage(war.str("Welcome to warzone " + zone.getName() + "."));
 					}
 				}

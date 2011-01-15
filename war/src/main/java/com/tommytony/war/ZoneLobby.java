@@ -156,7 +156,7 @@ public class ZoneLobby {
 			if(warzone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND) != null 
 					&& warzone.getTeamByMaterial(TeamMaterials.TEAMIRON) != null) {
 				diamondGate = lobbyMiddleWallBlock.getFace(leftSide, 2);
-				ironGate = lobbyMiddleWallBlock.getFace(BlockFace.West, 2);
+				ironGate = lobbyMiddleWallBlock.getFace(rightSide, 2);
 			} else if (warzone.getTeamByMaterial(TeamMaterials.TEAMIRON) != null
 					&& warzone.getTeamByMaterial(TeamMaterials.TEAMGOLD) != null) {
 				ironGate = lobbyMiddleWallBlock.getFace(leftSide, 2);
