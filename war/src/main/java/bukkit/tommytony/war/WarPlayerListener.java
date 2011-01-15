@@ -568,6 +568,16 @@ public class WarPlayerListener extends PlayerListener {
 					}
 					event.setCancelled(true); 
 				}
+			} else if (command.equals("setzone")		// Not a zone maker but War command.
+							|| command.equals("nextbattle")
+							|| command.equals("setzonelobby")
+							|| command.equals("savezone")
+							|| command.equals("deletezone")
+							|| command.equals("setteam")
+							|| command.equals("deleteteam")
+							|| command.equals("setmonument")
+							|| command.equals("deletemonument")) {
+				player.sendMessage(war.str("You can't do this if you are not a warzone maker."));
 			}
 		}
     }

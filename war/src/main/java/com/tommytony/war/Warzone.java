@@ -38,8 +38,8 @@ public class Warzone {
 	
 	private HashMap<String, List<ItemStack>> inventories = new HashMap<String, List<ItemStack>>();
 	private World world;
-	private Material originalSouthEastBlock;
-	private Material originalNorthWestBlock;
+	private Material[] originalSoutheastBlocks;
+	private Material[] originalNorthwestBlocks;
 	private final int minSafeDistanceFromWall = 5;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private War war;
@@ -97,39 +97,65 @@ public class Warzone {
 	}
 
 	public void setNorthwest(Location northwest) {
-		if(this.northwest != null && originalNorthWestBlock != null) {
+		resetNorthwestCursorBlocks();
+		this.northwest = northwest;
+		this.volume.setCornerOne(world.getBlockAt(northwest.getBlockX(), northwest.getBlockY(), northwest.getBlockZ()));
+		addNorthwestCursorBlocks();
+	}
+	
+	private void addNorthwestCursorBlocks() {
+		int newHighest = this.world.getHighestBlockYAt(this.northwest.getBlockX(), this.northwest.getBlockZ()) - 1;
+		Block topNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), newHighest, this.northwest.getBlockZ());
+		originalNorthwestBlocks[0] = topNWBlock.getType();	// save blocks for reset
+		originalNorthwestBlocks[1] = topNWBlock.getFace(BlockFace.East).getType();
+		originalNorthwestBlocks[2] = topNWBlock.getFace(BlockFace.South).getType();
+		topNWBlock.setType(Material.GLASS);
+		topNWBlock.getFace(BlockFace.East).setType(Material.GLASS);
+		topNWBlock.getFace(BlockFace.South).setType(Material.GLASS);
+	}
+	
+	private void resetNorthwestCursorBlocks() {
+		if(this.northwest != null && originalNorthwestBlocks != null) {
 			// reset old corner
 			int highest = this.world.getHighestBlockYAt(this.northwest.getBlockX(), this.northwest.getBlockZ()) - 1;
 			Block oldTopNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), highest, this.northwest.getBlockZ());
-			oldTopNWBlock.setType(originalNorthWestBlock);
+			oldTopNWBlock.setType(originalNorthwestBlocks[0]);
+			oldTopNWBlock.getFace(BlockFace.East).setType(originalNorthwestBlocks[1]);
+			oldTopNWBlock.getFace(BlockFace.South).setType(originalNorthwestBlocks[2]);
 		}
-		this.northwest = northwest;
-		int newHighest = this.world.getHighestBlockYAt(this.northwest.getBlockX(), this.northwest.getBlockZ()) - 1;
-		Block topNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), newHighest, this.northwest.getBlockZ());
-		originalNorthWestBlock = topNWBlock.getType();	// save block for reset
-		topNWBlock.setType(Material.GLASS);
-		this.volume.setCornerOne(world.getBlockAt(northwest.getBlockX(), northwest.getBlockY(), northwest.getBlockZ()));
 	}
-
 
 	public Location getNorthwest() {
 		return northwest;
 	}
 
 	public void setSoutheast(Location southeast) {
-		if(this.southeast != null && originalSouthEastBlock != null) {
+		resetSoutheastCursorBlocks();
+		this.southeast = southeast;
+		this.volume.setCornerTwo(world.getBlockAt(southeast.getBlockX(), southeast.getBlockY(), southeast.getBlockZ()));
+		addSoutheastCursorBlocks();
+	}
+	
+	private void addSoutheastCursorBlocks() {
+		int newHighest = this.world.getHighestBlockYAt(this.southeast.getBlockX(), this.southeast.getBlockZ()) - 1;
+		Block topSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), newHighest, this.southeast.getBlockZ());
+		originalSoutheastBlocks[0] = topSEBlock.getType();	// save block for reset
+		originalSoutheastBlocks[1] = topSEBlock.getFace(BlockFace.West).getType();
+		originalSoutheastBlocks[2] = topSEBlock.getFace(BlockFace.North).getType();
+		topSEBlock.setType(Material.GLASS);
+		topSEBlock.getFace(BlockFace.West).setType(Material.GLASS);
+		topSEBlock.getFace(BlockFace.North).setType(Material.GLASS);
+	}
+	
+	private void resetSoutheastCursorBlocks() {
+		if(this.southeast != null && originalSoutheastBlocks != null) {
 			// reset old corner
 			int highest = this.world.getHighestBlockYAt(this.southeast.getBlockX(), this.southeast.getBlockZ()) - 1;
 			Block oldTopSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), highest, this.southeast.getBlockZ());
-			oldTopSEBlock.setType(originalSouthEastBlock);
+			oldTopSEBlock.setType(originalSoutheastBlocks[0]);
+			oldTopSEBlock.getFace(BlockFace.West).setType(originalSoutheastBlocks[1]);
+			oldTopSEBlock.getFace(BlockFace.North).setType(originalSoutheastBlocks[2]);
 		}
-		// change corner
-		this.southeast = southeast;
-		int newHighest = this.world.getHighestBlockYAt(this.southeast.getBlockX(), this.southeast.getBlockZ()) - 1;
-		Block topSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), newHighest, this.southeast.getBlockZ());
-		originalSouthEastBlock = topSEBlock.getType();	// save block for reset
-		topSEBlock.setType(Material.GLASS);
-		this.volume.setCornerTwo(world.getBlockAt(southeast.getBlockX(), southeast.getBlockY(), southeast.getBlockZ()));		
 	}
 	
 	public Location getSoutheast() {
