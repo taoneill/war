@@ -28,8 +28,9 @@ import java.util.logging.Logger;
 public class War extends JavaPlugin {
 	
 	public War(PluginLoader pluginLoader, Server instance,
-			PluginDescriptionFile desc, File plugin, ClassLoader cLoader) {
-		super(pluginLoader, instance, desc, plugin, cLoader);
+			PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
+		super(pluginLoader, instance, desc, folder, plugin, cLoader);
+		// TODO: switch to bukkit config file
 	}
 	
 

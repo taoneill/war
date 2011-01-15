@@ -152,6 +152,27 @@ public class WarzoneMapper {
 		
 		// lobby
 		String lobbyStr = warzoneConfig.getString("lobby");
+		
+		warzoneConfig.close();
+		
+		if(loadBlocks && warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
+			
+			// zone blocks 
+			VerticalVolume zoneVolume = VolumeMapper.loadVerticalVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld());
+			warzone.setVolume(zoneVolume);
+		}
+	
+		// monument blocks
+		for(Monument monument: warzone.getMonuments()) {
+			monument.setVolume(VolumeMapper.loadCenteredVolume(monument.getName(),warzone.getName(), 7, war, world));
+		}
+		
+		// team spawn blocks
+		for(Team team : warzone.getTeams()) {
+			team.setVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), war, world));
+		}
+		
+		// lobby
 		BlockFace lobbyFace = null;
 		if(lobbyStr != null && !lobbyStr.equals("")){
 			if(lobbyStr.equals("south")) {
@@ -162,40 +183,12 @@ public class WarzoneMapper {
 				lobbyFace = BlockFace.North;
 			} else if(lobbyStr.equals("west")) {
 				lobbyFace = BlockFace.West;
-			} 
-			ZoneLobby lobby = new ZoneLobby(war, warzone, lobbyFace);
+			}
+			Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), war, world);
+			ZoneLobby lobby = new ZoneLobby(war, warzone, lobbyFace, lobbyVolume);
 			warzone.setLobby(lobby);
 		}
-		
-		warzoneConfig.close();
-		
-		if(loadBlocks && warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
-			
-			// zone blocks 
-			VerticalVolume zoneVolume = VolumeMapper.loadVerticalVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld());
-			warzone.setVolume(zoneVolume);
-			
-			// monument blocks
-			for(Monument monument: warzone.getMonuments()) {
-				monument.setVolume(VolumeMapper.loadCenteredVolume(monument.getName(),warzone.getName(), 7, war, world));
-			}
-			
-			// team spawn blocks
-			for(Team team : warzone.getTeams()) {
-				team.setVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), war, world));
-			}
-			
-			// lobby
-			if(warzone.getLobby() != null) {
-				Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), war, world);
-				warzone.getLobby().setVolume(lobbyVolume);
-			}
-			
-			//war.getLogger().info("Loaded warzone " + name + " config and blocks.");
-		} else {
-			//war.getLogger().info("Loaded warzone " + name + " config.");
-		}
-		
+				
 		return warzone;
 		
 	}

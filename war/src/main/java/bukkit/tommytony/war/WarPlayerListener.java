@@ -352,7 +352,7 @@ public class WarPlayerListener extends PlayerListener {
 						if(lobby != null) {
 							// reset existing lobby
 							lobby.getVolume().resetBlocks();
-							lobby.setWall(wall);
+							lobby.changeWall(wall);
 							lobby.initialize();
 							player.sendMessage(war.str("Warzone lobby moved to " + wallStr + "side of zone."));
 						} else {

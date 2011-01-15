@@ -160,6 +160,10 @@ public class Warzone {
 				monument.getVolume().resetBlocks();
 			}
 			
+			if(lobby != null) {
+				lobby.getVolume().resetBlocks();
+			}
+			
 			int saved = volume.saveBlocks();
 			initializeZone();	// bring back stuff
 			return saved;
@@ -617,7 +621,8 @@ public class Warzone {
 				playerGuards.add(guard);
 				int reset = volume.resetWallBlocks(guard.getWall()); // this should restore old blocks
 				if(lobby != null) {
-					lobby.getVolume().resetBlocks();
+					lobby.getVolume().resetBlocks(); // always reset the lobby even if the guard is on another wall
+													// because player can go around corner
 					lobby.initialize();
 				}
 				if(drawZoneOutline) {
