@@ -5,11 +5,11 @@ import org.bukkit.BlockFace;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import bukkit.tommytony.war.War;
+
 import com.tommytony.war.mappers.VolumeMapper;
 import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
-
-import bukkit.tommytony.war.War;
 
 /**
  * 
@@ -60,7 +60,7 @@ public class ZoneLobby {
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x, wallCenterPos);
 			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter+1, wallCenterPos);
-			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter+1, wallCenterPos + lobbyHalfSide);
+			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter, wallCenterPos + lobbyHalfSide);
 			corner2 = warzone.getWorld().getBlockAt(x - lobbyDepth, highestNonAirBlockAtCenter + 1 + lobbyHeight, wallCenterPos - lobbyHalfSide);
 			setGatePositions(lobbyMiddleWallBlock);
 		} else if (wall == BlockFace.East){
@@ -71,7 +71,7 @@ public class ZoneLobby {
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z);
 			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter + 1, z);
-			corner1 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter+1, z);
+			corner1 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter, z);
 			corner2 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, highestNonAirBlockAtCenter + 1 + lobbyHeight, z - lobbyDepth);
 			setGatePositions(lobbyMiddleWallBlock);
  		} else if (wall == BlockFace.South){
@@ -82,7 +82,7 @@ public class ZoneLobby {
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x, wallCenterPos);
 			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter + 1, wallCenterPos);
-			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter+1, wallCenterPos - lobbyHalfSide);
+			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter, wallCenterPos - lobbyHalfSide);
 			corner2 = warzone.getWorld().getBlockAt(x + lobbyDepth, highestNonAirBlockAtCenter + 1 + lobbyHeight, wallCenterPos + lobbyHalfSide);
 			setGatePositions(lobbyMiddleWallBlock);
 		} else if (wall == BlockFace.West){
@@ -93,7 +93,7 @@ public class ZoneLobby {
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z);
 			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter + 1, z);
-			corner1 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, highestNonAirBlockAtCenter+1, z);
+			corner1 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, highestNonAirBlockAtCenter, z);
 			corner2 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter + 1 + lobbyHeight, z + lobbyDepth);
 			setGatePositions(lobbyMiddleWallBlock);
 		}
@@ -107,7 +107,7 @@ public class ZoneLobby {
 			
 			// flatten the area (set all but floor to air, then replace any floor air blocks with glass)
 			this.volume.setToMaterial(Material.AIR);
-			this.volume.setFaceMaterial(BlockFace.Down, Material.AIR);	// beautiful
+			this.volume.setFaceMaterial(BlockFace.Down, Material.GLASS);	// beautiful
 			
 			// add war hub link gate
 			if(war.getWarHub() != null) {
@@ -323,5 +323,71 @@ public class ZoneLobby {
 			return true;
 		} 
 		return false;
+	}
+
+	public boolean blockIsAGateBlock(Block block, BlockFace blockWall) {
+		if(blockWall == wall) {
+			return isPartOfGate(diamondGate, block)
+					|| isPartOfGate(ironGate, block)
+					|| isPartOfGate(goldGate, block);
+		}
+		return false;
+	}
+
+	private boolean isPartOfGate(Block gateBlock, Block block) {
+		BlockFace leftSide = null;	// look at the zone
+		BlockFace rightSide = null;
+		if(wall == BlockFace.North) {
+			leftSide = BlockFace.East;
+			rightSide = BlockFace.West;
+		} else if(wall == BlockFace.East) {
+			leftSide = BlockFace.South;
+			rightSide = BlockFace.North;
+		} else if(wall == BlockFace.South) {
+			leftSide = BlockFace.West;
+			rightSide = BlockFace.East;
+		} else if(wall == BlockFace.West) {
+			leftSide = BlockFace.North;
+			rightSide = BlockFace.South;
+		}
+		return (block.getX() == gateBlock.getX()
+					&& block.getY() == gateBlock.getY()
+					&& block.getZ() == gateBlock.getZ())
+				||
+				(block.getX() == gateBlock.getFace(BlockFace.Up).getX()
+					&& block.getY() == gateBlock.getFace(BlockFace.Up).getY()
+					&& block.getZ() == gateBlock.getFace(BlockFace.Up).getZ())
+				||
+				(block.getX() == gateBlock.getFace(leftSide).getX()
+					&& block.getY() == gateBlock.getFace(leftSide).getY()
+					&& block.getZ() == gateBlock.getFace(leftSide).getZ())
+				||
+				(block.getX() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getX()
+					&& block.getY() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getY()
+					&& block.getZ() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getZ())
+				||
+				(block.getX() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getX()
+					&& block.getY() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getY()
+					&& block.getZ() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getZ())
+				||
+				(block.getX() == gateBlock.getFace(BlockFace.Up).getFace(BlockFace.Up).getX()
+					&& block.getY() == gateBlock.getFace(BlockFace.Up).getFace(BlockFace.Up).getY()
+					&& block.getZ() == gateBlock.getFace(BlockFace.Up).getFace(BlockFace.Up).getZ())
+				||
+				(block.getX() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getX()
+					&& block.getY() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getY()
+					&& block.getZ() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getZ())
+				||
+				(block.getX() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getX()
+					&& block.getY() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getY()
+					&& block.getZ() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getZ())
+				||
+				(block.getX() == gateBlock.getFace(rightSide).getX()
+					&& block.getY() == gateBlock.getFace(rightSide).getY()
+					&& block.getZ() == gateBlock.getFace(rightSide).getZ());
+	}
+
+	public Warzone getZone() {
+		return this.warzone;
 	}
 }

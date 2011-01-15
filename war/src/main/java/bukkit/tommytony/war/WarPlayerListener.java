@@ -316,16 +316,24 @@ public class WarPlayerListener extends PlayerListener {
 				}
 				
 				else if(command.equals("setzonelobby")) {
-					if(!war.inAnyWarzone(player.getLocation()) || arguments.length < 2 || arguments.length > 2 
-							|| (arguments.length == 2 && (!arguments[0].equals("north") && !arguments[0].equals("n")
+					if((!war.inAnyWarzone(player.getLocation())
+							&& !war.inAnyWarzoneLobby(player.getLocation()))
+							|| arguments.length < 1 || arguments.length > 1 
+							|| (arguments.length == 1 && !arguments[0].equals("north") && !arguments[0].equals("n")
 																	&& !arguments[0].equals("east") && !arguments[0].equals("e")
 																	&& !arguments[0].equals("south") && !arguments[0].equals("s")
-																	&& !arguments[0].equals("west") && !arguments[0].equals("w")))) {
+																	&& !arguments[0].equals("west") && !arguments[0].equals("w"))) {
 						player.sendMessage(war.str("Usage: /setzonelobby <north/n/east/e/south/s/west/w>. Must be in warzone." +
 								"Defines on which side the zone lobby lies. " +
 								"Removes any previously set lobby."));
 					} else {
 						Warzone warzone = war.warzone(player.getLocation());
+						ZoneLobby lobby = war.lobby(player.getLocation());
+						if(warzone == null && lobby != null) {
+							warzone = lobby.getZone();
+						} else {
+							lobby = warzone.getLobby();
+						}
 						BlockFace wall = null;
 						String wallStr = "";
 						if(arguments[0].equals("north") || arguments[0].equals("n")) {
@@ -340,8 +348,7 @@ public class WarPlayerListener extends PlayerListener {
 						} else if(arguments[0].equals("west") || arguments[0].equals("w")) {
 							wall = BlockFace.West;
 							wallStr = "west";
-						}
-						ZoneLobby lobby = warzone.getLobby();						
+						}				
 						if(lobby != null) {
 							// reset existing lobby
 							lobby.getVolume().resetBlocks();
@@ -361,7 +368,7 @@ public class WarPlayerListener extends PlayerListener {
 		
 				// /savewarzone
 				else if(command.equals("savezone") || command.equals("savewarzone")) {
-					if(!war.inAnyWarzone(player.getLocation())) {
+					if(!war.inAnyWarzone(player.getLocation()) && !war.inAnyWarzoneLobby(player.getLocation())) {
 						player.sendMessage(war.str("Usage: /savezone. Must be in warzone. " +
 								"Changes the warzone state loaded at the beginning of every battle. " +
 								"Also sets the teleport point for this warzone where you're standing." +
@@ -371,10 +378,16 @@ public class WarPlayerListener extends PlayerListener {
 								"or /resetzone before changing start state). "));
 					} else {
 						Warzone warzone = war.warzone(player.getLocation());
+						ZoneLobby lobby = war.lobby(player.getLocation());
+						if(warzone == null && lobby != null) {
+							warzone = lobby.getZone();
+						} else {
+							lobby = warzone.getLobby();
+						}
 						int savedBlocks = warzone.saveState();
 						if(warzone.getLobby() == null) {
 							// Set default lobby on south side
-							ZoneLobby lobby = new ZoneLobby(war, warzone, BlockFace.South);
+							lobby = new ZoneLobby(war, warzone, BlockFace.South);
 							warzone.setLobby(lobby);
 							lobby.initialize();
 							player.sendMessage(war.str("Default lobby created on south side of zone."));
@@ -388,10 +401,16 @@ public class WarPlayerListener extends PlayerListener {
 				
 				// /resetwarzone
 				else if(command.equals("resetzone") || command.equals("resetwarzone")) {
-					if(!war.inAnyWarzone(player.getLocation())) {
+					if(!war.inAnyWarzone(player.getLocation()) && !war.inAnyWarzoneLobby(player.getLocation())) {
 						player.sendMessage(war.str("Usage: /resetzone pool=10. Reloads the zone. All named parameter are optional. Defaults: pool=7 maxScore=-1 (infinite). Must be in warzone."));
 					} else {
 						Warzone warzone = war.warzone(player.getLocation());
+						ZoneLobby lobby = war.lobby(player.getLocation());
+						if(warzone == null && lobby != null) {
+							warzone = lobby.getZone();
+						} else {
+							lobby = warzone.getLobby();
+						}
 						int resetBlocks = warzone.getVolume().resetBlocks();
 						warzone.initializeZone();
 						for(Team team: warzone.getTeams()) {

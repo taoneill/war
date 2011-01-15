@@ -163,7 +163,8 @@ public class WarzoneMapper {
 			} else if(lobbyStr.equals("west")) {
 				lobbyFace = BlockFace.West;
 			} 
-			warzone.setLobby(new ZoneLobby(war, warzone, lobbyFace));
+			ZoneLobby lobby = new ZoneLobby(war, warzone, lobbyFace);
+			warzone.setLobby(lobby);
 		}
 		
 		warzoneConfig.close();

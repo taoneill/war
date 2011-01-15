@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.tommytony.war.Team;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.WarMapper;
 
 import java.io.File;
@@ -76,10 +77,7 @@ public class War extends JavaPlugin {
 		this.defaultLoadout.put(0, new ItemStack(Material.STONE_SWORD));
 		this.defaultLoadout.put(1, new ItemStack(Material.BOW));
 		this.defaultLoadout.put(2, new ItemStack(Material.ARROW, 7));
-		this.defaultLoadout.put(3, new ItemStack(Material.STONE_PICKAXE));
-		this.defaultLoadout.put(4, new ItemStack(Material.STONE_SPADE));
-		this.defaultLoadout.put(5, new ItemStack(Material.STONE_AXE));
-		this.defaultLoadout.put(6, new ItemStack(Material.BREAD, 2));
+		this.defaultLoadout.put(3, new ItemStack(Material.IRON_PICKAXE));
 		this.defaultLifepool = 7;
 		this.defaultFriendlyFire = false;
 		this.defaultAutoAssignOnly = false;
@@ -210,7 +208,6 @@ public class War extends JavaPlugin {
 	}
 
 	public WarHub getWarHub() {
-		// TODO Auto-generated method stub
 		return warHub;
 	}
 
@@ -218,5 +215,31 @@ public class War extends JavaPlugin {
 		this.warHub = warHub;
 	}
 
+	public ZoneLobby lobby(Location location) {
+		for(Warzone warzone : warzones) {
+			if(warzone.getLobby() != null 
+					&& warzone.getLobby().getVolume() != null 
+					&& warzone.getLobby().getVolume().contains(location)) 
+				return warzone.getLobby();
+		}
+		return null;
+	}
+
+	public boolean inAnyWarzoneLobby(Location location) {
+		if(lobby(location) == null) {
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean inWarzoneLobby(String warzoneName, Location location) {
+		ZoneLobby currentLobby = lobby(location);
+		if(currentLobby == null) {
+			return false;
+		} else if (warzoneName.equals(currentLobby.getZone().getName())){
+			return true;
+		}
+		return false;
+	}
 	
 }

@@ -616,6 +616,10 @@ public class Warzone {
 			if(guard.getPlayer().getName().equals(player.getName())){
 				playerGuards.add(guard);
 				int reset = volume.resetWallBlocks(guard.getWall()); // this should restore old blocks
+				if(lobby != null) {
+					lobby.getVolume().resetBlocks();
+					lobby.initialize();
+				}
 				if(drawZoneOutline) {
 					addZoneOutline(guard.getWall());
 				}
