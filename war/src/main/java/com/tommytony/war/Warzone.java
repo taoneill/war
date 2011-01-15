@@ -106,6 +106,7 @@ public class Warzone {
 	private void addNorthwestCursorBlocks() {
 		int newHighest = this.world.getHighestBlockYAt(this.northwest.getBlockX(), this.northwest.getBlockZ()) - 1;
 		Block topNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), newHighest, this.northwest.getBlockZ());
+		originalNorthwestBlocks = new Material[3];
 		originalNorthwestBlocks[0] = topNWBlock.getType();	// save blocks for reset
 		originalNorthwestBlocks[1] = topNWBlock.getFace(BlockFace.East).getType();
 		originalNorthwestBlocks[2] = topNWBlock.getFace(BlockFace.South).getType();
@@ -139,6 +140,7 @@ public class Warzone {
 	private void addSoutheastCursorBlocks() {
 		int newHighest = this.world.getHighestBlockYAt(this.southeast.getBlockX(), this.southeast.getBlockZ()) - 1;
 		Block topSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), newHighest, this.southeast.getBlockZ());
+		originalSoutheastBlocks = new Material[3];
 		originalSoutheastBlocks[0] = topSEBlock.getType();	// save block for reset
 		originalSoutheastBlocks[1] = topSEBlock.getFace(BlockFace.West).getType();
 		originalSoutheastBlocks[2] = topSEBlock.getFace(BlockFace.North).getType();
@@ -269,12 +271,13 @@ public class Warzone {
 		int highest = world.getHighestBlockYAt(x, z);
 		Block block = world.getBlockAt(x, highest -1 , z);
 		
-		if(block.getType() == Material.LEAVES) { // top of tree, lets find some dirt
+		if(block.getType() == Material.LEAVES) { // top of tree, lets find some dirt/ground
 			Block over = block.getFace(BlockFace.Down);
 			Block under = over.getFace(BlockFace.Down);
 			int treeHeight = 0;
-			while(!((over.getType() == Material.AIR || over.getType() == Material.LEAVES || over.getType() == Material.WOOD)
-					&& (under.getType() != Material.AIR || under.getType() != Material.LEAVES || under.getType() != Material.WOOD))
+			while(!((over.getType() == Material.AIR && under.getType() != Material.AIR && under.getType() != Material.LEAVES) 
+					|| (over.getType() == Material.LEAVES && under.getType() != Material.LEAVES && under.getType() != Material.AIR)
+					|| (over.getType() == Material.WOOD && under.getType() != Material.WOOD && under.getType() != Material.AIR))
 				  && treeHeight < 40) {
 				over = under;
 				under = over.getFace(BlockFace.Down);
