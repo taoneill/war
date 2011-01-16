@@ -39,9 +39,9 @@ public class ZoneWallGuard {
 
 		// add wall guard blocks
 		for(Block block : nearestWallBlocks) {
-			block.setType(Material.GLASS);
-			block.getFace(BlockFace.Up).setType(Material.GLASS);
-			block.getFace(BlockFace.Down).setType(Material.GLASS);
+			toGlass(block, wall);
+			toGlass(block.getFace(BlockFace.Up), wall);
+			toGlass(block.getFace(BlockFace.Down), wall);
 			if(this.wall == BlockFace.North && warzone.getVolume().isNorthWallBlock(block)) {
 				toGlass(block.getFace(BlockFace.East), BlockFace.North);
 				toGlass(block.getFace(BlockFace.East).getFace(BlockFace.Up), BlockFace.North);

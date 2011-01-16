@@ -649,13 +649,13 @@ public class Warzone {
 			if(guard.getPlayer().getName().equals(player.getName())){
 				playerGuards.add(guard);
 				int reset = volume.resetWallBlocks(guard.getWall()); // this should restore old blocks
+				if(drawZoneOutline) {
+					addZoneOutline(guard.getWall());
+				}
 				if(lobby != null) {
 					lobby.getVolume().resetBlocks(); // always reset the lobby even if the guard is on another wall
 													// because player can go around corner
 					lobby.initialize();
-				}
-				if(drawZoneOutline) {
-					addZoneOutline(guard.getWall());
 				}
 				war.getLogger().info("Reset " + reset + " blocks in " + guard.getWall() + "wall of warzone " + name);
 			}

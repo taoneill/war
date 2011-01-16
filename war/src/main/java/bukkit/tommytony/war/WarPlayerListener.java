@@ -600,7 +600,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 		}
 		
-		Warzone playerWarzone = war.getPlayerWarzone(player.getName());
+		Warzone playerWarzone = war.getPlayerWarzone(player.getName());	// this uses the teams, so it asks: get the player's team's warzone, to be clearer
 		if(playerWarzone != null) {
 			Team team = war.getPlayerTeam(player.getName());
 			
@@ -632,7 +632,7 @@ public class WarPlayerListener extends PlayerListener {
 					}
 				}
 				synchronized(player) {
-					if(!roundOver && war.warzone(player.getLocation()) == null) {	// only respawn him if he isnt back at zone yet
+					if(!roundOver && !war.inAnyWarzone(player.getLocation())) {	// only respawn him if he isnt back at zone yet
 						playerWarzone.respawnPlayer(event, team, player);
 						player.sendMessage(war.str("You died!"));
 						team.resetSign();
@@ -651,6 +651,10 @@ public class WarPlayerListener extends PlayerListener {
 				player.setHealth(20);
 				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
 			}
+		} else if (war.inAnyWarzone(player.getLocation())) { // player is not in any team, but inside warzone boundaries, get him out
+			Warzone zone = war.warzone(player.getLocation());
+			event.setTo(zone.getTeleport());
+			player.sendMessage(war.str("You can't be inside a warzone without a team."));
 		}
 		
 		if(to != null) {

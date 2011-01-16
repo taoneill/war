@@ -370,56 +370,59 @@ public class ZoneLobby {
 	}
 
 	private boolean isPartOfGate(Block gateBlock, Block block) {
-		BlockFace leftSide = null;	// look at the zone
-		BlockFace rightSide = null;
-		if(wall == BlockFace.North) {
-			leftSide = BlockFace.East;
-			rightSide = BlockFace.West;
-		} else if(wall == BlockFace.East) {
-			leftSide = BlockFace.South;
-			rightSide = BlockFace.North;
-		} else if(wall == BlockFace.South) {
-			leftSide = BlockFace.West;
-			rightSide = BlockFace.East;
-		} else if(wall == BlockFace.West) {
-			leftSide = BlockFace.North;
-			rightSide = BlockFace.South;
+		if(gateBlock != null) {
+			BlockFace leftSide = null;	// look at the zone
+			BlockFace rightSide = null;
+			if(wall == BlockFace.North) {
+				leftSide = BlockFace.East;
+				rightSide = BlockFace.West;
+			} else if(wall == BlockFace.East) {
+				leftSide = BlockFace.South;
+				rightSide = BlockFace.North;
+			} else if(wall == BlockFace.South) {
+				leftSide = BlockFace.West;
+				rightSide = BlockFace.East;
+			} else if(wall == BlockFace.West) {
+				leftSide = BlockFace.North;
+				rightSide = BlockFace.South;
+			}
+			return (block.getX() == gateBlock.getX()
+						&& block.getY() == gateBlock.getY()
+						&& block.getZ() == gateBlock.getZ())
+					||
+					(block.getX() == gateBlock.getFace(BlockFace.Up).getX()
+						&& block.getY() == gateBlock.getFace(BlockFace.Up).getY()
+						&& block.getZ() == gateBlock.getFace(BlockFace.Up).getZ())
+					||
+					(block.getX() == gateBlock.getFace(leftSide).getX()
+						&& block.getY() == gateBlock.getFace(leftSide).getY()
+						&& block.getZ() == gateBlock.getFace(leftSide).getZ())
+					||
+					(block.getX() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getX()
+						&& block.getY() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getY()
+						&& block.getZ() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getZ())
+					||
+					(block.getX() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getX()
+						&& block.getY() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getY()
+						&& block.getZ() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getZ())
+					||
+					(block.getX() == gateBlock.getFace(BlockFace.Up).getFace(BlockFace.Up).getX()
+						&& block.getY() == gateBlock.getFace(BlockFace.Up).getFace(BlockFace.Up).getY()
+						&& block.getZ() == gateBlock.getFace(BlockFace.Up).getFace(BlockFace.Up).getZ())
+					||
+					(block.getX() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getX()
+						&& block.getY() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getY()
+						&& block.getZ() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getZ())
+					||
+					(block.getX() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getX()
+						&& block.getY() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getY()
+						&& block.getZ() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getZ())
+					||
+					(block.getX() == gateBlock.getFace(rightSide).getX()
+						&& block.getY() == gateBlock.getFace(rightSide).getY()
+						&& block.getZ() == gateBlock.getFace(rightSide).getZ());
 		}
-		return (block.getX() == gateBlock.getX()
-					&& block.getY() == gateBlock.getY()
-					&& block.getZ() == gateBlock.getZ())
-				||
-				(block.getX() == gateBlock.getFace(BlockFace.Up).getX()
-					&& block.getY() == gateBlock.getFace(BlockFace.Up).getY()
-					&& block.getZ() == gateBlock.getFace(BlockFace.Up).getZ())
-				||
-				(block.getX() == gateBlock.getFace(leftSide).getX()
-					&& block.getY() == gateBlock.getFace(leftSide).getY()
-					&& block.getZ() == gateBlock.getFace(leftSide).getZ())
-				||
-				(block.getX() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getX()
-					&& block.getY() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getY()
-					&& block.getZ() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getZ())
-				||
-				(block.getX() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getX()
-					&& block.getY() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getY()
-					&& block.getZ() == gateBlock.getFace(leftSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getZ())
-				||
-				(block.getX() == gateBlock.getFace(BlockFace.Up).getFace(BlockFace.Up).getX()
-					&& block.getY() == gateBlock.getFace(BlockFace.Up).getFace(BlockFace.Up).getY()
-					&& block.getZ() == gateBlock.getFace(BlockFace.Up).getFace(BlockFace.Up).getZ())
-				||
-				(block.getX() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getX()
-					&& block.getY() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getY()
-					&& block.getZ() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getZ())
-				||
-				(block.getX() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getX()
-					&& block.getY() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getY()
-					&& block.getZ() == gateBlock.getFace(rightSide).getFace(BlockFace.Up).getFace(BlockFace.Up).getZ())
-				||
-				(block.getX() == gateBlock.getFace(rightSide).getX()
-					&& block.getY() == gateBlock.getFace(rightSide).getY()
-					&& block.getZ() == gateBlock.getFace(rightSide).getZ());
+		return false;
 	}
 
 	public Warzone getZone() {
