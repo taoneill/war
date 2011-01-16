@@ -1,3 +1,67 @@
 name: War
 main: bukkit.tommytony.war.War
 version: 0.3
+commands:
+  war:
+    description: Prompts you to use /warhub, /zones and /zone. Can also be used as a prefix for all commands as a fallback if they are taken.
+    usage: /war, /war setzone ziggy northwest, /war warhub, /war zone ziggy, etc.
+  warzones: 
+    description: Lists the warzones on the server. Each warzone is an independent TDM arena.
+    usage: /warzones
+  zones:
+    description: Shortcut for /warzones.
+    usage: /zones
+  warzone:
+    description: Teleports you to the specified warzone's lobby.
+    usage: /warzone ziggy
+  zone:
+    description: Shortcut for /warzone.
+    usage: /zone ziggy
+  warhub:
+    description: Teleports you to the warhub, if it exists. The warhub offers portals to reach each warzone on the server.
+    usage: /warhub
+  teams:
+    description: Lists the teams in the warzone. Must be standing in zone or in its lobby.
+    usage: /teams
+  join:
+    description: Use to change teams. Must be in zone. If in lobby, use to join a team as an alternative to walking in the team gate.
+    usage: /join <diamond/iron/gold/d/i/g>
+  leave:
+    description: Use to leave a battle or a zone. Teleports you back to the zone lobby. Must be in a team already and inside the zone.
+    usage: /leave
+  team:
+    description: Team chat. 
+    usage: /team <Leeeroooy!!!>
+  nextbattle:
+    description: Zone makers only. Zone blocks are restored. Teams are respawned. Just as if a team's life pool had been exhausted.
+    usage: /nextbattle
+  setzone:
+    description: Zone makers only. Use to create and adjust the warzone outline. A zone area is defined by its Northwest and Southeast corners, up to the sky and down to adminium. When the second corner is set down correctly, the zone blocks are saved.
+    usage: /setzone <northwest/southeast/nw/se>, e.g. first: /setzone zig se, then: /setzone zig northwest
+  savezone:
+    description: Zone makers only. Use to persist any aesthetic or practical changes made to the zone after the last save. Puts down a default lobby if there are none already. Must be in warzone. 
+    usage: /savezone
+  setzonelobby:
+    description: Zone makers only. Creates or changes the position of the warzone lobby.
+    usage: /setzonelobby <north/east/south/west/n/e/s/w>
+  setteam:
+    description: Zone makers only. Creates or moves a team spawn. The lobby is updated to reflect any new team. The only available teams are diamond, iron and gold. Must be inside zone. 
+    usage: /setteam <diamond/iron/gold/d/i/g>
+  setmonument:
+    description: Zone makers only. Creates or moves a monument.  
+    usage: /setmonument <monument-name>
+  resetzone:
+    description: Zone makers only. Reloads zone blocks from disk. Optionally specify a new team life pool value. Sends everyone back to the warzone lobby. Must be in zone or lobby. 
+    usage: /resetzone
+  deletezone:
+    description: Zone makers only. Deletes the zone, resets all blocks. Must be in zone or lobby.  
+    usage: /deletezone
+  deleteteam:
+    description: Zone makers only. Deletes the team. Team must exist. 
+    usage: /deleteteam <d/i/g>
+  deletemonument:
+    description: Zone makers only. Deletes the monument. 
+    usage: /deletemonument
+  setwarhub:
+    description: Zone makers only. Create or moves a West-facing wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
+    usage: /setwarhub
