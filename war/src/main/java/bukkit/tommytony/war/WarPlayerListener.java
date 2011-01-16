@@ -3,10 +3,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 
-import org.bukkit.BlockFace;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Player;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
@@ -348,16 +348,16 @@ public class WarPlayerListener extends PlayerListener {
 						BlockFace wall = null;
 						String wallStr = "";
 						if(arguments[0].equals("north") || arguments[0].equals("n")) {
-							wall = BlockFace.North;
+							wall = BlockFace.NORTH;
 							wallStr = "north";
 						} else if(arguments[0].equals("east") || arguments[0].equals("e")) {
-							wall = BlockFace.East;
+							wall = BlockFace.EAST;
 							wallStr = "east";
 						} else if(arguments[0].equals("south") || arguments[0].equals("s")) {
-							wall = BlockFace.South;
+							wall = BlockFace.SOUTH;
 							wallStr = "south";
 						} else if(arguments[0].equals("west") || arguments[0].equals("w")) {
-							wall = BlockFace.West;
+							wall = BlockFace.WEST;
 							wallStr = "west";
 						}				
 						if(lobby != null) {
@@ -365,7 +365,7 @@ public class WarPlayerListener extends PlayerListener {
 							lobby.getVolume().resetBlocks();
 							lobby.changeWall(wall);
 							lobby.initialize();
-							player.sendMessage(war.str("Warzone lobby moved to " + wallStr + "side of zone."));
+							player.sendMessage(war.str("Warzone lobby moved to " + wallStr + " side of zone."));
 						} else {
 							// new lobby
 							lobby = new ZoneLobby(war, warzone, wall);
@@ -398,7 +398,7 @@ public class WarPlayerListener extends PlayerListener {
 						int savedBlocks = warzone.saveState();
 						if(warzone.getLobby() == null) {
 							// Set default lobby on south side
-							lobby = new ZoneLobby(war, warzone, BlockFace.South);
+							lobby = new ZoneLobby(war, warzone, BlockFace.SOUTH);
 							warzone.setLobby(lobby);
 							lobby.initialize();
 							player.sendMessage(war.str("Default lobby created on south side of zone."));

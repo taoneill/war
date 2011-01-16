@@ -1,10 +1,10 @@
 package com.tommytony.war.volumes;
 
-import org.bukkit.Block;
-import org.bukkit.BlockFace;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
@@ -80,9 +80,9 @@ public class Volume {
 						for(int k = 0;k < getSizeZ(); k++) {
 							BlockInfo oldBlockInfo = getBlockInfos()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(currentBlock.getTypeID() != oldBlockInfo.getTypeID() ||
-								(currentBlock.getTypeID() == oldBlockInfo.getTypeID() && currentBlock.getData() != oldBlockInfo.getData()) ||
-								(currentBlock.getTypeID() == oldBlockInfo.getTypeID() && currentBlock.getData() == oldBlockInfo.getData() &&
+							if(currentBlock.getTypeId() != oldBlockInfo.getTypeId() ||
+								(currentBlock.getTypeId() == oldBlockInfo.getTypeId() && currentBlock.getData() != oldBlockInfo.getData()) ||
+								(currentBlock.getTypeId() == oldBlockInfo.getTypeId() && currentBlock.getData() == oldBlockInfo.getData() &&
 										(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST))
 								)
 							) {
@@ -336,12 +336,12 @@ public class Volume {
 					for(int j = 0; j < getSizeY(); j++){
 						int z = getMinZ();
 						for(int k = 0;k < getSizeZ(); k++) {
-							if((face == BlockFace.Down && y == getMinY()) 
-									|| (face == BlockFace.Up && y == getMaxY())
-									|| (face == BlockFace.North && x == getMinX())
-									|| (face == BlockFace.East && z == getMinZ())
-									|| (face == BlockFace.South && x == getMaxX())
-									|| (face == BlockFace.West && z == getMaxZ())) {
+							if((face == BlockFace.DOWN && y == getMinY()) 
+									|| (face == BlockFace.UP && y == getMaxY())
+									|| (face == BlockFace.NORTH && x == getMinX())
+									|| (face == BlockFace.EAST && z == getMinZ())
+									|| (face == BlockFace.SOUTH && x == getMaxX())
+									|| (face == BlockFace.WEST && z == getMaxZ())) {
 								Block currentBlock = getWorld().getBlockAt(x, y, z);
 								currentBlock.setType(material);
 							}

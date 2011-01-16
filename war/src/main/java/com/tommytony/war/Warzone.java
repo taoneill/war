@@ -3,15 +3,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bukkit.Block;
-import org.bukkit.BlockFace;
-import org.bukkit.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Player;
-import org.bukkit.PlayerInventory;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import bukkit.tommytony.war.War;
 
@@ -108,11 +108,11 @@ public class Warzone {
 		Block topNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), newHighest, this.northwest.getBlockZ());
 		originalNorthwestBlocks = new Material[3];
 		originalNorthwestBlocks[0] = topNWBlock.getType();	// save blocks for reset
-		originalNorthwestBlocks[1] = topNWBlock.getFace(BlockFace.East).getType();
-		originalNorthwestBlocks[2] = topNWBlock.getFace(BlockFace.South).getType();
+		originalNorthwestBlocks[1] = topNWBlock.getFace(BlockFace.EAST).getType();
+		originalNorthwestBlocks[2] = topNWBlock.getFace(BlockFace.SOUTH).getType();
 		topNWBlock.setType(Material.GLASS);
-		topNWBlock.getFace(BlockFace.East).setType(Material.GLASS);
-		topNWBlock.getFace(BlockFace.South).setType(Material.GLASS);
+		topNWBlock.getFace(BlockFace.EAST).setType(Material.GLASS);
+		topNWBlock.getFace(BlockFace.SOUTH).setType(Material.GLASS);
 	}
 	
 	private void resetNorthwestCursorBlocks() {
@@ -121,8 +121,8 @@ public class Warzone {
 			int highest = this.world.getHighestBlockYAt(this.northwest.getBlockX(), this.northwest.getBlockZ()) - 1;
 			Block oldTopNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), highest, this.northwest.getBlockZ());
 			oldTopNWBlock.setType(originalNorthwestBlocks[0]);
-			oldTopNWBlock.getFace(BlockFace.East).setType(originalNorthwestBlocks[1]);
-			oldTopNWBlock.getFace(BlockFace.South).setType(originalNorthwestBlocks[2]);
+			oldTopNWBlock.getFace(BlockFace.EAST).setType(originalNorthwestBlocks[1]);
+			oldTopNWBlock.getFace(BlockFace.SOUTH).setType(originalNorthwestBlocks[2]);
 		}
 	}
 
@@ -142,11 +142,11 @@ public class Warzone {
 		Block topSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), newHighest, this.southeast.getBlockZ());
 		originalSoutheastBlocks = new Material[3];
 		originalSoutheastBlocks[0] = topSEBlock.getType();	// save block for reset
-		originalSoutheastBlocks[1] = topSEBlock.getFace(BlockFace.West).getType();
-		originalSoutheastBlocks[2] = topSEBlock.getFace(BlockFace.North).getType();
+		originalSoutheastBlocks[1] = topSEBlock.getFace(BlockFace.WEST).getType();
+		originalSoutheastBlocks[2] = topSEBlock.getFace(BlockFace.NORTH).getType();
 		topSEBlock.setType(Material.GLASS);
-		topSEBlock.getFace(BlockFace.West).setType(Material.GLASS);
-		topSEBlock.getFace(BlockFace.North).setType(Material.GLASS);
+		topSEBlock.getFace(BlockFace.WEST).setType(Material.GLASS);
+		topSEBlock.getFace(BlockFace.NORTH).setType(Material.GLASS);
 	}
 	
 	private void resetSoutheastCursorBlocks() {
@@ -155,8 +155,8 @@ public class Warzone {
 			int highest = this.world.getHighestBlockYAt(this.southeast.getBlockX(), this.southeast.getBlockZ()) - 1;
 			Block oldTopSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), highest, this.southeast.getBlockZ());
 			oldTopSEBlock.setType(originalSoutheastBlocks[0]);
-			oldTopSEBlock.getFace(BlockFace.West).setType(originalSoutheastBlocks[1]);
-			oldTopSEBlock.getFace(BlockFace.North).setType(originalSoutheastBlocks[2]);
+			oldTopSEBlock.getFace(BlockFace.WEST).setType(originalSoutheastBlocks[1]);
+			oldTopSEBlock.getFace(BlockFace.NORTH).setType(originalSoutheastBlocks[2]);
 		}
 	}
 	
@@ -175,10 +175,10 @@ public class Warzone {
 	public int saveState() {
 		if(ready()){
 			// removed everything to keep save clean
-			volume.resetWallBlocks(BlockFace.East);
-			volume.resetWallBlocks(BlockFace.West);
-			volume.resetWallBlocks(BlockFace.North);
-			volume.resetWallBlocks(BlockFace.South);
+			volume.resetWallBlocks(BlockFace.EAST);
+			volume.resetWallBlocks(BlockFace.WEST);
+			volume.resetWallBlocks(BlockFace.NORTH);
+			volume.resetWallBlocks(BlockFace.SOUTH);
 			
 			for(Team team : teams) {
 				team.getVolume().resetBlocks();
@@ -238,10 +238,10 @@ public class Warzone {
 	private void initZone() {
 		// add wall outlines
 		if(drawZoneOutline) {
-			addZoneOutline(BlockFace.North);
-			addZoneOutline(BlockFace.East);
-			addZoneOutline(BlockFace.South);
-			addZoneOutline(BlockFace.West);
+			addZoneOutline(BlockFace.NORTH);
+			addZoneOutline(BlockFace.EAST);
+			addZoneOutline(BlockFace.SOUTH);
+			addZoneOutline(BlockFace.WEST);
 		}
 		
 		// reset monuments
@@ -266,19 +266,19 @@ public class Warzone {
 		Block nw = world.getBlockAt(volume.getMinX(), c2maxY, volume.getMaxZ());
 		Block se = world.getBlockAt(volume.getMaxX(), c2maxY, volume.getMinZ());
 		Block lastBlock = null;
-		if(BlockFace.North == wall) {
+		if(BlockFace.NORTH == wall) {
 			for(int z = volume.getMinZ(); z < volume.getMaxZ(); z++) {
 				lastBlock = highestBlockToGlass(ne.getX(), z, lastBlock);
 			}
-		} else if (BlockFace.East == wall) {
+		} else if (BlockFace.EAST == wall) {
 			for(int x = volume.getMinX(); x < volume.getMaxX(); x++) {
 				lastBlock = highestBlockToGlass(x, ne.getZ(), lastBlock);
 			}
-		} else if (BlockFace.South == wall) {
+		} else if (BlockFace.SOUTH == wall) {
 			for(int z = volume.getMinZ(); z < volume.getMaxZ(); z++) {
 				lastBlock = highestBlockToGlass(se.getX(), z, lastBlock);
 			}
-		} else if (BlockFace.West == wall) {
+		} else if (BlockFace.WEST == wall) {
 			for(int x = volume.getMinX(); x < volume.getMaxX(); x++) {
 				lastBlock = highestBlockToGlass(x, nw.getZ(), lastBlock);
 			}
@@ -290,15 +290,15 @@ public class Warzone {
 		Block block = world.getBlockAt(x, highest -1 , z);
 		
 		if(block.getType() == Material.LEAVES) { // top of tree, lets find some dirt/ground
-			Block over = block.getFace(BlockFace.Down);
-			Block under = over.getFace(BlockFace.Down);
+			Block over = block.getFace(BlockFace.DOWN);
+			Block under = over.getFace(BlockFace.DOWN);
 			int treeHeight = 0;
 			while(!((over.getType() == Material.AIR && under.getType() != Material.AIR && under.getType() != Material.LEAVES) 
 					|| (over.getType() == Material.LEAVES && under.getType() != Material.LEAVES && under.getType() != Material.AIR)
 					|| (over.getType() == Material.WOOD && under.getType() != Material.WOOD && under.getType() != Material.AIR))
 				  && treeHeight < 40) {
 				over = under;
-				under = over.getFace(BlockFace.Down);
+				under = over.getFace(BlockFace.DOWN);
 				treeHeight++;
 			}
 			block = under; // found the ground
@@ -309,16 +309,16 @@ public class Warzone {
 		if(lastBlock != null) {
 			// link the new block and the old vertically if there's a big drop or rise
 			if(block.getY() - lastBlock.getY() > 1) {  // new block too high 
-				Block under = block.getFace(BlockFace.Down);
+				Block under = block.getFace(BlockFace.DOWN);
 				while(under.getY() != lastBlock.getY() - 1) {
 					under.setType(Material.GLASS);
-					under = under.getFace(BlockFace.Down);
+					under = under.getFace(BlockFace.DOWN);
 				}
 			} else if (lastBlock.getY() - block.getY() > 1) { // new block too low
-				Block over = block.getFace(BlockFace.Up);
+				Block over = block.getFace(BlockFace.UP);
 				while(over.getY() != lastBlock.getY() + 1) {
 					over.setType(Material.GLASS);
-					over = over.getFace(BlockFace.Up);
+					over = over.getFace(BlockFace.UP);
 				}
 			}
 		}
@@ -537,7 +537,7 @@ public class Warzone {
 	
 	public Team getTeamByMaterial(Material material) {
 		for(Team t : teams) {
-			if(t.getMaterial().getID() == material.getID()) {
+			if(t.getMaterial().getId() == material.getId()) {
 				return t;
 			}
 		}
@@ -610,28 +610,28 @@ public class Warzone {
 				&& latestPlayerLocation.getBlockX() <= southeast.getBlockX()
 				&& latestPlayerLocation.getBlockX() >= northwest.getBlockX()) {
 			// near east wall
-			walls.add(BlockFace.East);
+			walls.add(BlockFace.EAST);
 		} 
 		
 		if (Math.abs(southeast.getBlockX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
 				&& latestPlayerLocation.getBlockZ() <= northwest.getBlockZ()
 				&& latestPlayerLocation.getBlockZ() >= southeast.getBlockZ()) {
 			// near south wall
-			walls.add(BlockFace.South); 	
+			walls.add(BlockFace.SOUTH); 	
 		}
 
 		if (Math.abs(northwest.getBlockX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
 				&& latestPlayerLocation.getBlockZ() <= northwest.getBlockZ()
 				&& latestPlayerLocation.getBlockZ() >= southeast.getBlockZ()) {
 			// near north wall
-			walls.add(BlockFace.North);
+			walls.add(BlockFace.NORTH);
 		} 
 
 		if (Math.abs(northwest.getBlockZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall
 				&& latestPlayerLocation.getBlockX() <= southeast.getBlockX()
 				&& latestPlayerLocation.getBlockX() >= northwest.getBlockX()) {
 			// near west wall
-			walls.add(BlockFace.West);
+			walls.add(BlockFace.WEST);
 		}
 		return walls;
 	}

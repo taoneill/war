@@ -3,6 +3,7 @@ package bukkit.tommytony.war;
 import org.bukkit.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
@@ -75,10 +76,10 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);	// BROKEN
 		
 		// Load files from disk or create them (using these defaults)
-		this.defaultLoadout.put(0, new ItemStack(Material.STONE_SWORD));
-		this.defaultLoadout.put(1, new ItemStack(Material.BOW));
+		this.defaultLoadout.put(0, new ItemStack(Material.STONE_SWORD, 1,  (byte) 8));
+		this.defaultLoadout.put(1, new ItemStack(Material.BOW, 1, (byte) 8));
 		this.defaultLoadout.put(2, new ItemStack(Material.ARROW, 7));
-		this.defaultLoadout.put(3, new ItemStack(Material.IRON_PICKAXE));
+		this.defaultLoadout.put(3, new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8));
 		this.defaultLifepool = 7;
 		this.defaultFriendlyFire = false;
 		this.defaultAutoAssignOnly = false;

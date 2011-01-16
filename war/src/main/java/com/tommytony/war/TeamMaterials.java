@@ -25,13 +25,13 @@ public class TeamMaterials {
 	}
 	
 	public static String teamMaterialToString(Material material) {
-		if(material.getID() == TEAMDIAMOND.getID()) {
+		if(material.getId() == TEAMDIAMOND.getId()) {
 			return "diamond";
 		}
-		if(material.getID() == TEAMIRON.getID()) {
+		if(material.getId() == TEAMIRON.getId()) {
 			return "iron";
 		}
-		if(material.getID() == TEAMGOLD.getID()) {
+		if(material.getId() == TEAMGOLD.getId()) {
 			return "gold";
 		}
 		return null;

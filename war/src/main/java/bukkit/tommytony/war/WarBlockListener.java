@@ -2,12 +2,12 @@ package bukkit.tommytony.war;
 
 import java.util.List;
 
-import org.bukkit.Block;
-import org.bukkit.BlockDamageLevel;
-import org.bukkit.Player;
-import org.bukkit.event.block.BlockDamagedEvent;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockDamageLevel;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockListener;
-import org.bukkit.event.block.BlockPlacedEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
@@ -26,7 +26,7 @@ public class WarBlockListener extends BlockListener {
 		this.war = war;
 	}
 	
-	public void onBlockPlaced(BlockPlacedEvent event) {
+	public void onBlockPlace(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
     	Block block = event.getBlock();
     	if(player != null) {
@@ -65,7 +65,7 @@ public class WarBlockListener extends BlockListener {
 		}
     }
 	
-    public void onBlockDamaged(BlockDamagedEvent event) {
+    public void onBlockDamage(BlockDamageEvent event) {
     	Player player = event.getPlayer();
     	Block block = event.getBlock();
     	if(player != null && block != null && event.getDamageLevel() == BlockDamageLevel.BROKEN) {

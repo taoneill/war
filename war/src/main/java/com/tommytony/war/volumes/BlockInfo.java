@@ -1,7 +1,7 @@
 package com.tommytony.war.volumes;
 
-import org.bukkit.Block;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
@@ -22,7 +22,7 @@ public class BlockInfo {
 		this.x = block.getX();
 		this.y = block.getX();
 		this.z = block.getX();
-		this.type = block.getTypeID();
+		this.type = block.getTypeId();
 		this.data = block.getData();
 	}
 	
@@ -30,8 +30,8 @@ public class BlockInfo {
 		this.x = blockState.getX();
 		this.y = blockState.getX();
 		this.z = blockState.getX();
-		this.type = blockState.getTypeID();
-		this.data = blockState.getData();
+		this.type = blockState.getTypeId();
+		this.data = blockState.getData().getData();
 		if(is(Material.SIGN) || is(Material.SIGN_POST)) {
 			Sign sign = (Sign)blockState;
 			this.signLines = sign.getLines();
@@ -56,7 +56,7 @@ public class BlockInfo {
 		return z;
 	}
 	
-	public int getTypeID() {
+	public int getTypeId() {
 		return type;
 	}
 	

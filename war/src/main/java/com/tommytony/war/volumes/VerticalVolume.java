@@ -1,9 +1,9 @@
 package com.tommytony.war.volumes;
 
-import org.bukkit.Block;
-import org.bukkit.BlockFace;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 
@@ -79,7 +79,7 @@ public class VerticalVolume extends Volume{
 		int noOfResetBlocks = 0;
 		try {
 			if(hasTwoCorners() && getBlockInfos() != null) {
-				if(wall == BlockFace.East) {
+				if(wall == BlockFace.EAST) {
 					int z = getMinZ();
 					int k = 0;
 					int y = getMinY();
@@ -97,7 +97,7 @@ public class VerticalVolume extends Volume{
 						}
 						y++;
 					}
-				} else if(wall == BlockFace.West) {
+				} else if(wall == BlockFace.WEST) {
 					int z = getMaxZ();
 					int k = getSizeZ()-1;
 					int y = getMinY();
@@ -115,7 +115,7 @@ public class VerticalVolume extends Volume{
 						}
 						y++;
 					}
-				} else if(wall == BlockFace.North) {
+				} else if(wall == BlockFace.NORTH) {
 					int x = getMinX();
 					int i = 0;
 					int y = getMinY();
@@ -133,7 +133,7 @@ public class VerticalVolume extends Volume{
 						}
 						y++;
 					}
-				} else if(wall == BlockFace.South) {
+				} else if(wall == BlockFace.SOUTH) {
 					int x = getMaxX();
 					int i = getSizeX()-1;
 					int y = getMinY();
@@ -160,9 +160,9 @@ public class VerticalVolume extends Volume{
 	}
 	
 	private boolean resetBlock(BlockInfo oldBlockInfo, Block currentBlock) {
-		if(currentBlock.getTypeID() != oldBlockInfo.getTypeID() ||
-				(currentBlock.getTypeID() == oldBlockInfo.getTypeID() && currentBlock.getData() != oldBlockInfo.getData()) ||
-				(currentBlock.getTypeID() == oldBlockInfo.getTypeID() && currentBlock.getData() == oldBlockInfo.getData() &&
+		if(currentBlock.getTypeId() != oldBlockInfo.getTypeId() ||
+				(currentBlock.getTypeId() == oldBlockInfo.getTypeId() && currentBlock.getData() != oldBlockInfo.getData()) ||
+				(currentBlock.getTypeId() == oldBlockInfo.getTypeId() && currentBlock.getData() == oldBlockInfo.getData() &&
 						(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST))
 				)
 			) {

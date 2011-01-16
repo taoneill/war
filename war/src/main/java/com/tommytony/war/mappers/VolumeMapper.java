@@ -78,7 +78,7 @@ public class VolumeMapper {
 								int typeID = Integer.parseInt(blockSplit[0]);
 								byte data = Byte.parseByte(blockSplit[1]);
 								String[] lines = null;
-								if(typeID == Material.SIGN.getID() || typeID == Material.SIGN_POST.getID()) {
+								if(typeID == Material.SIGN.getId() || typeID == Material.SIGN_POST.getId()) {
 									String signLines = blockSplit[2];
 									if(blockSplit.length > 3) {
 										// sign includes commas
@@ -150,11 +150,11 @@ public class VolumeMapper {
 							} else {
 								if(info.getType() == Material.SIGN || info.getType() == Material.SIGN_POST) {
 									String[] lines = info.getSignLines();
-									out.write(info.getTypeID() + "," + info.getData() + "," + lines[0] + "[line]" + lines[1] 
+									out.write(info.getTypeId() + "," + info.getData() + "," + lines[0] + "[line]" + lines[1] 
 									          + "[line]" + lines[2] + "[line]"+ lines[3]);
 									
 								} else {
-									out.write(info.getTypeID() + "," + info.getData() + ","); 
+									out.write(info.getTypeId() + "," + info.getData() + ","); 
 								}
 							}
 							out.newLine();

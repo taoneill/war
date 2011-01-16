@@ -1,8 +1,8 @@
 package com.tommytony.war.volumes;
 
-import org.bukkit.Block;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 import bukkit.tommytony.war.War;
 

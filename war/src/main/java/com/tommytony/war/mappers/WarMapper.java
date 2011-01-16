@@ -3,9 +3,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.bukkit.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
 
@@ -140,7 +140,7 @@ public class WarMapper {
 		HashMap<Integer, ItemStack> items = war.getDefaultLoadout();
 		for(Integer slot : items.keySet()) {
 			ItemStack item = items.get(slot);
-			defaultLoadoutStr += item.getTypeID() + "," + item.getAmount() + "," + slot + ";";
+			defaultLoadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 		}
 		warConfig.setString("defaultLoadout", defaultLoadoutStr);
 		

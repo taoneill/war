@@ -1,14 +1,8 @@
 package bukkit.tommytony.war;
 
-import java.util.List;
-import java.util.logging.Level;
-
-import org.bukkit.Entity;
-import org.bukkit.Player;
-import org.bukkit.event.entity.EntityDamagedByBlockEvent;
-import org.bukkit.event.entity.EntityDamagedByEntityEvent;
-import org.bukkit.event.entity.EntityDamagedEvent;
-import org.bukkit.event.entity.EntityDamagedEvent.DamageCause;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityListener;
 
 import com.tommytony.war.Team;
@@ -71,7 +65,7 @@ public class WarEntityListener extends EntityListener {
 //			
 //    }
 
-    public void onEntityDamagedByEntity(EntityDamagedByEntityEvent event) {
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
     	// BUKKIT !!
     	Entity attacker = event.getDamager();
     	Entity defender = event.getEntity();
@@ -87,12 +81,12 @@ public class WarEntityListener extends EntityListener {
 			if(attackerTeam != null && defenderTeam != null 
 					&& attackerTeam != defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
-				// A real attack: handle death scenario.
-				if(event.getDamage() >= d.getHealth()) {
-					// Player died
-					handleDeath(d);
-					event.setCancelled(true); // Don't let the killing blow fall down.
-				}
+				// A real attack: handle death scenario. ==> NOT: now handled in player move.. but spammy
+//				if(event.getDamage() >= d.getHealth()) {
+//					// Player died
+//					handleDeath(d);
+//					event.setCancelled(true); // Don't let the killing blow fall down.
+//				}
 			} else if (attackerTeam != null && defenderTeam != null 
 					&& attackerTeam == defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {

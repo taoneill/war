@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bukkit.BlockFace;
-import org.bukkit.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
 
@@ -176,13 +176,13 @@ public class WarzoneMapper {
 		BlockFace lobbyFace = null;
 		if(lobbyStr != null && !lobbyStr.equals("")){
 			if(lobbyStr.equals("south")) {
-				lobbyFace = BlockFace.South;
+				lobbyFace = BlockFace.SOUTH;
 			} else if(lobbyStr.equals("east")) {
-				lobbyFace = BlockFace.East;
+				lobbyFace = BlockFace.EAST;
 			} else if(lobbyStr.equals("north")) {
-				lobbyFace = BlockFace.North;
+				lobbyFace = BlockFace.NORTH;
 			} else if(lobbyStr.equals("west")) {
-				lobbyFace = BlockFace.West;
+				lobbyFace = BlockFace.WEST;
 			}
 			Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), war, world);
 			ZoneLobby lobby = new ZoneLobby(war, warzone, lobbyFace, lobbyVolume);
@@ -245,7 +245,7 @@ public class WarzoneMapper {
 		HashMap<Integer, ItemStack> items = warzone.getLoadout();
 		for(Integer slot : items.keySet()) {
 			ItemStack item = items.get(slot);
-			loadoutStr += item.getTypeID() + "," + item.getAmount() + "," + slot + ";";
+			loadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 		}
 		warzoneConfig.setString("loadout", loadoutStr);
 		
@@ -264,13 +264,13 @@ public class WarzoneMapper {
 		// lobby
 		String lobbyStr = "";
 		if(warzone.getLobby() != null) {
-			if(BlockFace.South == warzone.getLobby().getWall()) {
+			if(BlockFace.SOUTH == warzone.getLobby().getWall()) {
 				lobbyStr = "south";
-			} else if(BlockFace.East == warzone.getLobby().getWall()) {
+			} else if(BlockFace.EAST == warzone.getLobby().getWall()) {
 				lobbyStr = "east";
-			} else if(BlockFace.North == warzone.getLobby().getWall()) {
+			} else if(BlockFace.NORTH == warzone.getLobby().getWall()) {
 				lobbyStr = "north";
-			} else if(BlockFace.West == warzone.getLobby().getWall()) {
+			} else if(BlockFace.WEST == warzone.getLobby().getWall()) {
 				lobbyStr = "west";
 			} 
 		}

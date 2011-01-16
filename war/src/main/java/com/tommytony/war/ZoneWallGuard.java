@@ -2,11 +2,11 @@ package com.tommytony.war;
 
 import java.util.List;
 
-import org.bukkit.Block;
-import org.bukkit.BlockFace;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Player;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import bukkit.tommytony.war.War;
 
@@ -40,36 +40,36 @@ public class ZoneWallGuard {
 		// add wall guard blocks
 		for(Block block : nearestWallBlocks) {
 			toGlass(block, wall);
-			toGlass(block.getFace(BlockFace.Up), wall);
-			toGlass(block.getFace(BlockFace.Down), wall);
-			if(this.wall == BlockFace.North && warzone.getVolume().isNorthWallBlock(block)) {
-				toGlass(block.getFace(BlockFace.East), BlockFace.North);
-				toGlass(block.getFace(BlockFace.East).getFace(BlockFace.Up), BlockFace.North);
-				toGlass(block.getFace(BlockFace.East).getFace(BlockFace.Down), BlockFace.North);
-				toGlass(block.getFace(BlockFace.West), BlockFace.North);
-				toGlass(block.getFace(BlockFace.West).getFace(BlockFace.Up), BlockFace.North);
-				toGlass(block.getFace(BlockFace.West).getFace(BlockFace.Down), BlockFace.North);
-			} else if(this.wall == BlockFace.South && warzone.getVolume().isSouthWallBlock(block)) {
-				toGlass(block.getFace(BlockFace.East), BlockFace.South);
-				toGlass(block.getFace(BlockFace.East).getFace(BlockFace.Up), BlockFace.South);
-				toGlass(block.getFace(BlockFace.East).getFace(BlockFace.Down), BlockFace.South);
-				toGlass(block.getFace(BlockFace.West), BlockFace.South);
-				toGlass(block.getFace(BlockFace.West).getFace(BlockFace.Up), BlockFace.South);
-				toGlass(block.getFace(BlockFace.West).getFace(BlockFace.Down), BlockFace.South);
-			} else if(this.wall == BlockFace.East && warzone.getVolume().isEastWallBlock(block)) {
-				toGlass(block.getFace(BlockFace.North), BlockFace.East);
-				toGlass(block.getFace(BlockFace.North).getFace(BlockFace.Up), BlockFace.East);
-				toGlass(block.getFace(BlockFace.North).getFace(BlockFace.Down), BlockFace.East);
-				toGlass(block.getFace(BlockFace.South), BlockFace.West);
-				toGlass(block.getFace(BlockFace.South).getFace(BlockFace.Up), BlockFace.West);
-				toGlass(block.getFace(BlockFace.South).getFace(BlockFace.Down), BlockFace.West);
-			} else if(this.wall == BlockFace.West && warzone.getVolume().isWestWallBlock(block)) {
-				toGlass(block.getFace(BlockFace.North), BlockFace.West);
-				toGlass(block.getFace(BlockFace.North).getFace(BlockFace.Up), BlockFace.West);
-				toGlass(block.getFace(BlockFace.North).getFace(BlockFace.Down), BlockFace.West);
-				toGlass(block.getFace(BlockFace.South), BlockFace.West);
-				toGlass(block.getFace(BlockFace.South).getFace(BlockFace.Up), BlockFace.West);
-				toGlass(block.getFace(BlockFace.South).getFace(BlockFace.Down), BlockFace.West);
+			toGlass(block.getFace(BlockFace.UP), wall);
+			toGlass(block.getFace(BlockFace.DOWN), wall);
+			if(this.wall == BlockFace.NORTH && warzone.getVolume().isNorthWallBlock(block)) {
+				toGlass(block.getFace(BlockFace.EAST), BlockFace.NORTH);
+				toGlass(block.getFace(BlockFace.EAST).getFace(BlockFace.UP), BlockFace.NORTH);
+				toGlass(block.getFace(BlockFace.EAST).getFace(BlockFace.DOWN), BlockFace.NORTH);
+				toGlass(block.getFace(BlockFace.WEST), BlockFace.NORTH);
+				toGlass(block.getFace(BlockFace.WEST).getFace(BlockFace.UP), BlockFace.NORTH);
+				toGlass(block.getFace(BlockFace.WEST).getFace(BlockFace.DOWN), BlockFace.NORTH);
+			} else if(this.wall == BlockFace.SOUTH && warzone.getVolume().isSouthWallBlock(block)) {
+				toGlass(block.getFace(BlockFace.EAST), BlockFace.SOUTH);
+				toGlass(block.getFace(BlockFace.EAST).getFace(BlockFace.UP), BlockFace.SOUTH);
+				toGlass(block.getFace(BlockFace.EAST).getFace(BlockFace.DOWN), BlockFace.SOUTH);
+				toGlass(block.getFace(BlockFace.WEST), BlockFace.SOUTH);
+				toGlass(block.getFace(BlockFace.WEST).getFace(BlockFace.UP), BlockFace.SOUTH);
+				toGlass(block.getFace(BlockFace.WEST).getFace(BlockFace.DOWN), BlockFace.SOUTH);
+			} else if(this.wall == BlockFace.EAST && warzone.getVolume().isEastWallBlock(block)) {
+				toGlass(block.getFace(BlockFace.NORTH), BlockFace.EAST);
+				toGlass(block.getFace(BlockFace.NORTH).getFace(BlockFace.UP), BlockFace.EAST);
+				toGlass(block.getFace(BlockFace.NORTH).getFace(BlockFace.DOWN), BlockFace.EAST);
+				toGlass(block.getFace(BlockFace.SOUTH), BlockFace.WEST);
+				toGlass(block.getFace(BlockFace.SOUTH).getFace(BlockFace.UP), BlockFace.WEST);
+				toGlass(block.getFace(BlockFace.SOUTH).getFace(BlockFace.DOWN), BlockFace.WEST);
+			} else if(this.wall == BlockFace.WEST && warzone.getVolume().isWestWallBlock(block)) {
+				toGlass(block.getFace(BlockFace.NORTH), BlockFace.WEST);
+				toGlass(block.getFace(BlockFace.NORTH).getFace(BlockFace.UP), BlockFace.WEST);
+				toGlass(block.getFace(BlockFace.NORTH).getFace(BlockFace.DOWN), BlockFace.WEST);
+				toGlass(block.getFace(BlockFace.SOUTH), BlockFace.WEST);
+				toGlass(block.getFace(BlockFace.SOUTH).getFace(BlockFace.UP), BlockFace.WEST);
+				toGlass(block.getFace(BlockFace.SOUTH).getFace(BlockFace.DOWN), BlockFace.WEST);
 			}
 		}
 	}
@@ -77,19 +77,19 @@ public class ZoneWallGuard {
 	private void toGlass(Block block, BlockFace wall) {
 		// face here means which wall we are working on
 		if(warzone.getLobby() == null || (warzone.getLobby() != null && !warzone.getLobby().blockIsAGateBlock(block, wall))){
-			if(wall == BlockFace.North) {
+			if(wall == BlockFace.NORTH) {
 				if(warzone.getVolume().isNorthWallBlock(block)) {
 					block.setType(Material.GLASS);
 				}
-			} else if (wall == BlockFace.South) {
+			} else if (wall == BlockFace.SOUTH) {
 				if(warzone.getVolume().isSouthWallBlock(block)) {
 					block.setType(Material.GLASS);
 				}
-			} else if (wall == BlockFace.East) {
+			} else if (wall == BlockFace.EAST) {
 				if(warzone.getVolume().isEastWallBlock(block)) {
 					block.setType(Material.GLASS);
 				}
-			} else if (wall == BlockFace.West) {
+			} else if (wall == BlockFace.WEST) {
 				if(warzone.getVolume().isWestWallBlock(block)) {
 					block.setType(Material.GLASS);
 				}
