@@ -206,15 +206,6 @@ public class Warzone {
 	 */
 	public void initializeZone() {
 		if(ready() && volume.isSaved()){			
-
-			// add wall outlines
-			if(drawZoneOutline) {
-				addZoneOutline(BlockFace.North);
-				addZoneOutline(BlockFace.East);
-				addZoneOutline(BlockFace.South);
-				addZoneOutline(BlockFace.West);
-			}
-			
 			// everyone back to team spawn with full health
 			for(Team team : teams) {
 				for(Player player : team.getPlayers()) {
@@ -225,20 +216,47 @@ public class Warzone {
 				team.resetSign();
 			}
 			
-			// reset monuments
-			for(Monument monument : monuments) {
-				monument.getVolume().resetBlocks();
-				monument.addMonumentBlocks();
-			}
-
-			// reset lobby
-			if(lobby != null) {
-				lobby.initialize();
-			}
-			
-			this.setNorthwest(this.getNorthwest());
-			this.setSoutheast(this.getSoutheast());
+			initZone();
 		}
+	}
+	
+	public void initializeZone(PlayerMoveEvent event) {
+		if(ready() && volume.isSaved()){			
+			// everyone back to team spawn with full health
+			for(Team team : teams) {
+				for(Player player : team.getPlayers()) {
+					if(player.getName().equals(event.getPlayer().getName())) respawnPlayer(event, team, player);
+					respawnPlayer(team, player);
+				}
+				team.setRemainingTickets(lifePool);
+				team.setTeamSpawn(team.getTeamSpawn());
+				team.resetSign();
+			}
+		}
+	}
+	
+	private void initZone() {
+		// add wall outlines
+		if(drawZoneOutline) {
+			addZoneOutline(BlockFace.North);
+			addZoneOutline(BlockFace.East);
+			addZoneOutline(BlockFace.South);
+			addZoneOutline(BlockFace.West);
+		}
+		
+		// reset monuments
+		for(Monument monument : monuments) {
+			monument.getVolume().resetBlocks();
+			monument.addMonumentBlocks();
+		}
+
+		// reset lobby
+		if(lobby != null) {
+			lobby.initialize();
+		}
+		
+		this.setNorthwest(this.getNorthwest());
+		this.setSoutheast(this.getSoutheast());
 	}
 
 	private void addZoneOutline(BlockFace wall) {
@@ -350,7 +368,7 @@ public class Warzone {
 			playerInv.setHelmet(new ItemStack(Material.IRON_BOOTS));
 		}
 		
-		player.setHealth(20);
+		//player.setHealth(20);
 		
 	}
 

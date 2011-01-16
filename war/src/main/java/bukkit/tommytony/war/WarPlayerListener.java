@@ -275,23 +275,34 @@ public class WarPlayerListener extends PlayerListener {
 						} else {
 							// change existing warzone
 							if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
-								int reset = warzone.getVolume().resetBlocks();
-								warzone.setNorthwest(player.getLocation());
-								warzone.saveState();
-								warzone.initializeZone();
-								message += "Northwesternmost point set at x=" + (int)warzone.getNorthwest().getBlockX() 
-												+ " z=" + (int)warzone.getNorthwest().getBlockZ() + " on warzone " + warzone.getName() + ". " +
-												reset + " blocks reset. Zone saved.";
-								
+								if(warzone.getSoutheast() != null 
+										&& (player.getLocation().getBlockX() >= warzone.getSoutheast().getBlockX()
+												|| player.getLocation().getBlockZ() <= warzone.getSoutheast().getBlockZ())) {
+									player.sendMessage(war.str("You must place that corner northwest relative to the existing southeast corner!"));
+								} else {
+									int reset = warzone.getVolume().resetBlocks();
+									warzone.setNorthwest(player.getLocation());
+									warzone.saveState();
+									warzone.initializeZone();
+									message += "Northwesternmost point set at x=" + (int)warzone.getNorthwest().getBlockX() 
+													+ " z=" + (int)warzone.getNorthwest().getBlockZ() + " on warzone " + warzone.getName() + ". " +
+													reset + " blocks reset. Zone saved.";
+								} 
 							} else {
-								int reset = warzone.getVolume().resetBlocks();
-								warzone.setSoutheast(player.getLocation());
-								warzone.saveState();
-								warzone.initializeZone();
-								
-								message += "Southeasternmost point set at x=" + (int)warzone.getSoutheast().getBlockX()
-												+ " z=" + (int)warzone.getSoutheast().getBlockZ() + " on warzone " + warzone.getName() + ". " +
-												reset + " blocks reset. Zone saved.";
+								if(warzone.getNorthwest() != null 
+										&& (player.getLocation().getBlockX() <= warzone.getNorthwest().getBlockX()
+												|| player.getLocation().getBlockZ() >= warzone.getNorthwest().getBlockZ())) {
+									player.sendMessage(war.str("You must place that corner southeast relative to the existing northwest corner!"));
+								} else {
+									int reset = warzone.getVolume().resetBlocks();
+									warzone.setSoutheast(player.getLocation());
+									warzone.saveState();
+									warzone.initializeZone();
+									
+									message += "Southeasternmost point set at x=" + (int)warzone.getSoutheast().getBlockX()
+													+ " z=" + (int)warzone.getSoutheast().getBlockZ() + " on warzone " + warzone.getName() + ". " +
+													reset + " blocks reset. Zone saved.";
+								}
 							}
 							WarzoneMapper.save(war, warzone, true);
 						}
@@ -604,8 +615,8 @@ public class WarPlayerListener extends PlayerListener {
 		if(playerWarzone != null) {
 			Team team = war.getPlayerTeam(player.getName());
 			
-			// Player belongs to a warzone team but is outside: he just died! Handle death!
-			if(to != null && war.warzone(player.getLocation()) == null && team != null) {
+			// Player belongs to a warzone team but is outside: he just died! Handle death! Exempt the zone maker.
+			if(from != null && war.warzone(player.getLocation()) == null && team != null && !war.isZoneMaker(player.getName())) {
 				// teleport to team spawn upon death
 				
 				boolean roundOver = false;
@@ -623,7 +634,6 @@ public class WarPlayerListener extends PlayerListener {
 								t.resetSign();
 							}
 						}
-						playerWarzone.endRound();
 						playerWarzone.getVolume().resetBlocks();
 						playerWarzone.initializeZone();
 						roundOver = true;
@@ -651,7 +661,7 @@ public class WarPlayerListener extends PlayerListener {
 				player.setHealth(20);
 				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
 			}
-		} else if (war.inAnyWarzone(player.getLocation())) { // player is not in any team, but inside warzone boundaries, get him out
+		} else if (war.inAnyWarzone(player.getLocation()) && !war.isZoneMaker(player.getName())) { // player is not in any team, but inside warzone boundaries, get him out
 			Warzone zone = war.warzone(player.getLocation());
 			event.setTo(zone.getTeleport());
 			player.sendMessage(war.str("You can't be inside a warzone without a team."));
@@ -667,7 +677,7 @@ public class WarPlayerListener extends PlayerListener {
 							if(zone.getLobby().isAutoAssignGate(to)) {
 								dropFromOldTeamIfAny(player);
 								zone.autoAssign(event, player);
-							} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMDIAMOND, from)){
+							} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMDIAMOND, to)){
 								dropFromOldTeamIfAny(player);
 								Team diamondTeam = zone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND);
 								diamondTeam.addPlayer(player);
@@ -701,6 +711,19 @@ public class WarPlayerListener extends PlayerListener {
 								dropFromOldTeamIfAny(player);
 								event.setTo(to);
 								player.teleportTo(war.getWarHub().getLocation());
+							}
+						} else if(war.inAnyWarzone(event.getFrom())) { // already in a team and in warzone, leaving
+							if(zone.getLobby().isAutoAssignGate(to)
+									|| zone.getLobby().isInTeamGate(TeamMaterials.TEAMDIAMOND, to)
+									|| zone.getLobby().isInTeamGate(TeamMaterials.TEAMIRON, to)
+									|| zone.getLobby().isInTeamGate(TeamMaterials.TEAMGOLD, to)) {
+								// same as leave, except event.setTo
+								Team playerTeam = war.getPlayerTeam(player.getName());
+								playerTeam.removePlayer(player.getName());
+								event.setTo(playerWarzone.getTeleport());
+								player.sendMessage(war.str("Left the zone."));
+								playerWarzone.restorePlayerInventory(player);
+								player.sendMessage(war.str("Your inventory has (hopefully) been restored."));
 							}
 						}
 					}
