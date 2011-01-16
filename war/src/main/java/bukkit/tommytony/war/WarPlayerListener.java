@@ -116,9 +116,9 @@ public class WarPlayerListener extends PlayerListener {
 			
 			// /teams
 			else if(command.equals("teams")){
-				if(!war.inAnyWarzone(player.getLocation())) {
+				if(!war.inAnyWarzone(player.getLocation()) && !war.inAnyWarzoneLobby(player.getLocation())) {
 					player.sendMessage(war.str("Usage: /teams. " +
-							"Must be in a warzone (try /warzones and /warzone)."));
+							"Must be in a warzone or zone lobby (try /war, /zones and /zone)."));
 				} else {
 					player.sendMessage(war.str("" + getAllTeamsMsg(player)));
 				}
@@ -498,6 +498,11 @@ public class WarPlayerListener extends PlayerListener {
 							newTeam.setRemainingTickets(warzone.getLifePool());
 							warzone.getTeams().add(newTeam);
 							newTeam.setTeamSpawn(player.getLocation());
+							if(warzone.getLobby() != null) {
+								warzone.getLobby().getVolume().resetBlocks();
+								warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
+								warzone.getLobby().initialize();
+							}
 							player.sendMessage(war.str("Team " + name + " created with spawn here."));
 						}
 						
@@ -513,7 +518,7 @@ public class WarPlayerListener extends PlayerListener {
 								" Deletes the team and its spawn. " +
 								"Must be in a warzone (try /zones and /zone). "));
 					} else {
-						String name = TeamMaterials.teamMaterialToString(TeamMaterials.teamMaterialFromString(arguments[1]));
+						String name = TeamMaterials.teamMaterialToString(TeamMaterials.teamMaterialFromString(arguments[0]));
 						Warzone warzone = war.warzone(player.getLocation());
 						List<Team> teams = warzone.getTeams();
 						Team team = null;
@@ -526,6 +531,11 @@ public class WarPlayerListener extends PlayerListener {
 							team.getVolume().resetBlocks();	
 							warzone.getTeams().remove(team);
 							WarzoneMapper.save(war, warzone, false);
+							if(warzone.getLobby() != null) {
+								warzone.getLobby().getVolume().resetBlocks();
+								warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
+								warzone.getLobby().initialize();
+							}
 							player.sendMessage(war.str("Team " + name + " removed."));
 						} else {
 							player.sendMessage(war.str("No such team."));
@@ -534,7 +544,7 @@ public class WarPlayerListener extends PlayerListener {
 					event.setCancelled(true); 
 				}
 				
-				// /monument
+				// /setmonument
 				else if(command.equals("setmonument")) {
 					if(!war.inAnyWarzone(player.getLocation())) {
 						player.sendMessage(war.str("Usage: /setmonument <name>. Creates or moves a monument. Must be in warzone."));
@@ -644,7 +654,6 @@ public class WarPlayerListener extends PlayerListener {
 				synchronized(player) {
 					if(!roundOver && !war.inAnyWarzone(player.getLocation())) {	// only respawn him if he isnt back at zone yet
 						playerWarzone.respawnPlayer(event, team, player);
-						player.sendMessage(war.str("You died!"));
 						team.resetSign();
 						war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
 					} else {

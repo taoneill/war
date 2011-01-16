@@ -72,8 +72,8 @@ public class Warzone {
 	}
 	
 	public boolean tooBig() {
-		if((getSoutheast().getBlockX() - getNorthwest().getBlockX() > 1000)
-				|| (getNorthwest().getBlockZ() - getSoutheast().getBlockZ() > 1000)) return true;
+		if((getSoutheast().getBlockX() - getNorthwest().getBlockX() > 500)
+				|| (getNorthwest().getBlockZ() - getSoutheast().getBlockZ() > 500)) return true;
 		return false;
 	}
 	
@@ -675,7 +675,7 @@ public class Warzone {
 													// because player can go around corner
 					lobby.initialize();
 				}
-				war.getLogger().info("Reset " + reset + " blocks in " + guard.getWall() + "wall of warzone " + name);
+				war.getLogger().info("Reset " + reset + " blocks in " + guard.getWall() + " wall of warzone " + name);
 			}
 		}
 		// now remove those zone guards

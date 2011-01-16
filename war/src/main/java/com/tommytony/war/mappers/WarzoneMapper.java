@@ -164,7 +164,7 @@ public class WarzoneMapper {
 	
 		// monument blocks
 		for(Monument monument: warzone.getMonuments()) {
-			monument.setVolume(VolumeMapper.loadCenteredVolume(monument.getName(),warzone.getName(), 7, war, world));
+			monument.setVolume(VolumeMapper.loadVolume(monument.getName(),warzone.getName(), war, world));
 		}
 		
 		// team spawn blocks

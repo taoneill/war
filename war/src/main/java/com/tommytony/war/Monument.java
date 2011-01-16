@@ -2,6 +2,8 @@ package com.tommytony.war;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 import bukkit.tommytony.war.War;
 
@@ -15,7 +17,7 @@ import com.tommytony.war.volumes.Volume;
  */
 public class Monument {
 	private Location location;
-	private CenteredVolume volume;
+	private Volume volume;
 	
 	private Team ownerTeam = null;
 	private final String name;
@@ -25,13 +27,9 @@ public class Monument {
 		this.name = name;
 		this.location = location;
 		this.warzone = warzone;
-		volume = new CenteredVolume(name, 
-						warzone.getWorld().getBlockAt(location.getBlockX(), 
-												location.getBlockY() + 2, 
-												location.getBlockZ()), 
-						7, war, warzone.getWorld());
-		volume.calculateCorners();
-		volume.saveBlocks();
+		volume = new Volume(name, war, warzone.getWorld());
+		this.setLocation(location);
+		
 		this.addMonumentBlocks();
 	}
 	
@@ -144,17 +142,20 @@ public class Monument {
 		return name;
 	}
 
-	public void setLocation(Location location) {		
-		volume.changeCenter(location);
-		this.addMonumentBlocks();
+	public void setLocation(Location location) {	
+		Block locationBlock = warzone.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+		volume.setCornerOne(locationBlock.getFace(BlockFace.DOWN).getFace(BlockFace.EAST, 2).getFace(BlockFace.SOUTH, 2));
+		volume.setCornerTwo(locationBlock.getFace(BlockFace.UP, 2).getFace(BlockFace.WEST, 2).getFace(BlockFace.NORTH, 2));
+		volume.saveBlocks();
 		this.location = location;
+		this.addMonumentBlocks();
 	}
 
-	public CenteredVolume getVolume() {
+	public Volume getVolume() {
 		return volume;
 	}
 
-	public void setVolume(CenteredVolume newVolume) {
+	public void setVolume(Volume newVolume) {
 		this.volume = newVolume;
 		
 	}	

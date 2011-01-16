@@ -160,6 +160,19 @@ public class ZoneLobby {
 			// set zone tp
 			zoneTeleportBlock = lobbyMiddleWallBlock.getFace(wall, 6);
 			warzone.setTeleport(new Location(warzone.getWorld(), zoneTeleportBlock.getX(), zoneTeleportBlock.getY(), zoneTeleportBlock.getZ()));
+			
+			// lets get some light in here
+			if(wall == BlockFace.NORTH || wall == BlockFace.SOUTH) {
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.WEST, lobbyHalfSide - 1).getFace(wall, 3).setType(Material.GLOWSTONE);
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.WEST, lobbyHalfSide - 1).getFace(wall, 7).setType(Material.GLOWSTONE);
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.EAST, lobbyHalfSide - 1).getFace(wall, 3).setType(Material.GLOWSTONE);
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.EAST, lobbyHalfSide - 1).getFace(wall, 7).setType(Material.GLOWSTONE);
+			} else {
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.NORTH, lobbyHalfSide - 1).getFace(wall, 3).setType(Material.GLOWSTONE);
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.NORTH, lobbyHalfSide - 1).getFace(wall, 7).setType(Material.GLOWSTONE);
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.SOUTH, lobbyHalfSide - 1).getFace(wall, 3).setType(Material.GLOWSTONE);
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.SOUTH, lobbyHalfSide - 1).getFace(wall, 7).setType(Material.GLOWSTONE);
+			}
 		} else {
 			war.getLogger().warning("Failed to initalize zone " + warzone.getName());
 		}

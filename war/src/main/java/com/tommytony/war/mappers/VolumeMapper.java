@@ -38,12 +38,12 @@ public class VolumeMapper {
 		return volume;
 	}
 	
-	public static CenteredVolume loadCenteredVolume(String volumeName, String zoneName, int sideSize,
-			War war, World world) {
-		CenteredVolume volume = new CenteredVolume(volumeName, null, sideSize, war, world);
-		load(volume, zoneName, war, world);
-		return volume;
-	}
+//	public static CenteredVolume loadCenteredVolume(String volumeName, String zoneName, int sideSize,
+//			War war, World world) {
+//		CenteredVolume volume = new CenteredVolume(volumeName, null, sideSize, war, world);
+//		load(volume, zoneName, war, world);
+//		return volume;
+//	}
 	
 	public static void load(Volume volume, String zoneName, War war, World world) {
 		BufferedReader in = null;
@@ -60,13 +60,13 @@ public class VolumeMapper {
 				int y2 = Integer.parseInt(in.readLine());
 				int z2 = Integer.parseInt(in.readLine());
 				
-				if(volume instanceof CenteredVolume) {
-					((CenteredVolume)volume).setCenter(world.getBlockAt(x1, y1, z1));
-					((CenteredVolume)volume).calculateCorners();
-				} else {
+//				if(volume instanceof CenteredVolume) {
+//					((CenteredVolume)volume).setCenter(world.getBlockAt(x1, y1, z1));
+//					((CenteredVolume)volume).calculateCorners();
+//				} else {
 					volume.setCornerOne(world.getBlockAt(x1, y1, z1));
 					volume.setCornerTwo(world.getBlockAt(x2, y2, z2));	
-				}
+//				}
 				
 				volume.setBlockInfos(new BlockInfo[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
 				for(int i = 0; i < volume.getSizeX(); i++){
@@ -121,16 +121,16 @@ public class VolumeMapper {
 			try {
 				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File("War/volume-" + volume.getName() + ".dat")));
 				else out = new BufferedWriter(new FileWriter(new File("War/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
-				if(volume instanceof CenteredVolume) {
-					out.write("center"); out.newLine();
-					out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
-					out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
-					out.write(Integer.toString(volume.getCornerOne().getZ())); out.newLine();
-					out.write("nothing"); out.newLine();
-					out.write(Integer.toString(0)); out.newLine();
-					out.write(Integer.toString(0)); out.newLine();
-					out.write(Integer.toString(0)); out.newLine();
-				} else {
+//				if(volume instanceof CenteredVolume) {
+//					out.write("center"); out.newLine();
+//					out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
+//					out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
+//					out.write(Integer.toString(volume.getCornerOne().getZ())); out.newLine();
+//					out.write("nothing"); out.newLine();
+//					out.write(Integer.toString(0)); out.newLine();
+//					out.write(Integer.toString(0)); out.newLine();
+//					out.write(Integer.toString(0)); out.newLine();
+//				} else {
 					out.write("corner1"); out.newLine();
 					out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
 					out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
@@ -139,7 +139,7 @@ public class VolumeMapper {
 					out.write(Integer.toString(volume.getCornerTwo().getX())); out.newLine();
 					out.write(Integer.toString(volume.getCornerTwo().getY())); out.newLine();
 					out.write(Integer.toString(volume.getCornerTwo().getZ())); out.newLine();
-				}
+//				}
 				
 				for(int i = 0; i < volume.getSizeX(); i++){
 					for(int j = 0; j < volume.getSizeY(); j++) {
