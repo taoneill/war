@@ -259,7 +259,7 @@ public class Warzone {
 		this.setSoutheast(this.getSoutheast());
 	}
 
-	private void addZoneOutline(BlockFace wall) {
+	public void addZoneOutline(BlockFace wall) {
 		int c1maxY = world.getHighestBlockYAt(volume.getMinX(), volume.getMinZ());
 		int c2maxY = world.getHighestBlockYAt(volume.getMaxX(), volume.getMaxZ());
 		Block ne = world.getBlockAt(volume.getMinX(), c1maxY, volume.getMinZ());

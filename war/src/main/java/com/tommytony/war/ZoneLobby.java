@@ -199,25 +199,34 @@ public class ZoneLobby {
 		} else if(warzone.getTeams().size() == 1) { 
 			if(warzone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND) != null) {
 				diamondGate = lobbyMiddleWallBlock;
+				ironGate = null;
+				goldGate = null;
 			} else if (warzone.getTeamByMaterial(TeamMaterials.TEAMIRON) != null) {
 				ironGate = lobbyMiddleWallBlock;
+				diamondGate = null;
+				goldGate = null;
 			} else if (warzone.getTeamByMaterial(TeamMaterials.TEAMGOLD) != null) {
 				goldGate = lobbyMiddleWallBlock;
+				diamondGate = null;
+				ironGate = null;
 			}
 		} else if(warzone.getTeams().size() == 2) {
 			if(warzone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND) != null 
 					&& warzone.getTeamByMaterial(TeamMaterials.TEAMIRON) != null) {
 				diamondGate = lobbyMiddleWallBlock.getFace(leftSide, 2);
 				ironGate = lobbyMiddleWallBlock.getFace(rightSide, 2);
+				goldGate = null;
 			} else if (warzone.getTeamByMaterial(TeamMaterials.TEAMIRON) != null
 					&& warzone.getTeamByMaterial(TeamMaterials.TEAMGOLD) != null) {
 				ironGate = lobbyMiddleWallBlock.getFace(leftSide, 2);
 				goldGate = lobbyMiddleWallBlock.getFace(rightSide, 2);
+				diamondGate = null;
 			}
 			if (warzone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND) != null 
 					&& warzone.getTeamByMaterial(TeamMaterials.TEAMGOLD) != null) {
 				diamondGate = lobbyMiddleWallBlock.getFace(leftSide, 2);
 				goldGate = lobbyMiddleWallBlock.getFace(rightSide, 2);
+				ironGate = null;
 			}
 		} else if(warzone.getTeams().size() == 3) {
 			diamondGate = lobbyMiddleWallBlock.getFace(leftSide, 4);

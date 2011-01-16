@@ -3,6 +3,8 @@ package bukkit.tommytony.war;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityListener;
 
 import com.tommytony.war.Team;
@@ -21,6 +23,60 @@ public class WarEntityListener extends EntityListener {
 		this.war = war;
 		// TODO Auto-generated constructor stub
 	}
+	
+	public void onEntityDamage(EntityDamageEvent event) {
+//		// BUKKIT !!
+//    	//Entity attacker = event.getDamager();
+//    	Entity defender = event.getEntity();
+//    	DamageCause cause = event.getCause();
+//    	
+//    	if(attacker != null && defender != null && attacker instanceof Player && defender instanceof Player) {
+//			// only let adversaries (same warzone, different team) attack each other
+//			Player a = (Player)attacker;
+//			Player d = (Player)defender;
+//			Warzone attackerWarzone = war.getPlayerWarzone(a.getName());
+//			Team attackerTeam = war.getPlayerTeam(a.getName());
+//			Warzone defenderWarzone = war.getPlayerWarzone(d.getName());
+//			Team defenderTeam = war.getPlayerTeam(d.getName());
+//			if(attackerTeam != null && defenderTeam != null 
+//					&& attackerTeam != defenderTeam 			
+//					&& attackerWarzone == defenderWarzone) {
+//				// A real attack: handle death scenario. ==> NOT: now handled in player move.. but spammy
+////				if(event.getDamage() >= d.getHealth()) {
+////					// Player died
+////					handleDeath(d);
+////					event.setCancelled(true); // Don't let the killing blow fall down.
+////				}
+//			} else if (attackerTeam != null && defenderTeam != null 
+//					&& attackerTeam == defenderTeam 			
+//					&& attackerWarzone == defenderWarzone) {
+//				// same team
+//				if(attackerWarzone.getFriendlyFire()) {
+//					a.sendMessage(war.str("Friendly fire!")); // if ff is on, let the attack go through
+//				} else {
+//					a.sendMessage(war.str("Your attack missed!"));
+//					a.sendMessage(war.str("Your target is on your team."));
+//					event.setCancelled(true);	// ff is off
+//				}
+//			} else if (attackerTeam == null && defenderTeam == null){
+//				// normal PVP
+//			} else {
+//				a.sendMessage(war.str("Your attack missed!"));
+//				if(attackerTeam == null) {
+//					a.sendMessage(war.str(" You must join a team " +
+//						", then you'll be able to damage people " +
+//						"in the other teams in that warzone."));
+//				} else if (defenderTeam == null) {
+//					a.sendMessage(war.str("Your target is not in a team."));
+//				} else if (attackerTeam == defenderTeam) {
+//					a.sendMessage(war.str("Your target is on your team."));
+//				} else if (attackerWarzone != defenderWarzone) {
+//					a.sendMessage(war.str("Your target is playing in another warzone."));
+//				}
+//				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
+//			}
+//		}
+    }
 	
 //	public void onEntityDamaged(EntityDamagedEvent event) {
 //		Entity damaged = event.getEntity();

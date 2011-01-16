@@ -114,7 +114,7 @@ public class WarMapper {
 		}
 		
 		warConfig.close();
-		war.getLogger().info("Loaded war config.");
+		//war.getLogger().info("Loaded war config.");
 	}
 	
 	public static void save(War war) {
