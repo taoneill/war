@@ -65,8 +65,8 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_COMMAND, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 		
-		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Normal, this); 
-		//pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal, this); //DAMAGE
+		//pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Normal, this); 	// done thru Move at respawn
+		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_IGNITE, blockListener, Priority.Normal, this);

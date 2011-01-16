@@ -602,11 +602,50 @@ public class WarPlayerListener extends PlayerListener {
 		
 		Warzone playerWarzone = war.getPlayerWarzone(player.getName());
 		if(playerWarzone != null) {
-			Team playerTeam = war.getPlayerTeam(player.getName());
+			Team team = war.getPlayerTeam(player.getName());
+			
+			// Player belongs to a warzone team but is outside: he just died! Handle death!
+			if(to != null && war.warzone(player.getLocation()) == null && team != null) {
+				// teleport to team spawn upon death
+				
+				boolean roundOver = false;
+				synchronized(playerWarzone) {
+					int remaining = team.getRemainingTickets();
+					if(remaining == 0) { // your death caused your team to lose
+						List<Team> teams = playerWarzone.getTeams();
+						for(Team t : teams) {
+							t.teamcast(war.str("The battle is over. Team " + team.getName() + " lost: " 
+									+ player.getName() + " hit the bottom of their life pool." ));
+							t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
+							if(!t.getName().equals(team.getName())) {
+								// all other teams get a point
+								t.addPoint();
+								t.resetSign();
+							}
+						}
+						playerWarzone.endRound();
+						playerWarzone.getVolume().resetBlocks();
+						playerWarzone.initializeZone();
+						roundOver = true;
+					} else {
+						team.setRemainingTickets(remaining - 1);
+					}
+				}
+				synchronized(player) {
+					if(!roundOver && war.warzone(player.getLocation()) == null) {	// only respawn him if he isnt back at zone yet
+						playerWarzone.respawnPlayer(event, team, player);
+						player.sendMessage(war.str("You died!"));
+						team.resetSign();
+						war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
+					} else {
+						war.getLogger().log(Level.INFO, player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");
+					}
+				}
+			}
 			
 			// Monuments
-			if(to != null && playerTeam != null
-					&& playerWarzone.nearAnyOwnedMonument(to, playerTeam) 
+			if(to != null && team != null
+					&& playerWarzone.nearAnyOwnedMonument(to, team) 
 					&& player.getHealth() < 20
 					&& random.nextInt(42) == 3 ) {	// one chance out of many of getting healed
 				player.setHealth(20);

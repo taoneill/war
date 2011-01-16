@@ -28,50 +28,51 @@ public class WarEntityListener extends EntityListener {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public void onEntityDamaged(EntityDamagedEvent event) {
-		Entity damaged = event.getEntity();
-		DamageCause cause = event.getCause();
-		if(damaged != null && damaged instanceof Player){  
-			Player player = (Player)damaged;
-			int damage = event.getDamage();
-			int currentPlayerHp = player.getHealth();
-			if(damage >= currentPlayerHp) {
-				Warzone zone = war.warzone(player.getLocation());
-				if(war.getPlayerTeam(player.getName()) != null) {
-					// player on a team killed himself
-					handleDeath(((Player)damaged));
-					
-				} else if (zone != null ) {
-					player.teleportTo(zone.getTeleport());
-				}
-				event.setCancelled(true);	// Don't totally kill the player
-			}
-		}
-	}
-	
-	public void onEntityDamagedByBlock(EntityDamagedByBlockEvent event) {
-		Entity damaged = event.getEntity();
-		
-		if(damaged != null && damaged instanceof Player){  
-			Player player = (Player)damaged;
-			int damage = event.getDamage();
-			int currentPlayerHp = player.getHealth();
-			if(damage >= currentPlayerHp) {
-				Warzone zone = war.warzone(player.getLocation());
-				if(war.getPlayerTeam(player.getName()) != null) {
-					// player on a team killed himself
-					handleDeath(((Player)damaged));
-					
-				} else if (zone != null ) {
-					player.teleportTo(zone.getTeleport());
-				}
-				event.setCancelled(true);	// Don't let the block totally kill the player
-			}
-		}
-			
-    }
+//	public void onEntityDamaged(EntityDamagedEvent event) {
+//		Entity damaged = event.getEntity();
+//		DamageCause cause = event.getCause();
+//		if(damaged != null && damaged instanceof Player){  
+//			Player player = (Player)damaged;
+//			int damage = event.getDamage();
+//			int currentPlayerHp = player.getHealth();
+//			if(damage >= currentPlayerHp) {
+//				Warzone zone = war.warzone(player.getLocation());
+//				if(war.getPlayerTeam(player.getName()) != null) {
+//					// player on a team killed himself
+//					handleDeath(((Player)damaged));
+//					
+//				} else if (zone != null ) {
+//					player.teleportTo(zone.getTeleport());
+//				}
+//				event.setCancelled(true);	// Don't totally kill the player
+//			}
+//		}
+//	}
+//	
+//	public void onEntityDamagedByBlock(EntityDamagedByBlockEvent event) {
+//		Entity damaged = event.getEntity();
+//		
+//		if(damaged != null && damaged instanceof Player){  
+//			Player player = (Player)damaged;
+//			int damage = event.getDamage();
+//			int currentPlayerHp = player.getHealth();
+//			if(damage >= currentPlayerHp) {
+//				Warzone zone = war.warzone(player.getLocation());
+//				if(war.getPlayerTeam(player.getName()) != null) {
+//					// player on a team killed himself
+//					handleDeath(((Player)damaged));
+//					
+//				} else if (zone != null ) {
+//					player.teleportTo(zone.getTeleport());
+//				}
+//				event.setCancelled(true);	// Don't let the block totally kill the player
+//			}
+//		}
+//			
+//    }
 
     public void onEntityDamagedByEntity(EntityDamagedByEntityEvent event) {
+    	// BUKKIT !!
     	Entity attacker = event.getDamager();
     	Entity defender = event.getEntity();
     	
@@ -124,41 +125,41 @@ public class WarEntityListener extends EntityListener {
     }
     
     private void handleDeath(Player player) {
-		Team team = war.getPlayerTeam(player.getName());
-		if(team != null){
-			// teleport to team spawn upon death
-			Warzone zone = war.warzone(player.getLocation());
-			boolean roundOver = false;
-			synchronized(zone) {
-				int remaining = team.getRemainingTickets();
-				if(remaining == 0) { // your death caused your team to lose
-					List<Team> teams = zone.getTeams();
-					for(Team t : teams) {
-						t.teamcast(war.str("The battle is over. Team " + team.getName() + " lost: " 
-								+ player.getName() + " hit the bottom of their life pool." ));
-						t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
-						if(!t.getName().equals(team.getName())) {
-							// all other teams get a point
-							t.addPoint();
-							t.resetSign();
-						}
-					}
-					zone.endRound();
-					zone.getVolume().resetBlocks();
-					zone.initializeZone();
-					roundOver = true;
-				} else {
-					team.setRemainingTickets(remaining - 1);
-				}
-			}
-			if(!roundOver) {
-				zone.respawnPlayer(team, player);
-				player.sendMessage(war.str("You died!"));
-				team.resetSign();
-				war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
-			} else {
-				war.getLogger().log(Level.INFO, player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");
-			}
-		}
+//		Team team = war.getPlayerTeam(player.getName());
+//		if(team != null){
+//			// teleport to team spawn upon death
+//			Warzone zone = war.warzone(player.getLocation());
+//			boolean roundOver = false;
+//			synchronized(zone) {
+//				int remaining = team.getRemainingTickets();
+//				if(remaining == 0) { // your death caused your team to lose
+//					List<Team> teams = zone.getTeams();
+//					for(Team t : teams) {
+//						t.teamcast(war.str("The battle is over. Team " + team.getName() + " lost: " 
+//								+ player.getName() + " hit the bottom of their life pool." ));
+//						t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
+//						if(!t.getName().equals(team.getName())) {
+//							// all other teams get a point
+//							t.addPoint();
+//							t.resetSign();
+//						}
+//					}
+//					zone.endRound();
+//					zone.getVolume().resetBlocks();
+//					zone.initializeZone();
+//					roundOver = true;
+//				} else {
+//					team.setRemainingTickets(remaining - 1);
+//				}
+//			}
+//			if(!roundOver) {
+//				zone.respawnPlayer(team, player);
+//				player.sendMessage(war.str("You died!"));
+//				team.resetSign();
+//				war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
+//			} else {
+//				war.getLogger().log(Level.INFO, player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");
+//			}
+//		}
     }
 }
