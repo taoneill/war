@@ -111,6 +111,13 @@ public class WarMapper {
 			hub.setVolume(vol);
 			hub.getVolume().resetBlocks();
 			hub.initialize();
+			
+			for(Warzone zone : war.getWarzones()) {
+				if(zone.getLobby() != null) {
+					zone.getLobby().initialize();	// adds the warhub link gate
+				}
+					
+			}
 		}
 		
 		warConfig.close();

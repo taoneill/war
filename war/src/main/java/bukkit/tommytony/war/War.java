@@ -96,14 +96,14 @@ public class War extends JavaPlugin {
 		String command = cmd.replace("/", "");
 		String[] arguments = null;
 		// Handle both /war <command> and /<war command>. I.e. "/war zone temple" == "/zone temple"
-		if((command.equals("war") || command.equals("War")) && args.length > 0) {
+		if((command.equals("war") || command.equals("War")) && args.length > 1) {
 			command = args[1];
 			arguments = new String[args.length - 2];
 			for(int i = 2; i <= arguments.length; i++) {
 				arguments[i-2] = args[i];
 			}
 		} else if (command.equals("war") || command.equals("War")) {
-			player.sendMessage(this.str("War is on. Plese pick your battle." +
+			player.sendMessage(this.str("War is on. Please pick your battle. " +
 					"Use /warhub, /zones and /zone."));
 		} else {
 			arguments = new String[args.length - 1];

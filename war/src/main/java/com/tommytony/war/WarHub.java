@@ -61,19 +61,24 @@ public class WarHub {
 		if(noOfWarzones > 0) {
 			int hubWidth = noOfWarzones * 4 + 1;
 			int halfHubWidth = hubWidth / 2;
-			int hubDepth = 5;
+			int hubDepth = 6;
 			int hubHeigth = 4;
 			
 			Block locationBlock = location.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-			volume.setCornerOne(locationBlock.getFace(BlockFace.SOUTH, halfHubWidth).getFace(BlockFace.DOWN));
-			volume.setCornerTwo(locationBlock.getFace(BlockFace.NORTH, halfHubWidth).getFace(BlockFace.WEST, hubDepth).getFace(BlockFace.NORTH, hubHeigth));
+			volume.setCornerOne(locationBlock.getFace(BlockFace.EAST).getFace(BlockFace.SOUTH, halfHubWidth).getFace(BlockFace.DOWN));
+			volume.setCornerTwo(locationBlock.getFace(BlockFace.NORTH, halfHubWidth).getFace(BlockFace.WEST, hubDepth).getFace(BlockFace.UP, hubHeigth));
 			volume.saveBlocks();
 			
+			// glass floor
+			volume.setToMaterial(Material.AIR);
+			volume.setFaceMaterial(BlockFace.DOWN, Material.GLASS);
+			
 			// draw gates
-			Block currentGateBlock = locationBlock.getFace(BlockFace.SOUTH, halfHubWidth - 2).getFace(BlockFace.WEST, hubDepth);
+			Block currentGateBlock = volume.getCornerOne().getFace(BlockFace.UP).getFace(BlockFace.WEST, hubDepth).getFace(BlockFace.NORTH, 2);
 			
 			for(int i = 0;i < war.getWarzones().size(); i++) {	// gonna use the index to find it again
 				zoneGateBlocks.add(0, currentGateBlock);
+				currentGateBlock.getFace(BlockFace.DOWN).setType(Material.GLOWSTONE);
 				currentGateBlock.setType(Material.PORTAL);
 				currentGateBlock.getFace(BlockFace.UP).setType(Material.PORTAL);
 				currentGateBlock.getFace(BlockFace.SOUTH).setType(Material.OBSIDIAN);

@@ -163,15 +163,11 @@ public class ZoneLobby {
 			
 			// lets get some light in here
 			if(wall == BlockFace.NORTH || wall == BlockFace.SOUTH) {
-				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.WEST, lobbyHalfSide - 1).getFace(wall, 3).setType(Material.GLOWSTONE);
-				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.WEST, lobbyHalfSide - 1).getFace(wall, 7).setType(Material.GLOWSTONE);
-				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.EAST, lobbyHalfSide - 1).getFace(wall, 3).setType(Material.GLOWSTONE);
-				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.EAST, lobbyHalfSide - 1).getFace(wall, 7).setType(Material.GLOWSTONE);
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.WEST, lobbyHalfSide - 1).getFace(wall, 9).setType(Material.GLOWSTONE);
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.EAST, lobbyHalfSide - 1).getFace(wall, 9).setType(Material.GLOWSTONE);
 			} else {
-				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.NORTH, lobbyHalfSide - 1).getFace(wall, 3).setType(Material.GLOWSTONE);
-				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.NORTH, lobbyHalfSide - 1).getFace(wall, 7).setType(Material.GLOWSTONE);
-				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.SOUTH, lobbyHalfSide - 1).getFace(wall, 3).setType(Material.GLOWSTONE);
-				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.SOUTH, lobbyHalfSide - 1).getFace(wall, 7).setType(Material.GLOWSTONE);
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.NORTH, lobbyHalfSide - 1).getFace(wall, 9).setType(Material.GLOWSTONE);
+				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.SOUTH, lobbyHalfSide - 1).getFace(wall, 9).setType(Material.GLOWSTONE);
 			}
 		} else {
 			war.getLogger().warning("Failed to initalize zone " + warzone.getName());
@@ -233,7 +229,7 @@ public class ZoneLobby {
 			ironGate = lobbyMiddleWallBlock;
 			goldGate = lobbyMiddleWallBlock.getFace(rightSide, 4);
 		}
-		warHubLinkGate = lobbyMiddleWallBlock.getFace(wall, 8);
+		warHubLinkGate = lobbyMiddleWallBlock.getFace(wall, 9);
 	}
 
 	private void placeGate(Block block,
@@ -254,6 +250,7 @@ public class ZoneLobby {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}  
+			block.getFace(BlockFace.DOWN).setType(Material.GLOWSTONE);
 			block.setType(Material.PORTAL);
 			block.getFace(BlockFace.UP).setType(Material.PORTAL);
 			block.getFace(leftSide).setType(teamMaterial);
