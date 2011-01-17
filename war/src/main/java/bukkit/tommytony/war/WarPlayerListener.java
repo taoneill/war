@@ -47,6 +47,7 @@ public class WarPlayerListener extends PlayerListener {
 		Team team = war.getPlayerTeam(player.getName());
 		if(team != null) {
 			team.removePlayer(player.getName());
+			team.resetSign();
 		}
 	}
 
@@ -178,6 +179,7 @@ public class WarPlayerListener extends PlayerListener {
 								Team diamondTeam = zone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND);
 								if(diamondTeam.getPlayers().size() < zone.getTeamCap()) {
 									diamondTeam.addPlayer(player);
+									diamondTeam.resetSign();
 									zone.keepPlayerInventory(player);
 									player.sendMessage(war.str("Your inventory is is storage until you /leave."));
 									zone.respawnPlayer(event, diamondTeam, player);
@@ -193,6 +195,7 @@ public class WarPlayerListener extends PlayerListener {
 								Team ironTeam = zone.getTeamByMaterial(TeamMaterials.TEAMIRON);
 								if(ironTeam.getPlayers().size() < zone.getTeamCap()) {
 									ironTeam.addPlayer(player);
+									ironTeam.resetSign();
 									zone.keepPlayerInventory(player);
 									player.sendMessage(war.str("Your inventory is is storage until you /leave."));
 									zone.respawnPlayer(event, ironTeam, player);
@@ -208,6 +211,7 @@ public class WarPlayerListener extends PlayerListener {
 								Team goldTeam = zone.getTeamByMaterial(TeamMaterials.TEAMGOLD);
 								if(goldTeam.getPlayers().size() < zone.getTeamCap()) {
 									goldTeam.addPlayer(player);
+									goldTeam.resetSign();
 									zone.keepPlayerInventory(player);
 									player.sendMessage(war.str("Your inventory is is storage until you /leave."));
 									zone.respawnPlayer(event, goldTeam, player);
@@ -231,6 +235,7 @@ public class WarPlayerListener extends PlayerListener {
 								// same as leave, except event.setTo
 								Team playerTeam = war.getPlayerTeam(player.getName());
 								playerTeam.removePlayer(player.getName());
+								playerTeam.resetSign();
 								event.setTo(playerWarzone.getTeleport());
 								player.sendMessage(war.str("Left the zone."));
 								playerWarzone.restorePlayerInventory(player);

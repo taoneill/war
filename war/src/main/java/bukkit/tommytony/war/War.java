@@ -204,6 +204,7 @@ public class War extends JavaPlugin {
 						}
 						if(team.getPlayers().size() < warzone.getTeamCap()) {
 							team.addPlayer(player);
+							team.resetSign();
 							Warzone zone = this.warzone(player.getLocation());
 							zone.respawnPlayer(team, player);
 							foundTeam = true;
@@ -231,6 +232,7 @@ public class War extends JavaPlugin {
 			} else {
 				Team playerTeam = this.getPlayerTeam(player.getName());
 				playerTeam.removePlayer(player.getName());
+				playerTeam.resetSign();
 				
 				Warzone zone = this.warzone(player.getLocation());
 				player.teleportTo(zone.getTeleport());

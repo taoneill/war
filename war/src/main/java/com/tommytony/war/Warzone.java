@@ -702,6 +702,7 @@ public class Warzone {
 		}
 		if(lowestNoOfPlayers != null) {
 			lowestNoOfPlayers.addPlayer(player);
+			lowestNoOfPlayers.resetSign();
 			if(!hasPlayerInventory(player.getName())) {
 				keepPlayerInventory(player);
 			}
@@ -745,6 +746,5 @@ public class Warzone {
 		return drawZoneOutline;
 	}
 
-	
 
 }

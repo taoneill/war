@@ -7,6 +7,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 
 import bukkit.tommytony.war.War;
 
@@ -93,8 +95,32 @@ public class WarHub {
 		}
 	}
 	
-	public void resetSigns() {
+	public void resetZoneSign(Warzone zone) {
 		// TODO Signs
+		int i = 0;
+		for(i = 0; i < war.getWarzones().size(); i++) {
+			if(zone.getName() == war.getWarzones().get(i).getName()) break;
+		}
+		
+		Block zoneGate = zoneGateBlocks.get(i);
+		Block block = zoneGate.getFace(BlockFace.SOUTH).getFace(BlockFace.EAST, 1);
+		if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+		block.setData((byte)8);
+		
+		int zoneCap = 0;
+		int zonePlayers = 0;
+		for(Team t : zone.getTeams()) {
+			zonePlayers += t.getPlayers().size();
+			zoneCap += zone.getTeamCap();
+		}
+		
+		BlockState state = block.getState();
+		Sign sign = (Sign) state;
+		sign.setLine(0, "Warzone");
+		sign.setLine(1, zone.getName());
+		sign.setLine(2, zonePlayers + "/" + zoneCap + " players");
+		sign.setLine(3, zone.getTeams().size() + " teams");
+		state.update(true);
 	}
 
 	public void setVolume(Volume vol) {

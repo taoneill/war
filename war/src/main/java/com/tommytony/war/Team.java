@@ -6,9 +6,11 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.material.MaterialData;
 
 import bukkit.tommytony.war.War;
 
@@ -196,22 +198,26 @@ public class Team {
 		return volume;
 	}
 	
-	
 	public void resetSign(){
 		int x = teamSpawn.getBlockX();
 		int y = teamSpawn.getBlockY();
 		int z = teamSpawn.getBlockZ();
 		
-		Block block = warzone.getWorld().getBlockAt(x, y, z);
-		block.setType(Material.SIGN_POST);
+		Block block = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
+		if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+		block.setData((byte)6);
 		
 		BlockState state = block.getState();
-		Sign sign = (Sign) state; 
-		sign.setLine(0, "Team");
-		sign.setLine(1, name);
-		sign.setLine(2, points + " pts");
-		sign.setLine(3, remainingTickets + "/" + warzone.getLifePool() + " lives left");
-		state.update(true);	
+		Sign sign = (Sign) state;
+		sign.setLine(0, "Team " + name);
+		sign.setLine(1, remainingTickets + "/" + warzone.getLifePool() + " lives left");
+		sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
+		sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
+		state.update(true);
+		
+		if(warzone.getLobby() != null) {
+			warzone.getLobby().resetTeamGateSign(this);
+		}
 	}
 
 	public void setVolume(Volume volume) {

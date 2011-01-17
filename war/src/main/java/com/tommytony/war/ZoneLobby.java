@@ -4,6 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 
 import bukkit.tommytony.war.War;
 
@@ -149,6 +151,13 @@ public class ZoneLobby {
 			// add war hub link gate
 			if(war.getWarHub() != null) {
 				placeGate(warHubLinkGate, Material.OBSIDIAN);
+				// add warhub sign
+				String[] lines = new String[4];
+				lines[0] = "";
+				lines[1] = "War hub";
+				lines[2] = "";
+				lines[3] = "";
+				resetGateSign(warHubLinkGate, lines, false);
 			}
 			
 			// add team gates or single auto assign gate
@@ -156,6 +165,9 @@ public class ZoneLobby {
 			placeGate(diamondGate, TeamMaterials.TEAMDIAMOND);
 			placeGate(ironGate, TeamMaterials.TEAMIRON);
 			placeGate(goldGate, TeamMaterials.TEAMGOLD);
+			for(Team t : warzone.getTeams()) {
+				resetTeamGateSign(t);
+			}
 			
 			// set zone tp
 			zoneTeleportBlock = lobbyMiddleWallBlock.getFace(wall, 6);
@@ -446,5 +458,74 @@ public class ZoneLobby {
 
 	public Warzone getZone() {
 		return this.warzone;
+	}
+
+	public void resetTeamGateSign(Team team) {
+		if(team.getMaterial() == TeamMaterials.TEAMDIAMOND) {
+			resetTeamGateSign(team, diamondGate);
+		} else if(team.getMaterial() == TeamMaterials.TEAMIRON) {
+			resetTeamGateSign(team, ironGate);
+		} else if(team.getMaterial() == TeamMaterials.TEAMGOLD) {
+			resetTeamGateSign(team, goldGate);
+		}
+		
+		if(war.getWarHub() != null) {
+			war.getWarHub().resetZoneSign(warzone);
+		}
+	}
+
+	private void resetTeamGateSign(Team team, Block gate) {
+		if(gate != null) {
+			String[] lines = new String[4];
+			lines[0] =  "Team " + team.getName();
+			lines[1] = team.getPlayers().size() + "/" + warzone.getTeamCap() + " players";
+			lines[2] = team.getPoints() + "/" + warzone.getScoreCap() + " pts";
+			lines[3] = team.getRemainingTickets() + "/" + warzone.getLifePool() + " lives left";
+			resetGateSign(gate, lines, true);
+		}
+	}
+	
+	private void resetGateSign(Block gate, String[] lines, boolean awayFromWall) {
+		Block block = null;
+		BlockFace direction = null;
+		if(awayFromWall) {
+			direction = wall;
+		} else if (wall == BlockFace.NORTH) {
+			direction = BlockFace.SOUTH;
+		} else if (wall == BlockFace.EAST) {
+			direction = BlockFace.WEST;
+		} else if (wall == BlockFace.SOUTH) {
+			direction = BlockFace.NORTH;
+		} else if (wall == BlockFace.WEST) {
+			direction = BlockFace.EAST;
+		}
+		if(wall == BlockFace.NORTH) {
+			block = gate.getFace(direction).getFace(BlockFace.EAST);
+			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+			if(awayFromWall) block.setData((byte)4);
+			else block.setData((byte)12);
+		} else if(wall == BlockFace.EAST) {
+			block = gate.getFace(direction).getFace(BlockFace.SOUTH);
+			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+			if(awayFromWall) block.setData((byte)8);
+			else block.setData((byte)0);
+		} else if(wall == BlockFace.SOUTH) {
+			block = gate.getFace(direction).getFace(BlockFace.WEST);
+			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+			if(awayFromWall) block.setData((byte)12);
+			else block.setData((byte)4);
+		} else if(wall == BlockFace.WEST) {
+			block = gate.getFace(direction).getFace(BlockFace.NORTH);
+			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+			if(awayFromWall) block.setData((byte)0);
+			else block.setData((byte)8);
+		}
+		BlockState state = block.getState();
+		Sign sign = (Sign) state;
+		sign.setLine(0, lines[0]);
+		sign.setLine(1, lines[1]);
+		sign.setLine(2, lines[2]);
+		sign.setLine(3, lines[3]);
+		state.update(true);
 	}
 }
