@@ -88,7 +88,7 @@ public class War extends JavaPlugin {
 		this.defaultLifepool = 7;
 		this.defaultFriendlyFire = false;
 		this.defaultAutoAssignOnly = false;
-		getLogger().info("Loading War secrets...");
+		getLogger().info("Loading War files...");
 		WarMapper.load(this, this.getServer().getWorlds()[0]);		
 		getLogger().info("War v" + version + " is on.");
 	}

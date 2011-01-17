@@ -36,7 +36,7 @@ public class Warzone {
 	private HashMap<Integer, ItemStack> loadout; 
 	private boolean drawZoneOutline;
 	
-	private HashMap<String, List<ItemStack>> inventories = new HashMap<String, List<ItemStack>>();
+	private HashMap<String, ItemStack[]> inventories = new HashMap<String, ItemStack[]>();
 	private World world;
 	private Material[] originalSoutheastBlocks;
 	private Material[] originalNorthwestBlocks;
@@ -343,11 +343,7 @@ public class Warzone {
 	private void handleRespawn(Team team, Player player){
 		// Reset inventory to loadout
 		PlayerInventory playerInv = player.getInventory();
-		// BUKKIT
-//		for(int i = 0; i < playerInv.getSize(); i++){
-//			playerInv.setItem(index, new ItemStack(Material.))
-//			playerInv.setItem(i, null);	
-//		}
+		playerInv.clear();		
 		for(Integer slot : loadout.keySet()) {
 //			if(slot == 101) {
 //				playerInv.setLeggings(loadout.get(slot));
@@ -367,7 +363,6 @@ public class Warzone {
 		} else if (team.getMaterial() == Material.IRON_BLOCK) {
 			playerInv.setHelmet(new ItemStack(Material.IRON_BOOTS));
 		}
-		
 		//player.setHealth(20);
 		
 	}
@@ -439,23 +434,18 @@ public class Warzone {
 
 	public void keepPlayerInventory(Player player) {
 		PlayerInventory inventory = player.getInventory();
-		List<ItemStack> invToStore = new ArrayList<ItemStack>();
-		for(int i=0; i < inventory.getSize(); i++) {
-			invToStore.add(i, inventory.getItem(i));
-		}
-		inventories.put(player.getName(), invToStore);
+		ItemStack[] contents = inventory.getContents();
+		inventories.put(player.getName(), contents);
 	}
 
 	public void restorePlayerInventory(Player player) {
-		List<ItemStack> originalContents = inventories.remove(player.getName());
+		ItemStack[] originalContents = inventories.remove(player.getName());
 		PlayerInventory playerInv = player.getInventory();
-		// BUKKIT
-//		for(int i = 0; i < playerInv.getSize(); i++) {
-//			playerInv.setItem(i, new ItemStack(Material.AIR));
-//		}
-//		for(int i = 0; i < playerInv.getSize(); i++) {
-//			playerInv.setItem(i, originalContents.get(i));
-//		}
+		playerInv.clear();
+		playerInv.remove(Material.DIAMOND_BOOTS.getId());
+		playerInv.remove(Material.GOLD_BOOTS.getId());
+		playerInv.remove(Material.IRON_BOOTS.getId());
+		playerInv.setContents(originalContents);
 	}
 
 	public boolean hasMonument(String monumentName) {
