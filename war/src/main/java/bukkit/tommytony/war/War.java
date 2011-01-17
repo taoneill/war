@@ -1,6 +1,7 @@
 package bukkit.tommytony.war;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -703,8 +704,12 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean inAnyWarzone(Location location) {
-		if(warzone(location) == null) {
-			return false;
+		Block locBlock = location.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+		Warzone currentZone = warzone(location);
+		if(currentZone == null) {
+			return false; 
+		} else if (currentZone.getVolume().isWallBlock(locBlock)) {
+			return false;	// wall block doesnt count. this lets people in at the lobby side wall because wall gates overlap with the zone.
 		}
 		return true;
 	}

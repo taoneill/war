@@ -72,8 +72,8 @@ public class WarPlayerListener extends PlayerListener {
 		if(playerWarzone != null) {
 			Team team = war.getPlayerTeam(player.getName());
 			
-			// Player belongs to a warzone team but is outside: he just died! Handle death! Exempt the zone maker.
-			if(from != null && war.warzone(player.getLocation()) == null && team != null && !war.isZoneMaker(player.getName())) {
+			// Player belongs to a warzone team but is outside: he just died! Handle death! Don't exempt the zone maker.
+			if(from != null && war.warzone(player.getLocation()) == null && team != null) {
 				// teleport to team spawn upon death
 				
 				boolean roundOver = false;
