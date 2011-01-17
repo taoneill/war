@@ -52,10 +52,13 @@ public class War extends JavaPlugin {
     private final List<Warzone> warzones = new ArrayList<Warzone>();
     private final List<String> zoneMakerNames = new ArrayList<String>();
     private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
-    private int defaultLifepool = 7;
+    private int defaultLifepool = 15;
     private boolean defaultFriendlyFire = false;
 	private boolean defaultDrawZoneOutline = true;
 	private boolean defaultAutoAssignOnly = false;
+	private int defaultTeamCap = 5;
+	private int defaultScoreCap = 5;
+	private boolean pvpInZonesOnly = false;
 	private WarHub warHub;
 	
 	public void onDisable() {
@@ -199,10 +202,15 @@ public class War extends JavaPlugin {
 							warzone.keepPlayerInventory(player);
 							player.sendMessage(this.str("Your inventory is is storage until you /leave."));
 						}
-						team.addPlayer(player);
-						Warzone zone = this.warzone(player.getLocation());
-						zone.respawnPlayer(team, player);
-						foundTeam = true;
+						if(team.getPlayers().size() < warzone.getTeamCap()) {
+							team.addPlayer(player);
+							Warzone zone = this.warzone(player.getLocation());
+							zone.respawnPlayer(team, player);
+							foundTeam = true;
+						} else {
+							player.sendMessage(this.str("Team " + name + " is full."));
+							foundTeam = true;
+						}
 					}
 				}
 				if(foundTeam) {
@@ -834,6 +842,30 @@ public class War extends JavaPlugin {
 			return true;
 		}
 		return false;
+	}
+
+	public void setDefaultTeamCap(int defaultTeamCap) {
+		this.defaultTeamCap = defaultTeamCap;
+	}
+
+	public int getDefaultTeamCap() {
+		return defaultTeamCap;
+	}
+
+	public void setPvpInZonesOnly(boolean pvpInZonesOnly) {
+		this.pvpInZonesOnly = pvpInZonesOnly;
+	}
+
+	public boolean isPvpInZonesOnly() {
+		return pvpInZonesOnly;
+	}
+
+	public void setDefaultScoreCap(int defaultScoreCap) {
+		this.defaultScoreCap = defaultScoreCap;
+	}
+
+	public int getDefaultScoreCap() {
+		return defaultScoreCap;
 	}
 	
 }

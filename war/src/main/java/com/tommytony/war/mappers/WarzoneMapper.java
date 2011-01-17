@@ -131,6 +131,19 @@ public class WarzoneMapper {
 		
 		// life pool
 		warzone.setLifePool(warzoneConfig.getInt("lifePool"));
+		
+		// drawZoneOutline
+		warzone.setFriendlyFire(warzoneConfig.getBoolean("drawZoneOutline"));
+		
+		// autoAssignOnly
+		warzone.setAutoAssignOnly(warzoneConfig.getBoolean("autoAssignOnly"));
+		
+		// team cap
+		warzone.setTeamCap(warzoneConfig.getInt("teamCap"));
+		
+		// score cap
+		warzone.setScoreCap(warzoneConfig.getInt("scoreCap"));
+
 				
 		// monuments
 		String monumentsStr = warzoneConfig.getString("monuments");
@@ -251,6 +264,18 @@ public class WarzoneMapper {
 		
 		// life pool
 		warzoneConfig.setInt("lifePool", warzone.getLifePool());
+		
+		// drawZoneOutline
+		warzoneConfig.setBoolean("drawZoneOutline", warzone.isDrawZoneOutline());
+		
+		// autoAssignOnly
+		warzoneConfig.setBoolean("autoAssignOnly", warzone.isAutoAssignOnly());
+		
+		// team cap
+		warzoneConfig.setInt("teamCap", warzone.getTeamCap());
+		
+		// score cap
+		warzoneConfig.setInt("scoreCap", warzone.getScoreCap());
 		
 		// monuments
 		String monumentsStr = "";

@@ -154,8 +154,8 @@ public class WarEntityListener extends EntityListener {
 					a.sendMessage(war.str("Your target is on your team."));
 					event.setCancelled(true);	// ff is off
 				}
-			} else if (attackerTeam == null && defenderTeam == null){
-				// normal PVP
+			} else if (attackerTeam == null && defenderTeam == null && !war.isPvpInZonesOnly()){
+				// let normal PVP through is its not turned off
 			} else {
 				a.sendMessage(war.str("Your attack missed!"));
 				if(attackerTeam == null) {

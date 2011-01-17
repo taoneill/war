@@ -35,6 +35,8 @@ public class Warzone {
 	private int lifePool;
 	private HashMap<Integer, ItemStack> loadout; 
 	private boolean drawZoneOutline;
+	private int teamCap = 5;
+	private int scoreCap = 5;
 	
 	private HashMap<String, ItemStack[]> inventories = new HashMap<String, ItemStack[]>();
 	private World world;
@@ -54,8 +56,10 @@ public class Warzone {
 		this.friendlyFire = war.getDefaultFriendlyFire();
 		this.setLifePool(war.getDefaultLifepool());
 		this.setLoadout(war.getDefaultLoadout());
-		this.drawZoneOutline = war.getDefaultDrawZoneOutline();
-		this.autoAssignOnly = war.getDefaultAutoAssignOnly();
+		this.setDrawZoneOutline(war.getDefaultDrawZoneOutline());
+		this.setAutoAssignOnly(war.getDefaultAutoAssignOnly());
+		this.teamCap = war.getDefaultTeamCap();
+		this.scoreCap = war.getDefaultScoreCap();
 		this.volume = new VerticalVolume(name, war, this.getWorld());
 	}
 	
@@ -237,7 +241,7 @@ public class Warzone {
 	
 	private void initZone() {
 		// add wall outlines
-		if(drawZoneOutline) {
+		if(isDrawZoneOutline()) {
 			addZoneOutline(BlockFace.NORTH);
 			addZoneOutline(BlockFace.EAST);
 			addZoneOutline(BlockFace.SOUTH);
@@ -657,7 +661,7 @@ public class Warzone {
 			if(guard.getPlayer().getName().equals(player.getName())){
 				playerGuards.add(guard);
 				int reset = volume.resetWallBlocks(guard.getWall()); // this should restore old blocks
-				if(drawZoneOutline) {
+				if(isDrawZoneOutline()) {
 					addZoneOutline(guard.getWall());
 				}
 				if(lobby != null) {
@@ -677,7 +681,7 @@ public class Warzone {
 
 	public boolean getAutoAssignOnly() {
 		
-		return autoAssignOnly;
+		return isAutoAssignOnly();
 	}
 
 	public void setLobby(ZoneLobby lobby) {
@@ -707,6 +711,38 @@ public class Warzone {
 				team.teamcast(war.str("" + player.getName() + " joined team " + team.getName() + "."));
 			}
 		}
+	}
+
+	public void setTeamCap(int teamCap) {
+		this.teamCap = teamCap;
+	}
+
+	public int getTeamCap() {
+		return teamCap;
+	}
+
+	public void setScoreCap(int scoreCap) {
+		this.scoreCap = scoreCap;
+	}
+
+	public int getScoreCap() {
+		return scoreCap;
+	}
+
+	public void setAutoAssignOnly(boolean autoAssignOnly) {
+		this.autoAssignOnly = autoAssignOnly;
+	}
+
+	public boolean isAutoAssignOnly() {
+		return autoAssignOnly;
+	}
+
+	public void setDrawZoneOutline(boolean drawZoneOutline) {
+		this.drawZoneOutline = drawZoneOutline;
+	}
+
+	public boolean isDrawZoneOutline() {
+		return drawZoneOutline;
 	}
 
 	

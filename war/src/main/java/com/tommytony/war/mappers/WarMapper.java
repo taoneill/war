@@ -96,6 +96,15 @@ public class WarMapper {
 		// defaultAutoAssignOnly
 		war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
 		
+		// defaultTeamCap
+		war.setDefaultTeamCap(warConfig.getInt("defaultTeamCap"));
+		
+		// defaultScoreCap
+		war.setDefaultScoreCap(warConfig.getInt("defaultScoreCap"));
+
+		// defaultScoreCap
+		war.setPvpInZonesOnly(warConfig.getBoolean("pvpInZonesOnly"));
+		
 		// warhub
 		String hubStr = warConfig.getString("warhub");
 		if(hubStr != null && !hubStr.equals("")) {
@@ -162,6 +171,16 @@ public class WarMapper {
 		
 		// defaultAutoAssignOnly
 		warConfig.setBoolean("defaultAutoAssignOnly", war.getDefaultAutoAssignOnly());
+		
+		// defaultTeamCap
+		warConfig.setInt("defaultTeamCap", war.getDefaultTeamCap());
+		
+		// defaultScoreCap
+		warConfig.getInt("defaultScoreCap", war.getDefaultScoreCap());
+
+		// defaultScoreCap
+		warConfig.setBoolean("pvpInZonesOnly", war.isPvpInZonesOnly());
+		war.setPvpInZonesOnly(warConfig.getBoolean("pvpInZonesOnly"));
 		
 		// warhub
 		String hubStr = "";

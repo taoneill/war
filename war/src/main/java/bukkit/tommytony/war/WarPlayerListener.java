@@ -1,4 +1,5 @@
 package bukkit.tommytony.war;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -76,7 +77,8 @@ public class WarPlayerListener extends PlayerListener {
 			if(from != null && war.warzone(player.getLocation()) == null && team != null) {
 				// teleport to team spawn upon death
 				
-				boolean roundOver = false;
+				boolean newBattle = false;
+				boolean scoreCapReached = false;
 				synchronized(playerWarzone) {
 					int remaining = team.getRemainingTickets();
 					if(remaining == 0) { // your death caused your team to lose
@@ -84,26 +86,55 @@ public class WarPlayerListener extends PlayerListener {
 						for(Team t : teams) {
 							t.teamcast(war.str("The battle is over. Team " + team.getName() + " lost: " 
 									+ player.getName() + " hit the bottom of their life pool." ));
-							t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
+							
 							if(!t.getName().equals(team.getName())) {
 								// all other teams get a point
 								t.addPoint();
 								t.resetSign();
 							}
 						}
-						playerWarzone.getVolume().resetBlocks();
-						playerWarzone.initializeZone();
-						roundOver = true;
+						// detect score cap
+						List<Team> scoreCapTeams = new ArrayList<Team>();
+						for(Team t : teams) {
+							if(t.getPoints() == playerWarzone.getScoreCap()) {
+								scoreCapTeams.add(t);
+							}
+						}
+						if(!scoreCapTeams.isEmpty()) {
+							String winnersStr = "Score cap reached! Winning team(s): ";
+							for(Team winner : scoreCapTeams) {
+								winnersStr += winner.getName() + " ";
+							}
+							winnersStr += ". The warzone is being reset... Please choose a new team.";
+							// Score cap reached. Reset everything.
+							for(Team t : teams) {
+								t.teamcast(war.str(winnersStr));
+								t.getPlayers().clear();	// empty the team
+							}
+							scoreCapReached = true;
+						} else {
+							// We can keep going
+							for(Team t : teams) {
+								t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
+							}
+							playerWarzone.getVolume().resetBlocks();
+							playerWarzone.initializeZone();
+							newBattle = true;
+						}
 					} else {
 						team.setRemainingTickets(remaining - 1);
 					}
 				}
 				synchronized(player) {
-					if(!roundOver && !war.inAnyWarzone(player.getLocation())) {	// only respawn him if he isnt back at zone yet
+					if(!newBattle && !scoreCapReached && !war.inAnyWarzone(player.getLocation())) {	// only respawn him if he isnt back at zone yet
 						playerWarzone.respawnPlayer(event, team, player);
 						team.resetSign();
 						war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
-					} else {
+					} else if (scoreCapReached) { 
+						player.teleportTo(playerWarzone.getTeleport());
+						team.resetSign();
+						war.getLogger().log(Level.INFO, player.getName() + " died and enemy team reached score cap");
+					} else if (newBattle){
 						war.getLogger().log(Level.INFO, player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");
 					}
 				}
@@ -132,36 +163,60 @@ public class WarPlayerListener extends PlayerListener {
 						if(oldTeam == null) { // trying to counter spammy player move
 							if(zone.getLobby().isAutoAssignGate(to)) {
 								dropFromOldTeamIfAny(player);
-								zone.autoAssign(event, player);
+								int noOfPlayers = 0;
+								for(Team t : zone.getTeams()) {
+									noOfPlayers += t.getPlayers().size();
+								}
+								if(noOfPlayers < zone.getTeams().size() * zone.getTeamCap()) {
+									zone.autoAssign(event, player);
+								} else {
+									event.setTo(zone.getTeleport());
+									player.sendMessage("All teams are full.");
+								}
 							} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMDIAMOND, to)){
 								dropFromOldTeamIfAny(player);
 								Team diamondTeam = zone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND);
-								diamondTeam.addPlayer(player);
-								zone.keepPlayerInventory(player);
-								player.sendMessage(war.str("Your inventory is is storage until you /leave."));
-								zone.respawnPlayer(event, diamondTeam, player);
-								for(Team team : zone.getTeams()){
-									team.teamcast(war.str("" + player.getName() + " joined team diamond."));
+								if(diamondTeam.getPlayers().size() < zone.getTeamCap()) {
+									diamondTeam.addPlayer(player);
+									zone.keepPlayerInventory(player);
+									player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+									zone.respawnPlayer(event, diamondTeam, player);
+									for(Team team : zone.getTeams()){
+										team.teamcast(war.str("" + player.getName() + " joined team diamond."));
+									}
+								} else {
+									event.setTo(zone.getTeleport());
+									player.sendMessage("Team diamond is full.");
 								}
 							} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMIRON, to)){
 								dropFromOldTeamIfAny(player);
 								Team ironTeam = zone.getTeamByMaterial(TeamMaterials.TEAMIRON);
-								ironTeam.addPlayer(player);
-								zone.keepPlayerInventory(player);
-								player.sendMessage(war.str("Your inventory is is storage until you /leave."));
-								zone.respawnPlayer(event, ironTeam, player);
-								for(Team team : zone.getTeams()){
-									team.teamcast(war.str("" + player.getName() + " joined team iron."));
+								if(ironTeam.getPlayers().size() < zone.getTeamCap()) {
+									ironTeam.addPlayer(player);
+									zone.keepPlayerInventory(player);
+									player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+									zone.respawnPlayer(event, ironTeam, player);
+									for(Team team : zone.getTeams()){
+										team.teamcast(war.str("" + player.getName() + " joined team iron."));
+									}
+								} else {
+									event.setTo(zone.getTeleport());
+									player.sendMessage("Team iron is full.");
 								}
 							} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMGOLD, to)){
 								dropFromOldTeamIfAny(player);
 								Team goldTeam = zone.getTeamByMaterial(TeamMaterials.TEAMGOLD);
-								goldTeam.addPlayer(player);
-								zone.keepPlayerInventory(player);
-								player.sendMessage(war.str("Your inventory is is storage until you /leave."));
-								zone.respawnPlayer(event, goldTeam, player);
-								for(Team team : zone.getTeams()){
-									team.teamcast(war.str("" + player.getName() + " joined team gold."));
+								if(goldTeam.getPlayers().size() < zone.getTeamCap()) {
+									goldTeam.addPlayer(player);
+									zone.keepPlayerInventory(player);
+									player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+									zone.respawnPlayer(event, goldTeam, player);
+									for(Team team : zone.getTeams()){
+										team.teamcast(war.str("" + player.getName() + " joined team gold."));
+									}
+								} else {
+									event.setTo(zone.getTeleport());
+									player.sendMessage("Team gold is full.");
 								}
 							} else if (zone.getLobby().isInWarHubLinkGate(to)){
 								dropFromOldTeamIfAny(player);
