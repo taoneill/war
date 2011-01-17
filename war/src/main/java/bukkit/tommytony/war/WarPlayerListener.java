@@ -165,8 +165,7 @@ public class WarPlayerListener extends PlayerListener {
 								}
 							} else if (zone.getLobby().isInWarHubLinkGate(to)){
 								dropFromOldTeamIfAny(player);
-								event.setTo(to);
-								player.teleportTo(war.getWarHub().getLocation());
+								event.setTo(war.getWarHub().getLocation());
 							}
 						} else if(war.inAnyWarzone(event.getFrom())) { // already in a team and in warzone, leaving
 							if(zone.getLobby().isAutoAssignGate(to)
@@ -191,7 +190,6 @@ public class WarPlayerListener extends PlayerListener {
 			if(hub != null) {
 				Warzone zone = hub.getDestinationWarzoneForLocation(player.getLocation());
 				synchronized(player) {
-					
 					if(zone != null) {
 						event.setTo(zone.getTeleport());
 						//player.teleportTo(zone.getTeleport());

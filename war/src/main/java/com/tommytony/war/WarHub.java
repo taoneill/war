@@ -71,8 +71,9 @@ public class WarHub {
 			
 			// draw gates
 			Block currentGateBlock = locationBlock.getFace(BlockFace.SOUTH, halfHubWidth - 2).getFace(BlockFace.WEST, hubDepth);
-			for(Warzone zone : war.getWarzones()) {	// gonna use the index to find it again
-				zoneGateBlocks.add(currentGateBlock);
+			
+			for(int i = 0;i < war.getWarzones().size(); i++) {	// gonna use the index to find it again
+				zoneGateBlocks.add(0, currentGateBlock);
 				currentGateBlock.setType(Material.PORTAL);
 				currentGateBlock.getFace(BlockFace.UP).setType(Material.PORTAL);
 				currentGateBlock.getFace(BlockFace.SOUTH).setType(Material.OBSIDIAN);

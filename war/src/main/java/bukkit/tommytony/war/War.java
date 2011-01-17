@@ -87,7 +87,7 @@ public class War extends JavaPlugin {
 		this.defaultLifepool = 7;
 		this.defaultFriendlyFire = false;
 		this.defaultAutoAssignOnly = false;
-		getLogger().info("Loading War files...");
+		getLogger().info("Loading War secrets...");
 		WarMapper.load(this, this.getServer().getWorlds()[0]);		
 		getLogger().info("War v" + version + " is on.");
 	}
@@ -285,15 +285,18 @@ public class War extends JavaPlugin {
 			
 			// /setwarhub
 			else if(command.equals("setwarhub")) {
-				WarHub hub = this.getWarHub();
-				if(hub != null) {
+				if(warHub != null) {
 					// reset existing hub
-					hub.getVolume().resetBlocks();
-					hub.setLocation(player.getLocation());
-					hub.initialize();
+					warHub.getVolume().resetBlocks();
+					warHub.setLocation(player.getLocation());
+					warHub.initialize();
 				} else {
-					hub = new WarHub(this, player.getLocation());
-					hub.initialize();
+					warHub = new WarHub(this, player.getLocation());
+					warHub.initialize();
+					for(Warzone zone : warzones) {
+						zone.getLobby().getVolume().resetBlocks();
+						zone.getLobby().initialize();
+					}
 				}
 				WarMapper.save(this);
 			}

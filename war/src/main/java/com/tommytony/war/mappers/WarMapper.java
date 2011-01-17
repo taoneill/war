@@ -161,6 +161,7 @@ public class WarMapper {
 		WarHub hub = war.getWarHub();
 		if(hub != null) {
 			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ();
+			VolumeMapper.save(hub.getVolume(), "", war);
 		}
 		warConfig.setString("warhub", hubStr);
 		
