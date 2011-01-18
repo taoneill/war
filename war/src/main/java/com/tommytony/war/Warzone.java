@@ -441,11 +441,12 @@ public class Warzone {
 
 	public void restorePlayerInventory(Player player) {
 		ItemStack[] originalContents = inventories.remove(player.getName());
-		PlayerInventory playerInv = player.getInventory();
-		playerInv.clear();
-		playerInv.setHelmet(new ItemStack(0));
-		playerInv.setBoots(new ItemStack(0));
-		playerInv.setContents(originalContents);
+		if(originalContents != null) {
+			PlayerInventory playerInv = player.getInventory();
+			playerInv.clear();
+			playerInv.setHelmet(new ItemStack(0));
+			playerInv.setContents(originalContents);
+		}
 	}
 
 	public boolean hasMonument(String monumentName) {

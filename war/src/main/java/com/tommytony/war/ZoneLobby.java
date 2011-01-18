@@ -205,6 +205,9 @@ public class ZoneLobby {
 		}  
 		if(warzone.getAutoAssignOnly()){
 			autoAssignGate = lobbyMiddleWallBlock;
+			diamondGate = null;
+			ironGate = null;
+			goldGate = null;
 		} else if(warzone.getTeams().size() == 1) { 
 			if(warzone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND) != null) {
 				diamondGate = lobbyMiddleWallBlock;

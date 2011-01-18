@@ -16,7 +16,7 @@ public class BlockInfo {
 //	private int z;
 	private int type;
 	private byte data;
-	private String[] signLines;
+	//private String[] signLines;
 
 	public BlockInfo(Block block) {
 //		this.x = block.getX();
@@ -24,10 +24,10 @@ public class BlockInfo {
 //		this.z = block.getX();
 		this.type = block.getTypeId();
 		this.data = block.getData();
-		if(is(Material.SIGN) || is(Material.SIGN_POST)) {
-			Sign sign = (Sign)block.getState();
-			this.signLines = sign.getLines();
-		}
+//		if(is(Material.SIGN) || is(Material.SIGN_POST)) {
+//			Sign sign = (Sign)block.getState();
+//			this.signLines = sign.getLines();
+//		}
 	}
 	
 	public BlockInfo(BlockState blockState) {
@@ -36,16 +36,16 @@ public class BlockInfo {
 //		this.z = blockState.getX();
 		this.type = blockState.getTypeId();
 		this.data = blockState.getData().getData();
-		if(is(Material.SIGN) || is(Material.SIGN_POST)) {
-			Sign sign = (Sign)blockState;
-			this.signLines = sign.getLines();
-		}
+//		if(is(Material.SIGN) || is(Material.SIGN_POST)) {
+//			Sign sign = (Sign)blockState;
+//			this.signLines = sign.getLines();
+//		}
 	}
 	
 	public BlockInfo(int typeID, byte data, String[] lines) {
 		type = typeID;
 		this.data = data;
-		signLines = lines;
+		//signLines = lines;
 	}
 
 //	public int getX() {
@@ -76,10 +76,10 @@ public class BlockInfo {
 		return getType() == material;
 	}
 	
-	public String[] getSignLines() {
-		if(is(Material.SIGN) || is(Material.SIGN_POST)){
-			return signLines;
-		}
-		return null;
-	}
+//	public String[] getSignLines() {
+//		if(is(Material.SIGN) || is(Material.SIGN_POST)){
+//			return new String[4] {"", ""};
+//		}
+//		return null;
+//	}
 }

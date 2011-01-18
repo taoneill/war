@@ -5,8 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 
 import bukkit.tommytony.war.War;
 
@@ -21,7 +19,8 @@ public class Volume {
 	//private final Warzone warzone;
 	private Block cornerOne;
 	private Block cornerTwo;
-	private BlockInfo[][][] blockInfos = null;
+	private int[][][] blockTypes = null;
+	private byte[][][] blockDatas = null;
 	private final War war;	
 
 	public Volume(String name, War war, World world) {
@@ -46,14 +45,17 @@ public class Volume {
 		int noOfSavedBlocks = 0;
 		try {
 			if(hasTwoCorners()) {
-				this.setBlockInfos(new BlockInfo[getSizeX()][getSizeY()][getSizeZ()]);
+				this.setBlockTypes(new int[getSizeX()][getSizeY()][getSizeZ()]);
+				this.setBlockDatas(new byte[getSizeX()][getSizeY()][getSizeZ()]);
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMinY();
 					for(int j = 0; j < getSizeY(); j++){
 						int z = getMinZ();
 						for(int k = 0;k < getSizeZ(); k++) {
-							this.getBlockInfos()[i][j][k] = new BlockInfo(getWorld().getBlockAt(x, y, z));
+							Block block = getWorld().getBlockAt(x, y, z);
+							this.getBlockTypes()[i][j][k] = block.getTypeId();
+							this.getBlockDatas()[i][j][k] = block.getData();
 							z++;
 							noOfSavedBlocks++;
 						}
@@ -72,32 +74,33 @@ public class Volume {
 		int noOfResetBlocks = 0;
 		clearBlocksThatDontFloat();
 		try {
-			if(hasTwoCorners() && getBlockInfos() != null) {
+			if(hasTwoCorners() && getBlockTypes() != null) {
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMinY();
 					for(int j = 0; j < getSizeY(); j++){
 						int z = getMinZ();
 						for(int k = 0;k < getSizeZ(); k++) {
-							BlockInfo oldBlockInfo = getBlockInfos()[i][j][k];
+							int oldBlockType = getBlockTypes()[i][j][k];
+							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(currentBlock.getTypeId() != oldBlockInfo.getTypeId() ||
-								(currentBlock.getTypeId() == oldBlockInfo.getTypeId() && currentBlock.getData() != oldBlockInfo.getData()) ||
-								(currentBlock.getTypeId() == oldBlockInfo.getTypeId() && currentBlock.getData() == oldBlockInfo.getData() &&
-										(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST))
+							if(currentBlock.getTypeId() != oldBlockType ||
+								(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData ) ||
+								(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() == oldBlockData &&
+										(oldBlockType == Material.SIGN.getId() || oldBlockType == Material.SIGN_POST.getId())
 								)
 							) {
-								currentBlock.setType(oldBlockInfo.getType());
-								currentBlock.setData(oldBlockInfo.getData());
-								if(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST)) {
-									BlockState state = currentBlock.getState();
-									Sign currentSign = (Sign) state;
-									currentSign.setLine(0, oldBlockInfo.getSignLines()[0]);
-									currentSign.setLine(1, oldBlockInfo.getSignLines()[1]);
-									currentSign.setLine(2, oldBlockInfo.getSignLines()[2]);
-									currentSign.setLine(3, oldBlockInfo.getSignLines()[3]);
-									state.update();
-								}
+								currentBlock.setTypeId(oldBlockType);
+								currentBlock.setData(oldBlockData);
+//								if(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST)) {
+//									BlockState state = currentBlock.getState();
+//									Sign currentSign = (Sign) state;
+//									currentSign.setLine(0, oldBlockInfo.getSignLines()[0]);
+//									currentSign.setLine(1, oldBlockInfo.getSignLines()[1]);
+//									currentSign.setLine(2, oldBlockInfo.getSignLines()[2]);
+//									currentSign.setLine(3, oldBlockInfo.getSignLines()[3]);
+//									state.update();
+//								}
 								noOfResetBlocks++;
 							}
 							z++;
@@ -112,6 +115,16 @@ public class Volume {
 		}
 		return noOfResetBlocks;
 	}
+
+	public byte[][][] getBlockDatas() {
+		// TODO Auto-generated method stub
+		return this.blockDatas;
+	}
+	
+	public void setBlockDatas(byte[][][] data) {
+		this.blockDatas = data;
+	}
+	
 
 	public void setCornerTwo(Block block) {
 		this.cornerTwo = block;
@@ -184,11 +197,11 @@ public class Volume {
 	}	
 
 	public boolean isSaved() {
-		return getBlockInfos() != null;
+		return getBlockTypes() != null;
 	}
 
-	public BlockInfo[][][] getBlockInfos() {
-		return blockInfos;
+	public int[][][] getBlockTypes() {
+		return blockTypes;
 	}
 	
 	public Block getCornerOne() {
@@ -217,8 +230,8 @@ public class Volume {
 				z <= getMaxZ() && z >= getMinZ();
 	}
 
-	public void setBlockInfos(BlockInfo[][][] blockInfos) {
-		this.blockInfos = blockInfos;
+	public void setBlockTypes(int[][][] blockTypes) {
+		this.blockTypes = blockTypes;
 	}
 
 	public War getWar() {
@@ -231,7 +244,7 @@ public class Volume {
 
 	public void setToMaterial(Material material) {
 		try {
-			if(hasTwoCorners() && getBlockInfos() != null) {
+			if(hasTwoCorners() && getBlockTypes() != null) {
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMinY();
@@ -254,7 +267,7 @@ public class Volume {
 	
 	public void setFaceMaterial(BlockFace face, Material material) {
 		try {
-			if(hasTwoCorners() && getBlockInfos() != null) {
+			if(hasTwoCorners() && getBlockTypes() != null) {
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMinY();
@@ -284,7 +297,7 @@ public class Volume {
 	
 	private void switchMaterials(Material[] oldTypes, Material newType) {
 		try {
-			if(hasTwoCorners() && getBlockInfos() != null) {
+			if(hasTwoCorners() && getBlockTypes() != null) {
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMinY();

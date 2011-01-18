@@ -103,7 +103,7 @@ public class WarHub {
 				Sign sign = (Sign) state;
 				sign.setLine(0, "War hub");
 				sign.setLine(1, "");
-				sign.setLine(2, "Pick you battle!");
+				sign.setLine(2, "Pick your battle!");
 				sign.setLine(3, "");
 				state.update(true);
 			}

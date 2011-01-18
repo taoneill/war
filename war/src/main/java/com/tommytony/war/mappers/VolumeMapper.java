@@ -55,7 +55,8 @@ public class VolumeMapper {
 				volume.setCornerOne(world.getBlockAt(x1, y1, z1));
 				volume.setCornerTwo(world.getBlockAt(x2, y2, z2));	
 				
-				volume.setBlockInfos(new BlockInfo[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
+				volume.setBlockTypes(new int[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
+				volume.setBlockDatas(new byte[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
 				for(int i = 0; i < volume.getSizeX(); i++){
 					for(int j = 0; j < volume.getSizeY(); j++) {
 						for(int k = 0; k < volume.getSizeZ(); k++) {
@@ -65,22 +66,24 @@ public class VolumeMapper {
 								int typeID = Integer.parseInt(blockSplit[0]);
 								byte data = Byte.parseByte(blockSplit[1]);
 								String[] lines = null;
-								if(typeID == Material.SIGN.getId() || typeID == Material.SIGN_POST.getId()) {
-									String signLines = blockSplit[2];
-									if(blockSplit.length > 3) {
-										// sign includes commas
-										for(int splitI = 3; splitI < blockSplit.length; splitI++) {
-											signLines.concat(blockSplit[splitI]);
-										}
-									}
-									String[] signLinesSplit = signLines.split("[line]");
-									lines = new String[4];
-									lines[0] = signLinesSplit[0];
-									lines[1] = signLinesSplit[1];
-									lines[2] = signLinesSplit[2];
-									lines[3] = signLinesSplit[3];
-								}
-								volume.getBlockInfos()[i][j][k] = new BlockInfo(typeID, data, lines);
+//								if(typeID == Material.SIGN.getId() || typeID == Material.SIGN_POST.getId()) {
+//									String signLines = blockSplit[2];
+//									if(blockSplit.length > 3) {
+//										// sign includes commas
+//										for(int splitI = 3; splitI < blockSplit.length; splitI++) {
+//											signLines.concat(blockSplit[splitI]);
+//										}
+//									}
+//									String[] signLinesSplit = signLines.split("[line]");
+//									lines = new String[4];
+//									lines[0] = signLinesSplit[0];
+//									lines[1] = signLinesSplit[1];
+//									lines[2] = signLinesSplit[2];
+//									lines[3] = signLinesSplit[3];
+//								}
+								//volume.getBlockTypes()[i][j][k] = new BlockInfo(typeID, data, lines);
+								volume.getBlockTypes()[i][j][k] = typeID;
+								volume.getBlockDatas()[i][j][k] = data;
 							}
 						}
 					}
@@ -103,7 +106,7 @@ public class VolumeMapper {
 	}
 	
 	public static void save(Volume volume, String zoneName, War war) {
-		if(volume.isSaved() && volume.getBlockInfos() != null) {
+		if(volume.isSaved() && volume.getBlockTypes() != null) {
 			BufferedWriter out = null;
 			try {
 				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File("War/dat/volume-" + volume.getName() + ".dat")));
@@ -121,19 +124,22 @@ public class VolumeMapper {
 				for(int i = 0; i < volume.getSizeX(); i++){
 					for(int j = 0; j < volume.getSizeY(); j++) {
 						for(int k = 0; k < volume.getSizeZ(); k++) {
-							BlockInfo info = volume.getBlockInfos()[i][j][k];
-							if(info == null) {
-								out.write("0,0,");
-							} else {
-								if(info.getType() == Material.SIGN || info.getType() == Material.SIGN_POST) {
-									String[] lines = info.getSignLines();
-									out.write(info.getTypeId() + "," + info.getData() + "," + lines[0] + "[line]" + lines[1] 
-									          + "[line]" + lines[2] + "[line]"+ lines[3]);
-									
-								} else {
-									out.write(info.getTypeId() + "," + info.getData() + ","); 
-								}
-							}
+							int typeId = volume.getBlockTypes()[i][j][k];
+							byte data = volume.getBlockDatas()[i][j][k];
+							out.write(typeId + "," + data + ",");
+							//BlockInfo info = volume.getBlockTypes()[i][j][k];
+//							if(info == null) {
+//								out.write("0,0,");
+//							} else {
+//								if(info.getType() == Material.SIGN || info.getType() == Material.SIGN_POST) {
+//									String[] lines = info.getSignLines();
+//									out.write(info.getTypeId() + "," + info.getData() + "," + lines[0] + "[line]" + lines[1] 
+//									          + "[line]" + lines[2] + "[line]"+ lines[3]);
+//									
+//								} else {
+//									out.write(info.getTypeId() + "," + info.getData() + ","); 
+								//}
+//							}
 							out.newLine();
 						}
 					}
