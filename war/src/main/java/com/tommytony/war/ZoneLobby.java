@@ -303,7 +303,7 @@ public class ZoneLobby {
 				autoAssignGate.getFace(leftSide).setType(TeamMaterials.TEAMDIAMOND);
 				autoAssignGate.getFace(leftSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMIRON);
 				autoAssignGate.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMGOLD);
-				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMDIAMOND);
+				autoAssignGate.getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMDIAMOND);
 				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMIRON);
 				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMGOLD);
 				autoAssignGate.getFace(rightSide).setType(TeamMaterials.TEAMDIAMOND);			
@@ -311,7 +311,7 @@ public class ZoneLobby {
 				autoAssignGate.getFace(leftSide).setType(TeamMaterials.TEAMDIAMOND);
 				autoAssignGate.getFace(leftSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMIRON);
 				autoAssignGate.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMDIAMOND);
-				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMIRON);
+				autoAssignGate.getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMIRON);
 				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMDIAMOND);
 				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMIRON);
 				autoAssignGate.getFace(rightSide).setType(TeamMaterials.TEAMDIAMOND);	
@@ -319,7 +319,7 @@ public class ZoneLobby {
 				autoAssignGate.getFace(leftSide).setType(TeamMaterials.TEAMIRON);
 				autoAssignGate.getFace(leftSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMGOLD);
 				autoAssignGate.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMIRON);
-				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMGOLD);
+				autoAssignGate.getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMGOLD);
 				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMIRON);
 				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMGOLD);
 				autoAssignGate.getFace(rightSide).setType(TeamMaterials.TEAMIRON);	
@@ -327,7 +327,7 @@ public class ZoneLobby {
 				autoAssignGate.getFace(leftSide).setType(TeamMaterials.TEAMDIAMOND);
 				autoAssignGate.getFace(leftSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMGOLD);
 				autoAssignGate.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMDIAMOND);
-				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMGOLD);
+				autoAssignGate.getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMGOLD);
 				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(TeamMaterials.TEAMDIAMOND);
 				autoAssignGate.getFace(rightSide).getFace(BlockFace.UP).setType(TeamMaterials.TEAMGOLD);
 				autoAssignGate.getFace(rightSide).setType(TeamMaterials.TEAMDIAMOND);	
@@ -392,7 +392,8 @@ public class ZoneLobby {
 		if(blockWall == wall) {
 			return isPartOfGate(diamondGate, block)
 					|| isPartOfGate(ironGate, block)
-					|| isPartOfGate(goldGate, block);
+					|| isPartOfGate(goldGate, block)
+					|| isPartOfGate(autoAssignGate, block);
 		}
 		return false;
 	}

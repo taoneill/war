@@ -376,7 +376,7 @@ public class War extends JavaPlugin {
 						} else if (warzone.tooSmall()) {
 							message += " Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.";
 						} else if (warzone.tooBig()) {
-							message += " Warzone " + warzone.getName() + " is too Big. Max north-south size: 1000. Max east-west size: 1000.";
+							message += " Warzone " + warzone.getName() + " is too Big. Max north-south size: 500. Max east-west size: 500.";
 						}
 					}
 					player.sendMessage(this.str(message));
@@ -486,6 +486,10 @@ public class War extends JavaPlugin {
 					}
 					if(updateZoneFromNamedParams(warzone, arguments)) {
 						WarzoneMapper.save(this, warzone, false);
+						warzone.getVolume().resetBlocks();
+						if(lobby != null) {
+							lobby.getVolume().resetBlocks();
+						}
 						warzone.initializeZone();	// bring back team spawns etc
 						player.sendMessage(this.str("Warzone config saved. Zone reset."));
 					} else {
@@ -735,10 +739,10 @@ public class War extends JavaPlugin {
 				WarMapper.save(this);
 			}
 			
-			// /setzoneconfig
+			// /setwarconfig
 			else if(command.equals("setwarconfig")) {
 				if(arguments.length == 0) {
-					player.sendMessage(this.str("Usage: /setwarconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " +
+					player.sendMessage(this.str("Usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " +
 							"Changes the server defaults for new warzones. Please give at leaset one named parameter. Must be in warzone."));
 				} else {
 					if(updateFromNamedParams(arguments)) {
@@ -877,6 +881,9 @@ public class War extends JavaPlugin {
 				setDefaultAutoAssignOnly(onOff.equals("on"));
 			} else if(namedParams.containsKey("outline")){
 				String onOff = namedParams.get("outline");
+				setDefaultDrawZoneOutline(onOff.equals("on"));
+			} else if(namedParams.containsKey("pvpinzonesonly")){
+				String onOff = namedParams.get("pvpinzonesonly");
 				setDefaultDrawZoneOutline(onOff.equals("on"));
 			} 
 			return true;
