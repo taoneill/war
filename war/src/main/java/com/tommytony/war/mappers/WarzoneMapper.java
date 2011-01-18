@@ -336,13 +336,13 @@ public class WarzoneMapper {
 		for(File file : files) {
 			boolean deletedData = file.delete();
 			if(!deletedData) {
-				war.getLogger().warning("Failed to delete file " + file.getName());
+				war.warn("Failed to delete file " + file.getName());
 			}
 		}
 		;
 		boolean deletedData = zoneFolder.delete();
 		if(!deletedData) {
-			war.getLogger().warning("Failed to delete file " + zoneFolder.getName());
+			war.warn("Failed to delete file " + zoneFolder.getName());
 		}
 	}
 

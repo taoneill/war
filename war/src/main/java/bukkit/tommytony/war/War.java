@@ -19,6 +19,7 @@ import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
+import com.tommytony.war.mappers.VolumeMapper;
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
 
@@ -50,17 +51,17 @@ public class War extends JavaPlugin {
     private Logger log;
     String name = "War";
     String version = "0.3";
-    String versionCodeName = "Patton";
     
     private final List<Warzone> warzones = new ArrayList<Warzone>();
     private final List<String> zoneMakerNames = new ArrayList<String>();
+    private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
     private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
-    private int defaultLifepool = 15;
+    private int defaultLifepool = 42;
     private boolean defaultFriendlyFire = false;
 	private boolean defaultDrawZoneOutline = true;
 	private boolean defaultAutoAssignOnly = false;
-	private int defaultTeamCap = 5;
-	private int defaultScoreCap = 5;
+	private int defaultTeamCap = 7;
+	private int defaultScoreCap = 10;
 	private boolean pvpInZonesOnly = false;
 	private WarHub warHub;
 	
@@ -74,7 +75,7 @@ public class War extends JavaPlugin {
 		if(warHub != null) {
 			warHub.getVolume().resetBlocks();
 		}
-		this.info("All blocks reset. War v" + version + " (" + versionCodeName + ") disabled.");
+		this.info("All blocks reset. War v" + version + " disabled.");
 	}
 
 	public void onEnable() {
@@ -103,7 +104,7 @@ public class War extends JavaPlugin {
 		this.defaultAutoAssignOnly = false;
 		this.info("Restoring saved warzones...");
 		WarMapper.load(this, this.getServer().getWorlds()[0]);		
-		this.info("War v"+ version + " (" + versionCodeName + ") enabled.");
+		this.info("War v"+ version + " is on.");
 	}
 	
 	public boolean onCommand(Player player, Command cmd, String commandLabel, String[] args) {
@@ -282,9 +283,7 @@ public class War extends JavaPlugin {
 				player.teleportTo(this.getWarHub().getLocation());
 			}
 			
-		}
-		
-		if(this.isZoneMaker(player.getName())) {			
+		} else if(this.isZoneMaker(player.getName())) {			
 		// Mod commands : /nextbattle
 		
 			// /nextbattle
@@ -429,6 +428,10 @@ public class War extends JavaPlugin {
 						lobby = new ZoneLobby(this, warzone, wall);
 						warzone.setLobby(lobby);
 						lobby.initialize();
+						if(warHub != null) { // warhub has to change
+							warHub.getVolume().resetBlocks();
+							warHub.initialize();
+						}
 						player.sendMessage(this.str("Warzone lobby created on " + wallStr + "side of zone."));
 					}
 					WarzoneMapper.save(this, warzone, false);
@@ -454,6 +457,10 @@ public class War extends JavaPlugin {
 						lobby = new ZoneLobby(this, warzone, BlockFace.SOUTH);
 						warzone.setLobby(lobby);
 						lobby.initialize();
+						if(warHub != null) {	// warhub has to change
+							warHub.getVolume().resetBlocks();
+							warHub.initialize();
+						}
 						player.sendMessage(this.str("Default lobby created on south side of zone."));
 					}
 					updateZoneFromNamedParams(warzone, arguments);
@@ -554,6 +561,10 @@ public class War extends JavaPlugin {
 					this.getWarzones().remove(warzone);
 					WarMapper.save(this);
 					WarzoneMapper.delete(this, warzone.getName());
+					if(warHub != null) {	// warhub has to change
+						warHub.getVolume().resetBlocks();
+						warHub.initialize();
+					}
 					player.sendMessage(this.str("Warzone " + warzone.getName() + " removed."));
 				}
 			}
@@ -636,8 +647,10 @@ public class War extends JavaPlugin {
 			
 			// /setmonument
 			else if(command.equals("setmonument")) {
-				if(!this.inAnyWarzone(player.getLocation())) {
-					player.sendMessage(this.str("Usage: /setmonument <name>. Creates or moves a monument. Must be in warzone."));
+				if(!this.inAnyWarzone(player.getLocation()) || arguments.length < 1 || arguments.length > 1 
+						|| (arguments.length == 1 && this.warzone(player.getLocation()) != null
+								&& arguments[0].equals(this.warzone(player.getLocation()).getName()))) {
+					player.sendMessage(this.str("Usage: /setmonument <name>. Creates or moves a monument. Monument can't have same name as zone. Must be in warzone."));
 				} else {
 					Warzone warzone = this.warzone(player.getLocation());
 					String monumentName = arguments[0];
@@ -708,11 +721,13 @@ public class War extends JavaPlugin {
 				if(warHub != null) {
 					// reset existing hub
 					warHub.getVolume().resetBlocks();
+					VolumeMapper.delete(warHub.getVolume(), this);
+					this.warHub = null;
 					for(Warzone zone : warzones) {
 						zone.getLobby().getVolume().resetBlocks();
 						zone.getLobby().initialize();
 					}
-					this.warHub = null;
+					
 					player.sendMessage(this.str("War hub removed."));
 				} else {
 					player.sendMessage(this.str("No War hub to delete."));
@@ -734,6 +749,47 @@ public class War extends JavaPlugin {
 					}
 				}
 			}
+			
+			// /zonemaker
+			else if(command.equals("zonemaker")) {
+				if(arguments.length > 2) {
+					player.sendMessage(this.str("Usage: /zonemaker <player-name>, /zonemaker" +
+							"Elevates the player to zone maker or removes his rights. " +
+							"If you are already a zonemaker, you can toggle between player and zone maker modes by using the command without arguments."));
+				} else {
+					if(arguments.length == 1) {
+						// make someone zonemaker or remove the right
+						if(zoneMakerNames.contains(arguments[0])) {
+							// kick
+							zoneMakerNames.remove(arguments[0]);
+							player.sendMessage(str(arguments[0] + " is not a zone maker anymore."));
+							Player kickedMaker = getServer().getPlayer(arguments[0]);
+							if(kickedMaker != null) {
+								kickedMaker.sendMessage(str(player.getName() + " took away your warzone maker priviledges."));
+							}
+						} else {
+							// add
+							zoneMakerNames.add(arguments[0]);
+							player.sendMessage(str(arguments[0] + " is now a zone maker."));
+							Player newMaker = getServer().getPlayer(arguments[0]);
+							if(newMaker != null) {
+								newMaker.sendMessage(str(player.getName() + " made you warzone maker."));
+							}
+						}
+					} else {
+						// toggle to player mode
+						for(String name : zoneMakerNames) {
+							if(name.equals(player.getName())) {
+								getZoneMakersImpersonatingPlayers().add(player.getName());
+							}
+						}
+						zoneMakerNames.remove(player.getName());
+						player.sendMessage(str("You are now impersonating a regular player. Type /zonemaker again to toggle back to war maker mode."));
+					}
+					
+					WarMapper.save(this);
+				}
+			}
 		} else if (command.equals("setzone")		// Not a zone maker but War command.
 						|| command.equals("nextbattle")
 						|| command.equals("setzonelobby")
@@ -749,7 +805,19 @@ public class War extends JavaPlugin {
 						|| command.equals("deletewarhub")
 						|| command.equals("setwarconfig")) {
 			player.sendMessage(this.str("You can't do this if you are not a warzone maker."));
-			return false;
+		} else if (command.equals("zonemaker")) {
+			boolean wasImpersonating = false;
+			for(String name : getZoneMakersImpersonatingPlayers()) {
+				if(player.getName().equals(name)) {
+					zoneMakerNames.add(player.getName());
+					wasImpersonating = true;
+				}
+			}
+			if(wasImpersonating) {
+				getZoneMakersImpersonatingPlayers().remove(player.getName());
+				player.sendMessage(str("You are back as a zone maker."));
+			}
+			WarMapper.save(this);
 		}
 		return true;
 		
@@ -1015,6 +1083,10 @@ public class War extends JavaPlugin {
 
 	public boolean isDefaultDrawZoneOutline() {
 		return defaultDrawZoneOutline;
+	}
+
+	public List<String> getZoneMakersImpersonatingPlayers() {
+		return zoneMakersImpersonatingPlayers;
 	}
 	
 }

@@ -61,7 +61,7 @@ public class WarHub {
 		zoneGateBlocks.clear();
 		int noOfWarzones = war.getWarzones().size();
 		if(noOfWarzones > 0) {
-			int hubWidth = noOfWarzones * 4 + 1;
+			int hubWidth = noOfWarzones * 4 + 5;
 			int halfHubWidth = hubWidth / 2;
 			int hubDepth = 6;
 			int hubHeigth = 4;
@@ -72,6 +72,7 @@ public class WarHub {
 			volume.saveBlocks();
 			
 			// glass floor
+			volume.clearBlocksThatDontFloat();
 			volume.setToMaterial(Material.AIR);
 			volume.setFaceMaterial(BlockFace.DOWN, Material.GLASS);
 			
