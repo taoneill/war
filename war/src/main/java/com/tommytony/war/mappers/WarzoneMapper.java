@@ -87,7 +87,8 @@ public class WarzoneMapper {
 			int teleX = Integer.parseInt(teleportSplit[0]);
 			int teleY = Integer.parseInt(teleportSplit[1]);
 			int teleZ = Integer.parseInt(teleportSplit[2]);
-			warzone.setTeleport(new Location(world, teleX, teleY, teleZ));
+			int yaw = Integer.parseInt(teleportSplit[3]);
+			warzone.setTeleport(new Location(world, teleX, teleY, teleZ, yaw, 0));
 		}
 		
 		// teams
@@ -237,7 +238,7 @@ public class WarzoneMapper {
 		String teleportStr = "";
 		Location tele = warzone.getTeleport();
 		if(tele != null) {
-			teleportStr = tele.getBlockX() + "," + tele.getBlockY() + "," + tele.getBlockZ();
+			teleportStr = tele.getBlockX() + "," + tele.getBlockY() + "," + tele.getBlockZ() + "," + (int)tele.getYaw();
 		}
 		warzoneConfig.setString("teleport", teleportStr);
 		
