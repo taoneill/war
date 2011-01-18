@@ -361,14 +361,13 @@ public class Warzone {
 		}
 		
 		if(team.getMaterial() == Material.GOLD_BLOCK) {
-			playerInv.setHelmet(new ItemStack(Material.GOLD_BOOTS));
+			playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
 		} else if (team.getMaterial() == Material.DIAMOND_BLOCK) {
-			playerInv.setHelmet(new ItemStack(Material.DIAMOND_BOOTS));
+			playerInv.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 		} else if (team.getMaterial() == Material.IRON_BLOCK) {
-			playerInv.setHelmet(new ItemStack(Material.IRON_BOOTS));
+			playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
 		}
 		//player.setHealth(20);
-		
 	}
 
 	public boolean isMonumentCenterBlock(Block block) {
@@ -446,9 +445,8 @@ public class Warzone {
 		ItemStack[] originalContents = inventories.remove(player.getName());
 		PlayerInventory playerInv = player.getInventory();
 		playerInv.clear();
-		playerInv.remove(Material.DIAMOND_BOOTS.getId());
-		playerInv.remove(Material.GOLD_BOOTS.getId());
-		playerInv.remove(Material.IRON_BOOTS.getId());
+		playerInv.setHelmet(new ItemStack(0));
+		playerInv.setBoots(new ItemStack(0));
 		playerInv.setContents(originalContents);
 	}
 
@@ -482,35 +480,35 @@ public class Warzone {
 				return true;
 			}
 		}
-		if(teleportNear(block)) {
-			return true;
-		}
+//		if(lobby != null) {
+//			lobby.getVolume().contains(block);
+//		}
 		return false;
 	}
 
-	private boolean teleportNear(Block block) {
-		if(teleport != null) {
-			int x = (int)this.teleport.getBlockX();
-			int y = (int)this.teleport.getBlockY();
-			int z = (int)this.teleport.getBlockZ();
-			int bx = block.getX();
-			int by = block.getY();
-			int bz = block.getZ();
-			if((bx == x && by == y && bz == z) || 
-					(bx == x+1 && by == y-1 && bz == z+1) ||
-					(bx == x+1 && by == y-1 && bz == z) ||
-					(bx == x+1 && by == y-1 && bz == z-1) ||
-					(bx == x && by == y-1 && bz == z+1) ||
-					(bx == x && by == y-1 && bz == z) ||
-					(bx == x && by == y-1 && bz == z-1) ||
-					(bx == x-1 && by == y-1 && bz == z+1) ||
-					(bx == x-1 && by == y-1 && bz == z) ||
-					(bx == x-1 && by == y-1 && bz == z-1) ) {
-				return true;
-			}
-		}
-		return false;
-	}
+//	private boolean teleportNear(Block block) {
+//		if(teleport != null) {
+//			int x = (int)this.teleport.getBlockX();
+//			int y = (int)this.teleport.getBlockY();
+//			int z = (int)this.teleport.getBlockZ();
+//			int bx = block.getX();
+//			int by = block.getY();
+//			int bz = block.getZ();
+//			if((bx == x && by == y && bz == z) || 
+//					(bx == x+1 && by == y-1 && bz == z+1) ||
+//					(bx == x+1 && by == y-1 && bz == z) ||
+//					(bx == x+1 && by == y-1 && bz == z-1) ||
+//					(bx == x && by == y-1 && bz == z+1) ||
+//					(bx == x && by == y-1 && bz == z) ||
+//					(bx == x && by == y-1 && bz == z-1) ||
+//					(bx == x-1 && by == y-1 && bz == z+1) ||
+//					(bx == x-1 && by == y-1 && bz == z) ||
+//					(bx == x-1 && by == y-1 && bz == z-1) ) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 
 	public World getWorld() {
 		
@@ -669,7 +667,7 @@ public class Warzone {
 													// because player can go around corner
 					lobby.initialize();
 				}
-				war.getLogger().info("Reset " + reset + " blocks in " + guard.getWall() + " wall of warzone " + name);
+				//war.getLogger().info("Reset " + reset + " blocks in " + guard.getWall() + " wall of warzone " + name);
 			}
 		}
 		// now remove those zone guards

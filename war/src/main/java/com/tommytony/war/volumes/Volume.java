@@ -70,6 +70,9 @@ public class Volume {
 	
 	public int resetBlocks() {
 		int noOfResetBlocks = 0;
+		Material[] toAirMaterials = new Material[1];
+		toAirMaterials[0] = Material.SIGN_POST;
+		switchMaterials(toAirMaterials, Material.AIR);
 		try {
 			if(hasTwoCorners() && getBlockInfos() != null) {
 				int x = getMinX();
@@ -190,82 +193,6 @@ public class Volume {
 		return blockInfos;
 	}
 	
-//	public String blocksToString() {
-//		if(hasTwoCorners() && blockInfos != null) {
-//			StringBuilder volumeStringBuilder = new StringBuilder();
-//			volumeStringBuilder.append(cornerOne.getX() + "," + cornerOne.getY() + "," + cornerOne.getZ() + ";");
-//			volumeStringBuilder.append(cornerTwo.getX() + "," + cornerTwo.getY() + "," + cornerTwo.getZ() + ";");
-//			
-//			for(int i = 0; i < getSizeX(); i++){
-//				for(int j = 0; j < getSizeY(); j++) {
-//					for(int k = 0; k < getSizeZ(); k++) {
-//						BlockInfo info = getBlockInfos()[i][j][k];
-//						if(info == null) {
-//							volumeStringBuilder.append("0,0,");
-//						} else {
-//							volumeStringBuilder.append(info.getTypeID() + "," + info.getData() + ",");
-//							if(info.getType() == Material.Sign || info.getType() == Material.SignPost) {
-//								String[] lines = info.getSignLines();
-//								volumeStringBuilder.append(lines[0] + "\n");
-//								volumeStringBuilder.append(lines[1] + "\n");
-//								volumeStringBuilder.append(lines[2] + "\n");
-//								volumeStringBuilder.append(lines[3] + "\n");
-//							}
-//						}
-//						
-//						volumeStringBuilder.append(";");
-//					}
-//				}
-//			}
-//			return volumeStringBuilder.toString();
-//		}
-//		return "";
-//	}
-	
-//	public void blocksFromString(String volumeString) {
-//		Scanner scanner = new Scanner(volumeString);
-//		int x1 = 0;
-//		if(scanner.hasNext(".+,")) x1 = Integer.parseInt(scanner.next(".+,").replace(",", ""));
-//		int y1 = 0;
-//		if(scanner.hasNext(".+,")) y1 = Integer.parseInt(scanner.next(".+,").replace(",", ""));
-//		int z1 = 0;
-//		if(scanner.hasNext(".+,")) z1 = Integer.parseInt(scanner.next(".+,").replace(",", ""));
-//		if(scanner.hasNext(";")) scanner.next(";");
-//		cornerOne = getWorld().getBlockAt(x1, y1, z1);
-//		
-//		int x2 = 0;
-//		if(scanner.hasNext(".+,")) x2 = Integer.parseInt(scanner.next(".+,").replace(",", ""));
-//		int y2 = 0;
-//		if(scanner.hasNext(".+,")) y2 = Integer.parseInt(scanner.next(".+,").replace(",", ""));
-//		int z2 = 0;
-//		if(scanner.hasNext(".+,")) z2 = Integer.parseInt(scanner.next(".+,").replace(",", ""));
-//		if(scanner.hasNext(";")) scanner.next(";");
-//		cornerTwo = getWorld().getBlockAt(x2, y2, z2);
-//		
-//		setBlockInfos(new BlockInfo[getSizeX()][getSizeY()][getSizeZ()]);
-//		for(int i = 0; i < getSizeX(); i++){
-//			for(int j = 0; j < getSizeY(); j++) {
-//				for(int k = 0; k < getSizeZ(); k++) {
-//					int typeID = 0;
-//					if(scanner.hasNext(".+,")) typeID = Integer.parseInt(scanner.next(".+,").replace(",", ""));
-//					byte data = 0;
-//					if(scanner.hasNext(".+,")) data = Byte.parseByte(scanner.next(".+,").replace(",", ""));
-//					String[] lines = null;
-//					if(typeID == Material.Sign.getID() || typeID == Material.SignPost.getID()) {
-//						lines = new String[4];
-//						if(scanner.hasNextLine()) lines[0] = scanner.nextLine();
-//						if(scanner.hasNextLine()) lines[1] = scanner.nextLine();
-//						if(scanner.hasNextLine()) lines[2] = scanner.nextLine();
-//						if(scanner.hasNextLine()) lines[3] = scanner.nextLine();
-//					}
-//					if(scanner.hasNext(";")) scanner.next(";");
-//					getBlockInfos()[i][j][k] = new BlockInfo(typeID, data, lines);
-//				}
-//			}
-//		}
-//	}
-	
-	
 	public Block getCornerOne() {
 		return cornerOne;
 	}
@@ -354,6 +281,33 @@ public class Volume {
 			}		
 		} catch (Exception e) {
 			this.getWar().getLogger().warning("Failed to set block to " + material + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
+		}
+	}
+	
+	private void switchMaterials(Material[] oldTypes, Material newType) {
+		try {
+			if(hasTwoCorners() && getBlockInfos() != null) {
+				int x = getMinX();
+				for(int i = 0; i < getSizeX(); i++){
+					int y = getMinY();
+					for(int j = 0; j < getSizeY(); j++){
+						int z = getMinZ();
+						for(int k = 0;k < getSizeZ(); k++) {
+							Block currentBlock = getWorld().getBlockAt(x, y, z);
+							for(Material oldType : oldTypes) {
+								if(currentBlock.getType() == oldType) {
+									currentBlock.setType(newType);
+								}
+							}
+							z++;
+						}
+						y++;
+					}
+					x++;
+				}
+			}	
+		} catch (Exception e) {
+			this.getWar().getLogger().warning("Failed to switch block to " + newType + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
 		}
 	}
 

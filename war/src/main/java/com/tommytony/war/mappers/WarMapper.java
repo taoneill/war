@@ -123,6 +123,7 @@ public class WarMapper {
 			
 			for(Warzone zone : war.getWarzones()) {
 				if(zone.getLobby() != null) {
+					zone.getLobby().getVolume().resetBlocks();
 					zone.getLobby().initialize();	// adds the warhub link gate
 				}
 					

@@ -62,7 +62,16 @@ public class War extends JavaPlugin {
 	private WarHub warHub;
 	
 	public void onDisable() {
-		Logger.getLogger("Minecraft").info(name + " " + version + " disabled.");
+		for(Warzone warzone : warzones) {
+			if(warzone.getLobby() != null) {
+				warzone.getLobby().getVolume().resetBlocks();
+			}
+			warzone.getVolume().resetBlocks();
+		}
+		if(warHub != null) {
+			warHub.getVolume().resetBlocks();
+		}
+		Logger.getLogger("Minecraft").info("All warzone blocks reset. War v" + version + " disabled.");
 	}
 
 	public void onEnable() {
@@ -73,14 +82,11 @@ public class War extends JavaPlugin {
 		
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
-		//pm.registerEvent(Event.Type.PLAYER_COMMAND, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 		
-		//pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Normal, this); 	// done thru Move at respawn
 		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
-		//pm.registerEvent(Event.Type.BLOCK_CANBUILD, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
 		
 		// Load files from disk or create them (using these defaults)
@@ -676,11 +682,13 @@ public class War extends JavaPlugin {
 						|| command.equals("nextbattle")
 						|| command.equals("setzonelobby")
 						|| command.equals("savezone")
+						|| command.equals("resetzone")
 						|| command.equals("deletezone")
 						|| command.equals("setteam")
 						|| command.equals("deleteteam")
 						|| command.equals("setmonument")
-						|| command.equals("deletemonument")) {
+						|| command.equals("deletemonument")
+						|| command.equals("setwarhub")) {
 			player.sendMessage(this.str("You can't do this if you are not a warzone maker."));
 		}
 		

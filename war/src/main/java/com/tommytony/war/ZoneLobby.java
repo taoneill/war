@@ -364,10 +364,6 @@ public class ZoneLobby {
 		return false;
 	}
 	
-	public void resetSigns() {
-		// TODO Signs
-	}
-	
 	public Volume getVolume() {
 		return this.volume;
 	}

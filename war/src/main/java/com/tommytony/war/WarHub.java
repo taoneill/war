@@ -92,11 +92,22 @@ public class WarHub {
 				currentGateBlock.getFace(BlockFace.UP).getFace(BlockFace.UP).setType(Material.OBSIDIAN);
 				currentGateBlock = currentGateBlock.getFace(BlockFace.NORTH, 4);
 			}
+			
+			// War hub sign
+			Block signBlock = locationBlock.getFace(BlockFace.WEST);
+			if(signBlock.getType() != Material.SIGN_POST) signBlock.setType(Material.SIGN_POST);
+			signBlock.setData((byte)8);
+			BlockState state = signBlock.getState();
+			Sign sign = (Sign) state;
+			sign.setLine(0, "War hub");
+			sign.setLine(1, "");
+			sign.setLine(2, "Pick you battle!");
+			sign.setLine(3, "");
+			state.update(true);
 		}
 	}
 	
 	public void resetZoneSign(Warzone zone) {
-		// TODO Signs
 		int i = 0;
 		for(i = 0; i < war.getWarzones().size(); i++) {
 			if(zone.getName() == war.getWarzones().get(i).getName()) break;

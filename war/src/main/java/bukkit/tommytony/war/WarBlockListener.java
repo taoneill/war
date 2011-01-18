@@ -84,7 +84,7 @@ public class WarBlockListener extends BlockListener {
 	    				event.setCancelled(true);
 	    			}
 	    			// let team members loot one block the spawn for monument captures
-	    		} else {
+	    		} else if (!warzone.isMonumentCenterBlock(block)){
 		    		player.sendMessage(war.str("Can't destroy this."));
 		    		event.setCancelled(true);
 	    		}
