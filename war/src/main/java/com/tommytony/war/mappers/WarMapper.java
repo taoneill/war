@@ -27,7 +27,7 @@ public class WarMapper {
 		try {
 			warConfig.load();
 		} catch (IOException e) {
-			war.getLogger().info("Failed to load war.txt file.");
+			war.warn("Failed to load war.txt file.");
 			e.printStackTrace();
 		}
 		
@@ -36,11 +36,11 @@ public class WarMapper {
 		if(!warConfig.containsKey("warzones")) {
 			newWar = true;
 			WarMapper.save(war);
-			war.getLogger().info("War config file created.");
+			war.info("Config file created.");
 			try {
 				warConfig.load();
 			} catch (IOException e) {
-				war.getLogger().info("Failed to reload war.txt file after creating it.");
+				war.warn("Failed to reload war.txt file after creating it.");
 				e.printStackTrace();
 			}
 		}

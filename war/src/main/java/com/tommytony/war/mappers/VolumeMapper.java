@@ -13,7 +13,6 @@ import org.bukkit.World;
 import bukkit.tommytony.war.War;
 
 import com.tommytony.war.volumes.BlockInfo;
-import com.tommytony.war.volumes.CenteredVolume;
 import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
 
@@ -38,13 +37,6 @@ public class VolumeMapper {
 		return volume;
 	}
 	
-//	public static CenteredVolume loadCenteredVolume(String volumeName, String zoneName, int sideSize,
-//			War war, World world) {
-//		CenteredVolume volume = new CenteredVolume(volumeName, null, sideSize, war, world);
-//		load(volume, zoneName, war, world);
-//		return volume;
-//	}
-	
 	public static void load(Volume volume, String zoneName, War war, World world) {
 		BufferedReader in = null;
 		try {
@@ -60,13 +52,8 @@ public class VolumeMapper {
 				int y2 = Integer.parseInt(in.readLine());
 				int z2 = Integer.parseInt(in.readLine());
 				
-//				if(volume instanceof CenteredVolume) {
-//					((CenteredVolume)volume).setCenter(world.getBlockAt(x1, y1, z1));
-//					((CenteredVolume)volume).calculateCorners();
-//				} else {
-					volume.setCornerOne(world.getBlockAt(x1, y1, z1));
-					volume.setCornerTwo(world.getBlockAt(x2, y2, z2));	
-//				}
+				volume.setCornerOne(world.getBlockAt(x1, y1, z1));
+				volume.setCornerTwo(world.getBlockAt(x2, y2, z2));	
 				
 				volume.setBlockInfos(new BlockInfo[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
 				for(int i = 0; i < volume.getSizeX(); i++){
@@ -100,7 +87,7 @@ public class VolumeMapper {
 				}
 			}
 		} catch (IOException e) {
-			war.getLogger().warning("Failed to read volume file " + volume.getName() + 
+			war.warn("Failed to read volume file " + volume.getName() + 
 					" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -108,7 +95,7 @@ public class VolumeMapper {
 				try {
 					in.close();
 				} catch (IOException e) {
-					war.getLogger().warning("Failed to close file reader for volume " + volume.getName() +
+					war.warn("Failed to close file reader for volume " + volume.getName() +
 							" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 					e.printStackTrace();
 				}
@@ -121,25 +108,15 @@ public class VolumeMapper {
 			try {
 				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File("War/volume-" + volume.getName() + ".dat")));
 				else out = new BufferedWriter(new FileWriter(new File("War/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
-//				if(volume instanceof CenteredVolume) {
-//					out.write("center"); out.newLine();
-//					out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
-//					out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
-//					out.write(Integer.toString(volume.getCornerOne().getZ())); out.newLine();
-//					out.write("nothing"); out.newLine();
-//					out.write(Integer.toString(0)); out.newLine();
-//					out.write(Integer.toString(0)); out.newLine();
-//					out.write(Integer.toString(0)); out.newLine();
-//				} else {
-					out.write("corner1"); out.newLine();
-					out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
-					out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
-					out.write(Integer.toString(volume.getCornerOne().getZ())); out.newLine();
-					out.write("corner2"); out.newLine();
-					out.write(Integer.toString(volume.getCornerTwo().getX())); out.newLine();
-					out.write(Integer.toString(volume.getCornerTwo().getY())); out.newLine();
-					out.write(Integer.toString(volume.getCornerTwo().getZ())); out.newLine();
-//				}
+				
+				out.write("corner1"); out.newLine();
+				out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
+				out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
+				out.write(Integer.toString(volume.getCornerOne().getZ())); out.newLine();
+				out.write("corner2"); out.newLine();
+				out.write(Integer.toString(volume.getCornerTwo().getX())); out.newLine();
+				out.write(Integer.toString(volume.getCornerTwo().getY())); out.newLine();
+				out.write(Integer.toString(volume.getCornerTwo().getZ())); out.newLine();
 				
 				for(int i = 0; i < volume.getSizeX(); i++){
 					for(int j = 0; j < volume.getSizeY(); j++) {
@@ -162,7 +139,7 @@ public class VolumeMapper {
 					}
 				}
 			} catch (IOException e) {
-				war.getLogger().warning("Failed to write volume file " + zoneName + 
+				war.warn("Failed to write volume file " + zoneName + 
 						" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 				e.printStackTrace();
 			} 
@@ -171,7 +148,7 @@ public class VolumeMapper {
 					try {
 						out.close();
 					} catch (IOException e) {
-						war.getLogger().warning("Failed to close file writer for volume " + volume.getName() +
+						war.warn("Failed to close file writer for volume " + volume.getName() +
 								" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 						e.printStackTrace();
 					}	

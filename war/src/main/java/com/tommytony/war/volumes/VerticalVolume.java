@@ -154,7 +154,7 @@ public class VerticalVolume extends Volume{
 				}
 			}		
 		} catch (Exception e) {
-			this.getWar().getLogger().warning("Failed to reset wall " + wall + " in volume " + getName() + ". " + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().warn("Failed to reset wall " + wall + " in volume " + getName() + ". " + e.getClass().toString() + " " + e.getMessage());
 		}
 		return noOfResetBlocks;
 	}

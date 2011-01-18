@@ -9,6 +9,8 @@ import bukkit.tommytony.war.War;
 /**
  * 
  * @author tommytony
+ * 
+ * Broken, don't use.
  *
  */
 public class CenteredVolume extends Volume {

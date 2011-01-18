@@ -108,7 +108,7 @@ public class Volume {
 				}
 			}		
 		} catch (Exception e) {
-			this.getWar().getLogger().warning("Failed to reset volume " + getName() + " blocks. " + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().warn("Failed to reset volume " + getName() + " blocks. " + e.getClass().toString() + " " + e.getMessage());
 		}
 		return noOfResetBlocks;
 	}
@@ -248,7 +248,7 @@ public class Volume {
 				}
 			}		
 		} catch (Exception e) {
-			this.getWar().getLogger().warning("Failed to set block to " + material + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().warn("Failed to set block to " + material + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
 		}
 	}
 	
@@ -278,7 +278,7 @@ public class Volume {
 				}
 			}		
 		} catch (Exception e) {
-			this.getWar().getLogger().warning("Failed to set block to " + material + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().warn("Failed to set block to " + material + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
 		}
 	}
 	
@@ -305,7 +305,7 @@ public class Volume {
 				}
 			}	
 		} catch (Exception e) {
-			this.getWar().getLogger().warning("Failed to switch block to " + newType + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().warn("Failed to switch block to " + newType + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
 		}
 	}
 

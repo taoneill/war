@@ -4,11 +4,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.HumanEntity;
 
 import bukkit.tommytony.war.War;
 
-import com.tommytony.war.volumes.CenteredVolume;
 import com.tommytony.war.volumes.Volume;
 
 /**
@@ -123,13 +121,10 @@ public class Monument {
 	
 	public void capture(Team team) {
 		ownerTeam = team;
-		//warzone.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ()).setType(team.getMaterial());
 	}
 	
 	public void uncapture() {
 		ownerTeam = null;
-		//warzone.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ()).setType(Material.OBSIDIAN);
-		
 	}
 
 	public Location getLocation() {

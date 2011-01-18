@@ -106,6 +106,8 @@ public class WarPlayerListener extends PlayerListener {
 								t.teamcast(war.str(winnersStr));
 								t.getPlayers().clear();	// empty the team
 							}
+							playerWarzone.getVolume().resetBlocks();
+							playerWarzone.initializeZone();
 							scoreCapReached = true;
 						} else {
 							// We can keep going
@@ -124,13 +126,13 @@ public class WarPlayerListener extends PlayerListener {
 					if(!newBattle && !scoreCapReached && !war.inAnyWarzone(player.getLocation())) {	// only respawn him if he isnt back at zone yet
 						playerWarzone.respawnPlayer(event, team, player);
 						team.resetSign();
-						war.getLogger().log(Level.INFO, player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
+						war.info(player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
 					} else if (scoreCapReached) { 
 						player.teleportTo(playerWarzone.getTeleport());
 						team.resetSign();
-						war.getLogger().log(Level.INFO, player.getName() + " died and enemy team reached score cap");
+						war.info(player.getName() + " died and enemy team reached score cap");
 					} else if (newBattle){
-						war.getLogger().log(Level.INFO, player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");
+						war.info(player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");
 					}
 				}
 			}
@@ -260,7 +262,7 @@ public class WarPlayerListener extends PlayerListener {
 		Team previousTeam = war.getPlayerTeam(player.getName());
 		if(previousTeam != null) {
 			if(!previousTeam.removePlayer(player.getName())){
-				war.getLogger().log(Level.WARNING, "Could not remove player " + player.getName() + " from team " + previousTeam.getName());
+				war.warn("Could not remove player " + player.getName() + " from team " + previousTeam.getName());
 			}
 		}
 	}

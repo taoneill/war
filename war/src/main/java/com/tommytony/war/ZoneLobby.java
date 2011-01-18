@@ -183,7 +183,7 @@ public class ZoneLobby {
 				lobbyMiddleWallBlock.getFace(BlockFace.DOWN).getFace(BlockFace.SOUTH, lobbyHalfSide - 1).getFace(wall, 9).setType(Material.GLOWSTONE);
 			}
 		} else {
-			war.getLogger().warning("Failed to initalize zone " + warzone.getName());
+			war.warn("Failed to initalize zone lobby for zone " + warzone.getName());
 		}
 	}
 
