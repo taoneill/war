@@ -70,9 +70,7 @@ public class Volume {
 	
 	public int resetBlocks() {
 		int noOfResetBlocks = 0;
-		Material[] toAirMaterials = new Material[1];
-		toAirMaterials[0] = Material.SIGN_POST;
-		switchMaterials(toAirMaterials, Material.AIR);
+		clearBlocksThatDontFloat();
 		try {
 			if(hasTwoCorners() && getBlockInfos() != null) {
 				int x = getMinX();
@@ -295,7 +293,7 @@ public class Volume {
 						for(int k = 0;k < getSizeZ(); k++) {
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
 							for(Material oldType : oldTypes) {
-								if(currentBlock.getType() == oldType) {
+								if(currentBlock.getType().getId() == oldType.getId()) {
 									currentBlock.setType(newType);
 								}
 							}
@@ -309,6 +307,33 @@ public class Volume {
 		} catch (Exception e) {
 			this.getWar().getLogger().warning("Failed to switch block to " + newType + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
 		}
+	}
+
+	public void clearBlocksThatDontFloat() {
+		Material[] toAirMaterials = new Material[22];
+		toAirMaterials[0] = Material.SIGN_POST;
+		toAirMaterials[1] = Material.SIGN;
+		toAirMaterials[2] = Material.IRON_DOOR_BLOCK;
+		toAirMaterials[3] = Material.WOOD_DOOR;
+		toAirMaterials[4] = Material.LADDER;
+		toAirMaterials[5] = Material.YELLOW_FLOWER;
+		toAirMaterials[6] = Material.RED_ROSE;
+		toAirMaterials[7] = Material.RED_MUSHROOM;
+		toAirMaterials[8] = Material.BROWN_MUSHROOM;
+		toAirMaterials[9] = Material.SAPLING;
+		toAirMaterials[10] = Material.TORCH;
+		toAirMaterials[11] = Material.RAILS;
+		toAirMaterials[12] = Material.STONE_BUTTON;
+		toAirMaterials[13] = Material.STONE_PLATE;
+		toAirMaterials[14] = Material.WOOD_PLATE;
+		toAirMaterials[15] = Material.LEVER;
+		toAirMaterials[16] = Material.REDSTONE;
+		toAirMaterials[17] = Material.REDSTONE_TORCH_ON;
+		toAirMaterials[18] = Material.REDSTONE_TORCH_OFF;
+		toAirMaterials[19] = Material.CACTUS;
+		toAirMaterials[20] = Material.SNOW;
+		toAirMaterials[21] = Material.ICE;
+		switchMaterials(toAirMaterials, Material.AIR);
 	}
 
 }

@@ -98,12 +98,21 @@ public class WarHub {
 			if(signBlock.getType() != Material.SIGN_POST) signBlock.setType(Material.SIGN_POST);
 			signBlock.setData((byte)8);
 			BlockState state = signBlock.getState();
-			Sign sign = (Sign) state;
-			sign.setLine(0, "War hub");
-			sign.setLine(1, "");
-			sign.setLine(2, "Pick you battle!");
-			sign.setLine(3, "");
-			state.update(true);
+			if(state instanceof Sign) {
+				Sign sign = (Sign) state;
+				sign.setLine(0, "War hub");
+				sign.setLine(1, "");
+				sign.setLine(2, "Pick you battle!");
+				sign.setLine(3, "");
+				state.update(true);
+			}
+			
+			// Warzone signs
+			for(Warzone zone : war.getWarzones()) {
+				if(zone.ready()) {
+					war.getWarHub().resetZoneSign(zone);
+				}
+			}
 		}
 	}
 	
@@ -126,12 +135,14 @@ public class WarHub {
 		}
 		
 		BlockState state = block.getState();
-		Sign sign = (Sign) state;
-		sign.setLine(0, "Warzone");
-		sign.setLine(1, zone.getName());
-		sign.setLine(2, zonePlayers + "/" + zoneCap + " players");
-		sign.setLine(3, zone.getTeams().size() + " teams");
-		state.update(true);
+		if(state instanceof Sign) {
+			Sign sign = (Sign) state;
+			sign.setLine(0, "Warzone");
+			sign.setLine(1, zone.getName());
+			sign.setLine(2, zonePlayers + "/" + zoneCap + " players");
+			sign.setLine(3, zone.getTeams().size() + " teams");
+			state.update(true);
+		}
 	}
 
 	public void setVolume(Volume vol) {

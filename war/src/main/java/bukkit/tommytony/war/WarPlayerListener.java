@@ -5,22 +5,16 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.mappers.WarMapper;
-import com.tommytony.war.mappers.WarzoneMapper;
 
 
 /**
@@ -86,7 +80,7 @@ public class WarPlayerListener extends PlayerListener {
 						List<Team> teams = playerWarzone.getTeams();
 						for(Team t : teams) {
 							t.teamcast(war.str("The battle is over. Team " + team.getName() + " lost: " 
-									+ player.getName() + " hit the bottom of their life pool." ));
+									+ player.getName() + " died and there were no lives left in their life pool." ));
 							
 							if(!t.getName().equals(team.getName())) {
 								// all other teams get a point

@@ -54,6 +54,9 @@ public class Team {
 	}
 	
 	private void initializeTeamSpawn(Location teamSpawn) {
+		// make air
+		this.volume.setToMaterial(Material.AIR);
+		
 		// Set the spawn 
 		int x = teamSpawn.getBlockX();
 		int y = teamSpawn.getBlockY();
@@ -208,12 +211,14 @@ public class Team {
 		block.setData((byte)6);
 		
 		BlockState state = block.getState();
-		Sign sign = (Sign) state;
-		sign.setLine(0, "Team " + name);
-		sign.setLine(1, remainingTickets + "/" + warzone.getLifePool() + " lives left");
-		sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
-		sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
-		state.update(true);
+		if(state instanceof Sign) {
+			Sign sign = (Sign) state;
+			sign.setLine(0, "Team " + name);
+			sign.setLine(1, remainingTickets + "/" + warzone.getLifePool() + " lives left");
+			sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
+			sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
+			state.update(true);
+		}
 		
 		if(warzone.getLobby() != null) {
 			warzone.getLobby().resetTeamGateSign(this);

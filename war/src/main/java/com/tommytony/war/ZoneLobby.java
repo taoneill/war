@@ -145,6 +145,7 @@ public class ZoneLobby {
 
 		if(lobbyMiddleWallBlock != null && volume != null && volume.isSaved()) {
 			// flatten the area (set all but floor to air, then replace any floor air blocks with glass)
+			this.volume.clearBlocksThatDontFloat();
 			this.volume.setToMaterial(Material.AIR);
 			this.volume.setFaceMaterial(BlockFace.DOWN, Material.GLASS);	// beautiful
 			
@@ -154,7 +155,7 @@ public class ZoneLobby {
 				// add warhub sign
 				String[] lines = new String[4];
 				lines[0] = "";
-				lines[1] = "War hub";
+				lines[1] = "To War hub";
 				lines[2] = "";
 				lines[3] = "";
 				resetGateSign(warHubLinkGate, lines, false);
@@ -516,12 +517,15 @@ public class ZoneLobby {
 			if(awayFromWall) block.setData((byte)0);
 			else block.setData((byte)8);
 		}
+		
 		BlockState state = block.getState();
-		Sign sign = (Sign) state;
-		sign.setLine(0, lines[0]);
-		sign.setLine(1, lines[1]);
-		sign.setLine(2, lines[2]);
-		sign.setLine(3, lines[3]);
-		state.update(true);
+		if(state instanceof Sign) {
+			Sign sign = (Sign) state;
+			sign.setLine(0, lines[0]);
+			sign.setLine(1, lines[1]);
+			sign.setLine(2, lines[2]);
+			sign.setLine(3, lines[3]);
+			state.update(true);
+		}
 	}
 }

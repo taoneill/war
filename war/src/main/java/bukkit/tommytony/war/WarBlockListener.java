@@ -29,6 +29,7 @@ public class WarBlockListener extends BlockListener {
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
     	Block block = event.getBlock();
+    	boolean captured = false;
     	if(player != null) {
 			Team team = war.getPlayerTeam(player.getName()); 
 			Warzone zone = war.getPlayerWarzone(player.getName());
@@ -43,25 +44,28 @@ public class WarBlockListener extends BlockListener {
 					for(Team t : teams) {
 						t.teamcast(war.str("Monument " + monument.getName() + " has been captured by team " + team.getName() + "."));
 					}
-					return;	// important otherwise cancelled down a few line by isImportantblock
+					
+					captured = true;	// important otherwise cancelled down a few line by isImportantblock
 				} else {
 					player.sendMessage(war.str("You can't capture a monument without a block of your team's material. Get one from your team spawn."));
 					event.setCancelled(true);
 				}
 			}
-			if(zone != null && zone.isImportantBlock(block) && !isZoneMaker){
-				player.sendMessage(war.str("Can't build here."));
-				event.setCancelled(true);
-			}
-			// protect warzone lobbies
-	    	if(block != null) {
-		    	for(Warzone wz: war.getWarzones()) {
-		    		if(wz.getLobby() != null && wz.getLobby().getVolume().contains(block) && !isZoneMaker) {
-		    			player.sendMessage(war.str("Can't build here."));
-			    		event.setCancelled(true);
-		    		}
+			if(!captured) {
+				if(zone != null && zone.isImportantBlock(block) && !isZoneMaker){
+					player.sendMessage(war.str("Can't build here."));
+					event.setCancelled(true);
+				}
+				// protect warzone lobbies
+		    	if(block != null) {
+			    	for(Warzone wz: war.getWarzones()) {
+			    		if(wz.getLobby() != null && wz.getLobby().getVolume().contains(block) && !isZoneMaker) {
+			    			player.sendMessage(war.str("Can't build here."));
+				    		event.setCancelled(true);
+			    		}
+			    	}
 		    	}
-	    	}
+			}
 		}
     }
 	
@@ -77,7 +81,18 @@ public class WarBlockListener extends BlockListener {
 	    		// can't actually destroy blocks in a warzone if not part of a team
 	    		player.sendMessage(war.str("Can't destroy part of a warzone if you're not in a team."));
 	    		event.setCancelled(true);
-	    	} else if(warzone != null && warzone.isImportantBlock(block) && !isZoneMaker) {
+	    	} else if(team != null && block != null && warzone != null 
+					&& warzone.isMonumentCenterBlock(block)){
+				Monument monument = warzone.getMonumentFromCenterBlock(block);
+				if(monument.hasOwner()) {
+
+					List<Team> teams = warzone.getTeams();
+					for(Team t : teams) {
+						t.teamcast(war.str("Team " + monument.getOwnerTeam().getName() + " loses control of monument " + monument.getName()));
+					}
+					monument.uncapture();
+				}
+			}else if(warzone != null && warzone.isImportantBlock(block) && !isZoneMaker) {
 	    		if(team != null && team.getVolume().contains(block)) {
 	    			if(player.getInventory().contains(team.getMaterial())) {
 	    				player.sendMessage(war.str("You already have a " + team.getName() + " block."));
@@ -88,18 +103,7 @@ public class WarBlockListener extends BlockListener {
 		    		player.sendMessage(war.str("Can't destroy this."));
 		    		event.setCancelled(true);
 	    		}
-	    	} else if(team != null && block != null && warzone != null 
-					&& warzone.isMonumentCenterBlock(block)
-					){
-	    		Monument monument = warzone.getMonumentFromCenterBlock(block);
-	    		if(monument.hasOwner()) {
-					monument.uncapture();
-					List<Team> teams = warzone.getTeams();
-					for(Team t : teams) {
-						t.teamcast(war.str("Team " + team.getName() + " loses control of monument " + monument.getName()));
-					}
-				}
-	    	}
+	    	} 
 	    	
 	    	// protect warzone lobbies
 	    	if(block != null) {

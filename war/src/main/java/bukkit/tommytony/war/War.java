@@ -71,7 +71,7 @@ public class War extends JavaPlugin {
 		if(warHub != null) {
 			warHub.getVolume().resetBlocks();
 		}
-		Logger.getLogger("Minecraft").info("All warzone blocks reset. War v" + version + " disabled.");
+		Logger.getLogger("Minecraft").info("All War blocks reset. War v" + version + " disabled.");
 	}
 
 	public void onEnable() {
@@ -82,9 +82,9 @@ public class War extends JavaPlugin {
 		
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Highest, this);
 		
-		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal, this);
+		//pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
@@ -574,13 +574,14 @@ public class War extends JavaPlugin {
 						Team newTeam = new Team(name, teamMaterial, player.getLocation(), this, warzone);
 						newTeam.setRemainingTickets(warzone.getLifePool());
 						warzone.getTeams().add(newTeam);
-						newTeam.setTeamSpawn(player.getLocation());
 						if(warzone.getLobby() != null) {
 							warzone.getLobby().getVolume().resetBlocks();
 							warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
 							warzone.addZoneOutline(warzone.getLobby().getWall());
 							warzone.getLobby().initialize();
 						}
+						newTeam.setTeamSpawn(player.getLocation());
+						
 						player.sendMessage(this.str("Team " + name + " created with spawn here."));
 					}
 					

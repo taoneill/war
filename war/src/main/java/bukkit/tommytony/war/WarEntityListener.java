@@ -24,7 +24,7 @@ public class WarEntityListener extends EntityListener {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public void onEntityDamage(EntityDamageEvent event) {
+	//public void onEntityDamage(EntityDamageEvent event) {
 //		// BUKKIT !!
 //    	//Entity attacker = event.getDamager();
 //    	Entity defender = event.getEntity();
@@ -76,7 +76,7 @@ public class WarEntityListener extends EntityListener {
 //				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 //			}
 //		}
-    }
+    //}
 	
 //	public void onEntityDamaged(EntityDamagedEvent event) {
 //		Entity damaged = event.getEntity();
