@@ -22,7 +22,8 @@ public class WarMapper {
 	
 	public static void load(War war, World world) {
 		//war.getLogger().info("Loading war config...");
-		(new File(war.getName())).mkdir();
+		(new File("War")).mkdir();
+		(new File("War/dat")).mkdir();
 		PropertiesFile warConfig = new PropertiesFile(war.getName() + "/war.txt");
 		try {
 			warConfig.load();
@@ -36,7 +37,7 @@ public class WarMapper {
 		if(!warConfig.containsKey("warzones")) {
 			newWar = true;
 			WarMapper.save(war);
-			war.info("Config file created.");
+			war.info("war.txt settings file created.");
 			try {
 				warConfig.load();
 			} catch (IOException e) {
@@ -49,6 +50,7 @@ public class WarMapper {
 		String warzonesStr = warConfig.getString("warzones");
 		String[] warzoneSplit = warzonesStr.split(",");
 		war.getWarzones().clear();
+		if(warzoneSplit.length > 1) war.info("Restoring saved warzones..."); 
 		for(String warzoneName : warzoneSplit) {
 			if(warzoneName != null && !warzoneName.equals("")){
 				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWar);		// cascade load, only load blocks if warzone exists

@@ -9,7 +9,7 @@ commands:
   War:
     description: Same as /war. Used as fallback.
     usage: See /war.
-##-Player commands-
+#-Player commands-
   warzones: 
     description: Lists the warzones on the server. Each warzone is an independent TDM arena.
     usage: /warzones

@@ -29,7 +29,7 @@ public class WarzoneMapper {
 
 	public static Warzone load(War war, String name, boolean loadBlocks) {
 		//war.getLogger().info("Loading warzone " + name + " config and blocks...");
-		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + name + "/warzone-" + name + ".txt");
+		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + name + ".txt");
 		try {
 			warzoneConfig.load();
 		} catch (IOException e) {
@@ -207,8 +207,8 @@ public class WarzoneMapper {
 	}
 	
 	public static void save(War war, Warzone warzone, boolean saveAllBlocks) {
-		(new File(war.getName()+"/warzone-"+warzone.getName())).mkdir();
-		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + "/warzone-" + warzone.getName() + ".txt");
+		(new File(war.getName()+"/dat/warzone-"+warzone.getName())).mkdir();
+		PropertiesFile warzoneConfig = new PropertiesFile(war.getName() + "/warzone-" + warzone.getName() + ".txt");
 		//war.getLogger().info("Saving warzone " + warzone.getName() + "...");
 		
 		// name
@@ -331,7 +331,7 @@ public class WarzoneMapper {
 	}
 	
 	public static void delete(War war, String name) {
-		File zoneFolder = new File(war.getName() + "/warzone-" + name);
+		File zoneFolder = new File(war.getName() + "/dat/warzone-" + name);
 		File[] files = zoneFolder.listFiles();
 		for(File file : files) {
 			boolean deletedData = file.delete();
@@ -339,10 +339,14 @@ public class WarzoneMapper {
 				war.warn("Failed to delete file " + file.getName());
 			}
 		}
-		;
 		boolean deletedData = zoneFolder.delete();
 		if(!deletedData) {
-			war.warn("Failed to delete file " + zoneFolder.getName());
+			war.warn("Failed to delete folder " + zoneFolder.getName());
+		}
+		File zoneFile = new File(war.getName() + "/warzone-" + name + ".txt");
+		deletedData = zoneFile.delete();
+		if(!deletedData) {
+			war.warn("Failed to delete file " + zoneFile.getName());
 		}
 	}
 

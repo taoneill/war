@@ -11,25 +11,29 @@ import org.bukkit.block.Sign;
  *
  */
 public class BlockInfo {
-	private int x;
-	private int y;
-	private int z;
+//	private int x;
+//	private int y;
+//	private int z;
 	private int type;
 	private byte data;
 	private String[] signLines;
 
 	public BlockInfo(Block block) {
-		this.x = block.getX();
-		this.y = block.getX();
-		this.z = block.getX();
+//		this.x = block.getX();
+//		this.y = block.getX();
+//		this.z = block.getX();
 		this.type = block.getTypeId();
 		this.data = block.getData();
+		if(is(Material.SIGN) || is(Material.SIGN_POST)) {
+			Sign sign = (Sign)block.getState();
+			this.signLines = sign.getLines();
+		}
 	}
 	
 	public BlockInfo(BlockState blockState) {
-		this.x = blockState.getX();
-		this.y = blockState.getX();
-		this.z = blockState.getX();
+//		this.x = blockState.getX();
+//		this.y = blockState.getX();
+//		this.z = blockState.getX();
 		this.type = blockState.getTypeId();
 		this.data = blockState.getData().getData();
 		if(is(Material.SIGN) || is(Material.SIGN_POST)) {
@@ -44,17 +48,17 @@ public class BlockInfo {
 		signLines = lines;
 	}
 
-	public int getX() {
-		return x;
-	}
-	
-	public int getY() {
-		return y;
-	}
-	
-	public int getZ() {
-		return z;
-	}
+//	public int getX() {
+//		return x;
+//	}
+//	
+//	public int getY() {
+//		return y;
+//	}
+//	
+//	public int getZ() {
+//		return z;
+//	}
 	
 	public int getTypeId() {
 		return type;

@@ -61,7 +61,7 @@ public class WarHub {
 		zoneGateBlocks.clear();
 		int noOfWarzones = war.getWarzones().size();
 		if(noOfWarzones > 0) {
-			int hubWidth = noOfWarzones * 4 + 5;
+			int hubWidth = noOfWarzones * 4 + 2;
 			int halfHubWidth = hubWidth / 2;
 			int hubDepth = 6;
 			int hubHeigth = 4;

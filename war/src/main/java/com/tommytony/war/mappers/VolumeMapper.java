@@ -40,8 +40,8 @@ public class VolumeMapper {
 	public static void load(Volume volume, String zoneName, War war, World world) {
 		BufferedReader in = null;
 		try {
-			if(zoneName.equals("")) in = new BufferedReader(new FileReader(new File("War/volume-" + volume.getName() + ".dat"))); // for the warhub
-			else in = new BufferedReader(new FileReader(new File("War/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+			if(zoneName.equals("")) in = new BufferedReader(new FileReader(new File("War/dat/volume-" + volume.getName() + ".dat"))); // for the warhub
+			else in = new BufferedReader(new FileReader(new File("War/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 			String firstLine = in.readLine();
 			if(firstLine != null && !firstLine.equals("")) {
 				int x1 = Integer.parseInt(in.readLine());
@@ -106,8 +106,8 @@ public class VolumeMapper {
 		if(volume.isSaved() && volume.getBlockInfos() != null) {
 			BufferedWriter out = null;
 			try {
-				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File("War/volume-" + volume.getName() + ".dat")));
-				else out = new BufferedWriter(new FileWriter(new File("War/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File("War/dat/volume-" + volume.getName() + ".dat")));
+				else out = new BufferedWriter(new FileWriter(new File("War/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 				
 				out.write("corner1"); out.newLine();
 				out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
@@ -157,7 +157,7 @@ public class VolumeMapper {
 	}
 
 	public static void delete(Volume volume, War war) {
-		File volFile= new File("War/volume-" + volume.getName());
+		File volFile= new File("War/dat/volume-" + volume.getName());
 		boolean deletedData = volFile.delete();
 		if(!deletedData) {
 			war.warn("Failed to delete file " + volFile.getName());

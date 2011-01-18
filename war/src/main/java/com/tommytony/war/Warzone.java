@@ -122,8 +122,7 @@ public class Warzone {
 	private void resetNorthwestCursorBlocks() {
 		if(this.northwest != null && originalNorthwestBlocks != null) {
 			// reset old corner
-			int highest = this.world.getHighestBlockYAt(this.northwest.getBlockX(), this.northwest.getBlockZ()) - 1;
-			Block oldTopNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), highest, this.northwest.getBlockZ());
+			Block oldTopNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), this.northwest.getBlockY() - 1, this.northwest.getBlockZ());
 			oldTopNWBlock.setType(originalNorthwestBlocks[0]);
 			oldTopNWBlock.getFace(BlockFace.EAST).setType(originalNorthwestBlocks[1]);
 			oldTopNWBlock.getFace(BlockFace.SOUTH).setType(originalNorthwestBlocks[2]);
@@ -156,8 +155,7 @@ public class Warzone {
 	private void resetSoutheastCursorBlocks() {
 		if(this.southeast != null && originalSoutheastBlocks != null) {
 			// reset old corner
-			int highest = this.world.getHighestBlockYAt(this.southeast.getBlockX(), this.southeast.getBlockZ()) - 1;
-			Block oldTopSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), highest, this.southeast.getBlockZ());
+			Block oldTopSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), this.southeast.getBlockY() - 1, this.southeast.getBlockZ());
 			oldTopSEBlock.setType(originalSoutheastBlocks[0]);
 			oldTopSEBlock.getFace(BlockFace.WEST).setType(originalSoutheastBlocks[1]);
 			oldTopSEBlock.getFace(BlockFace.NORTH).setType(originalSoutheastBlocks[2]);
