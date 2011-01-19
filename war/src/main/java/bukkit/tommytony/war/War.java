@@ -87,7 +87,7 @@ public class War extends JavaPlugin {
 		
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Highest, this);
 		
 		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal, this);
 		
@@ -193,7 +193,7 @@ public class War extends JavaPlugin {
 					if(!previousTeam.removePlayer(player.getName())){
 						warn("Could not remove player " + player.getName() + " from team " + previousTeam.getName());
 					}
-						
+					previousTeam.resetSign();
 				}
 				
 				// join new team
@@ -723,20 +723,26 @@ public class War extends JavaPlugin {
 			
 			// /setwarhub
 			else if(command.equals("setwarhub")) {
-				if(warHub != null) {
-					// reset existing hub
-					warHub.getVolume().resetBlocks();
-					warHub.setLocation(player.getLocation());
-					warHub.initialize();
-				} else {
-					warHub = new WarHub(this, player.getLocation());
-					warHub.initialize();
-					for(Warzone zone : warzones) {
-						zone.getLobby().getVolume().resetBlocks();
-						zone.getLobby().initialize();
+				if(warzones.size() > 0) {
+					if(warHub != null) {
+						// reset existing hub
+						warHub.getVolume().resetBlocks();
+						warHub.setLocation(player.getLocation());
+						warHub.initialize();
+						player.sendMessage(str("War hub moved."));
+					} else {
+						warHub = new WarHub(this, player.getLocation());
+						warHub.initialize();
+						for(Warzone zone : warzones) {
+							zone.getLobby().getVolume().resetBlocks();
+							zone.getLobby().initialize();
+						}
+						player.sendMessage(str("War hub created."));
 					}
+					WarMapper.save(this);
+				} else {
+					player.sendMessage(str("No warzones yet."));
 				}
-				WarMapper.save(this);
 			}
 			
 			// /deletewarhub

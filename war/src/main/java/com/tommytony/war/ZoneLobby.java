@@ -510,10 +510,10 @@ public class ZoneLobby {
 		} else if(team.getMaterial() == TeamMaterials.TEAMGOLD) {
 			resetTeamGateSign(team, goldGate);
 		}
-		
-		if(war.getWarHub() != null) {
-			war.getWarHub().resetZoneSign(warzone);
-		}
+//		
+//		if(war.getWarHub() != null) {
+//			war.getWarHub().resetZoneSign(warzone);
+//		}
 	}
 
 	private void resetTeamGateSign(Team team, Block gate) {

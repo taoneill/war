@@ -111,7 +111,7 @@ public class WarHub {
 			// Warzone signs
 			for(Warzone zone : war.getWarzones()) {
 				if(zone.ready()) {
-					war.getWarHub().resetZoneSign(zone);
+					this.resetZoneSign(zone);
 				}
 			}
 		}
