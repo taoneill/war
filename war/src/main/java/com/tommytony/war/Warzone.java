@@ -365,7 +365,7 @@ public class Warzone {
 		} else if (team.getMaterial() == Material.IRON_BLOCK) {
 			playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
 		}
-		//player.setHealth(20);
+		player.setHealth(20);
 	}
 
 	public boolean isMonumentCenterBlock(Block block) {

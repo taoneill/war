@@ -86,7 +86,7 @@ commands:
 #|-Defaults--
   setwarconfig:
     description: War makers only. Change the default warzone configuration values.
-    usage: /setwarconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on
+    usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on
  
    
 #-Fallback-

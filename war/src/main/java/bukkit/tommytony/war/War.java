@@ -920,7 +920,7 @@ public class War extends JavaPlugin {
 			} 
 			if(namedParams.containsKey("pvpinzonesonly")){
 				String onOff = namedParams.get("pvpinzonesonly");
-				setDefaultDrawZoneOutline(onOff.equals("on") || onOff.equals("true"));
+				setPvpInZonesOnly(onOff.equals("on") || onOff.equals("true"));
 			} 
 			return true;
 		} catch (Exception e) {
