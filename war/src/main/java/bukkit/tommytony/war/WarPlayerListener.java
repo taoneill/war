@@ -231,6 +231,7 @@ public class WarPlayerListener extends PlayerListener {
 							} else if (zone.getLobby().isInWarHubLinkGate(to)){
 								dropFromOldTeamIfAny(player);
 								event.setTo(war.getWarHub().getLocation());
+								player.teleportTo(war.getWarHub().getLocation());
 								player.sendMessage(war.str("Welcome to the War hub."));
 							}
 						} else if(zone.getLobby().isLeavingZone(to)) { // already in a team and in warzone, leaving
