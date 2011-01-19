@@ -493,7 +493,12 @@ public class ZoneLobby {
 					||
 					(block.getX() == gateBlock.getFace(rightSide).getX()
 						&& block.getY() == gateBlock.getFace(rightSide).getY()
-						&& block.getZ() == gateBlock.getFace(rightSide).getZ());
+						&& block.getZ() == gateBlock.getFace(rightSide).getZ())
+					||
+					(block.getX() == gateBlock.getX()
+							&& block.getY() == gateBlock.getY() - 1
+							&& block.getZ() == gateBlock.getZ())
+					;
 		}
 		return false;
 	}
@@ -572,5 +577,66 @@ public class ZoneLobby {
 			sign.setLine(3, lines[3]);
 			state.update(true);
 		}
+	}
+	
+	public boolean isLeavingZone(Location location) {
+		
+		BlockFace inside = null;
+		BlockFace left = null;
+		BlockFace right = null;
+		if (wall == BlockFace.NORTH) {
+			inside = BlockFace.SOUTH;
+			left = BlockFace.WEST;
+			right = BlockFace.EAST;
+		} else if (wall == BlockFace.EAST) {
+			inside = BlockFace.WEST;
+			left = BlockFace.NORTH;
+			right = BlockFace.SOUTH;
+		} else if (wall == BlockFace.SOUTH) {
+			inside = BlockFace.NORTH;
+			left = BlockFace.EAST;
+			right = BlockFace.WEST;
+		} else if (wall == BlockFace.WEST) {
+			inside = BlockFace.EAST;
+			left = BlockFace.SOUTH;
+			right = BlockFace.NORTH;
+		}		
+		if(autoAssignGate != null){
+			if(leaving(location, autoAssignGate, inside, left, right)) return true;
+		} else if(diamondGate != null){
+			if(leaving(location, diamondGate, inside, left, right)) return true;
+		} else if(ironGate != null){
+			if(leaving(location, ironGate, inside, left, right)) return true;
+		} else if(goldGate != null){
+			if(leaving(location, goldGate, inside, left, right)) return true;
+		}		
+		return false;
+	}
+
+	private boolean leaving(Location location, Block gate, BlockFace inside,
+			BlockFace left, BlockFace right) {
+		int x = location.getBlockX();
+		int y = location.getBlockY();
+		int z = location.getBlockZ();
+		Block out = gate.getFace(inside);
+		Block outL = out.getFace(left);
+		Block outR = out.getFace(right);
+		Block out2 = gate.getFace(inside, 2);
+		Block out2L = out2.getFace(left);
+		Block out2R = out2.getFace(right);
+		if(out.getX() == x && out.getY() == y && out.getZ() == z) {
+			return true;
+		} else if(outL.getX() == x && outL.getY() == y && outL.getZ() == z) {
+			return true;
+		} else if(outR.getX() == x && outR.getY() == y && outR.getZ() == z) {
+			return true;
+		} else if(out2.getX() == x && out2.getY() == y && out2.getZ() == z) {
+			return true;
+		} else if(out2L.getX() == x && out2L.getY() == y && out2L.getZ() == z) {
+			return true;
+		} else if(out2R.getX() == x && out2R.getY() == y && out2R.getZ() == z) {
+			return true;
+		}
+		return false;
 	}
 }

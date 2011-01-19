@@ -529,6 +529,7 @@ public class War extends JavaPlugin {
 							warzone.restorePlayerInventory(p);
 							player.sendMessage(this.str("You have left the warzone. Your inventory has (hopefully) been restored."));
 						}
+						team.getPlayers().clear();
 					}
 					
 					Warzone resetWarzone = null;

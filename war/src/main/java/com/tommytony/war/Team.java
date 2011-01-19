@@ -228,4 +228,8 @@ public class Team {
 		this.volume = volume;
 	}
 
+	public void setPoints(int score) {
+		this.points = score;
+	}
+
 }

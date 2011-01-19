@@ -71,55 +71,65 @@ public class WarPlayerListener extends PlayerListener {
 			// Player belongs to a warzone team but is outside: he just died! Handle death! Don't exempt the zone maker.
 			if(from != null && war.warzone(player.getLocation()) == null && team != null) {
 				// teleport to team spawn upon death
-				
+				player.sendMessage(war.str("You died."));
 				boolean newBattle = false;
 				boolean scoreCapReached = false;
 				synchronized(playerWarzone) {
-					int remaining = team.getRemainingTickets();
-					if(remaining == 0) { // your death caused your team to lose
-						List<Team> teams = playerWarzone.getTeams();
-						for(Team t : teams) {
-							t.teamcast(war.str("The battle is over. Team " + team.getName() + " lost: " 
-									+ player.getName() + " died and there were no lives left in their life pool." ));
-							
-							if(!t.getName().equals(team.getName())) {
-								// all other teams get a point
-								t.addPoint();
-								t.resetSign();
-							}
-						}
-						// detect score cap
-						List<Team> scoreCapTeams = new ArrayList<Team>();
-						for(Team t : teams) {
-							if(t.getPoints() == playerWarzone.getScoreCap()) {
-								scoreCapTeams.add(t);
-							}
-						}
-						if(!scoreCapTeams.isEmpty()) {
-							String winnersStr = "Score cap reached! Winning team(s): ";
-							for(Team winner : scoreCapTeams) {
-								winnersStr += winner.getName() + " ";
-							}
-							winnersStr += ". The warzone is being reset... Please choose a new team.";
-							// Score cap reached. Reset everything.
+					synchronized(player) {
+						int remaining = team.getRemainingTickets();
+						if(remaining == 0) { // your death caused your team to lose
+							List<Team> teams = playerWarzone.getTeams();
 							for(Team t : teams) {
-								t.teamcast(war.str(winnersStr));
-								t.getPlayers().clear();	// empty the team
+								t.teamcast(war.str("The battle is over. Team " + team.getName() + " lost: " 
+										+ player.getName() + " died and there were no lives left in their life pool." ));
+								
+								if(!t.getName().equals(team.getName())) {
+									// all other teams get a point
+									t.addPoint();
+									t.resetSign();
+								}
 							}
-							playerWarzone.getVolume().resetBlocks();
-							playerWarzone.initializeZone();
-							scoreCapReached = true;
-						} else {
-							// We can keep going
+							// detect score cap
+							List<Team> scoreCapTeams = new ArrayList<Team>();
 							for(Team t : teams) {
-								t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
+								if(t.getPoints() == playerWarzone.getScoreCap()) {
+									scoreCapTeams.add(t);
+								}
 							}
-							playerWarzone.getVolume().resetBlocks();
-							playerWarzone.initializeZone();
-							newBattle = true;
+							if(!scoreCapTeams.isEmpty()) {
+								String winnersStr = "Score cap reached! Winning team(s): ";
+								for(Team winner : scoreCapTeams) {
+									winnersStr += winner.getName() + " ";
+								}
+								winnersStr += ". The warzone is being reset... Please choose a new team.";
+								// Score cap reached. Reset everything.
+								for(Team t : teams) {
+									t.teamcast(war.str(winnersStr));
+									for(Player tp : t.getPlayers()) {
+										if(tp.getName() != player.getName()) {
+											tp.teleportTo(playerWarzone.getTeleport());
+										}
+									}
+									t.setPoints(0);
+									t.getPlayers().clear();	// empty the team
+								}
+								playerWarzone.getVolume().resetBlocks();
+								playerWarzone.initializeZone();
+								scoreCapReached = true;
+							} else {
+								// We can keep going
+								for(Team t : teams) {
+									t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
+								}
+								playerWarzone.getVolume().resetBlocks();
+								playerWarzone.initializeZone();
+								newBattle = true;
+								team.setRemainingTickets(team.getRemainingTickets()+1); // TODO get rid of this dirty workaround for the twice move-on-death bug
+							}
+						} else if(!team.getVolume().contains(player.getLocation())){
+							// only decrement points if the player is not already back at spawn
+							team.setRemainingTickets(remaining - 1);
 						}
-					} else {
-						team.setRemainingTickets(remaining - 1);
 					}
 				}
 				synchronized(player) {
@@ -128,7 +138,7 @@ public class WarPlayerListener extends PlayerListener {
 						team.resetSign();
 						war.info(player.getName() + " died and was tp'd back to team " + team.getName() + "'s spawn");
 					} else if (scoreCapReached) { 
-						player.teleportTo(playerWarzone.getTeleport());
+						event.setTo(playerWarzone.getTeleport());
 						team.resetSign();
 						war.info(player.getName() + " died and enemy team reached score cap");
 					} else if (newBattle){
@@ -145,8 +155,8 @@ public class WarPlayerListener extends PlayerListener {
 				player.setHealth(20);
 				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
 			}
-		} else if (war.inAnyWarzone(player.getLocation()) && !war.isZoneMaker(player.getName())) { // player is not in any team, but inside warzone boundaries, get him out
-			Warzone zone = war.warzone(player.getLocation());
+		} else if (war.inAnyWarzone(to) && !war.isZoneMaker(player.getName())) { // player is not in any team, but inside warzone boundaries, get him out
+			Warzone zone = war.warzone(to);
 			event.setTo(zone.getTeleport());
 			player.sendMessage(war.str("You can't be inside a warzone without a team."));
 		}
@@ -223,11 +233,7 @@ public class WarPlayerListener extends PlayerListener {
 								event.setTo(war.getWarHub().getLocation());
 								player.sendMessage(war.str("Welcome to the War hub."));
 							}
-						} else if(war.inAnyWarzone(event.getFrom())) { // already in a team and in warzone, leaving
-							if(zone.getLobby().isAutoAssignGate(to)
-									|| zone.getLobby().isInTeamGate(TeamMaterials.TEAMDIAMOND, to)
-									|| zone.getLobby().isInTeamGate(TeamMaterials.TEAMIRON, to)
-									|| zone.getLobby().isInTeamGate(TeamMaterials.TEAMGOLD, to)) {
+						} else if(zone.getLobby().isLeavingZone(to)) { // already in a team and in warzone, leaving
 								// same as leave, except event.setTo
 								Team playerTeam = war.getPlayerTeam(player.getName());
 								playerTeam.removePlayer(player.getName());
@@ -236,7 +242,7 @@ public class WarPlayerListener extends PlayerListener {
 								player.sendMessage(war.str("Left the zone."));
 								playerWarzone.restorePlayerInventory(player);
 								player.sendMessage(war.str("Your inventory has (hopefully) been restored."));
-							}
+							
 						}
 					}
 				}
