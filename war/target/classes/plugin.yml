@@ -1,10 +1,12 @@
 name: War
+version: 0.4 (Montgomery)
+description: Lets you create team deathmatch arenas (warzones) for a more structured PVP experience.
+author: tommytony   
+website: war.tommytony.com
 main: bukkit.tommytony.war.War
-version: 0.3
 commands:
-
-#-Player commands-
-  warzones: 
+# Player commands
+  warzones:
     description: Lists the warzones on the server. Each warzone is an independent TDM arena.
     usage: /warzones
   zones:
@@ -31,16 +33,12 @@ commands:
   team:
     description: Team chat. 
     usage: /team Leeeroooy!!!
-
-
-#-Warzone maker commands-
-
-#|-Battle-related commands-
+# Warzone maker commands
+# 1- Battle-related commands
   nextbattle:
     description: War makers only. Zone blocks are restored (from memory). Teams are respawned. Just as if a team's life pool had been exhausted.
     usage: /nextbattle
-    
-#|-Warzone creation commands-
+# 2- Warzone creation commands
   setzone:
     description: Zone makers only. Use to create and adjust the warzone outline. A zone area is defined by its Northwest and Southeast corners, up to the sky and down to adminium. When the second corner is set down correctly, the zone blocks are saved.
     usage: /setzone <northwest/southeast/nw/se>, e.g. first, /setzone ziggy se, then, /setzone ziggy northwest
@@ -74,28 +72,23 @@ commands:
   zonemaker:
     description: Zone makers only. Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player. 
     usage: /zonemaker, /zonemaker <new-or-kicked-maker-name>
-    
-#|-War hub--
+# 3- War hub
   setwarhub:
     description: War makers only. Create or moves a West-facing wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
     usage: /setwarhub
   deletewarhub:
     description: War makers only. Deletes the warhub if it exists. Resets all warzone lobbies.
     usage: /deletewarhub
-    
-#|-Defaults--
+# 4- Defaults
   setwarconfig:
     description: War makers only. Change the default warzone configuration values.
     usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on
- 
-   
-#-Fallback-
+# Fallback
   war:
     description: Prompts you to use /warhub, /zones and /zone. Can also be used as a prefix for all commands as a fallback if they are taken.
     usage: /war, /war setzone ziggy northwest, /war warhub, /war zone ziggy, etc.
   War:
     description: Same as /war. Used as fallback.
-    usage: See /war.
-    
+    usage: See /war.    
 #Note: When you /disable War with General, all warzone blocks will be reset and artifacts will disappear. 
 #      When you /enable War, all blocks will be loaded from disk and the War-related artifacts will reappear.  

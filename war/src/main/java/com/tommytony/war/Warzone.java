@@ -174,25 +174,29 @@ public class Warzone {
 		return this.teleport;
 	}
 	
-	public int saveState() {
+	public int saveState(boolean clearArtifacts) {
 		if(ready()){
-			// removed everything to keep save clean
-			volume.resetWallBlocks(BlockFace.EAST);
-			volume.resetWallBlocks(BlockFace.WEST);
-			volume.resetWallBlocks(BlockFace.NORTH);
-			volume.resetWallBlocks(BlockFace.SOUTH);
-			
-			for(Team team : teams) {
-				team.getVolume().resetBlocks();
+			if(clearArtifacts) {
+				// removed everything to keep save clean
+				volume.resetWallBlocks(BlockFace.EAST);
+				volume.resetWallBlocks(BlockFace.WEST);
+				volume.resetWallBlocks(BlockFace.NORTH);
+				volume.resetWallBlocks(BlockFace.SOUTH);
+				
+				for(Team team : teams) {
+					team.getVolume().resetBlocks();
+				}
+				
+				for(Monument monument : monuments) {
+					monument.getVolume().resetBlocks();
+				}
+				
+				if(lobby != null) {
+					lobby.getVolume().resetBlocks();
+				}
 			}
 			
-			for(Monument monument : monuments) {
-				monument.getVolume().resetBlocks();
-			}
 			
-			if(lobby != null) {
-				lobby.getVolume().resetBlocks();
-			}
 			
 			int saved = volume.saveBlocks();
 			initializeZone();	// bring back stuff

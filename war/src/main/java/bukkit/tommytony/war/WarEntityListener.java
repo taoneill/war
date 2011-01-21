@@ -122,7 +122,6 @@ public class WarEntityListener extends EntityListener {
 //    }
 
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-    	// BUKKIT !!
     	Entity attacker = event.getDamager();
     	Entity defender = event.getEntity();
     	

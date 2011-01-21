@@ -2,7 +2,6 @@ package bukkit.tommytony.war;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -33,15 +32,27 @@ public class WarPlayerListener extends PlayerListener {
 	}
 	
 	public void onPlayerJoin(PlayerEvent event) {
-		event.getPlayer().sendMessage(war.str("War is on! Pick your battle (try /warzones)."));
+		event.getPlayer().sendMessage(war.str("War is on! Pick your battle (try /warhub, /zones and /zone)."));
     }
 	
 	public void onPlayerQuit(PlayerEvent event) {
 		Player player = event.getPlayer();
 		Team team = war.getPlayerTeam(player.getName());
 		if(team != null) {
+			Warzone zone = war.getPlayerWarzone(player.getName());
+			if(zone != null && zone.hasPlayerInventory(player.getName())) {
+				player.teleportTo(zone.getTeleport());
+				zone.restorePlayerInventory(player);
+				if(zone.getLobby() != null) {
+					zone.getLobby().resetTeamGateSign(team);
+				}
+			}
 			team.removePlayer(player.getName());
 			team.resetSign();
+			if(war.getWarHub() != null) {
+				war.getWarHub().resetZoneSign(zone);
+			}
+			player.sendMessage(war.str("You have left the warzone. Your inventory has (hopefully) been restored."));  
 		}
 	}
 
@@ -240,10 +251,14 @@ public class WarPlayerListener extends PlayerListener {
 								playerTeam.removePlayer(player.getName());
 								playerTeam.resetSign();
 								event.setTo(playerWarzone.getTeleport());
-								player.sendMessage(war.str("Left the zone."));
 								playerWarzone.restorePlayerInventory(player);
-								player.sendMessage(war.str("Your inventory has (hopefully) been restored."));
-							
+								if(playerWarzone.getLobby() != null) {
+									playerWarzone.getLobby().resetTeamGateSign(playerTeam);
+								}
+								player.sendMessage(war.str("Left the zone. Your inventory has (hopefully) been restored."));
+								if(war.getWarHub() != null) {
+									war.getWarHub().resetZoneSign(zone);
+								}
 						}
 					}
 				}

@@ -52,7 +52,6 @@ public class ZoneLobby {
 	public ZoneLobby(War war, Warzone warzone, BlockFace wall, Volume volume) {
 		this.war = war;
 		this.warzone = warzone;
-		Volume zoneVolume = warzone.getVolume();
 		this.wall = wall;
 		this.setVolume(volume);
 		// we're setting the zoneVolume directly, so we need to figure out the lobbyMiddleWallBlock on our own
@@ -68,74 +67,72 @@ public class ZoneLobby {
 	}
 	
 	public void changeWall(BlockFace newWall) {
-		if(this.wall != newWall) {
-			if(volume == null) {
-				// no previous wall
-				this.volume = new Volume("lobby", war, warzone.getWorld());
-			} else {
-				// move the lobby
-				this.volume.resetBlocks();
-			}
-			
-			this.wall = newWall;
-			// find center of the wall and set the new volume corners
-			VerticalVolume zoneVolume = warzone.getVolume();
-			
-			Block corner1 = null;
-			Block corner2 = null;
-			
-			if(wall == BlockFace.NORTH) {
-				int wallStart = zoneVolume.getMinZ();
-				int wallEnd = zoneVolume.getMaxZ();
-				int x = zoneVolume.getMinX();
-				int wallLength = wallEnd - wallStart + 1;
-				int wallCenterPos = wallStart + wallLength / 2;
-				int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x, wallCenterPos);
-				lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter+1, wallCenterPos);
-				corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter, wallCenterPos + lobbyHalfSide);
-				corner2 = warzone.getWorld().getBlockAt(x - lobbyDepth, 
-						highestNonAirBlockAtCenter + 1 + lobbyHeight, wallCenterPos - lobbyHalfSide);
-			} else if (wall == BlockFace.EAST){
-				int wallStart = zoneVolume.getMinX();
-				int wallEnd = zoneVolume.getMaxX();
-				int z = zoneVolume.getMinZ();
-				int wallLength = wallEnd - wallStart + 1;
-				int wallCenterPos = wallStart + wallLength / 2;
-				int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z);
-				lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter + 1, z);
-				corner1 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter, z);
-				corner2 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, 
-						highestNonAirBlockAtCenter + 1 + lobbyHeight, z - lobbyDepth);
-	 		} else if (wall == BlockFace.SOUTH){
-	 			int wallStart = zoneVolume.getMinZ();
-				int wallEnd = zoneVolume.getMaxZ();
-				int x = zoneVolume.getMaxX();
-				int wallLength = wallEnd - wallStart + 1;
-				int wallCenterPos = wallStart + wallLength / 2;
-				int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x, wallCenterPos);
-				lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter + 1, wallCenterPos);
-				corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter, wallCenterPos - lobbyHalfSide);
-				corner2 = warzone.getWorld().getBlockAt(x + lobbyDepth, 
-						highestNonAirBlockAtCenter + 1 + lobbyHeight, wallCenterPos + lobbyHalfSide);
-			} else if (wall == BlockFace.WEST){
-				int wallStart = zoneVolume.getMinX();
-				int wallEnd = zoneVolume.getMaxX();
-				int z = zoneVolume.getMaxZ();
-				int wallLength = wallEnd - wallStart + 1;
-				int wallCenterPos = wallStart + wallLength / 2;
-				int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z);
-				lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter + 1, z);
-				corner1 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, highestNonAirBlockAtCenter, z);
-				corner2 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter + 1 + lobbyHeight, z + lobbyDepth);
-			}
-			
-			if(corner1 != null && corner2 != null) {
-				// save the blocks, wide enough for three team gates, 3+1 high and 10 deep, extruding out from the zone wall.
-				this.volume.setCornerOne(corner1);
-				this.volume.setCornerTwo(corner2);
-				this.volume.saveBlocks();
-				VolumeMapper.save(volume, warzone.getName(), war);
-			}
+		if(volume == null) {
+			// no previous wall
+			this.volume = new Volume("lobby", war, warzone.getWorld());
+		} else {
+			// move the lobby
+			// this.volume.resetBlocks(); // should be done previously thru getVolume
+		}
+		
+		this.wall = newWall;
+		// find center of the wall and set the new volume corners
+		VerticalVolume zoneVolume = warzone.getVolume();
+		
+		Block corner1 = null;
+		Block corner2 = null;
+		
+		if(wall == BlockFace.NORTH) {
+			int wallStart = zoneVolume.getMinZ();
+			int wallEnd = zoneVolume.getMaxZ();
+			int x = zoneVolume.getMinX();
+			int wallLength = wallEnd - wallStart + 1;
+			int wallCenterPos = wallStart + wallLength / 2;
+			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x, wallCenterPos);
+			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter+1, wallCenterPos);
+			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter, wallCenterPos + lobbyHalfSide);
+			corner2 = warzone.getWorld().getBlockAt(x - lobbyDepth, 
+					highestNonAirBlockAtCenter + 1 + lobbyHeight, wallCenterPos - lobbyHalfSide);
+		} else if (wall == BlockFace.EAST){
+			int wallStart = zoneVolume.getMinX();
+			int wallEnd = zoneVolume.getMaxX();
+			int z = zoneVolume.getMinZ();
+			int wallLength = wallEnd - wallStart + 1;
+			int wallCenterPos = wallStart + wallLength / 2;
+			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z);
+			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter + 1, z);
+			corner1 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter, z);
+			corner2 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, 
+					highestNonAirBlockAtCenter + 1 + lobbyHeight, z - lobbyDepth);
+ 		} else if (wall == BlockFace.SOUTH){
+ 			int wallStart = zoneVolume.getMinZ();
+			int wallEnd = zoneVolume.getMaxZ();
+			int x = zoneVolume.getMaxX();
+			int wallLength = wallEnd - wallStart + 1;
+			int wallCenterPos = wallStart + wallLength / 2;
+			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x, wallCenterPos);
+			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter + 1, wallCenterPos);
+			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter, wallCenterPos - lobbyHalfSide);
+			corner2 = warzone.getWorld().getBlockAt(x + lobbyDepth, 
+					highestNonAirBlockAtCenter + 1 + lobbyHeight, wallCenterPos + lobbyHalfSide);
+		} else if (wall == BlockFace.WEST){
+			int wallStart = zoneVolume.getMinX();
+			int wallEnd = zoneVolume.getMaxX();
+			int z = zoneVolume.getMaxZ();
+			int wallLength = wallEnd - wallStart + 1;
+			int wallCenterPos = wallStart + wallLength / 2;
+			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z);
+			lobbyMiddleWallBlock = warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter + 1, z);
+			corner1 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, highestNonAirBlockAtCenter, z);
+			corner2 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter + 1 + lobbyHeight, z + lobbyDepth);
+		}
+		
+		if(corner1 != null && corner2 != null) {
+			// save the blocks, wide enough for three team gates, 3+1 high and 10 deep, extruding out from the zone wall.
+			this.volume.setCornerOne(corner1);
+			this.volume.setCornerTwo(corner2);
+			this.volume.saveBlocks();
+			VolumeMapper.save(volume, warzone.getName(), war);
 		}
 	}
 	
@@ -515,10 +512,6 @@ public class ZoneLobby {
 		} else if(team.getMaterial() == TeamMaterials.TEAMGOLD) {
 			resetTeamGateSign(team, goldGate);
 		}
-//		
-//		if(war.getWarHub() != null) {
-//			war.getWarHub().resetZoneSign(warzone);
-//		}
 	}
 
 	private void resetTeamGateSign(Team team, Block gate) {
