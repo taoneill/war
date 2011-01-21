@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.material.MaterialData;
 
 import bukkit.tommytony.war.War;
 
@@ -52,7 +53,7 @@ public class Team {
 		this.volume.setCornerTwo(warzone.getWorld().getBlockAt(x+2, y+5, z+2));
 	}
 	
-	private void initializeTeamSpawn(Location teamSpawn) {
+	public void initializeTeamSpawn(Location teamSpawn) {
 		// make air
 		this.volume.setToMaterial(Material.AIR);
 		
@@ -125,7 +126,32 @@ public class Team {
 		//warzone.getWorld().getBlockAt(x-2, y+3, z-2).setType(Material.LightStone);
 		warzone.getWorld().getBlockAt(x-2, y+3, z-2).setType(material);
 		
-		resetSign();
+		// BUKKIT
+		//resetSign();
+		
+		Block block = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
+		if(block.getType() != Material.SIGN_POST) { 
+			block.setType(Material.SIGN_POST);
+		} 
+		else {
+			// already a signpost, gotta delete it and create a new one
+			block.setType(Material.AIR);
+			block.setType(Material.SIGN_POST);
+		}
+		block.setData((byte)6);
+		
+		BlockState state = block.getState();
+		if(state instanceof Sign) {
+			Sign sign = (Sign) state;
+			sign.setType(Material.SIGN_POST);
+			sign.setData(new MaterialData(Material.SIGN_POST, (byte)6));
+			sign.setLine(0, "Team " + name);
+			sign.setLine(1, remainingTickets + "/" + warzone.getLifePool() + " lives left");
+			sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
+			sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
+			state.update(true);
+		}
+		
 	}
 	
 	public void setTeamSpawn(Location teamSpawn) {
@@ -201,23 +227,36 @@ public class Team {
 	}
 	
 	public void resetSign(){
-		int x = teamSpawn.getBlockX();
-		int y = teamSpawn.getBlockY();
-		int z = teamSpawn.getBlockZ();
+		this.getVolume().resetBlocks();
+		this.initializeTeamSpawn(this.getTeamSpawn()); // reset everything instead of just sign
 		
-		Block block = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
-		if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
-		block.setData((byte)6);
-		
-		BlockState state = block.getState();
-		if(state instanceof Sign) {
-			Sign sign = (Sign) state;
-			sign.setLine(0, "Team " + name);
-			sign.setLine(1, remainingTickets + "/" + warzone.getLifePool() + " lives left");
-			sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
-			sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
-			state.update(true);
-		}
+		// BUKKIT
+//		int x = teamSpawn.getBlockX();
+//		int y = teamSpawn.getBlockY();
+//		int z = teamSpawn.getBlockZ();
+//		
+//		Block block = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
+//		if(block.getType() != Material.SIGN_POST) { 
+//			block.setType(Material.SIGN_POST);
+//		} 
+////		else {
+////			// already a signpost, gotta delete it and create a new one
+////			block.setType(Material.AIR);
+////			block.setType(Material.SIGN_POST);
+////		}
+////		block.setData((byte)6);
+//		
+//		BlockState state = block.getState();
+//		if(state instanceof Sign) {
+//			Sign sign = (Sign) state;
+//			sign.setType(Material.SIGN_POST);
+//			sign.setData(new MaterialData(Material.SIGN_POST, (byte)6));
+//			sign.setLine(0, "Team " + name);
+//			sign.setLine(1, remainingTickets + "/" + warzone.getLifePool() + " lives left");
+//			sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
+//			sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
+//			state.update(true);
+//		}
 		
 		if(warzone.getLobby() != null) {
 			warzone.getLobby().resetTeamGateSign(this);

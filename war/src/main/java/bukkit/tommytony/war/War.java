@@ -95,10 +95,10 @@ public class War extends JavaPlugin {
 		
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.High, this);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Highest, this);
 		
-		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.High, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
@@ -272,7 +272,15 @@ public class War extends JavaPlugin {
 						"Sends a message only to your teammates."));
 			} else {
 				Team playerTeam = this.getPlayerTeam(player.getName());
-				String teamMessage = player.getName();
+				ChatColor color = null;
+				if(playerTeam.getMaterial() == TeamMaterials.TEAMDIAMOND) {
+					color = ChatColor.DARK_AQUA;
+				} else if(playerTeam.getMaterial() == TeamMaterials.TEAMGOLD) {
+					color = ChatColor.GOLD;
+				} else if(playerTeam.getMaterial() ==  TeamMaterials.TEAMIRON) {
+					color = ChatColor.GRAY;
+				}
+				String teamMessage = player.getName() + ": " + ChatColor.WHITE;
 				for(int j = 0 ; j<arguments.length; j++) {
 					String part = arguments[j];
 					teamMessage += part + " ";

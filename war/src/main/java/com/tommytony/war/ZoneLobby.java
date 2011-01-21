@@ -596,11 +596,14 @@ public class ZoneLobby {
 		}		
 		if(autoAssignGate != null){
 			if(leaving(location, autoAssignGate, inside, left, right)) return true;
-		} else if(diamondGate != null){
+		}
+		if(diamondGate != null){
 			if(leaving(location, diamondGate, inside, left, right)) return true;
-		} else if(ironGate != null){
+		} 
+		if(ironGate != null){
 			if(leaving(location, ironGate, inside, left, right)) return true;
-		} else if(goldGate != null){
+		} 
+		if(goldGate != null){
 			if(leaving(location, goldGate, inside, left, right)) return true;
 		}		
 		return false;

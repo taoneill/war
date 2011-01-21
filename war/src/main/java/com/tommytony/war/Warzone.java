@@ -716,6 +716,28 @@ public class Warzone {
 			}
 		}
 	}
+	
+	public void autoAssign(Player player) {
+		Team lowestNoOfPlayers = null;
+		for(Team t : teams) {
+			if(lowestNoOfPlayers == null
+					|| (lowestNoOfPlayers != null && lowestNoOfPlayers.getPlayers().size() > t.getPlayers().size())) {
+				lowestNoOfPlayers = t;
+			}
+		}
+		if(lowestNoOfPlayers != null) {
+			lowestNoOfPlayers.addPlayer(player);
+			lowestNoOfPlayers.resetSign();
+			if(!hasPlayerInventory(player.getName())) {
+				keepPlayerInventory(player);
+			}
+			player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+			respawnPlayer(lowestNoOfPlayers, player);
+			for(Team team : teams){
+				team.teamcast(war.str("" + player.getName() + " joined team " + team.getName() + "."));
+			}
+		}
+	}
 
 	public void setTeamCap(int teamCap) {
 		this.teamCap = teamCap;

@@ -60,7 +60,6 @@ public class WarPlayerListener extends PlayerListener {
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
 		synchronized(player) {
-			Location from = event.getFrom();
 			Location to = event.getTo();
 			
 			// Zone walls
@@ -78,26 +77,32 @@ public class WarPlayerListener extends PlayerListener {
 			
 			Warzone playerWarzone = war.getPlayerWarzone(player.getName());	// this uses the teams, so it asks: get the player's team's warzone, to be clearer
 			
+			boolean enteredGate = false;
 			if(to != null) {
 				// Warzone lobby gates
 				for(Warzone zone : war.getWarzones()){
 					if(zone.getLobby() != null) {
-						synchronized(player) {
 							Team oldTeam = war.getPlayerTeam(player.getName());
 							if(oldTeam == null) { // trying to counter spammy player move
 								if(zone.getLobby().isAutoAssignGate(to)) {
+									enteredGate = true;
 									dropFromOldTeamIfAny(player);
 									int noOfPlayers = 0;
 									for(Team t : zone.getTeams()) {
 										noOfPlayers += t.getPlayers().size();
 									}
 									if(noOfPlayers < zone.getTeams().size() * zone.getTeamCap()) {
-										zone.autoAssign(event, player);
+										//zone.autoAssign(event, player);
+										zone.autoAssign(player);
+										event.setCancelled(true);
 									} else {
-										event.setTo(zone.getTeleport());
+										//event.setTo(zone.getTeleport());
+										player.teleportTo(zone.getTeleport());
+										event.setCancelled(true);
 										player.sendMessage("All teams are full.");
 									}
 								} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMDIAMOND, to)){
+									enteredGate = true;
 									dropFromOldTeamIfAny(player);
 									Team diamondTeam = zone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND);
 									if(diamondTeam.getPlayers().size() < zone.getTeamCap()) {
@@ -105,15 +110,20 @@ public class WarPlayerListener extends PlayerListener {
 										diamondTeam.resetSign();
 										zone.keepPlayerInventory(player);
 										player.sendMessage(war.str("Your inventory is is storage until you /leave."));
-										zone.respawnPlayer(event, diamondTeam, player);
+										//zone.respawnPlayer(event, diamondTeam, player);
+										zone.respawnPlayer(diamondTeam, player);
+										event.setCancelled(true);
 										for(Team team : zone.getTeams()){
 											team.teamcast(war.str("" + player.getName() + " joined team diamond."));
 										}
 									} else {
-										event.setTo(zone.getTeleport());
+										//event.setTo(zone.getTeleport());
+										player.teleportTo(zone.getTeleport());
+										event.setCancelled(true);
 										player.sendMessage("Team diamond is full.");
 									}
 								} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMIRON, to)){
+									enteredGate = true;
 									dropFromOldTeamIfAny(player);
 									Team ironTeam = zone.getTeamByMaterial(TeamMaterials.TEAMIRON);
 									if(ironTeam.getPlayers().size() < zone.getTeamCap()) {
@@ -121,15 +131,20 @@ public class WarPlayerListener extends PlayerListener {
 										ironTeam.resetSign();
 										zone.keepPlayerInventory(player);
 										player.sendMessage(war.str("Your inventory is is storage until you /leave."));
-										zone.respawnPlayer(event, ironTeam, player);
+										//zone.respawnPlayer(event, ironTeam, player);
+										zone.respawnPlayer(ironTeam, player);
+										event.setCancelled(true);
 										for(Team team : zone.getTeams()){
 											team.teamcast(war.str("" + player.getName() + " joined team iron."));
 										}
 									} else {
-										event.setTo(zone.getTeleport());
+										//event.setTo(zone.getTeleport());
+										player.teleportTo(zone.getTeleport());
+										event.setCancelled(true);
 										player.sendMessage("Team iron is full.");
 									}
 								} else if (zone.getLobby().isInTeamGate(TeamMaterials.TEAMGOLD, to)){
+									enteredGate = true;
 									dropFromOldTeamIfAny(player);
 									Team goldTeam = zone.getTeamByMaterial(TeamMaterials.TEAMGOLD);
 									if(goldTeam.getPlayers().size() < zone.getTeamCap()) {
@@ -137,26 +152,35 @@ public class WarPlayerListener extends PlayerListener {
 										goldTeam.resetSign();
 										zone.keepPlayerInventory(player);
 										player.sendMessage(war.str("Your inventory is is storage until you /leave."));
-										zone.respawnPlayer(event, goldTeam, player);
+										//zone.respawnPlayer(event, goldTeam, player);
+										zone.respawnPlayer(goldTeam, player);
+										event.setCancelled(true);
 										for(Team team : zone.getTeams()){
 											team.teamcast(war.str("" + player.getName() + " joined team gold."));
 										}
 									} else {
-										event.setTo(zone.getTeleport());
+										//event.setTo(zone.getTeleport());
+										player.teleportTo(zone.getTeleport());
+										event.setCancelled(true);
 										player.sendMessage("Team gold is full.");
 									}
 								} else if (zone.getLobby().isInWarHubLinkGate(to)){
+									enteredGate = true;
 									dropFromOldTeamIfAny(player);
-									event.setTo(war.getWarHub().getLocation());
+									//event.setTo(war.getWarHub().getLocation());
 									player.teleportTo(war.getWarHub().getLocation());
+									event.setCancelled(true);
 									player.sendMessage(war.str("Welcome to the War hub."));
 								}
 							} else if(zone.getLobby().isLeavingZone(to)) { // already in a team and in warzone, leaving
+									enteredGate = true;
 									// same as leave, except event.setTo
 									Team playerTeam = war.getPlayerTeam(player.getName());
 									playerTeam.removePlayer(player.getName());
 									playerTeam.resetSign();
-									event.setTo(playerWarzone.getTeleport());
+									//event.setTo(playerWarzone.getTeleport());
+									player.teleportTo(zone.getTeleport());
+									event.setCancelled(true);
 									playerWarzone.restorePlayerInventory(player);
 									if(playerWarzone.getLobby() != null) {
 										playerWarzone.getLobby().resetTeamGateSign(playerTeam);
@@ -166,30 +190,32 @@ public class WarPlayerListener extends PlayerListener {
 										war.getWarHub().resetZoneSign(zone);
 									}
 							}
-						}
 					}
 				}
 				
 				// Warhub zone gates
 				WarHub hub = war.getWarHub();
 				if(hub != null) {
-					Warzone zone = hub.getDestinationWarzoneForLocation(player.getLocation());
+					Warzone zone = hub.getDestinationWarzoneForLocation(to);
 					synchronized(player) {
 						if(zone != null) {
-							event.setTo(zone.getTeleport());
-							//player.teleportTo(zone.getTeleport());
+							//event.setTo(zone.getTeleport());
+							player.teleportTo(zone.getTeleport());
+							event.setCancelled(true);
 							player.sendMessage(war.str("Welcome to warzone " + zone.getName() + "."));
 						}
 					}
 				}
 			
-				if(playerWarzone != null) {
+				if(playerWarzone != null && !enteredGate) {
 					Team team = war.getPlayerTeam(player.getName());
 					
 					// Player belongs to a warzone team but is outside: he snuck out!.
-					if(from != null && war.warzone(player.getLocation()) == null && team != null) {
-						player.sendMessage("Teleported back to spawn. Please /leave your team if you want to exit the zone.");
-						event.setTo(team.getTeamSpawn());
+					if(war.warzone(to) == null && team != null) {
+						//player.sendMessage(war.str("Teleporting you back to spawn. Please /leave your team if you want to exit the zone."));
+						//event.setTo(team.getTeamSpawn());
+						player.teleportTo(team.getTeamSpawn());
+						event.setCancelled(true);
 					}
 		
 					// Monuments
@@ -200,10 +226,12 @@ public class WarPlayerListener extends PlayerListener {
 						player.setHealth(20);
 						player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
 					}
-				} else if (war.inAnyWarzone(to) && !war.isZoneMaker(player.getName())) { // player is not in any team, but inside warzone boundaries, get him out
+				} else if (!enteredGate && war.inAnyWarzone(to) && !war.warzone(to).getLobby().isLeavingZone(to) && !war.isZoneMaker(player.getName())) { // player is not in any team, but inside warzone boundaries, get him out
 					Warzone zone = war.warzone(to);
-					event.setTo(zone.getTeleport());
-					player.sendMessage(war.str("You can't be inside a warzone without a team."));
+					//event.setTo(zone.getTeleport());
+					player.teleportTo(zone.getTeleport());
+					event.setCancelled(true);
+					//player.sendMessage(war.str("You can't be inside a warzone without a team."));
 				}
 			
 			}

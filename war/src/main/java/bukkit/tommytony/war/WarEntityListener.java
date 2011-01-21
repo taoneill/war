@@ -103,12 +103,12 @@ public class WarEntityListener extends EntityListener {
 			if(attackerTeam != null && defenderTeam != null 
 					&& attackerTeam != defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
-				// A real attack: handle death scenario. ==> NOT: now handled in player move.. but spammy
-				if(event.getDamage() >= d.getHealth()) {
-					// Player died
-					handleDeath(d, defenderWarzone, defenderTeam);
-					event.setCancelled(true); // Don't let the killing blow fall down. How does this affect drops?
-				}
+				// A real attack: handle death scenario. ==> NOT: now handled in entity damage
+//				if(event.getDamage() >= d.getHealth()) {
+//					// Player died
+//					handleDeath(d, defenderWarzone, defenderTeam);
+//					event.setCancelled(true); // Don't let the killing blow fall down. How does this affect drops?
+//				}
 			} else if (attackerTeam != null && defenderTeam != null 
 					&& attackerTeam == defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
@@ -198,7 +198,7 @@ public class WarEntityListener extends EntityListener {
 						playerWarzone.getVolume().resetBlocks();
 						playerWarzone.initializeZone();
 						newBattle = true;
-						playerTeam.setRemainingTickets(playerTeam.getRemainingTickets()+1); // TODO get rid of this dirty workaround for the twice move-on-death bug
+						playerTeam.setRemainingTickets(playerTeam.getRemainingTickets()); // TODO get rid of this dirty workaround for the twice move-on-death bug
 					}
 				} else {
 					playerTeam.setRemainingTickets(remaining - 1);
