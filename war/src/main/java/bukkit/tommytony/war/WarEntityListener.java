@@ -1,6 +1,7 @@
 package bukkit.tommytony.war;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.entity.Entity;
@@ -9,6 +10,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityListener;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
@@ -32,13 +35,16 @@ public class WarEntityListener extends EntityListener {
 		
 		if(defender instanceof Player) {
 			Player d = (Player)defender;
-			if(event.getDamage() >= d.getHealth()) {
-				// Player died
-				Warzone defenderWarzone = war.getPlayerWarzone(d.getName());
-				Team defenderTeam = war.getPlayerTeam(d.getName());
-				if(defenderTeam != null) {
-					handleDeath(d, defenderWarzone, defenderTeam);
-					event.setCancelled(true); // Don't let the killing blow fall down.
+			synchronized(defender) {
+				if(event.getDamage() >= d.getHealth()) {
+					// Player died
+					Warzone defenderWarzone = war.getPlayerWarzone(d.getName());
+					Team defenderTeam = war.getPlayerTeam(d.getName());
+					if(defenderTeam != null) {
+						
+						handleDeath(d, defenderWarzone, defenderTeam);
+						event.setCancelled(true); // Don't let the killing blow fall down.
+					}
 				}
 			}
 		}
@@ -103,12 +109,30 @@ public class WarEntityListener extends EntityListener {
 			if(attackerTeam != null && defenderTeam != null 
 					&& attackerTeam != defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
-				// A real attack: handle death scenario. ==> NOT: now handled in entity damage
-//				if(event.getDamage() >= d.getHealth()) {
-//					// Player died
-//					handleDeath(d, defenderWarzone, defenderTeam);
-//					event.setCancelled(true); // Don't let the killing blow fall down. How does this affect drops?
-//				}
+				// A real attack: handle death scenario. ==> now handled in entity damage as well
+				synchronized(d) {
+					if(event.getDamage() >= d.getHealth()) {
+//						// Player died, loot him!
+//						PlayerInventory attackerInv = a.getInventory();
+//						PlayerInventory defenderInv = d.getInventory();
+//						HashMap<Integer, ItemStack> noMorePlace = new HashMap<Integer, ItemStack>();
+//						for(ItemStack stack : defenderInv.getContents()) {
+//							HashMap<Integer, ItemStack> newNoMorePlace = attackerInv.addItem(stack);
+//							noMorePlace.putAll(newNoMorePlace);
+//						}					
+//						
+//						// attacker inventory is full, drop the rest.
+//						if(!noMorePlace.isEmpty()) {
+//							for(Integer key : noMorePlace.keySet()) {
+//								ItemStack toDrop = noMorePlace.get(key);
+//								defender.getWorld().dropItem(defender.getLocation(), toDrop);
+//							}
+//						}
+						
+						handleDeath(d, defenderWarzone, defenderTeam);
+						event.setCancelled(true);
+					}
+				}
 			} else if (attackerTeam != null && defenderTeam != null 
 					&& attackerTeam == defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {

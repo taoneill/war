@@ -199,9 +199,11 @@ public class WarPlayerListener extends PlayerListener {
 					Warzone zone = hub.getDestinationWarzoneForLocation(to);
 					synchronized(player) {
 						if(zone != null) {
-							//event.setTo(zone.getTeleport());
-							player.teleportTo(zone.getTeleport());
-							event.setCancelled(true);
+							enteredGate = true;
+							event.setTo(zone.getTeleport());
+//							player.teleportTo(zone.getTeleport());
+//							
+//							event.setCancelled(true);
 							player.sendMessage(war.str("Welcome to warzone " + zone.getName() + "."));
 						}
 					}
@@ -214,7 +216,8 @@ public class WarPlayerListener extends PlayerListener {
 					if(war.warzone(to) == null && team != null) {
 						//player.sendMessage(war.str("Teleporting you back to spawn. Please /leave your team if you want to exit the zone."));
 						//event.setTo(team.getTeamSpawn());
-						player.teleportTo(team.getTeamSpawn());
+						playerWarzone.respawnPlayer(team, player);
+						//player.teleportTo(team.getTeamSpawn());
 						event.setCancelled(true);
 					}
 		
