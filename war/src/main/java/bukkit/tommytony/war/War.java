@@ -67,6 +67,14 @@ public class War extends JavaPlugin {
 	
 	public void onDisable() {
 		for(Warzone warzone : warzones) {
+			for(Team team : warzone.getTeams()) {
+				for(Player player : team.getPlayers()) {
+					if(warzone.hasPlayerInventory(player.getName())) {
+						warzone.restorePlayerInventory(player);
+						player.sendMessage(str("War disabled. Your inventory has (hopefully) been restored."));
+					}
+				}
+			}
 			if(warzone.getLobby() != null) {
 				warzone.getLobby().getVolume().resetBlocks();
 			}
@@ -90,6 +98,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.High, this);
 		
 		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
