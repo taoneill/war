@@ -199,7 +199,9 @@ public class Warzone {
 			
 			
 			int saved = volume.saveBlocks();
-			initializeZone();	// bring back stuff
+			if(clearArtifacts) {
+				initializeZone();	// bring back stuff
+			}
 			return saved;
 		}
 		return 0;
