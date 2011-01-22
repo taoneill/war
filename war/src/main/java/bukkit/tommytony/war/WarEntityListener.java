@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityListener;
@@ -64,6 +65,8 @@ public class WarEntityListener extends EntityListener {
 			if(attackerTeam != null && defenderTeam != null 
 					&& attackerTeam != defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
+				// Make sure one of the players isn't in the spawn
+				if(!defenderTeam.getVolume().contains(d.getLocation())){
 				// A real attack: handle death scenario. ==> now handled in entity damage as well
 				//synchronized(d) {
 					if(d.getHealth() <= 0) {
@@ -87,6 +90,11 @@ public class WarEntityListener extends EntityListener {
 						handleDeath(d, defenderWarzone, defenderTeam);
 						event.setCancelled(true);
 					}
+				}
+				else {	// attacking person in spawn
+					a.sendMessage(war.str("Can't attack a player that's inside his team's spawn."));
+					event.setCancelled(true);
+				}
 				//}
 			} else if (attackerTeam != null && defenderTeam != null 
 					&& attackerTeam == defenderTeam 			
@@ -120,6 +128,9 @@ public class WarEntityListener extends EntityListener {
 				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 			}
 		}
+    }
+    
+    public void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
     }
     
     private void handleDeath(Player player, Warzone playerWarzone, Team playerTeam) {

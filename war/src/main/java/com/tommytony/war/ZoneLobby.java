@@ -617,22 +617,23 @@ public class ZoneLobby {
 		Block out = gate.getFace(inside);
 		Block outL = out.getFace(left);
 		Block outR = out.getFace(right);
-		Block out2 = gate.getFace(inside, 2);
-		Block out2L = out2.getFace(left);
-		Block out2R = out2.getFace(right);
+//		Block out2 = gate.getFace(inside, 2);
+//		Block out2L = out2.getFace(left);
+//		Block out2R = out2.getFace(right);
 		if(out.getX() == x && out.getY() == y && out.getZ() == z) {
 			return true;
 		} else if(outL.getX() == x && outL.getY() == y && outL.getZ() == z) {
 			return true;
 		} else if(outR.getX() == x && outR.getY() == y && outR.getZ() == z) {
 			return true;
-		} else if(out2.getX() == x && out2.getY() == y && out2.getZ() == z) {
-			return true;
-		} else if(out2L.getX() == x && out2L.getY() == y && out2L.getZ() == z) {
-			return true;
-		} else if(out2R.getX() == x && out2R.getY() == y && out2R.getZ() == z) {
-			return true;
 		}
+//		} else if(out2.getX() == x && out2.getY() == y && out2.getZ() == z) {
+//			return true;
+//		} else if(out2L.getX() == x && out2L.getY() == y && out2L.getZ() == z) {
+//			return true;
+//		} else if(out2R.getX() == x && out2R.getY() == y && out2R.getZ() == z) {
+//			return true;
+//		}
 		return false;
 	}
 }

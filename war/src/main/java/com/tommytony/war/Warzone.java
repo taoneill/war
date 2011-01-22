@@ -344,7 +344,9 @@ public class Warzone {
 	}
 	
 	public void respawnPlayer(PlayerMoveEvent event, Team team, Player player) {
-		event.setTo(team.getTeamSpawn());
+		event.setFrom(team.getTeamSpawn());
+		player.teleportTo(team.getTeamSpawn());
+		event.setCancelled(true);
 		handleRespawn(team, player);
 	}
 	

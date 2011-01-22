@@ -98,10 +98,11 @@ public class War extends JavaPlugin {
 		
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 		
-		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Highest, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Highest, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.High, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.High, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
@@ -867,7 +868,6 @@ public class War extends JavaPlugin {
 								getZoneMakersImpersonatingPlayers().add(player.getName());
 							}
 						}
-						zoneMakerNames.remove(player.getName());
 						player.sendMessage(str("You are now impersonating a regular player. Type /zonemaker again to toggle back to war maker mode."));
 					}
 					
@@ -1108,11 +1108,17 @@ public class War extends JavaPlugin {
 	}
 	
 	public boolean isZoneMaker(Player player) {
-		for(String zoneMaker : zoneMakerNames) {
-			if(zoneMaker.equals(player.getName())) return true;
+		boolean isPlayerImpersonator = false;
+		for(String disguised : zoneMakersImpersonatingPlayers) {
+			if(disguised.equals(player.getName())) isPlayerImpersonator = true;
 		}
-		if(Permissions != null && Permissions.Security.permission(player, "war.*")) {
-			return true;
+		if(!isPlayerImpersonator) {
+			for(String zoneMaker : zoneMakerNames) {
+				if(zoneMaker.equals(player.getName())) return true;
+			}
+			if(Permissions != null && Permissions.Security.permission(player, "war.*")) {
+				return true;
+			}
 		}
 		return false;			
 	}
