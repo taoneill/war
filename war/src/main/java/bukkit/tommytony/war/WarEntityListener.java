@@ -1,18 +1,11 @@
 package bukkit.tommytony.war;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityListener;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
@@ -31,26 +24,30 @@ public class WarEntityListener extends EntityListener {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public void onEntityDamage(EntityDamageEvent event) {
-		Entity defender = event.getEntity();
-		
-		if(defender instanceof Player) {
-			Player d = (Player)defender;
-			if(event.getDamage() >= d.getHealth()) {
-				// Player died
-				Warzone defenderWarzone = war.getPlayerTeamWarzone(d.getName());
-				Team defenderTeam = war.getPlayerTeam(d.getName());
-				if(defenderTeam != null) {
-					
-					handleDeath(d, defenderWarzone, defenderTeam);
-					event.setCancelled(true); // Don't let the killing blow fall down.
-				}
-			}
-		}
-		
-    }
+//	public void onEntityDamage(EntityDamageEvent event) {
+////		Entity defender = event.getEntity();
+////		
+////		if(defender instanceof Player) {
+////			Player d = (Player)defender;
+////			if(event.getDamage() >= d.getHealth()) {
+////				// Player died
+////				Warzone defenderWarzone = war.getPlayerTeamWarzone(d.getName());
+////				Team defenderTeam = war.getPlayerTeam(d.getName());
+////				if(defenderTeam != null) {
+////					
+////					handleDeath(d, defenderWarzone, defenderTeam);
+////					event.setCancelled(true); // Don't let the killing blow fall down.
+////				}
+////			}
+////		}
+//		
+//    }
 	
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+    	handlerAttackDefend(event);
+    }
+    
+    private void handlerAttackDefend(EntityDamageByEntityEvent event) {
     	Entity attacker = event.getDamager();
     	Entity defender = event.getEntity();
     	
@@ -69,27 +66,27 @@ public class WarEntityListener extends EntityListener {
 				if(!defenderTeam.getVolume().contains(d.getLocation())){
 				// A real attack: handle death scenario. ==> now handled in entity damage as well
 				//synchronized(d) {
-					if(d.getHealth() <= 0) {
-//						// Player died, loot him!
-//						PlayerInventory attackerInv = a.getInventory();
-//						PlayerInventory defenderInv = d.getInventory();
-//						HashMap<Integer, ItemStack> noMorePlace = new HashMap<Integer, ItemStack>();
-//						for(ItemStack stack : defenderInv.getContents()) {
-//							HashMap<Integer, ItemStack> newNoMorePlace = attackerInv.addItem(stack);
-//							noMorePlace.putAll(newNoMorePlace);
-//						}					
+//					if(d.getHealth() <= 0) {
+////						// Player died, loot him!
+////						PlayerInventory attackerInv = a.getInventory();
+////						PlayerInventory defenderInv = d.getInventory();
+////						HashMap<Integer, ItemStack> noMorePlace = new HashMap<Integer, ItemStack>();
+////						for(ItemStack stack : defenderInv.getContents()) {
+////							HashMap<Integer, ItemStack> newNoMorePlace = attackerInv.addItem(stack);
+////							noMorePlace.putAll(newNoMorePlace);
+////						}					
+////						
+////						// attacker inventory is full, drop the rest.
+////						if(!noMorePlace.isEmpty()) {
+////							for(Integer key : noMorePlace.keySet()) {
+////								ItemStack toDrop = noMorePlace.get(key);
+////								defender.getWorld().dropItem(defender.getLocation(), toDrop);
+////							}
+////						}
 //						
-//						// attacker inventory is full, drop the rest.
-//						if(!noMorePlace.isEmpty()) {
-//							for(Integer key : noMorePlace.keySet()) {
-//								ItemStack toDrop = noMorePlace.get(key);
-//								defender.getWorld().dropItem(defender.getLocation(), toDrop);
-//							}
-//						}
-						
-						handleDeath(d, defenderWarzone, defenderTeam);
-						event.setCancelled(true);
-					}
+//						handleDeath(d, defenderWarzone, defenderTeam);
+//						event.setCancelled(true);
+					//}
 				}
 				else {	// attacking person in spawn
 					a.sendMessage(war.str("Can't attack a player that's inside his team's spawn."));
@@ -127,87 +124,92 @@ public class WarEntityListener extends EntityListener {
 				}
 				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 			}
+			
+//			if(event.isCancelled() && event instanceof EntityDamageByProjectileEvent) {
+//				//((EntityDamageByProjectileEvent)event).setBounce(true);
+//			}
 		}
+	}
+
+	public void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
+    	handlerAttackDefend(event);
     }
     
-    public void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
-    }
-    
-    private void handleDeath(Player player, Warzone playerWarzone, Team playerTeam) {
-    	// teleport to team spawn upon death
-		player.sendMessage(war.str("You died."));
-		boolean newBattle = false;
-		boolean scoreCapReached = false;
-		synchronized(playerWarzone) {
-			synchronized(player) {
-				int remaining = playerTeam.getRemainingTickets();
-				if(remaining == 0) { // your death caused your team to lose
-					List<Team> teams = playerWarzone.getTeams();
-					for(Team t : teams) {
-						t.teamcast(war.str("The battle is over. Team " + playerTeam.getName() + " lost: " 
-								+ player.getName() + " died and there were no lives left in their life pool." ));
-						
-						if(!t.getName().equals(playerTeam.getName())) {
-							// all other teams get a point
-							t.addPoint();
-							t.resetSign();
-						}
-					}
-					// detect score cap
-					List<Team> scoreCapTeams = new ArrayList<Team>();
-					for(Team t : teams) {
-						if(t.getPoints() == playerWarzone.getScoreCap()) {
-							scoreCapTeams.add(t);
-						}
-					}
-					if(!scoreCapTeams.isEmpty()) {
-						String winnersStr = "Score cap reached! Winning team(s): ";
-						for(Team winner : scoreCapTeams) {
-							winnersStr += winner.getName() + " ";
-						}
-						winnersStr += ". The warzone is being reset... Please choose a new team.";
-						// Score cap reached. Reset everything.
-						for(Team t : teams) {
-							t.teamcast(war.str(winnersStr));
-							for(Player tp : t.getPlayers()) {
-								if(tp.getName() != player.getName()) {
-									tp.teleportTo(playerWarzone.getTeleport());
-								}
-							}
-							t.setPoints(0);
-							t.getPlayers().clear();	// empty the team
-						}
-						playerWarzone.getVolume().resetBlocks();
-						playerWarzone.initializeZone();
-						scoreCapReached = true;
-					} else {
-						// We can keep going
-						for(Team t : teams) {
-							t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
-						}
-						playerWarzone.getVolume().resetBlocks();
-						playerWarzone.initializeZone();
-						newBattle = true;
-						playerTeam.setRemainingTickets(playerTeam.getRemainingTickets()); // TODO get rid of this dirty workaround for the twice move-on-death bug
-					}
-				} else {
-					playerTeam.setRemainingTickets(remaining - 1);
-				}
-			}
-		}
-		synchronized(player) {
-			if(!newBattle && !scoreCapReached) {
-				playerWarzone.respawnPlayer(playerTeam, player);
-				playerTeam.resetSign();
-				war.info(player.getName() + " died and was tp'd back to team " + playerTeam.getName() + "'s spawn");
-			} else if (scoreCapReached) { 
-				player.teleportTo(playerWarzone.getTeleport());
-				playerTeam.resetSign();
-				war.info(player.getName() + " died and enemy team reached score cap");
-			} else if (newBattle){
-				war.info(player.getName() + " died and battle ended in team " + playerTeam.getName() + "'s disfavor");
-			}
-		}
+//    private void handleDeath(Player player, Warzone playerWarzone, Team playerTeam) {
+//    	// teleport to team spawn upon death
+//		player.sendMessage(war.str("You died."));
+//		boolean newBattle = false;
+//		boolean scoreCapReached = false;
+//		synchronized(playerWarzone) {
+//			synchronized(player) {
+//				int remaining = playerTeam.getRemainingTickets();
+//				if(remaining == 0) { // your death caused your team to lose
+//					List<Team> teams = playerWarzone.getTeams();
+//					for(Team t : teams) {
+//						t.teamcast(war.str("The battle is over. Team " + playerTeam.getName() + " lost: " 
+//								+ player.getName() + " died and there were no lives left in their life pool." ));
+//						
+//						if(!t.getName().equals(playerTeam.getName())) {
+//							// all other teams get a point
+//							t.addPoint();
+//							t.resetSign();
+//						}
+//					}
+//					// detect score cap
+//					List<Team> scoreCapTeams = new ArrayList<Team>();
+//					for(Team t : teams) {
+//						if(t.getPoints() == playerWarzone.getScoreCap()) {
+//							scoreCapTeams.add(t);
+//						}
+//					}
+//					if(!scoreCapTeams.isEmpty()) {
+//						String winnersStr = "Score cap reached! Winning team(s): ";
+//						for(Team winner : scoreCapTeams) {
+//							winnersStr += winner.getName() + " ";
+//						}
+//						winnersStr += ". The warzone is being reset... Please choose a new team.";
+//						// Score cap reached. Reset everything.
+//						for(Team t : teams) {
+//							t.teamcast(war.str(winnersStr));
+//							for(Player tp : t.getPlayers()) {
+//								if(tp.getName() != player.getName()) {
+//									tp.teleportTo(playerWarzone.getTeleport());
+//								}
+//							}
+//							t.setPoints(0);
+//							t.getPlayers().clear();	// empty the team
+//						}
+//						playerWarzone.getVolume().resetBlocks();
+//						playerWarzone.initializeZone();
+//						scoreCapReached = true;
+//					} else {
+//						// We can keep going
+//						for(Team t : teams) {
+//							t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
+//						}
+//						playerWarzone.getVolume().resetBlocks();
+//						playerWarzone.initializeZone();
+//						newBattle = true;
+//						playerTeam.setRemainingTickets(playerTeam.getRemainingTickets()); // TODO get rid of this dirty workaround for the twice move-on-death bug
+//					}
+//				} else {
+//					playerTeam.setRemainingTickets(remaining - 1);
+//				}
+//			}
+//		}
+//		synchronized(player) {
+//			if(!newBattle && !scoreCapReached) {
+//				playerWarzone.respawnPlayer(playerTeam, player);
+//				playerTeam.resetSign();
+//				war.info(player.getName() + " died and was tp'd back to team " + playerTeam.getName() + "'s spawn");
+//			} else if (scoreCapReached) { 
+//				player.teleportTo(playerWarzone.getTeleport());
+//				playerTeam.resetSign();
+//				war.info(player.getName() + " died and enemy team reached score cap");
+//			} else if (newBattle){
+//				war.info(player.getName() + " died and battle ended in team " + playerTeam.getName() + "'s disfavor");
+//			}
+//		}
     	// old
 //		Team team = war.getPlayerTeam(player.getName());
 //		if(team != null){
@@ -245,5 +247,5 @@ public class WarEntityListener extends EntityListener {
 //				war.getLogger().log(Level.INFO, player.getName() + " died and battle ended in team " + team.getName() + "'s disfavor");
 //			}
 //		}
-    }
+    //}
 }

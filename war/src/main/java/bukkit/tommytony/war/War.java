@@ -101,7 +101,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.High, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High, this);
+		//pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.High, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
@@ -863,10 +863,8 @@ public class War extends JavaPlugin {
 						}
 					} else {
 						// toggle to player mode
-						for(String name : zoneMakerNames) {
-							if(name.equals(player.getName())) {
-								getZoneMakersImpersonatingPlayers().add(player.getName());
-							}
+						if(isZoneMaker(player)) {
+							getZoneMakersImpersonatingPlayers().add(player.getName());
 						}
 						player.sendMessage(str("You are now impersonating a regular player. Type /zonemaker again to toggle back to war maker mode."));
 					}
@@ -893,7 +891,6 @@ public class War extends JavaPlugin {
 			boolean wasImpersonating = false;
 			for(String name : getZoneMakersImpersonatingPlayers()) {
 				if(player.getName().equals(name)) {
-					zoneMakerNames.add(player.getName());
 					wasImpersonating = true;
 				}
 			}
