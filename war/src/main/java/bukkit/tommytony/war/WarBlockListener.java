@@ -32,8 +32,8 @@ public class WarBlockListener extends BlockListener {
     	boolean captured = false;
     	if(player != null) {
 			Team team = war.getPlayerTeam(player.getName()); 
-			Warzone zone = war.getPlayerWarzone(player.getName());
-			boolean isZoneMaker = war.isZoneMaker(player.getName());
+			Warzone zone = war.getPlayerTeamWarzone(player.getName());
+			boolean isZoneMaker = war.isZoneMaker(player);
 			if(team != null && block != null && zone != null 
 					&& zone.isMonumentCenterBlock(block)
 					&& block.getType() == team.getMaterial()) {
@@ -75,7 +75,7 @@ public class WarBlockListener extends BlockListener {
     	if(player != null && block != null && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
 	    	Warzone warzone = war.warzone(player.getLocation());
 	    	Team team = war.getPlayerTeam(player.getName());
-	    	boolean isZoneMaker = war.isZoneMaker(player.getName());
+	    	boolean isZoneMaker = war.isZoneMaker(player);
 	    	
 	    	if(warzone != null && war.getPlayerTeam(player.getName()) == null && !isZoneMaker) {
 	    		// can't actually destroy blocks in a warzone if not part of a team

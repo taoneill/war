@@ -40,8 +40,9 @@ public class VolumeMapper {
 	public static void load(Volume volume, String zoneName, War war, World world) {
 		BufferedReader in = null;
 		try {
-			if(zoneName.equals("")) in = new BufferedReader(new FileReader(new File("War/dat/volume-" + volume.getName() + ".dat"))); // for the warhub
-			else in = new BufferedReader(new FileReader(new File("War/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+			if(zoneName.equals("")) in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + 
+												"/dat/volume-" + volume.getName() + ".dat"))); // for the warhub
+			else in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 			String firstLine = in.readLine();
 			if(firstLine != null && !firstLine.equals("")) {
 				int x1 = Integer.parseInt(in.readLine());
@@ -109,8 +110,9 @@ public class VolumeMapper {
 		if(volume.isSaved() && volume.getBlockTypes() != null) {
 			BufferedWriter out = null;
 			try {
-				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File("War/dat/volume-" + volume.getName() + ".dat")));
-				else out = new BufferedWriter(new FileWriter(new File("War/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
+				else out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + 
+												"/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 				
 				out.write("corner1"); out.newLine();
 				out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();

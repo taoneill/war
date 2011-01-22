@@ -35,65 +35,20 @@ public class WarEntityListener extends EntityListener {
 		
 		if(defender instanceof Player) {
 			Player d = (Player)defender;
-			synchronized(defender) {
-				if(event.getDamage() >= d.getHealth()) {
-					// Player died
-					Warzone defenderWarzone = war.getPlayerWarzone(d.getName());
-					Team defenderTeam = war.getPlayerTeam(d.getName());
-					if(defenderTeam != null) {
-						
-						handleDeath(d, defenderWarzone, defenderTeam);
-						event.setCancelled(true); // Don't let the killing blow fall down.
-					}
+			if(event.getDamage() >= d.getHealth()) {
+				// Player died
+				Warzone defenderWarzone = war.getPlayerTeamWarzone(d.getName());
+				Team defenderTeam = war.getPlayerTeam(d.getName());
+				if(defenderTeam != null) {
+					
+					handleDeath(d, defenderWarzone, defenderTeam);
+					event.setCancelled(true); // Don't let the killing blow fall down.
 				}
 			}
 		}
 		
     }
 	
-//	public void onEntityDamaged(EntityDamagedEvent event) {
-//		Entity damaged = event.getEntity();
-//		DamageCause cause = event.getCause();
-//		if(damaged != null && damaged instanceof Player){  
-//			Player player = (Player)damaged;
-//			int damage = event.getDamage();
-//			int currentPlayerHp = player.getHealth();
-//			if(damage >= currentPlayerHp) {
-//				Warzone zone = war.warzone(player.getLocation());
-//				if(war.getPlayerTeam(player.getName()) != null) {
-//					// player on a team killed himself
-//					handleDeath(((Player)damaged));
-//					
-//				} else if (zone != null ) {
-//					player.teleportTo(zone.getTeleport());
-//				}
-//				event.setCancelled(true);	// Don't totally kill the player
-//			}
-//		}
-//	}
-//	
-//	public void onEntityDamagedByBlock(EntityDamagedByBlockEvent event) {
-//		Entity damaged = event.getEntity();
-//		
-//		if(damaged != null && damaged instanceof Player){  
-//			Player player = (Player)damaged;
-//			int damage = event.getDamage();
-//			int currentPlayerHp = player.getHealth();
-//			if(damage >= currentPlayerHp) {
-//				Warzone zone = war.warzone(player.getLocation());
-//				if(war.getPlayerTeam(player.getName()) != null) {
-//					// player on a team killed himself
-//					handleDeath(((Player)damaged));
-//					
-//				} else if (zone != null ) {
-//					player.teleportTo(zone.getTeleport());
-//				}
-//				event.setCancelled(true);	// Don't let the block totally kill the player
-//			}
-//		}
-//			
-//    }
-
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
     	Entity attacker = event.getDamager();
     	Entity defender = event.getEntity();
@@ -102,16 +57,16 @@ public class WarEntityListener extends EntityListener {
 			// only let adversaries (same warzone, different team) attack each other
 			Player a = (Player)attacker;
 			Player d = (Player)defender;
-			Warzone attackerWarzone = war.getPlayerWarzone(a.getName());
+			Warzone attackerWarzone = war.getPlayerTeamWarzone(a.getName());
 			Team attackerTeam = war.getPlayerTeam(a.getName());
-			Warzone defenderWarzone = war.getPlayerWarzone(d.getName());
+			Warzone defenderWarzone = war.getPlayerTeamWarzone(d.getName());
 			Team defenderTeam = war.getPlayerTeam(d.getName());
 			if(attackerTeam != null && defenderTeam != null 
 					&& attackerTeam != defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
 				// A real attack: handle death scenario. ==> now handled in entity damage as well
-				synchronized(d) {
-					if(event.getDamage() >= d.getHealth()) {
+				//synchronized(d) {
+					if(d.getHealth() <= 0) {
 //						// Player died, loot him!
 //						PlayerInventory attackerInv = a.getInventory();
 //						PlayerInventory defenderInv = d.getInventory();
@@ -132,7 +87,7 @@ public class WarEntityListener extends EntityListener {
 						handleDeath(d, defenderWarzone, defenderTeam);
 						event.setCancelled(true);
 					}
-				}
+				//}
 			} else if (attackerTeam != null && defenderTeam != null 
 					&& attackerTeam == defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {

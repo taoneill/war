@@ -22,9 +22,9 @@ public class WarMapper {
 	
 	public static void load(War war, World world) {
 		//war.getLogger().info("Loading war config...");
-		(new File("War")).mkdir();
-		(new File("War/dat")).mkdir();
-		PropertiesFile warConfig = new PropertiesFile(war.getName() + "/war.txt");
+		(war.getDataFolder()).mkdir();
+		(new File(war.getDataFolder().getPath() + "/dat")).mkdir();
+		PropertiesFile warConfig = new PropertiesFile(war.getDataFolder().getPath() + "/war.txt");
 		try {
 			warConfig.load();
 		} catch (IOException e) {
@@ -138,7 +138,7 @@ public class WarMapper {
 	
 	public static void save(War war) {
 		//war.getLogger().info("Saving war config...");
-		PropertiesFile warConfig = new PropertiesFile(war.getName() + "/war.txt");
+		PropertiesFile warConfig = new PropertiesFile(war.getDataFolder().getPath() + "/war.txt");
 		String warzonesStr = "";
 		
 		// warzones

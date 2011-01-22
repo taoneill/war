@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
@@ -31,12 +32,15 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.nijikokun.bukkit.Permissions.Permissions;
+
 /**
  * 
  * @author tommytony
  *
  */
 public class War extends JavaPlugin {
+	public static Permissions Permissions = null;
 	
 	public War(PluginLoader pluginLoader, Server instance,
 			PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
@@ -44,7 +48,6 @@ public class War extends JavaPlugin {
 		// TODO: switch to bukkit config file
 		this.desc = desc;
 	}
-	
 
 	private WarPlayerListener playerListener = new WarPlayerListener(this);
 	private WarEntityListener entityListener = new WarEntityListener(this);
@@ -88,7 +91,7 @@ public class War extends JavaPlugin {
 
 	public void onEnable() {
 		this.log = Logger.getLogger("Minecraft");
-
+		this.setupPermissions();
 		
 		// Register hooks		
 		PluginManager pm = getServer().getPluginManager();
@@ -185,7 +188,7 @@ public class War extends JavaPlugin {
 		}
 		
 		// /join <teamname>
-		else if(command.equals("join")) {
+		else if(command.equals("join") && canPlayWar(player)) {
 			if(arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))
 					|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
 				player.sendMessage(this.str("Usage: /join <diamond/iron/gold/d/i/g>." +
@@ -267,11 +270,11 @@ public class War extends JavaPlugin {
 		
 		// /team <msg>
 		else if(command.equals("team")) {
-			if(!this.inAnyWarzone(player.getLocation())) {
+			Team playerTeam = this.getPlayerTeam(player.getName());
+			if(!this.inAnyWarzone(player.getLocation()) && playerTeam != null) {
 				player.sendMessage(this.str("Usage: /team <message>. " +
 						"Sends a message only to your teammates."));
 			} else {
-				Team playerTeam = this.getPlayerTeam(player.getName());
 				ChatColor color = null;
 				if(playerTeam.getMaterial() == TeamMaterials.TEAMDIAMOND) {
 					color = ChatColor.DARK_AQUA;
@@ -295,7 +298,7 @@ public class War extends JavaPlugin {
 				player.sendMessage("No warhub on this War server. Try /zones and /zone.");
 			} else {
 				Team playerTeam = this.getPlayerTeam(player.getName());
-				Warzone playerWarzone = getPlayerWarzone(player.getName());
+				Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
 				if(playerTeam != null) { // was in zone
 					playerTeam.removePlayer(player.getName());
 				}
@@ -306,7 +309,7 @@ public class War extends JavaPlugin {
 				player.teleportTo(this.getWarHub().getLocation());
 			}
 			
-		} else if(this.isZoneMaker(player.getName())) {			
+		} else if(this.isZoneMaker(player)) {			
 		// Mod commands : /nextbattle
 		
 			// /nextbattle
@@ -988,7 +991,7 @@ public class War extends JavaPlugin {
 		return null;
 	}
 	
-	public Warzone getPlayerWarzone(String playerName) {
+	public Warzone getPlayerTeamWarzone(String playerName) {
 		for(Warzone warzone : warzones) {
 			Team team = warzone.getPlayerTeam(playerName);
 			if(team != null) return warzone;
@@ -1093,9 +1096,23 @@ public class War extends JavaPlugin {
 		return zoneMakerNames;
 	}
 	
-	public boolean isZoneMaker(String playerName) {
+	public boolean canPlayWar(Player player) {
+		if(Permissions != null && Permissions.Security.permission(player, "war.player")) {
+			return true;
+		}
+		if(Permissions == null) {
+			// w/o Permissions, everyone can play
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isZoneMaker(Player player) {
 		for(String zoneMaker : zoneMakerNames) {
-			if(zoneMaker.equals(playerName)) return true;
+			if(zoneMaker.equals(player.getName())) return true;
+		}
+		if(Permissions != null && Permissions.Security.permission(player, "war.*")) {
+			return true;
 		}
 		return false;			
 	}
@@ -1183,5 +1200,17 @@ public class War extends JavaPlugin {
 	public List<String> getZoneMakersImpersonatingPlayers() {
 		return zoneMakersImpersonatingPlayers;
 	}
+	
+	public void setupPermissions() {
+		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
+
+		if(this.Permissions == null) {
+		    if(test != null) {
+		    	this.Permissions = (Permissions)test;
+		    } else {
+		    	info(str("Permission system not enabled. Defaulting to regular War config."));
+		    }
+		}
+	    }
 	
 }
