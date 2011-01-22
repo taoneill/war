@@ -1211,7 +1211,7 @@ public class War extends JavaPlugin {
 		    if(test != null) {
 		    	this.Permissions = (Permissions)test;
 		    } else {
-		    	info(str("Permission system not enabled. Defaulting to regular War config."));
+		    	info("Permissions system not enabled. Defaulting to regular War config.");
 		    }
 		}
 	    }

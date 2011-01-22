@@ -73,15 +73,13 @@ public class WarPlayerListener extends PlayerListener {
 		boolean isMaker = war.isZoneMaker(player);
 		
 		// Zone walls
-		if(!isMaker) { // zone makers don't get bothered with guard walls
-			Warzone nearbyZone = war.zoneOfZoneWallAtProximity(playerLoc);
-			if(nearbyZone != null) {	
-				nearbyZone.protectZoneWallAgainstPlayer(player);
-			} else {
-				// make sure to delete any wall guards as you leave
-				for(Warzone zone : war.getWarzones()) {
-					zone.dropZoneWallGuardIfAny(player);
-				}
+		Warzone nearbyZone = war.zoneOfZoneWallAtProximity(playerLoc);
+		if(nearbyZone != null && !isMaker) { // zone makers don't get bothered with guard walls
+			nearbyZone.protectZoneWallAgainstPlayer(player);
+		} else { // zone makers still need to delete their walls
+			// make sure to delete any wall guards as you leave
+			for(Warzone zone : war.getWarzones()) {
+				zone.dropZoneWallGuardIfAny(player);
 			}
 		}
 		
