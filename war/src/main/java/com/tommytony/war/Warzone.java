@@ -444,17 +444,22 @@ public class Warzone {
 	public void keepPlayerInventory(Player player) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack[] contents = inventory.getContents();
-		inventories.put(player.getName(), contents);
+		inventories.put(player.getName(), contents);	
 	}
 
 	public void restorePlayerInventory(Player player) {
 		ItemStack[] originalContents = inventories.remove(player.getName());
+		PlayerInventory playerInv = player.getInventory();
 		if(originalContents != null) {
-			PlayerInventory playerInv = player.getInventory();
 			playerInv.clear();
-			playerInv.setHelmet(new ItemStack(0));
-			playerInv.setContents(originalContents);
+			for(ItemStack item : originalContents) {
+				if(item.getTypeId() != 0) {
+					playerInv.addItem(item);
+				}
+			}
 		}
+		// BUKKIT
+		// playerInv.setHelmet(new ItemStack(Material.AIR));
 	}
 
 	public boolean hasMonument(String monumentName) {
@@ -771,6 +776,29 @@ public class Warzone {
 
 	public boolean isDrawZoneOutline() {
 		return drawZoneOutline;
+	}
+
+	public void handlePlayerLeave(Player player, Location destination) {
+		Team playerTeam = war.getPlayerTeam(player.getName());
+		if(playerTeam !=null) {
+			Warzone zone = war.getPlayerTeamWarzone(player.getName());
+			playerTeam.removePlayer(player.getName());
+			playerTeam.resetSign();
+			if(zone != null) {			
+				if(zone.getLobby() != null) {
+					zone.getLobby().resetTeamGateSign(playerTeam);
+				}
+				player.teleportTo(destination);
+				if(zone.hasPlayerInventory(player.getName())) {
+					zone.restorePlayerInventory(player);
+				}
+				player.sendMessage(war.str("Left the zone. Your inventory has (hopefully) been restored."));
+				if(war.getWarHub() != null) {
+					war.getWarHub().resetZoneSign(zone);
+				}
+			}
+		}
+		
 	}
 
 

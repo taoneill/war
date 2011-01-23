@@ -40,19 +40,9 @@ public class WarPlayerListener extends PlayerListener {
 		Team team = war.getPlayerTeam(player.getName());
 		if(team != null) {
 			Warzone zone = war.getPlayerTeamWarzone(player.getName());
-			if(zone != null && zone.hasPlayerInventory(player.getName())) {
-				player.teleportTo(zone.getTeleport());
-				zone.restorePlayerInventory(player);
-				if(zone.getLobby() != null) {
-					zone.getLobby().resetTeamGateSign(team);
-				}
+			if(zone != null) {
+				zone.handlePlayerLeave(player, zone.getTeleport());
 			}
-			team.removePlayer(player.getName());
-			team.resetSign();
-			if(war.getWarHub() != null) {
-				war.getWarHub().resetZoneSign(zone);
-			}
-			player.sendMessage(war.str("You have left the warzone. Your inventory has (hopefully) been restored."));  
 		}
 	}
 
@@ -235,19 +225,9 @@ public class WarPlayerListener extends PlayerListener {
 			// same as leave, except using event.setFrom and cancelling even .. don't ask me, see NetServerHandler code 
 			Team playerTeam = war.getPlayerTeam(player.getName());
 			if(playerTeam != null) {
-				playerTeam.removePlayer(player.getName());
-				playerTeam.resetSign();
 				event.setFrom(playerWarzone.getTeleport());
-				player.teleportTo(playerWarzone.getTeleport());
+				playerWarzone.handlePlayerLeave(player, playerWarzone.getTeleport());
 				event.setCancelled(true);
-				playerWarzone.restorePlayerInventory(player);
-				if(playerWarzone.getLobby() != null) {
-					playerWarzone.getLobby().resetTeamGateSign(playerTeam);
-				}
-				player.sendMessage(war.str("Left the zone. Your inventory has (hopefully) been restored."));
-				if(war.getWarHub() != null) {
-					war.getWarHub().resetZoneSign(locZone);
-				}
 				return;
 			}
 		}

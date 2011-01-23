@@ -45,7 +45,6 @@ public class War extends JavaPlugin {
 	public War(PluginLoader pluginLoader, Server instance,
 			PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
 		super(pluginLoader, instance, desc, folder, plugin, cLoader);
-		// TODO: switch to bukkit config file
 		this.desc = desc;
 	}
 
@@ -72,10 +71,7 @@ public class War extends JavaPlugin {
 		for(Warzone warzone : warzones) {
 			for(Team team : warzone.getTeams()) {
 				for(Player player : team.getPlayers()) {
-					if(warzone.hasPlayerInventory(player.getName())) {
-						warzone.restorePlayerInventory(player);
-						player.sendMessage(str("War disabled. Your inventory has (hopefully) been restored."));
-					}
+					warzone.handlePlayerLeave(player, warzone.getTeleport());
 				}
 			}
 			if(warzone.getLobby() != null) {
@@ -168,7 +164,13 @@ public class War extends JavaPlugin {
 				boolean warped = false;
 				for(Warzone warzone : this.getWarzones()) {
 					if(warzone.getName().equals(arguments[0]) && warzone.getTeleport() != null){
-						player.teleportTo(warzone.getTeleport());
+						Team playerTeam = getPlayerTeam(player.getName());
+						if(playerTeam != null) {
+							Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
+							playerWarzone.handlePlayerLeave(player, warzone.getTeleport());
+						} else {					
+							player.teleportTo(warzone.getTeleport());
+						}
 						warped = true;
 					}
 				}
@@ -227,6 +229,9 @@ public class War extends JavaPlugin {
 							team.addPlayer(player);
 							team.resetSign();
 							warzone.respawnPlayer(team, player);
+							if(warHub != null) {
+								warHub.resetZoneSign(warzone);
+							}
 							foundTeam = true;
 						} else {
 							player.sendMessage(this.str("Team " + name + " is full."));
@@ -250,22 +255,8 @@ public class War extends JavaPlugin {
 				player.sendMessage(this.str("Usage: /leave. " +
 						"Must be in a team already."));
 			} else {
-				Team playerTeam = this.getPlayerTeam(player.getName());
-				playerTeam.removePlayer(player.getName());
-				playerTeam.resetSign();
-				
-				Warzone zone = this.warzone(player.getLocation());
-				if(zone.getLobby() != null) {
-					zone.getLobby().resetTeamGateSign(playerTeam);
-				}
-				player.teleportTo(zone.getTeleport());
-				if(zone.hasPlayerInventory(player.getName())) {
-					zone.restorePlayerInventory(player);
-				}
-				player.sendMessage(this.str("Left the zone. Your inventory has (hopefully) been restored."));
-				if(this.getWarHub() != null) {
-					this.getWarHub().resetZoneSign(zone);
-				}
+				Warzone zone = getPlayerTeamWarzone(player.getName());
+				zone.handlePlayerLeave(player, zone.getTeleport());
 			}
 		}
 		
@@ -301,11 +292,7 @@ public class War extends JavaPlugin {
 				Team playerTeam = this.getPlayerTeam(player.getName());
 				Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
 				if(playerTeam != null) { // was in zone
-					playerTeam.removePlayer(player.getName());
-				}
-				if(playerWarzone != null) {
-					playerWarzone.getLobby().resetTeamGateSign(playerTeam);
-					this.getWarHub().resetZoneSign(playerWarzone);	// gotta see i just left
+					playerWarzone.handlePlayerLeave(player, this.getWarHub().getLocation());
 				}
 				player.teleportTo(this.getWarHub().getLocation());
 			}
