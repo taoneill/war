@@ -131,7 +131,7 @@ public class WarBlockListener extends BlockListener {
 								t.teamcast(war.str("Prevent " + player.getName() + " from reaching team " + team.getName() + "'s spawn."));
 							}
 						}
-		    			player.sendMessage(war.str("You have team " + lostFlagTeam + "'s flag. Reach your team spawn to capture it!"));
+		    			player.sendMessage(war.str("You have team " + lostFlagTeam.getName() + "'s flag. Reach your team spawn to capture it!"));
 	    			}
 	    			event.setCancelled(true);
 	    			return;

@@ -604,7 +604,7 @@ public class War extends JavaPlugin {
 			// /deletezone
 			else if(command.equals("deletezone")) {
 				if(!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-					player.sendMessage(this.str("Usage: /deletewarzone. " +
+					player.sendMessage(this.str("Usage: /deletezone. " +
 							"Deletes the warzone. " +
 							"Must be in the warzone (try /zones and /zone). "));
 				} else {

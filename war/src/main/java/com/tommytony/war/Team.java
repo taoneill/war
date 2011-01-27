@@ -289,8 +289,8 @@ public class Team {
 		int x = teamFlag.getBlockX();
 		int y = teamFlag.getBlockY();
 		int z = teamFlag.getBlockZ();
-		this.flagVolume.setCornerOne(warzone.getWorld().getBlockAt(x-2, y-1, z-2));
-		this.flagVolume.setCornerTwo(warzone.getWorld().getBlockAt(x+2, y+5, z+2));
+		this.flagVolume.setCornerOne(warzone.getWorld().getBlockAt(x-1, y-1, z-1));
+		this.flagVolume.setCornerTwo(warzone.getWorld().getBlockAt(x+1, y+3, z+1));
 	}
 
 	public void initializeTeamFlag() {
@@ -307,36 +307,17 @@ public class Team {
 		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.OBSIDIAN);
 		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.OBSIDIAN);
 		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.GLOWSTONE);
 		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.OBSIDIAN);
 		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.OBSIDIAN);
 		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.OBSIDIAN);
 		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.OBSIDIAN);
-		
-		// outer ring
-		warzone.getWorld().getBlockAt(x+2, y-1, z+2).setType(Material.GLOWSTONE);
-		warzone.getWorld().getBlockAt(x+2, y-1, z+1).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x+2, y-1, z).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x+2, y-1, z-1).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x+2, y-1, z-2).setType(Material.GLOWSTONE);
-		
-		warzone.getWorld().getBlockAt(x-1, y-1, z+2).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x-1, y-1, z-2).setType(Material.OBSIDIAN);
-		
-		warzone.getWorld().getBlockAt(x, y-1, z+2).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x, y-1, z-2).setType(Material.OBSIDIAN);
-		
-		warzone.getWorld().getBlockAt(x+1, y-1, z+2).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x+1, y-1, z-2).setType(Material.OBSIDIAN);
-		
-		warzone.getWorld().getBlockAt(x-2, y-1, z+2).setType(Material.GLOWSTONE);
-		warzone.getWorld().getBlockAt(x-2, y-1, z+1).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x-2, y-1, z).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x-2, y-1, z-1).setType(Material.OBSIDIAN);
-		warzone.getWorld().getBlockAt(x-2, y-1, z-2).setType(Material.GLOWSTONE);
-		
+			
 		// flag post
-		warzone.getWorld().getBlockAt(x, y, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x, y, z-1).setType(Material.FENCE);
+		warzone.getWorld().getBlockAt(x, y+1, z-1).setType(Material.FENCE);
+		warzone.getWorld().getBlockAt(x, y+2, z-1).setType(Material.FENCE);
+		warzone.getWorld().getBlockAt(x, y+2, z).setType(material);
 		warzone.getWorld().getBlockAt(x, y+1, z).setType(material);
 		
 	}

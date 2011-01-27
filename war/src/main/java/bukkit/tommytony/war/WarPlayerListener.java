@@ -201,23 +201,20 @@ public class WarPlayerListener extends PlayerListener {
 		WarHub hub = war.getWarHub();
 		if(hub != null && hub.getVolume().contains(playerLoc)) {
 			Warzone zone = hub.getDestinationWarzoneForLocation(playerLoc);
-			//synchronized(player) {
 				if(zone != null) {
 					enteredGate = true;
 					event.setFrom(zone.getTeleport());
 							player.teleportTo(zone.getTeleport());
-//							
 					event.setCancelled(true);
 					player.sendMessage(war.str("Welcome to warzone " + zone.getName() + "."));
 					return;
 				}
-			//}
 		}
 		
 		if(locZone != null && locZone.getLobby() != null
 				&& locZone.getLobby().isLeavingZone(playerLoc)) { // already in a team and in warzone, leaving
 			enteredGate = true;
-			// same as leave, except using event.setFrom and cancelling even .. don't ask me, see NetServerHandler code 
+			// same as leave
 			Team playerTeam = war.getPlayerTeam(player.getName());
 			if(playerTeam != null) {
 				event.setFrom(playerWarzone.getTeleport());
@@ -245,8 +242,11 @@ public class WarPlayerListener extends PlayerListener {
 					&& playerWarzone.nearAnyOwnedMonument(playerLoc, team) 
 					&& player.getHealth() < 20
 					&& random.nextInt(42) == 3 ) {	// one chance out of many of getting healed
-				player.setHealth(20);
-				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
+				int currentHp = player.getHealth();
+				int newHp = currentHp + 5;
+				if(newHp > 20) newHp = 20;
+				player.setHealth(newHp);
+				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain health!"));
 				return;
 			}
 			
@@ -254,17 +254,29 @@ public class WarPlayerListener extends PlayerListener {
 			if(playerWarzone.isFlagThief(player.getName()) 
 					&& (team.getSpawnVolume().contains(player.getLocation())
 							|| (team.getFlagVolume() != null && team.getFlagVolume().contains(player.getLocation())))) {
-				// flags can be captured at own spawn or own flag pole
-				team.setPoints(team.getPoints() + 1);
-				Team victim = playerWarzone.getVictimTeamForThief(player.getName());
-				victim.getFlagVolume().resetBlocks();	// bring back flag to team that lost it
-				victim.initializeTeamFlag();
-				for(Team t : playerWarzone.getTeams()) {
-					t.teamcast(war.str(player.getName() + " captured team " + victim.getName()
-							+ "'s flag. Team " + team.getName() + " scores one point." ));
+				synchronized(playerWarzone) {
+					// flags can be captured at own spawn or own flag pole
+					team.addPoint();
+					if(team.getPoints() >= playerWarzone.getScoreCap()) {
+						handleScoreCapReached(player, team.getName(), playerWarzone);
+						event.setFrom(playerWarzone.getTeleport());
+						player.teleportTo(playerWarzone.getTeleport());
+						event.setCancelled(true);
+					} else {
+						// added a point
+						Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+						victim.getFlagVolume().resetBlocks();	// bring back flag to team that lost it
+						victim.initializeTeamFlag();
+						for(Team t : playerWarzone.getTeams()) {
+							t.teamcast(war.str(player.getName() + " captured team " + victim.getName()
+									+ "'s flag. Team " + team.getName() + " scores one point." ));
+						}
+						playerWarzone.respawnPlayer(event, team, player);
+						team.resetSign();
+						playerWarzone.getLobby().resetTeamGateSign(team);
+					}				
+					playerWarzone.removeThief(player.getName());
 				}
-				playerWarzone.respawnPlayer(team, player);
-				playerWarzone.removeThief(player.getName());
 			}
 		} else if (locZone != null && locZone.getLobby() != null 
 				&&  !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker) { 
@@ -338,30 +350,11 @@ public class WarPlayerListener extends PlayerListener {
 						}
 					}
 					if(!scoreCapTeams.isEmpty()) {
-						String winnersStr = "Score cap reached! Winning team(s): ";
+						String winnersStr = "";
 						for(Team winner : scoreCapTeams) {
 							winnersStr += winner.getName() + " ";
 						}
-						winnersStr += ". Your inventory has (hopefully) been reset. The warzone is being reset... Please choose a new team.";
-						// Score cap reached. Reset everything.
-						for(Team t : teams) {
-							t.teamcast(war.str(winnersStr));
-							for(Player tp : t.getPlayers()) {
-								if(tp.getName() != player.getName()) {
-									tp.teleportTo(playerWarzone.getTeleport());
-								}
-								if(playerWarzone.hasPlayerInventory(tp.getName())){
-									playerWarzone.restorePlayerInventory(tp);
-								}
-							}
-							t.setPoints(0);
-							t.getPlayers().clear();	// empty the team
-						}
-						if(playerWarzone.getLobby() != null) {
-							playerWarzone.getLobby().getVolume().resetBlocks();
-						}
-						playerWarzone.getVolume().resetBlocks();
-						playerWarzone.initializeZone();
+						handleScoreCapReached(player, winnersStr,  playerWarzone);
 						scoreCapReached = true;
 					} else {
 						// We can keep going
@@ -374,6 +367,16 @@ public class WarPlayerListener extends PlayerListener {
 						playerTeam.setRemainingTickets(playerTeam.getRemainingTickets()); // TODO get rid of this dirty workaround for the twice move-on-death bug
 					}
 				} else {
+					if(playerWarzone.isFlagThief(player.getName())) {
+						// died while carrying flag.. dropped it
+						Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+						victim.getFlagVolume().resetBlocks();
+						victim.initializeTeamFlag();
+						playerWarzone.removeThief(player.getName());
+						for(Team t : playerWarzone.getTeams()) {
+							t.teamcast(war.str(player.getName() + " died and dropped team " + victim.getName() + "'s flag."));
+						}
+					}
 					playerTeam.setRemainingTickets(remaining - 1);
 				}
 			}
@@ -394,5 +397,29 @@ public class WarPlayerListener extends PlayerListener {
 				war.info(player.getName() + " died and battle ended in team " + playerTeam.getName() + "'s disfavor");
 			}
 		}
+	}
+
+	private void handleScoreCapReached(Player player, String winnersStr, Warzone playerWarzone) {
+		winnersStr = "Score cap reached! Winning team(s): " + winnersStr;		
+		winnersStr += ". Your inventory has (hopefully) been reset. The warzone is being reset... Please choose a new team.";
+		// Score cap reached. Reset everything.
+		for(Team t : playerWarzone.getTeams()) {
+			t.teamcast(war.str(winnersStr));
+			for(Player tp : t.getPlayers()) {
+				if(tp.getName() != player.getName()) {
+					tp.teleportTo(playerWarzone.getTeleport());
+				}
+				if(playerWarzone.hasPlayerInventory(tp.getName())){
+					playerWarzone.restorePlayerInventory(tp);
+				}
+			}
+			t.setPoints(0);
+			t.getPlayers().clear();	// empty the team
+		}
+		if(playerWarzone.getLobby() != null) {
+			playerWarzone.getLobby().getVolume().resetBlocks();
+		}
+		playerWarzone.getVolume().resetBlocks();
+		playerWarzone.initializeZone();
 	}
 }
