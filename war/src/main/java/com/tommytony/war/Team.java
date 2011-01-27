@@ -24,38 +24,42 @@ import com.tommytony.war.volumes.Volume;
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
 	private Location teamSpawn = null;
+	private Location teamFlag = null;
 	private String name;
 	private int remainingTickets;
 	private int points = 0;
-	private Volume volume;
+	private Volume spawnVolume;
+	private Volume flagVolume;
 	private final Warzone warzone;
 	private Material material;
+	private War war;
 	
 	public Team(String name, Material material, Location teamSpawn, War war, Warzone warzone) {
 		this.warzone = warzone;
 		this.setName(name);
 		this.teamSpawn = teamSpawn;
-		this.setVolume(new Volume(name, war, warzone.getWorld()));
+		this.war = war;
+		this.setSpawnVolume(new Volume(name, war, warzone.getWorld()));
 		this.material = material;
-		
+		this.setFlagVolume(null); // no flag at the start
 	}
 	
 	public Material getMaterial() {
 		return material;
 	}
 	
-	private void setVolume() {
-		if(volume.isSaved()) volume.resetBlocks();
+	private void setSpawnVolume() {
+		if(spawnVolume.isSaved()) spawnVolume.resetBlocks();
 		int x = teamSpawn.getBlockX();
 		int y = teamSpawn.getBlockY();
 		int z = teamSpawn.getBlockZ();
-		this.volume.setCornerOne(warzone.getWorld().getBlockAt(x-2, y-1, z-2));
-		this.volume.setCornerTwo(warzone.getWorld().getBlockAt(x+2, y+5, z+2));
+		this.spawnVolume.setCornerOne(warzone.getWorld().getBlockAt(x-2, y-1, z-2));
+		this.spawnVolume.setCornerTwo(warzone.getWorld().getBlockAt(x+2, y+5, z+2));
 	}
 	
-	public void initializeTeamSpawn(Location teamSpawn) {
+	public void initializeTeamSpawn() {
 		// make air
-		this.volume.setToMaterial(Material.AIR);
+		this.spawnVolume.setToMaterial(Material.AIR);
 		
 		// Set the spawn 
 		int x = teamSpawn.getBlockX();
@@ -159,10 +163,10 @@ public class Team {
 		this.teamSpawn = teamSpawn;
 		
 		// this resets the block to old state
-		this.setVolume();
-		getVolume().saveBlocks();
+		this.setSpawnVolume();
+		getSpawnVolume().saveBlocks();
 		
-		initializeTeamSpawn(teamSpawn);
+		initializeTeamSpawn();
 	}
 	
 	public Location getTeamSpawn() {
@@ -221,14 +225,14 @@ public class Team {
 		return points;
 	}
 
-	public Volume getVolume() {
+	public Volume getSpawnVolume() {
 		
-		return volume;
+		return spawnVolume;
 	}
 	
 	public void resetSign(){
-		this.getVolume().resetBlocks();
-		this.initializeTeamSpawn(this.getTeamSpawn()); // reset everything instead of just sign
+		this.getSpawnVolume().resetBlocks();
+		this.initializeTeamSpawn(); // reset everything instead of just sign
 		
 		// BUKKIT
 //		int x = teamSpawn.getBlockX();
@@ -263,12 +267,107 @@ public class Team {
 		}
 	}
 
-	public void setVolume(Volume volume) {
-		this.volume = volume;
+	public void setSpawnVolume(Volume volume) {
+		this.spawnVolume = volume;
 	}
 
 	public void setPoints(int score) {
 		this.points = score;
 	}
 
+	public void setFlagVolume(Volume flagVolume) {
+		this.flagVolume = flagVolume;
+	}
+
+	public Volume getFlagVolume() {
+		return flagVolume;
+	}
+	
+	private void setFlagVolume() {
+		if(flagVolume == null) flagVolume = new Volume(getName() + "flag", war, warzone.getWorld());
+		if(flagVolume.isSaved()) flagVolume.resetBlocks();
+		int x = teamFlag.getBlockX();
+		int y = teamFlag.getBlockY();
+		int z = teamFlag.getBlockZ();
+		this.flagVolume.setCornerOne(warzone.getWorld().getBlockAt(x-2, y-1, z-2));
+		this.flagVolume.setCornerTwo(warzone.getWorld().getBlockAt(x+2, y+5, z+2));
+	}
+
+	public void initializeTeamFlag() {
+		// make air
+		this.flagVolume.setToMaterial(Material.AIR);
+		
+		// Set the flag blocks
+		int x = teamFlag.getBlockX();
+		int y = teamFlag.getBlockY();
+		int z = teamFlag.getBlockZ();
+		
+		// first ring
+		warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.OBSIDIAN);
+		
+		// outer ring
+		warzone.getWorld().getBlockAt(x+2, y-1, z+2).setType(Material.GLOWSTONE);
+		warzone.getWorld().getBlockAt(x+2, y-1, z+1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+2, y-1, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+2, y-1, z-1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+2, y-1, z-2).setType(Material.GLOWSTONE);
+		
+		warzone.getWorld().getBlockAt(x-1, y-1, z+2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-1, y-1, z-2).setType(Material.OBSIDIAN);
+		
+		warzone.getWorld().getBlockAt(x, y-1, z+2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x, y-1, z-2).setType(Material.OBSIDIAN);
+		
+		warzone.getWorld().getBlockAt(x+1, y-1, z+2).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x+1, y-1, z-2).setType(Material.OBSIDIAN);
+		
+		warzone.getWorld().getBlockAt(x-2, y-1, z+2).setType(Material.GLOWSTONE);
+		warzone.getWorld().getBlockAt(x-2, y-1, z+1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-2, y-1, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-2, y-1, z-1).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x-2, y-1, z-2).setType(Material.GLOWSTONE);
+		
+		// flag post
+		warzone.getWorld().getBlockAt(x, y, z).setType(Material.OBSIDIAN);
+		warzone.getWorld().getBlockAt(x, y+1, z).setType(material);
+		
+	}
+	
+	public void setTeamFlag(Location teamFlag) {
+		
+		this.teamFlag = teamFlag;
+		
+		// this resets the block to old state
+		this.setFlagVolume();
+		getFlagVolume().saveBlocks();
+		
+		initializeTeamFlag();
+	}
+	
+	public boolean isTeamFlagBlock(Block block) {
+		if(teamFlag != null) {
+			int flagX = teamFlag.getBlockX();
+			int flagY = teamFlag.getBlockY() + 1;
+			int flagZ = teamFlag.getBlockZ();
+			if(block.getX() == flagX
+					&& block.getY() == flagY
+					&& block.getZ() == flagZ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public Location getTeamFlag() {
+		
+		return teamFlag;
+	}
 }

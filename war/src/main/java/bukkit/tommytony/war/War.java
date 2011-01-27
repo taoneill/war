@@ -97,8 +97,9 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.High, this);
-		//pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.High, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.High, this);
+		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.High, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
@@ -615,7 +616,8 @@ public class War extends JavaPlugin {
 						lobby = warzone.getLobby();
 					}
 					for(Team t : warzone.getTeams()) {
-						t.getVolume().resetBlocks();
+						if(t.getTeamFlag() != null) t.getFlagVolume().resetBlocks();
+						t.getSpawnVolume().resetBlocks();
 					}
 					for(Monument m : warzone.getMonuments()) {
 						m.getVolume().resetBlocks();
@@ -663,8 +665,44 @@ public class War extends JavaPlugin {
 							warzone.getLobby().initialize();
 						}
 						newTeam.setTeamSpawn(player.getLocation());
-						
 						player.sendMessage(this.str("Team " + name + " created with spawn here."));
+					}
+					
+					WarzoneMapper.save(this, warzone, false);
+				}
+			}
+			
+			// /setteamflag <diamond/iron/gold/d/i/g>
+			else if(command.equals("setteamflag")) {
+				if(arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) 
+						|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
+					player.sendMessage(this.str("Usage: /setteamflag <diamond/iron/gold/d/i/g>. " +
+							"Sets the team flag post to the current location. " +
+							"Must be in a warzone (try /zones and /zone). "));
+				} else {
+					Material teamMaterial = TeamMaterials.teamMaterialFromString(arguments[0]);
+					String name = TeamMaterials.teamMaterialToString(teamMaterial);					
+					Warzone warzone = this.warzone(player.getLocation());
+					Team team = warzone.getTeamByMaterial(teamMaterial);
+					if(team == null) {
+						// no such team yet			
+						player.sendMessage(this.str("Place the team spawn first."));
+						return true;
+					} else if (team.getFlagVolume() == null){
+						// new team flag
+						team.setTeamFlag(player.getLocation());
+						Location playerLoc = player.getLocation();
+						player.teleportTo(new Location(playerLoc.getWorld(), 
+								playerLoc.getBlockX(), playerLoc.getBlockY() + 1, playerLoc.getBlockZ()));
+						player.sendMessage(this.str("Team " + name + " flag added here."));
+					} else {
+						// relocate flag
+						team.getFlagVolume().resetBlocks();
+						team.setTeamFlag(player.getLocation());
+						Location playerLoc = player.getLocation();
+						player.teleportTo(new Location(playerLoc.getWorld(), 
+								playerLoc.getBlockX(), playerLoc.getBlockY() + 1, playerLoc.getBlockZ()));
+						player.sendMessage(this.str("Team " + name + " flag moved."));
 					}
 					
 					WarzoneMapper.save(this, warzone, false);
@@ -695,7 +733,8 @@ public class War extends JavaPlugin {
 						}
 					}
 					if(team != null) {
-						team.getVolume().resetBlocks();	
+						if(team.getFlagVolume() != null) team.getFlagVolume().resetBlocks();
+						team.getSpawnVolume().resetBlocks();	
 						warzone.getTeams().remove(team);
 						if(warzone.getLobby() != null) {
 							warzone.getLobby().getVolume().resetBlocks();

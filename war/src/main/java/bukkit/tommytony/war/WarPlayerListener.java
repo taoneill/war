@@ -50,15 +50,10 @@ public class WarPlayerListener extends PlayerListener {
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
 		Location playerLoc = event.getFrom(); // same as player.getLoc. Don't call again we need same result.
-		//Location from = event.getFrom();
 		Warzone locZone = null;
 		ZoneLobby locLobby = null;
-		//if(from != null) {
-			locZone = war.warzone(playerLoc);
-			locLobby = war.lobby(playerLoc);
-		//}
-//		synchronized(player) {
-		//Location to = event.getTo();
+		locZone = war.warzone(playerLoc);
+		locLobby = war.lobby(playerLoc);
 		boolean canPlay = war.canPlayWar(player);
 		boolean isMaker = war.isZoneMaker(player);
 		
@@ -242,6 +237,7 @@ public class WarPlayerListener extends PlayerListener {
 				//playerWarzone.respawnPlayer(team, player);
 				player.teleportTo(team.getTeamSpawn());
 				event.setCancelled(true);
+				return;
 			}
 
 			// Monuments
@@ -251,6 +247,24 @@ public class WarPlayerListener extends PlayerListener {
 					&& random.nextInt(42) == 3 ) {	// one chance out of many of getting healed
 				player.setHealth(20);
 				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain full health!"));
+				return;
+			}
+			
+			// Flag capture
+			if(playerWarzone.isFlagThief(player.getName()) 
+					&& (team.getSpawnVolume().contains(player.getLocation())
+							|| (team.getFlagVolume() != null && team.getFlagVolume().contains(player.getLocation())))) {
+				// flags can be captured at own spawn or own flag pole
+				team.setPoints(team.getPoints() + 1);
+				Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+				victim.getFlagVolume().resetBlocks();	// bring back flag to team that lost it
+				victim.initializeTeamFlag();
+				for(Team t : playerWarzone.getTeams()) {
+					t.teamcast(war.str(player.getName() + " captured team " + victim.getName()
+							+ "'s flag. Team " + team.getName() + " scores one point." ));
+				}
+				playerWarzone.respawnPlayer(team, player);
+				playerWarzone.removeThief(player.getName());
 			}
 		} else if (locZone != null && locZone.getLobby() != null 
 				&&  !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker) { 

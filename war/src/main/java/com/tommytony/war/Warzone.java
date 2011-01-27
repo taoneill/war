@@ -39,6 +39,7 @@ public class Warzone {
 	private int scoreCap = 5;
 	
 	private HashMap<String, ItemStack[]> inventories = new HashMap<String, ItemStack[]>();
+	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
 	private World world;
 	private Material[] originalSoutheastBlocks;
 	private Material[] originalNorthwestBlocks;
@@ -184,7 +185,8 @@ public class Warzone {
 				volume.resetWallBlocks(BlockFace.SOUTH);
 				
 				for(Team team : teams) {
-					team.getVolume().resetBlocks();
+					team.getSpawnVolume().resetBlocks();
+					if(team.getTeamFlag() != null) team.getFlagVolume().resetBlocks();
 				}
 				
 				for(Monument monument : monuments) {
@@ -221,6 +223,7 @@ public class Warzone {
 				}
 				team.setRemainingTickets(lifePool);
 				team.setTeamSpawn(team.getTeamSpawn());
+				if(team.getTeamFlag() != null) team.setTeamFlag(team.getTeamFlag());
 				team.resetSign();
 			}
 			
@@ -238,6 +241,7 @@ public class Warzone {
 				}
 				team.setRemainingTickets(lifePool);
 				team.setTeamSpawn(team.getTeamSpawn());
+				if(team.getTeamFlag() != null) team.setTeamFlag(team.getTeamFlag());
 				team.resetSign();
 			}
 		}
@@ -488,9 +492,15 @@ public class Warzone {
 			}
 		}
 		for(Team t : teams) {
-			if(t.getVolume().contains(block)){
+			if(t.getSpawnVolume().contains(block)){
+				return true;
+			} else if (t.getFlagVolume() != null 
+					&& t.getFlagVolume().contains(block)) {
 				return true;
 			}
+		}
+		if(volume.isWallBlock(block)){
+			return true;
 		}
 //		if(lobby != null) {
 //			lobby.getVolume().contains(block);
@@ -799,6 +809,42 @@ public class Warzone {
 			}
 		}
 		
+	}
+
+	public boolean isEnemyTeamFlagBlock(Team playerTeam, Block block) {
+		for(Team team : teams) {
+			if(!team.getName().equals(playerTeam.getName())
+					&& team.isTeamFlagBlock(block)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public Team getTeamForFlagBlock(Block block) {
+		for(Team team : teams) {
+			if(team.isTeamFlagBlock(block)) {
+				return team;
+			}
+		}
+		return null;
+	}
+
+	public void addFlagThief(Team lostFlagTeam, String flagThief) {
+		flagThieves.put(flagThief, lostFlagTeam);
+	}
+
+	public boolean isFlagThief(String suspect) {
+		if(flagThieves.containsKey(suspect)) return true;
+		return false;
+	}
+	
+	public Team getVictimTeamForThief(String thief) {
+		return flagThieves.get(thief);
+	}
+
+	public void removeThief(String thief) {
+		flagThieves.remove(thief);		
 	}
 
 

@@ -28,7 +28,7 @@ public class WarHub {
 	public WarHub(War war, Location location) {
 		this.war = war;
 		this.location = location;
-		this.volume = new Volume("warHub", war, location.getWorld());
+		this.volume = new Volume("warhub", war, location.getWorld());
 	}
 
 	public Volume getVolume() {

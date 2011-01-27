@@ -112,6 +112,24 @@ public class WarzoneMapper {
 			}
 		}
 		
+		// teamFlags
+		String teamFlagsStr = warzoneConfig.getString("teamFlags");
+		if(teamFlagsStr != null && !teamFlagsStr.equals("")) {
+			String[] teamFlagsSplit = teamFlagsStr.split(";");
+			for(String teamFlagStr : teamFlagsSplit) {
+				if(teamFlagStr != null && !teamFlagStr.equals("")){
+					String[] teamFlagStrSplit =teamFlagStr.split(",");
+					Team team = warzone.getTeamByMaterial(TeamMaterials.teamMaterialFromString(teamFlagStrSplit[0]));
+					if(team != null) {
+						int teamFlagX = Integer.parseInt(teamFlagStrSplit[1]);
+						int teamFlagY = Integer.parseInt(teamFlagStrSplit[2]);
+						int teamFlagZ = Integer.parseInt(teamFlagStrSplit[3]);
+						team.setTeamFlag(new Location(world, teamFlagX, teamFlagY, teamFlagZ));	// this may screw things up
+					}
+				}
+			}
+		}
+		
 		// ff
 		warzone.setFriendlyFire(warzoneConfig.getBoolean("friendlyFire"));
 		
@@ -183,7 +201,10 @@ public class WarzoneMapper {
 		
 		// team spawn blocks
 		for(Team team : warzone.getTeams()) {
-			team.setVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), war, world));
+			team.setSpawnVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), war, world));
+			if(team.getTeamFlag() != null) {
+				team.setFlagVolume(VolumeMapper.loadVolume(team.getName()+"flag", warzone.getName(), war, world));
+			}
 		}
 		
 		// lobby
@@ -251,6 +272,16 @@ public class WarzoneMapper {
 		}
 		warzoneConfig.setString("teams", teamsStr);
 		
+		// team flags
+		String teamFlagsStr = "";;
+		for(Team team : teams) {
+			if(team.getFlagVolume() != null) {
+				Location flag = team.getTeamFlag();
+				teamFlagsStr += team.getName() + "," + flag.getBlockX() + "," + flag.getBlockY() + "," + flag.getBlockZ() + ";";
+			}
+		}
+		warzoneConfig.setString("teamFlags", teamFlagsStr);
+		
 		// ff
 		warzoneConfig.setBoolean("firendlyFire", warzone.getFriendlyFire());
 		
@@ -315,10 +346,13 @@ public class WarzoneMapper {
 			VolumeMapper.save(monument.getVolume(), warzone.getName(), war);
 		}
 		
-		// team spawn blocks
+		// team spawn & flag blocks
 		for(Team team : teams) {
-			VolumeMapper.save(team.getVolume(), warzone.getName(), war);
-		}
+			VolumeMapper.save(team.getSpawnVolume(), warzone.getName(), war);
+			if(team.getFlagVolume() != null) {
+				VolumeMapper.save(team.getFlagVolume(),	warzone.getName(), war);
+			}
+		}	
 		
 		if(warzone.getLobby() != null) {
 			VolumeMapper.save(warzone.getLobby().getVolume(), warzone.getName(), war);

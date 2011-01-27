@@ -2,15 +2,18 @@ package bukkit.tommytony.war;
 
 import java.util.List;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockDamageLevel;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
+import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.Warzone;
 
 /**
@@ -103,13 +106,35 @@ public class WarBlockListener extends BlockListener {
 				}
 				return;
 			}else if(warzone != null && warzone.isImportantBlock(block) && !isZoneMaker) {
-	    		if(team != null && team.getVolume().contains(block)) {
+	    		if(team != null && team.getSpawnVolume().contains(block)) {
 	    			if(player.getInventory().contains(team.getMaterial())) {
 	    				player.sendMessage(war.str("You already have a " + team.getName() + " block."));
 	    				event.setCancelled(true);
 	    				return;
 	    			}
 	    			// let team members loot one block the spawn for monument captures
+	    		} else if (team != null && warzone.isEnemyTeamFlagBlock(team, block)) {
+	    			if(warzone.isFlagThief(player.getName())) {
+	    				// detect audacious thieves
+	    				player.sendMessage(war.str("You can only steal one flag at a time!"));
+	    			} else {
+		    			// player just broke the flag block of other team: cancel to avoid drop, give player the block, set block to air
+		    			Team lostFlagTeam = warzone.getTeamForFlagBlock(block);
+		    			player.getInventory().clear();
+		    			player.getInventory().addItem(new ItemStack(lostFlagTeam.getMaterial(), 1));
+		    			warzone.addFlagThief(lostFlagTeam, player.getName());
+		    			block.setType(Material.AIR);
+		    			
+		    			for(Team t : warzone.getTeams()) {
+							t.teamcast(war.str(player.getName() + " stole team " + lostFlagTeam.getName() + "'s flag."));
+							if(t.getName().equals(lostFlagTeam.getName())){
+								t.teamcast(war.str("Prevent " + player.getName() + " from reaching team " + team.getName() + "'s spawn."));
+							}
+						}
+		    			player.sendMessage(war.str("You have team " + lostFlagTeam + "'s flag. Reach your team spawn to capture it!"));
+	    			}
+	    			event.setCancelled(true);
+	    			return;
 	    		} else if (!warzone.isMonumentCenterBlock(block)){
 		    		player.sendMessage(war.str("Can't destroy this."));
 		    		event.setCancelled(true);

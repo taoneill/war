@@ -1,9 +1,14 @@
 package bukkit.tommytony.war;
 
+import java.util.List;
+
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 
 import com.tommytony.war.Team;
@@ -22,6 +27,13 @@ public class WarEntityListener extends EntityListener {
 		this.war = war;
 		// TODO Auto-generated constructor stub
 	}
+	
+	public void onEntityDeath(EntityDeathEvent event) {
+		if(event.getEntity() instanceof Player) {
+			((Player)event.getEntity()).sendMessage(war.str("You really died!"));
+		}
+		
+    }
 	
 //	public void onEntityDamage(EntityDamageEvent event) {
 ////		Entity defender = event.getEntity();
@@ -62,7 +74,7 @@ public class WarEntityListener extends EntityListener {
 					&& attackerTeam != defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
 				// Make sure one of the players isn't in the spawn
-				if(!defenderTeam.getVolume().contains(d.getLocation())){
+				if(!defenderTeam.getSpawnVolume().contains(d.getLocation())){
 				// A real attack: handle death scenario. ==> now handled in entity damage as well
 				//synchronized(d) {
 //					if(d.getHealth() <= 0) {
@@ -132,6 +144,29 @@ public class WarEntityListener extends EntityListener {
 
 	public void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
     	handlerAttackDefend(event);
+    }
+	
+	public void onEntityExplode(EntityExplodeEvent event) {
+		// protect zones elements, lobbies and warhub from creepers
+		List<Block> explodedBlocks = event.blockList();
+		for(Block block : explodedBlocks) {
+			if(war.getWarHub() != null && war.getWarHub().getVolume().contains(block)) {
+				event.setCancelled(true);
+				war.info("Explosion prevented at warhub.");
+				return;
+			}
+			for(Warzone zone : war.getWarzones()) {
+				if(zone.isImportantBlock(block)) {
+					event.setCancelled(true);
+					war.info("Explosion prevented in zone " + zone.getName() + ".");
+					return;
+				} else if (zone.getLobby() != null && zone.getLobby().getVolume().contains(block)) {
+					event.setCancelled(true);
+					war.info("Explosion prevented at zone " + zone.getName() + " lobby.");
+					return;
+				}
+			}
+		}
     }
     
 //    private void handleDeath(Player player, Warzone playerWarzone, Team playerTeam) {

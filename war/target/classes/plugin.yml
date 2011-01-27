@@ -1,5 +1,5 @@
 name: War
-version: 0.5 (Rommel)
+version: 0.6 (Zhukov)
 description: Lets you create team deathmatch arenas (warzones) for a more structured PVP experience.
 author: tommytony   
 website: war.tommytony.com
@@ -54,6 +54,9 @@ commands:
   setmonument:
     description: Zone makers only. Creates or moves a monument. Must be in warzone.  
     usage: /setmonument <monument-name>
+  setteamflag:
+    description: Zone makers only. Creates or moves a team flag post for CTF-style play. The only available teams are diamond, iron and gold. Must be warzone. 
+    usage: /setteamflag <diamond/iron/gold/d/i/g>
   resetzone:
     description: Zone makers only. Reloads zone blocks from memory by default. Reloads blocks from disk if "hard" option is added. Sends everyone back to the warzone lobby. Must be in zone or lobby. 
     usage: /resetzone, /resetzone <hard/h>
