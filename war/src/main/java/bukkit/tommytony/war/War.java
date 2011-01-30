@@ -69,8 +69,8 @@ public class War extends JavaPlugin {
 	private WarHub warHub;
 	
 	public void onDisable() {
-		this.info("Eliminating war traces...");
 		for(Warzone warzone : warzones) {
+			this.info("Clearing zone " + warzone.getName() + "...");
 			for(Team team : warzone.getTeams()) {
 				for(Player player : team.getPlayers()) {
 					warzone.handlePlayerLeave(player, warzone.getTeleport());
@@ -116,7 +116,7 @@ public class War extends JavaPlugin {
 		this.defaultFriendlyFire = false;
 		this.defaultAutoAssignOnly = false;
 		WarMapper.load(this, this.getServer().getWorlds()[0]);
-		this.info("War v"+ desc.getVersion() + " is on.");
+		this.info("Done. War v"+ desc.getVersion() + " is on.");
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -207,8 +207,18 @@ public class War extends JavaPlugin {
 					// drop from old team if any
 					Team previousTeam = this.getPlayerTeam(player.getName());
 					if(previousTeam != null) {
+						Warzone zone = this.getPlayerTeamWarzone(player.getName());
 						if(!previousTeam.removePlayer(player.getName())){
 							warn("Could not remove player " + player.getName() + " from team " + previousTeam.getName());
+						}						
+						if(zone.isFlagThief(player.getName())) {
+							Team victim = zone.getVictimTeamForThief(player.getName());
+							victim.getFlagVolume().resetBlocks();
+							victim.initializeTeamFlag();
+							zone.removeThief(player.getName());
+							for(Team t : zone.getTeams()) {
+								t.teamcast(this.str("Team " + victim.getName() + " flag was returned."));
+							}
 						}
 						previousTeam.resetSign();
 					}
@@ -574,8 +584,8 @@ public class War extends JavaPlugin {
 						for(Team team: warzone.getTeams()) {
 							team.teamcast(this.str("The war has ended. " + playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams..."));
 							for(Player p : team.getPlayers()) {
-								p.teleportTo(warzone.getTeleport());
 								warzone.restorePlayerInventory(p);
+								p.teleportTo(warzone.getTeleport());
 								player.sendMessage(this.str("You have left the warzone. Your inventory has (hopefully) been restored."));
 							}
 							team.getPlayers().clear();

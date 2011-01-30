@@ -235,11 +235,12 @@ public class Warzone {
 		if(ready() && volume.isSaved()){			
 			// everyone back to team spawn with full health
 			for(Team team : teams) {
-				for(Player player : team.getPlayers()) {
-					if(player.getName().equals(event.getPlayer().getName())) { 
-						respawnPlayer(event, team, player);
+				for(Player p : team.getPlayers()) {
+					if(p.getName().equals(event.getPlayer().getName())) { 
+						respawnPlayer(event, team, event.getPlayer());
+					} else {
+						respawnPlayer(team, p);
 					}
-					respawnPlayer(team, player);
 				}
 				team.setRemainingLives(lifePool);
 				team.setTeamSpawn(team.getTeamSpawn());
@@ -349,15 +350,15 @@ public class Warzone {
 	}
 
 	public void respawnPlayer(Team team, Player player) {
-		player.teleportTo(team.getTeamSpawn());
 		handleRespawn(team, player);
+		player.teleportTo(team.getTeamSpawn());
 	}
 	
 	public void respawnPlayer(PlayerMoveEvent event, Team team, Player player) {
 		event.setFrom(team.getTeamSpawn());
+		handleRespawn(team, player);
 		player.teleportTo(team.getTeamSpawn());
 		event.setCancelled(true);
-		handleRespawn(team, player);
 	}
 	
 	private void handleRespawn(Team team, Player player){
@@ -462,14 +463,14 @@ public class Warzone {
 		PlayerInventory playerInv = player.getInventory();
 		if(originalContents != null) {
 			playerInv.clear();
+			
 			for(ItemStack item : originalContents) {
 				if(item.getTypeId() != 0) {
 					playerInv.addItem(item);
 				}
 			}
 		}
-		// BUKKIT
-		// playerInv.setHelmet(new ItemStack(Material.AIR));
+		playerInv.clear(playerInv.getSize() + 3);
 	}
 
 	public boolean hasMonument(String monumentName) {
@@ -806,14 +807,17 @@ public class Warzone {
 					victim.getFlagVolume().resetBlocks();
 					victim.initializeTeamFlag();
 					zone.removeThief(player.getName());
+					for(Team t : zone.getTeams()) {
+						t.teamcast(war.str("Team " + victim.getName() + " flag was returned."));
+					}
 				}
 				if(zone.getLobby() != null) {
 					zone.getLobby().resetTeamGateSign(playerTeam);
 				}
-				player.teleportTo(destination);
 				if(zone.hasPlayerInventory(player.getName())) {
 					zone.restorePlayerInventory(player);
 				}
+				player.teleportTo(destination);
 				player.sendMessage(war.str("Left the zone. Your inventory has (hopefully) been restored."));
 				if(war.getWarHub() != null) {
 					war.getWarHub().resetZoneSign(zone);

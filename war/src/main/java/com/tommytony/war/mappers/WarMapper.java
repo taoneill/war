@@ -50,9 +50,9 @@ public class WarMapper {
 		String warzonesStr = warConfig.getString("warzones");
 		String[] warzoneSplit = warzonesStr.split(",");
 		war.getWarzones().clear();
-		if(warzonesStr.length() > 1) war.info("Restoring warzones..."); 
 		for(String warzoneName : warzoneSplit) {
 			if(warzoneName != null && !warzoneName.equals("")){
+				war.info("Restoring zone " + warzoneName + "...");
 				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWar);		// cascade load, only load blocks if warzone exists
 				war.getWarzones().add(zone);
 				zone.getVolume().resetBlocks();

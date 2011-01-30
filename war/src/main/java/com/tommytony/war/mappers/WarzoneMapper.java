@@ -102,9 +102,14 @@ public class WarzoneMapper {
 					int teamX = Integer.parseInt(teamStrSplit[1]);
 					int teamY = Integer.parseInt(teamStrSplit[2]);
 					int teamZ = Integer.parseInt(teamStrSplit[3]);
+					Location teamLocation = new Location(world, teamX, teamY, teamZ);
+					if(teamStrSplit.length > 4) {
+						int yaw = Integer.parseInt(teamStrSplit[4]);
+						teamLocation.setYaw(yaw);
+					}
 					Team team = new Team(teamStrSplit[0], 
 										TeamMaterials.teamMaterialFromString(teamStrSplit[0]),
-										new Location(world, teamX, teamY, teamZ),
+										teamLocation,
 										war, warzone );
 					team.setRemainingLives(warzone.getLifePool());
 					warzone.getTeams().add(team);
@@ -259,7 +264,7 @@ public class WarzoneMapper {
 		String teleportStr = "";
 		Location tele = warzone.getTeleport();
 		if(tele != null) {
-			teleportStr = tele.getBlockX() + "," + tele.getBlockY() + "," + tele.getBlockZ() + "," + (int)tele.getYaw();
+			teleportStr = tele.getBlockX() + "," + tele.getBlockY() + "," + tele.getBlockZ() + "," + (int)(tele.getYaw() % 360);
 		}
 		warzoneConfig.setString("teleport", teleportStr);
 		
@@ -268,7 +273,7 @@ public class WarzoneMapper {
 		List<Team> teams = warzone.getTeams();
 		for(Team team : teams) {
 			Location spawn = team.getTeamSpawn();
-			teamsStr += team.getName() + "," + spawn.getBlockX() + "," + spawn.getBlockY() + "," + spawn.getBlockZ() + ";";
+			teamsStr += team.getName() + "," + spawn.getBlockX() + "," + spawn.getBlockY() + "," + spawn.getBlockZ() + "," + (int)spawn.getYaw() + ";";
 		}
 		warzoneConfig.setString("teams", teamsStr);
 		
