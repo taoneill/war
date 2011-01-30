@@ -520,7 +520,7 @@ public class ZoneLobby {
 			lines[0] =  "Team " + team.getName();
 			lines[1] = team.getPlayers().size() + "/" + warzone.getTeamCap() + " players";
 			lines[2] = team.getPoints() + "/" + warzone.getScoreCap() + " pts";
-			lines[3] = team.getRemainingTickets() + "/" + warzone.getLifePool() + " lives left";
+			lines[3] = team.getRemainingLifes() + "/" + warzone.getLifePool() + " lives left";
 			resetGateSign(gate, lines, true);
 		}
 	}

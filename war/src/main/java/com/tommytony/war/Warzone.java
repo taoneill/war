@@ -221,7 +221,7 @@ public class Warzone {
 				for(Player player : team.getPlayers()) {
 					respawnPlayer(team, player);
 				}
-				team.setRemainingTickets(lifePool);
+				team.setRemainingLives(lifePool);
 				team.setTeamSpawn(team.getTeamSpawn());
 				if(team.getTeamFlag() != null) team.setTeamFlag(team.getTeamFlag());
 				team.resetSign();
@@ -236,14 +236,18 @@ public class Warzone {
 			// everyone back to team spawn with full health
 			for(Team team : teams) {
 				for(Player player : team.getPlayers()) {
-					if(player.getName().equals(event.getPlayer().getName())) respawnPlayer(event, team, player);
+					if(player.getName().equals(event.getPlayer().getName())) { 
+						respawnPlayer(event, team, player);
+					}
 					respawnPlayer(team, player);
 				}
-				team.setRemainingTickets(lifePool);
+				team.setRemainingLives(lifePool);
 				team.setTeamSpawn(team.getTeamSpawn());
 				if(team.getTeamFlag() != null) team.setTeamFlag(team.getTeamFlag());
 				team.resetSign();
 			}
+			
+			initZone();
 		}
 	}
 	
@@ -269,6 +273,8 @@ public class Warzone {
 		
 		this.setNorthwest(this.getNorthwest());
 		this.setSoutheast(this.getSoutheast());
+		
+		this.flagThieves.clear();
 	}
 
 	public void addZoneOutline(BlockFace wall) {
@@ -794,7 +800,13 @@ public class Warzone {
 			Warzone zone = war.getPlayerTeamWarzone(player.getName());
 			playerTeam.removePlayer(player.getName());
 			playerTeam.resetSign();
-			if(zone != null) {			
+			if(zone != null) {	
+				if(zone.isFlagThief(player.getName())) {
+					Team victim = zone.getVictimTeamForThief(player.getName());
+					victim.getFlagVolume().resetBlocks();
+					victim.initializeTeamFlag();
+					zone.removeThief(player.getName());
+				}
 				if(zone.getLobby() != null) {
 					zone.getLobby().resetTeamGateSign(playerTeam);
 				}
@@ -845,6 +857,10 @@ public class Warzone {
 
 	public void removeThief(String thief) {
 		flagThieves.remove(thief);		
+	}
+
+	public void clearFlagThieves() {
+		flagThieves.clear();
 	}
 
 

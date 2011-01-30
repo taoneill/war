@@ -307,6 +307,7 @@ public class War extends JavaPlugin {
 					player.sendMessage(this.str("Usage: /nextbattle. Resets the zone blocks and all teams' life pools. Must be in warzone."));
 				} else {
 					Warzone warzone = this.warzone(player.getLocation());
+					warzone.clearFlagThieves();
 					for(Team team: warzone.getTeams()) {
 						team.teamcast(this.str("The battle was interrupted. " + playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and life pools..."));
 					}
@@ -565,6 +566,7 @@ public class War extends JavaPlugin {
 						lobby = warzone.getLobby();
 					}
 					int resetBlocks = 0;
+					warzone.clearFlagThieves();
 					for(Team team: warzone.getTeams()) {
 						team.teamcast(this.str("The war has ended. " + playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams..."));
 						for(Player p : team.getPlayers()) {
@@ -656,7 +658,7 @@ public class War extends JavaPlugin {
 					} else {
 						// new team
 						Team newTeam = new Team(name, teamMaterial, player.getLocation(), this, warzone);
-						newTeam.setRemainingTickets(warzone.getLifePool());
+						newTeam.setRemainingLives(warzone.getLifePool());
 						warzone.getTeams().add(newTeam);
 						if(warzone.getLobby() != null) {
 							warzone.getLobby().getVolume().resetBlocks();
@@ -693,7 +695,7 @@ public class War extends JavaPlugin {
 						team.setTeamFlag(player.getLocation());
 						Location playerLoc = player.getLocation();
 						player.teleportTo(new Location(playerLoc.getWorld(), 
-								playerLoc.getBlockX(), playerLoc.getBlockY() + 1, playerLoc.getBlockZ()));
+								playerLoc.getBlockX()+1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
 						player.sendMessage(this.str("Team " + name + " flag added here."));
 					} else {
 						// relocate flag
@@ -701,7 +703,7 @@ public class War extends JavaPlugin {
 						team.setTeamFlag(player.getLocation());
 						Location playerLoc = player.getLocation();
 						player.teleportTo(new Location(playerLoc.getWorld(), 
-								playerLoc.getBlockX(), playerLoc.getBlockY() + 1, playerLoc.getBlockZ()));
+								playerLoc.getBlockX()+1, playerLoc.getBlockY() + 1, playerLoc.getBlockZ()));
 						player.sendMessage(this.str("Team " + name + " flag moved."));
 					}
 					

@@ -26,7 +26,7 @@ public class Team {
 	private Location teamSpawn = null;
 	private Location teamFlag = null;
 	private String name;
-	private int remainingTickets;
+	private int remainingLives;
 	private int points = 0;
 	private Volume spawnVolume;
 	private Volume flagVolume;
@@ -150,7 +150,7 @@ public class Team {
 			sign.setType(Material.SIGN_POST);
 			sign.setData(new MaterialData(Material.SIGN_POST, (byte)6));
 			sign.setLine(0, "Team " + name);
-			sign.setLine(1, remainingTickets + "/" + warzone.getLifePool() + " lives left");
+			sign.setLine(1, remainingLives + "/" + warzone.getLifePool() + " lives left");
 			sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
 			sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
 			state.update(true);
@@ -209,12 +209,12 @@ public class Team {
 		return false;
 	}
 
-	public void setRemainingTickets(int remainingTickets) {
-		this.remainingTickets = remainingTickets;		
+	public void setRemainingLives(int remainingLives) {
+		this.remainingLives = remainingLives;		
 	}
 
-	public int getRemainingTickets() {
-		return remainingTickets;
+	public int getRemainingLifes() {
+		return remainingLives;
 	}
 	
 	public void addPoint() {
@@ -317,7 +317,7 @@ public class Team {
 		warzone.getWorld().getBlockAt(x, y, z-1).setType(Material.FENCE);
 		warzone.getWorld().getBlockAt(x, y+1, z-1).setType(Material.FENCE);
 		warzone.getWorld().getBlockAt(x, y+2, z-1).setType(Material.FENCE);
-		warzone.getWorld().getBlockAt(x, y+2, z).setType(material);
+		warzone.getWorld().getBlockAt(x, y+2, z).setType(Material.FENCE);
 		warzone.getWorld().getBlockAt(x, y+1, z).setType(material);
 		
 	}

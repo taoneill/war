@@ -106,7 +106,7 @@ public class WarzoneMapper {
 										TeamMaterials.teamMaterialFromString(teamStrSplit[0]),
 										new Location(world, teamX, teamY, teamZ),
 										war, warzone );
-					team.setRemainingTickets(warzone.getLifePool());
+					team.setRemainingLives(warzone.getLifePool());
 					warzone.getTeams().add(team);
 				}
 			}

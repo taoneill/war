@@ -13,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.Warzone;
 
 /**
@@ -56,7 +55,7 @@ public class WarBlockListener extends BlockListener {
 				}
 			}
 			
-			if(zone != null && zone.isImportantBlock(block) && !isZoneMaker){
+			if(zone != null && zone.isImportantBlock(block)){
 				player.sendMessage(war.str("Can't build here."));
 				event.setCancelled(true);
 				return;
@@ -64,7 +63,7 @@ public class WarBlockListener extends BlockListener {
 			// protect warzone lobbies
 	    	if(block != null) {
 		    	for(Warzone wz: war.getWarzones()) {
-		    		if(wz.getLobby() != null && wz.getLobby().getVolume().contains(block) && !isZoneMaker) {
+		    		if(wz.getLobby() != null && wz.getLobby().getVolume().contains(block)) {
 		    			player.sendMessage(war.str("Can't build here."));
 			    		event.setCancelled(true);
 			    		return;
@@ -105,7 +104,7 @@ public class WarBlockListener extends BlockListener {
 					monument.uncapture();
 				}
 				return;
-			}else if(warzone != null && warzone.isImportantBlock(block) && !isZoneMaker) {
+			}else if(warzone != null && warzone.isImportantBlock(block)) {
 	    		if(team != null && team.getSpawnVolume().contains(block)) {
 	    			if(player.getInventory().contains(team.getMaterial())) {
 	    				player.sendMessage(war.str("You already have a " + team.getName() + " block."));
@@ -128,10 +127,10 @@ public class WarBlockListener extends BlockListener {
 		    			for(Team t : warzone.getTeams()) {
 							t.teamcast(war.str(player.getName() + " stole team " + lostFlagTeam.getName() + "'s flag."));
 							if(t.getName().equals(lostFlagTeam.getName())){
-								t.teamcast(war.str("Prevent " + player.getName() + " from reaching team " + team.getName() + "'s spawn."));
+								t.teamcast(war.str("Prevent " + player.getName() + " from reaching team " + team.getName() + "'s spawn or flag."));
 							}
 						}
-		    			player.sendMessage(war.str("You have team " + lostFlagTeam.getName() + "'s flag. Reach your team spawn to capture it!"));
+		    			player.sendMessage(war.str("You have team " + lostFlagTeam.getName() + "'s flag. Reach your team spawn or flag to capture it!"));
 	    			}
 	    			event.setCancelled(true);
 	    			return;
