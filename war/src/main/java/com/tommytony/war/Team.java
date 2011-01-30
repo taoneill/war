@@ -100,7 +100,12 @@ public class Team {
 		warzone.getWorld().getBlockAt(x-2, y-1, z-2).setType(material);
 		
 		// Orientation
-		float yaw = teamSpawn.getYaw() % 360;
+		int yaw = 0;
+		if(teamSpawn.getYaw() >= 0){
+			yaw = (int)(teamSpawn.getYaw() % 360);
+		} else {
+			yaw = (int)(360 + (teamSpawn.getYaw() % 360));
+		}
 		BlockFace facing = null;
 		BlockFace opposite = null;
 		int signData = 0;

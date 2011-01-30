@@ -264,7 +264,13 @@ public class WarzoneMapper {
 		String teleportStr = "";
 		Location tele = warzone.getTeleport();
 		if(tele != null) {
-			teleportStr = tele.getBlockX() + "," + tele.getBlockY() + "," + tele.getBlockZ() + "," + (int)(tele.getYaw() % 360);
+			int intYaw = 0;
+			if(tele.getYaw() >= 0){
+				intYaw = (int)(tele.getYaw() % 360);
+			} else {
+				intYaw = (int)(360 + (tele.getYaw() % 360));
+			}
+			teleportStr = tele.getBlockX() + "," + tele.getBlockY() + "," + tele.getBlockZ() + "," + intYaw;
 		}
 		warzoneConfig.setString("teleport", teleportStr);
 		
@@ -273,7 +279,13 @@ public class WarzoneMapper {
 		List<Team> teams = warzone.getTeams();
 		for(Team team : teams) {
 			Location spawn = team.getTeamSpawn();
-			teamsStr += team.getName() + "," + spawn.getBlockX() + "," + spawn.getBlockY() + "," + spawn.getBlockZ() + "," + (int)spawn.getYaw() + ";";
+			int intYaw = 0;
+			if(spawn.getYaw() >= 0){
+				intYaw = (int)(spawn.getYaw() % 360);
+			} else {
+				intYaw = (int)(360 + (spawn.getYaw() % 360));
+			}
+			teamsStr += team.getName() + "," + spawn.getBlockX() + "," + spawn.getBlockY() + "," + spawn.getBlockZ() + "," + intYaw + ";";
 		}
 		warzoneConfig.setString("teams", teamsStr);
 		
