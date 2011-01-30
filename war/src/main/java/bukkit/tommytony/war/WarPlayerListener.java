@@ -255,27 +255,31 @@ public class WarPlayerListener extends PlayerListener {
 			if(playerWarzone.isFlagThief(player.getName()) 
 					&& (team.getSpawnVolume().contains(player.getLocation())
 							|| (team.getFlagVolume() != null && team.getFlagVolume().contains(player.getLocation())))) {
-				synchronized(playerWarzone) {
-					// flags can be captured at own spawn or own flag pole
-					team.addPoint();
-					if(team.getPoints() >= playerWarzone.getScoreCap()) {
-						event.setFrom(playerWarzone.getTeleport());
-						handleScoreCapReached(team.getName(), playerWarzone);
-						event.setCancelled(true);						
-					} else {
-						// added a point
-						Team victim = playerWarzone.getVictimTeamForThief(player.getName());
-						victim.getFlagVolume().resetBlocks();	// bring back flag to team that lost it
-						victim.initializeTeamFlag();
-						for(Team t : playerWarzone.getTeams()) {
-							t.teamcast(war.str(player.getName() + " captured team " + victim.getName()
-									+ "'s flag. Team " + team.getName() + " scores one point." ));
-						}
-						playerWarzone.respawnPlayer(event, team, player);
-						team.resetSign();
-						playerWarzone.getLobby().resetTeamGateSign(team);
-					}				
-					playerWarzone.removeThief(player.getName());
+				if(playerWarzone.isTeamFlagStolen(team)) {
+					player.sendMessage(war.str("You can't capture the enemy flag until your team flag is returned."));
+				} else {
+					synchronized(playerWarzone) {
+						// flags can be captured at own spawn or own flag pole
+						team.addPoint();
+						if(team.getPoints() >= playerWarzone.getScoreCap()) {
+							event.setFrom(playerWarzone.getTeleport());
+							handleScoreCapReached(team.getName(), playerWarzone);
+							event.setCancelled(true);						
+						} else {
+							// added a point
+							Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+							victim.getFlagVolume().resetBlocks();	// bring back flag to team that lost it
+							victim.initializeTeamFlag();
+							for(Team t : playerWarzone.getTeams()) {
+								t.teamcast(war.str(player.getName() + " captured team " + victim.getName()
+										+ "'s flag. Team " + team.getName() + " scores one point." ));
+							}
+							playerWarzone.respawnPlayer(event, team, player);
+							team.resetSign();
+							playerWarzone.getLobby().resetTeamGateSign(team);
+						}				
+						playerWarzone.removeThief(player.getName());
+					}
 				}
 			}
 		} else if (locZone != null && locZone.getLobby() != null 

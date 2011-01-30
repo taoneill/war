@@ -862,6 +862,15 @@ public class Warzone {
 	public void clearFlagThieves() {
 		flagThieves.clear();
 	}
+	
+	public boolean isTeamFlagStolen(Team team) {
+		for(String playerKey : flagThieves.keySet()) {
+			if(flagThieves.get(playerKey).getName().equals(team.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 
 }

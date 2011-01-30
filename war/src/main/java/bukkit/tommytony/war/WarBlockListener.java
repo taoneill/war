@@ -34,13 +34,12 @@ public class WarBlockListener extends BlockListener {
     	boolean captured = false;
     	if(player != null && block != null) {
 			Team team = war.getPlayerTeam(player.getName()); 
-			Warzone zone = war.getPlayerTeamWarzone(player.getName());
-			boolean isZoneMaker = war.isZoneMaker(player);
+			Warzone zone = war.warzone(player.getLocation());
 			if(team != null && block != null && zone != null 
 					&& zone.isMonumentCenterBlock(block)
 					&& block.getType() == team.getMaterial()) {
 				Monument monument = zone.getMonumentFromCenterBlock(block);
-				if(!monument.hasOwner()) {
+				if(monument != null && !monument.hasOwner()) {
 					monument.capture(team);
 					List<Team> teams = zone.getTeams();
 					for(Team t : teams) {
@@ -61,14 +60,12 @@ public class WarBlockListener extends BlockListener {
 				return;
 			}
 			// protect warzone lobbies
-	    	if(block != null) {
-		    	for(Warzone wz: war.getWarzones()) {
-		    		if(wz.getLobby() != null && wz.getLobby().getVolume().contains(block)) {
-		    			player.sendMessage(war.str("Can't build here."));
-			    		event.setCancelled(true);
-			    		return;
-		    		}
-		    	}
+	    	for(Warzone wz: war.getWarzones()) {
+	    		if(wz.getLobby() != null && wz.getLobby().getVolume().contains(block)) {
+	    			player.sendMessage(war.str("Can't build here."));
+		    		event.setCancelled(true);
+		    		return;
+	    		}
 	    	}
 	    	// protect the hub
 	    	if(war.getWarHub() != null && war.getWarHub().getVolume().contains(block)) {

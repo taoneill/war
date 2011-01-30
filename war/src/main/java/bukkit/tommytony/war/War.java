@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -68,6 +69,7 @@ public class War extends JavaPlugin {
 	private WarHub warHub;
 	
 	public void onDisable() {
+		this.info("Eliminating war traces...");
 		for(Warzone warzone : warzones) {
 			for(Team team : warzone.getTeams()) {
 				for(Player player : team.getPlayers()) {
@@ -82,7 +84,7 @@ public class War extends JavaPlugin {
 		if(warHub != null) {
 			warHub.getVolume().resetBlocks();
 		}
-		this.info("All warzone blocks reset. War v" + desc.getVersion() + " is off.");
+		this.info("Done. War v" + desc.getVersion() + " is off.");
 	}
 
 	public void onEnable() {
@@ -92,8 +94,8 @@ public class War extends JavaPlugin {
 		// Register hooks		
 		PluginManager pm = getServer().getPluginManager();
 		
-		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
+		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.High, this);
@@ -117,608 +119,101 @@ public class War extends JavaPlugin {
 		this.info("War v"+ desc.getVersion() + " is on.");
 	}
 	
-	public boolean onCommand(Player player, Command cmd, String commandLabel, String[] args) {
-		String command = cmd.getName();
-		String[] arguments = null;
-		// Handle both /war <command> and /<war command>. I.e. "/war zone temple" == "/zone temple"
-		if((command.equals("war") || command.equals("War")) && args.length > 1) {
-			command = args[1];
-			arguments = new String[args.length - 1];
-			for(int i = 2; i <= arguments.length; i++) {
-				arguments[i-1] = args[i];
-			}
-		} else if (command.equals("war") || command.equals("War")) {
-			player.sendMessage(this.str("War is on. Please pick your battle. " +
-					"Use /warhub, /zones and /zone."));
-		} else {
-			arguments = args;
-		}
-	
-		// Player commands: /warzones, /warzone, /teams, /join, /leave
-		
-		// warzones
-		if(command.equals("zones") || command.equals("warzones")){
-			
-			String warzonesMessage = "Warzones: ";
-			if(this.getWarzones().isEmpty()){
-				warzonesMessage += "none.";
-			}
-			for(Warzone warzone : this.getWarzones()) {
-				
-				warzonesMessage += warzone.getName() + " ("
-				+ warzone.getTeams().size() + " teams, ";
-				int playerTotal = 0;
-				for(Team team : warzone.getTeams()) {
-					playerTotal += team.getPlayers().size();
+	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+		if(sender.isPlayer()) {
+			Player player = (Player) sender;
+			String command = cmd.getName();
+			String[] arguments = null;
+			// Handle both /war <command> and /<war command>. I.e. "/war zone temple" == "/zone temple"
+			if((command.equals("war") || command.equals("War")) && args.length > 1) {
+				command = args[1];
+				arguments = new String[args.length - 1];
+				for(int i = 2; i <= arguments.length; i++) {
+					arguments[i-1] = args[i];
 				}
-				warzonesMessage += playerTotal + " players)  ";
-			}
-			player.sendMessage(this.str(warzonesMessage + "  Use /zone <zone-name> to " +
-					"teleport to a warzone. "));
-		}
-		
-		// warzone
-		else if(command.equals("zone") || command.equals("warzone")) {
-			if(arguments.length < 1) {
-				player.sendMessage(this.str("Usage: /zone <warzone-name>."));
+			} else if (command.equals("war") || command.equals("War")) {
+				player.sendMessage(this.str("War is on. Please pick your battle. " +
+						"Use /warhub, /zones and /zone."));
 			} else {
-				boolean warped = false;
+				arguments = args;
+			}
+		
+			// Player commands: /warzones, /warzone, /teams, /join, /leave
+			
+			// warzones
+			if(command.equals("zones") || command.equals("warzones")){
+				
+				String warzonesMessage = "Warzones: ";
+				if(this.getWarzones().isEmpty()){
+					warzonesMessage += "none.";
+				}
 				for(Warzone warzone : this.getWarzones()) {
-					if(warzone.getName().equals(arguments[0]) && warzone.getTeleport() != null){
-						Team playerTeam = getPlayerTeam(player.getName());
-						if(playerTeam != null) {
-							Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
-							playerWarzone.handlePlayerLeave(player, warzone.getTeleport());
-						} else {					
-							player.teleportTo(warzone.getTeleport());
-						}
-						warped = true;
-					}
-				}
-				if(!warped) {
-					player.sendMessage("No such warzone.");
-				}
-			}
-		}
-		
-		// /teams
-		else if(command.equals("teams")){
-			if(!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-				player.sendMessage(this.str("Usage: /teams. " +
-						"Must be in a warzone or zone lobby (try /war, /zones and /zone)."));
-			} else {
-				player.sendMessage(this.str("" + playerListener.getAllTeamsMsg(player)));
-			}
-		}
-		
-		// /join <teamname>
-		else if(command.equals("join") && canPlayWar(player)) {
-			if(arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))
-					|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
-				player.sendMessage(this.str("Usage: /join <diamond/iron/gold/d/i/g>." +
-						" Teams are warzone specific." +
-						" You must be inside a warzone or zone lobby to join a team." +
-						" Use as an alternative to walking through the team gate."));
-			} else {				
-				// drop from old team if any
-				Team previousTeam = this.getPlayerTeam(player.getName());
-				if(previousTeam != null) {
-					if(!previousTeam.removePlayer(player.getName())){
-						warn("Could not remove player " + player.getName() + " from team " + previousTeam.getName());
-					}
-					previousTeam.resetSign();
-				}
-				
-				// join new team
-				String name = TeamMaterials.teamMaterialToString(TeamMaterials.teamMaterialFromString(arguments[0]));
-				Warzone warzone = this.warzone(player.getLocation());
-				ZoneLobby lobby = this.lobby(player.getLocation());
-				if(warzone == null && lobby != null) {
-					warzone = lobby.getZone();
-				} else {
-					lobby = warzone.getLobby();
-				}
-				List<Team> teams = warzone.getTeams();
-				boolean foundTeam = false;
-				for(Team team : teams) {
-					if(team.getName().equals(name)) {
-						if(!warzone.hasPlayerInventory(player.getName())) {
-							warzone.keepPlayerInventory(player);
-							player.sendMessage(this.str("Your inventory is is storage until you /leave."));
-						}
-						if(team.getPlayers().size() < warzone.getTeamCap()) {
-							team.addPlayer(player);
-							team.resetSign();
-							warzone.respawnPlayer(team, player);
-							if(warHub != null) {
-								warHub.resetZoneSign(warzone);
-							}
-							foundTeam = true;
-						} else {
-							player.sendMessage(this.str("Team " + name + " is full."));
-							foundTeam = true;
-						}
-					}
-				}
-				if(foundTeam) {
-					for(Team team : teams){
-						team.teamcast(this.str("" + player.getName() + " joined " + name));
-					}
-				} else {
-					player.sendMessage(this.str("No such team. Try /teams."));
-				}
-			}
-		}
-		
-		// /leave
-		else if(command.equals("leave")) {
-			if(!this.inAnyWarzone(player.getLocation()) || this.getPlayerTeam(player.getName()) == null) {
-				player.sendMessage(this.str("Usage: /leave. " +
-						"Must be in a team already."));
-			} else {
-				Warzone zone = getPlayerTeamWarzone(player.getName());
-				zone.handlePlayerLeave(player, zone.getTeleport());
-			}
-		}
-		
-		// /team <msg>
-		else if(command.equals("team")) {
-			Team playerTeam = this.getPlayerTeam(player.getName());
-			if(!this.inAnyWarzone(player.getLocation()) && playerTeam != null) {
-				player.sendMessage(this.str("Usage: /team <message>. " +
-						"Sends a message only to your teammates."));
-			} else {
-				ChatColor color = null;
-				if(playerTeam.getMaterial() == TeamMaterials.TEAMDIAMOND) {
-					color = ChatColor.DARK_AQUA;
-				} else if(playerTeam.getMaterial() == TeamMaterials.TEAMGOLD) {
-					color = ChatColor.GOLD;
-				} else if(playerTeam.getMaterial() ==  TeamMaterials.TEAMIRON) {
-					color = ChatColor.GRAY;
-				}
-				String teamMessage = player.getName() + ": " + ChatColor.WHITE;
-				for(int j = 0 ; j<arguments.length; j++) {
-					String part = arguments[j];
-					teamMessage += part + " ";
-				}
-				playerTeam.teamcast(this.str(teamMessage));
-			}
-		}
-		
-		// /warhub
-		else if(command.equals("warhub")) {
-			if(this.getWarHub() == null) {
-				player.sendMessage("No warhub on this War server. Try /zones and /zone.");
-			} else {
-				Team playerTeam = this.getPlayerTeam(player.getName());
-				Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
-				if(playerTeam != null) { // was in zone
-					playerWarzone.handlePlayerLeave(player, this.getWarHub().getLocation());
-				}
-				player.teleportTo(this.getWarHub().getLocation());
-			}
-			
-		} else if(this.isZoneMaker(player)) {			
-		// Mod commands : /nextbattle
-		
-			// /nextbattle
-			if(command.equals("nextbattle")) {
-				if(!this.inAnyWarzone(player.getLocation())) {
-					player.sendMessage(this.str("Usage: /nextbattle. Resets the zone blocks and all teams' life pools. Must be in warzone."));
-				} else {
-					Warzone warzone = this.warzone(player.getLocation());
-					warzone.clearFlagThieves();
-					for(Team team: warzone.getTeams()) {
-						team.teamcast(this.str("The battle was interrupted. " + playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and life pools..."));
-					}
-					int resetBlocks = warzone.getVolume().resetBlocks();
-					warzone.initializeZone();
-					player.sendMessage(this.str("Warzone reset. " + resetBlocks + " blocks reset."));
-					info(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
-				}
-			}
-			
-			// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
-			
-			// /setzone
-			else if(command.equals("setzone")) {
-				if(arguments.length < 2 || arguments.length > 2 
-						|| (arguments.length == 2 && (!arguments[1].equals("southeast") && !arguments[1].equals("northwest")
-																&& !arguments[1].equals("se") && !arguments[1].equals("nw")))) {
-					player.sendMessage(this.str("Usage: /setzone <warzone-name> <'southeast'/'northwest'/'se'/'nw'>. " +
-							"Set one corner, then the next. Defines the outline of the warzone, which will be reset at the start of every battle. " +
-							"Saves the zone blocks if the zone if the outline is correct."));
-				} else {
-					Warzone warzone = this.findWarzone(arguments[0]);
-					if(warzone == null) {
-						// create the warzone
-						warzone = new Warzone(this, player.getLocation().getWorld(), arguments[0]);
-						this.addWarzone(warzone);
-						WarMapper.save(this);
-						if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
-							warzone.setNorthwest(player.getLocation());
-							player.sendMessage(this.str("Warzone " + warzone.getName() + " created. Northwesternmost point set to x:" 
-									+ (int)warzone.getNorthwest().getBlockX() + " z:" + (int)warzone.getNorthwest().getBlockZ() + "."));
-						} else {
-							warzone.setSoutheast(player.getLocation());
-							player.sendMessage(this.str("Warzone " + warzone.getName() + " created. Southeasternmost point set to x:" 
-									+ (int)warzone.getSoutheast().getBlockX() + " z:" + (int)warzone.getSoutheast().getBlockZ() + "."));
-						}
-						WarzoneMapper.save(this, warzone, false);
-					} else {
-						// change existing warzone
-						if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
-							if(warzone.getSoutheast() != null 
-									&& (player.getLocation().getBlockX() >= warzone.getSoutheast().getBlockX()
-											|| player.getLocation().getBlockZ() <= warzone.getSoutheast().getBlockZ())) {
-								player.sendMessage(this.str("You must place that corner northwest relative to the existing southeast corner!"));
-							} else if (warzone.getSoutheast() == null){
-								// just moving the single nw corner we've placed so far
-								warzone.setNorthwest(player.getLocation());
-							}else {
-								String msgString = "";
-								if(warzone.getVolume().isSaved()) {
-									player.sendMessage(str("Resetting " + warzone.getName() + " blocks."));
-									if(warzone.getLobby() != null) {
-										warzone.getLobby().getVolume().resetBlocks();
-									}
-									int reset = warzone.getVolume().resetBlocks();
-									
-									msgString = reset + " blocks reset. ";
-								}
-								warzone.setNorthwest(player.getLocation());
-								if(warzone.tooSmall()) {
-									player.sendMessage(str("Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20."));
-								} else if (warzone.tooBig()) {
-									player.sendMessage(str("Warzone " + warzone.getName() + " is too Big. Max north-south size: 500. Max east-west size: 500."));
-								}
-								else {
-									msgString += "New zone outline ok. Northwesternmost point of zone " + warzone.getName() + " set to x:" + (int)warzone.getNorthwest().getBlockX()
-										+ " z:" + (int)warzone.getNorthwest().getBlockZ()+ ". Saving new warzone blocks...";
-									player.sendMessage(str(msgString));
-								}
-							} 
-						} else if(arguments[1].equals("southeast") || arguments[1].equals("se")) {
-							if(warzone.getNorthwest() != null 
-									&& (player.getLocation().getBlockX() <= warzone.getNorthwest().getBlockX()
-											|| player.getLocation().getBlockZ() >= warzone.getNorthwest().getBlockZ())) {
-								player.sendMessage(this.str("You must place that corner southeast relative to the existing northwest corner! "));
-							} else if (warzone.getNorthwest() == null){
-								// just moving the single se corner we've placed so far
-								warzone.setSoutheast(player.getLocation());
-							} else {
-								String msgString = "";
-								if(warzone.getVolume().isSaved()) {
-									player.sendMessage(str("Resetting zone " + warzone.getName() + " blocks."));
-									if(warzone.getLobby() != null) {
-										warzone.getLobby().getVolume().resetBlocks();
-									}
-									int reset = warzone.getVolume().resetBlocks();
-									
-									msgString = reset + " blocks reset. ";
-								}
-								warzone.setSoutheast(player.getLocation());
-								if(warzone.tooSmall()) {
-									player.sendMessage(str("Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20."));
-								} else if (warzone.tooBig()) {
-									player.sendMessage(str("Warzone " + warzone.getName() + " is too Big. Max north-south size: 500. Max east-west size: 500."));
-								}
-								else {
-									msgString += "New zone outline ok. Southeasternmost point of zone " + warzone.getName() + " set to x:" + (int)warzone.getSoutheast().getBlockX()
-										+ " z:" + (int)warzone.getSoutheast().getBlockZ()+ ". Saving new warzone blocks...";
-									player.sendMessage(str(msgString));
-								}
-							}
-						}
-					}
-					if(warzone.getNorthwest() == null) {
-						player.sendMessage(str("Still missing northwesternmost point."));
-					}
-					if(warzone.getSoutheast() == null) {
-						player.sendMessage(str("Still missing southeasternmost point."));
-					}
-					if(warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
-						if(warzone.ready()) {
-							warzone.saveState(false); // we just changed the volume, cant reset walls 
-							if(warzone.getLobby() == null) {
-								// Set default lobby on south side
-								ZoneLobby lobby = new ZoneLobby(this, warzone, BlockFace.SOUTH);
-								warzone.setLobby(lobby);
-								//lobby.initialize();
-								if(warHub != null) {	// warhub has to change
-									warHub.getVolume().resetBlocks();
-									warHub.initialize();
-								}
-								player.sendMessage(this.str("Default lobby created on south side of zone. Use /setzonelobby <n/s/e/w> to change which zone wall it is attached to."));
-							} else {
-								// gotta move the lobby
-								warzone.getLobby().changeWall(warzone.getLobby().getWall());
-							}
-							warzone.initializeZone();
-							WarzoneMapper.save(this, warzone, true);
-							player.sendMessage(this.str("Warzone saved. Use /setteam, /setmonument and /savezone to configure the zone."));
-						}
-					}
-				}
-			}
-			
-			else if(command.equals("setzonelobby")) {
-				if((!this.inAnyWarzone(player.getLocation())
-						&& !this.inAnyWarzoneLobby(player.getLocation()))
-						|| arguments.length < 1 || arguments.length > 1 
-						|| (arguments.length == 1 && !arguments[0].equals("north") && !arguments[0].equals("n")
-																&& !arguments[0].equals("east") && !arguments[0].equals("e")
-																&& !arguments[0].equals("south") && !arguments[0].equals("s")
-																&& !arguments[0].equals("west") && !arguments[0].equals("w"))) {
-					player.sendMessage(this.str("Usage: /setzonelobby <north/n/east/e/south/s/west/w>. Must be in warzone." +
-							"Defines on which side the zone lobby lies. " +
-							"Removes any previously set lobby."));
-				} else {
-					Warzone warzone = this.warzone(player.getLocation());
-					ZoneLobby lobby = this.lobby(player.getLocation());
-					if(warzone == null && lobby != null) {
-						warzone = lobby.getZone();
-					} else {
-						lobby = warzone.getLobby();
-					}
-					BlockFace wall = null;
-					String wallStr = "";
-					if(arguments[0].equals("north") || arguments[0].equals("n")) {
-						wall = BlockFace.NORTH;
-						wallStr = "north";
-					} else if(arguments[0].equals("east") || arguments[0].equals("e")) {
-						wall = BlockFace.EAST;
-						wallStr = "east";
-					} else if(arguments[0].equals("south") || arguments[0].equals("s")) {
-						wall = BlockFace.SOUTH;
-						wallStr = "south";
-					} else if(arguments[0].equals("west") || arguments[0].equals("w")) {
-						wall = BlockFace.WEST;
-						wallStr = "west";
-					}				
-					if(lobby != null) {
-						// reset existing lobby
-						lobby.getVolume().resetBlocks();
-						lobby.changeWall(wall);
-						lobby.initialize();
-						player.sendMessage(this.str("Warzone lobby moved to " + wallStr + " side of zone."));
-					} else {
-						// new lobby
-						lobby = new ZoneLobby(this, warzone, wall);
-						warzone.setLobby(lobby);
-						lobby.initialize();
-						if(warHub != null) { // warhub has to change
-							warHub.getVolume().resetBlocks();
-							warHub.initialize();
-						}
-						player.sendMessage(this.str("Warzone lobby created on " + wallStr + "side of zone."));
-					}
-					WarzoneMapper.save(this, warzone, false);
-				}
-			}
-	
-			// /savewarzone
-			else if(command.equals("savezone")) {
-				if(!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-					player.sendMessage(this.str("Usage: /savezone lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on " +
-							"All named params optional. Saves the blocks of the warzone (i.e. the current zone state will be reloaded at each battle start). Must be in warzone."));
-				} else {
-					Warzone warzone = this.warzone(player.getLocation());
-					ZoneLobby lobby = this.lobby(player.getLocation());
-					if(warzone == null && lobby != null) {
-						warzone = lobby.getZone();
-					} else {
-						lobby = warzone.getLobby();
-					}
-					player.sendMessage(this.str("Saving warzone " + warzone.getName() + "."));
-					int savedBlocks = warzone.saveState(true);
-					updateZoneFromNamedParams(warzone, arguments);
-					WarzoneMapper.save(this, warzone, true);
-					warzone.getVolume().resetBlocks();
-					if(lobby != null) {
-						lobby.getVolume().resetBlocks();
-					}
-					warzone.initializeZone();	// bring back team spawns etc
 					
-					player.sendMessage(this.str("Warzone " + warzone.getName() + " initial state changed. Saved " + savedBlocks + " blocks."));
+					warzonesMessage += warzone.getName() + " ("
+					+ warzone.getTeams().size() + " teams, ";
+					int playerTotal = 0;
+					for(Team team : warzone.getTeams()) {
+						playerTotal += team.getPlayers().size();
+					}
+					warzonesMessage += playerTotal + " players)  ";
 				}
+				player.sendMessage(this.str(warzonesMessage + "  Use /zone <zone-name> to " +
+						"teleport to a warzone. "));
 			}
 			
-			// /setzoneconfig
-			else if(command.equals("setzoneconfig")) {
-				if((!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))
-					|| arguments.length == 0) {
-					player.sendMessage(this.str("Usage: /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " +
-							"Please give at leaset one named parameter. Does not save the blocks of the warzone. Resets the zone with the new config. Must be in warzone."));
+			// warzone
+			else if(command.equals("zone") || command.equals("warzone")) {
+				if(arguments.length < 1) {
+					player.sendMessage(this.str("Usage: /zone <warzone-name>."));
 				} else {
-					Warzone warzone = this.warzone(player.getLocation());
-					ZoneLobby lobby = this.lobby(player.getLocation());
-					if(warzone == null && lobby != null) {
-						warzone = lobby.getZone();
-					} else {
-						lobby = warzone.getLobby();
-					}
-					if(updateZoneFromNamedParams(warzone, arguments)) {
-						player.sendMessage(this.str("Saving config and resetting warzone " + warzone.getName() + "."));
-						WarzoneMapper.save(this, warzone, false);
-						warzone.getVolume().resetBlocks();
-						if(lobby != null) {
-							lobby.getVolume().resetBlocks();
+					boolean warped = false;
+					for(Warzone warzone : this.getWarzones()) {
+						if(warzone.getName().equals(arguments[0]) && warzone.getTeleport() != null){
+							Team playerTeam = getPlayerTeam(player.getName());
+							if(playerTeam != null) {
+								Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
+								playerWarzone.handlePlayerLeave(player, warzone.getTeleport());
+							} else {					
+								player.teleportTo(warzone.getTeleport());
+							}
+							warped = true;
 						}
-						warzone.initializeZone();	// bring back team spawns etc
-						player.sendMessage(this.str("Warzone config saved. Zone reset."));
-					} else {
-						player.sendMessage(this.str("Failed to read named parameters."));
+					}
+					if(!warped) {
+						player.sendMessage("No such warzone.");
 					}
 				}
 			}
 			
-			// /resetwarzone
-			else if(command.equals("resetzone")) {
+			// /teams
+			else if(command.equals("teams")){
 				if(!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-					player.sendMessage(this.str("Usage: /resetzone <hard/h>. Reloads the zone (from disk if the hard option is specified). Must be in warzone or lobby."));
+					player.sendMessage(this.str("Usage: /teams. " +
+							"Must be in a warzone or zone lobby (try /war, /zones and /zone)."));
 				} else {
-					Warzone warzone = this.warzone(player.getLocation());
-					ZoneLobby lobby = this.lobby(player.getLocation());
-					if(warzone == null && lobby != null) {
-						warzone = lobby.getZone();
-					} else {
-						lobby = warzone.getLobby();
-					}
-					int resetBlocks = 0;
-					warzone.clearFlagThieves();
-					for(Team team: warzone.getTeams()) {
-						team.teamcast(this.str("The war has ended. " + playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams..."));
-						for(Player p : team.getPlayers()) {
-							p.teleportTo(warzone.getTeleport());
-							warzone.restorePlayerInventory(p);
-							player.sendMessage(this.str("You have left the warzone. Your inventory has (hopefully) been restored."));
-						}
-						team.getPlayers().clear();
-					}
-					
-					Warzone resetWarzone = null;
-					player.sendMessage(this.str("Reloading warzone " + warzone.getName() + "."));
-					if(arguments.length == 1 && (arguments[0].equals("hard") || arguments[0].equals("h"))) {
-						// reset from disk
-						this.getWarzones().remove(warzone);
-						resetWarzone = WarzoneMapper.load(this, warzone.getName(), true);
-						this.getWarzones().add(resetWarzone);
-						warzone.getVolume().resetBlocks();
-						if(lobby!=null) {
-							lobby.getVolume().resetBlocks();
-						}
-						resetWarzone.initializeZone();
-					} else {
-						resetBlocks = warzone.getVolume().resetBlocks();
-						if(lobby!=null) {
-							lobby.getVolume().resetBlocks();
-						}
-						warzone.initializeZone();
-						
-					}
-					
-					player.sendMessage(this.str("Warzone and teams reset. " + resetBlocks + " blocks reset."));
-					info(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
+					player.sendMessage(this.str("" + playerListener.getAllTeamsMsg(player)));
 				}
 			}
 			
-			// /deletezone
-			else if(command.equals("deletezone")) {
-				if(!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-					player.sendMessage(this.str("Usage: /deletezone. " +
-							"Deletes the warzone. " +
-							"Must be in the warzone (try /zones and /zone). "));
-				} else {
-					Warzone warzone = this.warzone(player.getLocation());
-					ZoneLobby lobby = this.lobby(player.getLocation());
-					if(warzone == null && lobby != null) {
-						warzone = lobby.getZone();
-					} else {
-						lobby = warzone.getLobby();
-					}
-					for(Team t : warzone.getTeams()) {
-						if(t.getTeamFlag() != null) t.getFlagVolume().resetBlocks();
-						t.getSpawnVolume().resetBlocks();
-					}
-					for(Monument m : warzone.getMonuments()) {
-						m.getVolume().resetBlocks();
-					}
-					if(warzone.getLobby() != null) {
-						warzone.getLobby().getVolume().resetBlocks();
-					}
-					warzone.getVolume().resetBlocks();
-					this.getWarzones().remove(warzone);
-					WarMapper.save(this);
-					WarzoneMapper.delete(this, warzone.getName());
-					if(warHub != null) {	// warhub has to change
-						warHub.getVolume().resetBlocks();
-						warHub.initialize();
-					}
-					player.sendMessage(this.str("Warzone " + warzone.getName() + " removed."));
-				}
-			}
-			
-			// /setteam <diamond/iron/gold/d/i/g>
-			else if(command.equals("setteam")) {
-				if(arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) 
+			// /join <teamname>
+			else if(command.equals("join") && canPlayWar(player)) {
+				if(arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))
 						|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
-					player.sendMessage(this.str("Usage: /setteam <diamond/iron/gold/d/i/g>. " +
-							"Sets the team spawn to the current location. " +
-							"Must be in a warzone (try /zones and /zone). "));
-				} else {
-					Material teamMaterial = TeamMaterials.teamMaterialFromString(arguments[0]);
-					String name = TeamMaterials.teamMaterialToString(teamMaterial);					
-					Warzone warzone = this.warzone(player.getLocation());
-					Team existingTeam = warzone.getTeamByMaterial(teamMaterial);
-					if(existingTeam != null) {
-						// relocate
-						existingTeam.setTeamSpawn(player.getLocation());
-						player.sendMessage(this.str("Team " + existingTeam.getName() + " spawn relocated."));
-					} else {
-						// new team
-						Team newTeam = new Team(name, teamMaterial, player.getLocation(), this, warzone);
-						newTeam.setRemainingLives(warzone.getLifePool());
-						warzone.getTeams().add(newTeam);
-						if(warzone.getLobby() != null) {
-							warzone.getLobby().getVolume().resetBlocks();
-							warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
-							warzone.addZoneOutline(warzone.getLobby().getWall());
-							warzone.getLobby().initialize();
+					player.sendMessage(this.str("Usage: /join <diamond/iron/gold/d/i/g>." +
+							" Teams are warzone specific." +
+							" You must be inside a warzone or zone lobby to join a team." +
+							" Use as an alternative to walking through the team gate."));
+				} else {				
+					// drop from old team if any
+					Team previousTeam = this.getPlayerTeam(player.getName());
+					if(previousTeam != null) {
+						if(!previousTeam.removePlayer(player.getName())){
+							warn("Could not remove player " + player.getName() + " from team " + previousTeam.getName());
 						}
-						newTeam.setTeamSpawn(player.getLocation());
-						player.sendMessage(this.str("Team " + name + " created with spawn here."));
+						previousTeam.resetSign();
 					}
 					
-					WarzoneMapper.save(this, warzone, false);
-				}
-			}
-			
-			// /setteamflag <diamond/iron/gold/d/i/g>
-			else if(command.equals("setteamflag")) {
-				if(arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) 
-						|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
-					player.sendMessage(this.str("Usage: /setteamflag <diamond/iron/gold/d/i/g>. " +
-							"Sets the team flag post to the current location. " +
-							"Must be in a warzone (try /zones and /zone). "));
-				} else {
-					Material teamMaterial = TeamMaterials.teamMaterialFromString(arguments[0]);
-					String name = TeamMaterials.teamMaterialToString(teamMaterial);					
-					Warzone warzone = this.warzone(player.getLocation());
-					Team team = warzone.getTeamByMaterial(teamMaterial);
-					if(team == null) {
-						// no such team yet			
-						player.sendMessage(this.str("Place the team spawn first."));
-						return true;
-					} else if (team.getFlagVolume() == null){
-						// new team flag
-						team.setTeamFlag(player.getLocation());
-						Location playerLoc = player.getLocation();
-						player.teleportTo(new Location(playerLoc.getWorld(), 
-								playerLoc.getBlockX()+1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
-						player.sendMessage(this.str("Team " + name + " flag added here."));
-					} else {
-						// relocate flag
-						team.getFlagVolume().resetBlocks();
-						team.setTeamFlag(player.getLocation());
-						Location playerLoc = player.getLocation();
-						player.teleportTo(new Location(playerLoc.getWorld(), 
-								playerLoc.getBlockX()+1, playerLoc.getBlockY() + 1, playerLoc.getBlockZ()));
-						player.sendMessage(this.str("Team " + name + " flag moved."));
-					}
-					
-					WarzoneMapper.save(this, warzone, false);
-				}
-			}
-			
-			// /deleteteam <teamname>
-			else if(command.equals("deleteteam")) {
-				if(arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) 
-												&& !this.inAnyWarzoneLobby(player.getLocation()))) {
-					player.sendMessage(this.str("Usage: /deleteteam <team-name>." +
-							" Deletes the team and its spawn. " +
-							"Must be in a warzone or lobby (try /zones and /zone). "));
-				} else {
+					// join new team
 					String name = TeamMaterials.teamMaterialToString(TeamMaterials.teamMaterialFromString(arguments[0]));
 					Warzone warzone = this.warzone(player.getLocation());
 					ZoneLobby lobby = this.lobby(player.getLocation());
@@ -728,205 +223,715 @@ public class War extends JavaPlugin {
 						lobby = warzone.getLobby();
 					}
 					List<Team> teams = warzone.getTeams();
-					Team team = null;
-					for(Team t : teams) {
-						if(name.equals(t.getName())) {
-							team = t;
+					boolean foundTeam = false;
+					for(Team team : teams) {
+						if(team.getName().equals(name)) {
+							if(!warzone.hasPlayerInventory(player.getName())) {
+								warzone.keepPlayerInventory(player);
+								player.sendMessage(this.str("Your inventory is is storage until you /leave."));
+							}
+							if(team.getPlayers().size() < warzone.getTeamCap()) {
+								team.addPlayer(player);
+								team.resetSign();
+								warzone.respawnPlayer(team, player);
+								if(warHub != null) {
+									warHub.resetZoneSign(warzone);
+								}
+								foundTeam = true;
+							} else {
+								player.sendMessage(this.str("Team " + name + " is full."));
+								foundTeam = true;
+							}
 						}
 					}
-					if(team != null) {
-						if(team.getFlagVolume() != null) team.getFlagVolume().resetBlocks();
-						team.getSpawnVolume().resetBlocks();	
-						warzone.getTeams().remove(team);
+					if(foundTeam) {
+						for(Team team : teams){
+							team.teamcast(this.str("" + player.getName() + " joined " + name));
+						}
+					} else {
+						player.sendMessage(this.str("No such team. Try /teams."));
+					}
+				}
+			}
+			
+			// /leave
+			else if(command.equals("leave")) {
+				if(!this.inAnyWarzone(player.getLocation()) || this.getPlayerTeam(player.getName()) == null) {
+					player.sendMessage(this.str("Usage: /leave. " +
+							"Must be in a team already."));
+				} else {
+					Warzone zone = getPlayerTeamWarzone(player.getName());
+					zone.handlePlayerLeave(player, zone.getTeleport());
+				}
+			}
+			
+			// /team <msg>
+			else if(command.equals("team")) {
+				Team playerTeam = this.getPlayerTeam(player.getName());
+				if(!this.inAnyWarzone(player.getLocation()) && playerTeam != null) {
+					player.sendMessage(this.str("Usage: /team <message>. " +
+							"Sends a message only to your teammates."));
+				} else {
+					ChatColor color = null;
+					if(playerTeam.getMaterial() == TeamMaterials.TEAMDIAMOND) {
+						color = ChatColor.DARK_AQUA;
+					} else if(playerTeam.getMaterial() == TeamMaterials.TEAMGOLD) {
+						color = ChatColor.GOLD;
+					} else if(playerTeam.getMaterial() ==  TeamMaterials.TEAMIRON) {
+						color = ChatColor.GRAY;
+					}
+					String teamMessage = player.getName() + ": " + ChatColor.WHITE;
+					for(int j = 0 ; j<arguments.length; j++) {
+						String part = arguments[j];
+						teamMessage += part + " ";
+					}
+					playerTeam.teamcast(this.str(teamMessage));
+				}
+			}
+			
+			// /warhub
+			else if(command.equals("warhub")) {
+				if(this.getWarHub() == null) {
+					player.sendMessage("No warhub on this War server. Try /zones and /zone.");
+				} else {
+					Team playerTeam = this.getPlayerTeam(player.getName());
+					Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
+					if(playerTeam != null) { // was in zone
+						playerWarzone.handlePlayerLeave(player, this.getWarHub().getLocation());
+					}
+					player.teleportTo(this.getWarHub().getLocation());
+				}
+				
+			} else if(this.isZoneMaker(player)) {			
+			// Mod commands : /nextbattle
+			
+				// /nextbattle
+				if(command.equals("nextbattle")) {
+					if(!this.inAnyWarzone(player.getLocation())) {
+						player.sendMessage(this.str("Usage: /nextbattle. Resets the zone blocks and all teams' life pools. Must be in warzone."));
+					} else {
+						Warzone warzone = this.warzone(player.getLocation());
+						warzone.clearFlagThieves();
+						for(Team team: warzone.getTeams()) {
+							team.teamcast(this.str("The battle was interrupted. " + playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and life pools..."));
+						}
+						int resetBlocks = warzone.getVolume().resetBlocks();
+						warzone.initializeZone();
+						player.sendMessage(this.str("Warzone reset. " + resetBlocks + " blocks reset."));
+						info(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
+					}
+				}
+				
+				// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
+				
+				// /setzone
+				else if(command.equals("setzone")) {
+					if(arguments.length < 2 || arguments.length > 2 
+							|| (arguments.length == 2 && (!arguments[1].equals("southeast") && !arguments[1].equals("northwest")
+																	&& !arguments[1].equals("se") && !arguments[1].equals("nw")))) {
+						player.sendMessage(this.str("Usage: /setzone <warzone-name> <'southeast'/'northwest'/'se'/'nw'>. " +
+								"Set one corner, then the next. Defines the outline of the warzone, which will be reset at the start of every battle. " +
+								"Saves the zone blocks if the zone if the outline is correct."));
+					} else {
+						Warzone warzone = this.findWarzone(arguments[0]);
+						if(warzone == null) {
+							// create the warzone
+							warzone = new Warzone(this, player.getLocation().getWorld(), arguments[0]);
+							this.addWarzone(warzone);
+							WarMapper.save(this);
+							if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
+								warzone.setNorthwest(player.getLocation());
+								player.sendMessage(this.str("Warzone " + warzone.getName() + " created. Northwesternmost point set to x:" 
+										+ (int)warzone.getNorthwest().getBlockX() + " z:" + (int)warzone.getNorthwest().getBlockZ() + "."));
+							} else {
+								warzone.setSoutheast(player.getLocation());
+								player.sendMessage(this.str("Warzone " + warzone.getName() + " created. Southeasternmost point set to x:" 
+										+ (int)warzone.getSoutheast().getBlockX() + " z:" + (int)warzone.getSoutheast().getBlockZ() + "."));
+							}
+							WarzoneMapper.save(this, warzone, false);
+						} else {
+							// change existing warzone
+							if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
+								if(warzone.getSoutheast() != null 
+										&& (player.getLocation().getBlockX() >= warzone.getSoutheast().getBlockX()
+												|| player.getLocation().getBlockZ() <= warzone.getSoutheast().getBlockZ())) {
+									player.sendMessage(this.str("You must place that corner northwest relative to the existing southeast corner!"));
+								} else if (warzone.getSoutheast() == null){
+									// just moving the single nw corner we've placed so far
+									warzone.setNorthwest(player.getLocation());
+								}else {
+									String msgString = "";
+									if(warzone.getVolume().isSaved()) {
+										player.sendMessage(str("Resetting " + warzone.getName() + " blocks."));
+										if(warzone.getLobby() != null) {
+											warzone.getLobby().getVolume().resetBlocks();
+										}
+										int reset = warzone.getVolume().resetBlocks();
+										
+										msgString = reset + " blocks reset. ";
+									}
+									warzone.setNorthwest(player.getLocation());
+									if(warzone.tooSmall()) {
+										player.sendMessage(str("Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20."));
+									} else if (warzone.tooBig()) {
+										player.sendMessage(str("Warzone " + warzone.getName() + " is too Big. Max north-south size: 500. Max east-west size: 500."));
+									}
+									else {
+										msgString += "New zone outline ok. Northwesternmost point of zone " + warzone.getName() + " set to x:" + (int)warzone.getNorthwest().getBlockX()
+											+ " z:" + (int)warzone.getNorthwest().getBlockZ()+ ". Saving new warzone blocks...";
+										player.sendMessage(str(msgString));
+									}
+								} 
+							} else if(arguments[1].equals("southeast") || arguments[1].equals("se")) {
+								if(warzone.getNorthwest() != null 
+										&& (player.getLocation().getBlockX() <= warzone.getNorthwest().getBlockX()
+												|| player.getLocation().getBlockZ() >= warzone.getNorthwest().getBlockZ())) {
+									player.sendMessage(this.str("You must place that corner southeast relative to the existing northwest corner! "));
+								} else if (warzone.getNorthwest() == null){
+									// just moving the single se corner we've placed so far
+									warzone.setSoutheast(player.getLocation());
+								} else {
+									String msgString = "";
+									if(warzone.getVolume().isSaved()) {
+										player.sendMessage(str("Resetting zone " + warzone.getName() + " blocks."));
+										if(warzone.getLobby() != null) {
+											warzone.getLobby().getVolume().resetBlocks();
+										}
+										int reset = warzone.getVolume().resetBlocks();
+										
+										msgString = reset + " blocks reset. ";
+									}
+									warzone.setSoutheast(player.getLocation());
+									if(warzone.tooSmall()) {
+										player.sendMessage(str("Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20."));
+									} else if (warzone.tooBig()) {
+										player.sendMessage(str("Warzone " + warzone.getName() + " is too Big. Max north-south size: 500. Max east-west size: 500."));
+									}
+									else {
+										msgString += "New zone outline ok. Southeasternmost point of zone " + warzone.getName() + " set to x:" + (int)warzone.getSoutheast().getBlockX()
+											+ " z:" + (int)warzone.getSoutheast().getBlockZ()+ ". Saving new warzone blocks...";
+										player.sendMessage(str(msgString));
+									}
+								}
+							}
+						}
+						if(warzone.getNorthwest() == null) {
+							player.sendMessage(str("Still missing northwesternmost point."));
+						}
+						if(warzone.getSoutheast() == null) {
+							player.sendMessage(str("Still missing southeasternmost point."));
+						}
+						if(warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
+							if(warzone.ready()) {
+								warzone.saveState(false); // we just changed the volume, cant reset walls 
+								if(warzone.getLobby() == null) {
+									// Set default lobby on south side
+									ZoneLobby lobby = new ZoneLobby(this, warzone, BlockFace.SOUTH);
+									warzone.setLobby(lobby);
+									//lobby.initialize();
+									if(warHub != null) {	// warhub has to change
+										warHub.getVolume().resetBlocks();
+										warHub.initialize();
+									}
+									player.sendMessage(this.str("Default lobby created on south side of zone. Use /setzonelobby <n/s/e/w> to change which zone wall it is attached to."));
+								} else {
+									// gotta move the lobby
+									warzone.getLobby().changeWall(warzone.getLobby().getWall());
+								}
+								warzone.initializeZone();
+								WarzoneMapper.save(this, warzone, true);
+								player.sendMessage(this.str("Warzone saved. Use /setteam, /setmonument and /savezone to configure the zone."));
+							}
+						}
+					}
+				}
+				
+				else if(command.equals("setzonelobby")) {
+					if((!this.inAnyWarzone(player.getLocation())
+							&& !this.inAnyWarzoneLobby(player.getLocation()))
+							|| arguments.length < 1 || arguments.length > 1 
+							|| (arguments.length == 1 && !arguments[0].equals("north") && !arguments[0].equals("n")
+																	&& !arguments[0].equals("east") && !arguments[0].equals("e")
+																	&& !arguments[0].equals("south") && !arguments[0].equals("s")
+																	&& !arguments[0].equals("west") && !arguments[0].equals("w"))) {
+						player.sendMessage(this.str("Usage: /setzonelobby <north/n/east/e/south/s/west/w>. Must be in warzone." +
+								"Defines on which side the zone lobby lies. " +
+								"Removes any previously set lobby."));
+					} else {
+						Warzone warzone = this.warzone(player.getLocation());
+						ZoneLobby lobby = this.lobby(player.getLocation());
+						if(warzone == null && lobby != null) {
+							warzone = lobby.getZone();
+						} else {
+							lobby = warzone.getLobby();
+						}
+						BlockFace wall = null;
+						String wallStr = "";
+						if(arguments[0].equals("north") || arguments[0].equals("n")) {
+							wall = BlockFace.NORTH;
+							wallStr = "north";
+						} else if(arguments[0].equals("east") || arguments[0].equals("e")) {
+							wall = BlockFace.EAST;
+							wallStr = "east";
+						} else if(arguments[0].equals("south") || arguments[0].equals("s")) {
+							wall = BlockFace.SOUTH;
+							wallStr = "south";
+						} else if(arguments[0].equals("west") || arguments[0].equals("w")) {
+							wall = BlockFace.WEST;
+							wallStr = "west";
+						}				
+						if(lobby != null) {
+							// reset existing lobby
+							lobby.getVolume().resetBlocks();
+							lobby.changeWall(wall);
+							lobby.initialize();
+							player.sendMessage(this.str("Warzone lobby moved to " + wallStr + " side of zone."));
+						} else {
+							// new lobby
+							lobby = new ZoneLobby(this, warzone, wall);
+							warzone.setLobby(lobby);
+							lobby.initialize();
+							if(warHub != null) { // warhub has to change
+								warHub.getVolume().resetBlocks();
+								warHub.initialize();
+							}
+							player.sendMessage(this.str("Warzone lobby created on " + wallStr + "side of zone."));
+						}
+						WarzoneMapper.save(this, warzone, false);
+					}
+				}
+		
+				// /savewarzone
+				else if(command.equals("savezone")) {
+					if(!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
+						player.sendMessage(this.str("Usage: /savezone lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on " +
+								"All named params optional. Saves the blocks of the warzone (i.e. the current zone state will be reloaded at each battle start). Must be in warzone."));
+					} else {
+						Warzone warzone = this.warzone(player.getLocation());
+						ZoneLobby lobby = this.lobby(player.getLocation());
+						if(warzone == null && lobby != null) {
+							warzone = lobby.getZone();
+						} else {
+							lobby = warzone.getLobby();
+						}
+						player.sendMessage(this.str("Saving warzone " + warzone.getName() + "."));
+						int savedBlocks = warzone.saveState(true);
+						updateZoneFromNamedParams(warzone, arguments);
+						WarzoneMapper.save(this, warzone, true);
+						warzone.getVolume().resetBlocks();
+						if(lobby != null) {
+							lobby.getVolume().resetBlocks();
+						}
+						warzone.initializeZone();	// bring back team spawns etc
+						
+						player.sendMessage(this.str("Warzone " + warzone.getName() + " initial state changed. Saved " + savedBlocks + " blocks."));
+					}
+				}
+				
+				// /setzoneconfig
+				else if(command.equals("setzoneconfig")) {
+					if((!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))
+						|| arguments.length == 0) {
+						player.sendMessage(this.str("Usage: /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " +
+								"Please give at leaset one named parameter. Does not save the blocks of the warzone. Resets the zone with the new config. Must be in warzone."));
+					} else {
+						Warzone warzone = this.warzone(player.getLocation());
+						ZoneLobby lobby = this.lobby(player.getLocation());
+						if(warzone == null && lobby != null) {
+							warzone = lobby.getZone();
+						} else {
+							lobby = warzone.getLobby();
+						}
+						if(updateZoneFromNamedParams(warzone, arguments)) {
+							player.sendMessage(this.str("Saving config and resetting warzone " + warzone.getName() + "."));
+							WarzoneMapper.save(this, warzone, false);
+							warzone.getVolume().resetBlocks();
+							if(lobby != null) {
+								lobby.getVolume().resetBlocks();
+							}
+							warzone.initializeZone();	// bring back team spawns etc
+							player.sendMessage(this.str("Warzone config saved. Zone reset."));
+						} else {
+							player.sendMessage(this.str("Failed to read named parameters."));
+						}
+					}
+				}
+				
+				// /resetwarzone
+				else if(command.equals("resetzone")) {
+					if(!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
+						player.sendMessage(this.str("Usage: /resetzone <hard/h>. Reloads the zone (from disk if the hard option is specified). Must be in warzone or lobby."));
+					} else {
+						Warzone warzone = this.warzone(player.getLocation());
+						ZoneLobby lobby = this.lobby(player.getLocation());
+						if(warzone == null && lobby != null) {
+							warzone = lobby.getZone();
+						} else {
+							lobby = warzone.getLobby();
+						}
+						int resetBlocks = 0;
+						warzone.clearFlagThieves();
+						for(Team team: warzone.getTeams()) {
+							team.teamcast(this.str("The war has ended. " + playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams..."));
+							for(Player p : team.getPlayers()) {
+								p.teleportTo(warzone.getTeleport());
+								warzone.restorePlayerInventory(p);
+								player.sendMessage(this.str("You have left the warzone. Your inventory has (hopefully) been restored."));
+							}
+							team.getPlayers().clear();
+						}
+						
+						Warzone resetWarzone = null;
+						player.sendMessage(this.str("Reloading warzone " + warzone.getName() + "."));
+						if(arguments.length == 1 && (arguments[0].equals("hard") || arguments[0].equals("h"))) {
+							// reset from disk
+							this.getWarzones().remove(warzone);
+							resetWarzone = WarzoneMapper.load(this, warzone.getName(), true);
+							this.getWarzones().add(resetWarzone);
+							warzone.getVolume().resetBlocks();
+							if(lobby!=null) {
+								lobby.getVolume().resetBlocks();
+							}
+							resetWarzone.initializeZone();
+						} else {
+							resetBlocks = warzone.getVolume().resetBlocks();
+							if(lobby!=null) {
+								lobby.getVolume().resetBlocks();
+							}
+							warzone.initializeZone();
+							
+						}
+						
+						player.sendMessage(this.str("Warzone and teams reset. " + resetBlocks + " blocks reset."));
+						info(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
+					}
+				}
+				
+				// /deletezone
+				else if(command.equals("deletezone")) {
+					if(!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
+						player.sendMessage(this.str("Usage: /deletezone. " +
+								"Deletes the warzone. " +
+								"Must be in the warzone (try /zones and /zone). "));
+					} else {
+						Warzone warzone = this.warzone(player.getLocation());
+						ZoneLobby lobby = this.lobby(player.getLocation());
+						if(warzone == null && lobby != null) {
+							warzone = lobby.getZone();
+						} else {
+							lobby = warzone.getLobby();
+						}
+						for(Team t : warzone.getTeams()) {
+							if(t.getTeamFlag() != null) t.getFlagVolume().resetBlocks();
+							t.getSpawnVolume().resetBlocks();
+						}
+						for(Monument m : warzone.getMonuments()) {
+							m.getVolume().resetBlocks();
+						}
 						if(warzone.getLobby() != null) {
 							warzone.getLobby().getVolume().resetBlocks();
-							warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
-							warzone.addZoneOutline(warzone.getLobby().getWall());
-							warzone.getLobby().initialize();
+						}
+						warzone.getVolume().resetBlocks();
+						this.getWarzones().remove(warzone);
+						WarMapper.save(this);
+						WarzoneMapper.delete(this, warzone.getName());
+						if(warHub != null) {	// warhub has to change
+							warHub.getVolume().resetBlocks();
+							warHub.initialize();
+						}
+						player.sendMessage(this.str("Warzone " + warzone.getName() + " removed."));
+					}
+				}
+				
+				// /setteam <diamond/iron/gold/d/i/g>
+				else if(command.equals("setteam")) {
+					if(arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) 
+							|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
+						player.sendMessage(this.str("Usage: /setteam <diamond/iron/gold/d/i/g>. " +
+								"Sets the team spawn to the current location. " +
+								"Must be in a warzone (try /zones and /zone). "));
+					} else {
+						Material teamMaterial = TeamMaterials.teamMaterialFromString(arguments[0]);
+						String name = TeamMaterials.teamMaterialToString(teamMaterial);					
+						Warzone warzone = this.warzone(player.getLocation());
+						Team existingTeam = warzone.getTeamByMaterial(teamMaterial);
+						if(existingTeam != null) {
+							// relocate
+							existingTeam.setTeamSpawn(player.getLocation());
+							player.sendMessage(this.str("Team " + existingTeam.getName() + " spawn relocated."));
+						} else {
+							// new team
+							Team newTeam = new Team(name, teamMaterial, player.getLocation(), this, warzone);
+							newTeam.setRemainingLives(warzone.getLifePool());
+							warzone.getTeams().add(newTeam);
+							if(warzone.getLobby() != null) {
+								warzone.getLobby().getVolume().resetBlocks();
+								warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
+								warzone.addZoneOutline(warzone.getLobby().getWall());
+								warzone.getLobby().initialize();
+							}
+							newTeam.setTeamSpawn(player.getLocation());
+							player.sendMessage(this.str("Team " + name + " created with spawn here."));
+						}
+						
+						WarzoneMapper.save(this, warzone, false);
+					}
+				}
+				
+				// /setteamflag <diamond/iron/gold/d/i/g>
+				else if(command.equals("setteamflag")) {
+					if(arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) 
+							|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
+						player.sendMessage(this.str("Usage: /setteamflag <diamond/iron/gold/d/i/g>. " +
+								"Sets the team flag post to the current location. " +
+								"Must be in a warzone (try /zones and /zone). "));
+					} else {
+						Material teamMaterial = TeamMaterials.teamMaterialFromString(arguments[0]);
+						String name = TeamMaterials.teamMaterialToString(teamMaterial);					
+						Warzone warzone = this.warzone(player.getLocation());
+						Team team = warzone.getTeamByMaterial(teamMaterial);
+						if(team == null) {
+							// no such team yet			
+							player.sendMessage(this.str("Place the team spawn first."));
+							return true;
+						} else if (team.getFlagVolume() == null){
+							// new team flag
+							team.setTeamFlag(player.getLocation());
+							Location playerLoc = player.getLocation();
+							player.teleportTo(new Location(playerLoc.getWorld(), 
+									playerLoc.getBlockX()+1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
+							player.sendMessage(this.str("Team " + name + " flag added here."));
+						} else {
+							// relocate flag
+							team.getFlagVolume().resetBlocks();
+							team.setTeamFlag(player.getLocation());
+							Location playerLoc = player.getLocation();
+							player.teleportTo(new Location(playerLoc.getWorld(), 
+									playerLoc.getBlockX()+1, playerLoc.getBlockY() + 1, playerLoc.getBlockZ()));
+							player.sendMessage(this.str("Team " + name + " flag moved."));
+						}
+						
+						WarzoneMapper.save(this, warzone, false);
+					}
+				}
+				
+				// /deleteteam <teamname>
+				else if(command.equals("deleteteam")) {
+					if(arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) 
+													&& !this.inAnyWarzoneLobby(player.getLocation()))) {
+						player.sendMessage(this.str("Usage: /deleteteam <team-name>." +
+								" Deletes the team and its spawn. " +
+								"Must be in a warzone or lobby (try /zones and /zone). "));
+					} else {
+						String name = TeamMaterials.teamMaterialToString(TeamMaterials.teamMaterialFromString(arguments[0]));
+						Warzone warzone = this.warzone(player.getLocation());
+						ZoneLobby lobby = this.lobby(player.getLocation());
+						if(warzone == null && lobby != null) {
+							warzone = lobby.getZone();
+						} else {
+							lobby = warzone.getLobby();
+						}
+						List<Team> teams = warzone.getTeams();
+						Team team = null;
+						for(Team t : teams) {
+							if(name.equals(t.getName())) {
+								team = t;
+							}
+						}
+						if(team != null) {
+							if(team.getFlagVolume() != null) team.getFlagVolume().resetBlocks();
+							team.getSpawnVolume().resetBlocks();	
+							warzone.getTeams().remove(team);
+							if(warzone.getLobby() != null) {
+								warzone.getLobby().getVolume().resetBlocks();
+								warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
+								warzone.addZoneOutline(warzone.getLobby().getWall());
+								warzone.getLobby().initialize();
+							}
+							WarzoneMapper.save(this, warzone, false);
+							player.sendMessage(this.str("Team " + name + " removed."));
+						} else {
+							player.sendMessage(this.str("No such team."));
+						}
+					}
+				}
+				
+				// /setmonument
+				else if(command.equals("setmonument")) {
+					if(!this.inAnyWarzone(player.getLocation()) || arguments.length < 1 || arguments.length > 1 
+							|| (arguments.length == 1 && this.warzone(player.getLocation()) != null
+									&& arguments[0].equals(this.warzone(player.getLocation()).getName()))) {
+						player.sendMessage(this.str("Usage: /setmonument <name>. Creates or moves a monument. Monument can't have same name as zone. Must be in warzone."));
+					} else {
+						Warzone warzone = this.warzone(player.getLocation());
+						String monumentName = arguments[0];
+						if(warzone.hasMonument(monumentName)) {
+							// move the existing monument
+							Monument monument = warzone.getMonument(monumentName);
+							monument.getVolume().resetBlocks();
+							monument.setLocation(player.getLocation());
+							player.sendMessage(this.str("Monument " + monument.getName() + " was moved."));
+						} else {
+							// create a new monument
+							Monument monument = new Monument(arguments[0], this, warzone, player.getLocation());
+							warzone.getMonuments().add(monument);
+							player.sendMessage(this.str("Monument " + monument.getName() + " created."));
 						}
 						WarzoneMapper.save(this, warzone, false);
-						player.sendMessage(this.str("Team " + name + " removed."));
-					} else {
-						player.sendMessage(this.str("No such team."));
 					}
 				}
-			}
-			
-			// /setmonument
-			else if(command.equals("setmonument")) {
-				if(!this.inAnyWarzone(player.getLocation()) || arguments.length < 1 || arguments.length > 1 
-						|| (arguments.length == 1 && this.warzone(player.getLocation()) != null
-								&& arguments[0].equals(this.warzone(player.getLocation()).getName()))) {
-					player.sendMessage(this.str("Usage: /setmonument <name>. Creates or moves a monument. Monument can't have same name as zone. Must be in warzone."));
-				} else {
-					Warzone warzone = this.warzone(player.getLocation());
-					String monumentName = arguments[0];
-					if(warzone.hasMonument(monumentName)) {
-						// move the existing monument
-						Monument monument = warzone.getMonument(monumentName);
-						monument.getVolume().resetBlocks();
-						monument.setLocation(player.getLocation());
-						player.sendMessage(this.str("Monument " + monument.getName() + " was moved."));
+				
+				// /deletemonument <name>
+				else if(command.equals("deletemonument")) {
+					if(arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) 
+													&& !this.inAnyWarzoneLobby(player.getLocation()))) {
+						player.sendMessage(this.str("Usage: /deletemonument <name>." +
+								" Deletes the monument. " +
+								"Must be in a warzone or lobby (try /warzones and /warzone). "));
 					} else {
-						// create a new monument
-						Monument monument = new Monument(arguments[0], this, warzone, player.getLocation());
-						warzone.getMonuments().add(monument);
-						player.sendMessage(this.str("Monument " + monument.getName() + " created."));
-					}
-					WarzoneMapper.save(this, warzone, false);
-				}
-			}
-			
-			// /deletemonument <name>
-			else if(command.equals("deletemonument")) {
-				if(arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) 
-												&& !this.inAnyWarzoneLobby(player.getLocation()))) {
-					player.sendMessage(this.str("Usage: /deletemonument <name>." +
-							" Deletes the monument. " +
-							"Must be in a warzone or lobby (try /warzones and /warzone). "));
-				} else {
-					String name = arguments[0];
-					Warzone warzone = this.warzone(player.getLocation());
-					ZoneLobby lobby = this.lobby(player.getLocation());
-					if(warzone == null && lobby != null) {
-						warzone = lobby.getZone();
-					} else {
-						lobby = warzone.getLobby();
-					}
-					Monument monument = warzone.getMonument(name);
-					if(monument != null) {
-						monument.getVolume().resetBlocks();
-						warzone.getMonuments().remove(monument);
-						WarzoneMapper.save(this, warzone, false);
-						player.sendMessage(this.str("Monument " + name + " removed."));
-					} else {
-						player.sendMessage(this.str("No such monument."));
+						String name = arguments[0];
+						Warzone warzone = this.warzone(player.getLocation());
+						ZoneLobby lobby = this.lobby(player.getLocation());
+						if(warzone == null && lobby != null) {
+							warzone = lobby.getZone();
+						} else {
+							lobby = warzone.getLobby();
+						}
+						Monument monument = warzone.getMonument(name);
+						if(monument != null) {
+							monument.getVolume().resetBlocks();
+							warzone.getMonuments().remove(monument);
+							WarzoneMapper.save(this, warzone, false);
+							player.sendMessage(this.str("Monument " + name + " removed."));
+						} else {
+							player.sendMessage(this.str("No such monument."));
+						}
 					}
 				}
-			}
-			
-			// /setwarhub
-			else if(command.equals("setwarhub")) {
-				if(warzones.size() > 0) {
+				
+				// /setwarhub
+				else if(command.equals("setwarhub")) {
+					if(warzones.size() > 0) {
+						if(warHub != null) {
+							// reset existing hub
+							warHub.getVolume().resetBlocks();
+							warHub.setLocation(player.getLocation());
+							warHub.initialize();
+							player.sendMessage(str("War hub moved."));
+						} else {
+							warHub = new WarHub(this, player.getLocation());
+							warHub.initialize();
+							for(Warzone zone : warzones) {
+								zone.getLobby().getVolume().resetBlocks();
+								zone.getLobby().initialize();
+							}
+							player.sendMessage(str("War hub created."));
+						}
+						WarMapper.save(this);
+					} else {
+						player.sendMessage(str("No warzones yet."));
+					}
+				}
+				
+				// /deletewarhub
+				else if(command.equals("deletewarhub")) {
 					if(warHub != null) {
 						// reset existing hub
 						warHub.getVolume().resetBlocks();
-						warHub.setLocation(player.getLocation());
-						warHub.initialize();
-						player.sendMessage(str("War hub moved."));
-					} else {
-						warHub = new WarHub(this, player.getLocation());
-						warHub.initialize();
+						VolumeMapper.delete(warHub.getVolume(), this);
+						this.warHub = null;
 						for(Warzone zone : warzones) {
 							zone.getLobby().getVolume().resetBlocks();
 							zone.getLobby().initialize();
 						}
-						player.sendMessage(str("War hub created."));
+						
+						player.sendMessage(this.str("War hub removed."));
+					} else {
+						player.sendMessage(this.str("No War hub to delete."));
 					}
 					WarMapper.save(this);
-				} else {
-					player.sendMessage(str("No warzones yet."));
 				}
-			}
-			
-			// /deletewarhub
-			else if(command.equals("deletewarhub")) {
-				if(warHub != null) {
-					// reset existing hub
-					warHub.getVolume().resetBlocks();
-					VolumeMapper.delete(warHub.getVolume(), this);
-					this.warHub = null;
-					for(Warzone zone : warzones) {
-						zone.getLobby().getVolume().resetBlocks();
-						zone.getLobby().initialize();
+				
+				// /setwarconfig
+				else if(command.equals("setwarconfig")) {
+					if(arguments.length == 0) {
+						player.sendMessage(this.str("Usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " +
+								"Changes the server defaults for new warzones. Please give at leaset one named parameter. Must be in warzone."));
+					} else {
+						if(updateFromNamedParams(arguments)) {
+							WarMapper.save(this);
+							player.sendMessage(this.str("War config saved."));
+						} else {
+							player.sendMessage(this.str("Failed to read named parameters."));
+						}
 					}
-					
-					player.sendMessage(this.str("War hub removed."));
-				} else {
-					player.sendMessage(this.str("No War hub to delete."));
+				}
+				
+				// /zonemaker
+				else if(command.equals("zonemaker")) {
+					if(arguments.length > 2) {
+						player.sendMessage(this.str("Usage: /zonemaker <player-name>, /zonemaker" +
+								"Elevates the player to zone maker or removes his rights. " +
+								"If you are already a zonemaker, you can toggle between player and zone maker modes by using the command without arguments."));
+					} else {
+						if(arguments.length == 1) {
+							// make someone zonemaker or remove the right
+							if(zoneMakerNames.contains(arguments[0])) {
+								// kick
+								zoneMakerNames.remove(arguments[0]);
+								player.sendMessage(str(arguments[0] + " is not a zone maker anymore."));
+								Player kickedMaker = getServer().getPlayer(arguments[0]);
+								if(kickedMaker != null) {
+									kickedMaker.sendMessage(str(player.getName() + " took away your warzone maker priviledges."));
+								}
+							} else {
+								// add
+								zoneMakerNames.add(arguments[0]);
+								player.sendMessage(str(arguments[0] + " is now a zone maker."));
+								Player newMaker = getServer().getPlayer(arguments[0]);
+								if(newMaker != null) {
+									newMaker.sendMessage(str(player.getName() + " made you warzone maker."));
+								}
+							}
+						} else {
+							// toggle to player mode
+							if(isZoneMaker(player)) {
+								getZoneMakersImpersonatingPlayers().add(player.getName());
+							}
+							player.sendMessage(str("You are now impersonating a regular player. Type /zonemaker again to toggle back to war maker mode."));
+						}
+						
+						WarMapper.save(this);
+					}
+				}
+			} else if (command.equals("setzone")		// Not a zone maker but War command.
+							|| command.equals("nextbattle")
+							|| command.equals("setzonelobby")
+							|| command.equals("savezone")
+							|| command.equals("setzoneconfig")
+							|| command.equals("resetzone")
+							|| command.equals("deletezone")
+							|| command.equals("setteam")
+							|| command.equals("deleteteam")
+							|| command.equals("setmonument")
+							|| command.equals("deletemonument")
+							|| command.equals("setwarhub")
+							|| command.equals("deletewarhub")
+							|| command.equals("setwarconfig")) {
+				player.sendMessage(this.str("You can't do this if you are not a warzone maker."));
+			} else if (command.equals("zonemaker")) {
+				boolean wasImpersonating = false;
+				for(String name : getZoneMakersImpersonatingPlayers()) {
+					if(player.getName().equals(name)) {
+						wasImpersonating = true;
+					}
+				}
+				if(wasImpersonating) {
+					getZoneMakersImpersonatingPlayers().remove(player.getName());
+					player.sendMessage(str("You are back as a zone maker."));
 				}
 				WarMapper.save(this);
 			}
-			
-			// /setwarconfig
-			else if(command.equals("setwarconfig")) {
-				if(arguments.length == 0) {
-					player.sendMessage(this.str("Usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " +
-							"Changes the server defaults for new warzones. Please give at leaset one named parameter. Must be in warzone."));
-				} else {
-					if(updateFromNamedParams(arguments)) {
-						WarMapper.save(this);
-						player.sendMessage(this.str("War config saved."));
-					} else {
-						player.sendMessage(this.str("Failed to read named parameters."));
-					}
-				}
-			}
-			
-			// /zonemaker
-			else if(command.equals("zonemaker")) {
-				if(arguments.length > 2) {
-					player.sendMessage(this.str("Usage: /zonemaker <player-name>, /zonemaker" +
-							"Elevates the player to zone maker or removes his rights. " +
-							"If you are already a zonemaker, you can toggle between player and zone maker modes by using the command without arguments."));
-				} else {
-					if(arguments.length == 1) {
-						// make someone zonemaker or remove the right
-						if(zoneMakerNames.contains(arguments[0])) {
-							// kick
-							zoneMakerNames.remove(arguments[0]);
-							player.sendMessage(str(arguments[0] + " is not a zone maker anymore."));
-							Player kickedMaker = getServer().getPlayer(arguments[0]);
-							if(kickedMaker != null) {
-								kickedMaker.sendMessage(str(player.getName() + " took away your warzone maker priviledges."));
-							}
-						} else {
-							// add
-							zoneMakerNames.add(arguments[0]);
-							player.sendMessage(str(arguments[0] + " is now a zone maker."));
-							Player newMaker = getServer().getPlayer(arguments[0]);
-							if(newMaker != null) {
-								newMaker.sendMessage(str(player.getName() + " made you warzone maker."));
-							}
-						}
-					} else {
-						// toggle to player mode
-						if(isZoneMaker(player)) {
-							getZoneMakersImpersonatingPlayers().add(player.getName());
-						}
-						player.sendMessage(str("You are now impersonating a regular player. Type /zonemaker again to toggle back to war maker mode."));
-					}
-					
-					WarMapper.save(this);
-				}
-			}
-		} else if (command.equals("setzone")		// Not a zone maker but War command.
-						|| command.equals("nextbattle")
-						|| command.equals("setzonelobby")
-						|| command.equals("savezone")
-						|| command.equals("setzoneconfig")
-						|| command.equals("resetzone")
-						|| command.equals("deletezone")
-						|| command.equals("setteam")
-						|| command.equals("deleteteam")
-						|| command.equals("setmonument")
-						|| command.equals("deletemonument")
-						|| command.equals("setwarhub")
-						|| command.equals("deletewarhub")
-						|| command.equals("setwarconfig")) {
-			player.sendMessage(this.str("You can't do this if you are not a warzone maker."));
-		} else if (command.equals("zonemaker")) {
-			boolean wasImpersonating = false;
-			for(String name : getZoneMakersImpersonatingPlayers()) {
-				if(player.getName().equals(name)) {
-					wasImpersonating = true;
-				}
-			}
-			if(wasImpersonating) {
-				getZoneMakersImpersonatingPlayers().remove(player.getName());
-				player.sendMessage(str("You are back as a zone maker."));
-			}
-			WarMapper.save(this);
 		}
 		return true;
 		
