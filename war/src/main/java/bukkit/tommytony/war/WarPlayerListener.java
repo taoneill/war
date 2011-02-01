@@ -228,14 +228,14 @@ public class WarPlayerListener extends PlayerListener {
 			Team team = war.getPlayerTeam(player.getName());
 			
 			// Player belongs to a warzone team but is outside: he snuck out or is at spawn and died
-			if(locZone == null && team != null) {
-				handleDeath(event, player, playerWarzone, team);
-				event.setFrom(team.getTeamSpawn());
-				//playerWarzone.respawnPlayer(team, player);
-				player.teleportTo(team.getTeamSpawn());
-				event.setCancelled(true);
-				return;
-			}
+//			if(locZone == null && team != null) {
+//				handleDeath(event, player, playerWarzone, team);
+//				event.setFrom(team.getTeamSpawn());
+//				//playerWarzone.respawnPlayer(team, player);
+//				player.teleportTo(team.getTeamSpawn());
+//				event.setCancelled(true);
+//				return;
+//			}
 
 			// Monuments
 			if(team != null
@@ -265,7 +265,7 @@ public class WarPlayerListener extends PlayerListener {
 							if(playerWarzone.hasPlayerInventory(player.getName())){
 								playerWarzone.restorePlayerInventory(player);
 							}
-							handleScoreCapReached(event, team.getName(), playerWarzone);
+							playerWarzone.handleScoreCapReached(player, team.getName());
 							event.setFrom(playerWarzone.getTeleport());
 							player.teleportTo(playerWarzone.getTeleport());
 							event.setCancelled(true);
@@ -366,7 +366,7 @@ public class WarPlayerListener extends PlayerListener {
 							playerWarzone.restorePlayerInventory(player);
 						}
 						
-						handleScoreCapReached(event, winnersStr, playerWarzone);
+						playerWarzone.handleScoreCapReached(player, winnersStr);
 						event.setFrom(playerWarzone.getTeleport());
 						player.teleportTo(playerWarzone.getTeleport());
 						event.setCancelled(true);
@@ -408,34 +408,5 @@ public class WarPlayerListener extends PlayerListener {
 //				war.info(player.getName() + " died and battle ended in team " + playerTeam.getName() + "'s disfavor");
 //			}
 		//}
-	}
-
-	private void handleScoreCapReached(PlayerMoveEvent event, String winnersStr, Warzone playerWarzone) {
-		winnersStr = "Score cap reached! Winning team(s): " + winnersStr;		
-		winnersStr += ". Your inventory has (hopefully) been reset. The warzone is being reset... Please choose a new team.";
-		Player player = event.getPlayer();
-		// Score cap reached. Reset everything.
-		for(Team t : playerWarzone.getTeams()) {
-			t.teamcast(war.str(winnersStr));
-			for(Player tp : t.getPlayers()) {
-				if(!tp.getName().equals(player.getName())) {
-					if(playerWarzone.hasPlayerInventory(tp.getName())){
-						playerWarzone.restorePlayerInventory(tp);
-					}
-					tp.teleportTo(playerWarzone.getTeleport());
-				}
-				
-			}
-			t.setPoints(0);
-			t.getPlayers().clear();	// empty the team
-		}
-		if(playerWarzone.getLobby() != null) {
-			playerWarzone.getLobby().getVolume().resetBlocks();
-		}
-		playerWarzone.getVolume().resetBlocks();
-		playerWarzone.initializeZone();
-		if(war.getWarHub() != null) {
-			war.getWarHub().resetZoneSign(playerWarzone);
-		}
 	}
 }

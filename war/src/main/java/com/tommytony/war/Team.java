@@ -233,16 +233,21 @@ public class Team {
 		} 
 		
 		if(signBlock != null) {
-			if(signBlock.getType() != Material.SIGN_POST) { 
-				signBlock.setType(Material.SIGN_POST);
-			} 
-			else {
-				// already a signpost, gotta delete it and create a new one
-				signBlock.setType(Material.AIR);
-				signBlock.setType(Material.SIGN_POST);
-			}
+//			if(signBlock.getType() != Material.SIGN_POST) { 
+//				signBlock.setType(Material.SIGN_POST);
+//			} 
+//			else {
+//				// already a signpost, gotta delete it and create a new one
+//				signBlock.setType(Material.AIR);
+//				signBlock.setType(Material.SIGN_POST);
+//			}
 			
 			BlockState state = signBlock.getState();
+			if(state.getType() != Material.SIGN_POST) {
+				state.setType(Material.SIGN_POST);
+				state.update(true);
+				state = war.refetchStateForBlock(warzone.getWorld(), signBlock);
+			}			
 			if(state instanceof Sign) {
 				Sign sign = (Sign) state;
 				sign.setType(Material.SIGN_POST);
@@ -251,8 +256,8 @@ public class Team {
 				sign.setLine(1, remainingLives + "/" + warzone.getLifePool() + " lives left");
 				sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
 				sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
-				state.update(true);
 			}
+			state.update(true);
 		}
 		
 	}

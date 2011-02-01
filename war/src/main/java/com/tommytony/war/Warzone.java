@@ -736,7 +736,7 @@ public class Warzone {
 			player.sendMessage(war.str("Your inventory is is storage until you /leave."));
 			respawnPlayer(event, lowestNoOfPlayers, player);
 			for(Team team : teams){
-				team.teamcast(war.str("" + player.getName() + " joined team " + team.getName() + "."));
+				team.teamcast(war.str("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + "."));
 			}
 		}
 	}
@@ -876,5 +876,31 @@ public class Warzone {
 		return false;
 	}
 
-
+	public void handleScoreCapReached(Player player, String winnersStr) {
+		winnersStr = "Score cap reached! Winning team(s): " + winnersStr;		
+		winnersStr += ". Your inventory has (hopefully) been reset. The warzone is being reset... Please choose a new team.";
+		// Score cap reached. Reset everything.
+		for(Team t : this.getTeams()) {
+			t.teamcast(war.str(winnersStr));
+			for(Player tp : t.getPlayers()) {
+				if(!tp.getName().equals(player.getName())) {
+					if(this.hasPlayerInventory(tp.getName())){
+						this.restorePlayerInventory(tp);
+					}
+					tp.teleportTo(this.getTeleport());
+				}
+				
+			}
+			t.setPoints(0);
+			t.getPlayers().clear();	// empty the team
+		}
+		if(this.getLobby() != null) {
+			this.getLobby().getVolume().resetBlocks();
+		}
+		this.getVolume().resetBlocks();
+		this.initializeZone();
+		if(war.getWarHub() != null) {
+			war.getWarHub().resetZoneSign(this);
+		}
+	}
 }

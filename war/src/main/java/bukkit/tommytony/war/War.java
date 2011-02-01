@@ -3,6 +3,7 @@ package bukkit.tommytony.war;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -1258,5 +1259,10 @@ public class War extends JavaPlugin {
 		    }
 		}
 	    }
+
+	public BlockState refetchStateForBlock(World world, Block block) {
+		Block again = world.getBlockAt(block.getX(), block.getY(), block.getZ());
+		return again.getState();
+	}
 	
 }
