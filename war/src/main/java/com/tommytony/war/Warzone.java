@@ -48,6 +48,8 @@ public class Warzone {
 	private War war;
 	private ZoneLobby lobby;
 	private boolean autoAssignOnly;
+	private boolean blockHeads;
+	private boolean dropLootOnDeath;
 	
 	
 	public Warzone(War war, World world, String name) {
@@ -61,6 +63,8 @@ public class Warzone {
 		this.setAutoAssignOnly(war.getDefaultAutoAssignOnly());
 		this.teamCap = war.getDefaultTeamCap();
 		this.scoreCap = war.getDefaultScoreCap();
+		this.setBlockHeads(war.isDefaultBlockHeads());
+		this.setDropLootOnDeath(war.isDefaultDropLootOnDeath());
 		this.volume = new VerticalVolume(name, war, this.getWorld());
 	}
 	
@@ -376,13 +380,16 @@ public class Warzone {
 				playerInv.setItem(slot, loadout.get(slot));
 			//}
 		}
-		
-		if(team.getMaterial() == Material.GOLD_BLOCK) {
-			playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
-		} else if (team.getMaterial() == Material.DIAMOND_BLOCK) {
-			playerInv.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-		} else if (team.getMaterial() == Material.IRON_BLOCK) {
-			playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
+		if(isBlockHeads()) {
+			playerInv.setHelmet(new ItemStack(team.getMaterial()));
+		} else {
+			if(team.getMaterial() == Material.GOLD_BLOCK) {
+				playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
+			} else if (team.getMaterial() == Material.DIAMOND_BLOCK) {
+				playerInv.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+			} else if (team.getMaterial() == Material.IRON_BLOCK) {
+				playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
+			}
 		}
 		player.setHealth(20);
 	}
@@ -902,5 +909,21 @@ public class Warzone {
 		if(war.getWarHub() != null) {
 			war.getWarHub().resetZoneSign(this);
 		}
+	}
+
+	public void setBlockHeads(boolean blockHeads) {
+		this.blockHeads = blockHeads;
+	}
+
+	public boolean isBlockHeads() {
+		return blockHeads;
+	}
+
+	public void setDropLootOnDeath(boolean dropLootOnDeath) {
+		this.dropLootOnDeath = dropLootOnDeath;
+	}
+
+	public boolean isDropLootOnDeath() {
+		return dropLootOnDeath;
 	}
 }

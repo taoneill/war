@@ -168,7 +168,12 @@ public class WarzoneMapper {
 		// score cap
 		warzone.setScoreCap(warzoneConfig.getInt("scoreCap"));
 
-				
+		// blockHeads
+		warzone.setBlockHeads(warzoneConfig.getBoolean("blockHeads"));
+		
+		// dropLootOnDeath
+		//warzone.setDropLootOnDeath(warzoneConfig.getBoolean("dropLootOnDeath"));
+		
 		// monuments
 		String monumentsStr = warzoneConfig.getString("monuments");
 		if(monumentsStr != null && !monumentsStr.equals("")) {
@@ -325,6 +330,12 @@ public class WarzoneMapper {
 		
 		// score cap
 		warzoneConfig.setInt("scoreCap", warzone.getScoreCap());
+		
+		// blockHeads
+		warzoneConfig.setBoolean("blockHeads", warzone.isBlockHeads());
+		
+		// defaultDropLootOnDeath
+		//warzoneConfig.setBoolean("dropLootOnDeath", warzone.isDropLootOnDeath());
 		
 		// monuments
 		String monumentsStr = "";

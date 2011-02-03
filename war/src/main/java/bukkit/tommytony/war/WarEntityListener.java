@@ -27,7 +27,6 @@ public class WarEntityListener extends EntityListener {
 
 	public WarEntityListener(War war) {
 		this.war = war;
-		// TODO Auto-generated constructor stub
 	}
 	
 	public void onEntityDeath(EntityDeathEvent event) {
@@ -36,8 +35,11 @@ public class WarEntityListener extends EntityListener {
 			Player player = (Player)e;
 			Team team = war.getPlayerTeam(player.getName());
 			if(team != null) {
-				handleDeath(player, war.getPlayerTeamWarzone(player.getName()), team);
-				event.getDrops().clear();	// no loot
+				Warzone zone =  war.getPlayerTeamWarzone(player.getName());
+				handleDeath(player, zone, team);
+				if(!zone.isDropLootOnDeath()) {
+					event.getDrops().clear();	// no loot	
+				}				
 			}
 		}
     }
@@ -81,33 +83,36 @@ public class WarEntityListener extends EntityListener {
 					&& attackerTeam != defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
 				// Make sure one of the players isn't in the spawn
-				if(!defenderTeam.getSpawnVolume().contains(d.getLocation())){
-				// A real attack: handle death scenario. ==> now handled in entity damage as well
-				//synchronized(d) {
-//					if(d.getHealth() <= 0) {
-////						// Player died, loot him!
-////						PlayerInventory attackerInv = a.getInventory();
-////						PlayerInventory defenderInv = d.getInventory();
-////						HashMap<Integer, ItemStack> noMorePlace = new HashMap<Integer, ItemStack>();
-////						for(ItemStack stack : defenderInv.getContents()) {
-////							HashMap<Integer, ItemStack> newNoMorePlace = attackerInv.addItem(stack);
-////							noMorePlace.putAll(newNoMorePlace);
-////						}					
+//				if(!){
+//				// A real attack: handle death scenario. ==> now handled in entity damage as well
+//				//synchronized(d) {
+////					if(d.getHealth() <= 0) {
+//////						// Player died, loot him!
+//////						PlayerInventory attackerInv = a.getInventory();
+//////						PlayerInventory defenderInv = d.getInventory();
+//////						HashMap<Integer, ItemStack> noMorePlace = new HashMap<Integer, ItemStack>();
+//////						for(ItemStack stack : defenderInv.getContents()) {
+//////							HashMap<Integer, ItemStack> newNoMorePlace = attackerInv.addItem(stack);
+//////							noMorePlace.putAll(newNoMorePlace);
+//////						}					
+//////						
+//////						// attacker inventory is full, drop the rest.
+//////						if(!noMorePlace.isEmpty()) {
+//////							for(Integer key : noMorePlace.keySet()) {
+//////								ItemStack toDrop = noMorePlace.get(key);
+//////								defender.getWorld().dropItem(defender.getLocation(), toDrop);
+//////							}
+//////						}
 ////						
-////						// attacker inventory is full, drop the rest.
-////						if(!noMorePlace.isEmpty()) {
-////							for(Integer key : noMorePlace.keySet()) {
-////								ItemStack toDrop = noMorePlace.get(key);
-////								defender.getWorld().dropItem(defender.getLocation(), toDrop);
-////							}
-////						}
-//						
-//						handleDeath(d, defenderWarzone, defenderTeam);
-//						event.setCancelled(true);
-					//}
-				}
-				else {	// attacking person in spawn
+////						handleDeath(d, defenderWarzone, defenderTeam);
+////						event.setCancelled(true);
+//					//}
+//				}
+				if(defenderTeam.getSpawnVolume().contains(d.getLocation())) {	// attacking person in spawn
 					a.sendMessage(war.str("Can't attack a player that's inside his team's spawn."));
+					event.setCancelled(true);
+				} else if(attackerTeam.getSpawnVolume().contains(a.getLocation())) {
+					a.sendMessage(war.str("Can't attack a player from inside your spawn."));
 					event.setCancelled(true);
 				}
 				//}

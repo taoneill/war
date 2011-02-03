@@ -66,6 +66,8 @@ public class War extends JavaPlugin {
 	private boolean defaultAutoAssignOnly = false;
 	private int defaultTeamCap = 7;
 	private int defaultScoreCap = 10;
+	private boolean defaultBlockHeads = false;
+	private boolean defaultDropLootOnDeath = false;
 	private boolean pvpInZonesOnly = false;
 	private WarHub warHub;
 	
@@ -99,10 +101,10 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 		
-		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.High, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.High, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_ENTITY, entityListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGEDBY_PROJECTILE, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.High, this);
+		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
@@ -121,7 +123,7 @@ public class War extends JavaPlugin {
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-		if(sender.isPlayer()) {
+		if(sender instanceof Player) {
 			Player player = (Player) sender;
 			String command = cmd.getName();
 			String[] arguments = null;
@@ -589,6 +591,7 @@ public class War extends JavaPlugin {
 								p.teleportTo(warzone.getTeleport());
 								player.sendMessage(this.str("You have left the warzone. Your inventory has (hopefully) been restored."));
 							}
+							team.setPoints(0);
 							team.getPlayers().clear();
 						}
 						
@@ -977,7 +980,15 @@ public class War extends JavaPlugin {
 			if(namedParams.containsKey("outline")){
 				String onOff = namedParams.get("outline");
 				warzone.setDrawZoneOutline(onOff.equals("on") || onOff.equals("true"));
-			} 
+			}
+			if(namedParams.containsKey("blockHeads")){
+				String onOff = namedParams.get("blockHeads");
+				warzone.setBlockHeads(onOff.equals("on") || onOff.equals("true"));
+			}
+//			if(namedParams.containsKey("dropLootOnDeath")){
+//				String onOff = namedParams.get("dropLootOnDeath");
+//				warzone.setDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
+//			}
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -1018,6 +1029,14 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("pvpinzonesonly");
 				setPvpInZonesOnly(onOff.equals("on") || onOff.equals("true"));
 			} 
+			if(namedParams.containsKey("blockHeads")){
+				String onOff = namedParams.get("blockHeads");
+				setDefaultBlockHeads(onOff.equals("on") || onOff.equals("true"));
+			}
+//			if(namedParams.containsKey("dropLootOnDeath")){
+//				String onOff = namedParams.get("dropLootOnDeath");
+//				setDefaultDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
+//			}
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -1263,6 +1282,22 @@ public class War extends JavaPlugin {
 	public BlockState refetchStateForBlock(World world, Block block) {
 		Block again = world.getBlockAt(block.getX(), block.getY(), block.getZ());
 		return again.getState();
+	}
+
+	public void setDefaultBlockHeads(boolean defaultBlockHeads) {
+		this.defaultBlockHeads = defaultBlockHeads;
+	}
+
+	public boolean isDefaultBlockHeads() {
+		return defaultBlockHeads;
+	}
+
+	public void setDefaultDropLootOnDeath(boolean defaultDropLootOnDeath) {
+		this.defaultDropLootOnDeath = defaultDropLootOnDeath;
+	}
+
+	public boolean isDefaultDropLootOnDeath() {
+		return defaultDropLootOnDeath;
 	}
 	
 }

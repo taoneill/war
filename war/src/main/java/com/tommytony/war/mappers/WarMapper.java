@@ -104,8 +104,14 @@ public class WarMapper {
 		// defaultScoreCap
 		war.setDefaultScoreCap(warConfig.getInt("defaultScoreCap"));
 
-		// defaultScoreCap
+		// pvpInZonesOnly
 		war.setPvpInZonesOnly(warConfig.getBoolean("pvpInZonesOnly"));
+		
+		// defaultBlockHeads
+		war.setDefaultBlockHeads(warConfig.getBoolean("defaultBlockHeads"));
+		
+		// defaultDropLootOnDeath
+		//war.setDefaultDropLootOnDeath(warConfig.getBoolean("defaultDropLootOnDeath"));
 		
 		// warhub
 		String hubStr = warConfig.getString("warhub");
@@ -179,11 +185,16 @@ public class WarMapper {
 		warConfig.setInt("defaultTeamCap", war.getDefaultTeamCap());
 		
 		// defaultScoreCap
-		warConfig.getInt("defaultScoreCap", war.getDefaultScoreCap());
+		warConfig.setInt("defaultScoreCap", war.getDefaultScoreCap());
 
-		// defaultScoreCap
+		// pvpInZonesOnly
 		warConfig.setBoolean("pvpInZonesOnly", war.isPvpInZonesOnly());
-		war.setPvpInZonesOnly(warConfig.getBoolean("pvpInZonesOnly"));
+		
+		// defaultBlockHeads
+		warConfig.setBoolean("defaultBlockHeads", war.isDefaultBlockHeads());
+		
+		// defaultDropLootOnDeath
+		//warConfig.setBoolean("defaultDropLootOnDeath", war.isDefaultDropLootOnDeath());
 		
 		// warhub
 		String hubStr = "";
