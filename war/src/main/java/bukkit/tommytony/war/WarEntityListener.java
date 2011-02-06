@@ -111,7 +111,8 @@ public class WarEntityListener extends EntityListener {
 				if(defenderTeam.getSpawnVolume().contains(d.getLocation())) {	// attacking person in spawn
 					a.sendMessage(war.str("Can't attack a player that's inside his team's spawn."));
 					event.setCancelled(true);
-				} else if(attackerTeam.getSpawnVolume().contains(a.getLocation())) {
+				} else if(attackerTeam.getSpawnVolume().contains(a.getLocation()) && !attackerTeam.getSpawnVolume().contains(d.getLocation())) {
+					// only let a player inside spawn attack an enemy player if that player enters the spawn
 					a.sendMessage(war.str("Can't attack a player from inside your spawn."));
 					event.setCancelled(true);
 				}
