@@ -45,12 +45,21 @@ public class VolumeMapper {
 			else in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 			String firstLine = in.readLine();
 			if(firstLine != null && !firstLine.equals("")) {
+				boolean height129Fix = false;
 				int x1 = Integer.parseInt(in.readLine());
 				int y1 = Integer.parseInt(in.readLine());
+				if(y1 == 128) {
+					height129Fix = true;
+					y1 = 127;
+				}
 				int z1 = Integer.parseInt(in.readLine());
 				in.readLine();
 				int x2 = Integer.parseInt(in.readLine());
 				int y2 = Integer.parseInt(in.readLine());
+				if(y2 == 128) {
+					height129Fix = true;
+					y2 = 127;
+				}
 				int z2 = Integer.parseInt(in.readLine());
 				
 				volume.setCornerOne(world.getBlockAt(x1, y1, z1));
@@ -85,6 +94,11 @@ public class VolumeMapper {
 								//volume.getBlockTypes()[i][j][k] = new BlockInfo(typeID, data, lines);
 								volume.getBlockTypes()[i][j][k] = typeID;
 								volume.getBlockDatas()[i][j][k] = data;
+							}
+						}
+						if(height129Fix && j == volume.getSizeY() - 1) {
+							for(int skip = 0; skip < volume.getSizeZ(); skip++) {
+								in.readLine();	// throw away the extra vertical block I used to save pre 0.8
 							}
 						}
 					}

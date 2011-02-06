@@ -228,7 +228,7 @@ public class Warzone {
 				team.setRemainingLives(lifePool);
 				team.setTeamSpawn(team.getTeamSpawn());
 				if(team.getTeamFlag() != null) team.setTeamFlag(team.getTeamFlag());
-				team.resetSign();
+				//team.resetSign();
 			}
 			
 			initZone();
@@ -321,6 +321,7 @@ public class Warzone {
 					|| (over.getType() == Material.WOOD && under.getType() != Material.WOOD && under.getType() != Material.AIR))
 				  && treeHeight < 40) {
 				over = under;
+				if(over.getY() <= 0) break; 	// reached bottom
 				under = over.getFace(BlockFace.DOWN);
 				treeHeight++;
 			}
@@ -335,12 +336,14 @@ public class Warzone {
 				Block under = block.getFace(BlockFace.DOWN);
 				while(under.getY() != lastBlock.getY() - 1) {
 					under.setType(Material.GLASS);
+					if(under.getY() <= 0) break;	// reached bottom
 					under = under.getFace(BlockFace.DOWN);
 				}
 			} else if (lastBlock.getY() - block.getY() > 1) { // new block too low
 				Block over = block.getFace(BlockFace.UP);
 				while(over.getY() != lastBlock.getY() + 1) {
 					over.setType(Material.GLASS);
+					if(over.getY() >= 127) break;
 					over = over.getFace(BlockFace.UP);
 				}
 			}

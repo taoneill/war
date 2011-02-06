@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 
 import bukkit.tommytony.war.War;
 
@@ -308,6 +309,11 @@ public class Volume {
 							for(Material oldType : oldTypes) {
 								if(currentBlock.getType().getId() == oldType.getId()) {
 									currentBlock.setType(newType);
+//									BlockState state = currentBlock.getState();
+//									if(state != null) {
+//										state.setType(newType);
+//										state.update(true);
+//									}
 								}
 							}
 							z++;

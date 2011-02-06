@@ -24,7 +24,7 @@ public class VerticalVolume extends Volume{
 	@Override
 	public void setCornerOne(Block block){
 		// corner one defaults to topmost corner
-		Block topBlock = getWorld().getBlockAt(block.getX(), 128, block.getZ());
+		Block topBlock = getWorld().getBlockAt(block.getX(), 127, block.getZ());
 		super.setCornerOne(topBlock);
 	}
 	
