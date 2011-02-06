@@ -383,29 +383,60 @@ public class ZoneLobby {
 
 	public boolean isInTeamGate(Material team, Location location) {
 		if(team == TeamMaterials.TEAMDIAMOND && diamondGate != null
-				&& location.getBlockX() == diamondGate.getX()
-				&& location.getBlockY() == diamondGate.getY()
-				&& location.getBlockZ() == diamondGate.getZ()) {
-			return true;
+				&& 
+				(
+						(location.getBlockX() == diamondGate.getFace(this.getWall()).getX()
+						&& location.getBlockY() == diamondGate.getFace(this.getWall()).getY()
+						&& location.getBlockZ() == diamondGate.getFace(this.getWall()).getZ())
+					||
+						(location.getBlockX() == diamondGate.getX()
+						&& location.getBlockY() == diamondGate.getY()
+						&& location.getBlockZ() == diamondGate.getZ())
+					)
+				) {
+					return true;
 		} else if(team == TeamMaterials.TEAMIRON && ironGate != null
-				&& location.getBlockX() == ironGate.getX()
-				&& location.getBlockY() == ironGate.getY()
-				&& location.getBlockZ() == ironGate.getZ()) {
-			return true;
+				&& 
+				(
+						(location.getBlockX() == ironGate.getFace(this.getWall()).getX()
+						&& location.getBlockY() == ironGate.getFace(this.getWall()).getY()
+						&& location.getBlockZ() == ironGate.getFace(this.getWall()).getZ())
+					||
+						(location.getBlockX() == ironGate.getX()
+						&& location.getBlockY() == ironGate.getY()
+						&& location.getBlockZ() == ironGate.getZ())
+					)
+				) {
+					return true;
 		} else if(team == TeamMaterials.TEAMGOLD && goldGate != null
-				&& location.getBlockX() == goldGate.getX()
-				&& location.getBlockY() == goldGate.getY()
-				&& location.getBlockZ() == goldGate.getZ()) {
-			return true;
+				&& (
+						(location.getBlockX() == goldGate.getFace(this.getWall()).getX()
+								&& location.getBlockY() == goldGate.getFace(this.getWall()).getY()
+								&& location.getBlockZ() == goldGate.getFace(this.getWall()).getZ())
+							||
+								(location.getBlockX() == goldGate.getX()
+								&& location.getBlockY() == goldGate.getY()
+								&& location.getBlockZ() == goldGate.getZ())
+							)
+						) {
+					return true;
 		} 
 		return false;
 	}
 	
 	public boolean isAutoAssignGate(Location location) {
 		if(autoAssignGate != null
-				&& location.getBlockX() == autoAssignGate.getX()
-				&& location.getBlockY() == autoAssignGate.getY()
-				&& location.getBlockZ() == autoAssignGate.getZ()) {
+				&& 
+				(
+					(location.getBlockX() == autoAssignGate.getFace(this.getWall()).getX()
+					&& location.getBlockY() == autoAssignGate.getFace(this.getWall()).getY()
+					&& location.getBlockZ() == autoAssignGate.getFace(this.getWall()).getZ())
+				||
+					(location.getBlockX() == autoAssignGate.getX()
+					&& location.getBlockY() == autoAssignGate.getY()
+					&& location.getBlockZ() == autoAssignGate.getZ())
+				)
+			) {
 			return true;
 		} 
 		return false;
@@ -623,27 +654,47 @@ public class ZoneLobby {
 
 	private boolean leaving(Location location, Block gate, BlockFace inside,
 			BlockFace left, BlockFace right) {
-		int x = location.getBlockX();
-		int y = location.getBlockY();
-		int z = location.getBlockZ();
+//		int x = location.getBlockX();
+//		int y = location.getBlockY();
+//		int z = location.getBlockZ();
+//		
+		// 5x3x3 deep
+		Volume gateExitVolume = new Volume("tempGateExit", 	war, location.getWorld());
 		Block out = gate.getFace(inside);
-		Block outL = out.getFace(left);
-		Block outR = out.getFace(right);
+		gateExitVolume.setCornerOne(out.getFace(left, 2));
+		gateExitVolume.setCornerTwo(out.getFace(right, 2).getFace(inside, 2).getFace(BlockFace.UP, 2));
+		
+		if(gateExitVolume.contains(location)) {
+			return true;
+		}
+		
+		// 1 block thick arrow like detection grid:
+//		Block out = gate.getFace(inside);
+//		Block outL = out.getFace(left);
+//		Block outLL = out.getFace(left, 2);
+//		Block outR = out.getFace(right);
+//		Block outRR = out.getFace(right, 2);
 //		Block out2 = gate.getFace(inside, 2);
 //		Block out2L = out2.getFace(left);
 //		Block out2R = out2.getFace(right);
-		if(out.getX() == x && out.getY() == y && out.getZ() == z) {
-			return true;
-		} else if(outL.getX() == x && outL.getY() == y && outL.getZ() == z) {
-			return true;
-		} else if(outR.getX() == x && outR.getY() == y && outR.getZ() == z) {
-			return true;
-		}
+//		Block out3 = gate.getFace(inside, 3);
+//		if(out.getX() == x && out.getY() == y && out.getZ() == z) {
+//			return true;
+//		} else if(outL.getX() == x && outL.getY() == y && outL.getZ() == z) {
+//			return true;
+//		} else if(outR.getX() == x && outR.getY() == y && outR.getZ() == z) {
+//			return true;
+//		} else if(outLL.getX() == x && outLL.getY() == y && outLL.getZ() == z) {
+//			return true;
+//		} else if(outRR.getX() == x && outRR.getY() == y && outRR.getZ() == z) {
+//			return true;
 //		} else if(out2.getX() == x && out2.getY() == y && out2.getZ() == z) {
 //			return true;
 //		} else if(out2L.getX() == x && out2L.getY() == y && out2L.getZ() == z) {
 //			return true;
 //		} else if(out2R.getX() == x && out2R.getY() == y && out2R.getZ() == z) {
+//			return true;
+//		} else if(out3.getX() == x && out3.getY() == y && out3.getZ() == z) {
 //			return true;
 //		}
 		return false;
