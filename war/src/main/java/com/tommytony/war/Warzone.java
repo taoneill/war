@@ -38,7 +38,7 @@ public class Warzone {
 	private int teamCap = 5;
 	private int scoreCap = 5;
 	
-	private HashMap<String, ItemStack[]> inventories = new HashMap<String, ItemStack[]>();
+	private HashMap<String, InventoryStash> inventories = new HashMap<String, InventoryStash>();
 	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
 	private World world;
 	private Material[] originalSoutheastBlocks;
@@ -371,17 +371,23 @@ public class Warzone {
 	private void handleRespawn(Team team, Player player){
 		// Reset inventory to loadout
 		PlayerInventory playerInv = player.getInventory();
-		playerInv.clear();		
+		playerInv.clear();
+		playerInv.clear(playerInv.getSize() + 0);
+		playerInv.clear(playerInv.getSize() + 1);
+		playerInv.clear(playerInv.getSize() + 2);
+		playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
 		for(Integer slot : loadout.keySet()) {
-//			if(slot == 101) {
-//				playerInv.setLeggings(loadout.get(slot));
-//			} else if(slot == 102) {
-//				playerInv.setChestplate(loadout.get(slot));
-//			} else if(slot == 103) {
-//				playerInv.setHelmet(loadout.get(slot));
-//			} else { 
+			if(slot == 100) {
+				playerInv.setBoots(loadout.get(slot));
+			} else if(slot == 101) {
+				playerInv.setLeggings(loadout.get(slot));
+			} else if(slot == 102) {
+				playerInv.setChestplate(loadout.get(slot));
+			} else if(slot == 103) {
+				playerInv.setHelmet(loadout.get(slot));
+			} else { 
 				playerInv.setItem(slot, loadout.get(slot));
-			//}
+			}
 		}
 		if(isBlockHeads()) {
 			playerInv.setHelmet(new ItemStack(team.getMaterial()));
@@ -465,25 +471,41 @@ public class Warzone {
 	public void keepPlayerInventory(Player player) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack[] contents = inventory.getContents();
-		inventories.put(player.getName(), contents);	
+		inventories.put(player.getName(), new InventoryStash(contents, inventory.getHelmet(), inventory.getChestplate(), 
+																inventory.getLeggings(), inventory.getBoots()));	
 	}
 
 	public void restorePlayerInventory(Player player) {
-		ItemStack[] originalContents = inventories.remove(player.getName());
+		InventoryStash originalContents = inventories.remove(player.getName());
 		PlayerInventory playerInv = player.getInventory();
 		if(originalContents != null) {
 			playerInv.clear();
-			
-			for(ItemStack item : originalContents) {
+			playerInv.clear(playerInv.getSize() + 0);
+			playerInv.clear(playerInv.getSize() + 1);
+			playerInv.clear(playerInv.getSize() + 2);
+			playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
+			for(ItemStack item : originalContents.getContents()) {
 				if(item.getTypeId() != 0) {
 					playerInv.addItem(item);
 				}
 			}
+			if(originalContents.getHelmet() != null) {
+				playerInv.setHelmet(originalContents.getHelmet());
+			}
+			if(originalContents.getChest() != null) {
+				playerInv.setChestplate(originalContents.getChest());
+			}
+			if(originalContents.getLegs() != null) {
+				playerInv.setLeggings(originalContents.getLegs());
+			}
+			if(originalContents.getFeet() != null) {
+				playerInv.setBoots(originalContents.getFeet());
+			}
 		}
-		playerInv.clear(playerInv.getSize() + 3);
+		
 	}
 	
-	public ItemStack[] getPlayerInventory(String playerName) {
+	public InventoryStash getPlayerInventory(String playerName) {
 		if(inventories.containsKey(playerName)) return inventories.get(playerName);
 		return null;
 	}

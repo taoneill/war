@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.tommytony.war.InventoryStash;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.WarHub;
@@ -28,7 +29,7 @@ public class WarPlayerListener extends PlayerListener {
 
 	private final War war;
 	private Random random = null;
-	private HashMap<String, ItemStack[]> disconnected = new HashMap<String, ItemStack[]>();
+	private HashMap<String, InventoryStash> disconnected = new HashMap<String, InventoryStash>();
 
 	public WarPlayerListener(War war) {
 		this.war = war;
@@ -41,18 +42,35 @@ public class WarPlayerListener extends PlayerListener {
 		// Disconnected
 		if(disconnected.containsKey(player.getName())) {
 			// restore the disconnected player's inventory
-			ItemStack[] originalContents = disconnected.remove(player.getName());
+			InventoryStash originalContents = disconnected.remove(player.getName());
 			PlayerInventory playerInv = player.getInventory();
+			playerInv.clear(playerInv.getSize() + 0);
+			playerInv.clear(playerInv.getSize() + 1);
+			playerInv.clear(playerInv.getSize() + 2);
+			playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
 			if(originalContents != null) {
 				playerInv.clear();
 				
-				for(ItemStack item : originalContents) {
+				for(ItemStack item : originalContents.getContents()) {
 					if(item.getTypeId() != 0) {
 						playerInv.addItem(item);
 					}
 				}
+				
+				if(originalContents.getHelmet() != null) {
+					playerInv.setHelmet(originalContents.getHelmet());
+				}
+				if(originalContents.getChest() != null) {
+					playerInv.setChestplate(originalContents.getChest());
+				}
+				if(originalContents.getLegs() != null) {
+					playerInv.setLeggings(originalContents.getLegs());
+				}
+				if(originalContents.getFeet() != null) {
+					playerInv.setBoots(originalContents.getFeet());
+				}
 			}
-			playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
+			
 			player.sendMessage(war.str("You were disconnected. Here's your inventory from last time."));
 		}
     }
