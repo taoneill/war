@@ -1,11 +1,21 @@
 package com.tommytony.war.volumes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
+import org.bukkit.block.Dispenser;
+import org.bukkit.block.Sign;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 
 import bukkit.tommytony.war.War;
 
@@ -22,6 +32,8 @@ public class Volume {
 	private Block cornerTwo;
 	private int[][][] blockTypes = null;
 	private byte[][][] blockDatas = null;
+	private HashMap<String, String[]> signLines = new HashMap<String, String[]>();
+	private HashMap<String, List<ItemStack>> invBlockContents = new HashMap<String, List<ItemStack>>();
 	private final War war;	
 
 	public Volume(String name, War war, World world) {
@@ -48,6 +60,7 @@ public class Volume {
 			if(hasTwoCorners()) {
 				this.setBlockTypes(new int[getSizeX()][getSizeY()][getSizeZ()]);
 				this.setBlockDatas(new byte[getSizeX()][getSizeY()][getSizeZ()]);
+				this.getSignLines().clear();
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMinY();
@@ -57,6 +70,38 @@ public class Volume {
 							Block block = getWorld().getBlockAt(x, y, z);
 							this.getBlockTypes()[i][j][k] = block.getTypeId();
 							this.getBlockDatas()[i][j][k] = block.getData();
+							BlockState state = block.getState();
+							if(state instanceof Sign) {
+								// Signs
+								Sign sign = (Sign)state;
+								this.getSignLines().put("sign-" + i + "-" + j + "," + k, sign.getLines());	
+							} else if(state instanceof Chest) {
+								// Chests
+								Chest chest = (Chest)state;
+								Inventory inv = chest.getInventory();
+								int size = inv.getSize();
+								List<ItemStack> items = new ArrayList<ItemStack>();
+								for(int invIndex = 0; invIndex < size; invIndex++){
+									ItemStack item = inv.getItem(invIndex);
+									if(item != null && item.getType().getId() != Material.AIR.getId()) {
+										items.add(item);
+									}
+								}
+								this.getInvBlockContents().put("chest-" + i + "-" + j + "," + k, items);
+							} else if(state instanceof Dispenser) {
+								// Dispensers							
+								Dispenser dispenser = (Dispenser)state;
+								Inventory inv = dispenser.getInventory();
+								int size = inv.getSize();
+								List<ItemStack> items = new ArrayList<ItemStack>();
+								for(int invIndex = 0; invIndex < size; invIndex++){
+									ItemStack item = inv.getItem(invIndex);
+									if(item != null && item.getType().getId() != Material.AIR.getId()) {
+										items.add(item);
+									}
+								}
+								this.getInvBlockContents().put("dispenser-" + i + "-" + j + "," + k, items);
+							}
 							z++;
 							noOfSavedBlocks++;
 						}
@@ -88,11 +133,11 @@ public class Volume {
 							if(currentBlock.getTypeId() != oldBlockType ||
 								(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData ) ||
 								(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() == oldBlockData &&
-										(oldBlockType == Material.SIGN.getId() || oldBlockType == Material.SIGN_POST.getId())
+										(oldBlockType == Material.SIGN.getId() || oldBlockType == Material.SIGN_POST.getId()
+												|| oldBlockType == Material.CHEST.getId() || oldBlockType == Material.DISPENSER.getId())
 								)
 							) {
-								currentBlock.setTypeId(oldBlockType);
-								currentBlock.setData(oldBlockData);
+								
 //								if(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST)) {
 //									BlockState state = currentBlock.getState();
 //									Sign currentSign = (Sign) state;
@@ -102,6 +147,56 @@ public class Volume {
 //									currentSign.setLine(3, oldBlockInfo.getSignLines()[3]);
 //									state.update();
 //								}
+								BlockState state = currentBlock.getState();
+								if(oldBlockType == Material.SIGN.getId() 
+										|| oldBlockType == Material.SIGN_POST.getId()) {
+									// Signs
+									state.setType(Material.getMaterial(oldBlockType));
+									state.setData(new MaterialData(oldBlockType, oldBlockData));
+									state.update(true);
+									state = war.refetchStateForBlock(world, state.getBlock());
+									Sign sign = (Sign)state;
+									String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "," + k);
+									sign.setLine(0, lines[0]);
+									sign.setLine(1, lines[1]);
+									sign.setLine(2, lines[2]);
+									sign.setLine(3, lines[3]);
+									sign.update(true);
+								} else if(oldBlockType == Material.CHEST.getId()) {
+									// Chests
+									state.setType(Material.getMaterial(oldBlockType));
+									state.setData(new MaterialData(oldBlockType, oldBlockData));
+									state.update(true);
+									state = war.refetchStateForBlock(world, state.getBlock());
+									Chest chest = (Chest)state;
+									List<ItemStack> contents = this.getInvBlockContents().get("chest-" + i + "-" + j + "," + k);
+									int ii = 0;
+									chest.getInventory().clear();
+									for(ItemStack item : contents) {
+										chest.getInventory().setItem(ii, item);
+										ii++;
+									}
+									chest.update(true);
+								} else if(oldBlockType == Material.DISPENSER.getId()) {
+									// Dispensers		
+									state.setType(Material.getMaterial(oldBlockType));
+									state.setData(new MaterialData(oldBlockType, oldBlockData));
+									state.update(true);
+									state = war.refetchStateForBlock(world, state.getBlock());
+									Dispenser dispenser = (Dispenser)state;
+									List<ItemStack> contents = this.getInvBlockContents().get("dispenser-" + i + "-" + j + "," + k);
+									int ii = 0;
+									dispenser.getInventory().clear();
+									for(ItemStack item : contents) {
+										dispenser.getInventory().setItem(ii, item);
+										ii++;
+									}
+									dispenser.update(true);
+								} else {
+									// regular block
+									currentBlock.setType(Material.getMaterial(oldBlockType));
+									currentBlock.setData(oldBlockData);
+								}
 								noOfResetBlocks++;
 							}
 							z++;
@@ -353,6 +448,22 @@ public class Volume {
 		toAirMaterials[20] = Material.SNOW;
 		toAirMaterials[21] = Material.ICE;
 		switchMaterials(toAirMaterials, Material.AIR);
+	}
+
+	public void setSignLines(HashMap<String, String[]> signLines) {
+		this.signLines = signLines;
+	}
+
+	public HashMap<String, String[]> getSignLines() {
+		return signLines;
+	}
+
+	public void setInvBlockContents(HashMap<String, List<ItemStack>> invBlockContents) {
+		this.invBlockContents = invBlockContents;
+	}
+
+	public HashMap<String, List<ItemStack>> getInvBlockContents() {
+		return invBlockContents;
 	}
 
 }
