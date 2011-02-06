@@ -1,5 +1,6 @@
 package bukkit.tommytony.war;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -8,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
@@ -25,6 +28,7 @@ public class WarPlayerListener extends PlayerListener {
 
 	private final War war;
 	private Random random = null;
+	private HashMap<String, ItemStack[]> disconnected = new HashMap<String, ItemStack[]>();
 
 	public WarPlayerListener(War war) {
 		this.war = war;
@@ -32,7 +36,25 @@ public class WarPlayerListener extends PlayerListener {
 	}
 	
 	public void onPlayerJoin(PlayerEvent event) {
-		event.getPlayer().sendMessage(war.str("War is on! Pick your battle (try /warhub, /zones and /zone)."));
+		Player player = event.getPlayer();
+		player.sendMessage(war.str("War is on! Pick your battle (try /warhub, /zones and /zone)."));
+		// Disconnected
+		if(disconnected.containsKey(player.getName())) {
+			// restore the disconnected player's inventory
+			ItemStack[] originalContents = disconnected.remove(player.getName());
+			PlayerInventory playerInv = player.getInventory();
+			if(originalContents != null) {
+				playerInv.clear();
+				
+				for(ItemStack item : originalContents) {
+					if(item.getTypeId() != 0) {
+						playerInv.addItem(item);
+					}
+				}
+			}
+			playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
+			player.sendMessage(war.str("You were disconnected. Here's your inventory from last time."));
+		}
     }
 	
 	public void onPlayerQuit(PlayerEvent event) {
@@ -41,6 +63,9 @@ public class WarPlayerListener extends PlayerListener {
 		if(team != null) {
 			Warzone zone = war.getPlayerTeamWarzone(player.getName());
 			if(zone != null) {
+				if(zone.hasPlayerInventory(player.getName())) {
+					disconnected.put(player.getName(), zone.getPlayerInventory(player.getName()));
+				}
 				zone.handlePlayerLeave(player, zone.getTeleport());
 			}
 		}
@@ -67,6 +92,8 @@ public class WarPlayerListener extends PlayerListener {
 				zone.dropZoneWallGuardIfAny(player);
 			}
 		}
+		
+		
 		
 		Warzone playerWarzone = war.getPlayerTeamWarzone(player.getName());	
 			// this uses the teams, so it asks: get the player's team's warzone, to be clearer

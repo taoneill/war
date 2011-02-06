@@ -97,7 +97,7 @@ public class War extends JavaPlugin {
 		// Register hooks		
 		PluginManager pm = getServer().getPluginManager();
 		
-		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
 		

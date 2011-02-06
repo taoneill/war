@@ -482,6 +482,11 @@ public class Warzone {
 		}
 		playerInv.clear(playerInv.getSize() + 3);
 	}
+	
+	public ItemStack[] getPlayerInventory(String playerName) {
+		if(inventories.containsKey(playerName)) return inventories.get(playerName);
+		return null;
+	}
 
 	public boolean hasMonument(String monumentName) {
 		for(Monument monument: monuments) {
@@ -929,4 +934,6 @@ public class Warzone {
 	public boolean isDropLootOnDeath() {
 		return dropLootOnDeath;
 	}
+
+	
 }
