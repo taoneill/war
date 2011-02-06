@@ -74,7 +74,7 @@ public class Volume {
 							if(state instanceof Sign) {
 								// Signs
 								Sign sign = (Sign)state;
-								this.getSignLines().put("sign-" + i + "-" + j + "," + k, sign.getLines());	
+								this.getSignLines().put("sign-" + i + "-" + j + "-" + k, sign.getLines());	
 							} else if(state instanceof Chest) {
 								// Chests
 								Chest chest = (Chest)state;
@@ -87,7 +87,7 @@ public class Volume {
 										items.add(item);
 									}
 								}
-								this.getInvBlockContents().put("chest-" + i + "-" + j + "," + k, items);
+								this.getInvBlockContents().put("chest-" + i + "-" + j + "-" + k, items);
 							} else if(state instanceof Dispenser) {
 								// Dispensers							
 								Dispenser dispenser = (Dispenser)state;
@@ -100,7 +100,7 @@ public class Volume {
 										items.add(item);
 									}
 								}
-								this.getInvBlockContents().put("dispenser-" + i + "-" + j + "," + k, items);
+								this.getInvBlockContents().put("dispenser-" + i + "-" + j + "-" + k, items);
 							}
 							z++;
 							noOfSavedBlocks++;
@@ -156,12 +156,14 @@ public class Volume {
 									state.update(true);
 									state = war.refetchStateForBlock(world, state.getBlock());
 									Sign sign = (Sign)state;
-									String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "," + k);
-									sign.setLine(0, lines[0]);
-									sign.setLine(1, lines[1]);
-									sign.setLine(2, lines[2]);
-									sign.setLine(3, lines[3]);
-									sign.update(true);
+									String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "-" + k);
+									if(lines != null) {
+										sign.setLine(0, lines[0]);
+										if(lines.length>1)sign.setLine(1, lines[1]);
+										if(lines.length>2)sign.setLine(2, lines[2]);
+										if(lines.length>3)sign.setLine(3, lines[3]);
+										sign.update(true);
+									}
 								} else if(oldBlockType == Material.CHEST.getId()) {
 									// Chests
 									state.setType(Material.getMaterial(oldBlockType));
@@ -169,14 +171,16 @@ public class Volume {
 									state.update(true);
 									state = war.refetchStateForBlock(world, state.getBlock());
 									Chest chest = (Chest)state;
-									List<ItemStack> contents = this.getInvBlockContents().get("chest-" + i + "-" + j + "," + k);
-									int ii = 0;
-									chest.getInventory().clear();
-									for(ItemStack item : contents) {
-										chest.getInventory().setItem(ii, item);
-										ii++;
+									List<ItemStack> contents = this.getInvBlockContents().get("chest-" + i + "-" + j + "-" + k);
+									if(contents != null) {
+										int ii = 0;
+										chest.getInventory().clear();
+										for(ItemStack item : contents) {
+											chest.getInventory().setItem(ii, item);
+											ii++;
+										}
+										chest.update(true);
 									}
-									chest.update(true);
 								} else if(oldBlockType == Material.DISPENSER.getId()) {
 									// Dispensers		
 									state.setType(Material.getMaterial(oldBlockType));
@@ -184,14 +188,16 @@ public class Volume {
 									state.update(true);
 									state = war.refetchStateForBlock(world, state.getBlock());
 									Dispenser dispenser = (Dispenser)state;
-									List<ItemStack> contents = this.getInvBlockContents().get("dispenser-" + i + "-" + j + "," + k);
-									int ii = 0;
-									dispenser.getInventory().clear();
-									for(ItemStack item : contents) {
-										dispenser.getInventory().setItem(ii, item);
-										ii++;
+									List<ItemStack> contents = this.getInvBlockContents().get("dispenser-" + i + "-" + j + "-" + k);
+									if(contents != null) {
+										int ii = 0;
+										dispenser.getInventory().clear();
+										for(ItemStack item : contents) {
+											dispenser.getInventory().setItem(ii, item);
+											ii++;
+										}
+										dispenser.update(true);
 									}
-									dispenser.update(true);
 								} else {
 									// regular block
 									currentBlock.setType(Material.getMaterial(oldBlockType));
