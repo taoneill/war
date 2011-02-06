@@ -111,8 +111,6 @@ public class WarPlayerListener extends PlayerListener {
 			}
 		}
 		
-		
-		
 		Warzone playerWarzone = war.getPlayerTeamWarzone(player.getName());	
 			// this uses the teams, so it asks: get the player's team's warzone, to be clearer
 		
@@ -136,6 +134,9 @@ public class WarPlayerListener extends PlayerListener {
 					}
 					if(noOfPlayers < zone.getTeams().size() * zone.getTeamCap()) {
 						zone.autoAssign(event, player);
+						if(war.getWarHub() != null) {
+							war.getWarHub().resetZoneSign(zone);
+						}
 						//zone.autoAssign(player);
 						//event.setCancelled(true);
 					} else {
@@ -155,6 +156,9 @@ public class WarPlayerListener extends PlayerListener {
 					if(diamondTeam.getPlayers().size() < zone.getTeamCap()) {
 						diamondTeam.addPlayer(player);
 						diamondTeam.resetSign();
+						if(war.getWarHub() != null) {
+							war.getWarHub().resetZoneSign(zone);
+						}
 						zone.keepPlayerInventory(player);
 						player.sendMessage(war.str("Your inventory is is storage until you /leave."));
 						zone.respawnPlayer(event, diamondTeam, player);
@@ -180,6 +184,9 @@ public class WarPlayerListener extends PlayerListener {
 					if(ironTeam.getPlayers().size() < zone.getTeamCap()) {
 						ironTeam.addPlayer(player);
 						ironTeam.resetSign();
+						if(war.getWarHub() != null) {
+							war.getWarHub().resetZoneSign(zone);
+						}
 						zone.keepPlayerInventory(player);
 						player.sendMessage(war.str("Your inventory is is storage until you /leave."));
 						zone.respawnPlayer(event, ironTeam, player);
@@ -205,6 +212,9 @@ public class WarPlayerListener extends PlayerListener {
 					if(goldTeam.getPlayers().size() < zone.getTeamCap()) {
 						goldTeam.addPlayer(player);
 						goldTeam.resetSign();
+						if(war.getWarHub() != null) {
+							war.getWarHub().resetZoneSign(zone);
+						}
 						zone.keepPlayerInventory(player);
 						player.sendMessage(war.str("Your inventory is is storage until you /leave."));
 						zone.respawnPlayer(event, goldTeam, player);
@@ -236,7 +246,7 @@ public class WarPlayerListener extends PlayerListener {
 				event.setFrom(zone.getTeleport());
 				player.teleportTo(zone.getTeleport());
 				event.setCancelled(true);
-				player.sendMessage(war.str("You don't have permission to play War. Ask a mod, please."));
+				player.sendMessage(war.str("You don't have permission to play War. Ask a mod for the 'war.player' permission, please."));
 				return;
 			}
 			
