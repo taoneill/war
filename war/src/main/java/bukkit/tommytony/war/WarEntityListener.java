@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import com.tommytony.war.Team;
@@ -260,6 +264,58 @@ public class WarEntityListener extends EntityListener {
 //			}
 		//}
 	}
+	
+	public void onEntityDamage(EntityDamageEvent event) {
+		if(event.getCause() == DamageCause.FIRE_TICK) {
+			Entity entity =  event.getEntity();
+			if(entity instanceof Player) {
+				Player player = (Player) entity;
+				Team team = war.getPlayerTeam(player.getName());
+				if(team != null && team.getSpawnVolume().contains(player.getLocation())) {
+					// smother out the fire that didn't burn out when you respawned
+					// Stop fire (upcast, watch out!)
+					if(player instanceof CraftPlayer) {
+						net.minecraft.server.Entity playerEntity = ((CraftPlayer)player).getHandle();
+						playerEntity.fireTicks = 0;
+//						playerEntity.r(); // force refresh (?)
+					}
+					event.setCancelled(true);		
+				}
+				
+			}
+			
+		} else if (event.getCause() == DamageCause.DROWNING) {
+			Entity entity =  event.getEntity();
+			if(entity instanceof Player) {
+				Player player = (Player) entity;
+				Team team = war.getPlayerTeam(player.getName());
+				if(team != null && player.getHealth() <= 0) {
+					// don't keep killing drowing player: trying to stop "Player moved wrongly!" error at respawn.
+					event.setCancelled(true);		
+				}
+				
+			}
+		}
+    }
+
+	public void onEntityCombust(EntityCombustEvent event) {
+		Entity entity =  event.getEntity();
+		if(entity instanceof Player) {
+			Player player = (Player) entity;
+			Team team = war.getPlayerTeam(player.getName());
+			if(team != null && team.getSpawnVolume().contains(player.getLocation())) {
+				// smother out the fire that didn't burn out when you respawned
+				//Stop fire (upcast, watch out!)
+				if(player instanceof CraftPlayer) {
+					net.minecraft.server.Entity playerEntity = ((CraftPlayer)player).getHandle();
+					playerEntity.fireTicks = 0;
+//					playerEntity.r(); // force refresh (?)
+				}
+				event.setCancelled(true);		
+			}
+			
+		}
+    }
 
     
 //    private void handleDeath(Player player, Warzone playerWarzone, Team playerTeam) {
