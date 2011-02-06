@@ -3,11 +3,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import net.minecraft.server.Entity;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -358,13 +361,13 @@ public class Warzone {
 
 	public void respawnPlayer(Team team, Player player) {
 		handleRespawn(team, player);
-		player.teleportTo(team.getTeamSpawn());
+		
 	}
 	
 	public void respawnPlayer(PlayerMoveEvent event, Team team, Player player) {
 		event.setFrom(team.getTeamSpawn());
 		handleRespawn(team, player);
-		player.teleportTo(team.getTeamSpawn());
+		
 		event.setCancelled(true);
 	}
 	
@@ -400,7 +403,25 @@ public class Warzone {
 				playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
 			}
 		}
+		
+		// Fill hp
 		player.setHealth(20);
+
+		// Teleport the player back to spawn
+		Location playerLoc = player.getLocation();
+		int x = playerLoc.getBlockX();
+		int y = playerLoc.getBlockY();
+		int z = playerLoc.getBlockZ();
+		Block playerBlock = world.getBlockAt(x, y, z).getFace(BlockFace.UP);
+		Material playerBlockType = playerBlock.getType();
+		if(playerBlockType.getId() == Material.WATER.getId()
+				|| playerBlockType.getId() == Material.STATIONARY_WATER.getId()) {
+			// If in water, make arbitrary adjustments to fix drowning deaths causing "Player moved wrongly!" error
+			player.teleportTo(new Location(playerLoc.getWorld(),
+					team.getTeamSpawn().getX(), team.getTeamSpawn().getY() + 3, team.getTeamSpawn().getZ()));
+		} else {
+			player.teleportTo(team.getTeamSpawn());
+		}
 	}
 
 	public boolean isMonumentCenterBlock(Block block) {
