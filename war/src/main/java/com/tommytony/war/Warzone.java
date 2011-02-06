@@ -33,7 +33,7 @@ public class Warzone {
 	private Location teleport;
 	private boolean friendlyFire;
 	private int lifePool;
-	private HashMap<Integer, ItemStack> loadout; 
+	private HashMap<Integer, ItemStack> loadout = new HashMap<Integer, ItemStack>(); 
 	private boolean drawZoneOutline;
 	private int teamCap = 5;
 	private int scoreCap = 5;
@@ -386,7 +386,7 @@ public class Warzone {
 			} else if(slot == 103) {
 				playerInv.setHelmet(loadout.get(slot));
 			} else { 
-				playerInv.setItem(slot, loadout.get(slot));
+				playerInv.addItem(loadout.get(slot));
 			}
 		}
 		if(isBlockHeads()) {
@@ -444,8 +444,12 @@ public class Warzone {
 		return this.friendlyFire;
 	}
 
-	public void setLoadout(HashMap<Integer, ItemStack> loadout) {
-		this.loadout = loadout;
+	public void setLoadout(HashMap<Integer, ItemStack> newLoadout) {
+		this.loadout.clear();
+		for(Integer slot : newLoadout.keySet()) {
+			ItemStack stack = newLoadout.get(slot);
+			this.loadout.put(slot, stack);
+		}
 	}
 
 	public HashMap<Integer, ItemStack> getLoadout() {
