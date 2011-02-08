@@ -1,7 +1,7 @@
 name: War
-version: 0.8 (Yamamoto)
+version: 0.9 (Simonds)
 description: Lets you create TDM and CTF (warzones) for a more structured PVP experience.
-author: tommytony   
+author: tommytony
 website: war.tommytony.com
 main: bukkit.tommytony.war.War
 commands:

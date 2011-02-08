@@ -38,7 +38,6 @@ public class WarPlayerListener extends PlayerListener {
 	
 	public void onPlayerJoin(PlayerEvent event) {
 		Player player = event.getPlayer();
-		player.sendMessage(war.str("War is on! Pick your battle (try /warhub, /zones and /zone)."));
 		// Disconnected
 		if(disconnected.containsKey(player.getName())) {
 			// restore the disconnected player's inventory
