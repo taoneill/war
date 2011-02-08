@@ -48,28 +48,28 @@ public class WarBlockListener extends BlockListener {
 					
 					return; // important otherwise cancelled down a few line by isImportantblock
 				} else {
-					player.sendMessage(war.str("You can't capture a monument without a block of your team's material. Get one from your team spawn."));
+					player.sendMessage(war.bad("You can't capture a monument without a block of your team's material. Get one from your team spawn."));
 					event.setCancelled(true);
 					return;
 				}
 			}
 			
 			if(zone != null && zone.isImportantBlock(block)){
-				player.sendMessage(war.str("Can't build here."));
+				player.sendMessage(war.bad("Can't build here."));
 				event.setCancelled(true);
 				return;
 			}
 			// protect warzone lobbies
 	    	for(Warzone wz: war.getWarzones()) {
 	    		if(wz.getLobby() != null && wz.getLobby().getVolume().contains(block)) {
-	    			player.sendMessage(war.str("Can't build here."));
+	    			player.sendMessage(war.bad("Can't build here."));
 		    		event.setCancelled(true);
 		    		return;
 	    		}
 	    	}
 	    	// protect the hub
 	    	if(war.getWarHub() != null && war.getWarHub().getVolume().contains(block)) {
-	    		player.sendMessage(war.str("Can't build here."));
+	    		player.sendMessage(war.bad("Can't build here."));
 	    		event.setCancelled(true);
 	    		return;
 	    	}
@@ -86,7 +86,7 @@ public class WarBlockListener extends BlockListener {
 	    	
 	    	if(warzone != null && war.getPlayerTeam(player.getName()) == null && !isZoneMaker) {
 	    		// can't actually destroy blocks in a warzone if not part of a team
-	    		player.sendMessage(war.str("Can't destroy part of a warzone if you're not in a team."));
+	    		player.sendMessage(war.bad("Can't destroy part of a warzone if you're not in a team."));
 	    		event.setCancelled(true);
 	    		return;
 	    	} else if(team != null && block != null && warzone != null 
@@ -104,7 +104,7 @@ public class WarBlockListener extends BlockListener {
 			}else if(warzone != null && warzone.isImportantBlock(block)) {
 	    		if(team != null && team.getSpawnVolume().contains(block)) {
 	    			if(player.getInventory().contains(team.getMaterial())) {
-	    				player.sendMessage(war.str("You already have a " + team.getName() + " block."));
+	    				player.sendMessage(war.bad("You already have a " + team.getName() + " block."));
 	    				event.setCancelled(true);
 	    				return;
 	    			}
@@ -112,7 +112,7 @@ public class WarBlockListener extends BlockListener {
 	    		} else if (team != null && warzone.isEnemyTeamFlagBlock(team, block)) {
 	    			if(warzone.isFlagThief(player.getName())) {
 	    				// detect audacious thieves
-	    				player.sendMessage(war.str("You can only steal one flag at a time!"));
+	    				player.sendMessage(war.bad("You can only steal one flag at a time!"));
 	    			} else {
 		    			// player just broke the flag block of other team: cancel to avoid drop, give player the block, set block to air
 		    			Team lostFlagTeam = warzone.getTeamForFlagBlock(block);
@@ -132,7 +132,7 @@ public class WarBlockListener extends BlockListener {
 	    			event.setCancelled(true);
 	    			return;
 	    		} else if (!warzone.isMonumentCenterBlock(block)){
-		    		player.sendMessage(war.str("Can't destroy this."));
+		    		player.sendMessage(war.bad("Can't destroy this."));
 		    		event.setCancelled(true);
 		    		return;
 	    		}
@@ -142,7 +142,7 @@ public class WarBlockListener extends BlockListener {
 	    	if(block != null) {
 		    	for(Warzone zone: war.getWarzones()) {
 		    		if(zone.getLobby().getVolume().contains(block)) {
-		    			player.sendMessage(war.str("Can't destroy this."));
+		    			player.sendMessage(war.bad("Can't destroy this."));
 			    		event.setCancelled(true);
 			    		return;
 		    		}
@@ -151,7 +151,7 @@ public class WarBlockListener extends BlockListener {
 	    	
 	    	// protect the hub
 	    	if(war.getWarHub() != null && war.getWarHub().getVolume().contains(block)) {
-	    		player.sendMessage(war.str("Can't destroy this."));
+	    		player.sendMessage(war.bad("Can't destroy this."));
 	    		event.setCancelled(true);
 	    		return;
 	    	}
