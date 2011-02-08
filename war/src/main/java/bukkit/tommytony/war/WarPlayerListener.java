@@ -142,7 +142,7 @@ public class WarPlayerListener extends PlayerListener {
 						event.setFrom(zone.getTeleport());
 						player.teleportTo(zone.getTeleport());
 						event.setCancelled(true);
-						player.sendMessage("All teams are full.");
+						player.sendMessage(war.bad("All teams are full."));
 					}
 					return;
 				} 
@@ -170,7 +170,7 @@ public class WarPlayerListener extends PlayerListener {
 						event.setFrom(zone.getTeleport());
 						player.teleportTo(zone.getTeleport());
 						event.setCancelled(true);
-						player.sendMessage("Team diamond is full.");
+						player.sendMessage(war.bad("Team diamond is full."));
 					}
 					return;
 				}
@@ -198,7 +198,7 @@ public class WarPlayerListener extends PlayerListener {
 						event.setFrom(zone.getTeleport());
 						player.teleportTo(zone.getTeleport());
 						event.setCancelled(true);
-						player.sendMessage("Team iron is full.");
+						player.sendMessage(war.bad("Team iron is full."));
 					}
 					return;
 				}
@@ -226,7 +226,7 @@ public class WarPlayerListener extends PlayerListener {
 						event.setFrom(zone.getTeleport());
 						player.teleportTo(zone.getTeleport());
 						event.setCancelled(true);
-						player.sendMessage("Team gold is full.");
+						player.sendMessage(war.bad("Team gold is full."));
 					}
 					return;
 				} 
@@ -245,7 +245,7 @@ public class WarPlayerListener extends PlayerListener {
 				event.setFrom(zone.getTeleport());
 				player.teleportTo(zone.getTeleport());
 				event.setCancelled(true);
-				player.sendMessage(war.str("You don't have permission to play War. Ask a mod for the 'war.player' permission, please."));
+				player.sendMessage(war.bad("You don't have permission to play War. Ask a mod for the 'war.player' permission, please."));
 				return;
 			}
 			
@@ -310,7 +310,7 @@ public class WarPlayerListener extends PlayerListener {
 					&& (team.getSpawnVolume().contains(player.getLocation())
 							|| (team.getFlagVolume() != null && team.getFlagVolume().contains(player.getLocation())))) {
 				if(playerWarzone.isTeamFlagStolen(team)) {
-					player.sendMessage(war.str("You can't capture the enemy flag until your team flag is returned."));
+					player.sendMessage(war.bad("You can't capture the enemy flag until your team flag is returned."));
 				} else {
 					synchronized(playerWarzone) {
 						// flags can be captured at own spawn or own flag pole

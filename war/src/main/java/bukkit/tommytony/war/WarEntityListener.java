@@ -113,11 +113,11 @@ public class WarEntityListener extends EntityListener {
 //					//}
 //				}
 				if(defenderTeam.getSpawnVolume().contains(d.getLocation())) {	// attacking person in spawn
-					a.sendMessage(war.str("Can't attack a player that's inside his team's spawn."));
+					a.sendMessage(war.bad("Can't attack a player that's inside his team's spawn."));
 					event.setCancelled(true);
 				} else if(attackerTeam.getSpawnVolume().contains(a.getLocation()) && !attackerTeam.getSpawnVolume().contains(d.getLocation())) {
 					// only let a player inside spawn attack an enemy player if that player enters the spawn
-					a.sendMessage(war.str("Can't attack a player from inside your spawn."));
+					a.sendMessage(war.bad("Can't attack a player from inside your spawn."));
 					event.setCancelled(true);
 				}
 				//}
@@ -127,29 +127,28 @@ public class WarEntityListener extends EntityListener {
 					&& attacker.getEntityId() != defender.getEntityId()) {
 				// same team, but not same person
 				if(attackerWarzone.getFriendlyFire()) {
-					a.sendMessage(war.str("Friendly fire is on! Please, don't hurt your teammates.")); // if ff is on, let the attack go through
+					a.sendMessage(war.bad("Friendly fire is on! Please, don't hurt your teammates.")); // if ff is on, let the attack go through
 				} else {
-					a.sendMessage(war.str("Your attack missed!"));
-					a.sendMessage(war.str("Your target is on your team."));
+					a.sendMessage(war.bad("Your attack missed! Your target is on your team."));
 					event.setCancelled(true);	// ff is off
 				}
 			} else if (attackerTeam == null && defenderTeam == null && !war.isPvpInZonesOnly()){
 				// let normal PVP through is its not turned off
 			} else if (attackerTeam == null && defenderTeam == null && war.isPvpInZonesOnly()) {
-				a.sendMessage(war.str("Your attack missed! Global PVP is turned off. You can only attack other players in warzones. Try /warhub, /zones and /zone."));
+				a.sendMessage(war.bad("Your attack missed! Global PVP is turned off. You can only attack other players in warzones. Try /warhub, /zones and /zone."));
 				event.setCancelled(true);	// global pvp is off
 			} else {
-				a.sendMessage(war.str("Your attack missed!"));
+				a.sendMessage(war.bad("Your attack missed!"));
 				if(attackerTeam == null) {
-					a.sendMessage(war.str(" You must join a team " +
+					a.sendMessage(war.bad(" You must join a team " +
 						", then you'll be able to damage people " +
 						"in the other teams in that warzone."));
 				} else if (defenderTeam == null) {
-					a.sendMessage(war.str("Your target is not in a team."));
+					a.sendMessage(war.bad("Your target is not in a team."));
 				} else if (attackerTeam == defenderTeam) {
-					a.sendMessage(war.str("Your target is on your team."));
+					a.sendMessage(war.bad("Your target is on your team."));
 				} else if (attackerWarzone != defenderWarzone) {
-					a.sendMessage(war.str("Your target is playing in another warzone."));
+					a.sendMessage(war.bad("Your target is playing in another warzone."));
 				}
 				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 			}
@@ -197,6 +196,7 @@ public class WarEntityListener extends EntityListener {
 				int remaining = playerTeam.getRemainingLifes();
 				if(remaining == 0) { // your death caused your team to lose
 					List<Team> teams = playerWarzone.getTeams();
+					String scorers = "";
 					for(Team t : teams) {
 						t.teamcast(war.str("The battle is over. Team " + playerTeam.getName() + " lost: " 
 								+ player.getName() + " died and there were no lives left in their life pool." ));
@@ -205,6 +205,12 @@ public class WarEntityListener extends EntityListener {
 							// all other teams get a point
 							t.addPoint();
 							t.resetSign();
+							scorers += "Team " + t.getName() + " scores one point. ";
+						}
+					}
+					if(!scorers.equals("")){
+						for(Team t : teams) {
+							t.teamcast(war.str(scorers));
 						}
 					}
 					// detect score cap
@@ -229,7 +235,7 @@ public class WarEntityListener extends EntityListener {
 					} else {
 						// A new battle starts. Reset the zone but not the teams.
 						for(Team t : teams) {
-							t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
+							t.teamcast(war.str("A new battle begins. Warzone reset."));
 						}
 						playerWarzone.getVolume().resetBlocks();
 						playerWarzone.initializeZone();
@@ -248,6 +254,11 @@ public class WarEntityListener extends EntityListener {
 						}
 					}
 					playerTeam.setRemainingLives(remaining - 1);
+					if(remaining - 1 == 0) {
+						for(Team t : playerWarzone.getTeams()) {
+							t.teamcast(war.str("Team " + t.getName() + "'s life pool is empty. One more death and they lose the battle!"));
+						}
+					}
 				}
 			//}
 		//}
