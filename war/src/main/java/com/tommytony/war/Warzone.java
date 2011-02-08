@@ -514,16 +514,16 @@ public class Warzone {
 					playerInv.addItem(item);
 				}
 			}
-			if(originalContents.getHelmet() != null) {
+			if(originalContents.getHelmet() != null && originalContents.getHelmet().getType() != Material.AIR) {
 				playerInv.setHelmet(originalContents.getHelmet());
 			}
-			if(originalContents.getChest() != null) {
+			if(originalContents.getChest() != null && originalContents.getChest().getType() != Material.AIR) {
 				playerInv.setChestplate(originalContents.getChest());
 			}
-			if(originalContents.getLegs() != null) {
+			if(originalContents.getLegs() != null && originalContents.getLegs().getType() != Material.AIR) {
 				playerInv.setLeggings(originalContents.getLegs());
 			}
-			if(originalContents.getFeet() != null) {
+			if(originalContents.getFeet() != null && originalContents.getFeet().getType() != Material.AIR) {
 				playerInv.setBoots(originalContents.getFeet());
 			}
 		}

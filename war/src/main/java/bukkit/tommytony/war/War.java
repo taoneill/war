@@ -120,7 +120,7 @@ public class War extends JavaPlugin {
 		this.defaultLifepool = 7;
 		this.defaultFriendlyFire = false;
 		this.defaultAutoAssignOnly = false;
-		WarMapper.load(this, this.getServer().getWorlds()[0]);
+		WarMapper.load(this);
 		this.info("Done. War v"+ desc.getVersion() + " is on.");
 	}
 	

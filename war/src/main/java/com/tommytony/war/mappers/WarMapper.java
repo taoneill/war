@@ -20,7 +20,7 @@ import com.tommytony.war.volumes.Volume;
  */
 public class WarMapper {
 	
-	public static void load(War war, World world) {
+	public static void load(War war) {
 		//war.getLogger().info("Loading war config...");
 		(war.getDataFolder()).mkdir();
 		(new File(war.getDataFolder().getPath() + "/dat")).mkdir();
@@ -116,11 +116,18 @@ public class WarMapper {
 		// warhub
 		String hubStr = warConfig.getString("warhub");
 		if(hubStr != null && !hubStr.equals("")) {
-			String[] nwStrSplit = hubStr.split(",");
+			String[] hubStrSplit = hubStr.split(",");
 			
-			int hubX = Integer.parseInt(nwStrSplit[0]);
-			int hubY = Integer.parseInt(nwStrSplit[1]);
-			int hubZ = Integer.parseInt(nwStrSplit[2]);
+			int hubX = Integer.parseInt(hubStrSplit[0]);
+			int hubY = Integer.parseInt(hubStrSplit[1]);
+			int hubZ = Integer.parseInt(hubStrSplit[2]);
+			World world = null;
+			if(hubStrSplit.length > 3) {
+				String worldName = hubStrSplit[3];
+				world = war.getServer().getWorld(worldName);
+			} else {
+				world = war.getServer().getWorlds().get(0);		// default to first world
+			}
 			Location hubLocation = new Location(world, hubX, hubY, hubZ);
 			WarHub hub = new WarHub(war, hubLocation);
 			war.setWarHub(hub);
@@ -200,7 +207,8 @@ public class WarMapper {
 		String hubStr = "";
 		WarHub hub = war.getWarHub();
 		if(hub != null) {
-			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ();
+			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + "," 
+						+ hub.getLocation().getWorld().getName();
 			VolumeMapper.save(hub.getVolume(), "", war);
 		}
 		warConfig.setString("warhub", hubStr);

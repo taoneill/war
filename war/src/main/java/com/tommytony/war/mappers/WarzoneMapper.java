@@ -37,8 +37,16 @@ public class WarzoneMapper {
 			e.printStackTrace();
 		}
 		
-		World[] worlds = war.getServer().getWorlds();
-		World world = worlds[0];
+		// world
+		String worldStr = warzoneConfig.getProperty("world");
+		World world = null;
+		if(worldStr == null || worldStr.equals("")){
+			world = war.getServer().getWorlds().get(0); // default to first world
+		} else {
+			world = war.getServer().getWorld(worldStr);
+		}
+		
+		// Create the zone	
 		Warzone warzone = new Warzone(war, world, name);
 		
 		// Create file if needed 
@@ -52,10 +60,6 @@ public class WarzoneMapper {
 				e.printStackTrace();
 			}
 		}
-		
-		// world
-		//String worldStr = warzoneConfig.getProperty("world");
-		warzone.setWorld(world);	// default world for now
 				
 		// northwest
 		String nwStr = warzoneConfig.getString("northWest");
@@ -247,7 +251,7 @@ public class WarzoneMapper {
 		warzoneConfig.setString("name", warzone.getName());
 		
 		// world
-		warzoneConfig.setString("world", "world");	// default for now
+		warzoneConfig.setString("world", warzone.getWorld().getName());	// default for now
 		
 		// northwest
 		String nwStr = "";
