@@ -133,7 +133,12 @@ public class WarzoneMapper {
 						int teamFlagX = Integer.parseInt(teamFlagStrSplit[1]);
 						int teamFlagY = Integer.parseInt(teamFlagStrSplit[2]);
 						int teamFlagZ = Integer.parseInt(teamFlagStrSplit[3]);
-						team.setTeamFlag(new Location(world, teamFlagX, teamFlagY, teamFlagZ));	// this may screw things up
+						Location teamFlagLocation = new Location(world, teamFlagX, teamFlagY, teamFlagZ);
+						if(teamFlagStrSplit.length > 4) {
+							int yaw = Integer.parseInt(teamFlagStrSplit[4]);
+							teamFlagLocation.setYaw(yaw);
+						}
+						team.setTeamFlag(teamFlagLocation);	// this may screw things up
 					}
 				}
 			}
@@ -303,7 +308,13 @@ public class WarzoneMapper {
 		for(Team team : teams) {
 			if(team.getFlagVolume() != null) {
 				Location flag = team.getTeamFlag();
-				teamFlagsStr += team.getName() + "," + flag.getBlockX() + "," + flag.getBlockY() + "," + flag.getBlockZ() + ";";
+				int intYaw = 0;
+				if(flag.getYaw() >= 0){
+					intYaw = (int)(flag.getYaw() % 360);
+				} else {
+					intYaw = (int)(360 + (flag.getYaw() % 360));
+				}
+				teamFlagsStr += team.getName() + "," + flag.getBlockX() + "," + flag.getBlockY() + "," + flag.getBlockZ() + "," + intYaw + ";";
 			}
 		}
 		warzoneConfig.setString("teamFlags", teamFlagsStr);

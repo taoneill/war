@@ -416,14 +416,45 @@ public class Team {
 		warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.OBSIDIAN);
 		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.OBSIDIAN);
 		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.OBSIDIAN);
-			
-		// flag post
-		warzone.getWorld().getBlockAt(x, y, z-1).setType(Material.FENCE);
-		warzone.getWorld().getBlockAt(x, y+1, z-1).setType(Material.FENCE);
-		warzone.getWorld().getBlockAt(x, y+2, z-1).setType(Material.FENCE);
-		warzone.getWorld().getBlockAt(x, y+2, z).setType(Material.FENCE);
-		warzone.getWorld().getBlockAt(x, y+1, z).setType(material);
 		
+		// flag
+		warzone.getWorld().getBlockAt(x, y+1, z).setType(material);
+		warzone.getWorld().getBlockAt(x, y+2, z).setType(Material.FENCE);
+		
+		// Flag post using Orientation
+		int yaw = 0;
+		if(teamFlag.getYaw() >= 0){
+			yaw = (int)(teamFlag.getYaw() % 360);
+		} else {
+			yaw = (int)(360 + (teamFlag.getYaw() % 360));
+		}
+		BlockFace facing = null;
+		BlockFace opposite = null;
+		if((yaw >= 0 && yaw < 45) || (yaw >= 315 && yaw <= 360)) {
+			facing = BlockFace.WEST;
+			opposite = BlockFace.EAST;
+			warzone.getWorld().getBlockAt(x, y, z-1).setType(Material.FENCE);
+			warzone.getWorld().getBlockAt(x, y+1, z-1).setType(Material.FENCE);
+			warzone.getWorld().getBlockAt(x, y+2, z-1).setType(Material.FENCE);
+		} else if(yaw >= 45 && yaw < 135) {
+			facing = BlockFace.NORTH;
+			opposite = BlockFace.SOUTH;
+			warzone.getWorld().getBlockAt(x+1, y, z).setType(Material.FENCE);
+			warzone.getWorld().getBlockAt(x+1, y+1, z).setType(Material.FENCE);
+			warzone.getWorld().getBlockAt(x+1, y+2, z).setType(Material.FENCE);
+		} else if(yaw >= 135 && yaw < 225) {
+			facing = BlockFace.EAST;
+			opposite = BlockFace.WEST;
+			warzone.getWorld().getBlockAt(x, y, z+1).setType(Material.FENCE);
+			warzone.getWorld().getBlockAt(x, y+1, z+1).setType(Material.FENCE);
+			warzone.getWorld().getBlockAt(x, y+2, z+1).setType(Material.FENCE);
+		} else if(yaw >= 225 && yaw < 315) {
+			facing = BlockFace.SOUTH;
+			opposite = BlockFace.NORTH;
+			warzone.getWorld().getBlockAt(x-1, y, z).setType(Material.FENCE);
+			warzone.getWorld().getBlockAt(x-1, y+1, z).setType(Material.FENCE);
+			warzone.getWorld().getBlockAt(x-1, y+2, z).setType(Material.FENCE);
+		}
 	}
 	
 	public void setTeamFlag(Location teamFlag) {

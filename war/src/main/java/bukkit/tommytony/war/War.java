@@ -447,7 +447,7 @@ public class War extends JavaPlugin {
 				team.setTeamFlag(player.getLocation());
 				Location playerLoc = player.getLocation();
 				player.teleportTo(new Location(playerLoc.getWorld(), 
-						playerLoc.getBlockX()+1, playerLoc.getBlockY() + 1, playerLoc.getBlockZ()));
+						playerLoc.getBlockX(), playerLoc.getBlockY() + 1, playerLoc.getBlockZ()));
 				player.sendMessage(this.str("Team " + name + " flag moved."));
 				WarzoneMapper.save(this, warzone, false);
 			}
@@ -1038,7 +1038,7 @@ public class War extends JavaPlugin {
 			for(String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if(pairSplit.length == 2) {
-					namedParams.put(pairSplit[0], pairSplit[1]);
+					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
 				}
 			}
 			if(namedParams.containsKey("lifepool")){
@@ -1147,7 +1147,8 @@ public class War extends JavaPlugin {
 	}
 	
 	private String colorTeams(String str, ChatColor msgColor) {
-		String out = str.replaceAll("iron", TeamChatColors.TEAMIRON + "iron" + msgColor);
+		String out = str.replaceAll(" ", msgColor + " ");
+		out = out.replaceAll("iron", TeamChatColors.TEAMIRON + "iron" + msgColor);
 		out = out.replaceAll("Iron", TeamChatColors.TEAMIRON + "Iron" + msgColor);
 		out = out.replaceAll("gold", TeamChatColors.TEAMGOLD + "gold" + msgColor);
 		out = out.replaceAll("Gold", TeamChatColors.TEAMGOLD + "Gold" + msgColor);
