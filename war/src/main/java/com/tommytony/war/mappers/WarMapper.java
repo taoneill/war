@@ -29,7 +29,7 @@ public class WarMapper {
 		try {
 			warConfig.load();
 		} catch (IOException e) {
-			war.warn("Failed to load war.txt file.");
+			war.logWarn("Failed to load war.txt file.");
 			e.printStackTrace();
 		}
 		
@@ -38,11 +38,11 @@ public class WarMapper {
 		if(!warConfig.containsKey("warzones")) {
 			newWar = true;
 			WarMapper.save(war);
-			war.info("war.txt settings file created.");
+			war.logInfo("war.txt settings file created.");
 			try {
 				warConfig.load();
 			} catch (IOException e) {
-				war.warn("Failed to reload war.txt file after creating it.");
+				war.logWarn("Failed to reload war.txt file after creating it.");
 				e.printStackTrace();
 			}
 		}
@@ -53,7 +53,7 @@ public class WarMapper {
 		war.getWarzones().clear();
 		for(String warzoneName : warzoneSplit) {
 			if(warzoneName != null && !warzoneName.equals("")){
-				war.info("Restoring zone " + warzoneName + "...");
+				war.logInfo("Restoring zone " + warzoneName + "...");
 				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWar);		// cascade load, only load blocks if warzone exists
 				war.getWarzones().add(zone);
 				zone.getVolume().resetBlocks();

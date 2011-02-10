@@ -117,11 +117,11 @@ public class WarEntityListener extends EntityListener {
 //					//}
 //				}
 				if(defenderTeam.getSpawnVolume().contains(d.getLocation())) {	// attacking person in spawn
-					a.sendMessage(war.bad("Can't attack a player that's inside his team's spawn."));
+					war.badMsg(a, "Can't attack a player that's inside his team's spawn.");
 					event.setCancelled(true);
 				} else if(attackerTeam.getSpawnVolume().contains(a.getLocation()) && !attackerTeam.getSpawnVolume().contains(d.getLocation())) {
 					// only let a player inside spawn attack an enemy player if that player enters the spawn
-					a.sendMessage(war.bad("Can't attack a player from inside your spawn."));
+					war.badMsg(a, "Can't attack a player from inside your spawn.");
 					event.setCancelled(true);
 				}
 				//}
@@ -131,28 +131,28 @@ public class WarEntityListener extends EntityListener {
 					&& attacker.getEntityId() != defender.getEntityId()) {
 				// same team, but not same person
 				if(attackerWarzone.getFriendlyFire()) {
-					a.sendMessage(war.bad("Friendly fire is on! Please, don't hurt your teammates.")); // if ff is on, let the attack go through
+					war.badMsg(a, "Friendly fire is on! Please, don't hurt your teammates."); // if ff is on, let the attack go through
 				} else {
-					a.sendMessage(war.bad("Your attack missed! Your target is on your team."));
+					war.badMsg(a, "Your attack missed! Your target is on your team.");
 					event.setCancelled(true);	// ff is off
 				}
 			} else if (attackerTeam == null && defenderTeam == null && !war.isPvpInZonesOnly()){
 				// let normal PVP through is its not turned off
 			} else if (attackerTeam == null && defenderTeam == null && war.isPvpInZonesOnly()) {
-				a.sendMessage(war.bad("Your attack missed! Global PVP is turned off. You can only attack other players in warzones. Try /warhub, /zones and /zone."));
+				war.badMsg(a, "Your attack missed! Global PVP is turned off. You can only attack other players in warzones. Try /warhub, /zones and /zone.");
 				event.setCancelled(true);	// global pvp is off
 			} else {
-				a.sendMessage(war.bad("Your attack missed!"));
+				war.badMsg(a, "Your attack missed!");
 				if(attackerTeam == null) {
-					a.sendMessage(war.bad(" You must join a team " +
+					war.badMsg(a, "You must join a team " +
 						", then you'll be able to damage people " +
-						"in the other teams in that warzone."));
+						"in the other teams in that warzone.");
 				} else if (defenderTeam == null) {
-					a.sendMessage(war.bad("Your target is not in a team."));
+					war.badMsg(a, "Your target is not in a team.");
 				} else if (attackerTeam == defenderTeam) {
-					a.sendMessage(war.bad("Your target is on your team."));
+					war.badMsg(a, "Your target is on your team.");
 				} else if (attackerWarzone != defenderWarzone) {
-					a.sendMessage(war.bad("Your target is playing in another warzone."));
+					war.badMsg(a, "Your target is playing in another warzone.");
 				}
 				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 			}
@@ -173,17 +173,17 @@ public class WarEntityListener extends EntityListener {
 		for(Block block : explodedBlocks) {
 			if(war.getWarHub() != null && war.getWarHub().getVolume().contains(block)) {
 				event.setCancelled(true);
-				war.info("Explosion prevented at warhub.");
+				war.logInfo("Explosion prevented at warhub.");
 				return;
 			}
 			for(Warzone zone : war.getWarzones()) {
 				if(zone.isImportantBlock(block)) {
 					event.setCancelled(true);
-					war.info("Explosion prevented in zone " + zone.getName() + ".");
+					war.logInfo("Explosion prevented in zone " + zone.getName() + ".");
 					return;
 				} else if (zone.getLobby() != null && zone.getLobby().getVolume().contains(block)) {
 					event.setCancelled(true);
-					war.info("Explosion prevented at zone " + zone.getName() + " lobby.");
+					war.logInfo("Explosion prevented at zone " + zone.getName() + " lobby.");
 					return;
 				}
 			}
@@ -192,7 +192,7 @@ public class WarEntityListener extends EntityListener {
 	
 	private void handleDeath(Player player, Warzone playerWarzone, Team playerTeam) {
     	// teleport to team spawn upon death
-		player.sendMessage(war.str("You died."));
+		war.msg(player, "You died.");
 		boolean newBattle = false;
 		boolean scoreCapReached = false;
 		//synchronized(playerWarzone) {
@@ -202,8 +202,8 @@ public class WarEntityListener extends EntityListener {
 					List<Team> teams = playerWarzone.getTeams();
 					String scorers = "";
 					for(Team t : teams) {
-						t.teamcast(war.str("The battle is over. Team " + playerTeam.getName() + " lost: " 
-								+ player.getName() + " died and there were no lives left in their life pool." ));
+						t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " 
+								+ player.getName() + " died and there were no lives left in their life pool.");
 						
 						if(!t.getName().equals(playerTeam.getName())) {
 							// all other teams get a point
@@ -214,7 +214,7 @@ public class WarEntityListener extends EntityListener {
 					}
 					if(!scorers.equals("")){
 						for(Team t : teams) {
-							t.teamcast(war.str(scorers));
+							t.teamcast(scorers);
 						}
 					}
 					// detect score cap
@@ -239,7 +239,7 @@ public class WarEntityListener extends EntityListener {
 					} else {
 						// A new battle starts. Reset the zone but not the teams.
 						for(Team t : teams) {
-							t.teamcast(war.str("A new battle begins. Warzone reset."));
+							t.teamcast("A new battle begins. Warzone reset.");
 						}
 						playerWarzone.getVolume().resetBlocks();
 						playerWarzone.initializeZone();
@@ -254,13 +254,13 @@ public class WarEntityListener extends EntityListener {
 						victim.initializeTeamFlag();
 						playerWarzone.removeThief(player.getName());
 						for(Team t : playerWarzone.getTeams()) {
-							t.teamcast(war.str(player.getName() + " died and dropped team " + victim.getName() + "'s flag."));
+							t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
 						}
 					}
 					playerTeam.setRemainingLives(remaining - 1);
 					if(remaining - 1 == 0) {
 						for(Team t : playerWarzone.getTeams()) {
-							t.teamcast(war.str("Team " + t.getName() + "'s life pool is empty. One more death and they lose the battle!"));
+							t.teamcast("Team " + t.getName() + "'s life pool is empty. One more death and they lose the battle!");
 						}
 					}
 				}

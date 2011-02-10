@@ -455,17 +455,17 @@ public class WarzoneMapper {
 		for(File file : files) {
 			boolean deletedData = file.delete();
 			if(!deletedData) {
-				war.warn("Failed to delete file " + file.getName());
+				war.logWarn("Failed to delete file " + file.getName());
 			}
 		}
 		boolean deletedData = zoneFolder.delete();
 		if(!deletedData) {
-			war.warn("Failed to delete folder " + zoneFolder.getName());
+			war.logWarn("Failed to delete folder " + zoneFolder.getName());
 		}
 		File zoneFile = new File(war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		deletedData = zoneFile.delete();
 		if(!deletedData) {
-			war.warn("Failed to delete file " + zoneFile.getName());
+			war.logWarn("Failed to delete file " + zoneFile.getName());
 		}
 	}
 
