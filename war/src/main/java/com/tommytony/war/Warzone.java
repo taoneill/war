@@ -947,11 +947,13 @@ public class Warzone {
 		for(Team t : this.getTeams()) {
 			t.teamcast(winnersStr);
 			for(Player tp : t.getPlayers()) {
+				
 				if(!tp.getName().equals(player.getName())) {
+					tp.teleportTo(this.getTeleport());
+					// don't reset inv of dead guy who caused this, he's gonna die becasue this takes too long so we'll restore inv at PLAYER_MOVE 
 					if(this.hasPlayerInventory(tp.getName())){
 						this.restorePlayerInventory(tp);
 					}
-					tp.teleportTo(this.getTeleport());
 				}
 				if(winnersStr.contains(t.getName())) {
 					// give reward

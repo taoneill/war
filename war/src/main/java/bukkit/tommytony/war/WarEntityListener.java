@@ -235,6 +235,10 @@ public class WarEntityListener extends EntityListener {
 						
 						playerWarzone.handleScoreCapReached(player, winnersStr);
 						player.teleportTo(playerWarzone.getTeleport());
+						// player will die because it took too long :(
+						// we dont restore his inventory in handleScoreCapReached
+						// check out PLAYER_MOVE for the rest of the fix
+						
 						scoreCapReached = true;
 					} else {
 						// A new battle starts. Reset the zone but not the teams.
@@ -260,7 +264,7 @@ public class WarEntityListener extends EntityListener {
 					playerTeam.setRemainingLives(remaining - 1);
 					if(remaining - 1 == 0) {
 						for(Team t : playerWarzone.getTeams()) {
-							t.teamcast("Team " + t.getName() + "'s life pool is empty. One more death and they lose the battle!");
+							t.teamcast("Team " + playerTeam.getName() + "'s life pool is empty. One more death and they lose the battle!");
 						}
 					}
 				}
@@ -271,8 +275,6 @@ public class WarEntityListener extends EntityListener {
 				playerTeam.resetSign();
 				playerWarzone.respawnPlayer(playerTeam, player);
 			} 
-//			else if (scoreCapReached) {
-//				
 //				war.info(player.getName() + " died and enemy team reached score cap");
 //			} else if (newBattle){
 //				war.info(player.getName() + " died and battle ended in team " + playerTeam.getName() + "'s disfavor");

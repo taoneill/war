@@ -341,6 +341,7 @@ public class WarPlayerListener extends PlayerListener {
 						playerWarzone.removeThief(player.getName());
 					}
 				}
+				return;
 			}
 		} else if (locZone != null && locZone.getLobby() != null 
 				&&  !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker) { 
@@ -349,7 +350,18 @@ public class WarPlayerListener extends PlayerListener {
 			event.setFrom(zone.getTeleport());
 			player.teleportTo(zone.getTeleport());
 			event.setCancelled(true);
-			//war.str("You can't be inside a warzone without a team."));
+			war.badMsg(player, "You can't be inside a warzone without a team.");
+			return;
+		}
+		
+		// The guy whose death caused the game to end
+		// He dies for real (no quick respawn) becasue his ENTITY_DEATH takes too long (everyones warping)
+		if(locZone == null && locLobby == null) {
+			for(Warzone zone : war.getWarzones()) {
+				if(zone.hasPlayerInventory(player.getName())) {
+					zone.restorePlayerInventory(player);
+				}
+			}
 		}
 	
     }
