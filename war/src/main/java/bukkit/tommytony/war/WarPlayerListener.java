@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
@@ -70,7 +71,7 @@ public class WarPlayerListener extends PlayerListener {
 				}
 			}
 			
-			player.sendMessage(war.str("You were disconnected. Here's your inventory from last time."));
+			war.msg(player, "You were disconnected. Here's your inventory from last time.");
 		}
     }
 	
@@ -142,7 +143,7 @@ public class WarPlayerListener extends PlayerListener {
 						event.setFrom(zone.getTeleport());
 						player.teleportTo(zone.getTeleport());
 						event.setCancelled(true);
-						player.sendMessage(war.bad("All teams are full."));
+						war.badMsg(player, "All teams are full.");
 					}
 					return;
 				} 
@@ -159,18 +160,18 @@ public class WarPlayerListener extends PlayerListener {
 							war.getWarHub().resetZoneSign(zone);
 						}
 						zone.keepPlayerInventory(player);
-						player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+						war.msg(player, "Your inventory is is storage until you /leave.");
 						zone.respawnPlayer(event, diamondTeam, player);
 						//zone.respawnPlayer(diamondTeam, player);
 						//event.setCancelled(true);
 						for(Team team : zone.getTeams()){
-							team.teamcast(war.str("" + player.getName() + " joined team diamond."));
+							team.teamcast("" + player.getName() + " joined team diamond.");
 						}
 					} else {
 						event.setFrom(zone.getTeleport());
 						player.teleportTo(zone.getTeleport());
 						event.setCancelled(true);
-						player.sendMessage(war.bad("Team diamond is full."));
+						war.badMsg(player, "Team diamond is full.");
 					}
 					return;
 				}
@@ -187,18 +188,18 @@ public class WarPlayerListener extends PlayerListener {
 							war.getWarHub().resetZoneSign(zone);
 						}
 						zone.keepPlayerInventory(player);
-						player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+						war.msg(player, "Your inventory is is storage until you /leave.");
 						zone.respawnPlayer(event, ironTeam, player);
 //										zone.respawnPlayer(ironTeam, player);
 //										event.setCancelled(true);
 						for(Team team : zone.getTeams()){
-							team.teamcast(war.str("" + player.getName() + " joined team iron."));
+							team.teamcast("" + player.getName() + " joined team iron.");
 						}
 					} else {
 						event.setFrom(zone.getTeleport());
 						player.teleportTo(zone.getTeleport());
 						event.setCancelled(true);
-						player.sendMessage(war.bad("Team iron is full."));
+						war.badMsg(player, "Team iron is full.");
 					}
 					return;
 				}
@@ -215,18 +216,18 @@ public class WarPlayerListener extends PlayerListener {
 							war.getWarHub().resetZoneSign(zone);
 						}
 						zone.keepPlayerInventory(player);
-						player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+						war.msg(player, "Your inventory is is storage until you /leave.");
 						zone.respawnPlayer(event, goldTeam, player);
 						//zone.respawnPlayer(goldTeam, player);
 						//event.setCancelled(true);
 						for(Team team : zone.getTeams()){
-							team.teamcast(war.str("" + player.getName() + " joined team gold."));
+							team.teamcast("" + player.getName() + " joined team gold.");
 						}
 					} else {
 						event.setFrom(zone.getTeleport());
 						player.teleportTo(zone.getTeleport());
 						event.setCancelled(true);
-						player.sendMessage(war.bad("Team gold is full."));
+						war.badMsg(player, "Team gold is full.");
 					}
 					return;
 				} 
@@ -237,7 +238,7 @@ public class WarPlayerListener extends PlayerListener {
 					event.setFrom(war.getWarHub().getLocation());
 					player.teleportTo(war.getWarHub().getLocation());
 					event.setCancelled(true);
-					player.sendMessage(war.str("Welcome to the War hub."));
+					war.msg(player, "Welcome to the War hub.");
 					return;
 				}
 			} else if ((isAutoAssignGate || isDiamondGate || isGoldGate || isIronGate)  &&
@@ -245,7 +246,7 @@ public class WarPlayerListener extends PlayerListener {
 				event.setFrom(zone.getTeleport());
 				player.teleportTo(zone.getTeleport());
 				event.setCancelled(true);
-				player.sendMessage(war.bad("You don't have permission to play War. Ask a mod for the 'war.player' permission, please."));
+				war.badMsg(player, "You don't have permission to play War. Ask a mod for the 'war.player' permission, please.");
 				return;
 			}
 			
@@ -260,7 +261,7 @@ public class WarPlayerListener extends PlayerListener {
 					event.setFrom(zone.getTeleport());
 							player.teleportTo(zone.getTeleport());
 					event.setCancelled(true);
-					player.sendMessage(war.str("Welcome to warzone " + zone.getName() + "."));
+					war.msg(player, "Welcome to warzone " + zone.getName() + ".");
 					return;
 				}
 		}
@@ -282,14 +283,15 @@ public class WarPlayerListener extends PlayerListener {
 			Team team = war.getPlayerTeam(player.getName());
 			
 			// Player belongs to a warzone team but is outside: he snuck out or is at spawn and died
-//			if(locZone == null && team != null) {
-//				handleDeath(event, player, playerWarzone, team);
-//				event.setFrom(team.getTeamSpawn());
-//				//playerWarzone.respawnPlayer(team, player);
-//				player.teleportTo(team.getTeamSpawn());
-//				event.setCancelled(true);
-//				return;
-//			}
+			if(locZone == null && team != null) {
+				handleDeath(event, player, playerWarzone, team);
+				war.badMsg(player, "You can't sneak out of a zone while in a team. Use /leave or walk out the lobby to exit the zone, please.");
+				event.setFrom(team.getTeamSpawn());
+				//playerWarzone.respawnPlayer(team, player);
+				player.teleportTo(team.getTeamSpawn());
+				event.setCancelled(true);
+				return;
+			}
 
 			// Monuments
 			if(team != null
@@ -301,7 +303,7 @@ public class WarPlayerListener extends PlayerListener {
 				int newHp = currentHp + 5;
 				if(newHp > 20) newHp = 20;
 				player.setHealth(newHp);
-				player.sendMessage(war.str("Your dance pleases the monument's voodoo. You gain health!"));
+				war.msg(player, "Your dance pleases the monument's voodoo. You gain health!");
 				return;
 			}
 			
@@ -310,7 +312,7 @@ public class WarPlayerListener extends PlayerListener {
 					&& (team.getSpawnVolume().contains(player.getLocation())
 							|| (team.getFlagVolume() != null && team.getFlagVolume().contains(player.getLocation())))) {
 				if(playerWarzone.isTeamFlagStolen(team)) {
-					player.sendMessage(war.bad("You can't capture the enemy flag until your team flag is returned."));
+					war.badMsg(player, "You can't capture the enemy flag until your team's flag is returned.");
 				} else {
 					synchronized(playerWarzone) {
 						// flags can be captured at own spawn or own flag pole
@@ -329,8 +331,8 @@ public class WarPlayerListener extends PlayerListener {
 							victim.getFlagVolume().resetBlocks();	// bring back flag to team that lost it
 							victim.initializeTeamFlag();
 							for(Team t : playerWarzone.getTeams()) {
-								t.teamcast(war.str(player.getName() + " captured team " + victim.getName()
-										+ "'s flag. Team " + team.getName() + " scores one point." ));
+								t.teamcast(player.getName() + " captured team " + victim.getName()
+										+ "'s flag. Team " + team.getName() + " scores one point." );
 							}
 							playerWarzone.respawnPlayer(event, team, player);
 							team.resetSign();
@@ -347,7 +349,7 @@ public class WarPlayerListener extends PlayerListener {
 			event.setFrom(zone.getTeleport());
 			player.teleportTo(zone.getTeleport());
 			event.setCancelled(true);
-			//player.sendMessage(war.str("You can't be inside a warzone without a team."));
+			//war.str("You can't be inside a warzone without a team."));
 		}
 	
     }
@@ -357,7 +359,7 @@ public class WarPlayerListener extends PlayerListener {
 		Team previousTeam = war.getPlayerTeam(player.getName());
 		if(previousTeam != null) {
 			if(!previousTeam.removePlayer(player.getName())){
-				war.warn("Could not remove player " + player.getName() + " from team " + previousTeam.getName());
+				war.logWarn("Could not remove player " + player.getName() + " from team " + previousTeam.getName());
 			}
 		}
 	}
@@ -386,7 +388,7 @@ public class WarPlayerListener extends PlayerListener {
 
 	private void handleDeath(PlayerMoveEvent event, Player player, Warzone playerWarzone, Team playerTeam) {
     	// teleport to team spawn upon death
-		player.sendMessage(war.str("You died."));
+		war.msg(player, "You died.");
 		boolean newBattle = false;
 		boolean scoreCapReached = false;
 		//synchronized(playerWarzone) {
@@ -394,14 +396,21 @@ public class WarPlayerListener extends PlayerListener {
 				int remaining = playerTeam.getRemainingLifes();
 				if(remaining == 0) { // your death caused your team to lose
 					List<Team> teams = playerWarzone.getTeams();
+					String scorers = "";
 					for(Team t : teams) {
-						t.teamcast(war.str("The battle is over. Team " + playerTeam.getName() + " lost: " 
-								+ player.getName() + " died and there were no lives left in their life pool." ));
+						t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " 
+								+ player.getName() + " died and there were no lives left in their life pool." );
 						
 						if(!t.getName().equals(playerTeam.getName())) {
 							// all other teams get a point
 							t.addPoint();
 							t.resetSign();
+							scorers += "Team " + t.getName() + " scores one point. ";
+						}
+					}
+					if(!scorers.equals("")){
+						for(Team t : teams) {
+							t.teamcast(scorers);
 						}
 					}
 					// detect score cap
@@ -428,7 +437,7 @@ public class WarPlayerListener extends PlayerListener {
 					} else {
 						// A new battle starts. Reset the zone but not the teams.
 						for(Team t : teams) {
-							t.teamcast(war.str("A new battle begins. The warzone is being reset..."));
+							t.teamcast("A new battle begins. The warzone is being reset...");
 						}
 						playerWarzone.getVolume().resetBlocks();
 						playerWarzone.initializeZone(event);
@@ -443,10 +452,15 @@ public class WarPlayerListener extends PlayerListener {
 						victim.initializeTeamFlag();
 						playerWarzone.removeThief(player.getName());
 						for(Team t : playerWarzone.getTeams()) {
-							t.teamcast(war.str(player.getName() + " died and dropped team " + victim.getName() + "'s flag."));
+							t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
 						}
 					}
 					playerTeam.setRemainingLives(remaining - 1);
+					if(remaining - 1 == 0) {
+						for(Team t : playerWarzone.getTeams()) {
+							t.teamcast("Team " + t.getName() + "'s life pool is empty. One more death and they lose the battle!");
+						}
+					}
 				}
 			//}
 		//}

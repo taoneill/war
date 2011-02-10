@@ -138,7 +138,7 @@ public class VolumeMapper {
 				}
 			}
 		} catch (IOException e) {
-			war.warn("Failed to read volume file " + volume.getName() + 
+			war.logWarn("Failed to read volume file " + volume.getName() + 
 					" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		} finally {
@@ -146,7 +146,7 @@ public class VolumeMapper {
 				try {
 					in.close();
 				} catch (IOException e) {
-					war.warn("Failed to close file reader for volume " + volume.getName() +
+					war.logWarn("Failed to close file reader for volume " + volume.getName() +
 							" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 					e.printStackTrace();
 				}
@@ -213,7 +213,7 @@ public class VolumeMapper {
 					}
 				}
 			} catch (IOException e) {
-				war.warn("Failed to write volume file " + zoneName + 
+				war.logWarn("Failed to write volume file " + zoneName + 
 						" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 				e.printStackTrace();
 			} 
@@ -222,7 +222,7 @@ public class VolumeMapper {
 					try {
 						out.close();
 					} catch (IOException e) {
-						war.warn("Failed to close file writer for volume " + volume.getName() +
+						war.logWarn("Failed to close file writer for volume " + volume.getName() +
 								" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 						e.printStackTrace();
 					}	
@@ -234,7 +234,7 @@ public class VolumeMapper {
 		File volFile= new File("War/dat/volume-" + volume.getName());
 		boolean deletedData = volFile.delete();
 		if(!deletedData) {
-			war.warn("Failed to delete file " + volFile.getName());
+			war.logWarn("Failed to delete file " + volFile.getName());
 		}
 	}
 

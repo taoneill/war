@@ -797,10 +797,10 @@ public class Warzone {
 			if(!hasPlayerInventory(player.getName())) {
 				keepPlayerInventory(player);
 			}
-			player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+			war.msg(player, "Your inventory is is storage until you /leave.");
 			respawnPlayer(event, lowestNoOfPlayers, player);
 			for(Team team : teams){
-				team.teamcast(war.str("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + "."));
+				team.teamcast("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + ".");
 			}
 		}
 	}
@@ -819,10 +819,10 @@ public class Warzone {
 			if(!hasPlayerInventory(player.getName())) {
 				keepPlayerInventory(player);
 			}
-			player.sendMessage(war.str("Your inventory is is storage until you /leave."));
+			war.msg(player, "Your inventory is is storage until you /leave.");
 			respawnPlayer(lowestNoOfPlayers, player);
 			for(Team team : teams){
-				team.teamcast(war.str("" + player.getName() + " joined team " + team.getName() + "."));
+				team.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
 			}
 		}
 	}
@@ -872,7 +872,7 @@ public class Warzone {
 					victim.initializeTeamFlag();
 					zone.removeThief(player.getName());
 					for(Team t : zone.getTeams()) {
-						t.teamcast(war.str("Team " + victim.getName() + " flag was returned."));
+						t.teamcast("Team " + victim.getName() + " flag was returned.");
 					}
 				}
 				if(zone.getLobby() != null) {
@@ -882,7 +882,7 @@ public class Warzone {
 					zone.restorePlayerInventory(player);
 				}
 				player.teleportTo(destination);
-				player.sendMessage(war.str("Left the zone. Your inventory has (hopefully) been restored."));
+				war.msg(player, "Left the zone. Your inventory has (hopefully) been restored.");
 				if(war.getWarHub() != null) {
 					war.getWarHub().resetZoneSign(zone);
 				}
@@ -945,7 +945,7 @@ public class Warzone {
 		winnersStr += ". Your inventory has (hopefully) been reset. The warzone is being reset... Please choose a new team.";
 		// Score cap reached. Reset everything.
 		for(Team t : this.getTeams()) {
-			t.teamcast(war.str(winnersStr));
+			t.teamcast(winnersStr);
 			for(Player tp : t.getPlayers()) {
 				if(!tp.getName().equals(player.getName())) {
 					if(this.hasPlayerInventory(tp.getName())){

@@ -319,7 +319,7 @@ public class Team {
 	
 	public void teamcast(String message) {
 		for(Player player : players) {
-			player.sendMessage(message);
+			war.msg(player, message);
 		}
 	}
 
