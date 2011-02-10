@@ -40,6 +40,7 @@ public class Warzone {
 	private boolean drawZoneOutline;
 	private int teamCap = 5;
 	private int scoreCap = 5;
+	private String spawnStyle = TeamSpawnStyles.BIG;
 	
 	private HashMap<String, InventoryStash> inventories = new HashMap<String, InventoryStash>();
 	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
@@ -980,6 +981,14 @@ public class Warzone {
 
 	public boolean isDropLootOnDeath() {
 		return dropLootOnDeath;
+	}
+
+	public void setSpawnStyle(String spawnStyle) {
+		this.spawnStyle = spawnStyle;
+	}
+
+	public String getSpawnStyle() {
+		return spawnStyle;
 	}
 
 	

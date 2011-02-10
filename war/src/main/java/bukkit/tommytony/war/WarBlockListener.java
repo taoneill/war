@@ -141,7 +141,8 @@ public class WarBlockListener extends BlockListener {
 	    	// protect warzone lobbies
 	    	if(block != null) {
 		    	for(Warzone zone: war.getWarzones()) {
-		    		if(zone.getLobby().getVolume().contains(block)) {
+		    		if(zone.getLobby() != null && 
+		    				zone.getLobby().getVolume().contains(block)) {
 		    			player.sendMessage(war.bad("Can't destroy this."));
 			    		event.setCancelled(true);
 			    		return;

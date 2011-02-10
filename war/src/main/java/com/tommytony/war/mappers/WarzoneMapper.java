@@ -15,6 +15,7 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
+import com.tommytony.war.TeamSpawnStyles;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.volumes.VerticalVolume;
@@ -179,6 +180,18 @@ public class WarzoneMapper {
 
 		// blockHeads
 		warzone.setBlockHeads(warzoneConfig.getBoolean("blockHeads"));
+		
+		// spawnStyle
+		String spawnStyle = warzoneConfig.getString("spawnStyle");
+		if(spawnStyle != null && !spawnStyle.equals("")){
+			spawnStyle = spawnStyle.toLowerCase();
+			if(spawnStyle.equals(TeamSpawnStyles.SMALL)) {
+				warzone.setSpawnStyle(spawnStyle);
+			} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
+				warzone.setSpawnStyle(spawnStyle);
+			}
+			// default is already initialized to BIG (see Warzone)				
+		}
 		
 		// dropLootOnDeath
 		//warzone.setDropLootOnDeath(warzoneConfig.getBoolean("dropLootOnDeath"));
@@ -348,6 +361,9 @@ public class WarzoneMapper {
 		
 		// blockHeads
 		warzoneConfig.setBoolean("blockHeads", warzone.isBlockHeads());
+		
+		// spawnStyle
+		warzoneConfig.setString("spawnStyle", warzone.getSpawnStyle());
 		
 		// defaultDropLootOnDeath
 		//warzoneConfig.setBoolean("dropLootOnDeath", warzone.isDropLootOnDeath());

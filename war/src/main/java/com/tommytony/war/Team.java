@@ -53,8 +53,14 @@ public class Team {
 		int x = teamSpawn.getBlockX();
 		int y = teamSpawn.getBlockY();
 		int z = teamSpawn.getBlockZ();
-		this.spawnVolume.setCornerOne(warzone.getWorld().getBlockAt(x-2, y-1, z-2));
-		this.spawnVolume.setCornerTwo(warzone.getWorld().getBlockAt(x+2, y+3, z+2));
+		if(warzone.getSpawnStyle().equals(TeamSpawnStyles.SMALL)) {
+			this.spawnVolume.setCornerOne(warzone.getWorld().getBlockAt(x-1, y-1, z-1));
+			this.spawnVolume.setCornerTwo(warzone.getWorld().getBlockAt(x+1, y+3, z+1));
+		} else {
+			// flat or big
+			this.spawnVolume.setCornerOne(warzone.getWorld().getBlockAt(x-2, y-1, z-2));
+			this.spawnVolume.setCornerTwo(warzone.getWorld().getBlockAt(x+2, y+3, z+2));
+		}
 	}
 	
 	public void initializeTeamSpawn() {
@@ -77,28 +83,6 @@ public class Team {
 		warzone.getWorld().getBlockAt(x-1, y-1, z).setType(material);
 		warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(material);
 		
-		// outer ring
-		warzone.getWorld().getBlockAt(x+2, y-1, z+2).setType(material);
-		warzone.getWorld().getBlockAt(x+2, y-1, z+1).setType(material);
-		warzone.getWorld().getBlockAt(x+2, y-1, z).setType(material);
-		warzone.getWorld().getBlockAt(x+2, y-1, z-1).setType(material);
-		warzone.getWorld().getBlockAt(x+2, y-1, z-2).setType(material);
-		
-		warzone.getWorld().getBlockAt(x-1, y-1, z+2).setType(material);
-		warzone.getWorld().getBlockAt(x-1, y-1, z-2).setType(material);
-		
-		warzone.getWorld().getBlockAt(x, y-1, z+2).setType(material);
-		warzone.getWorld().getBlockAt(x, y-1, z-2).setType(material);
-		
-		warzone.getWorld().getBlockAt(x+1, y-1, z+2).setType(material);
-		warzone.getWorld().getBlockAt(x+1, y-1, z-2).setType(material);
-		
-		warzone.getWorld().getBlockAt(x-2, y-1, z+2).setType(material);
-		warzone.getWorld().getBlockAt(x-2, y-1, z+1).setType(material);
-		warzone.getWorld().getBlockAt(x-2, y-1, z).setType(material);
-		warzone.getWorld().getBlockAt(x-2, y-1, z-1).setType(material);
-		warzone.getWorld().getBlockAt(x-2, y-1, z-2).setType(material);
-		
 		// Orientation
 		int yaw = 0;
 		if(teamSpawn.getYaw() >= 0){
@@ -106,132 +90,181 @@ public class Team {
 		} else {
 			yaw = (int)(360 + (teamSpawn.getYaw() % 360));
 		}
-		BlockFace facing = null;
-		BlockFace opposite = null;
-		int signData = 0;
 		Block signBlock = null;
-		if(yaw >= 0 && yaw < 90) {
-			facing = BlockFace.NORTH_WEST;
-			opposite = BlockFace.SOUTH_EAST;
-			signData = 10;
-			signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH, 2).getFace(BlockFace.WEST, 2);
-			// rim
-			warzone.getWorld().getBlockAt(x-2, y, z-1).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x-1, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+1, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z-1).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z+1).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x+1, y, z+2).setType(material);
-			
-			// tower
-			warzone.getWorld().getBlockAt(x, y+1, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+1, y+1, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y+1, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y+1, z-1).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y+1, z).setType(material);
-			
-			warzone.getWorld().getBlockAt(x+1, y+2, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y+2, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y+2, z-1).setType(material);
-			
-			warzone.getWorld().getBlockAt(x+2, y+3, z-2).setType(material);
-		} else if(yaw >= 90 && yaw <= 180) {
-			facing = BlockFace.NORTH_EAST;
-			opposite = BlockFace.SOUTH_WEST;
-			signData = 14;
-			signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH, 2).getFace(BlockFace.EAST, 2);
-			// rim
-			warzone.getWorld().getBlockAt(x+1, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z-1).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z+1).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x+1, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-1, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z+1).setType(material);
-			
-			// tower
-			warzone.getWorld().getBlockAt(x+2, y+1, z).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y+1, z+1).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y+1, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x+1, y+1, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x, y+1, z+2).setType(material);
-			
-			warzone.getWorld().getBlockAt(x+2, y+2, z+1).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y+2, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x+1, y+2, z+2).setType(material);
-			
-			warzone.getWorld().getBlockAt(x+2, y+3, z+2).setType(material);
-		} else if(yaw >= 180 && yaw < 270) {
-			facing = BlockFace.SOUTH_EAST;
-			opposite = BlockFace.NORTH_WEST;
-			signData = 2;
-			signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.EAST, 2);
-			// rim
-			warzone.getWorld().getBlockAt(x+2, y, z+1).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x+1, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-1, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z+1).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z-1).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x-1, y, z-2).setType(material);
-			
-			// tower
-			warzone.getWorld().getBlockAt(x, y+1, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-1, y+1, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y+1, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y+1, z+1).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y+1, z).setType(material);
-			
-			warzone.getWorld().getBlockAt(x-1, y+2, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y+2, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y+2, z+1).setType(material);
-			
-			warzone.getWorld().getBlockAt(x-2, y+3, z+2).setType(material);
-		} else if(yaw >= 270 && yaw <= 360) {
-			facing = BlockFace.SOUTH_WEST;
-			opposite = BlockFace.NORTH_EAST;
-			signData = 6;
-			signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
-			// rim
-			warzone.getWorld().getBlockAt(x-1, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z+2).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z+1).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z-1).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x-1, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+1, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x+2, y, z-1).setType(material);
-			
-			// tower
-			warzone.getWorld().getBlockAt(x-2, y+1, z).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y+1, z-1).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y+1, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x-1, y+1, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x, y+1, z-2).setType(material);
-			
-			warzone.getWorld().getBlockAt(x-2, y+2, z-1).setType(material);
-			warzone.getWorld().getBlockAt(x-2, y+2, z-2).setType(material);
-			warzone.getWorld().getBlockAt(x-1, y+2, z-2).setType(material);
-			
-			warzone.getWorld().getBlockAt(x-2, y+3, z-2).setType(material);
-		} 
+		int signData = 0;
 		
+		if(warzone.getSpawnStyle().equals(TeamSpawnStyles.SMALL)){
+			// SMALL style
+			if(yaw >= 0 && yaw < 90) {
+				signData = 10;
+				signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH).getFace(BlockFace.WEST);
+			}else if(yaw >= 90 && yaw <= 180) {
+				signData = 14;
+				signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH).getFace(BlockFace.EAST);
+			} else if(yaw >= 180 && yaw < 270) {
+				signData = 2;
+				signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH).getFace(BlockFace.EAST);
+			} else if(yaw >= 270 && yaw <= 360) {
+				signData = 6;
+				signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH).getFace(BlockFace.WEST);
+			}
+		} else {
+			// outer ring (FLAT or BIG)
+			warzone.getWorld().getBlockAt(x+2, y-1, z+2).setType(material);
+			warzone.getWorld().getBlockAt(x+2, y-1, z+1).setType(material);
+			warzone.getWorld().getBlockAt(x+2, y-1, z).setType(material);
+			warzone.getWorld().getBlockAt(x+2, y-1, z-1).setType(material);
+			warzone.getWorld().getBlockAt(x+2, y-1, z-2).setType(material);
+			
+			warzone.getWorld().getBlockAt(x-1, y-1, z+2).setType(material);
+			warzone.getWorld().getBlockAt(x-1, y-1, z-2).setType(material);
+			
+			warzone.getWorld().getBlockAt(x, y-1, z+2).setType(material);
+			warzone.getWorld().getBlockAt(x, y-1, z-2).setType(material);
+			
+			warzone.getWorld().getBlockAt(x+1, y-1, z+2).setType(material);
+			warzone.getWorld().getBlockAt(x+1, y-1, z-2).setType(material);
+			
+			warzone.getWorld().getBlockAt(x-2, y-1, z+2).setType(material);
+			warzone.getWorld().getBlockAt(x-2, y-1, z+1).setType(material);
+			warzone.getWorld().getBlockAt(x-2, y-1, z).setType(material);
+			warzone.getWorld().getBlockAt(x-2, y-1, z-1).setType(material);
+			warzone.getWorld().getBlockAt(x-2, y-1, z-2).setType(material);
+			
+			BlockFace facing = null;
+			BlockFace opposite = null;
+			if(yaw >= 0 && yaw < 90) {
+				facing = BlockFace.NORTH_WEST;
+				opposite = BlockFace.SOUTH_EAST;
+				signData = 10;
+				signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH, 2).getFace(BlockFace.WEST, 2);
+				
+				if(warzone.getSpawnStyle().equals(TeamSpawnStyles.BIG)) {
+					// rim
+					warzone.getWorld().getBlockAt(x-2, y, z-1).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x-1, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+1, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z-1).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z+1).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x+1, y, z+2).setType(material);
+					
+					// tower
+					warzone.getWorld().getBlockAt(x, y+1, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+1, y+1, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y+1, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y+1, z-1).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y+1, z).setType(material);
+					
+					warzone.getWorld().getBlockAt(x+1, y+2, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y+2, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y+2, z-1).setType(material);
+					
+					warzone.getWorld().getBlockAt(x+2, y+3, z-2).setType(material);
+				}
+			} else if(yaw >= 90 && yaw <= 180) {
+				facing = BlockFace.NORTH_EAST;
+				opposite = BlockFace.SOUTH_WEST;
+				signData = 14;
+				signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH, 2).getFace(BlockFace.EAST, 2);
+				if(warzone.getSpawnStyle().equals(TeamSpawnStyles.BIG)) {
+					// rim
+					warzone.getWorld().getBlockAt(x+1, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z-1).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z+1).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x+1, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-1, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z+1).setType(material);
+					
+					// tower
+					warzone.getWorld().getBlockAt(x+2, y+1, z).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y+1, z+1).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y+1, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x+1, y+1, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x, y+1, z+2).setType(material);
+					
+					warzone.getWorld().getBlockAt(x+2, y+2, z+1).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y+2, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x+1, y+2, z+2).setType(material);
+					
+					warzone.getWorld().getBlockAt(x+2, y+3, z+2).setType(material);
+				}
+			} else if(yaw >= 180 && yaw < 270) {
+				facing = BlockFace.SOUTH_EAST;
+				opposite = BlockFace.NORTH_WEST;
+				signData = 2;
+				signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.EAST, 2);
+				if(warzone.getSpawnStyle().equals(TeamSpawnStyles.BIG)) {
+					// rim
+					warzone.getWorld().getBlockAt(x+2, y, z+1).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x+1, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-1, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z+1).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z-1).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x-1, y, z-2).setType(material);
+					
+					// tower
+					warzone.getWorld().getBlockAt(x, y+1, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-1, y+1, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y+1, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y+1, z+1).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y+1, z).setType(material);
+					
+					warzone.getWorld().getBlockAt(x-1, y+2, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y+2, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y+2, z+1).setType(material);
+					
+					warzone.getWorld().getBlockAt(x-2, y+3, z+2).setType(material);
+				}
+			} else if(yaw >= 270 && yaw <= 360) {
+				facing = BlockFace.SOUTH_WEST;
+				opposite = BlockFace.NORTH_EAST;
+				signData = 6;
+				signBlock = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
+				if(warzone.getSpawnStyle().equals(TeamSpawnStyles.BIG)) {
+					// rim
+					warzone.getWorld().getBlockAt(x-1, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z+2).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z+1).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z-1).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x-1, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+1, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x+2, y, z-1).setType(material);
+					
+					// tower
+					warzone.getWorld().getBlockAt(x-2, y+1, z).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y+1, z-1).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y+1, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x-1, y+1, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x, y+1, z-2).setType(material);
+					
+					warzone.getWorld().getBlockAt(x-2, y+2, z-1).setType(material);
+					warzone.getWorld().getBlockAt(x-2, y+2, z-2).setType(material);
+					warzone.getWorld().getBlockAt(x-1, y+2, z-2).setType(material);
+					
+					warzone.getWorld().getBlockAt(x-2, y+3, z-2).setType(material);
+				}
+			} 
+		}	
+			
 		if(signBlock != null) {
 //			if(signBlock.getType() != Material.SIGN_POST) { 
 //				signBlock.setType(Material.SIGN_POST);
@@ -259,7 +292,6 @@ public class Team {
 			}
 			state.update(true);
 		}
-		
 	}
 	
 	public void setTeamSpawn(Location teamSpawn) {

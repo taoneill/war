@@ -20,6 +20,7 @@ import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamChatColors;
 import com.tommytony.war.TeamMaterials;
+import com.tommytony.war.TeamSpawnStyles;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
@@ -1021,6 +1022,16 @@ public class War extends JavaPlugin {
 			if(namedParams.containsKey("blockheads")){
 				String onOff = namedParams.get("blockheads");
 				warzone.setBlockHeads(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("spawnstyle")) {
+				String spawnStyle = namedParams.get("spawnstyle").toLowerCase();
+				if(spawnStyle.equals(TeamSpawnStyles.SMALL)) {
+					warzone.setSpawnStyle(spawnStyle);
+				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
+					warzone.setSpawnStyle(spawnStyle);
+				} else {
+					warzone.setSpawnStyle(TeamSpawnStyles.BIG);
+				}
 			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
