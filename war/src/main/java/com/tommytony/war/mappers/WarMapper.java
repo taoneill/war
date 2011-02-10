@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.TeamSpawnStyles;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.volumes.Volume;
@@ -110,6 +111,33 @@ public class WarMapper {
 		// defaultBlockHeads
 		war.setDefaultBlockHeads(warConfig.getBoolean("defaultBlockHeads"));
 		
+		// defaultSpawnStyle
+		String spawnStyle = warConfig.getString("defaultspawnStyle");
+		if(spawnStyle != null && !spawnStyle.equals("")){
+			spawnStyle = spawnStyle.toLowerCase();
+			if(spawnStyle.equals(TeamSpawnStyles.SMALL)) {
+				war.setDefaultSpawnStyle(spawnStyle);
+			} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
+				war.setDefaultSpawnStyle(spawnStyle);
+			}
+			// default is already initialized to BIG (see Warzone)				
+		}
+		
+		// defaultReward
+		String defaultRewardStr = warConfig.getString("defaultReward");
+		if(defaultRewardStr != null && !defaultRewardStr.equals("")) {
+			String[] defaultRewardStrSplit = defaultRewardStr.split(";");
+			war.getDefaultReward().clear();
+			for(String itemStr : defaultRewardStrSplit) {
+				if(itemStr != null && !itemStr.equals("")) {
+					String[] itemStrSplit = itemStr.split(",");
+					ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
+							Integer.parseInt(itemStrSplit[1]));
+					war.getDefaultReward().put(Integer.parseInt(itemStrSplit[2]), item);
+				}
+			}
+		}
+		
 		// defaultDropLootOnDeath
 		//war.setDefaultDropLootOnDeath(warConfig.getBoolean("defaultDropLootOnDeath"));
 		
@@ -199,6 +227,18 @@ public class WarMapper {
 		
 		// defaultBlockHeads
 		warConfig.setBoolean("defaultBlockHeads", war.isDefaultBlockHeads());
+		
+		// spawnStyle
+		warConfig.setString("spawnStyle", war.getDefaultSpawnStyle());
+		
+		// defaultReward
+		String defaultRewardStr = "";
+		HashMap<Integer, ItemStack> rewardItems = war.getDefaultReward();
+		for(Integer slot : rewardItems.keySet()) {
+			ItemStack item = items.get(slot);
+			defaultRewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+		}
+		warConfig.setString("defaultReward", defaultRewardStr);
 		
 		// defaultDropLootOnDeath
 		//warConfig.setBoolean("defaultDropLootOnDeath", war.isDefaultDropLootOnDeath());

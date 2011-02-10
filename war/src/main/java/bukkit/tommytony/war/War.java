@@ -1,6 +1,18 @@
 package bukkit.tommytony.war;
 
-import org.bukkit.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -16,6 +28,7 @@ import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.nijikokun.bukkit.Permissions.Permissions;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamChatColors;
@@ -27,16 +40,6 @@ import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.VolumeMapper;
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 /**
  * 
@@ -70,7 +73,12 @@ public class War extends JavaPlugin {
 	private int defaultScoreCap = 10;
 	private boolean defaultBlockHeads = false;
 	private boolean defaultDropLootOnDeath = false;
+	private String defaultSpawnStyle = TeamSpawnStyles.BIG;
+	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
+	
 	private boolean pvpInZonesOnly = false;
+	
+	
 	private WarHub warHub;
 	
 	public void onDisable() {
@@ -122,6 +130,7 @@ public class War extends JavaPlugin {
 		this.defaultLifepool = 7;
 		this.defaultFriendlyFire = false;
 		this.defaultAutoAssignOnly = false;
+		this.getDefaultReward().put(0, new ItemStack(Material.CAKE, 1));
 		WarMapper.load(this);
 		this.info("Done. War v"+ desc.getVersion() + " is on.");
 	}
@@ -448,7 +457,7 @@ public class War extends JavaPlugin {
 				team.setTeamFlag(player.getLocation());
 				Location playerLoc = player.getLocation();
 				player.teleportTo(new Location(playerLoc.getWorld(), 
-						playerLoc.getBlockX(), playerLoc.getBlockY() + 1, playerLoc.getBlockZ()));
+						playerLoc.getBlockX()+1, playerLoc.getBlockY(), playerLoc.getBlockZ()+1));
 				player.sendMessage(this.str("Team " + name + " flag moved."));
 				WarzoneMapper.save(this, warzone, false);
 			}
@@ -991,7 +1000,7 @@ public class War extends JavaPlugin {
 
 	private boolean updateZoneFromNamedParams(Warzone warzone, String[] arguments) {
 		try {
-			Map<String,String> namedParams = new HashMap();
+			Map<String,String> namedParams = new HashMap<String,String>();
 			for(String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if(pairSplit.length == 2) {
@@ -1045,7 +1054,7 @@ public class War extends JavaPlugin {
 	
 	private boolean updateFromNamedParams(String[] arguments) {
 		try {
-			Map<String,String> namedParams = new HashMap();
+			Map<String,String> namedParams = new HashMap<String,String>();
 			for(String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if(pairSplit.length == 2) {
@@ -1077,9 +1086,19 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("pvpinzonesonly");
 				setPvpInZonesOnly(onOff.equals("on") || onOff.equals("true"));
 			} 
-			if(namedParams.containsKey("blockHeads")){
-				String onOff = namedParams.get("blockHeads");
+			if(namedParams.containsKey("blockheads")){
+				String onOff = namedParams.get("blockheads");
 				setDefaultBlockHeads(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("spawnstyle")){
+				String spawnStyle = namedParams.get("spawnstyle").toLowerCase();
+				if(spawnStyle.equals(TeamSpawnStyles.SMALL)) {
+					setDefaultSpawnStyle(spawnStyle);
+				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
+					setDefaultSpawnStyle(spawnStyle);
+				} else {
+					setDefaultSpawnStyle(TeamSpawnStyles.BIG);
+				}
 			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
@@ -1379,6 +1398,18 @@ public class War extends JavaPlugin {
 
 	public boolean isDefaultDropLootOnDeath() {
 		return defaultDropLootOnDeath;
+	}
+
+	public void setDefaultSpawnStyle(String defaultSpawnStyle) {
+		this.defaultSpawnStyle = defaultSpawnStyle;
+	}
+
+	public String getDefaultSpawnStyle() {
+		return defaultSpawnStyle;
+	}
+
+	public HashMap<Integer, ItemStack> getDefaultReward() {
+		return defaultReward;
 	}
 	
 }

@@ -193,6 +193,21 @@ public class WarzoneMapper {
 			// default is already initialized to BIG (see Warzone)				
 		}
 		
+		// reward
+		String rewardStr = warzoneConfig.getString("reward");
+		if(rewardStr != null && !rewardStr.equals("")) {
+			String[] rewardStrSplit = rewardStr.split(";");
+			warzone.getReward().clear();
+			for(String itemStr : rewardStrSplit) {
+				if(itemStr != null && !itemStr.equals("")) {
+					String[] itemStrSplit = itemStr.split(",");
+					ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
+							Integer.parseInt(itemStrSplit[1]));
+					warzone.getReward().put(Integer.parseInt(itemStrSplit[2]), item);
+				}
+			}
+		}
+		
 		// dropLootOnDeath
 		//warzone.setDropLootOnDeath(warzoneConfig.getBoolean("dropLootOnDeath"));
 		
@@ -364,6 +379,16 @@ public class WarzoneMapper {
 		
 		// spawnStyle
 		warzoneConfig.setString("spawnStyle", warzone.getSpawnStyle());
+		
+		// reward
+		String rewardStr = "";
+		HashMap<Integer, ItemStack> rewardItems = warzone.getReward();
+		for(Integer slot : rewardItems.keySet()) {
+			ItemStack item = items.get(slot);
+			rewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+		}
+		warzoneConfig.setString("reward", rewardStr);
+		
 		
 		// defaultDropLootOnDeath
 		//warzoneConfig.setBoolean("dropLootOnDeath", warzone.isDropLootOnDeath());

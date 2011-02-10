@@ -36,11 +36,12 @@ public class Warzone {
 	private Location teleport;
 	private boolean friendlyFire;
 	private int lifePool;
-	private HashMap<Integer, ItemStack> loadout = new HashMap<Integer, ItemStack>(); 
+	private HashMap<Integer, ItemStack> loadout = new HashMap<Integer, ItemStack>();
 	private boolean drawZoneOutline;
 	private int teamCap = 5;
 	private int scoreCap = 5;
 	private String spawnStyle = TeamSpawnStyles.BIG;
+	private HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
 	
 	private HashMap<String, InventoryStash> inventories = new HashMap<String, InventoryStash>();
 	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
@@ -952,7 +953,12 @@ public class Warzone {
 					}
 					tp.teleportTo(this.getTeleport());
 				}
-				
+				if(winnersStr.contains(t.getName())) {
+					// give reward
+					for(Integer slot : getReward().keySet()){
+						tp.getInventory().addItem(getReward().get(slot));
+					}
+				}
 			}
 			t.setPoints(0);
 			t.getPlayers().clear();	// empty the team
@@ -989,6 +995,14 @@ public class Warzone {
 
 	public String getSpawnStyle() {
 		return spawnStyle;
+	}
+
+	public void setReward(HashMap<Integer, ItemStack> reward) {
+		this.reward = reward;
+	}
+
+	public HashMap<Integer, ItemStack> getReward() {
+		return reward;
 	}
 
 	

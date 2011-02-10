@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import com.tommytony.war.LootDropperTask;
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 
@@ -41,9 +42,12 @@ public class WarEntityListener extends EntityListener {
 			if(team != null) {
 				Warzone zone =  war.getPlayerTeamWarzone(player.getName());
 				handleDeath(player, zone, team);
-				if(!zone.isDropLootOnDeath()) {
-					event.getDrops().clear();	// no loot	
-				}				
+//				if(zone.isDropLootOnDeath()) {
+//					war.getServer().getScheduler().scheduleAsyncDelayedTask(war, 
+//							new LootDropperTask(player.getLocation(), event.getDrops()), 
+//							750);
+//				}	
+				event.getDrops().clear();	// no loot
 			}
 		}
     }
