@@ -154,7 +154,7 @@ public class VolumeMapper {
 	}
 	
 	public static void save(Volume volume, String zoneName, War war) {
-		if(volume.isSaved() && volume.getBlockTypes() != null) {
+		if(volume.hasTwoCorners()) {
 			BufferedWriter out = null;
 			try {
 				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));

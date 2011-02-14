@@ -42,6 +42,7 @@ public class ZoneLobby {
 	public ZoneLobby(War war, Warzone warzone, BlockFace wall) {
 		this.war = war;
 		this.warzone = warzone;
+		//this.changeWall(wall, false);
 		this.changeWall(wall);
 	}
 	
@@ -68,6 +69,10 @@ public class ZoneLobby {
 	}
 	
 	public void changeWall(BlockFace newWall) {
+//		changeWall(newWall, true);
+//	}
+//	
+//	public void changeWall(BlockFace newWall, boolean save) {
 		if(volume == null) {
 			// no previous wall
 			this.volume = new Volume("lobby", war, warzone.getWorld());
@@ -128,7 +133,7 @@ public class ZoneLobby {
 			corner2 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter + 1 + lobbyHeight, z + lobbyDepth);
 		}
 		
-		if(corner1 != null && corner2 != null) {
+		if(corner1 != null && corner2 != null/* && save*/) {
 			// save the blocks, wide enough for three team gates, 3+1 high and 10 deep, extruding out from the zone wall.
 			this.volume.setCornerOne(corner1);
 			this.volume.setCornerTwo(corner2);
@@ -141,7 +146,7 @@ public class ZoneLobby {
 		// maybe the number of teams change, now reset the gate positions
 		setGatePositions(lobbyMiddleWallBlock);
 
-		if(lobbyMiddleWallBlock != null && volume != null && volume.isSaved()) {
+		if(lobbyMiddleWallBlock != null && volume != null /*&& volume.isSaved()*/) {
 			// flatten the area (set all but floor to air, then replace any floor air blocks with glass)
 			this.volume.clearBlocksThatDontFloat();
 			this.volume.setToMaterial(Material.AIR);

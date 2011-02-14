@@ -133,12 +133,12 @@ public class WarPlayerListener extends PlayerListener {
 						noOfPlayers += t.getPlayers().size();
 					}
 					if(noOfPlayers < zone.getTeams().size() * zone.getTeamCap()) {
-						zone.autoAssign(event, player);
+						Team team = zone.autoAssign(player);
+						event.setFrom(team.getTeamSpawn());
+						event.setCancelled(true);
 						if(war.getWarHub() != null) {
 							war.getWarHub().resetZoneSign(zone);
 						}
-						//zone.autoAssign(player);
-						//event.setCancelled(true);
 					} else {
 						event.setFrom(zone.getTeleport());
 						player.teleportTo(zone.getTeleport());
@@ -283,11 +283,10 @@ public class WarPlayerListener extends PlayerListener {
 			Team team = war.getPlayerTeam(player.getName());
 			
 			// Player belongs to a warzone team but is outside: he snuck out or is at spawn and died
-			if(locZone == null && team != null) {
-				handleDeath(event, player, playerWarzone, team);
+			if(locZone == null && team != null) {;
 				war.badMsg(player, "You can't sneak out of a zone while in a team. Use /leave or walk out the lobby to exit the zone, please.");
 				event.setFrom(team.getTeamSpawn());
-				//playerWarzone.respawnPlayer(team, player);
+				playerWarzone.handleDeath(player);
 				player.teleportTo(team.getTeamSpawn());
 				event.setCancelled(true);
 				return;
@@ -398,95 +397,95 @@ public class WarPlayerListener extends PlayerListener {
 		return teamsMessage;
 	}
 
-	private void handleDeath(PlayerMoveEvent event, Player player, Warzone playerWarzone, Team playerTeam) {
-    	// teleport to team spawn upon death
-		war.msg(player, "You died.");
-		boolean newBattle = false;
-		boolean scoreCapReached = false;
-		//synchronized(playerWarzone) {
-			//synchronized(player) {
-				int remaining = playerTeam.getRemainingLifes();
-				if(remaining == 0) { // your death caused your team to lose
-					List<Team> teams = playerWarzone.getTeams();
-					String scorers = "";
-					for(Team t : teams) {
-						t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " 
-								+ player.getName() + " died and there were no lives left in their life pool." );
-						
-						if(!t.getName().equals(playerTeam.getName())) {
-							// all other teams get a point
-							t.addPoint();
-							t.resetSign();
-							scorers += "Team " + t.getName() + " scores one point. ";
-						}
-					}
-					if(!scorers.equals("")){
-						for(Team t : teams) {
-							t.teamcast(scorers);
-						}
-					}
-					// detect score cap
-					List<Team> scoreCapTeams = new ArrayList<Team>();
-					for(Team t : teams) {
-						if(t.getPoints() == playerWarzone.getScoreCap()) {
-							scoreCapTeams.add(t);
-						}
-					}
-					if(!scoreCapTeams.isEmpty()) {
-						String winnersStr = "";
-						for(Team winner : scoreCapTeams) {
-							winnersStr += winner.getName() + " ";
-						}
-						if(playerWarzone.hasPlayerInventory(player.getName())){
-							playerWarzone.restorePlayerInventory(player);
-						}
-						
-						playerWarzone.handleScoreCapReached(player, winnersStr);
-						event.setFrom(playerWarzone.getTeleport());
-						player.teleportTo(playerWarzone.getTeleport());
-						event.setCancelled(true);
-						scoreCapReached = true;
-					} else {
-						// A new battle starts. Reset the zone but not the teams.
-						for(Team t : teams) {
-							t.teamcast("A new battle begins. The warzone is being reset...");
-						}
-						playerWarzone.getVolume().resetBlocks();
-						playerWarzone.initializeZone(event);
-						newBattle = true;
-					}
-				} else {
-					// player died without causing his team's demise
-					if(playerWarzone.isFlagThief(player.getName())) {
-						// died while carrying flag.. dropped it
-						Team victim = playerWarzone.getVictimTeamForThief(player.getName());
-						victim.getFlagVolume().resetBlocks();
-						victim.initializeTeamFlag();
-						playerWarzone.removeThief(player.getName());
-						for(Team t : playerWarzone.getTeams()) {
-							t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
-						}
-					}
-					playerTeam.setRemainingLives(remaining - 1);
-					if(remaining - 1 == 0) {
-						for(Team t : playerWarzone.getTeams()) {
-							t.teamcast("Team " + t.getName() + "'s life pool is empty. One more death and they lose the battle!");
-						}
-					}
-				}
-			//}
-		//}
-		//synchronized(player) {
-			if(!newBattle && !scoreCapReached) {
-				playerTeam.resetSign();
-				playerWarzone.respawnPlayer(event, playerTeam, player);
-			} 
-//			else if (scoreCapReached) {
-//				
-//				war.info(player.getName() + " died and enemy team reached score cap");
-//			} else if (newBattle){
-//				war.info(player.getName() + " died and battle ended in team " + playerTeam.getName() + "'s disfavor");
-//			}
-		//}
-	}
+//	private void handleDeath(PlayerMoveEvent event, Player player, Warzone playerWarzone, Team playerTeam) {
+//    	// teleport to team spawn upon death
+//		war.msg(player, "You died.");
+//		boolean newBattle = false;
+//		boolean scoreCapReached = false;
+//		//synchronized(playerWarzone) {
+//			//synchronized(player) {
+//				int remaining = playerTeam.getRemainingLifes();
+//				if(remaining == 0) { // your death caused your team to lose
+//					List<Team> teams = playerWarzone.getTeams();
+//					String scorers = "";
+//					for(Team t : teams) {
+//						t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " 
+//								+ player.getName() + " died and there were no lives left in their life pool." );
+//						
+//						if(!t.getName().equals(playerTeam.getName())) {
+//							// all other teams get a point
+//							t.addPoint();
+//							t.resetSign();
+//							scorers += "Team " + t.getName() + " scores one point. ";
+//						}
+//					}
+//					if(!scorers.equals("")){
+//						for(Team t : teams) {
+//							t.teamcast(scorers);
+//						}
+//					}
+//					// detect score cap
+//					List<Team> scoreCapTeams = new ArrayList<Team>();
+//					for(Team t : teams) {
+//						if(t.getPoints() == playerWarzone.getScoreCap()) {
+//							scoreCapTeams.add(t);
+//						}
+//					}
+//					if(!scoreCapTeams.isEmpty()) {
+//						String winnersStr = "";
+//						for(Team winner : scoreCapTeams) {
+//							winnersStr += winner.getName() + " ";
+//						}
+//						if(playerWarzone.hasPlayerInventory(player.getName())){
+//							playerWarzone.restorePlayerInventory(player);
+//						}
+//						
+//						playerWarzone.handleScoreCapReached(player, winnersStr);
+//						event.setFrom(playerWarzone.getTeleport());
+//						player.teleportTo(playerWarzone.getTeleport());
+//						event.setCancelled(true);
+//						scoreCapReached = true;
+//					} else {
+//						// A new battle starts. Reset the zone but not the teams.
+//						for(Team t : teams) {
+//							t.teamcast("A new battle begins. The warzone is being reset...");
+//						}
+//						playerWarzone.getVolume().resetBlocks();
+//						playerWarzone.initializeZone(event);
+//						newBattle = true;
+//					}
+//				} else {
+//					// player died without causing his team's demise
+//					if(playerWarzone.isFlagThief(player.getName())) {
+//						// died while carrying flag.. dropped it
+//						Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+//						victim.getFlagVolume().resetBlocks();
+//						victim.initializeTeamFlag();
+//						playerWarzone.removeThief(player.getName());
+//						for(Team t : playerWarzone.getTeams()) {
+//							t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
+//						}
+//					}
+//					playerTeam.setRemainingLives(remaining - 1);
+//					if(remaining - 1 == 0) {
+//						for(Team t : playerWarzone.getTeams()) {
+//							t.teamcast("Team " + t.getName() + "'s life pool is empty. One more death and they lose the battle!");
+//						}
+//					}
+//				}
+//			//}
+//		//}
+//		//synchronized(player) {
+//			if(!newBattle && !scoreCapReached) {
+//				playerTeam.resetSign();
+//				playerWarzone.respawnPlayer(event, playerTeam, player);
+//			} 
+////			else if (scoreCapReached) {
+////				
+////				war.info(player.getName() + " died and enemy team reached score cap");
+////			} else if (newBattle){
+////				war.info(player.getName() + " died and battle ended in team " + playerTeam.getName() + "'s disfavor");
+////			}
+//		//}
+//	}
 }

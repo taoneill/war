@@ -240,26 +240,26 @@ public class Warzone {
 		}
 	}
 	
-	public void initializeZone(PlayerMoveEvent event) {
-		if(ready() && volume.isSaved()){			
-			// everyone back to team spawn with full health
-			for(Team team : teams) {
-				for(Player p : team.getPlayers()) {
-					if(p.getName().equals(event.getPlayer().getName())) { 
-						respawnPlayer(event, team, event.getPlayer());
-					} else {
-						respawnPlayer(team, p);
-					}
-				}
-				team.setRemainingLives(lifePool);
-				team.setTeamSpawn(team.getTeamSpawn());
-				if(team.getTeamFlag() != null) team.setTeamFlag(team.getTeamFlag());
-				team.resetSign();
-			}
-			
-			initZone();
-		}
-	}
+//	public void initializeZone(PlayerMoveEvent event) {
+//		if(ready() && volume.isSaved()){			
+//			// everyone back to team spawn with full health
+//			for(Team team : teams) {
+//				for(Player p : team.getPlayers()) {
+//					if(p.getName().equals(event.getPlayer().getName())) { 
+//						respawnPlayer(event, team, event.getPlayer());
+//					} else {
+//						respawnPlayer(team, p);
+//					}
+//				}
+//				team.setRemainingLives(lifePool);
+//				team.setTeamSpawn(team.getTeamSpawn());
+//				if(team.getTeamFlag() != null) team.setTeamFlag(team.getTeamFlag());
+//				team.resetSign();
+//			}
+//			
+//			initZone();
+//		}
+//	}
 	
 	private void initZone() {
 		// add wall outlines
@@ -783,29 +783,29 @@ public class Warzone {
 		return lobby;
 	}
 
-	public void autoAssign(PlayerMoveEvent event, Player player) {
-		Team lowestNoOfPlayers = null;
-		for(Team t : teams) {
-			if(lowestNoOfPlayers == null
-					|| (lowestNoOfPlayers != null && lowestNoOfPlayers.getPlayers().size() > t.getPlayers().size())) {
-				lowestNoOfPlayers = t;
-			}
-		}
-		if(lowestNoOfPlayers != null) {
-			lowestNoOfPlayers.addPlayer(player);
-			lowestNoOfPlayers.resetSign();
-			if(!hasPlayerInventory(player.getName())) {
-				keepPlayerInventory(player);
-			}
-			war.msg(player, "Your inventory is is storage until you /leave.");
-			respawnPlayer(event, lowestNoOfPlayers, player);
-			for(Team team : teams){
-				team.teamcast("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + ".");
-			}
-		}
-	}
+//	public void autoAssign(PlayerMoveEvent event, Player player) {
+//		Team lowestNoOfPlayers = null;
+//		for(Team t : teams) {
+//			if(lowestNoOfPlayers == null
+//					|| (lowestNoOfPlayers != null && lowestNoOfPlayers.getPlayers().size() > t.getPlayers().size())) {
+//				lowestNoOfPlayers = t;
+//			}
+//		}
+//		if(lowestNoOfPlayers != null) {
+//			lowestNoOfPlayers.addPlayer(player);
+//			lowestNoOfPlayers.resetSign();
+//			if(!hasPlayerInventory(player.getName())) {
+//				keepPlayerInventory(player);
+//			}
+//			war.msg(player, "Your inventory is is storage until you /leave.");
+//			respawnPlayer(event, lowestNoOfPlayers, player);
+//			for(Team team : teams){
+//				team.teamcast("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + ".");
+//			}
+//		}
+//	}
 	
-	public void autoAssign(Player player) {
+	public Team autoAssign(Player player) {
 		Team lowestNoOfPlayers = null;
 		for(Team t : teams) {
 			if(lowestNoOfPlayers == null
@@ -825,6 +825,7 @@ public class Warzone {
 				team.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
 			}
 		}
+		return lowestNoOfPlayers;
 	}
 
 	public void setTeamCap(int teamCap) {
@@ -857,6 +858,102 @@ public class Warzone {
 
 	public boolean isDrawZoneOutline() {
 		return drawZoneOutline;
+	}
+	
+	public void handleDeath(Player player) {
+		Team playerTeam = war.getPlayerTeam(player.getName());
+		Warzone playerWarzone = war.getPlayerTeamWarzone(player.getName());
+		if(playerTeam != null && playerWarzone != null) {
+	    	// teleport to team spawn upon death
+			war.msg(player, "You died.");
+			boolean newBattle = false;
+			boolean scoreCapReached = false;
+			//synchronized(playerWarzone) {
+				//synchronized(player) {
+					int remaining = playerTeam.getRemainingLifes();
+					if(remaining == 0) { // your death caused your team to lose
+						List<Team> teams = playerWarzone.getTeams();
+						String scorers = "";
+						for(Team t : teams) {
+							t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " 
+									+ player.getName() + " died and there were no lives left in their life pool.");
+							
+							if(!t.getName().equals(playerTeam.getName())) {
+								// all other teams get a point
+								t.addPoint();
+								t.resetSign();
+								scorers += "Team " + t.getName() + " scores one point. ";
+							}
+						}
+						if(!scorers.equals("")){
+							for(Team t : teams) {
+								t.teamcast(scorers);
+							}
+						}
+						// detect score cap
+						List<Team> scoreCapTeams = new ArrayList<Team>();
+						for(Team t : teams) {
+							if(t.getPoints() == playerWarzone.getScoreCap()) {
+								scoreCapTeams.add(t);
+							}
+						}
+						if(!scoreCapTeams.isEmpty()) {
+							String winnersStr = "";
+							for(Team winner : scoreCapTeams) {
+								winnersStr += winner.getName() + " ";
+							}
+							if(playerWarzone.hasPlayerInventory(player.getName())){
+								playerWarzone.restorePlayerInventory(player);
+							}
+							
+							playerWarzone.handleScoreCapReached(player, winnersStr);
+							player.teleportTo(playerWarzone.getTeleport());
+							// player will die because it took too long :(
+							// we dont restore his inventory in handleScoreCapReached
+							// check out PLAYER_MOVE for the rest of the fix
+							
+							scoreCapReached = true;
+						} else {
+							// A new battle starts. Reset the zone but not the teams.
+							for(Team t : teams) {
+								t.teamcast("A new battle begins. Warzone reset.");
+							}
+							playerWarzone.getVolume().resetBlocks();
+							playerWarzone.initializeZone();
+							newBattle = true;
+						}
+					} else {
+						// player died without causing his team's demise
+						if(playerWarzone.isFlagThief(player.getName())) {
+							// died while carrying flag.. dropped it
+							Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+							victim.getFlagVolume().resetBlocks();
+							victim.initializeTeamFlag();
+							playerWarzone.removeThief(player.getName());
+							for(Team t : playerWarzone.getTeams()) {
+								t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
+							}
+						}
+						playerTeam.setRemainingLives(remaining - 1);
+						if(remaining - 1 == 0) {
+							for(Team t : playerWarzone.getTeams()) {
+								t.teamcast("Team " + playerTeam.getName() + "'s life pool is empty. One more death and they lose the battle!");
+							}
+						}
+					}
+				//}
+			//}
+			//synchronized(player) {
+				if(!newBattle && !scoreCapReached) {
+					playerTeam.resetSign();
+					playerWarzone.respawnPlayer(playerTeam, player);
+				} 
+//					war.info(player.getName() + " died and enemy team reached score cap");
+//				} else if (newBattle){
+//					war.info(player.getName() + " died and battle ended in team " + playerTeam.getName() + "'s disfavor");
+//				}
+			//}
+		}
 	}
 
 	public void handlePlayerLeave(Player player, Location destination) {

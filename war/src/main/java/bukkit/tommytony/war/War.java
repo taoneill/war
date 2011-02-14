@@ -63,6 +63,7 @@ public class War extends JavaPlugin {
     private PluginDescriptionFile desc = null;
     
     private final List<Warzone> warzones = new ArrayList<Warzone>();
+    private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
     private final List<String> zoneMakerNames = new ArrayList<String>();
     private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
     private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
@@ -705,8 +706,8 @@ public class War extends JavaPlugin {
 			if(warzone == null) {
 				// create the warzone
 				warzone = new Warzone(this, player.getLocation().getWorld(), arguments[0]);
-				this.addWarzone(warzone);
-				WarMapper.save(this);
+				this.getIncompleteZones().add(warzone);
+				//WarMapper.save(this);
 				if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
 					warzone.setNorthwest(player.getLocation());
 					this.msg(player, "Warzone " + warzone.getName() + " created. Northwesternmost point set to x:" 
@@ -716,7 +717,7 @@ public class War extends JavaPlugin {
 					this.msg(player, "Warzone " + warzone.getName() + " created. Southeasternmost point set to x:" 
 							+ (int)warzone.getSoutheast().getBlockX() + " z:" + (int)warzone.getSoutheast().getBlockZ() + ".");
 				}
-				WarzoneMapper.save(this, warzone, false);
+				//WarzoneMapper.save(this, warzone, false);
 			} else {
 				// change existing warzone
 				if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
@@ -737,6 +738,10 @@ public class War extends JavaPlugin {
 							int reset = warzone.getVolume().resetBlocks();
 							
 							msgString = reset + " blocks reset. ";
+						} else {
+							this.addWarzone(warzone);
+							this.incompleteZones.remove(warzone);
+							WarMapper.save(this);
 						}
 						warzone.setNorthwest(player.getLocation());
 						if(warzone.tooSmall()) {
@@ -748,6 +753,7 @@ public class War extends JavaPlugin {
 							msgString += "New zone outline ok. Northwesternmost point of zone " + warzone.getName() + " set to x:" + (int)warzone.getNorthwest().getBlockX()
 								+ " z:" + (int)warzone.getNorthwest().getBlockZ()+ ". Saving new warzone blocks...";
 							msg(player, msgString);
+							WarzoneMapper.save(this, warzone, false);
 						}
 					} 
 				} else if(arguments[1].equals("southeast") || arguments[1].equals("se")) {
@@ -768,6 +774,10 @@ public class War extends JavaPlugin {
 							int reset = warzone.getVolume().resetBlocks();
 							
 							msgString = reset + " blocks reset. ";
+						} else {
+							this.addWarzone(warzone);
+							this.incompleteZones.remove(warzone);
+							WarMapper.save(this);
 						}
 						warzone.setSoutheast(player.getLocation());
 						if(warzone.tooSmall()) {
@@ -779,6 +789,7 @@ public class War extends JavaPlugin {
 							msgString += "New zone outline ok. Southeasternmost point of zone " + warzone.getName() + " set to x:" + (int)warzone.getSoutheast().getBlockX()
 								+ " z:" + (int)warzone.getSoutheast().getBlockZ()+ ". Saving new warzone blocks...";
 							msg(player, msgString);
+							WarzoneMapper.save(this, warzone, false);
 						}
 					}
 				}
@@ -1201,6 +1212,11 @@ public class War extends JavaPlugin {
 				return warzone;
 			}
 		}
+		for(Warzone warzone : incompleteZones) {
+			if(warzone.getName().equals(warzoneName)) {
+				return warzone;
+			}
+		}
 		return null;
 	}
 
@@ -1410,6 +1426,10 @@ public class War extends JavaPlugin {
 
 	public HashMap<Integer, ItemStack> getDefaultReward() {
 		return defaultReward;
+	}
+
+	public List<Warzone> getIncompleteZones() {
+		return incompleteZones;
 	}
 	
 }
