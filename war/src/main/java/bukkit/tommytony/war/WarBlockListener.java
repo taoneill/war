@@ -134,7 +134,7 @@ public class WarBlockListener extends BlockListener {
     				event.setCancelled(true);
     				return;
     			} else {
-    				event.setCancelled(false);
+    				event.setCancelled(false);		// very important, otherwise could get cancelled but unbreakableZoneBlocks further down
     				return;
     			}
     			// let team members loot one block the spawn for monument captures
@@ -165,7 +165,7 @@ public class WarBlockListener extends BlockListener {
 	    		event.setCancelled(true);
 	    		return;
     		}
-    	} 
+    	}
     	
     	// protect warzone lobbies
     	if(block != null) {
@@ -187,10 +187,19 @@ public class WarBlockListener extends BlockListener {
     	}
     	
     	// buildInZonesOnly
-    	if(war.warzone(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ())) == null 
+    	Warzone blockZone = war.warzone(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ()));
+    	if(blockZone == null 
     			&& war.isBuildInZonesOnly() 
     			&& !war.canBuildOutsideZone(player)) {
     		war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
+    		event.setCancelled(true);
+    		return;
+    	}
+    	
+    	// unbreakableZoneBlocks
+    	if(blockZone != null && blockZone.isUnbreakableZoneBlocks() && !isZoneMaker) {
+    		// if the zone is unbreakable, no one but zone makers can break blocks
+    		war.badMsg(player, "The blocks in this zone are unbreakable!");
     		event.setCancelled(true);
     		return;
     	}

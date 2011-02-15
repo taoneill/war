@@ -141,6 +141,8 @@ public class WarMapper {
 			}
 		}
 		
+		// defaultUnbreakableZoneBlocks
+		war.setDefaultUnbreakableZoneBlocks(warConfig.getBoolean("defaultUnbreakableZoneBlocks"));
 		// defaultDropLootOnDeath
 		//war.setDefaultDropLootOnDeath(warConfig.getBoolean("defaultDropLootOnDeath"));
 		
@@ -245,6 +247,9 @@ public class WarMapper {
 			defaultRewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 		}
 		warConfig.setString("defaultReward", defaultRewardStr);
+
+		// defaultUnbreakableZoneBlocks
+		warConfig.setBoolean("defaultUnbreakableZoneBlocks", war.isDefaultUnbreakableZoneBlocks());
 		
 		// defaultDropLootOnDeath
 		//warConfig.setBoolean("defaultDropLootOnDeath", war.isDefaultDropLootOnDeath());

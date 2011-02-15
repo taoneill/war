@@ -55,6 +55,7 @@ public class Warzone {
 	private boolean autoAssignOnly;
 	private boolean blockHeads;
 	private boolean dropLootOnDeath;
+	private boolean unbreakableZoneBlocks;
 	
 	
 	public Warzone(War war, World world, String name) {
@@ -70,6 +71,7 @@ public class Warzone {
 		this.scoreCap = war.getDefaultScoreCap();
 		this.setBlockHeads(war.isDefaultBlockHeads());
 		this.setDropLootOnDeath(war.isDefaultDropLootOnDeath());
+		this.setUnbreakableZoneBlocks(war.isDefaultUnbreakableZoneBlocks());
 		this.volume = new VerticalVolume(name, war, this.getWorld());
 	}
 	
@@ -1102,6 +1104,14 @@ public class Warzone {
 
 	public HashMap<Integer, ItemStack> getReward() {
 		return reward;
+	}
+
+	public void setUnbreakableZoneBlocks(boolean unbreakableZoneBlocks) {
+		this.unbreakableZoneBlocks = unbreakableZoneBlocks;
+	}
+
+	public boolean isUnbreakableZoneBlocks() {
+		return unbreakableZoneBlocks;
 	}
 
 	

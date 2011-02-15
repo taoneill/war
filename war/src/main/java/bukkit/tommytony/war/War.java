@@ -77,6 +77,7 @@ public class War extends JavaPlugin {
 	private boolean defaultDropLootOnDeath = false;
 	private String defaultSpawnStyle = TeamSpawnStyles.BIG;
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
+	private boolean defaultUnbreakableZoneBlocks = false;
 	
 	private boolean pvpInZonesOnly = false;
 	private boolean buildInZonesOnly = false;
@@ -1056,6 +1057,10 @@ public class War extends JavaPlugin {
 					warzone.setSpawnStyle(TeamSpawnStyles.BIG);
 				}
 			}
+			if(namedParams.containsKey("unbreakable")) {
+				String onOff = namedParams.get("unbreakable");
+				warzone.setUnbreakableZoneBlocks(onOff.equals("on") || onOff.equals("true"));
+			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
 //				warzone.setDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
@@ -1117,6 +1122,10 @@ public class War extends JavaPlugin {
 			if(namedParams.containsKey("buildinzonesonly")) {
 				String onOff = namedParams.get("buildinzonesonly");
 				setBuildInZonesOnly(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("unbreakable")) {
+				String onOff = namedParams.get("unbreakable");
+				setDefaultUnbreakableZoneBlocks(onOff.equals("on") || onOff.equals("true"));
 			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
@@ -1458,6 +1467,14 @@ public class War extends JavaPlugin {
 
 	public boolean isBuildInZonesOnly() {
 		return buildInZonesOnly;
+	}
+
+	public void setDefaultUnbreakableZoneBlocks(boolean defaultUnbreakableZoneBlocks) {
+		this.defaultUnbreakableZoneBlocks = defaultUnbreakableZoneBlocks;
+	}
+
+	public boolean isDefaultUnbreakableZoneBlocks() {
+		return defaultUnbreakableZoneBlocks;
 	}
 	
 }
