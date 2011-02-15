@@ -861,7 +861,7 @@ public class War extends JavaPlugin {
 
 	public void performTeam(Player player, String[] arguments) {
 		Team playerTeam = this.getPlayerTeam(player.getName());
-		if(!this.inAnyWarzone(player.getLocation()) && playerTeam != null) {
+		if(playerTeam == null) {
 			this.badMsg(player, "Usage: /team <message>. " +
 					"Sends a message only to your teammates.");
 		} else {
