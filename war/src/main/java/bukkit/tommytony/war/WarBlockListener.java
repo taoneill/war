@@ -109,7 +109,7 @@ public class WarBlockListener extends BlockListener {
     	Team team = war.getPlayerTeam(player.getName());
     	boolean isZoneMaker = war.isZoneMaker(player);
     	
-    	if(warzone != null && war.getPlayerTeam(player.getName()) == null && !isZoneMaker) {
+    	if(warzone != null && team == null && !isZoneMaker) {
     		// can't actually destroy blocks in a warzone if not part of a team
     		war.badMsg(player, "Can't destroy part of a warzone if you're not in a team.");
     		event.setCancelled(true);
@@ -197,8 +197,11 @@ public class WarBlockListener extends BlockListener {
     	}
     	
     	// unbreakableZoneBlocks
-    	if(blockZone != null && blockZone.isUnbreakableZoneBlocks() && !isZoneMaker) {
-    		// if the zone is unbreakable, no one but zone makers can break blocks
+    	if(blockZone != null && blockZone.isUnbreakableZoneBlocks() 
+    			&& (!isZoneMaker
+    					|| (isZoneMaker && team != null)) 
+    					) {
+    		// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks
     		war.badMsg(player, "The blocks in this zone are unbreakable!");
     		event.setCancelled(true);
     		return;

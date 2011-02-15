@@ -159,7 +159,7 @@ public class VerticalVolume extends Volume{
 		if(currentBlock.getTypeId() != oldBlockType ||
 				(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData) ||
 				(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() == oldBlockData &&
-						(oldBlockType == Material.SIGN.getId() || oldBlockType == Material.SIGN_POST.getId())
+						(oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId())
 				)
 			) {
 				currentBlock.setTypeId(oldBlockType);

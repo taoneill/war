@@ -61,6 +61,7 @@ public class Volume {
 				this.setBlockTypes(new int[getSizeX()][getSizeY()][getSizeZ()]);
 				this.setBlockDatas(new byte[getSizeX()][getSizeY()][getSizeZ()]);
 				this.getSignLines().clear();
+				this.getInvBlockContents().clear();
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMinY();
@@ -133,7 +134,7 @@ public class Volume {
 							if(currentBlock.getTypeId() != oldBlockType ||
 								(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData ) ||
 								(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() == oldBlockData &&
-										(oldBlockType == Material.SIGN.getId() || oldBlockType == Material.SIGN_POST.getId()
+										(oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId()
 												|| oldBlockType == Material.CHEST.getId() || oldBlockType == Material.DISPENSER.getId())
 								)
 							) {
@@ -148,7 +149,7 @@ public class Volume {
 //									state.update();
 //								}
 								BlockState state = currentBlock.getState();
-								if(oldBlockType == Material.SIGN.getId() 
+								if(oldBlockType == Material.WALL_SIGN.getId() 
 										|| oldBlockType == Material.SIGN_POST.getId()) {
 									// Signs
 									state.setType(Material.getMaterial(oldBlockType));
@@ -197,6 +198,18 @@ public class Volume {
 											ii++;
 										}
 										dispenser.update(true);
+									}
+								} else if(oldBlockType == Material.WOODEN_DOOR.getId() || oldBlockType == Material.IRON_DOOR_BLOCK.getId()){
+									// Door blocks
+									
+									// Check if is bottom door block
+									if(j+1 < getSizeY() && getBlockTypes()[i][j+1][k] == oldBlockType) {
+										// set both door blocks right away
+										currentBlock.setType(Material.getMaterial(oldBlockType));
+										currentBlock.setData(oldBlockData);
+										Block blockAbove = getWorld().getBlockAt(x, y+1, z);
+										blockAbove.setType(Material.getMaterial(oldBlockType));
+										blockAbove.setData(getBlockDatas()[i][j+1][k]);	// top door block has the 0x08 bit enabled
 									}
 								} else {
 									// regular block
@@ -432,8 +445,10 @@ public class Volume {
 	public void clearBlocksThatDontFloat() {
 		Material[] toAirMaterials = new Material[22];
 		toAirMaterials[0] = Material.SIGN_POST;
-		toAirMaterials[1] = Material.SIGN;
-		toAirMaterials[2] = Material.IRON_DOOR_BLOCK;
+		toAirMaterials[1] = Material.WALL_SIGN;
+		//toAirMaterials[2] = Material.IRON_DOOR_BLOCK;
+		//toAirMaterials[3] = Material.WOODEN_DOOR;
+		toAirMaterials[2] = Material.IRON_DOOR;
 		toAirMaterials[3] = Material.WOOD_DOOR;
 		toAirMaterials[4] = Material.LADDER;
 		toAirMaterials[5] = Material.YELLOW_FLOWER;

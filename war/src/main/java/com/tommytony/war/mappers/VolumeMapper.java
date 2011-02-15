@@ -87,7 +87,7 @@ public class VolumeMapper {
 									volume.getBlockTypes()[i][j][k] = typeID;
 									volume.getBlockDatas()[i][j][k] = data;
 									
-									if(typeID == Material.SIGN.getId() 
+									if(typeID == Material.WALL_SIGN.getId() 
 											|| typeID == Material.SIGN_POST.getId()) {
 										// Signs
 										String linesStr = "";
@@ -176,7 +176,7 @@ public class VolumeMapper {
 							int typeId = volume.getBlockTypes()[i][j][k];
 							byte data = volume.getBlockDatas()[i][j][k];
 							out.write(typeId + "," + data + ",");
-							if(typeId == Material.SIGN.getId() 
+							if(typeId == Material.WALL_SIGN.getId() 
 									|| typeId == Material.SIGN_POST.getId()) {
 								// Signs
 								String extra = "";
