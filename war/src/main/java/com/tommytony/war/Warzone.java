@@ -56,6 +56,7 @@ public class Warzone {
 	private boolean blockHeads;
 	private boolean dropLootOnDeath;
 	private boolean unbreakableZoneBlocks;
+	private boolean disabled = false;
 	
 	
 	public Warzone(War war, World world, String name) {
@@ -1112,6 +1113,14 @@ public class Warzone {
 
 	public boolean isUnbreakableZoneBlocks() {
 		return unbreakableZoneBlocks;
+	}
+
+	public void setDisabled(boolean disabled) {
+		this.disabled = disabled;
+	}
+
+	public boolean isDisabled() {
+		return disabled;
 	}
 
 	

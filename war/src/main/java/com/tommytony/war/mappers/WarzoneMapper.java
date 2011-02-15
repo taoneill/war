@@ -211,6 +211,9 @@ public class WarzoneMapper {
 		// unbreakableZoneBlocks
 		warzone.setUnbreakableZoneBlocks(warzoneConfig.getBoolean("unbreakableZoneBlocks"));
 		
+		// disabled
+		warzone.setDisabled(warzoneConfig.getBoolean("disabled"));
+		
 		// dropLootOnDeath
 		//warzone.setDropLootOnDeath(warzoneConfig.getBoolean("dropLootOnDeath"));
 		
@@ -394,6 +397,9 @@ public class WarzoneMapper {
 		
 		// unbreakableZoneBlocks
 		warzoneConfig.setBoolean("unbreakableZoneBlocks", warzone.isUnbreakableZoneBlocks());
+		
+		// disabled
+		warzoneConfig.setBoolean("disabled", warzone.isDisabled());
 		
 		// defaultDropLootOnDeath
 		//warzoneConfig.setBoolean("dropLootOnDeath", warzone.isDropLootOnDeath());

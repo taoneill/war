@@ -126,24 +126,28 @@ public class WarPlayerListener extends PlayerListener {
 			if(oldTeam == null && canPlay) { // trying to counter spammy player move
 				isAutoAssignGate = zone.getLobby().isAutoAssignGate(playerLoc);
 				if(isAutoAssignGate) {
-					enteredGate = true;
-					dropFromOldTeamIfAny(player);
-					int noOfPlayers = 0;
-					for(Team t : zone.getTeams()) {
-						noOfPlayers += t.getPlayers().size();
-					}
-					if(noOfPlayers < zone.getTeams().size() * zone.getTeamCap()) {
-						Team team = zone.autoAssign(player);
-						event.setFrom(team.getTeamSpawn());
-						event.setCancelled(true);
-						if(war.getWarHub() != null) {
-							war.getWarHub().resetZoneSign(zone);
-						}
+					if(zone.isDisabled()){
+						handleDisabledZone(event, player, zone);
 					} else {
-						event.setFrom(zone.getTeleport());
-						player.teleportTo(zone.getTeleport());
-						event.setCancelled(true);
-						war.badMsg(player, "All teams are full.");
+						enteredGate = true;
+						dropFromOldTeamIfAny(player);
+						int noOfPlayers = 0;
+						for(Team t : zone.getTeams()) {
+							noOfPlayers += t.getPlayers().size();
+						}
+						if(noOfPlayers < zone.getTeams().size() * zone.getTeamCap()) {
+							Team team = zone.autoAssign(player);
+							event.setFrom(team.getTeamSpawn());
+							event.setCancelled(true);
+							if(war.getWarHub() != null) {
+								war.getWarHub().resetZoneSign(zone);
+							}
+						} else {
+							event.setFrom(zone.getTeleport());
+							player.teleportTo(zone.getTeleport());
+							event.setCancelled(true);
+							war.badMsg(player, "All teams are full.");
+						}
 					}
 					return;
 				} 
@@ -153,7 +157,9 @@ public class WarPlayerListener extends PlayerListener {
 					enteredGate = true;
 					dropFromOldTeamIfAny(player);
 					Team diamondTeam = zone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND);
-					if(diamondTeam.getPlayers().size() < zone.getTeamCap()) {
+					if(zone.isDisabled()){
+						handleDisabledZone(event, player, zone);
+					} else if(diamondTeam.getPlayers().size() < zone.getTeamCap()) {
 						diamondTeam.addPlayer(player);
 						diamondTeam.resetSign();
 						if(war.getWarHub() != null) {
@@ -181,7 +187,9 @@ public class WarPlayerListener extends PlayerListener {
 					enteredGate = true;
 					dropFromOldTeamIfAny(player);
 					Team ironTeam = zone.getTeamByMaterial(TeamMaterials.TEAMIRON);
-					if(ironTeam.getPlayers().size() < zone.getTeamCap()) {
+					if(zone.isDisabled()){
+						handleDisabledZone(event, player, zone);
+					} else if(ironTeam.getPlayers().size() < zone.getTeamCap()) {
 						ironTeam.addPlayer(player);
 						ironTeam.resetSign();
 						if(war.getWarHub() != null) {
@@ -209,7 +217,9 @@ public class WarPlayerListener extends PlayerListener {
 					enteredGate = true;
 					dropFromOldTeamIfAny(player);
 					Team goldTeam = zone.getTeamByMaterial(TeamMaterials.TEAMGOLD);
-					if(goldTeam.getPlayers().size() < zone.getTeamCap()) {
+					if(zone.isDisabled()){
+						handleDisabledZone(event, player, zone);
+					} else if(goldTeam.getPlayers().size() < zone.getTeamCap()) {
 						goldTeam.addPlayer(player);
 						goldTeam.resetSign();
 						if(war.getWarHub() != null) {
@@ -365,6 +375,15 @@ public class WarPlayerListener extends PlayerListener {
 	
     }
 	
+	private void handleDisabledZone(PlayerMoveEvent event, Player player, Warzone zone) {
+		if(zone.getLobby() != null) {
+			war.badMsg(player, "This warzone is disabled.");
+			event.setFrom(zone.getTeleport());
+			player.teleportTo(zone.getTeleport());
+			event.setCancelled(true);
+		}
+	}
+
 	private void dropFromOldTeamIfAny(Player player) {
 		// drop from old team if any
 		Team previousTeam = war.getPlayerTeam(player.getName());

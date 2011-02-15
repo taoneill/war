@@ -610,6 +610,11 @@ public class War extends JavaPlugin {
 				}
 				warzone.initializeZone();	// bring back team spawns etc
 				this.msg(player, "Warzone config saved. Zone reset.");
+				
+				if(warHub != null) { // maybe the zone was disabled/enabled
+					warHub.getVolume().resetBlocks();
+					warHub.initialize();
+				}
 			} else {
 				this.badMsg(player, "Failed to read named parameters.");
 			}
@@ -637,6 +642,11 @@ public class War extends JavaPlugin {
 				lobby.getVolume().resetBlocks();
 			}
 			warzone.initializeZone();	// bring back team spawns etc
+			
+			if(warHub != null) { // maybe the zone was disabled/enabled
+				warHub.getVolume().resetBlocks();
+				warHub.initialize();
+			}
 			
 			this.msg(player, "Warzone " + warzone.getName() + " initial state changed. Saved " + savedBlocks + " blocks.");
 		}
@@ -928,34 +938,38 @@ public class War extends JavaPlugin {
 			} else {
 				lobby = warzone.getLobby();
 			}
-			List<Team> teams = warzone.getTeams();
-			boolean foundTeam = false;
-			for(Team team : teams) {
-				if(team.getName().equals(name)) {
-					if(!warzone.hasPlayerInventory(player.getName())) {
-						warzone.keepPlayerInventory(player);
-						this.msg(player, "Your inventory is is storage until you /leave.");
-					}
-					if(team.getPlayers().size() < warzone.getTeamCap()) {
-						team.addPlayer(player);
-						team.resetSign();
-						warzone.respawnPlayer(team, player);
-						if(warHub != null) {
-							warHub.resetZoneSign(warzone);
-						}
-						foundTeam = true;
-					} else {
-						this.badMsg(player, "Team " + name + " is full.");
-						foundTeam = true;
-					}
-				}
-			}
-			if(foundTeam) {
-				for(Team team : teams){
-					team.teamcast("" + player.getName() + " joined " + name);
-				}
+			if(warzone.isDisabled()) {
+				badMsg(player, "This warzone is disabled.");
 			} else {
-				this.badMsg(player, "No such team. Try /teams.");
+				List<Team> teams = warzone.getTeams();
+				boolean foundTeam = false;
+				for(Team team : teams) {
+					if(team.getName().equals(name)) {
+						if(!warzone.hasPlayerInventory(player.getName())) {
+							warzone.keepPlayerInventory(player);
+							this.msg(player, "Your inventory is is storage until you /leave.");
+						}
+						if(team.getPlayers().size() < warzone.getTeamCap()) {
+							team.addPlayer(player);
+							team.resetSign();
+							warzone.respawnPlayer(team, player);
+							if(warHub != null) {
+								warHub.resetZoneSign(warzone);
+							}
+							foundTeam = true;
+						} else {
+							this.badMsg(player, "Team " + name + " is full.");
+							foundTeam = true;
+						}
+					}
+				}
+				if(foundTeam) {
+					for(Team team : teams){
+						team.teamcast("" + player.getName() + " joined " + name);
+					}
+				} else {
+					this.badMsg(player, "No such team. Try /teams.");
+				}
 			}
 		}
 	}
@@ -1060,6 +1074,10 @@ public class War extends JavaPlugin {
 			if(namedParams.containsKey("unbreakable")) {
 				String onOff = namedParams.get("unbreakable");
 				warzone.setUnbreakableZoneBlocks(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("disabled")) {
+				String onOff = namedParams.get("disabled");
+				warzone.setDisabled(onOff.equals("on") || onOff.equals("true"));
 			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
@@ -1221,13 +1239,14 @@ public class War extends JavaPlugin {
 		this.getLogger().log(Level.WARNING, "[War] " + str);
 	}
 	
+	// the only way to find a zone that has only one corner
 	public Warzone findWarzone(String warzoneName) {
 		for(Warzone warzone : warzones) {
 			if(warzone.getName().equals(warzoneName)) {
 				return warzone;
 			}
 		}
-		for(Warzone warzone : incompleteZones) {
+		for(Warzone warzone : incompleteZones) {	
 			if(warzone.getName().equals(warzoneName)) {
 				return warzone;
 			}
