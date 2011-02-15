@@ -111,6 +111,9 @@ public class WarMapper {
 		// defaultBlockHeads
 		war.setDefaultBlockHeads(warConfig.getBoolean("defaultBlockHeads"));
 		
+		// buildInZonesOnly
+		war.setBuildInZonesOnly(warConfig.getBoolean("buildInZonesOnly"));
+		
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
 		if(spawnStyle != null && !spawnStyle.equals("")){
@@ -227,6 +230,9 @@ public class WarMapper {
 		
 		// defaultBlockHeads
 		warConfig.setBoolean("defaultBlockHeads", war.isDefaultBlockHeads());
+		
+		// buildInZonesOnly
+		warConfig.setBoolean("buildInZonesOnly", war.isBuildInZonesOnly());
 		
 		// spawnStyle
 		warConfig.setString("spawnStyle", war.getDefaultSpawnStyle());

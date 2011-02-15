@@ -79,6 +79,7 @@ public class War extends JavaPlugin {
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
 	
 	private boolean pvpInZonesOnly = false;
+	private boolean buildInZonesOnly = false;
 	
 	
 	private WarHub warHub;
@@ -121,6 +122,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.ENTITY_COMBUST, entityListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
+		//pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
 		
 		// Load files from disk or create them (using these defaults)
@@ -1112,6 +1114,10 @@ public class War extends JavaPlugin {
 					setDefaultSpawnStyle(TeamSpawnStyles.BIG);
 				}
 			}
+			if(namedParams.containsKey("buildinzonesonly")) {
+				String onOff = namedParams.get("buildinzonesonly");
+				setBuildInZonesOnly(onOff.equals("on") || onOff.equals("true"));
+			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
 //				setDefaultDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
@@ -1281,6 +1287,20 @@ public class War extends JavaPlugin {
 		return false;
 	}
 	
+	public boolean canBuildOutsideZone(Player player) {
+		if(isBuildInZonesOnly()) {
+			if(Permissions != null 
+					&& (Permissions.Security.permission(player, "war.build")
+							|| Permissions.Security.permission(player, "War.build"))) {
+				return true;
+			}
+			// w/o Permissions, if buildInZonesOnly, no one can build outside the zone
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
 	public boolean isZoneMaker(Player player) {
 		boolean isPlayerImpersonator = false;
 		for(String disguised : zoneMakersImpersonatingPlayers) {
@@ -1430,6 +1450,14 @@ public class War extends JavaPlugin {
 
 	public List<Warzone> getIncompleteZones() {
 		return incompleteZones;
+	}
+
+	public void setBuildInZonesOnly(boolean buildInZonesOnly) {
+		this.buildInZonesOnly = buildInZonesOnly;
+	}
+
+	public boolean isBuildInZonesOnly() {
+		return buildInZonesOnly;
 	}
 	
 }
