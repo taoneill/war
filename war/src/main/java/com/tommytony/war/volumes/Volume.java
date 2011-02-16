@@ -56,17 +56,20 @@ public class Volume {
 	
 	public int saveBlocks() {
 		int noOfSavedBlocks = 0;
+		int x = 0;
+		int y = 0;
+		int z = 0;
 		try {
 			if(hasTwoCorners()) {
 				this.setBlockTypes(new int[getSizeX()][getSizeY()][getSizeZ()]);
 				this.setBlockDatas(new byte[getSizeX()][getSizeY()][getSizeZ()]);
 				this.getSignLines().clear();
 				this.getInvBlockContents().clear();
-				int x = getMinX();
+				x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
-					int y = getMinY();
+					y = getMinY();
 					for(int j = 0; j < getSizeY(); j++){
-						int z = getMinZ();
+						z = getMinZ();
 						for(int k = 0;k < getSizeZ(); k++) {
 							Block block = getWorld().getBlockAt(x, y, z);
 							this.getBlockTypes()[i][j][k] = block.getTypeId();
@@ -112,29 +115,33 @@ public class Volume {
 				}
 			}		
 		} catch (Exception e) {
-			this.getWar().getLogger().warning("Failed to save volume " + getName() + " blocks. " + e.getMessage());
+			this.getWar().getLogger().warning("Failed to save volume " + getName() + " blocks. Saved blocks:" + noOfSavedBlocks 
+					+ ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + e.getMessage());
 		}
 		return noOfSavedBlocks;
 	}
 	
 	public int resetBlocks() {
-		int noOfResetBlocks = 0;
+		int visitedBlocks = 0, noOfResetBlocks = 0, x = 0, y = 0, z = 0;
+		int currentBlockId = 0;
+		int oldBlockType = 0;
 		clearBlocksThatDontFloat();
 		try {
 			if(hasTwoCorners() && getBlockTypes() != null) {
-				int x = getMinX();
+				x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
-					int y = getMinY();
+					y = getMinY();
 					for(int j = 0; j < getSizeY(); j++){
-						int z = getMinZ();
+						z = getMinZ();
 						for(int k = 0;k < getSizeZ(); k++) {
-							int oldBlockType = getBlockTypes()[i][j][k];
+							oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(currentBlock.getTypeId() != oldBlockType ||
-								(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData ) ||
-								(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() == oldBlockData &&
-										(oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId()
+							currentBlockId = currentBlock.getTypeId();
+							if(currentBlockId != oldBlockType ||
+								(currentBlockId == oldBlockType && currentBlock.getData() != oldBlockData ) ||
+								(currentBlockId == oldBlockType && currentBlock.getData() == oldBlockData &&
+										(oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId() 
 												|| oldBlockType == Material.CHEST.getId() || oldBlockType == Material.DISPENSER.getId())
 								)
 							) {
@@ -159,7 +166,7 @@ public class Volume {
 									Sign sign = (Sign)state;
 									String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "-" + k);
 									if(lines != null) {
-										sign.setLine(0, lines[0]);
+										if(lines.length>0)sign.setLine(0, lines[0]);
 										if(lines.length>1)sign.setLine(1, lines[1]);
 										if(lines.length>2)sign.setLine(2, lines[2]);
 										if(lines.length>3)sign.setLine(3, lines[3]);
@@ -209,7 +216,7 @@ public class Volume {
 										currentBlock.setData(oldBlockData);
 										Block blockAbove = getWorld().getBlockAt(x, y+1, z);
 										blockAbove.setType(Material.getMaterial(oldBlockType));
-										blockAbove.setData(getBlockDatas()[i][j+1][k]);	// top door block has the 0x08 bit enabled
+										blockAbove.setData(getBlockDatas()[i][j+1][k]);
 									}
 								} else {
 									// regular block
@@ -218,6 +225,7 @@ public class Volume {
 								}
 								noOfResetBlocks++;
 							}
+							visitedBlocks++;
 							z++;
 						}
 						y++;
@@ -226,7 +234,9 @@ public class Volume {
 				}
 			}		
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to reset volume " + getName() + " blocks. " + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().logWarn("Failed to reset volume " + getName() + " blocks. Blocks visited: " + visitedBlocks 
+					+ ". Blocks reset: "+ noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z 
+					+ ". Current block: " + currentBlockId + ". Old block: " + oldBlockType + ". Exception: " + e.getClass().toString() + " " + e.getMessage());
 		}
 		return noOfResetBlocks;
 	}
