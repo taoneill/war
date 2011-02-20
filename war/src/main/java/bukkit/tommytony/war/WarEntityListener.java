@@ -51,10 +51,6 @@ public class WarEntityListener extends EntityListener {
 			}
 		}
     }
-	
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-    	handlerAttackDefend(event);
-    }
     
     private void handlerAttackDefend(EntityDamageByEntityEvent event) {
     	Entity attacker = event.getDamager();
@@ -144,10 +140,6 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 
-	public void onEntityDamageByProjectile(EntityDamageByProjectileEvent event) {
-    	handlerAttackDefend(event);
-    }
-	
 	public void onEntityExplode(EntityExplodeEvent event) {
 		// protect zones elements, lobbies and warhub from creepers
 		List<Block> explodedBlocks = event.blockList();
@@ -172,7 +164,10 @@ public class WarEntityListener extends EntityListener {
     }
 	
 	public void onEntityDamage(EntityDamageEvent event) {
-		if(event.getCause() == DamageCause.FIRE_TICK) {
+		if(event instanceof EntityDamageByEntityEvent || 
+				event instanceof EntityDamageByProjectileEvent) {
+			handlerAttackDefend((EntityDamageByEntityEvent)event);
+		} else if(event.getCause() == DamageCause.FIRE_TICK) {
 			Entity entity =  event.getEntity();
 			if(entity instanceof Player) {
 				Player player = (Player) entity;

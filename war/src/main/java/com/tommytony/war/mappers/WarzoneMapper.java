@@ -167,7 +167,7 @@ public class WarzoneMapper {
 		warzone.setLifePool(warzoneConfig.getInt("lifePool"));
 		
 		// drawZoneOutline
-		warzone.setFriendlyFire(warzoneConfig.getBoolean("drawZoneOutline"));
+		warzone.setDrawZoneOutline(warzoneConfig.getBoolean("drawZoneOutline"));
 		
 		// autoAssignOnly
 		warzone.setAutoAssignOnly(warzoneConfig.getBoolean("autoAssignOnly"));
