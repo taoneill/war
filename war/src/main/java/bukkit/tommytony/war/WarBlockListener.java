@@ -84,6 +84,18 @@ public class WarBlockListener extends BlockListener {
 	    		event.setCancelled(true);
 	    		return;
 	    	}
+	    	
+	    	boolean isZoneMaker = war.isZoneMaker(player);
+	    	// unbreakableZoneBlocks
+	    	if(zone != null && zone.isUnbreakableZoneBlocks() 
+	    			&& (!isZoneMaker
+	    					|| (isZoneMaker && team != null)) 
+	    					) {
+	    		// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks
+	    		war.badMsg(player, "The blocks in this zone are unbreakable - this also means you can't build!");
+	    		event.setCancelled(true);
+	    		return;
+	    	}
 		}
     }
 	
