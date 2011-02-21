@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.tommytony.war.InventoryStash;
+import com.tommytony.war.RestoreDeadmanInventoryJob;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.WarHub;
@@ -442,8 +443,9 @@ public class WarPlayerListener extends PlayerListener {
 		// He dies for real (no quick respawn) becasue his ENTITY_DEATH takes too long (everyones warping)
 		if(locZone == null && locLobby == null) {
 			for(Warzone zone : war.getWarzones()) {
-				if(zone.hasPlayerInventory(player.getName())) {
-					zone.restorePlayerInventory(player);
+				if(zone.isDeadMan(player.getName())) {
+					RestoreDeadmanInventoryJob job = new RestoreDeadmanInventoryJob(player, zone);
+					war.getServer().getScheduler().scheduleAsyncDelayedTask(war, job, 3);
 				}
 			}
 		}

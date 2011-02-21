@@ -58,6 +58,7 @@ public class Warzone {
 	private boolean unbreakableZoneBlocks;
 	private boolean disabled = false;
 	private boolean noCreatures;
+	private HashMap<String, InventoryStash> deadMenInventories = new HashMap<String, InventoryStash>();
 	
 	
 	public Warzone(War war, World world, String name) {
@@ -509,32 +510,36 @@ public class Warzone {
 		InventoryStash originalContents = inventories.remove(player.getName());
 		PlayerInventory playerInv = player.getInventory();
 		if(originalContents != null) {
-			playerInv.clear();
-			playerInv.clear(playerInv.getSize() + 0);
-			playerInv.clear(playerInv.getSize() + 1);
-			playerInv.clear(playerInv.getSize() + 2);
-			playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
-			for(ItemStack item : originalContents.getContents()) {
-				if(item.getTypeId() != 0) {
-					playerInv.addItem(item);
-				}
-			}
-			if(originalContents.getHelmet() != null && originalContents.getHelmet().getType() != Material.AIR) {
-				playerInv.setHelmet(originalContents.getHelmet());
-			}
-			if(originalContents.getChest() != null && originalContents.getChest().getType() != Material.AIR) {
-				playerInv.setChestplate(originalContents.getChest());
-			}
-			if(originalContents.getLegs() != null && originalContents.getLegs().getType() != Material.AIR) {
-				playerInv.setLeggings(originalContents.getLegs());
-			}
-			if(originalContents.getFeet() != null && originalContents.getFeet().getType() != Material.AIR) {
-				playerInv.setBoots(originalContents.getFeet());
-			}
+			playerInvFromInventoryStash(playerInv, originalContents);
 		}
-		
 	}
 	
+	private void playerInvFromInventoryStash(PlayerInventory playerInv,
+			InventoryStash originalContents) {
+		playerInv.clear();
+		playerInv.clear(playerInv.getSize() + 0);
+		playerInv.clear(playerInv.getSize() + 1);
+		playerInv.clear(playerInv.getSize() + 2);
+		playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
+		for(ItemStack item : originalContents.getContents()) {
+			if(item.getTypeId() != 0) {
+				playerInv.addItem(item);
+			}
+		}
+		if(originalContents.getHelmet() != null && originalContents.getHelmet().getType() != Material.AIR) {
+			playerInv.setHelmet(originalContents.getHelmet());
+		}
+		if(originalContents.getChest() != null && originalContents.getChest().getType() != Material.AIR) {
+			playerInv.setChestplate(originalContents.getChest());
+		}
+		if(originalContents.getLegs() != null && originalContents.getLegs().getType() != Material.AIR) {
+			playerInv.setLeggings(originalContents.getLegs());
+		}
+		if(originalContents.getFeet() != null && originalContents.getFeet().getType() != Material.AIR) {
+			playerInv.setBoots(originalContents.getFeet());
+		}
+	}
+
 	public InventoryStash getPlayerInventory(String playerName) {
 		if(inventories.containsKey(playerName)) return inventories.get(playerName);
 		return null;
@@ -905,12 +910,9 @@ public class Warzone {
 							for(Team winner : scoreCapTeams) {
 								winnersStr += winner.getName() + " ";
 							}
-							if(playerWarzone.hasPlayerInventory(player.getName())){
-								playerWarzone.restorePlayerInventory(player);
-							}
 							
 							playerWarzone.handleScoreCapReached(player, winnersStr);
-							player.teleportTo(playerWarzone.getTeleport());
+							//player.teleportTo(playerWarzone.getTeleport());
 							// player will die because it took too long :(
 							// we dont restore his inventory in handleScoreCapReached
 							// check out PLAYER_MOVE for the rest of the fix
@@ -1043,12 +1045,23 @@ public class Warzone {
 	public void handleScoreCapReached(Player player, String winnersStr) {
 		winnersStr = "Score cap reached! Winning team(s): " + winnersStr;		
 		winnersStr += ". Your inventory has (hopefully) been reset. The warzone is being reset... Please choose a new team.";
+		if(this.hasPlayerInventory(player.getName())){
+			InventoryStash stash = inventories.remove(player.getName());
+			deadMenInventories.put(player.getName(), stash);
+		}
 		// Score cap reached. Reset everything.
 		for(Team t : this.getTeams()) {
 			t.teamcast(winnersStr);
 			for(Player tp : t.getPlayers()) {
+				PlayerInventory inv = player.getInventory();
 				
 				if(!tp.getName().equals(player.getName())) {
+//					ScoreCapReachedJob job = new ScoreCapReachedJob(tp, this);
+//					if(winnersStr.contains(t.getName())) {
+//						job.giveReward(true);
+//					}
+//					war.getServer().getScheduler().scheduleAsyncDelayedTask(war, job, 1);
+// fail					
 					tp.teleportTo(this.getTeleport());
 					// don't reset inv of dead guy who caused this, he's gonna die becasue this takes too long so we'll restore inv at PLAYER_MOVE 
 					if(this.hasPlayerInventory(tp.getName())){
@@ -1129,5 +1142,20 @@ public class Warzone {
 
 	public void setNoCreatures(boolean noCreatures) {
 		this.noCreatures = noCreatures;
+	}
+
+	public boolean isDeadMan(String playerName) {
+		if(deadMenInventories.containsKey(playerName)) {
+			return true;
+		}
+		return false;
+	}
+
+	public void restoreDeadmanInventory(Player player) {
+		if(isDeadMan(player.getName())) {
+			playerInvFromInventoryStash(player.getInventory(), deadMenInventories.get(player.getName()));
+			deadMenInventories.remove(player.getName());
+		}
+		
 	}	
 }
