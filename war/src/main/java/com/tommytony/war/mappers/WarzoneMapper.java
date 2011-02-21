@@ -214,6 +214,9 @@ public class WarzoneMapper {
 		// disabled
 		warzone.setDisabled(warzoneConfig.getBoolean("disabled"));
 		
+		// defaultNoCreatures
+		warzone.setNoCreatures(warzoneConfig.getBoolean("noCreatures"));
+		
 		// dropLootOnDeath
 		//warzone.setDropLootOnDeath(warzoneConfig.getBoolean("dropLootOnDeath"));
 		
@@ -400,6 +403,9 @@ public class WarzoneMapper {
 		
 		// disabled
 		warzoneConfig.setBoolean("disabled", warzone.isDisabled());
+		
+		// noCreatures
+		warzoneConfig.setBoolean("noCreatures", warzone.isNoCreatures());
 		
 		// defaultDropLootOnDeath
 		//warzoneConfig.setBoolean("dropLootOnDeath", warzone.isDropLootOnDeath());

@@ -57,6 +57,7 @@ public class Warzone {
 	private boolean dropLootOnDeath;
 	private boolean unbreakableZoneBlocks;
 	private boolean disabled = false;
+	private boolean noCreatures;
 	
 	
 	public Warzone(War war, World world, String name) {
@@ -73,6 +74,7 @@ public class Warzone {
 		this.setBlockHeads(war.isDefaultBlockHeads());
 		this.setDropLootOnDeath(war.isDefaultDropLootOnDeath());
 		this.setUnbreakableZoneBlocks(war.isDefaultUnbreakableZoneBlocks());
+		this.setNoCreatures(war.getDefaultNoCreatures());
 		this.volume = new VerticalVolume(name, war, this.getWorld());
 	}
 	
@@ -820,7 +822,7 @@ public class Warzone {
 			if(!hasPlayerInventory(player.getName())) {
 				keepPlayerInventory(player);
 			}
-			war.msg(player, "Your inventory is is storage until you /leave.");
+			war.msg(player, "Your inventory is in storage until you /leave.");
 			respawnPlayer(lowestNoOfPlayers, player);
 			for(Team team : teams){
 				team.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
@@ -1121,5 +1123,11 @@ public class Warzone {
 		return disabled;
 	}
 
-	
+	public boolean isNoCreatures() {
+		return noCreatures;
+	}
+
+	public void setNoCreatures(boolean noCreatures) {
+		this.noCreatures = noCreatures;
+	}	
 }

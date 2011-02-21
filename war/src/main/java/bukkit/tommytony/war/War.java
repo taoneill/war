@@ -63,23 +63,24 @@ public class War extends JavaPlugin {
     private final List<String> zoneMakerNames = new ArrayList<String>();
     private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
     private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
-    private int defaultLifepool = 42;
+    private int defaultLifepool = 21;
     private boolean defaultFriendlyFire = false;
 	private boolean defaultDrawZoneOutline = true;
 	private boolean defaultAutoAssignOnly = false;
 	private int defaultTeamCap = 7;
 	private int defaultScoreCap = 10;
-	private boolean defaultBlockHeads = false;
+	private boolean defaultBlockHeads = true;
 	private boolean defaultDropLootOnDeath = false;
 	private String defaultSpawnStyle = TeamSpawnStyles.BIG;
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
 	private boolean defaultUnbreakableZoneBlocks = false;
+	private boolean defaultNoCreatures = false;
 	
 	private boolean pvpInZonesOnly = false;
 	private boolean buildInZonesOnly = false;
 	
-	
 	private WarHub warHub;
+	
 	
 	public void onDisable() {
 		for(Warzone warzone : warzones) {
@@ -102,7 +103,8 @@ public class War extends JavaPlugin {
 
 	public void onEnable() {
 		desc = this.getDescription();
-		this.log = Logger.getLogger("Minecraft");
+		//this.log = Logger.getLogger("Minecraft");
+		this.log = this.getServer().getLogger();
 		this.setupPermissions();
 		
 		// Register hooks		
@@ -120,6 +122,9 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_COMBUST, entityListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.Normal, this);
+		
+		
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
@@ -1000,7 +1005,7 @@ public class War extends JavaPlugin {
 					if(team.getName().equals(name)) {
 						if(!warzone.hasPlayerInventory(player.getName())) {
 							warzone.keepPlayerInventory(player);
-							this.msg(player, "Your inventory is is storage until you /leave.");
+							this.msg(player, "Your inventory is in storage until you /leave.");
 						}
 						if(team.getPlayers().size() < warzone.getTeamCap()) {
 							team.addPlayer(player);
@@ -1132,6 +1137,10 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("disabled");
 				warzone.setDisabled(onOff.equals("on") || onOff.equals("true"));
 			}
+			if(namedParams.containsKey("nocreatures")) {
+				String onOff = namedParams.get("nocreatures");
+				warzone.setNoCreatures(onOff.equals("on") || onOff.equals("true"));
+			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
 //				warzone.setDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
@@ -1197,6 +1206,10 @@ public class War extends JavaPlugin {
 			if(namedParams.containsKey("unbreakable")) {
 				String onOff = namedParams.get("unbreakable");
 				setDefaultUnbreakableZoneBlocks(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("nocreatures")) {
+				String onOff = namedParams.get("nocreatures");
+				this.setDefaultNoCreatures(onOff.equals("on") || onOff.equals("true"));
 			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
@@ -1547,6 +1560,19 @@ public class War extends JavaPlugin {
 
 	public boolean isDefaultUnbreakableZoneBlocks() {
 		return defaultUnbreakableZoneBlocks;
+	}
+
+	public boolean getDefaultNoCreatures() {
+		// TODO Auto-generated method stub
+		return isDefaultNoCreatures();
+	}
+
+	public void setDefaultNoCreatures(boolean defaultNoCreatures) {
+		this.defaultNoCreatures = defaultNoCreatures;
+	}
+
+	public boolean isDefaultNoCreatures() {
+		return defaultNoCreatures;
 	}
 	
 }

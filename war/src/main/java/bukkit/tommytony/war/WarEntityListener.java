@@ -3,10 +3,12 @@ package bukkit.tommytony.war;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
@@ -217,4 +219,14 @@ public class WarEntityListener extends EntityListener {
 			
 		}
     }
+	
+	public void onCreatureSpawn(CreatureSpawnEvent event) {
+		Location location = event.getLocation();
+		Warzone zone = war.warzone(location);
+		if(zone != null && zone.isNoCreatures()) {
+			event.setCancelled(true);
+			war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
+		}
+    }
+
 }

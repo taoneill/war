@@ -663,11 +663,11 @@ public class ZoneLobby {
 //		int y = location.getBlockY();
 //		int z = location.getBlockZ();
 //		
-		// 5x3x3 deep
+		// 3x4x1 deep
 		Volume gateExitVolume = new Volume("tempGateExit", 	war, location.getWorld());
 		Block out = gate.getFace(inside);
-		gateExitVolume.setCornerOne(out.getFace(left, 2));
-		gateExitVolume.setCornerTwo(out.getFace(right, 2).getFace(inside, 2).getFace(BlockFace.UP, 2));
+		gateExitVolume.setCornerOne(out.getFace(left).getFace(BlockFace.DOWN));
+		gateExitVolume.setCornerTwo(gate.getFace(right, 1).getFace(BlockFace.UP, 3));
 		
 		if(gateExitVolume.contains(location)) {
 			return true;

@@ -143,6 +143,10 @@ public class WarMapper {
 		
 		// defaultUnbreakableZoneBlocks
 		war.setDefaultUnbreakableZoneBlocks(warConfig.getBoolean("defaultUnbreakableZoneBlocks"));
+		
+		// defaultNoCreatures
+		war.setDefaultNoCreatures(warConfig.getBoolean("defaultNoCreatures"));
+		
 		// defaultDropLootOnDeath
 		//war.setDefaultDropLootOnDeath(warConfig.getBoolean("defaultDropLootOnDeath"));
 		
@@ -250,6 +254,9 @@ public class WarMapper {
 
 		// defaultUnbreakableZoneBlocks
 		warConfig.setBoolean("defaultUnbreakableZoneBlocks", war.isDefaultUnbreakableZoneBlocks());
+		
+		// defaultNoCreatures
+		warConfig.setBoolean("defaultNoCreatures", war.isDefaultNoCreatures());
 		
 		// defaultDropLootOnDeath
 		//warConfig.setBoolean("defaultDropLootOnDeath", war.isDefaultDropLootOnDeath());

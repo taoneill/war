@@ -241,7 +241,7 @@ public class WarPlayerListener extends PlayerListener {
 							war.getWarHub().resetZoneSign(zone);
 						}
 						zone.keepPlayerInventory(player);
-						war.msg(player, "Your inventory is is storage until you /leave.");
+						war.msg(player, "Your inventory is in storage until you /leave.");
 						zone.respawnPlayer(event, diamondTeam, player);
 						//zone.respawnPlayer(diamondTeam, player);
 						//event.setCancelled(true);
@@ -271,7 +271,7 @@ public class WarPlayerListener extends PlayerListener {
 							war.getWarHub().resetZoneSign(zone);
 						}
 						zone.keepPlayerInventory(player);
-						war.msg(player, "Your inventory is is storage until you /leave.");
+						war.msg(player, "Your inventory is in storage until you /leave.");
 						zone.respawnPlayer(event, ironTeam, player);
 //										zone.respawnPlayer(ironTeam, player);
 //										event.setCancelled(true);
@@ -301,7 +301,7 @@ public class WarPlayerListener extends PlayerListener {
 							war.getWarHub().resetZoneSign(zone);
 						}
 						zone.keepPlayerInventory(player);
-						war.msg(player, "Your inventory is is storage until you /leave.");
+						war.msg(player, "Your inventory is in storage until you /leave.");
 						zone.respawnPlayer(event, goldTeam, player);
 						//zone.respawnPlayer(goldTeam, player);
 						//event.setCancelled(true);
