@@ -6,10 +6,17 @@ import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.ItemDrop;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerInventoryEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -89,6 +96,74 @@ public class WarPlayerListener extends PlayerListener {
 		}
 	}
 
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+    	Player player = event.getPlayer();
+		Team team = war.getPlayerTeam(player.getName());
+		if(team != null) {
+			Warzone zone = war.getPlayerTeamWarzone(player.getName());
+			
+			if(zone.isFlagThief(player.getName())) {
+				// a flag thief can't drop his flag
+				war.badMsg(player, "Can't drop the flag. What are you doing? Run!");
+				event.setCancelled(true);
+				
+			} else {
+				ItemDrop itemDrop = event.getItemDrop();
+				ItemStack itemStack =  itemDrop.getItemStack();
+				if(itemStack != null && itemStack.getType().getId() == team.getMaterial().getId()) {
+					// Can't drop a precious block
+					war.badMsg(player, "Can't drop " + team.getName() + " block blocks.");
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+    }
+
+    public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+    	Player player = event.getPlayer();
+		Team team = war.getPlayerTeam(player.getName());
+		if(team != null) {
+			Warzone zone = war.getPlayerTeamWarzone(player.getName());
+			
+			if(zone.isFlagThief(player.getName())) {
+				// a flag thief can't pick up anything
+				event.setCancelled(true);
+			}
+			// BUKKIT (waiting for EvilSeph)
+//			} else {
+//				Item item = event.getItem();
+//				ItemStack itemStack = null;
+//				if(item instanceof ItemDrop) {
+//					ItemDrop itemDrop = (ItemDrop) item;
+//					itemStack = itemDrop.getItemStack();
+//				}
+//				if(itemStack != null && itemStack.getType().getId() == team.getMaterial().getId()
+//						&& player.getInventory().contains(team.getMaterial())) {
+//					// Can't pick up a second precious block
+//					war.badMsg(player, "You already have a " + team.getName() + " block.");
+//					event.setCancelled(true);
+//					return;
+//				}
+//			}
+		}
+    }
+    
+    public void onInventoryOpen(PlayerInventoryEvent event) {
+    	Player player = event.getPlayer();
+    	Inventory inventory = event.getInventory();
+    	Team team = war.getPlayerTeam(player.getName());
+    	if(team != null && inventory instanceof PlayerInventory) {
+    		// make sure the player doesn't have too many precious blocks
+    		// or illegal armor (i.e. armor not found in loadout)
+    		PlayerInventory playerInv = (PlayerInventory) inventory;
+    		if(playerInv.contains(team.getMaterial(), 2)) {
+    			playerInv.remove(team.getMaterial());
+    			playerInv.addItem(new ItemStack(team.getMaterial()));
+    			war.badMsg(player, "All that " + team.getName() + " must have been heavy!");
+    		}
+    	}
+    }
 	
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
@@ -415,96 +490,4 @@ public class WarPlayerListener extends PlayerListener {
 		}
 		return teamsMessage;
 	}
-
-//	private void handleDeath(PlayerMoveEvent event, Player player, Warzone playerWarzone, Team playerTeam) {
-//    	// teleport to team spawn upon death
-//		war.msg(player, "You died.");
-//		boolean newBattle = false;
-//		boolean scoreCapReached = false;
-//		//synchronized(playerWarzone) {
-//			//synchronized(player) {
-//				int remaining = playerTeam.getRemainingLifes();
-//				if(remaining == 0) { // your death caused your team to lose
-//					List<Team> teams = playerWarzone.getTeams();
-//					String scorers = "";
-//					for(Team t : teams) {
-//						t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " 
-//								+ player.getName() + " died and there were no lives left in their life pool." );
-//						
-//						if(!t.getName().equals(playerTeam.getName())) {
-//							// all other teams get a point
-//							t.addPoint();
-//							t.resetSign();
-//							scorers += "Team " + t.getName() + " scores one point. ";
-//						}
-//					}
-//					if(!scorers.equals("")){
-//						for(Team t : teams) {
-//							t.teamcast(scorers);
-//						}
-//					}
-//					// detect score cap
-//					List<Team> scoreCapTeams = new ArrayList<Team>();
-//					for(Team t : teams) {
-//						if(t.getPoints() == playerWarzone.getScoreCap()) {
-//							scoreCapTeams.add(t);
-//						}
-//					}
-//					if(!scoreCapTeams.isEmpty()) {
-//						String winnersStr = "";
-//						for(Team winner : scoreCapTeams) {
-//							winnersStr += winner.getName() + " ";
-//						}
-//						if(playerWarzone.hasPlayerInventory(player.getName())){
-//							playerWarzone.restorePlayerInventory(player);
-//						}
-//						
-//						playerWarzone.handleScoreCapReached(player, winnersStr);
-//						event.setFrom(playerWarzone.getTeleport());
-//						player.teleportTo(playerWarzone.getTeleport());
-//						event.setCancelled(true);
-//						scoreCapReached = true;
-//					} else {
-//						// A new battle starts. Reset the zone but not the teams.
-//						for(Team t : teams) {
-//							t.teamcast("A new battle begins. The warzone is being reset...");
-//						}
-//						playerWarzone.getVolume().resetBlocks();
-//						playerWarzone.initializeZone(event);
-//						newBattle = true;
-//					}
-//				} else {
-//					// player died without causing his team's demise
-//					if(playerWarzone.isFlagThief(player.getName())) {
-//						// died while carrying flag.. dropped it
-//						Team victim = playerWarzone.getVictimTeamForThief(player.getName());
-//						victim.getFlagVolume().resetBlocks();
-//						victim.initializeTeamFlag();
-//						playerWarzone.removeThief(player.getName());
-//						for(Team t : playerWarzone.getTeams()) {
-//							t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
-//						}
-//					}
-//					playerTeam.setRemainingLives(remaining - 1);
-//					if(remaining - 1 == 0) {
-//						for(Team t : playerWarzone.getTeams()) {
-//							t.teamcast("Team " + t.getName() + "'s life pool is empty. One more death and they lose the battle!");
-//						}
-//					}
-//				}
-//			//}
-//		//}
-//		//synchronized(player) {
-//			if(!newBattle && !scoreCapReached) {
-//				playerTeam.resetSign();
-//				playerWarzone.respawnPlayer(event, playerTeam, player);
-//			} 
-////			else if (scoreCapReached) {
-////				
-////				war.info(player.getName() + " died and enemy team reached score cap");
-////			} else if (newBattle){
-////				war.info(player.getName() + " died and battle ended in team " + playerTeam.getName() + "'s disfavor");
-////			}
-//		//}
-//	}
 }

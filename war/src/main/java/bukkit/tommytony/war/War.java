@@ -100,6 +100,7 @@ public class War extends JavaPlugin {
 	}
 
 	public void onEnable() {
+		desc = this.getDescription();
 		this.log = Logger.getLogger("Minecraft");
 		this.setupPermissions();
 		
@@ -109,6 +110,10 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.INVENTORY_OPEN, playerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Priority.Normal, this);
+		
 
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
@@ -116,7 +121,6 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.ENTITY_COMBUST, entityListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
-		//pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
 		
 		// Load files from disk or create them (using these defaults)
