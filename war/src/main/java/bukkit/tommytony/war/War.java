@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -185,6 +186,8 @@ public class War extends JavaPlugin {
 					performSetZone(player, arguments);
 				} else if(command.equals("setzonelobby")) {
 					performSetZoneLobby(player, arguments);
+				} else if(command.equals("setzoneloadout")) {
+					performSetZoneLoadout(player, arguments);
 				} else if(command.equals("savezone")) {
 					performSaveZone(player, arguments);
 				} else if(command.equals("setzoneconfig")) {
@@ -209,6 +212,8 @@ public class War extends JavaPlugin {
 					performDeleteWarhub(player);
 				} else if(command.equals("setwarconfig")) {
 					performSetWarConfig(player, arguments);
+				} else if(command.equals("setwarloadout")) {
+					performSetWarLoadout(player, arguments);
 				} else if(command.equals("zonemaker")) {
 					performZonemakerAsZonemaker(player, arguments);
 				}
@@ -232,6 +237,57 @@ public class War extends JavaPlugin {
 			}
 		}
 		return true;
+	}
+
+	private void performSetZoneLoadout(Player player, String[] arguments) {
+		if(arguments.length > 0 || (!this.inAnyWarzone(player.getLocation()) 
+				&& !this.inAnyWarzoneLobby(player.getLocation()))) {
+			this.badMsg(player, "Usage: Fill you inventory with what you want players to spawn with in this zone, then use /setzoneloadout. Must be in a warzone or lobby.");
+		} else {
+			Warzone zone = this.warzone(player.getLocation());
+			if(zone == null) {
+				ZoneLobby lobby = this.lobby(player.getLocation());
+				zone = lobby.getZone();
+			}
+			HashMap<Integer, ItemStack> loadout = zone.getLoadout();
+			inventoryToLoadout(player, loadout);
+			WarzoneMapper.save(this, zone, false);
+			this.msg(player, "Zone loadout changed.");
+		}
+	}
+	
+	private void performSetWarLoadout(Player player, String[] arguments) {
+		if(arguments.length > 0) {
+			this.badMsg(player, "Usage: Fill you inventory with what you want players to spawn with in all new zone, then use /setwarloadout.");
+		} else {
+			HashMap<Integer, ItemStack> loadout = this.getDefaultLoadout();
+			inventoryToLoadout(player, loadout);
+			
+			WarMapper.save(this);
+			this.msg(player, "War default loadout changed.");
+		}
+	}
+
+	private void inventoryToLoadout(Player player,
+			HashMap<Integer, ItemStack> loadout) {
+		loadout.clear();
+		PlayerInventory inv = player.getInventory();
+		int i = 0;
+		for(ItemStack stack : inv.getContents()){
+			if(stack.getType() != Material.AIR) {
+				loadout.put(i, stack);
+			}
+			i++;
+		}
+		if(inv.getBoots() != null && inv.getBoots().getType() != Material.AIR) {
+			loadout.put(100, inv.getBoots());
+		}
+		if(inv.getLeggings() != null && inv.getLeggings().getType() != Material.AIR) {
+			loadout.put(101, inv.getLeggings());
+		}
+		if(inv.getChestplate() != null && inv.getChestplate().getType() != Material.AIR) {
+			loadout.put(102, inv.getChestplate());
+		}
 	}
 
 	public void performZonemakerAsPlayer(Player player) {

@@ -391,8 +391,6 @@ public class Warzone {
 				playerInv.setLeggings(loadout.get(slot));
 			} else if(slot == 102) {
 				playerInv.setChestplate(loadout.get(slot));
-			} else if(slot == 103) {
-				playerInv.setHelmet(loadout.get(slot));
 			} else { 
 				playerInv.addItem(loadout.get(slot));
 			}

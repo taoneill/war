@@ -36,7 +36,7 @@ commands:
 # Warzone maker commands
 # 1- Battle-related commands
   nextbattle:
-    description: War makers only. Zone blocks are restored (from memory). Teams are respawned. Just as if a team's life pool had been exhausted.
+    description: Zone makers only. Zone blocks are restored (from memory). Teams are respawned. Just as if a team's life pool had been exhausted.
     usage: /nextbattle
 # 2- Warzone creation commands
   setzone:
@@ -48,6 +48,9 @@ commands:
   setzonelobby:
     description: Zone makers only. Creates or changes the position of the warzone lobby. Must be in warzone or lobby.
     usage: /setzonelobby <north/east/south/west/n/e/s/w>
+  setzoneloadout:
+    description: Zone makers only. Changes the zone's respawn loadout to your current inventory. Must be in warzone or lobby.
+    usage: /setzoneloadout
   setteam:
     description: Zone makers only. Creates or moves a team spawn. The lobby is updated to reflect any new team. The only available teams are diamond, iron and gold. Must be warzone. 
     usage: /setteam <diamond/iron/gold/d/i/g>
@@ -77,15 +80,18 @@ commands:
     usage: /zonemaker, /zonemaker <new-or-kicked-maker-name>
 # 3- War hub
   setwarhub:
-    description: War makers only. Create or moves a West-facing wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
+    description: Zone makers only. Create or moves a West-facing wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
     usage: /setwarhub
   deletewarhub:
-    description: War makers only. Deletes the warhub if it exists. Resets all warzone lobbies.
+    description: Zone makers only. Deletes the warhub if it exists. Resets all warzone lobbies.
     usage: /deletewarhub
 # 4- Defaults
   setwarconfig:
-    description: War makers only. Change the default warzone configuration values.
+    description: Zone makers only. Change the default warzone configuration values.
     usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on
+  setwarloadout:
+    description: Zone makers only. Changes the default respawn loadout for all new zones.
+    usage: /setzoneloadout
 # Fallback
   war:
     description: Prompts you to use /warhub, /zones and /zone. Can also be used as a prefix for all commands as a fallback if they are taken.
