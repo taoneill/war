@@ -774,6 +774,10 @@ public class War extends JavaPlugin {
 					"Saves the zone blocks if the zone if the outline is correct.");
 		} else {
 			Warzone warzone = this.findWarzone(arguments[0]);
+			String msgString = "";
+			Location oldSoutheast = null;
+			Location oldNorthwest = null;
+			boolean fail = false;
 			if(warzone == null) {
 				// create the warzone
 				warzone = new Warzone(this, player.getLocation().getWorld(), arguments[0]);
@@ -800,7 +804,6 @@ public class War extends JavaPlugin {
 						// just moving the single nw corner we've placed so far
 						warzone.setNorthwest(player.getLocation());
 					}else {
-						String msgString = "";
 						if(warzone.getVolume().isSaved()) {
 							msg(player, "Resetting " + warzone.getName() + " blocks.");
 							if(warzone.getLobby() != null) {
@@ -809,35 +812,22 @@ public class War extends JavaPlugin {
 							int reset = warzone.getVolume().resetBlocks();
 							
 							msgString = reset + " blocks reset. ";
-						} else {
-							this.addWarzone(warzone);
-							this.incompleteZones.remove(warzone);
-							WarMapper.save(this);
-						}
+							oldNorthwest = warzone.getNorthwest();
+						}						
 						warzone.setNorthwest(player.getLocation());
-						if(warzone.tooSmall()) {
-							badMsg(player, "Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.");
-						} else if (warzone.tooBig()) {
-							badMsg(player, "Warzone " + warzone.getName() + " is too Big. Max north-south size: 500. Max east-west size: 500.");
-						}
-						else {
-							msgString += "New zone outline ok. Northwesternmost point of zone " + warzone.getName() + " set to x:" + (int)warzone.getNorthwest().getBlockX()
-								+ " z:" + (int)warzone.getNorthwest().getBlockZ()+ ". Saving new warzone blocks...";
-							msg(player, msgString);
-							WarzoneMapper.save(this, warzone, false);
-						}
 					} 
 				} else if(arguments[1].equals("southeast") || arguments[1].equals("se")) {
 					if(warzone.getNorthwest() != null 
 							&& (player.getLocation().getBlockX() <= warzone.getNorthwest().getBlockX()
 									|| player.getLocation().getBlockZ() >= warzone.getNorthwest().getBlockZ())) {
 						this.badMsg(player, "You must place that corner southeast relative to the existing northwest corner! ");
+						fail = true;
 					} else if (warzone.getNorthwest() == null){
 						// just moving the single se corner we've placed so far
 						warzone.setSoutheast(player.getLocation());
 					} else {
-						String msgString = "";
 						if(warzone.getVolume().isSaved()) {
+							// we're resizing a zone
 							msg(player, "Resetting zone " + warzone.getName() + " blocks.");
 							if(warzone.getLobby() != null) {
 								warzone.getLobby().getVolume().resetBlocks();
@@ -845,54 +835,62 @@ public class War extends JavaPlugin {
 							int reset = warzone.getVolume().resetBlocks();
 							
 							msgString = reset + " blocks reset. ";
-						} else {
-							this.addWarzone(warzone);
-							this.incompleteZones.remove(warzone);
-							WarMapper.save(this);
+							oldSoutheast = warzone.getSoutheast();
 						}
 						warzone.setSoutheast(player.getLocation());
-						if(warzone.tooSmall()) {
-							badMsg(player, "Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.");
-						} else if (warzone.tooBig()) {
-							badMsg(player, "Warzone " + warzone.getName() + " is too Big. Max north-south size: 500. Max east-west size: 500.");
-						}
-						else {
-							msgString += "New zone outline ok. Southeasternmost point of zone " + warzone.getName() + " set to x:" + (int)warzone.getSoutheast().getBlockX()
-								+ " z:" + (int)warzone.getSoutheast().getBlockZ()+ ". Saving new warzone blocks...";
-							msg(player, msgString);
-							WarzoneMapper.save(this, warzone, false);
-						}
 					}
 				}
 			}
 			if(warzone.getNorthwest() == null) {
-				msg(player, "Still missing northwesternmost point.");
-			}
-			if(warzone.getSoutheast() == null) {
-				msg(player, "Still missing southeasternmost point.");
-			}
-			if(warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
-				if(warzone.ready()) {
-					warzone.saveState(false); // we just changed the volume, cant reset walls 
-					if(warzone.getLobby() == null) {
-						// Set default lobby on south side
-						ZoneLobby lobby = new ZoneLobby(this, warzone, BlockFace.SOUTH);
-						warzone.setLobby(lobby);
-						//lobby.initialize();
-						if(warHub != null) {	// warhub has to change
-							warHub.getVolume().resetBlocks();
-							warHub.initialize();
-						}
-						this.msg(player, "Default lobby created on south side of zone. Use /setzonelobby <n/s/e/w> to change which zone wall it is attached to.");
-					} else {
-						// gotta move the lobby
-						warzone.getLobby().changeWall(warzone.getLobby().getWall());
-					}
-					warzone.initializeZone();
-					WarzoneMapper.save(this, warzone, true);
-					this.msg(player, "Warzone saved. Use /setteam, /setmonument and /savezone to configure the zone.");
+				msg(player, msgString + "Still missing northwesternmost point.");
+			} else if(warzone.getSoutheast() == null) {
+				msg(player, msgString + "Still missing southeasternmost point.");
+			} else if (warzone.tooBig()) {
+				badMsg(player, msgString + "Warzone " + warzone.getName() + " is too Big. Max north-south size: 500. Max east-west size: 500.");
+			}  else if (warzone.tooSmall()) {
+				badMsg(player, msgString + "Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.");
+			} else if(!fail && warzone.ready()) {
+				if(!this.warzones.contains(warzone)) {
+					this.addWarzone(warzone);
 				}
+				if(this.incompleteZones.contains(warzone)) {
+					this.incompleteZones.remove(warzone);
+				}
+				WarMapper.save(this);
+				msgString += "New zone outline ok. Saving new warzone blocks...";
+				msg(player, msgString);
+				warzone.saveState(false); // we just changed the volume, cant reset walls 
+				if(warzone.getLobby() == null) {
+					// Set default lobby on south side
+					ZoneLobby lobby = new ZoneLobby(this, warzone, BlockFace.SOUTH);
+					warzone.setLobby(lobby);
+					if(warHub != null) {	// warhub has to change
+						warHub.getVolume().resetBlocks();
+						warHub.initialize();
+					}
+					this.msg(player, "Default lobby created on south side of zone. Use /setzonelobby <n/s/e/w> to change its position.");
+				} else {
+					// gotta move the lobby
+					warzone.getLobby().changeWall(warzone.getLobby().getWall());
+				}
+				warzone.initializeZone();
+				WarzoneMapper.save(this, warzone, true);
+				this.msg(player, "Warzone saved. Use /setteam, /setmonument and /savezone to configure the zone.");
 			}
+			
+			if(warzone.getVolume().isSaved() 
+					&& (warzone.tooBig() || warzone.tooSmall()) 
+					&& (oldNorthwest != null || oldSoutheast != null) ) 
+			{
+				// we resized but the result is too small or too big. Restore the old corner and reinit the zone.
+				if(oldNorthwest != null) {
+					warzone.setNorthwest(oldNorthwest);
+				} else if (oldSoutheast != null) {
+					warzone.setSoutheast(oldSoutheast);
+				}
+				warzone.initializeZone();
+			}
+			
 		}
 	}
 

@@ -42,7 +42,6 @@ public class ZoneLobby {
 	public ZoneLobby(War war, Warzone warzone, BlockFace wall) {
 		this.war = war;
 		this.warzone = warzone;
-		//this.changeWall(wall, false);
 		this.changeWall(wall);
 	}
 	
@@ -69,16 +68,9 @@ public class ZoneLobby {
 	}
 	
 	public void changeWall(BlockFace newWall) {
-//		changeWall(newWall, true);
-//	}
-//	
-//	public void changeWall(BlockFace newWall, boolean save) {
 		if(volume == null) {
 			// no previous wall
 			this.volume = new Volume("lobby", war, warzone.getWorld());
-		} else {
-			// move the lobby
-			// this.volume.resetBlocks(); // should be done previously thru getVolume
 		}
 		
 		this.wall = newWall;
@@ -133,12 +125,12 @@ public class ZoneLobby {
 			corner2 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter + 1 + lobbyHeight, z + lobbyDepth);
 		}
 		
-		if(corner1 != null && corner2 != null/* && save*/) {
+		if(corner1 != null && corner2 != null) {
 			// save the blocks, wide enough for three team gates, 3+1 high and 10 deep, extruding out from the zone wall.
 			this.volume.setCornerOne(corner1);
 			this.volume.setCornerTwo(corner2);
 			this.volume.saveBlocks();
-			VolumeMapper.save(volume, warzone.getName(), war);
+			//VolumeMapper.save(volume, warzone.getName(), war);
 		}
 	}
 	
