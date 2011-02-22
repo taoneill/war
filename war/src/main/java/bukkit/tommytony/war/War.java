@@ -191,8 +191,6 @@ public class War extends JavaPlugin {
 					performSetZone(player, arguments);
 				} else if(command.equals("setzonelobby")) {
 					performSetZoneLobby(player, arguments);
-				} else if(command.equals("setzoneloadout")) {
-					performSetZoneLoadout(player, arguments);
 				} else if(command.equals("savezone")) {
 					performSaveZone(player, arguments);
 				} else if(command.equals("setzoneconfig")) {
@@ -217,8 +215,6 @@ public class War extends JavaPlugin {
 					performDeleteWarhub(player);
 				} else if(command.equals("setwarconfig")) {
 					performSetWarConfig(player, arguments);
-				} else if(command.equals("setwarloadout")) {
-					performSetWarLoadout(player, arguments);
 				} else if(command.equals("zonemaker")) {
 					performZonemakerAsZonemaker(player, arguments);
 				}
@@ -242,35 +238,6 @@ public class War extends JavaPlugin {
 			}
 		}
 		return true;
-	}
-
-	private void performSetZoneLoadout(Player player, String[] arguments) {
-		if(arguments.length > 0 || (!this.inAnyWarzone(player.getLocation()) 
-				&& !this.inAnyWarzoneLobby(player.getLocation()))) {
-			this.badMsg(player, "Usage: Fill you inventory with what you want players to spawn with in this zone, then use /setzoneloadout. Must be in a warzone or lobby.");
-		} else {
-			Warzone zone = this.warzone(player.getLocation());
-			if(zone == null) {
-				ZoneLobby lobby = this.lobby(player.getLocation());
-				zone = lobby.getZone();
-			}
-			HashMap<Integer, ItemStack> loadout = zone.getLoadout();
-			inventoryToLoadout(player, loadout);
-			WarzoneMapper.save(this, zone, false);
-			this.msg(player, "Zone loadout changed.");
-		}
-	}
-	
-	private void performSetWarLoadout(Player player, String[] arguments) {
-		if(arguments.length > 0) {
-			this.badMsg(player, "Usage: Fill you inventory with what you want players to spawn with in all new zone, then use /setwarloadout.");
-		} else {
-			HashMap<Integer, ItemStack> loadout = this.getDefaultLoadout();
-			inventoryToLoadout(player, loadout);
-			
-			WarMapper.save(this);
-			this.msg(player, "War default loadout changed.");
-		}
 	}
 
 	private void inventoryToLoadout(Player player,
@@ -351,7 +318,7 @@ public class War extends JavaPlugin {
 			this.badMsg(player, "Usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " +
 					"Changes the server defaults for new warzones. Please give at leaset one named parameter. Must be in warzone.");
 		} else {
-			if(updateFromNamedParams(arguments)) {
+			if(updateFromNamedParams(player, arguments)) {
 				WarMapper.save(this);
 				this.msg(player, "War config saved.");
 			} else {
@@ -659,7 +626,7 @@ public class War extends JavaPlugin {
 			} else {
 				lobby = warzone.getLobby();
 			}
-			if(updateZoneFromNamedParams(warzone, arguments)) {
+			if(updateZoneFromNamedParams(warzone, player, arguments)) {
 				this.msg(player, "Saving config and resetting warzone " + warzone.getName() + ".");
 				WarzoneMapper.save(this, warzone, false);
 				warzone.getVolume().resetBlocks();
@@ -693,7 +660,7 @@ public class War extends JavaPlugin {
 			}
 			this.msg(player, "Saving warzone " + warzone.getName() + ".");
 			int savedBlocks = warzone.saveState(true);
-			updateZoneFromNamedParams(warzone, arguments);
+			updateZoneFromNamedParams(warzone, player, arguments);
 			WarzoneMapper.save(this, warzone, true);
 			warzone.getVolume().resetBlocks();
 			if(lobby != null) {
@@ -1083,7 +1050,7 @@ public class War extends JavaPlugin {
 				"teleport to a warzone. ");
 	}
 
-	private boolean updateZoneFromNamedParams(Warzone warzone, String[] arguments) {
+	private boolean updateZoneFromNamedParams(Warzone warzone, Player player, String[] arguments) {
 		try {
 			Map<String,String> namedParams = new HashMap<String,String>();
 			for(String namedPair : arguments) {
@@ -1139,6 +1106,14 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("nocreatures");
 				warzone.setNoCreatures(onOff.equals("on") || onOff.equals("true"));
 			}
+			if(namedParams.containsKey("loadout")) {
+				//String loadoutType = namedParams.get("loadout");
+				inventoryToLoadout(player, warzone.getLoadout());
+			}
+			if(namedParams.containsKey("reward")) {
+				//String rewardType = namedParams.get("reward");
+				inventoryToLoadout(player, warzone.getReward());
+			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
 //				warzone.setDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
@@ -1149,7 +1124,7 @@ public class War extends JavaPlugin {
 		}
 	}
 	
-	private boolean updateFromNamedParams(String[] arguments) {
+	private boolean updateFromNamedParams(Player player, String[] arguments) {
 		try {
 			Map<String,String> namedParams = new HashMap<String,String>();
 			for(String namedPair : arguments) {
@@ -1208,6 +1183,14 @@ public class War extends JavaPlugin {
 			if(namedParams.containsKey("nocreatures")) {
 				String onOff = namedParams.get("nocreatures");
 				this.setDefaultNoCreatures(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("loadout")) {
+				//String loadoutType = namedParams.get("loadout");
+				inventoryToLoadout(player, this.getDefaultLoadout());
+			}
+			if(namedParams.containsKey("reward")) {
+				//String rewardType = namedParams.get("reward");
+				inventoryToLoadout(player, this.getDefaultReward());
 			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");

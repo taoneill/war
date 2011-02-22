@@ -1,18 +1,16 @@
 package bukkit.tommytony.war;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemDrop;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInventoryEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -109,8 +107,8 @@ public class WarPlayerListener extends PlayerListener {
 				event.setCancelled(true);
 				
 			} else {
-				ItemDrop itemDrop = event.getItemDrop();
-				ItemStack itemStack =  itemDrop.getItemStack();
+				ItemDrop item = event.getItemDrop();
+				ItemStack itemStack =  item.getItemStack();
 				if(itemStack != null && itemStack.getType().getId() == team.getMaterial().getId()) {
 					// Can't drop a precious block
 					war.badMsg(player, "Can't drop " + team.getName() + " block blocks.");
@@ -131,22 +129,21 @@ public class WarPlayerListener extends PlayerListener {
 				// a flag thief can't pick up anything
 				event.setCancelled(true);
 			}
-			// BUKKIT (waiting for EvilSeph)
 //			} else {
 //				Item item = event.getItem();
-//				ItemStack itemStack = null;
-//				if(item instanceof ItemDrop) {
-//					ItemDrop itemDrop = (ItemDrop) item;
-//					itemStack = itemDrop.getItemStack();
+//				if(item instanceof CraftItem) {
+//					CraftItem cItem = (CraftItem)item;
+//					ItemStack itemStack = cItem.getItemStack();
+//					if(itemStack != null && itemStack.getType().getId() == team.getMaterial().getId()
+//							&& player.getInventory().contains(team.getMaterial())) {
+//						// Can't pick up a second precious block
+//						war.badMsg(player, "You already have a " + team.getName() + " block.");
+//						event.setCancelled(true);
+//						return;
+//					}
 //				}
-//				if(itemStack != null && itemStack.getType().getId() == team.getMaterial().getId()
-//						&& player.getInventory().contains(team.getMaterial())) {
-//					// Can't pick up a second precious block
-//					war.badMsg(player, "You already have a " + team.getName() + " block.");
-//					event.setCancelled(true);
-//					return;
-//				}
-//			}
+//				
+			//}
 		}
     }
     
