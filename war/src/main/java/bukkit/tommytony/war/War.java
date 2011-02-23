@@ -125,7 +125,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.BLOCK_DAMAGED, blockListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
 		
 		//pm.registerEvent(Event.Type.CHUNK_UNLOADED, blockListener, Priority.Normal, this);
 		

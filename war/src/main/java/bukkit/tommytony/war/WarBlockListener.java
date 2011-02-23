@@ -99,22 +99,22 @@ public class WarBlockListener extends BlockListener {
 		}
     }
 	
-//	public void onBlockBreak(BlockBreakEvent event) {
-//		Player player = event.getPlayer();
-//    	Block block = event.getBlock();
-//    	if(player != null && block != null) {
-//    		handleBreakOrDamage(player, block, event);
-//    	}
-//    }
-	
-    public void onBlockDamage(BlockDamageEvent event) {
-    	Player player = event.getPlayer();
+	public void onBlockBreak(BlockBreakEvent event) {
+		Player player = event.getPlayer();
     	Block block = event.getBlock();
-    	if(player != null && block != null && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
-    		handleBreakOrDamage(player,block, event);
-	    	
+    	if(player != null && block != null) {
+    		handleBreakOrDamage(player, block, event);
     	}
     }
+	
+//    public void onBlockDamage(BlockDamageEvent event) {
+//    	Player player = event.getPlayer();
+//    	Block block = event.getBlock();
+//    	if(player != null && block != null && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
+//    		handleBreakOrDamage(player,block, event);
+//	    	
+//    	}
+//    }
 
 	private void handleBreakOrDamage(Player player, Block block, Cancellable event) {
 		Warzone warzone = war.warzone(player.getLocation());
@@ -142,7 +142,7 @@ public class WarBlockListener extends BlockListener {
 		}else if(warzone != null && warzone.isImportantBlock(block)) {
     		if(team != null && team.getSpawnVolume().contains(block)) {
     			if(player.getInventory().contains(team.getMaterial())) {
-    				war.badMsg(player, "You already have a " + team.getName() + " block.");
+    				//war.badMsg(player, "You already have a " + team.getName() + " block.");
     				event.setCancelled(true);
     				return;
     			} else {

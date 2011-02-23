@@ -6,6 +6,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/bukkit"/>
 	<classpathentry kind="lib" path="C:/dev/war/war/lib/Permissions.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/craftbukkit"/>
-	<classpathentry kind="lib" path="C:/dev/war/war/lib/minecraft_server.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
