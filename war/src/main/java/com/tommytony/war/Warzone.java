@@ -964,33 +964,43 @@ public class Warzone {
 	public void handlePlayerLeave(Player player, Location destination) {
 		Team playerTeam = war.getPlayerTeam(player.getName());
 		if(playerTeam !=null) {
-			Warzone zone = war.getPlayerTeamWarzone(player.getName());
 			playerTeam.removePlayer(player.getName());
-			playerTeam.resetSign();
-			if(zone != null) {	
-				if(zone.isFlagThief(player.getName())) {
-					Team victim = zone.getVictimTeamForThief(player.getName());
-					victim.getFlagVolume().resetBlocks();
-					victim.initializeTeamFlag();
-					zone.removeThief(player.getName());
-					for(Team t : zone.getTeams()) {
-						t.teamcast("Team " + victim.getName() + " flag was returned.");
-					}
-				}
-				if(zone.getLobby() != null) {
-					zone.getLobby().resetTeamGateSign(playerTeam);
-				}
-				if(zone.hasPlayerInventory(player.getName())) {
-					zone.restorePlayerInventory(player);
-				}
-				player.teleportTo(destination);
-				war.msg(player, "Left the zone. Your inventory has (hopefully) been restored.");
-				if(war.getWarHub() != null) {
-					war.getWarHub().resetZoneSign(zone);
+			playerTeam.resetSign();	
+			if(this.isFlagThief(player.getName())) {
+				Team victim = this.getVictimTeamForThief(player.getName());
+				victim.getFlagVolume().resetBlocks();
+				victim.initializeTeamFlag();
+				this.removeThief(player.getName());
+				for(Team t : this.getTeams()) {
+					t.teamcast("Team " + victim.getName() + " flag was returned.");
 				}
 			}
+			if(this.getLobby() != null) {
+				this.getLobby().resetTeamGateSign(playerTeam);
+			}
+			if(this.hasPlayerInventory(player.getName())) {
+				this.restorePlayerInventory(player);
+			}
+			player.teleportTo(destination);
+			war.msg(player, "Left the zone. Your inventory has (hopefully) been restored.");
+			if(war.getWarHub() != null) {
+				war.getWarHub().resetZoneSign(this);
+			}
+
+			boolean zoneEmpty = true;
+			for(Team team : this.getTeams()) {
+				if(team.getPlayers().size() > 0) {
+					zoneEmpty = false;
+					break;
+				}
+			}
+			if(zoneEmpty) {
+				// reset the zone for a new game when the last player leaves
+				int resetBlocks = this.getVolume().resetBlocks();
+				this.initializeZone();
+				war.logInfo("Last player left warzone " + this.getName() + ". " + resetBlocks + " blocks reset automatically.");
+			}
 		}
-		
 	}
 
 	public boolean isEnemyTeamFlagBlock(Team playerTeam, Block block) {
