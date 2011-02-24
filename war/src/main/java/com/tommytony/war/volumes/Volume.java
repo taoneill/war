@@ -78,7 +78,9 @@ public class Volume {
 							if(state instanceof Sign) {
 								// Signs
 								Sign sign = (Sign)state;
-								this.getSignLines().put("sign-" + i + "-" + j + "-" + k, sign.getLines());	
+								if(sign.getLines() != null) {
+									this.getSignLines().put("sign-" + i + "-" + j + "-" + k, sign.getLines());
+								}
 							} else if(state instanceof Chest) {
 								// Chests
 								Chest chest = (Chest)state;
@@ -117,6 +119,7 @@ public class Volume {
 		} catch (Exception e) {
 			this.getWar().getLogger().warning("Failed to save volume " + getName() + " blocks. Saved blocks:" + noOfSavedBlocks 
 					+ ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + e.getMessage());
+			e.printStackTrace();
 		}
 		return noOfSavedBlocks;
 	}
@@ -145,66 +148,58 @@ public class Volume {
 												|| oldBlockType == Material.CHEST.getId() || oldBlockType == Material.DISPENSER.getId())
 								)
 							) {
-								
-//								if(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST)) {
-//									BlockState state = currentBlock.getState();
-//									Sign currentSign = (Sign) state;
-//									currentSign.setLine(0, oldBlockInfo.getSignLines()[0]);
-//									currentSign.setLine(1, oldBlockInfo.getSignLines()[1]);
-//									currentSign.setLine(2, oldBlockInfo.getSignLines()[2]);
-//									currentSign.setLine(3, oldBlockInfo.getSignLines()[3]);
-//									state.update();
-//								}
-								BlockState state = currentBlock.getState();
 								if(oldBlockType == Material.WALL_SIGN.getId() 
 										|| oldBlockType == Material.SIGN_POST.getId()) {
 									// Signs
-									state.setType(Material.getMaterial(oldBlockType));
-									state.setData(new MaterialData(oldBlockType, oldBlockData));
-									state.update(true);
-									state = war.refetchStateForBlock(world, state.getBlock());
-									Sign sign = (Sign)state;
-									String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "-" + k);
-									if(lines != null) {
-										if(lines.length>0)sign.setLine(0, lines[0]);
-										if(lines.length>1)sign.setLine(1, lines[1]);
-										if(lines.length>2)sign.setLine(2, lines[2]);
-										if(lines.length>3)sign.setLine(3, lines[3]);
-										sign.update(true);
+									currentBlock.setType(Material.getMaterial(oldBlockType));
+									currentBlock.setData(oldBlockData);
+									BlockState state = currentBlock.getState();
+									if(state instanceof Sign) {
+										Sign sign = (Sign)state;
+										String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "-" + k);
+										if(lines != null && sign.getLines() != null) {
+											if(lines.length>0)sign.setLine(0, lines[0]);
+											if(lines.length>1)sign.setLine(1, lines[1]);
+											if(lines.length>2)sign.setLine(2, lines[2]);
+											if(lines.length>3)sign.setLine(3, lines[3]);
+											sign.update(true);
+										}
 									}
 								} else if(oldBlockType == Material.CHEST.getId()) {
 									// Chests
-									state.setType(Material.getMaterial(oldBlockType));
-									state.setData(new MaterialData(oldBlockType, oldBlockData));
-									state.update(true);
-									state = war.refetchStateForBlock(world, state.getBlock());
-									Chest chest = (Chest)state;
-									List<ItemStack> contents = this.getInvBlockContents().get("chest-" + i + "-" + j + "-" + k);
-									if(contents != null) {
-										int ii = 0;
-										chest.getInventory().clear();
-										for(ItemStack item : contents) {
-											chest.getInventory().setItem(ii, item);
-											ii++;
+									currentBlock.setType(Material.getMaterial(oldBlockType));
+									currentBlock.setData(oldBlockData);
+									BlockState state = currentBlock.getState();
+									if(state instanceof Chest) {
+										Chest chest = (Chest)state;
+										List<ItemStack> contents = this.getInvBlockContents().get("chest-" + i + "-" + j + "-" + k);
+										if(contents != null) {
+											int ii = 0;
+											chest.getInventory().clear();
+											for(ItemStack item : contents) {
+												chest.getInventory().setItem(ii, item);
+												ii++;
+											}
+											chest.update(true);
 										}
-										chest.update(true);
 									}
 								} else if(oldBlockType == Material.DISPENSER.getId()) {
 									// Dispensers		
-									state.setType(Material.getMaterial(oldBlockType));
-									state.setData(new MaterialData(oldBlockType, oldBlockData));
-									state.update(true);
-									state = war.refetchStateForBlock(world, state.getBlock());
-									Dispenser dispenser = (Dispenser)state;
-									List<ItemStack> contents = this.getInvBlockContents().get("dispenser-" + i + "-" + j + "-" + k);
-									if(contents != null) {
-										int ii = 0;
-										dispenser.getInventory().clear();
-										for(ItemStack item : contents) {
-											dispenser.getInventory().setItem(ii, item);
-											ii++;
+									currentBlock.setType(Material.getMaterial(oldBlockType));
+									currentBlock.setData(oldBlockData);
+									BlockState state = currentBlock.getState();
+									if(state instanceof Dispenser) {
+										Dispenser dispenser = (Dispenser)state;
+										List<ItemStack> contents = this.getInvBlockContents().get("dispenser-" + i + "-" + j + "-" + k);
+										if(contents != null) {
+											int ii = 0;
+											dispenser.getInventory().clear();
+											for(ItemStack item : contents) {
+												dispenser.getInventory().setItem(ii, item);
+												ii++;
+											}
+											dispenser.update(true);
 										}
-										dispenser.update(true);
 									}
 								} else if(oldBlockType == Material.WOODEN_DOOR.getId() || oldBlockType == Material.IRON_DOOR_BLOCK.getId()){
 									// Door blocks
@@ -237,6 +232,7 @@ public class Volume {
 			this.getWar().logWarn("Failed to reset volume " + getName() + " blocks. Blocks visited: " + visitedBlocks 
 					+ ". Blocks reset: "+ noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z 
 					+ ". Current block: " + currentBlockId + ". Old block: " + oldBlockType + ". Exception: " + e.getClass().toString() + " " + e.getMessage());
+			e.printStackTrace();
 		}
 		return noOfResetBlocks;
 	}

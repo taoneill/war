@@ -87,8 +87,9 @@ public class War extends JavaPlugin {
 			this.logInfo("Clearing zone " + warzone.getName() + "...");
 			for(Team team : warzone.getTeams()) {
 				for(Player player : team.getPlayers()) {
-					warzone.handlePlayerLeave(player, warzone.getTeleport());
+					warzone.handlePlayerLeave(player, warzone.getTeleport(), false);
 				}
+				team.getPlayers().clear();
 			}
 			if(warzone.getLobby() != null) {
 				warzone.getLobby().getVolume().resetBlocks();
@@ -116,6 +117,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.INVENTORY_OPEN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Priority.Normal, this);
 		
 
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal, this);
@@ -886,7 +888,7 @@ public class War extends JavaPlugin {
 			Team playerTeam = this.getPlayerTeam(player.getName());
 			Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
 			if(playerTeam != null) { // was in zone
-				playerWarzone.handlePlayerLeave(player, this.getWarHub().getLocation());
+				playerWarzone.handlePlayerLeave(player, this.getWarHub().getLocation(), true);
 			}
 			player.teleportTo(this.getWarHub().getLocation());
 		}
@@ -921,7 +923,7 @@ public class War extends JavaPlugin {
 					"Must be in a team already.");
 		} else {
 			Warzone zone = getPlayerTeamWarzone(player.getName());
-			zone.handlePlayerLeave(player, zone.getTeleport());
+			zone.handlePlayerLeave(player, zone.getTeleport(), true);
 		}
 	}
 
@@ -1018,7 +1020,7 @@ public class War extends JavaPlugin {
 					Team playerTeam = getPlayerTeam(player.getName());
 					if(playerTeam != null) {
 						Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
-						playerWarzone.handlePlayerLeave(player, warzone.getTeleport());
+						playerWarzone.handlePlayerLeave(player, warzone.getTeleport(), true);
 					} else {					
 						player.teleportTo(warzone.getTeleport());
 					}
@@ -1490,10 +1492,10 @@ public class War extends JavaPlugin {
 		}
 	    }
 
-	public BlockState refetchStateForBlock(World world, Block block) {
-		Block again = world.getBlockAt(block.getX(), block.getY(), block.getZ());
-		return again.getState();
-	}
+//	public BlockState refetchStateForBlock(World world, Block block) {
+//		Block again = world.getBlockAt(block.getX(), block.getY(), block.getZ());
+//		return again.getState();
+//	}
 
 	public void setDefaultBlockHeads(boolean defaultBlockHeads) {
 		this.defaultBlockHeads = defaultBlockHeads;

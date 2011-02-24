@@ -393,7 +393,7 @@ public class WarzoneMapper {
 		String rewardStr = "";
 		HashMap<Integer, ItemStack> rewardItems = warzone.getReward();
 		for(Integer slot : rewardItems.keySet()) {
-			ItemStack item = items.get(slot);
+			ItemStack item = rewardItems.get(slot);
 			rewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 		}
 		warzoneConfig.setString("reward", rewardStr);

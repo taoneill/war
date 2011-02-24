@@ -181,34 +181,35 @@ public class ZoneLobby {
 			
 			// set zone sign
 			Block zoneSignBlock = lobbyMiddleWallBlock.getFace(wall, 4);
-			BlockState state = zoneSignBlock.getState();
-			if(state.getType() != Material.SIGN_POST) {
-				state.setType(Material.SIGN_POST);
+			
+			if(zoneSignBlock.getType() != Material.SIGN_POST) {
+				zoneSignBlock.setType(Material.SIGN_POST);
 			}
 			if(wall == BlockFace.NORTH) {
-				state.setData(new MaterialData(Material.SIGN_POST, (byte)4));
+				zoneSignBlock.setData((byte)4);
 			} else if(wall == BlockFace.EAST) {
-				state.setData(new MaterialData(Material.SIGN_POST, (byte)8));
+				zoneSignBlock.setData((byte)8);
 			} else if(wall == BlockFace.SOUTH) {
-				state.setData(new MaterialData(Material.SIGN_POST, (byte)12));
+				zoneSignBlock.setData((byte)12);
 			} else if(wall == BlockFace.WEST) {
-				state.setData(new MaterialData(Material.SIGN_POST, (byte)0));
+				zoneSignBlock.setData((byte)0);
 			}
-			state.update(true);
-			state = war.refetchStateForBlock(warzone.getWorld(), zoneSignBlock);
+			BlockState state = zoneSignBlock.getState();
 			if(state instanceof Sign) {
 				Sign sign = (Sign) state;
-				sign.setLine(0, "Warzone");
-				sign.setLine(1, warzone.getName());
-				if(autoAssignGate != null) {
-					sign.setLine(2, "Walk in the");
-					sign.setLine(3, "auto-assign gate.");
-				} else {
-					sign.setLine(2, "");
-					sign.setLine(3, "Pick your team.");
+				if(sign.getLines() != null) {
+					sign.setLine(0, "Warzone");
+					sign.setLine(1, warzone.getName());
+					if(autoAssignGate != null) {
+						sign.setLine(2, "Walk in the");
+						sign.setLine(3, "auto-assign gate.");
+					} else {
+						sign.setLine(2, "");
+						sign.setLine(3, "Pick your team.");
+					}
+					sign.update(true);
 				}
 			}
-			state.update(true);
 			
 			// lets get some light in here
 			if(wall == BlockFace.NORTH || wall == BlockFace.SOUTH) {
@@ -561,7 +562,6 @@ public class ZoneLobby {
 	private void resetGateSign(Block gate, String[] lines, boolean awayFromWall) {
 		Block block = null;
 		BlockFace direction = null;
-		BlockState state = null;
 		if(awayFromWall) {
 			direction = wall;
 		} else if (wall == BlockFace.NORTH) {
@@ -576,40 +576,36 @@ public class ZoneLobby {
 		
 		if(wall == BlockFace.NORTH) {
 			block = gate.getFace(direction).getFace(BlockFace.EAST);
-			state = block.getState();
-			if(state.getType() != Material.SIGN_POST) state.setType(Material.SIGN_POST);
-			if(awayFromWall) state.setData(new MaterialData(Material.SIGN_POST, (byte)4));
-			else state.setData(new MaterialData(Material.SIGN_POST, (byte)12));
+			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+			if(awayFromWall) block.setData((byte)4);
+			else block.setData((byte)12);
 		} else if(wall == BlockFace.EAST) {
 			block = gate.getFace(direction).getFace(BlockFace.SOUTH);
-			state = block.getState();
-			if(state.getType() != Material.SIGN_POST) state.setType(Material.SIGN_POST);
-			if(awayFromWall) state.setData(new MaterialData(Material.SIGN_POST, (byte)8));
-			else state.setData(new MaterialData(Material.SIGN_POST, (byte)0));
+			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+			if(awayFromWall) block.setData((byte)8);
+			else block.setData((byte)0);
 		} else if(wall == BlockFace.SOUTH) {
 			block = gate.getFace(direction).getFace(BlockFace.WEST);
-			state = block.getState();
-			if(state.getType() != Material.SIGN_POST) state.setType(Material.SIGN_POST);
-			if(awayFromWall) state.setData(new MaterialData(Material.SIGN_POST, (byte)12));
-			else state.setData(new MaterialData(Material.SIGN_POST, (byte)4));
+			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+			if(awayFromWall) block.setData((byte)12);
+			else block.setData((byte)4);
 		} else if(wall == BlockFace.WEST) {
 			block = gate.getFace(direction).getFace(BlockFace.NORTH);
-			state = block.getState();
-			if(state.getType() != Material.SIGN_POST) state.setType(Material.SIGN_POST);
-			if(awayFromWall) state.setData(new MaterialData(Material.SIGN_POST, (byte)0));
-			else state.setData(new MaterialData(Material.SIGN_POST, (byte)8));
+			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+			if(awayFromWall) block.setData((byte)0);
+			else block.setData((byte)8);
 		}		
-		state.update(true);
-		state = war.refetchStateForBlock(warzone.getWorld(), block);
+		BlockState state = block.getState(); 
 		if(state instanceof Sign) {
 			Sign sign = (Sign) state;
-			sign.setLine(0, lines[0]);
-			sign.setLine(1, lines[1]);
-			sign.setLine(2, lines[2]);
-			sign.setLine(3, lines[3]);
-			
+			if(sign.getLines() != null) {	
+				sign.setLine(0, lines[0]);
+				sign.setLine(1, lines[1]);
+				sign.setLine(2, lines[2]);
+				sign.setLine(3, lines[3]);
+				sign.update(true);
+			}
 		}
-		state.update(true);
 	}
 	
 	public boolean isLeavingZone(Location location) {

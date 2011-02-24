@@ -830,7 +830,7 @@ public class Warzone {
 			war.msg(player, "Your inventory is in storage until you /leave.");
 			respawnPlayer(lowestNoOfPlayers, player);
 			for(Team team : teams){
-				team.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
+				team.teamcast("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + ".");
 			}
 		}
 		return lowestNoOfPlayers;
@@ -961,10 +961,10 @@ public class Warzone {
 		}
 	}
 
-	public void handlePlayerLeave(Player player, Location destination) {
+	public void handlePlayerLeave(Player player, Location destination, boolean removeFromTeam) {
 		Team playerTeam = war.getPlayerTeam(player.getName());
 		if(playerTeam !=null) {
-			playerTeam.removePlayer(player.getName());
+			if(removeFromTeam) playerTeam.removePlayer(player.getName());
 			playerTeam.resetSign();	
 			if(this.isFlagThief(player.getName())) {
 				Team victim = this.getVictimTeamForThief(player.getName());
@@ -998,6 +998,10 @@ public class Warzone {
 				// reset the zone for a new game when the last player leaves
 				int resetBlocks = this.getVolume().resetBlocks();
 				this.initializeZone();
+				for(Team team : this.getTeams()) {
+					team.setPoints(0);
+					team.setRemainingLives(this.getLifePool());
+				}
 				war.logInfo("Last player left warzone " + this.getName() + ". " + resetBlocks + " blocks reset automatically.");
 			}
 		}

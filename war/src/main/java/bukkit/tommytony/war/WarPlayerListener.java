@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInventoryEvent;
@@ -89,7 +90,7 @@ public class WarPlayerListener extends PlayerListener {
 				if(zone.hasPlayerInventory(player.getName())) {
 					disconnected.put(player.getName(), zone.getPlayerInventory(player.getName()));
 				}
-				zone.handlePlayerLeave(player, zone.getTeleport());
+				zone.handlePlayerLeave(player, zone.getTeleport(), true);
 			}
 		}
 	}
@@ -137,7 +138,7 @@ public class WarPlayerListener extends PlayerListener {
 					if(itemStack != null && itemStack.getType().getId() == team.getMaterial().getId()
 							&& player.getInventory().contains(team.getMaterial())) {
 						// Can't pick up a second precious block
-						war.badMsg(player, "You already have a " + team.getName() + " block.");
+						//war.badMsg(player, "You already have a " + team.getName() + " block.");
 						event.setCancelled(true);
 						return;
 					}
@@ -161,6 +162,30 @@ public class WarPlayerListener extends PlayerListener {
     			war.badMsg(player, "All that " + team.getName() + " must have been heavy!");
     		}
     	}
+    }
+    
+    public void onPlayerCommandPreprocess(PlayerChatEvent event) {
+    	Player player = event.getPlayer();
+    	Team talkingPlayerTeam = war.getPlayerTeam(player.getName());
+    	if(talkingPlayerTeam != null) {
+    		String msg = event.getMessage();
+    		String[] split = msg.split(" ");
+    		if(!war.isZoneMaker(player) && split.length > 0 && split[0].startsWith("/")) {
+    			String command = split[0].substring(1);
+    			if(!command.equals("zones") && !command.equals("warzones")
+    				&& !command.equals("zone") && !command.equals("warzone")
+    				&& !command.equals("teams")
+    				&& !command.equals("join")
+    				&& !command.equals("leave")
+    				&& !command.equals("team")
+    				&& !command.equals("warhub")
+    				&& !command.equals("zonemaker")) {
+    				war.badMsg(player, "Can't use anything but War commands (e.g. /leave, /warhub) while you're playing in a warzone.");
+    				event.setCancelled(true);
+    			}
+    		}
+    	}
+    	
     }
 	
 	public void onPlayerMove(PlayerMoveEvent event) {
@@ -356,7 +381,7 @@ public class WarPlayerListener extends PlayerListener {
 			Team playerTeam = war.getPlayerTeam(player.getName());
 			if(playerTeam != null) {
 				event.setFrom(playerWarzone.getTeleport());
-				playerWarzone.handlePlayerLeave(player, playerWarzone.getTeleport());
+				playerWarzone.handlePlayerLeave(player, playerWarzone.getTeleport(), true);
 				event.setCancelled(true);
 				return;
 			}
@@ -369,7 +394,6 @@ public class WarPlayerListener extends PlayerListener {
 			if(locZone == null && team != null) {;
 				war.badMsg(player, "You can't sneak out of a zone while in a team. Use /leave or walk out the lobby to exit the zone, please.");
 				event.setFrom(team.getTeamSpawn());
-				playerWarzone.handleDeath(player);
 				player.teleportTo(team.getTeamSpawn());
 				event.setCancelled(true);
 				return;

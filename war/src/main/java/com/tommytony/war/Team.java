@@ -275,22 +275,22 @@ public class Team {
 //				signBlock.setType(Material.SIGN_POST);
 //			}
 			
+			
+			if(signBlock.getType() != Material.SIGN_POST) {
+				signBlock.setType(Material.SIGN_POST);
+			}
+			signBlock.setData((byte)signData);
 			BlockState state = signBlock.getState();
-			if(state.getType() != Material.SIGN_POST) {
-				state.setType(Material.SIGN_POST);
-				state.update(true);
-				state = war.refetchStateForBlock(warzone.getWorld(), signBlock);
-			}			
 			if(state instanceof Sign) {
 				Sign sign = (Sign) state;
-				sign.setType(Material.SIGN_POST);
-				sign.setData(new MaterialData(Material.SIGN_POST, (byte)signData));
-				sign.setLine(0, "Team " + name);
-				sign.setLine(1, remainingLives + "/" + warzone.getLifePool() + " lives left");
-				sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
-				sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
+				if(sign.getLines() != null) {
+					sign.setLine(0, "Team " + name);
+					sign.setLine(1, remainingLives + "/" + warzone.getLifePool() + " lives left");
+					sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
+					sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
+					sign.update(true);
+				}
 			}
-			state.update(true);
 		}
 	}
 	

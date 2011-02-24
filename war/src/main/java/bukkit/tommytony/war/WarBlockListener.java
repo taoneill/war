@@ -85,6 +85,20 @@ public class WarBlockListener extends BlockListener {
 	    		return;
 	    	}
 	    	
+	    	// can't place a block of your team's color
+	    	if(team != null && block.getType() == team.getMaterial()) {
+	    		war.badMsg(player, "You can only use your team's blocks to capture monuments.");
+	    		event.setCancelled(true);
+	    		return;
+	    	}
+	    	
+	    	if(team != null && zone != null && zone.isFlagThief(player.getName())) {
+				// a flag thief can't drop his flag
+				war.badMsg(player, "Can't drop the flag. What are you doing? Run!");
+				event.setCancelled(true);
+				
+			}
+	    	
 	    	boolean isZoneMaker = war.isZoneMaker(player);
 	    	// unbreakableZoneBlocks
 	    	if(zone != null && zone.isUnbreakableZoneBlocks() 
@@ -142,7 +156,7 @@ public class WarBlockListener extends BlockListener {
 		}else if(warzone != null && warzone.isImportantBlock(block)) {
     		if(team != null && team.getSpawnVolume().contains(block)) {
     			if(player.getInventory().contains(team.getMaterial())) {
-    				//war.badMsg(player, "You already have a " + team.getName() + " block.");
+    				war.badMsg(player, "You already have a " + team.getName() + " block.");
     				event.setCancelled(true);
     				return;
     			} else {

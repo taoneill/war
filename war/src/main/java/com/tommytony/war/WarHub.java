@@ -106,20 +106,21 @@ public class WarHub {
 			
 			// War hub sign
 			Block signBlock = locationBlock.getFace(BlockFace.WEST);
-			BlockState state = signBlock.getState();
-			if(state.getType() != Material.SIGN_POST) {
-				state.setType(Material.SIGN_POST);
+			
+			if(signBlock.getType() != Material.SIGN_POST) {
+				signBlock.setType(Material.SIGN_POST);
 			}	
-			state.setData(new MaterialData(Material.SIGN_POST, (byte)8));
-			state.update(true);
-			state = war.refetchStateForBlock(location.getWorld(), signBlock);
+			signBlock.setData((byte)8);
+			BlockState state = signBlock.getState();
 			if(state instanceof Sign) {
 				Sign sign = (Sign) state;
-				sign.setLine(0, "War hub");
-				sign.setLine(1, "");
-				sign.setLine(2, "Pick your battle!");
-				sign.setLine(3, "");
-				state.update(true);
+				if(sign.getLines() != null) {
+					sign.setLine(0, "War hub");
+					sign.setLine(1, "");
+					sign.setLine(2, "Pick your battle!");
+					sign.setLine(3, "");
+					sign.update(true);
+				}
 			}
 			
 			// Warzone signs
@@ -145,21 +146,21 @@ public class WarHub {
 			zoneCap += zone.getTeamCap();
 		}
 		
-		BlockState state = block.getState();
-		if(state.getType() != Material.SIGN_POST) {
-			state.setType(Material.SIGN_POST);
+		if(block.getType() != Material.SIGN_POST) {
+			block.setType(Material.SIGN_POST);
 		}
-		state.setData(new MaterialData(Material.SIGN_POST, (byte)8));
-		state.update(true);
-		state = war.refetchStateForBlock(location.getWorld(), block);
+		block.setData((byte)8);
+		BlockState state = block.getState();
 		if(state instanceof Sign) {
 			Sign sign = (Sign) state;
-			sign.setLine(0, "Warzone");
-			sign.setLine(1, zone.getName());
-			sign.setLine(2, zonePlayers + "/" + zoneCap + " players");
-			sign.setLine(3, zone.getTeams().size() + " teams");
+			if(sign.getLines() != null) {
+				sign.setLine(0, "Warzone");
+				sign.setLine(1, zone.getName());
+				sign.setLine(2, zonePlayers + "/" + zoneCap + " players");
+				sign.setLine(3, zone.getTeams().size() + " teams");
+				sign.update(true);
+			}
 		}
-		state.update(true);
 	}
 
 	public void setVolume(Volume vol) {
