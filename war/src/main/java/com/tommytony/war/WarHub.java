@@ -15,6 +15,7 @@ import org.bukkit.material.MaterialData;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.Volume;
 
 /**
@@ -107,21 +108,12 @@ public class WarHub {
 			// War hub sign
 			Block signBlock = locationBlock.getFace(BlockFace.WEST);
 			
-			if(signBlock.getType() != Material.SIGN_POST) {
-				signBlock.setType(Material.SIGN_POST);
-			}	
-			signBlock.setData((byte)8);
-			BlockState state = signBlock.getState();
-			if(state instanceof Sign) {
-				Sign sign = (Sign) state;
-				if(sign.getLines() != null) {
-					sign.setLine(0, "War hub");
-					sign.setLine(1, "");
-					sign.setLine(2, "Pick your battle!");
-					sign.setLine(3, "");
-					sign.update(true);
-				}
-			}
+			String[] lines = new String[4];
+			lines[0] = "War hub";
+			lines[1] = "";
+			lines[2] = "Pick your battle!";
+			lines[3] = "";
+			SignHelper.setToSign(signBlock, (byte)8, lines);
 			
 			// Warzone signs
 			for(Warzone zone : war.getWarzones()) {
@@ -145,22 +137,12 @@ public class WarHub {
 			zonePlayers += t.getPlayers().size();
 			zoneCap += zone.getTeamCap();
 		}
-		
-		if(block.getType() != Material.SIGN_POST) {
-			block.setType(Material.SIGN_POST);
-		}
-		block.setData((byte)8);
-		BlockState state = block.getState();
-		if(state instanceof Sign) {
-			Sign sign = (Sign) state;
-			if(sign.getLines() != null) {
-				sign.setLine(0, "Warzone");
-				sign.setLine(1, zone.getName());
-				sign.setLine(2, zonePlayers + "/" + zoneCap + " players");
-				sign.setLine(3, zone.getTeams().size() + " teams");
-				sign.update(true);
-			}
-		}
+		String[] lines = new String[4];
+		lines[0] = "Warzone";
+		lines[1] = zone.getName();
+		lines[2] = zonePlayers + "/" + zoneCap + " players";
+		lines[3] = zone.getTeams().size() + " teams";
+		SignHelper.setToSign(block, (byte)8, lines);
 	}
 
 	public void setVolume(Volume vol) {

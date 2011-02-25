@@ -19,9 +19,9 @@ import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import com.tommytony.war.LootDropperTask;
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.jobs.LootDropperTask;
 
 /**
  * 

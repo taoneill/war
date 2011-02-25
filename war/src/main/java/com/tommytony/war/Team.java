@@ -14,6 +14,7 @@ import org.bukkit.material.MaterialData;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.Volume;
 
 /**
@@ -275,22 +276,12 @@ public class Team {
 //				signBlock.setType(Material.SIGN_POST);
 //			}
 			
-			
-			if(signBlock.getType() != Material.SIGN_POST) {
-				signBlock.setType(Material.SIGN_POST);
-			}
-			signBlock.setData((byte)signData);
-			BlockState state = signBlock.getState();
-			if(state instanceof Sign) {
-				Sign sign = (Sign) state;
-				if(sign.getLines() != null) {
-					sign.setLine(0, "Team " + name);
-					sign.setLine(1, remainingLives + "/" + warzone.getLifePool() + " lives left");
-					sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
-					sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
-					sign.update(true);
-				}
-			}
+			String[] lines = new String[4];
+			lines[0] = "Team " + name;
+			lines[1] = remainingLives + "/" + warzone.getLifePool() + " lives left";
+			lines[2] = points + "/" + warzone.getScoreCap() + " pts";
+			lines[3] = players.size() + "/" + warzone.getTeamCap() + " players";
+			SignHelper.setToSign(signBlock, (byte)signData, lines);
 		}
 	}
 	

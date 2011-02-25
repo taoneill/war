@@ -27,7 +27,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nijikokun.bukkit.Permissions.Permissions;
-import com.tommytony.war.ChatFixUtil;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamChatColors;
@@ -39,6 +38,7 @@ import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.VolumeMapper;
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
+import com.tommytony.war.utils.ChatFixUtil;
 
 /**
  * 

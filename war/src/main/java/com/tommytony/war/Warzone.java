@@ -18,6 +18,8 @@ import org.bukkit.inventory.PlayerInventory;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.jobs.ResetCursorJob;
+import com.tommytony.war.utils.InventoryStash;
 import com.tommytony.war.volumes.VerticalVolume;
 
 /**

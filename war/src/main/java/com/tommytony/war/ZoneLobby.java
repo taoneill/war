@@ -11,6 +11,7 @@ import org.bukkit.material.MaterialData;
 import bukkit.tommytony.war.War;
 
 import com.tommytony.war.mappers.VolumeMapper;
+import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
 
@@ -181,35 +182,27 @@ public class ZoneLobby {
 			
 			// set zone sign
 			Block zoneSignBlock = lobbyMiddleWallBlock.getFace(wall, 4);
-			
-			if(zoneSignBlock.getType() != Material.SIGN_POST) {
-				zoneSignBlock.setType(Material.SIGN_POST);
-			}
+			byte data = 0;
 			if(wall == BlockFace.NORTH) {
-				zoneSignBlock.setData((byte)4);
+				data = (byte)4;
 			} else if(wall == BlockFace.EAST) {
-				zoneSignBlock.setData((byte)8);
+				data = (byte)8;
 			} else if(wall == BlockFace.SOUTH) {
-				zoneSignBlock.setData((byte)12);
+				data = (byte)12;
 			} else if(wall == BlockFace.WEST) {
-				zoneSignBlock.setData((byte)0);
+				data = (byte)0;
 			}
-			BlockState state = zoneSignBlock.getState();
-			if(state instanceof Sign) {
-				Sign sign = (Sign) state;
-				if(sign.getLines() != null) {
-					sign.setLine(0, "Warzone");
-					sign.setLine(1, warzone.getName());
-					if(autoAssignGate != null) {
-						sign.setLine(2, "Walk in the");
-						sign.setLine(3, "auto-assign gate.");
-					} else {
-						sign.setLine(2, "");
-						sign.setLine(3, "Pick your team.");
-					}
-					sign.update(true);
-				}
+			String[] lines = new String[4];
+			lines[0] = "Warzone";
+			lines[1] = warzone.getName();
+			if(autoAssignGate != null) {
+				lines[2] = "Walk in the";
+				lines[3] = "auto-assign gate.";
+			} else {
+				lines[2] = "";
+				lines[3] = "Pick your team.";
 			}
+			SignHelper.setToSign(zoneSignBlock, data, lines);
 			
 			// lets get some light in here
 			if(wall == BlockFace.NORTH || wall == BlockFace.SOUTH) {
@@ -573,39 +566,26 @@ public class ZoneLobby {
 		} else if (wall == BlockFace.WEST) {
 			direction = BlockFace.EAST;
 		}
-		
+		byte data = 0;
 		if(wall == BlockFace.NORTH) {
 			block = gate.getFace(direction).getFace(BlockFace.EAST);
-			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
-			if(awayFromWall) block.setData((byte)4);
-			else block.setData((byte)12);
+			if(awayFromWall) data = (byte)4;
+			else data = (byte)12;
 		} else if(wall == BlockFace.EAST) {
 			block = gate.getFace(direction).getFace(BlockFace.SOUTH);
-			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
-			if(awayFromWall) block.setData((byte)8);
-			else block.setData((byte)0);
+			if(awayFromWall) data = (byte)8;
+			else data = (byte)0;
 		} else if(wall == BlockFace.SOUTH) {
 			block = gate.getFace(direction).getFace(BlockFace.WEST);
-			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
-			if(awayFromWall) block.setData((byte)12);
-			else block.setData((byte)4);
+			if(awayFromWall) data = (byte)12;
+			else data = (byte)4;
 		} else if(wall == BlockFace.WEST) {
 			block = gate.getFace(direction).getFace(BlockFace.NORTH);
-			if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
-			if(awayFromWall) block.setData((byte)0);
-			else block.setData((byte)8);
+			if(awayFromWall) data = (byte)0;
+			else data = (byte)8;
 		}		
-		BlockState state = block.getState(); 
-		if(state instanceof Sign) {
-			Sign sign = (Sign) state;
-			if(sign.getLines() != null) {	
-				sign.setLine(0, lines[0]);
-				sign.setLine(1, lines[1]);
-				sign.setLine(2, lines[2]);
-				sign.setLine(3, lines[3]);
-				sign.update(true);
-			}
-		}
+	
+		SignHelper.setToSign(block, data, lines);
 	}
 	
 	public boolean isLeavingZone(Location location) {

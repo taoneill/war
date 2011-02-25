@@ -1,4 +1,4 @@
-package com.tommytony.war;
+package com.tommytony.war.jobs;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;

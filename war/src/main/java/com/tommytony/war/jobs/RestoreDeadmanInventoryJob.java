@@ -1,6 +1,8 @@
-package com.tommytony.war;
+package com.tommytony.war.jobs;
 
 import org.bukkit.entity.Player;
+
+import com.tommytony.war.Warzone;
 
 public class RestoreDeadmanInventoryJob implements Runnable {
 

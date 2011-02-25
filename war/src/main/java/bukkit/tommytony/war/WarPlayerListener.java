@@ -18,13 +18,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.tommytony.war.InventoryStash;
-import com.tommytony.war.RestoreDeadmanInventoryJob;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamMaterials;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
+import com.tommytony.war.jobs.RestoreDeadmanInventoryJob;
+import com.tommytony.war.utils.InventoryStash;
 
 
 /**

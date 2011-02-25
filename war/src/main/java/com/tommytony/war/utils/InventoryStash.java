@@ -1,4 +1,4 @@
-package com.tommytony.war;
+package com.tommytony.war.utils;
 
 import org.bukkit.inventory.ItemStack;
 

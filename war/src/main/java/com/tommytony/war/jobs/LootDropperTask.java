@@ -1,4 +1,4 @@
-package com.tommytony.war;
+package com.tommytony.war.jobs;
 
 import java.util.List;
 
