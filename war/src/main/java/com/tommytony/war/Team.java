@@ -281,7 +281,7 @@ public class Team {
 			lines[1] = remainingLives + "/" + warzone.getLifePool() + " lives left";
 			lines[2] = points + "/" + warzone.getScoreCap() + " pts";
 			lines[3] = players.size() + "/" + warzone.getTeamCap() + " players";
-			SignHelper.setToSign(signBlock, (byte)signData, lines);
+			SignHelper.setToSign(war, signBlock, (byte)signData, lines);
 		}
 	}
 	

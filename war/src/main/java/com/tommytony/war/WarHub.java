@@ -113,7 +113,7 @@ public class WarHub {
 			lines[1] = "";
 			lines[2] = "Pick your battle!";
 			lines[3] = "";
-			SignHelper.setToSign(signBlock, (byte)8, lines);
+			SignHelper.setToSign(war, signBlock, (byte)8, lines);
 			
 			// Warzone signs
 			for(Warzone zone : war.getWarzones()) {
@@ -142,7 +142,7 @@ public class WarHub {
 		lines[1] = zone.getName();
 		lines[2] = zonePlayers + "/" + zoneCap + " players";
 		lines[3] = zone.getTeams().size() + " teams";
-		SignHelper.setToSign(block, (byte)8, lines);
+		SignHelper.setToSign(war, block, (byte)8, lines);
 	}
 
 	public void setVolume(Volume vol) {

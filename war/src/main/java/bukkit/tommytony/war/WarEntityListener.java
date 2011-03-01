@@ -180,7 +180,6 @@ public class WarEntityListener extends EntityListener {
 					if(player instanceof CraftPlayer) {
 						net.minecraft.server.Entity playerEntity = ((CraftPlayer)player).getHandle();
 						playerEntity.fireTicks = 0;
-//						playerEntity.r(); // force refresh (?)
 					}
 					event.setCancelled(true);		
 				}
@@ -212,7 +211,6 @@ public class WarEntityListener extends EntityListener {
 				if(player instanceof CraftPlayer) {
 					net.minecraft.server.Entity playerEntity = ((CraftPlayer)player).getHandle();
 					playerEntity.fireTicks = 0;
-//					playerEntity.r(); // force refresh (?)
 				}
 				event.setCancelled(true);		
 			}
@@ -225,7 +223,7 @@ public class WarEntityListener extends EntityListener {
 		Warzone zone = war.warzone(location);
 		if(zone != null && zone.isNoCreatures()) {
 			event.setCancelled(true);
-			war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
+			//war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
 		}
     }
 

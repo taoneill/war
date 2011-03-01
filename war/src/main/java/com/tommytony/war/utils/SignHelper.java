@@ -9,11 +9,13 @@ import bukkit.tommytony.war.War;
 
 public class SignHelper {
 
-	public static void setToSign(Block block, byte data, String[] lines) {
+	public static void setToSign(War war, Block block, byte data, String[] lines) {
 		if(block.getType() != Material.SIGN_POST) {
 			block.setType(Material.SIGN_POST);
 		}
-		block.setData(data);
+		if(block.getData() != data) {
+			block.setData(data);
+		}
 		BlockState state = block.getState();
 		if(state instanceof Sign) {
 			Sign sign = (Sign) state;
@@ -26,6 +28,7 @@ public class SignHelper {
 					sign.update(true);
 				}
 			} catch (Exception e) {
+				
 				// just can't stand this anymore
 			}
 		}

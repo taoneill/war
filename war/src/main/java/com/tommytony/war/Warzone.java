@@ -117,14 +117,12 @@ public class Warzone {
 	}
 
 	public void setNorthwest(Location northwest) {
-		//resetNorthwestCursorBlocks();
 		this.northwest = northwest;
 		this.volume.setCornerOne(world.getBlockAt(northwest.getBlockX(), northwest.getBlockY(), northwest.getBlockZ()));
 		addNorthwestCursorBlocks();
 	}
 	
 	private void addNorthwestCursorBlocks() {
-//		int newHighest = this.world.getHighestBlockYAt(this.northwest.getBlockX(), this.northwest.getBlockZ()) - 1;
 		Block topNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), this.northwest.getBlockY()-1, this.northwest.getBlockZ());
 		Material[] originalNorthwestBlocks = new Material[3];
 		originalNorthwestBlocks[0] = topNWBlock.getType();	// save blocks for reset
@@ -136,29 +134,17 @@ public class Warzone {
 		this.war.getServer().getScheduler().scheduleAsyncDelayedTask(this.war, new ResetCursorJob(topNWBlock, originalNorthwestBlocks, false), 85);
 	}
 	
-//	private void resetNorthwestCursorBlocks() {
-//		if(this.northwest != null && originalNorthwestBlocks != null) {
-//			// reset old corner
-//			Block oldTopNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), this.northwest.getBlockY() - 1, this.northwest.getBlockZ());
-//			oldTopNWBlock.setType(originalNorthwestBlocks[0]);
-//			oldTopNWBlock.getFace(BlockFace.EAST).setType(originalNorthwestBlocks[1]);
-//			oldTopNWBlock.getFace(BlockFace.SOUTH).setType(originalNorthwestBlocks[2]);
-//		}
-//	}
-
 	public Location getNorthwest() {
 		return northwest;
 	}
 
 	public void setSoutheast(Location southeast) {
-		//resetSoutheastCursorBlocks();
 		this.southeast = southeast;
 		this.volume.setCornerTwo(world.getBlockAt(southeast.getBlockX(), southeast.getBlockY(), southeast.getBlockZ()));
 		addSoutheastCursorBlocks();
 	}
 	
 	private void addSoutheastCursorBlocks() {
-//		int newHighest = this.world.getHighestBlockYAt(this.southeast.getBlockX(), this.southeast.getBlockZ()) - 1;
 		Block topSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), this.southeast.getBlockY()-1, this.southeast.getBlockZ());
 		Material[] originalSoutheastBlocks = new Material[3];
 		originalSoutheastBlocks[0] = topSEBlock.getType();	// save block for reset
@@ -170,15 +156,6 @@ public class Warzone {
 		this.war.getServer().getScheduler().scheduleAsyncDelayedTask(this.war, new ResetCursorJob(topSEBlock, originalSoutheastBlocks, true), 85);
 	}
 	
-//	private void resetSoutheastCursorBlocks() {
-//		if(this.southeast != null && originalSoutheastBlocks != null) {
-//			// reset old corner
-//			Block oldTopSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), this.southeast.getBlockY() - 1, this.southeast.getBlockZ());
-//			oldTopSEBlock.setType(originalSoutheastBlocks[0]);
-//			oldTopSEBlock.getFace(BlockFace.WEST).setType(originalSoutheastBlocks[1]);
-//			oldTopSEBlock.getFace(BlockFace.NORTH).setType(originalSoutheastBlocks[2]);
-//		}
-//	}
 	
 	public Location getSoutheast() {
 		return southeast;
@@ -215,8 +192,6 @@ public class Warzone {
 				}
 			}
 			
-			
-			
 			int saved = volume.saveBlocks();
 			if(clearArtifacts) {
 				initializeZone();	// bring back stuff
@@ -239,7 +214,7 @@ public class Warzone {
 					respawnPlayer(team, player);
 				}
 				team.setRemainingLives(lifePool);
-				team.setTeamSpawn(team.getTeamSpawn());
+				team.initializeTeamSpawn();
 				if(team.getTeamFlag() != null) team.setTeamFlag(team.getTeamFlag());
 				//team.resetSign();
 			}
@@ -247,28 +222,7 @@ public class Warzone {
 			initZone();
 		}
 	}
-	
-//	public void initializeZone(PlayerMoveEvent event) {
-//		if(ready() && volume.isSaved()){			
-//			// everyone back to team spawn with full health
-//			for(Team team : teams) {
-//				for(Player p : team.getPlayers()) {
-//					if(p.getName().equals(event.getPlayer().getName())) { 
-//						respawnPlayer(event, team, event.getPlayer());
-//					} else {
-//						respawnPlayer(team, p);
-//					}
-//				}
-//				team.setRemainingLives(lifePool);
-//				team.setTeamSpawn(team.getTeamSpawn());
-//				if(team.getTeamFlag() != null) team.setTeamFlag(team.getTeamFlag());
-//				team.resetSign();
-//			}
-//			
-//			initZone();
-//		}
-//	}
-	
+		
 	private void initZone() {
 		// add wall outlines
 		if(isDrawZoneOutline()) {

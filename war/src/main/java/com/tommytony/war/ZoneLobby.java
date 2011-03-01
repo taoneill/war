@@ -202,7 +202,7 @@ public class ZoneLobby {
 				lines[2] = "";
 				lines[3] = "Pick your team.";
 			}
-			SignHelper.setToSign(zoneSignBlock, data, lines);
+			SignHelper.setToSign(war, zoneSignBlock, data, lines);
 			
 			// lets get some light in here
 			if(wall == BlockFace.NORTH || wall == BlockFace.SOUTH) {
@@ -585,7 +585,7 @@ public class ZoneLobby {
 			else data = (byte)8;
 		}		
 	
-		SignHelper.setToSign(block, data, lines);
+		SignHelper.setToSign(war, block, data, lines);
 	}
 	
 	public boolean isLeavingZone(Location location) {
