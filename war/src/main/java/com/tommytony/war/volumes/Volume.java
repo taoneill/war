@@ -170,8 +170,8 @@ public class Volume {
 											|| oldBlockType == Material.SIGN_POST.getId()) {
 										// Signs
 										currentBlock.setType(Material.getMaterial(oldBlockType));
-										currentBlock.setData(oldBlockData);
 										BlockState state = currentBlock.getState();
+										state.setData(new org.bukkit.material.Sign(oldBlockType, oldBlockData));
 										if(state instanceof Sign) {
 											Sign sign = (Sign)state;
 											String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "-" + k);

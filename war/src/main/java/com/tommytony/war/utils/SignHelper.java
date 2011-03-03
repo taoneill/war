@@ -13,10 +13,8 @@ public class SignHelper {
 		if(block.getType() != Material.SIGN_POST) {
 			block.setType(Material.SIGN_POST);
 		}
-		if(block.getData() != data) {
-			block.setData(data);
-		}
 		BlockState state = block.getState();
+		state.setData(new org.bukkit.material.Sign(Material.SIGN_POST, data));
 		if(state instanceof Sign) {
 			Sign sign = (Sign) state;
 			try {
@@ -28,7 +26,6 @@ public class SignHelper {
 					sign.update(true);
 				}
 			} catch (Exception e) {
-				
 				// just can't stand this anymore
 			}
 		}
