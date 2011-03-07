@@ -923,6 +923,9 @@ public class Warzone {
 		Team playerTeam = war.getPlayerTeam(player.getName());
 		if(playerTeam !=null) {
 			if(removeFromTeam) playerTeam.removePlayer(player.getName());
+			for(Team t : this.getTeams()) {
+				t.teamcast(player.getName() + " left the zone.");
+			}
 			playerTeam.resetSign();	
 			if(this.isFlagThief(player.getName())) {
 				Team victim = this.getVictimTeamForThief(player.getName());

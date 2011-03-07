@@ -268,7 +268,7 @@ public class ZoneLobby {
 			for(int doorIndex = 0; doorIndex < warzone.getTeams().size(); doorIndex++) {
 				// 0 at center, 1 to the left, 2 to the right, 3 to the left, etc
 				Team team = warzone.getTeams().get(doorIndex);
-				if(team.getPlayers().size() % 2 == 0) {
+				if(warzone.getTeams().size() % 2 == 0) {
 					// even number of teams
 					if(doorIndex % 2 == 0) {
 						teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getFace(rightSide, doorIndex * 2 + 2)));

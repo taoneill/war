@@ -1002,7 +1002,7 @@ public class War extends JavaPlugin {
 		} else {
 			boolean warped = false;
 			for(Warzone warzone : this.getWarzones()) {
-				if(warzone.getName().equals(arguments[0]) && warzone.getTeleport() != null){
+				if(warzone.getName().toLowerCase().startsWith(arguments[0]) && warzone.getTeleport() != null){
 					Team playerTeam = getPlayerTeam(player.getName());
 					if(playerTeam != null) {
 						Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
@@ -1011,6 +1011,7 @@ public class War extends JavaPlugin {
 						player.teleportTo(warzone.getTeleport());
 					}
 					warped = true;
+					break;
 				}
 			}
 			if(!warped) {

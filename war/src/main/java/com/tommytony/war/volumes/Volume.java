@@ -88,6 +88,7 @@ public class Volume {
 									if(sign.getLines() != null) {
 										this.getSignLines().put("sign-" + i + "-" + j + "-" + k, sign.getLines());
 									}
+									
 								} else if(state instanceof Chest) {
 									// Chests
 									Chest chest = (Chest)state;
