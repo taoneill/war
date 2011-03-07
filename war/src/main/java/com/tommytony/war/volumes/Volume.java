@@ -31,8 +31,8 @@ public class Volume {
 	private final String name;
 	private final World world;
 	//private final Warzone warzone;
-	private Block cornerOne;
-	private Block cornerTwo;
+	private BlockInfo cornerOne;
+	private BlockInfo cornerTwo;
 	private int[][][] blockTypes = null;
 	private byte[][][] blockDatas = null;
 	private HashMap<String, String[]> signLines = new HashMap<String, String[]>();
@@ -54,7 +54,7 @@ public class Volume {
 	}
 	
 	public void setCornerOne(Block block) {
-		this.cornerOne = block;
+		this.cornerOne = new BlockInfo(block);
 	}
 	
 	public int saveBlocks() {
@@ -273,22 +273,22 @@ public class Volume {
 	
 
 	public void setCornerTwo(Block block) {
-		this.cornerTwo = block;
+		this.cornerTwo = new BlockInfo(block);
 	}
 	
 	public Block getMinXBlock() {
-		if(cornerOne.getX() < cornerTwo.getX()) return cornerOne;
-		return cornerTwo;
+		if(cornerOne.getX() < cornerTwo.getX()) return BlockInfo.getBlock(world, cornerOne);
+		return BlockInfo.getBlock(world, cornerTwo);
 	}
 	
 	public Block getMinYBlock() {
-		if(cornerOne.getY() < cornerTwo.getY()) return cornerOne;
-		return cornerTwo;
+		if(cornerOne.getY() < cornerTwo.getY()) return BlockInfo.getBlock(world, cornerOne);
+		return BlockInfo.getBlock(world, cornerTwo);
 	}
 	
 	public Block getMinZBlock() {
-		if(cornerOne.getZ() < cornerTwo.getZ()) return cornerOne;
-		return cornerTwo;
+		if(cornerOne.getZ() < cornerTwo.getZ()) return BlockInfo.getBlock(world, cornerOne);
+		return BlockInfo.getBlock(world, cornerTwo);
 	}
 	
 	public int getMinX() {
@@ -304,18 +304,18 @@ public class Volume {
 	}
 	
 	public Block getMaxXBlock() {
-		if(cornerOne.getX() < cornerTwo.getX()) return cornerTwo;
-		return cornerOne;
+		if(cornerOne.getX() < cornerTwo.getX()) return BlockInfo.getBlock(world, cornerTwo);
+		return BlockInfo.getBlock(world, cornerOne);
 	}
 	
 	public Block getMaxYBlock() {
-		if(cornerOne.getY() < cornerTwo.getY()) return cornerTwo;
-		return cornerOne;
+		if(cornerOne.getY() < cornerTwo.getY()) return BlockInfo.getBlock(world, cornerTwo);
+		return BlockInfo.getBlock(world, cornerOne);
 	}
 	
 	public Block getMaxZBlock() {
-		if(cornerOne.getZ() < cornerTwo.getZ()) return cornerTwo;
-		return cornerOne;
+		if(cornerOne.getZ() < cornerTwo.getZ()) return BlockInfo.getBlock(world, cornerTwo);
+		return BlockInfo.getBlock(world, cornerOne);
 	}
 	
 	public int getMaxX() {
@@ -351,11 +351,11 @@ public class Volume {
 	}
 	
 	public Block getCornerOne() {
-		return cornerOne;
+		return BlockInfo.getBlock(world, cornerOne);
 	}
 	
 	public Block getCornerTwo() {
-		return cornerTwo;
+		return BlockInfo.getBlock(world, cornerTwo);
 	}
 
 	public boolean contains(Location location) {

@@ -14,7 +14,7 @@ import bukkit.tommytony.war.War;
 
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamMaterials;
+import com.tommytony.war.TeamKinds;
 import com.tommytony.war.TeamSpawnStyles;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
@@ -113,7 +113,7 @@ public class WarzoneMapper {
 						teamLocation.setYaw(yaw);
 					}
 					Team team = new Team(teamStrSplit[0], 
-										TeamMaterials.teamMaterialFromString(teamStrSplit[0]),
+										TeamKinds.teamKindFromString(teamStrSplit[0]),
 										teamLocation,
 										war, warzone );
 					team.setRemainingLives(warzone.getLifePool());
@@ -129,7 +129,7 @@ public class WarzoneMapper {
 			for(String teamFlagStr : teamFlagsSplit) {
 				if(teamFlagStr != null && !teamFlagStr.equals("")){
 					String[] teamFlagStrSplit =teamFlagStr.split(",");
-					Team team = warzone.getTeamByMaterial(TeamMaterials.teamMaterialFromString(teamFlagStrSplit[0]));
+					Team team = warzone.getTeamByKind(TeamKinds.teamKindFromString(teamFlagStrSplit[0]));
 					if(team != null) {
 						int teamFlagX = Integer.parseInt(teamFlagStrSplit[1]);
 						int teamFlagY = Integer.parseInt(teamFlagStrSplit[2]);

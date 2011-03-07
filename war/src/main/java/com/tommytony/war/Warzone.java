@@ -355,14 +355,16 @@ public class Warzone {
 			}
 		}
 		if(isBlockHeads()) {
-			playerInv.setHelmet(new ItemStack(team.getMaterial()));
+			playerInv.setHelmet(new ItemStack(team.getKind().getMaterial(), 1, (short)1, new Byte(team.getKind().getData())));
 		} else {
-			if(team.getMaterial() == Material.GOLD_BLOCK) {
+			if(team.getKind() == TeamKinds.teamKindFromString("gold")) {
 				playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
-			} else if (team.getMaterial() == Material.DIAMOND_BLOCK) {
+			} else if (team.getKind() == TeamKinds.teamKindFromString("diamond")) {
 				playerInv.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-			} else if (team.getMaterial() == Material.IRON_BLOCK) {
+			} else if (team.getKind() == TeamKinds.teamKindFromString("iron")) {
 				playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
+			} else {
+				playerInv.setHelmet(new ItemStack(Material.LEATHER_HELMET));
 			}
 		}
 		
@@ -512,7 +514,7 @@ public class Warzone {
 	
 	public Monument getMonument(String monumentName) {
 		for(Monument monument: monuments) {
-			if(monument.getName().equals(monumentName)) {
+			if(monument.getName().startsWith(monumentName)) {
 				return monument;
 			}
 		}
@@ -584,9 +586,9 @@ public class Warzone {
 		this.volume = zoneVolume;
 	}
 	
-	public Team getTeamByMaterial(Material material) {
+	public Team getTeamByKind(TeamKind kind) {
 		for(Team t : teams) {
-			if(t.getMaterial().getId() == material.getId()) {
+			if(t.getKind() == kind) {
 				return t;
 			}
 		}
@@ -1127,5 +1129,14 @@ public class Warzone {
 			deadMenInventories.remove(player.getName());
 		}
 		
-	}	
+	}
+
+//	public Team getTeamByName(String name) {
+//		for(Team team : getTeams()) {
+//			if(team.getName().startsWith(name)) {
+//				return team;
+//			}
+//		}
+//		return null;
+//	}	
 }

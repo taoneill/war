@@ -41,7 +41,8 @@ public class WarBlockListener extends BlockListener {
 			Warzone zone = war.warzone(player.getLocation());
 			if(team != null && block != null && zone != null 
 					&& zone.isMonumentCenterBlock(block)
-					&& block.getType() == team.getMaterial()) {
+					&& block.getType() == team.getKind().getMaterial()
+					&& block.getData() == team.getKind().getData()) {
 				Monument monument = zone.getMonumentFromCenterBlock(block);
 				if(monument != null && !monument.hasOwner()) {
 					monument.capture(team);
@@ -86,7 +87,8 @@ public class WarBlockListener extends BlockListener {
 	    	}
 	    	
 	    	// can't place a block of your team's color
-	    	if(team != null && block.getType() == team.getMaterial()) {
+	    	if(team != null && block.getType() == team.getKind().getMaterial()
+					&& block.getData() == team.getKind().getData()) {
 	    		war.badMsg(player, "You can only use your team's blocks to capture monuments.");
 	    		event.setCancelled(true);
 	    		return;
@@ -154,8 +156,10 @@ public class WarBlockListener extends BlockListener {
 			event.setCancelled(false);
 			return;
 		}else if(warzone != null && warzone.isImportantBlock(block)) {
+			
     		if(team != null && team.getSpawnVolume().contains(block)) {
-    			if(player.getInventory().contains(team.getMaterial())) {
+    			ItemStack teamKindBlock = new ItemStack(team.getKind().getMaterial(), team.getKind().getData());
+    			if(player.getInventory().contains(teamKindBlock)) {
     				war.badMsg(player, "You already have a " + team.getName() + " block.");
     				event.setCancelled(true);
     				return;
@@ -171,8 +175,9 @@ public class WarBlockListener extends BlockListener {
     			} else {
 	    			// player just broke the flag block of other team: cancel to avoid drop, give player the block, set block to air
 	    			Team lostFlagTeam = warzone.getTeamForFlagBlock(block);
+	    			ItemStack teamKindBlock = new ItemStack(lostFlagTeam.getKind().getMaterial(), 1, (short)1, new Byte(lostFlagTeam.getKind().getData()));
 	    			player.getInventory().clear();
-	    			player.getInventory().addItem(new ItemStack(lostFlagTeam.getMaterial(), 1));
+	    			player.getInventory().addItem(teamKindBlock);
 	    			warzone.addFlagThief(lostFlagTeam, player.getName());
 	    			block.setType(Material.AIR);
 	    			

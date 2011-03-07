@@ -10,10 +10,8 @@ import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,13 +27,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamChatColors;
-import com.tommytony.war.TeamMaterials;
+import com.tommytony.war.TeamKind;
+import com.tommytony.war.TeamKinds;
 import com.tommytony.war.TeamSpawnStyles;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.jobs.WarJobQueue;
 import com.tommytony.war.mappers.VolumeMapper;
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
@@ -391,7 +388,7 @@ public class War extends JavaPlugin {
 				monument.getVolume().resetBlocks();
 				warzone.getMonuments().remove(monument);
 				WarzoneMapper.save(this, warzone, false);
-				this.msg(player, "Monument " + name + " removed.");
+				this.msg(player, "Monument " + monument.getName() + " removed.");
 			} else {
 				this.badMsg(player, "No such monument.");
 			}
@@ -425,11 +422,11 @@ public class War extends JavaPlugin {
 	public void performDeleteTeam(Player player, String[] arguments) {
 		if(arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) 
 										&& !this.inAnyWarzoneLobby(player.getLocation()))) {
-			this.badMsg(player, "Usage: /deleteteam <team-name>." +
+			this.badMsg(player, "Usage: /deleteteam <team-name/color>." +
 					" Deletes the team and its spawn. " +
 					"Must be in a warzone or lobby (try /zones and /zone). ");
 		} else {
-			String name = TeamMaterials.teamMaterialToString(TeamMaterials.teamMaterialFromString(arguments[0]));
+			String name = arguments[0];
 			Warzone warzone = this.warzone(player.getLocation());
 			ZoneLobby lobby = this.lobby(player.getLocation());
 			if(warzone == null && lobby != null) {
@@ -438,12 +435,7 @@ public class War extends JavaPlugin {
 				lobby = warzone.getLobby();
 			}
 			List<Team> teams = warzone.getTeams();
-			Team team = null;
-			for(Team t : teams) {
-				if(name.equals(t.getName())) {
-					team = t;
-				}
-			}
+			Team team = warzone.getTeamByKind(TeamKinds.teamKindFromString(name));
 			if(team != null) {
 				if(team.getFlagVolume() != null) team.getFlagVolume().resetBlocks();
 				team.getSpawnVolume().resetBlocks();	
@@ -455,7 +447,7 @@ public class War extends JavaPlugin {
 					warzone.getLobby().initialize();
 				}
 				WarzoneMapper.save(this, warzone, false);
-				this.msg(player, "Team " + name + " removed.");
+				this.msg(player, "Team " + team.getName() + " removed.");
 			} else {
 				this.badMsg(player, "No such team.");
 			}
@@ -464,15 +456,15 @@ public class War extends JavaPlugin {
 
 	public void performSetTeamFlag(Player player, String[] arguments) {
 		if(arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) 
-				|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
-			this.badMsg(player, "Usage: /setteamflag <diamond/iron/gold/d/i/g>. " +
+				|| (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
+			this.badMsg(player, "Usage: /setteamflag <team-name/color>, e.g. /setteamflag diamond. " +
 					"Sets the team flag post to the current location. " +
 					"Must be in a warzone (try /zones and /zone). ");
 		} else {
-			Material teamMaterial = TeamMaterials.teamMaterialFromString(arguments[0]);
-			String name = TeamMaterials.teamMaterialToString(teamMaterial);					
+			TeamKind kind = TeamKinds.teamKindFromString(arguments[0]);	
+			String name = arguments[0];
 			Warzone warzone = this.warzone(player.getLocation());
-			Team team = warzone.getTeamByMaterial(teamMaterial);
+			Team team = warzone.getTeamByKind(kind);
 			if(team == null) {
 				// no such team yet			
 				this.badMsg(player, "Place the team spawn first.");
@@ -482,7 +474,7 @@ public class War extends JavaPlugin {
 				Location playerLoc = player.getLocation();
 				player.teleportTo(new Location(playerLoc.getWorld(), 
 						playerLoc.getBlockX()+1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
-				this.msg(player, "Team " + name + " flag added here.");
+				this.msg(player, "Team " + team.getName() + " flag added here.");
 				WarzoneMapper.save(this, warzone, false);
 			} else {
 				// relocate flag
@@ -491,7 +483,7 @@ public class War extends JavaPlugin {
 				Location playerLoc = player.getLocation();
 				player.teleportTo(new Location(playerLoc.getWorld(), 
 						playerLoc.getBlockX()+1, playerLoc.getBlockY(), playerLoc.getBlockZ()+1));
-				this.msg(player, "Team " + name + " flag moved.");
+				this.msg(player, "Team " + team.getName() + " flag moved.");
 				WarzoneMapper.save(this, warzone, false);
 			}
 		}
@@ -499,22 +491,21 @@ public class War extends JavaPlugin {
 
 	public void performSetTeam(Player player, String[] arguments) {
 		if(arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) 
-				|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
-			this.badMsg(player, "Usage: /setteam <diamond/iron/gold/d/i/g>. " +
+				|| (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
+			this.badMsg(player, "Usage: /setteam <team-kind/color>, e.g. /setteam red." +
 					"Sets the team spawn to the current location. " +
 					"Must be in a warzone (try /zones and /zone). ");
 		} else {
-			Material teamMaterial = TeamMaterials.teamMaterialFromString(arguments[0]);
-			String name = TeamMaterials.teamMaterialToString(teamMaterial);					
+			TeamKind teamKind = TeamKinds.teamKindFromString(arguments[0]);					
 			Warzone warzone = this.warzone(player.getLocation());
-			Team existingTeam = warzone.getTeamByMaterial(teamMaterial);
+			Team existingTeam = warzone.getTeamByKind(teamKind);
 			if(existingTeam != null) {
 				// relocate
 				existingTeam.setTeamSpawn(player.getLocation());
 				this.msg(player, "Team " + existingTeam.getName() + " spawn relocated.");
 			} else {
-				// new team
-				Team newTeam = new Team(name, teamMaterial, player.getLocation(), this, warzone);
+				// new team (use default TeamKind name for now)
+				Team newTeam = new Team(teamKind.getDefaultName(), teamKind, player.getLocation(), this, warzone);
 				newTeam.setRemainingLives(warzone.getLifePool());
 				warzone.getTeams().add(newTeam);
 				if(warzone.getLobby() != null) {
@@ -524,7 +515,7 @@ public class War extends JavaPlugin {
 					warzone.getLobby().initialize();
 				}
 				newTeam.setTeamSpawn(player.getLocation());
-				this.msg(player, "Team " + name + " created with spawn here.");
+				this.msg(player, "Team " + newTeam.getName() + " created with spawn here.");
 			}
 			
 			WarzoneMapper.save(this, warzone, false);
@@ -901,14 +892,7 @@ public class War extends JavaPlugin {
 			this.badMsg(player, "Usage: /team <message>. " +
 					"Sends a message only to your teammates.");
 		} else {
-			ChatColor color = null;
-			if(playerTeam.getMaterial() == TeamMaterials.TEAMDIAMOND) {
-				color = TeamChatColors.TEAMDIAMOND;
-			} else if(playerTeam.getMaterial() == TeamMaterials.TEAMGOLD) {
-				color = TeamChatColors.TEAMGOLD;
-			} else if(playerTeam.getMaterial() ==  TeamMaterials.TEAMIRON) {
-				color = TeamChatColors.TEAMIRON;
-			}
+			ChatColor color = playerTeam.getKind().getColor();
 			String teamMessage = color + player.getName() + ": " + ChatColor.WHITE;
 			for(int j = 0 ; j<arguments.length; j++) {
 				String part = arguments[j];
@@ -930,7 +914,7 @@ public class War extends JavaPlugin {
 
 	public void performJoin(Player player, String[] arguments) {
 		if(arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))
-				|| (arguments.length > 0 && TeamMaterials.teamMaterialFromString(arguments[0]) == null)) {
+				|| (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
 			this.badMsg(player, "Usage: /join <diamond/iron/gold/d/i/g>." +
 					" Teams are warzone specific." +
 					" You must be inside a warzone or zone lobby to join a team." +
@@ -956,7 +940,8 @@ public class War extends JavaPlugin {
 			}
 			
 			// join new team
-			String name = TeamMaterials.teamMaterialToString(TeamMaterials.teamMaterialFromString(arguments[0]));
+			String name = arguments[0];
+			TeamKind kind =	TeamKinds.teamKindFromString(arguments[0]);
 			Warzone warzone = this.warzone(player.getLocation());
 			ZoneLobby lobby = this.lobby(player.getLocation());
 			if(warzone == null && lobby != null) {
@@ -970,7 +955,7 @@ public class War extends JavaPlugin {
 				List<Team> teams = warzone.getTeams();
 				boolean foundTeam = false;
 				for(Team team : teams) {
-					if(team.getName().equals(name)) {
+					if(team.getName().startsWith(name) || team.getKind() == kind) {
 						if(!warzone.hasPlayerInventory(player.getName())) {
 							warzone.keepPlayerInventory(player);
 							this.msg(player, "Your inventory is in storage until you /leave.");
@@ -984,14 +969,14 @@ public class War extends JavaPlugin {
 							}
 							foundTeam = true;
 						} else {
-							this.badMsg(player, "Team " + name + " is full.");
+							this.badMsg(player, "Team " + team.getName() + " is full.");
 							foundTeam = true;
 						}
 					}
 				}
 				if(foundTeam) {
 					for(Team team : teams){
-						team.teamcast("" + player.getName() + " joined " + name);
+						team.teamcast("" + player.getName() + " joined " + team.getName());
 					}
 				} else {
 					this.badMsg(player, "No such team. Try /teams.");
@@ -1262,31 +1247,28 @@ public class War extends JavaPlugin {
 	}
 	
 	public void msg(Player player, String str) {
-		String out = ChatColor.GRAY + "[War] " + ChatColor.WHITE + colorTeams(str, ChatColor.WHITE) + " ";
+		String out = ChatColor.GRAY + "War> " + ChatColor.WHITE + colorTeams(str, ChatColor.WHITE) + " ";
 		ChatFixUtil.sendMessage(player, out);
 	}
 	
 	public void badMsg(Player player, String str) {
-		String out = ChatColor.GRAY + "[War] " + ChatColor.RED + colorTeams(str, ChatColor.RED) + " ";
+		String out = ChatColor.GRAY + "War> " + ChatColor.RED + colorTeams(str, ChatColor.RED) + " ";
 		ChatFixUtil.sendMessage(player, out);
 	}
 	
 	private String colorTeams(String str, ChatColor msgColor) {
-		String out = str.replaceAll("iron", TeamChatColors.TEAMIRON + "iron" + msgColor);
-		out = out.replaceAll("Iron", TeamChatColors.TEAMIRON + "Iron" + msgColor);
-		out = out.replaceAll("gold", TeamChatColors.TEAMGOLD + "gold" + msgColor);
-		out = out.replaceAll("Gold", TeamChatColors.TEAMGOLD + "Gold" + msgColor);
-		out = out.replaceAll("diamond", TeamChatColors.TEAMDIAMOND + "diamond" + msgColor);
-		out = out.replaceAll("Diamond", TeamChatColors.TEAMDIAMOND + "Diamond" + msgColor);
-		return out;
+		for(TeamKind kind : TeamKinds.getTeamkinds()) {
+			str = str.replaceAll(" " + kind.getDefaultName(), " " + kind.getColor() + kind.getDefaultName() + msgColor);
+		}
+		return str;
 	}
 	
 	public void logInfo(String str) {
-		this.getLogger().log(Level.INFO, "[War] " + str);
+		this.getLogger().log(Level.INFO, "War> " + str);
 	}
 	
 	public void logWarn(String str) {
-		this.getLogger().log(Level.WARNING, "[War] " + str);
+		this.getLogger().log(Level.WARNING, "War> " + str);
 	}
 	
 	// the only way to find a zone that has only one corner

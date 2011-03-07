@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamMaterials;
+import com.tommytony.war.TeamKinds;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
@@ -103,15 +103,17 @@ public class WarPlayerListener extends PlayerListener {
 			
 			if(zone.isFlagThief(player.getName())) {
 				// a flag thief can't drop his flag
-				war.badMsg(player, "Can't drop the flag. What are you doing? Run!");
+				war.badMsg(player, "Can't drop items while stealing flag. What are you doing?! Run!");
 				event.setCancelled(true);
 				
 			} else {
 				Item item = event.getItemDrop();
 				if(item instanceof CraftItem) {
 					ItemStack itemStack =  ((CraftItem)item).getItemStack();
-					if(itemStack != null && itemStack.getType().getId() == team.getMaterial().getId()) {
-						// Can't drop a precious block
+					if(itemStack != null 
+							&& itemStack.getType() == team.getKind().getMaterial() 
+							&& itemStack.getData().getData() == team.getKind().getData()) {
+						// Can't drop your team's kind block
 						war.badMsg(player, "Can't drop " + team.getName() + " block blocks.");
 						event.setCancelled(true);
 						return;
@@ -135,8 +137,8 @@ public class WarPlayerListener extends PlayerListener {
 				if(item instanceof CraftItem) {
 					CraftItem cItem = (CraftItem)item;
 					ItemStack itemStack = cItem.getItemStack();
-					if(itemStack != null && itemStack.getType().getId() == team.getMaterial().getId()
-							&& player.getInventory().contains(team.getMaterial())) {
+					if(itemStack != null && itemStack.getType() == team.getKind().getMaterial()
+							&& player.getInventory().contains(new ItemStack(team.getKind().getMaterial(), team.getKind().getData()))) {
 						// Can't pick up a second precious block
 						//war.badMsg(player, "You already have a " + team.getName() + " block.");
 						event.setCancelled(true);
@@ -156,9 +158,10 @@ public class WarPlayerListener extends PlayerListener {
     		// make sure the player doesn't have too many precious blocks
     		// or illegal armor (i.e. armor not found in loadout)
     		PlayerInventory playerInv = (PlayerInventory) inventory;
-    		if(playerInv.contains(team.getMaterial(), 2)) {
-    			playerInv.remove(team.getMaterial());
-    			playerInv.addItem(new ItemStack(team.getMaterial()));
+    		ItemStack teamKindBlock = new ItemStack(team.getKind().getMaterial(), team.getKind().getData());
+    		if(playerInv.contains(teamKindBlock, 2)) {
+    			playerInv.remove(teamKindBlock);
+    			playerInv.addItem(teamKindBlock);
     			war.badMsg(player, "All that " + team.getName() + " must have been heavy!");
     		}
     	}
@@ -218,9 +221,7 @@ public class WarPlayerListener extends PlayerListener {
 			Warzone zone = locLobby.getZone(); 
 			Team oldTeam = war.getPlayerTeam(player.getName());
 			boolean isAutoAssignGate = false;
-			boolean isDiamondGate = false;
-			boolean isIronGate = false;
-			boolean isGoldGate = false;
+			boolean isSomeTeamGate = false;
 			if(oldTeam == null && canPlay) { // trying to counter spammy player move
 				isAutoAssignGate = zone.getLobby().isAutoAssignGate(playerLoc);
 				if(isAutoAssignGate) {
@@ -248,98 +249,38 @@ public class WarPlayerListener extends PlayerListener {
 						}
 					}
 					return;
-				} 
-				
-				isDiamondGate = zone.getLobby().isInTeamGate(TeamMaterials.TEAMDIAMOND, playerLoc);	
-				if (isDiamondGate){
-					enteredGate = true;
-					dropFromOldTeamIfAny(player);
-					Team diamondTeam = zone.getTeamByMaterial(TeamMaterials.TEAMDIAMOND);
-					if(zone.isDisabled()){
-						handleDisabledZone(event, player, zone);
-					} else if(diamondTeam.getPlayers().size() < zone.getTeamCap()) {
-						diamondTeam.addPlayer(player);
-						diamondTeam.resetSign();
-						if(war.getWarHub() != null) {
-							war.getWarHub().resetZoneSign(zone);
-						}
-						zone.keepPlayerInventory(player);
-						war.msg(player, "Your inventory is in storage until you /leave.");
-						zone.respawnPlayer(event, diamondTeam, player);
-						//zone.respawnPlayer(diamondTeam, player);
-						//event.setCancelled(true);
-						for(Team team : zone.getTeams()){
-							team.teamcast("" + player.getName() + " joined team diamond.");
-						}
-					} else {
-						event.setFrom(zone.getTeleport());
-						player.teleportTo(zone.getTeleport());
-						event.setCancelled(true);
-						war.badMsg(player, "Team diamond is full.");
-					}
-					return;
 				}
 				
-				isIronGate = zone.getLobby().isInTeamGate(TeamMaterials.TEAMIRON, playerLoc);	
-				if (isIronGate){
-					enteredGate = true;
-					dropFromOldTeamIfAny(player);
-					Team ironTeam = zone.getTeamByMaterial(TeamMaterials.TEAMIRON);
-					if(zone.isDisabled()){
-						handleDisabledZone(event, player, zone);
-					} else if(ironTeam.getPlayers().size() < zone.getTeamCap()) {
-						ironTeam.addPlayer(player);
-						ironTeam.resetSign();
-						if(war.getWarHub() != null) {
-							war.getWarHub().resetZoneSign(zone);
+				// go through all the team gates
+				for(Team team : zone.getTeams()){
+					if(zone.getLobby().isInTeamGate(team, playerLoc)) {
+						enteredGate = true;
+						dropFromOldTeamIfAny(player);
+						if(zone.isDisabled()){
+							handleDisabledZone(event, player, zone);
+						} else if(team.getPlayers().size() < zone.getTeamCap()) {
+							team.addPlayer(player);
+							team.resetSign();
+							if(war.getWarHub() != null) {
+								war.getWarHub().resetZoneSign(zone);
+							}
+							zone.keepPlayerInventory(player);
+							war.msg(player, "Your inventory is in storage until you /leave.");
+							zone.respawnPlayer(event, team, player);
+							for(Team t : zone.getTeams()){
+								t.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
+							}
+						} else {
+							event.setFrom(zone.getTeleport());
+							player.teleportTo(zone.getTeleport());
+							event.setCancelled(true);
+							war.badMsg(player, "Team " + team.getName() + " is full.");
 						}
-						zone.keepPlayerInventory(player);
-						war.msg(player, "Your inventory is in storage until you /leave.");
-						zone.respawnPlayer(event, ironTeam, player);
-//										zone.respawnPlayer(ironTeam, player);
-//										event.setCancelled(true);
-						for(Team team : zone.getTeams()){
-							team.teamcast("" + player.getName() + " joined team iron.");
-						}
-					} else {
-						event.setFrom(zone.getTeleport());
-						player.teleportTo(zone.getTeleport());
-						event.setCancelled(true);
-						war.badMsg(player, "Team iron is full.");
+						isSomeTeamGate = true;
+						return;
 					}
-					return;
 				}
-				
-				isGoldGate = zone.getLobby().isInTeamGate(TeamMaterials.TEAMGOLD, playerLoc);	
-				if (isGoldGate){
-					enteredGate = true;
-					dropFromOldTeamIfAny(player);
-					Team goldTeam = zone.getTeamByMaterial(TeamMaterials.TEAMGOLD);
-					if(zone.isDisabled()){
-						handleDisabledZone(event, player, zone);
-					} else if(goldTeam.getPlayers().size() < zone.getTeamCap()) {
-						goldTeam.addPlayer(player);
-						goldTeam.resetSign();
-						if(war.getWarHub() != null) {
-							war.getWarHub().resetZoneSign(zone);
-						}
-						zone.keepPlayerInventory(player);
-						war.msg(player, "Your inventory is in storage until you /leave.");
-						zone.respawnPlayer(event, goldTeam, player);
-						//zone.respawnPlayer(goldTeam, player);
-						//event.setCancelled(true);
-						for(Team team : zone.getTeams()){
-							team.teamcast("" + player.getName() + " joined team gold.");
-						}
-					} else {
-						event.setFrom(zone.getTeleport());
-						player.teleportTo(zone.getTeleport());
-						event.setCancelled(true);
-						war.badMsg(player, "Team gold is full.");
-					}
-					return;
-				} 
-					
+								
 				if (zone.getLobby().isInWarHubLinkGate(playerLoc)){
 					enteredGate = true;
 					dropFromOldTeamIfAny(player);
@@ -349,13 +290,6 @@ public class WarPlayerListener extends PlayerListener {
 					war.msg(player, "Welcome to the War hub.");
 					return;
 				}
-			} else if ((isAutoAssignGate || isDiamondGate || isGoldGate || isIronGate)  &&
-					    !canPlay) {
-				event.setFrom(zone.getTeleport());
-				player.teleportTo(zone.getTeleport());
-				event.setCancelled(true);
-				war.badMsg(player, "You don't have permission to play War. Ask a mod for the 'war.player' permission, please.");
-				return;
 			}
 			
 		}
