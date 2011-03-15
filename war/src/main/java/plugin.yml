@@ -30,7 +30,7 @@ commands:
     description: (War) Use to change teams. Also used instead of walking in the team gate in the lobby.
     usage:
        - Must be standing in warzone or lobby. 
-       - /join <diamond/iron/gold/d/i/g>
+       - /join <team color>
   leave:
     description: (War) Use to leave a warzone. Teleports you back to the lobby.
     usage:
@@ -70,7 +70,7 @@ commands:
     description: (War) Creates or moves a team spawn. The lobby is updated. Teams are diamond, iron or gold.
     usage:
         - Must be standing in warzone.
-        - /setteam <diamond/iron/gold/d/i/g>
+        - /setteam <diamond/iron/gold/white/orange/magenta/blue/green/pink/gray/purple/navy/brown/darkgreen/red/black>
   setmonument:
     description: (War) Creates or moves a monument.  
     usage:
@@ -80,7 +80,7 @@ commands:
     description: (War) Creates/moves a team flag post for CTF. 
     usage:
         - Must be standing in warzone.
-        - /setteamflag <diamond/iron/gold/d/i/g>
+        - /setteamflag <team-color>
   resetzone:
     description: (War) Reloads zone blocks from memory. Reloads from disk with "hard" option. Everyone back to the lobby. 
     usage:
@@ -95,7 +95,7 @@ commands:
     description: (War) Deletes the team. Team must exist. 
     usage:
         - Must be standing in warzone or lobby.
-        - /deleteteam <d/i/g>
+        - /deleteteam <team-color>
   deletemonument:
     description: (War) Deletes the monument. 
     usage:
