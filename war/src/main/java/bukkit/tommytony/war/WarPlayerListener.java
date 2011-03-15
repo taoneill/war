@@ -287,7 +287,7 @@ public class WarPlayerListener extends PlayerListener {
 					}
 				}
 								
-				if (zone.getLobby().isInWarHubLinkGate(playerLoc)){
+				if (war.getWarHub() != null && zone.getLobby().isInWarHubLinkGate(playerLoc)){
 					enteredGate = true;
 					dropFromOldTeamIfAny(player);
 					event.setFrom(war.getWarHub().getLocation());
