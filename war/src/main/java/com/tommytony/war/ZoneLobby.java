@@ -6,8 +6,10 @@ import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.CraftWorld;
 
 import bukkit.tommytony.war.War;
 
@@ -241,6 +243,12 @@ public class ZoneLobby {
 			}
 		} else {
 			war.logWarn("Failed to initalize zone lobby for zone " + warzone.getName());
+		}
+		World world = warzone.getWorld();
+		if(world instanceof CraftWorld && lobbyMiddleWallBlock != null) {
+			((CraftWorld)world).refreshChunk(lobbyMiddleWallBlock.getX(), lobbyMiddleWallBlock.getZ());
+			((CraftWorld)world).refreshChunk(volume.getCornerOne().getX(), volume.getCornerOne().getZ());
+			((CraftWorld)world).refreshChunk(volume.getCornerTwo().getX(), volume.getCornerTwo().getZ());
 		}
 	}
 

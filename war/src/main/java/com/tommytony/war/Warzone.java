@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -220,6 +221,21 @@ public class Warzone {
 			}
 			
 			initZone();
+			
+			// Set the zone chunks to all players
+			World world = this.getWorld();
+			if(world instanceof CraftWorld) {
+				CraftWorld craftWorld = (CraftWorld)world; 
+				// team spawns
+				for(Team team : teams) {
+					if(team.getPlayers().size() > 0) {
+						craftWorld.refreshChunk(team.getTeamSpawn().getBlockX(), team.getTeamSpawn().getBlockZ());
+						craftWorld.refreshChunk(team.getSpawnVolume().getCornerOne().getX(), team.getSpawnVolume().getCornerOne().getZ());
+						craftWorld.refreshChunk(team.getSpawnVolume().getCornerTwo().getX(), team.getSpawnVolume().getCornerTwo().getZ());
+					}
+				}
+				// dont do all the zone chunks for now
+			}
 		}
 	}
 		

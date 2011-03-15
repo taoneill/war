@@ -1002,7 +1002,7 @@ public class War extends JavaPlugin {
 		} else {
 			boolean warped = false;
 			for(Warzone warzone : this.getWarzones()) {
-				if(warzone.getName().toLowerCase().startsWith(arguments[0]) && warzone.getTeleport() != null){
+				if(warzone.getName().toLowerCase().startsWith(arguments[0].toLowerCase()) && warzone.getTeleport() != null){
 					Team playerTeam = getPlayerTeam(player.getName());
 					if(playerTeam != null) {
 						Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
@@ -1233,7 +1233,7 @@ public class War extends JavaPlugin {
 		Warzone currentZone = warzone(location);
 		if(currentZone == null) {
 			return false;
-		} else if (warzoneName.equals(currentZone.getName())){
+		} else if (warzoneName.toLowerCase().equals(currentZone.getName().toLowerCase())){
 			return true;
 		}
 		return false;
@@ -1275,7 +1275,7 @@ public class War extends JavaPlugin {
 	// the only way to find a zone that has only one corner
 	public Warzone findWarzone(String warzoneName) {
 		for(Warzone warzone : warzones) {
-			if(warzone.getName().equals(warzoneName)) {
+			if(warzone.getName().toLowerCase().equals(warzoneName.toLowerCase())) {
 				return warzone;
 			}
 		}
@@ -1422,7 +1422,7 @@ public class War extends JavaPlugin {
 		ZoneLobby currentLobby = lobby(location);
 		if(currentLobby == null) {
 			return false;
-		} else if (warzoneName.equals(currentLobby.getZone().getName())){
+		} else if (warzoneName.toLowerCase().equals(currentLobby.getZone().getName().toLowerCase())){
 			return true;
 		}
 		return false;

@@ -118,6 +118,12 @@ public class WarPlayerListener extends PlayerListener {
 						event.setCancelled(true);
 						return;
 					}
+					
+					if(zone.isNearWall(player.getLocation()) && itemStack != null) {
+						war.badMsg(player, "Can't drop items near the zone border!");
+						event.setCancelled(true);
+						return;
+					}
 				}
 			}
 		}
