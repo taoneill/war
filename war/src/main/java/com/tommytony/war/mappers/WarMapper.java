@@ -55,12 +55,14 @@ public class WarMapper {
 			if(warzoneName != null && !warzoneName.equals("")){
 				war.logInfo("Restoring zone " + warzoneName + "...");
 				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWar);		// cascade load, only load blocks if warzone exists
-				war.getWarzones().add(zone);
-				zone.getVolume().resetBlocks();
-				if(zone.getLobby() != null) {
-					zone.getLobby().getVolume().resetBlocks();
+				if(zone != null) { // could have failed, would've been logged already 
+					war.getWarzones().add(zone);
+					zone.getVolume().resetBlocks();
+					if(zone.getLobby() != null) {
+						zone.getLobby().getVolume().resetBlocks();
+					}
+					zone.initializeZone();			// is this wise?
 				}
-				zone.initializeZone();			// is this wise?
 			}
 		}
 		
