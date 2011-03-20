@@ -366,7 +366,7 @@ public class Volume {
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
 		return hasTwoCorners() &&
-				location.getWorld() == world &&
+				location.getWorld().getName().equals(world.getName()) &&
 				x <= getMaxX() && x >= getMinX() && 
 				y <= getMaxY() && y >= getMinY() &&
 				z <= getMaxZ() && z >= getMinZ();
@@ -377,7 +377,7 @@ public class Volume {
 		int y = block.getY();
 		int z = block.getZ();
 		return hasTwoCorners() &&
-				block.getWorld() == world &&
+				block.getWorld().getName().equals(world.getName()) &&
 				x <= getMaxX() && x >= getMinX() && 
 				y <= getMaxY() && y >= getMinY() &&
 				z <= getMaxZ() && z >= getMinZ();
