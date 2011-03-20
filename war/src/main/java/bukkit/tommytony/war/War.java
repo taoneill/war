@@ -102,7 +102,6 @@ public class War extends JavaPlugin {
 
 	public void onEnable() {
 		desc = this.getDescription();
-		//this.log = Logger.getLogger("Minecraft");
 		this.log = this.getServer().getLogger();
 		this.setupPermissions();
 		
@@ -193,7 +192,7 @@ public class War extends JavaPlugin {
 					performSetZoneLobby(player, arguments);
 				} else if(command.equals("savezone")) {
 					performSaveZone(player, arguments);
-				} else if(command.equals("setzoneconfig")) {
+				} else if(command.equals("setzoneconfig") || command.equals("zonecfg")) {
 					performSetZoneConfig(player, arguments);
 				} else if(command.equals("resetzone")) {
 					performResetZone(player, arguments);
@@ -213,7 +212,7 @@ public class War extends JavaPlugin {
 					performSetWarhub(player);
 				} else if(command.equals("deletewarhub")) {
 					performDeleteWarhub(player);
-				} else if(command.equals("setwarconfig")) {
+				} else if(command.equals("setwarconfig") || command.equals("warcfg")) {
 					performSetWarConfig(player, arguments);
 				} else if(command.equals("zonemaker")) {
 					performZonemakerAsZonemaker(player, arguments);
@@ -588,22 +587,22 @@ public class War extends JavaPlugin {
 				this.getWarzones().remove(warzone);
 				resetWarzone = WarzoneMapper.load(this, warzone.getName(), true);
 				this.getWarzones().add(resetWarzone);
-				resetBlocks = warzone.getVolume().resetBlocks();
+				warzone.getVolume().resetBlocksAsJob();
 				if(lobby!=null) {
-					lobby.getVolume().resetBlocks();
+					lobby.getVolume().resetBlocksAsJob();
 				}
-				resetWarzone.initializeZone();
+				resetWarzone.initializeZoneAsJob();
 			} else {
-				resetBlocks = warzone.getVolume().resetBlocks();
+				warzone.getVolume().resetBlocksAsJob();
 				if(lobby!=null) {
-					lobby.getVolume().resetBlocks();
+					lobby.getVolume().resetBlocksAsJob();
 				}
-				warzone.initializeZone();
+				warzone.initializeZoneAsJob();
 				
 			}
 			
-			this.msg(player, "Warzone and teams reset. " + resetBlocks + " blocks reset.");
-			logInfo(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
+//			this.msg(player, "Warzone and teams reset. " + resetBlocks + " blocks reset.");
+//			logInfo(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
 		}
 	}
 
@@ -864,10 +863,10 @@ public class War extends JavaPlugin {
 			for(Team team: warzone.getTeams()) {
 				team.teamcast("The battle was interrupted. " + playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and life pools...");
 			}
-			int resetBlocks = warzone.getVolume().resetBlocks();
-			warzone.initializeZone();
-			this.msg(player, "Warzone reset. " + resetBlocks + " blocks reset.");
-			logInfo(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
+			warzone.getVolume().resetBlocksAsJob();
+			warzone.initializeZoneAsJob();
+//			this.msg(player, "Warzone reset. " + resetBlocks + " blocks reset.");
+//			logInfo(resetBlocks + " blocks reset in warzone " + warzone.getName() + ".");
 		}
 	}
 

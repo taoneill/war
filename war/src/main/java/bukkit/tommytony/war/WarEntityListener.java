@@ -70,31 +70,6 @@ public class WarEntityListener extends EntityListener {
 					&& attackerTeam != defenderTeam 			
 					&& attackerWarzone == defenderWarzone) {
 				// Make sure one of the players isn't in the spawn
-//				if(!){
-//				// A real attack: handle death scenario. ==> now handled in entity damage as well
-//				//synchronized(d) {
-////					if(d.getHealth() <= 0) {
-//////						// Player died, loot him!
-//////						PlayerInventory attackerInv = a.getInventory();
-//////						PlayerInventory defenderInv = d.getInventory();
-//////						HashMap<Integer, ItemStack> noMorePlace = new HashMap<Integer, ItemStack>();
-//////						for(ItemStack stack : defenderInv.getContents()) {
-//////							HashMap<Integer, ItemStack> newNoMorePlace = attackerInv.addItem(stack);
-//////							noMorePlace.putAll(newNoMorePlace);
-//////						}					
-//////						
-//////						// attacker inventory is full, drop the rest.
-//////						if(!noMorePlace.isEmpty()) {
-//////							for(Integer key : noMorePlace.keySet()) {
-//////								ItemStack toDrop = noMorePlace.get(key);
-//////								defender.getWorld().dropItem(defender.getLocation(), toDrop);
-//////							}
-//////						}
-////						
-////						handleDeath(d, defenderWarzone, defenderTeam);
-////						event.setCancelled(true);
-//					//}
-//				}
 				if(defenderTeam.getSpawnVolume().contains(d.getLocation())) {	// attacking person in spawn
 					war.badMsg(a, "Can't attack a player that's inside his team's spawn.");
 					event.setCancelled(true);

@@ -3,15 +3,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import net.minecraft.server.Entity;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -19,7 +16,9 @@ import org.bukkit.inventory.PlayerInventory;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.jobs.InitZoneJob;
 import com.tommytony.war.jobs.ResetCursorJob;
+import com.tommytony.war.jobs.ScoreCapReachedJob;
 import com.tommytony.war.utils.InventoryStash;
 import com.tommytony.war.volumes.VerticalVolume;
 
@@ -132,7 +131,7 @@ public class Warzone {
 		topNWBlock.setType(Material.GLASS);
 		topNWBlock.getFace(BlockFace.EAST).setType(Material.GLASS);
 		topNWBlock.getFace(BlockFace.SOUTH).setType(Material.GLASS);
-		this.war.getServer().getScheduler().scheduleAsyncDelayedTask(this.war, new ResetCursorJob(topNWBlock, originalNorthwestBlocks, false), 85);
+		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, new ResetCursorJob(topNWBlock, originalNorthwestBlocks, false), 40);
 	}
 	
 	public Location getNorthwest() {
@@ -154,7 +153,7 @@ public class Warzone {
 		topSEBlock.setType(Material.GLASS);
 		topSEBlock.getFace(BlockFace.WEST).setType(Material.GLASS);
 		topSEBlock.getFace(BlockFace.NORTH).setType(Material.GLASS);
-		this.war.getServer().getScheduler().scheduleAsyncDelayedTask(this.war, new ResetCursorJob(topSEBlock, originalSoutheastBlocks, true), 85);
+		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, new ResetCursorJob(topSEBlock, originalSoutheastBlocks, true), 40);
 	}
 	
 	
@@ -208,11 +207,15 @@ public class Warzone {
 	 * @return
 	 */
 	public void initializeZone() {
+		initializeZone(null);
+	}
+	
+	public void initializeZone(Player respawnExempted) {
 		if(ready() && volume.isSaved()){			
 			// everyone back to team spawn with full health
 			for(Team team : teams) {
 				for(Player player : team.getPlayers()) {
-					respawnPlayer(team, player);
+					if(player != respawnExempted) respawnPlayer(team, player);
 				}
 				team.setRemainingLives(lifePool);
 				team.initializeTeamSpawn();
@@ -230,13 +233,22 @@ public class Warzone {
 				for(Team team : teams) {
 					if(team.getPlayers().size() > 0) {
 						craftWorld.refreshChunk(team.getTeamSpawn().getBlockX(), team.getTeamSpawn().getBlockZ());
-						craftWorld.refreshChunk(team.getSpawnVolume().getCornerOne().getX(), team.getSpawnVolume().getCornerOne().getZ());
-						craftWorld.refreshChunk(team.getSpawnVolume().getCornerTwo().getX(), team.getSpawnVolume().getCornerTwo().getZ());
 					}
 				}
 				// dont do all the zone chunks for now
 			}
 		}
+	}
+
+	
+	public void initializeZoneAsJob(Player respawnExempted) {
+		InitZoneJob job = new InitZoneJob(this, respawnExempted);		
+		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
+	}
+	
+	public void initializeZoneAsJob() {
+		InitZoneJob job = new InitZoneJob(this);		
+		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
 	}
 		
 	private void initZone() {
@@ -388,20 +400,20 @@ public class Warzone {
 		player.setHealth(20);
 
 		// Teleport the player back to spawn
-		Location playerLoc = player.getLocation();
-		int x = playerLoc.getBlockX();
-		int y = playerLoc.getBlockY();
-		int z = playerLoc.getBlockZ();
-		Block playerBlock = world.getBlockAt(x, y, z).getFace(BlockFace.UP);
-		Material playerBlockType = playerBlock.getType();
-		if(playerBlockType.getId() == Material.WATER.getId()
-				|| playerBlockType.getId() == Material.STATIONARY_WATER.getId()) {
-			// If in water, make arbitrary adjustments to fix drowning deaths causing "Player moved wrongly!" error
-			player.teleportTo(new Location(playerLoc.getWorld(),
-					team.getTeamSpawn().getX(), team.getTeamSpawn().getY() + 3, team.getTeamSpawn().getZ()));
-		} else {
+//		Location playerLoc = player.getLocation();
+//		int x = playerLoc.getBlockX();
+//		int y = playerLoc.getBlockY();
+//		int z = playerLoc.getBlockZ();
+//		Block playerBlock = world.getBlockAt(x, y, z).getFace(BlockFace.UP);
+//		Material playerBlockType = playerBlock.getType();
+//		if(playerBlockType.getId() == Material.WATER.getId()
+//				|| playerBlockType.getId() == Material.STATIONARY_WATER.getId()) {
+//			// If in water, make arbitrary adjustments to fix drowning deaths causing "Player moved wrongly!" error
+//			player.teleportTo(new Location(playerLoc.getWorld(),
+//					team.getTeamSpawn().getX(), team.getTeamSpawn().getY() + 3, team.getTeamSpawn().getZ()));
+//		} else {
 			player.teleportTo(team.getTeamSpawn());
-		}
+//		}
 	}
 
 	public boolean isMonumentCenterBlock(Block block) {
@@ -895,10 +907,10 @@ public class Warzone {
 						} else {
 							// A new battle starts. Reset the zone but not the teams.
 							for(Team t : teams) {
-								t.teamcast("A new battle begins. Warzone reset.");
+								t.teamcast("A new battle begins. Resetting warzone...");
 							}
-							playerWarzone.getVolume().resetBlocks();
-							playerWarzone.initializeZone();
+							playerWarzone.getVolume().resetBlocksAsJob();
+							playerWarzone.initializeZoneAsJob(player);
 							newBattle = true;
 						}
 					} else {
@@ -920,18 +932,10 @@ public class Warzone {
 							}
 						}
 					}
-				//}
-			//}
-			//synchronized(player) {
-				if(!newBattle && !scoreCapReached) {
+				//if(!newBattle /*&& !scoreCapReached*/) {
 					playerTeam.resetSign();
 					playerWarzone.respawnPlayer(playerTeam, player);
-				} 
-//					war.info(player.getName() + " died and enemy team reached score cap");
-//				} else if (newBattle){
-//					war.info(player.getName() + " died and battle ended in team " + playerTeam.getName() + "'s disfavor");
-//				}
-			//}
+				//} 
 		}
 	}
 
@@ -973,13 +977,13 @@ public class Warzone {
 			}
 			if(zoneEmpty) {
 				// reset the zone for a new game when the last player leaves
-				int resetBlocks = this.getVolume().resetBlocks();
-				this.initializeZone();
 				for(Team team : this.getTeams()) {
 					team.setPoints(0);
 					team.setRemainingLives(this.getLifePool());
 				}
-				war.logInfo("Last player left warzone " + this.getName() + ". " + resetBlocks + " blocks reset automatically.");
+				this.getVolume().resetBlocksAsJob();
+				this.initializeZoneAsJob();
+				war.logInfo("Last player left warzone " + this.getName() + ". Warzone blocks resetting automatically...");
 			}
 		}
 	}
@@ -1035,46 +1039,50 @@ public class Warzone {
 
 	public void handleScoreCapReached(Player player, String winnersStr) {
 		winnersStr = "Score cap reached! Winning team(s): " + winnersStr;		
-		winnersStr += ". Your inventory has (hopefully) been reset. The warzone is being reset... Please choose a new team.";
-		if(this.hasPlayerInventory(player.getName())){
-			InventoryStash stash = inventories.remove(player.getName());
-			deadMenInventories.put(player.getName(), stash);
-		}
+		winnersStr += ". The warzone and your inventory are being reset....";
+// DEADMAN		
+//		if(this.hasPlayerInventory(player.getName())){
+//			InventoryStash stash = inventories.remove(player.getName());
+//			deadMenInventories.put(player.getName(), stash);
+//		}
 		// Score cap reached. Reset everything.
-		for(Team t : this.getTeams()) {
-			t.teamcast(winnersStr);
-			for(Player tp : t.getPlayers()) {
-				PlayerInventory inv = player.getInventory();
-				
-				if(!tp.getName().equals(player.getName())) {
+		ScoreCapReachedJob job = new ScoreCapReachedJob(this, winnersStr);		
+		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
+//		for(Team t : this.getTeams()) {
+//			t.teamcast(winnersStr);
+//			for(Player tp : t.getPlayers()) {
+//				PlayerInventory inv = player.getInventory();
+//				
+//				if(!tp.getName().equals(player.getName())) {
 //					ScoreCapReachedJob job = new ScoreCapReachedJob(tp, this);
 //					if(winnersStr.contains(t.getName())) {
 //						job.giveReward(true);
 //					}
 //					war.getServer().getScheduler().scheduleAsyncDelayedTask(war, job, 1);
-// fail					
-					tp.teleportTo(this.getTeleport());
-					// don't reset inv of dead guy who caused this, he's gonna die becasue this takes too long so we'll restore inv at PLAYER_MOVE 
-					if(this.hasPlayerInventory(tp.getName())){
-						this.restorePlayerInventory(tp);
-					}
-				}
-				if(winnersStr.contains(t.getName())) {
-					// give reward
-					for(Integer slot : getReward().keySet()){
-						tp.getInventory().addItem(getReward().get(slot));
-					}
-				}
-			}
-			t.setPoints(0);
-			t.getPlayers().clear();	// empty the team
-		}
+//					
+//					tp.teleportTo(this.getTeleport());
+//					// don't reset inv of dead guy who caused this, he's gonna die becasue this takes too long so we'll restore inv at PLAYER_MOVE 
+//					if(this.hasPlayerInventory(tp.getName())){
+//						this.restorePlayerInventory(tp);
+//					}
+//				}
+//				if(winnersStr.contains(t.getName())) {
+//					// give reward
+//					for(Integer slot : getReward().keySet()){
+//						tp.getInventory().addItem(getReward().get(slot));
+//					}
+//				}
+//			}
+//			t.setPoints(0);
+//			t.getPlayers().clear();	// empty the team
+//		}
 		if(this.getLobby() != null) {
-			this.getLobby().getVolume().resetBlocks();
+			this.getLobby().getVolume().resetBlocksAsJob();
 		}
-		this.getVolume().resetBlocks();
-		this.initializeZone();
+		this.getVolume().resetBlocksAsJob();
+		this.initializeZoneAsJob(player);
 		if(war.getWarHub() != null) {
+			// TODO: test if warhub sign give the correct info despite the jobs
 			war.getWarHub().resetZoneSign(this);
 		}
 	}
@@ -1149,6 +1157,7 @@ public class Warzone {
 		}
 		
 	}
+
 
 //	public Team getTeamByName(String name) {
 //		for(Team team : getTeams()) {

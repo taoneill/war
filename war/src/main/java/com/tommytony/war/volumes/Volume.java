@@ -139,10 +139,12 @@ public class Volume {
 		return noOfSavedBlocks;
 	}
 	
+	public void resetBlocksAsJob() {
+		BlockResetJob job = new BlockResetJob(this);
+		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
+	}
+	
 	public int resetBlocks() {
-//		BlockResetJob job = new BlockResetJob(this);
-//		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
-//		return 0;
 		int visitedBlocks = 0, noOfResetBlocks = 0, x = 0, y = 0, z = 0;
 		int currentBlockId = 0;
 		int oldBlockType = 0;
@@ -478,8 +480,6 @@ public class Volume {
 		Material[] toAirMaterials = new Material[22];
 		toAirMaterials[0] = Material.SIGN_POST;
 		toAirMaterials[1] = Material.WALL_SIGN;
-		//toAirMaterials[2] = Material.IRON_DOOR_BLOCK;
-		//toAirMaterials[3] = Material.WOODEN_DOOR;
 		toAirMaterials[2] = Material.IRON_DOOR;
 		toAirMaterials[3] = Material.WOOD_DOOR;
 		toAirMaterials[4] = Material.LADDER;

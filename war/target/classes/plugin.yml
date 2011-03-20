@@ -1,5 +1,5 @@
 name: War
-version: 1.2.1 (Bradley)
+version: 1.3 (Rokossovsky)
 description: Lets you create TDM and CTF (warzones) for a more structured PVP experience.
 author: tommytony
 website: war.tommytony.com
@@ -108,6 +108,9 @@ commands:
         - /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on
         - /setzoneconfig loadout:default  =>  sets the respawn inventory to your current items
         - /setzoneconfig reward:default  =>  sets the winner's reward to your current items
+  zonecfg:
+    description: (War) Alias for /setzoneconfig
+    usage:
   zonemaker:
     description: (War) Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player. 
     usage: 
@@ -120,7 +123,7 @@ commands:
   deletewarhub:
     description: (War) Deletes the warhub if it exists. Resets all warzone lobbies.
     usage: /deletewarhub
-# 4- Defaults
+# 4- Defaults and server configuration
   setwarconfig:
     description: (War) Change gobal settings and the default warzone configuration values.
     usage: 
@@ -128,6 +131,9 @@ commands:
         - /setwarconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on  =>  Warzone defaults
         - /setwarconfig loadout:default  =>  sets the respawn inventory to your current items
         - /setwarconfig reward:default  =>  sets the winner's reward to your current items
+  warcfg:
+    description: (War) Alias for /setwarconfig
+    usage:
 # Fallback
   war:
     description: (War) Short War help. Can also be used as a prefix for all War commands as a fallback if they conflict with other plugins.

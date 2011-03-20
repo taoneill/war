@@ -1,31 +1,39 @@
 package com.tommytony.war.jobs;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
 
+import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 
 public class ScoreCapReachedJob implements Runnable {
 
-	private final Player player;
 	private final Warzone zone;
 	private boolean giveReward;
+	private final String winnersStr;
 
-	public ScoreCapReachedJob(Player player, Warzone zone) {
-		this.player = player;
+	public ScoreCapReachedJob(Warzone zone, String winnersStr) {
 		this.zone = zone;
+		this.winnersStr = winnersStr;
 	}
 
 	public void run() {
-		player.teleportTo(zone.getTeleport());
-		// don't reset inv of dead guy who caused this, he's gonna die becasue this takes too long so we'll restore inv at PLAYER_MOVE 
-		if(zone.hasPlayerInventory(player.getName())){
-			zone.restorePlayerInventory(player);
-		}
-		if(giveReward) {
-			// give reward
-			for(Integer slot : zone.getReward().keySet()){
-				player.getInventory().addItem(zone.getReward().get(slot));
+		for(Team t : zone.getTeams()) {
+			t.teamcast(winnersStr);
+			for(Player tp : t.getPlayers()) {
+				tp.teleportTo(zone.getTeleport());	// TODO: change this to a more general rally point (which will enable linking zones together)
+				if(zone.hasPlayerInventory(tp.getName())){
+					zone.restorePlayerInventory(tp);
+				}
+				if(winnersStr.contains(t.getName())) {
+					// give reward
+					for(Integer slot : zone.getReward().keySet()){
+						tp.getInventory().addItem(zone.getReward().get(slot));
+					}
+				}
 			}
+			t.setPoints(0);
+			t.getPlayers().clear();	// empty the team
 		}
 	}
 

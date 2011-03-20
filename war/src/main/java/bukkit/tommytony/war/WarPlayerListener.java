@@ -400,16 +400,17 @@ public class WarPlayerListener extends PlayerListener {
 			return;
 		}
 		
+		// DEADMAN
 		// The guy whose death caused the game to end
 		// He dies for real (no quick respawn) becasue his ENTITY_DEATH takes too long (everyones warping)
-		if(locZone == null && locLobby == null) {
-			for(Warzone zone : war.getWarzones()) {
-				if(zone.isDeadMan(player.getName())) {
-					RestoreDeadmanInventoryJob job = new RestoreDeadmanInventoryJob(player, zone);
-					war.getServer().getScheduler().scheduleAsyncDelayedTask(war, job, 3);
-				}
-			}
-		}
+//		if(locZone == null && locLobby == null) {
+//			for(Warzone zone : war.getWarzones()) {
+//				if(zone.isDeadMan(player.getName())) {
+//					RestoreDeadmanInventoryJob job = new RestoreDeadmanInventoryJob(player, zone);
+//					war.getServer().getScheduler().scheduleAsyncDelayedTask(war, job, 3);
+//				}
+//			}
+//		}
 	
     }
 	
