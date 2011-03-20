@@ -225,18 +225,18 @@ public class Warzone {
 			
 			initZone();
 			
-			// Set the zone chunks to all players
-			World world = this.getWorld();
-			if(world instanceof CraftWorld) {
-				CraftWorld craftWorld = (CraftWorld)world; 
-				// team spawns
-				for(Team team : teams) {
-					if(team.getPlayers().size() > 0) {
-						craftWorld.refreshChunk(team.getTeamSpawn().getBlockX(), team.getTeamSpawn().getBlockZ());
-					}
-				}
-				// dont do all the zone chunks for now
-			}
+//			// Set the zone chunks to all players
+//			World world = this.getWorld();
+//			if(world instanceof CraftWorld) {
+//				CraftWorld craftWorld = (CraftWorld)world; 
+//				// team spawns
+//				for(Team team : teams) {
+//					if(team.getPlayers().size() > 0) {
+//						craftWorld.refreshChunk(team.getTeamSpawn().getBlockX(), team.getTeamSpawn().getBlockZ());
+//					}
+//				}
+//				// dont do all the zone chunks for now
+//			}
 		}
 	}
 

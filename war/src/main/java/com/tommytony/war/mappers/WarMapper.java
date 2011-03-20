@@ -53,15 +53,15 @@ public class WarMapper {
 		war.getWarzones().clear();
 		for(String warzoneName : warzoneSplit) {
 			if(warzoneName != null && !warzoneName.equals("")){
-				war.logInfo("Restoring zone " + warzoneName + "...");
+				war.logInfo("Starting zone " + warzoneName + " restore...");
 				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWar);		// cascade load, only load blocks if warzone exists
 				if(zone != null) { // could have failed, would've been logged already 
 					war.getWarzones().add(zone);
-					zone.getVolume().resetBlocks();
+					zone.getVolume().resetBlocksAsJob();
 					if(zone.getLobby() != null) {
-						zone.getLobby().getVolume().resetBlocks();
+						zone.getLobby().getVolume().resetBlocksAsJob();
 					}
-					zone.initializeZone();			// is this wise?
+					zone.initializeZoneAsJob();			// is this wise?
 				}
 			}
 		}
@@ -175,13 +175,13 @@ public class WarMapper {
 			hub.getVolume().resetBlocks();
 			hub.initialize();
 			
-			for(Warzone zone : war.getWarzones()) {
-				if(zone.getLobby() != null) {
-					zone.getLobby().getVolume().resetBlocks();
-					zone.getLobby().initialize();	// adds the warhub link gate
-				}
-					
-			}
+//			for(Warzone zone : war.getWarzones()) {
+//				if(zone.getLobby() != null) {
+//					zone.getLobby().getVolume().resetBlocksAsJob();
+//					zone.getLobby().initialize();	// adds the warhub link gate
+//				}
+//					
+//			}
 		}
 		
 		warConfig.close();
