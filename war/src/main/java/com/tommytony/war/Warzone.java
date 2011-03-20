@@ -550,26 +550,24 @@ public class Warzone {
 	}
 	
 	public boolean isImportantBlock(Block block) {
-		block.getX();
-		for(Monument m : monuments) {
-			if(m.getVolume().contains(block)){
-				return true;
+		if(ready()) {
+			for(Monument m : monuments) {
+				if(m.getVolume().contains(block)){
+					return true;
+				}
 			}
-		}
-		for(Team t : teams) {
-			if(t.getSpawnVolume().contains(block)){
-				return true;
-			} else if (t.getFlagVolume() != null 
-					&& t.getFlagVolume().contains(block)) {
-				return true;
+			for(Team t : teams) {
+				if(t.getSpawnVolume().contains(block)){
+					return true;
+				} else if (t.getFlagVolume() != null 
+						&& t.getFlagVolume().contains(block)) {
+					return true;
+				}
 			}
+			if(volume.isWallBlock(block)){
+				return true;
+			}			
 		}
-		if(volume.isWallBlock(block)){
-			return true;
-		}
-//		if(lobby != null) {
-//			lobby.getVolume().contains(block);
-//		}
 		return false;
 	}
 
