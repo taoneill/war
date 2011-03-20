@@ -109,6 +109,8 @@ public class ZoneLobby {
 			int wallLength = wallEnd - wallStart + 1;
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x+1, wallCenterPos);
+			if(highestNonAirBlockAtCenter < 3 || highestNonAirBlockAtCenter > 125 - lobbyHeight) 
+				highestNonAirBlockAtCenter = warzone.getNorthwest().getBlockY();
 			lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter, wallCenterPos));
 			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter - 1, wallCenterPos + lobbyHalfSide);
 			corner2 = warzone.getWorld().getBlockAt(x - lobbyDepth, 
@@ -120,6 +122,8 @@ public class ZoneLobby {
 			int wallLength = wallEnd - wallStart + 1;
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z+1);
+			if(highestNonAirBlockAtCenter < 3 || highestNonAirBlockAtCenter > 125 - lobbyHeight) 
+				highestNonAirBlockAtCenter = warzone.getSoutheast().getBlockY();
 			lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter, z));
 			corner1 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter - 1, z);
 			corner2 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, 
@@ -131,6 +135,8 @@ public class ZoneLobby {
 			int wallLength = wallEnd - wallStart + 1;
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x-1, wallCenterPos);
+			if(highestNonAirBlockAtCenter < 3 || highestNonAirBlockAtCenter > 125 - lobbyHeight) 
+				highestNonAirBlockAtCenter = warzone.getSoutheast().getBlockY();
 			lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter, wallCenterPos));
 			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter -1 , wallCenterPos - lobbyHalfSide);
 			corner2 = warzone.getWorld().getBlockAt(x + lobbyDepth, 
@@ -142,6 +148,8 @@ public class ZoneLobby {
 			int wallLength = wallEnd - wallStart + 1;
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z-1);
+			if(highestNonAirBlockAtCenter < 3 || highestNonAirBlockAtCenter > 125 - lobbyHeight) 
+				highestNonAirBlockAtCenter = warzone.getNorthwest().getBlockY();
 			lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter, z));
 			corner1 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, highestNonAirBlockAtCenter - 1, z);
 			corner2 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter + 1 + lobbyHeight, z + lobbyDepth);
@@ -244,12 +252,12 @@ public class ZoneLobby {
 		} else {
 			war.logWarn("Failed to initalize zone lobby for zone " + warzone.getName());
 		}
-		World world = warzone.getWorld();
-		if(world instanceof CraftWorld && lobbyMiddleWallBlock != null) {
-			((CraftWorld)world).refreshChunk(lobbyMiddleWallBlock.getX(), lobbyMiddleWallBlock.getZ());
-			((CraftWorld)world).refreshChunk(volume.getCornerOne().getX(), volume.getCornerOne().getZ());
-			((CraftWorld)world).refreshChunk(volume.getCornerTwo().getX(), volume.getCornerTwo().getZ());
-		}
+//		World world = warzone.getWorld();
+//		if(world instanceof CraftWorld && lobbyMiddleWallBlock != null) {
+//			((CraftWorld)world).refreshChunk(lobbyMiddleWallBlock.getX(), lobbyMiddleWallBlock.getZ());
+//			((CraftWorld)world).refreshChunk(volume.getCornerOne().getX(), volume.getCornerOne().getZ());
+//			((CraftWorld)world).refreshChunk(volume.getCornerTwo().getX(), volume.getCornerTwo().getZ());
+//		}
 	}
 
 	private void setGatePositions(Block lobbyMiddleWallBlock) {

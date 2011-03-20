@@ -48,7 +48,7 @@ public class Warzone {
 	private HashMap<String, InventoryStash> inventories = new HashMap<String, InventoryStash>();
 	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
 	private World world;
-	private final int minSafeDistanceFromWall = 5;
+	private final int minSafeDistanceFromWall = 6;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private War war;
 	private ZoneLobby lobby;
@@ -86,14 +86,14 @@ public class Warzone {
 	}
 	
 	public boolean tooSmall() {
-		if((getSoutheast().getBlockX() - getNorthwest().getBlockX() < 20)
-				|| (getNorthwest().getBlockZ() - getSoutheast().getBlockZ() < 20)) return true;
+		if((getSoutheast().getBlockX() - getNorthwest().getBlockX() < 10)
+				|| (getNorthwest().getBlockZ() - getSoutheast().getBlockZ() < 10)) return true;
 		return false;
 	}
 	
 	public boolean tooBig() {
-		if((getSoutheast().getBlockX() - getNorthwest().getBlockX() > 500)
-				|| (getNorthwest().getBlockZ() - getSoutheast().getBlockZ() > 500)) return true;
+		if((getSoutheast().getBlockX() - getNorthwest().getBlockX() > 750)
+				|| (getNorthwest().getBlockZ() - getSoutheast().getBlockZ() > 750)) return true;
 		return false;
 	}
 	

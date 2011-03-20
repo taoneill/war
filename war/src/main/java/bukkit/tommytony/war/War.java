@@ -806,9 +806,9 @@ public class War extends JavaPlugin {
 			} else if(warzone.getSoutheast() == null) {
 				msg(player, msgString + "Still missing southeasternmost point.");
 			} else if (warzone.tooBig()) {
-				badMsg(player, msgString + "Warzone " + warzone.getName() + " is too Big. Max north-south size: 500. Max east-west size: 500.");
+				badMsg(player, msgString + "Warzone " + warzone.getName() + " is too Big. Max north-south size: 750. Max east-west size: 750.");
 			}  else if (warzone.tooSmall()) {
-				badMsg(player, msgString + "Warzone " + warzone.getName() + " is too small. Min north-south size: 20. Min east-west size: 20.");
+				badMsg(player, msgString + "Warzone " + warzone.getName() + " is too small. Min north-south size: 10. Min east-west size: 10.");
 			} else if(!fail && warzone.ready()) {
 				if(!this.warzones.contains(warzone)) {
 					this.addWarzone(warzone);
