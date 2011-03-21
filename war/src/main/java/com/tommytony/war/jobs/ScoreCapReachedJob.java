@@ -19,7 +19,9 @@ public class ScoreCapReachedJob implements Runnable {
 		for(Team t : zone.getTeams()) {
 			t.teamcast(winnersStr);
 			for(Player tp : t.getPlayers()) {
-				tp.teleportTo(zone.getTeleport());	// TODO: change this to a more general rally point (which will enable linking zones together)
+				// Send everyone to rally point (or zone lobby if not rally point)
+				if(zone.getRallyPoint() != null) tp.teleportTo(zone.getRallyPoint());
+				else tp.teleportTo(zone.getTeleport());
 				tp.setFireTicks(0);
 				tp.setRemainingAir(300);
 				if(zone.hasPlayerInventory(tp.getName())){

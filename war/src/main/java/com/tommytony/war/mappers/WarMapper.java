@@ -61,7 +61,7 @@ public class WarMapper {
 					if(zone.getLobby() != null) {
 						zone.getLobby().getVolume().resetBlocksAsJob();
 					}
-					zone.initializeZoneAsJob();			// is this wise?
+					zone.initializeZoneAsJob();
 				}
 			}
 		}

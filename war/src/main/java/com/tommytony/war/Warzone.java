@@ -59,7 +59,7 @@ public class Warzone {
 	private boolean disabled = false;
 	private boolean noCreatures;
 	private HashMap<String, InventoryStash> deadMenInventories = new HashMap<String, InventoryStash>();
-	
+	private Location rallyPoint;
 	
 	public Warzone(War war, World world, String name) {
 		this.world = world;
@@ -867,7 +867,7 @@ public class Warzone {
 					int remaining = playerTeam.getRemainingLifes();
 					if(remaining == 0) { // your death caused your team to lose
 						List<Team> teams = playerWarzone.getTeams();
-						String scorers = "";
+						String scores = "";
 						for(Team t : teams) {
 							t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " 
 									+ player.getName() + " died and there were no lives left in their life pool.");
@@ -876,12 +876,12 @@ public class Warzone {
 								// all other teams get a point
 								t.addPoint();
 								t.resetSign();
-								scorers += "Team " + t.getName() + " scores one point. ";
 							}
+							scores += t.getName() + "(" + t.getPoints() + ") " ;
 						}
-						if(!scorers.equals("")){
+						if(!scores.equals("")){
 							for(Team t : teams) {
-								t.teamcast(scorers);
+								t.teamcast("New scores - " + scores + " (/" + getScoreCap() + ")" );
 							}
 						}
 						// detect score cap
@@ -962,6 +962,9 @@ public class Warzone {
 			if(this.hasPlayerInventory(player.getName())) {
 				this.restorePlayerInventory(player);
 			}
+			player.setHealth(20);
+			player.setFireTicks(0);
+			player.setRemainingAir(300);
 			player.teleportTo(destination);
 			war.msg(player, "Left the zone. Your inventory has (hopefully) been restored.");
 			if(war.getWarHub() != null) {
@@ -1038,44 +1041,11 @@ public class Warzone {
 	}
 
 	public void handleScoreCapReached(Player player, String winnersStr) {
-		winnersStr = "Score cap reached! Winning team(s): " + winnersStr;		
-		winnersStr += ". The warzone and your inventory are being reset....";
-// DEADMAN		
-//		if(this.hasPlayerInventory(player.getName())){
-//			InventoryStash stash = inventories.remove(player.getName());
-//			deadMenInventories.put(player.getName(), stash);
-//		}
+		winnersStr = "Score cap reached. Game is over! Winning team(s): " + winnersStr;		
+		winnersStr += ". Resetting warzone and your inventory...";
 		// Score cap reached. Reset everything.
 		ScoreCapReachedJob job = new ScoreCapReachedJob(this, winnersStr);		
 		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
-//		for(Team t : this.getTeams()) {
-//			t.teamcast(winnersStr);
-//			for(Player tp : t.getPlayers()) {
-//				PlayerInventory inv = player.getInventory();
-//				
-//				if(!tp.getName().equals(player.getName())) {
-//					ScoreCapReachedJob job = new ScoreCapReachedJob(tp, this);
-//					if(winnersStr.contains(t.getName())) {
-//						job.giveReward(true);
-//					}
-//					war.getServer().getScheduler().scheduleAsyncDelayedTask(war, job, 1);
-//					
-//					tp.teleportTo(this.getTeleport());
-//					// don't reset inv of dead guy who caused this, he's gonna die becasue this takes too long so we'll restore inv at PLAYER_MOVE 
-//					if(this.hasPlayerInventory(tp.getName())){
-//						this.restorePlayerInventory(tp);
-//					}
-//				}
-//				if(winnersStr.contains(t.getName())) {
-//					// give reward
-//					for(Integer slot : getReward().keySet()){
-//						tp.getInventory().addItem(getReward().get(slot));
-//					}
-//				}
-//			}
-//			t.setPoints(0);
-//			t.getPlayers().clear();	// empty the team
-//		}
 		if(this.getLobby() != null) {
 			this.getLobby().getVolume().resetBlocksAsJob();
 		}
@@ -1156,6 +1126,14 @@ public class Warzone {
 			deadMenInventories.remove(player.getName());
 		}
 		
+	}
+
+	public void setRallyPoint(Location location) {
+		this.rallyPoint = location;
+	}
+	
+	public Location getRallyPoint() {
+		return this.rallyPoint;
 	}
 
 

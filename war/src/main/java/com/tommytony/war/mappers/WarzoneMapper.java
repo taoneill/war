@@ -221,6 +221,18 @@ public class WarzoneMapper {
 			// defaultNoCreatures
 			warzone.setNoCreatures(warzoneConfig.getBoolean("noCreatures"));
 			
+			// rallyPoint
+			String rallyPointStr = warzoneConfig.getString("rallyPoint");
+			if(rallyPointStr != null && !rallyPointStr.equals("")) {
+				String[] rallyPointStrSplit = rallyPointStr.split(",");
+				
+				int rpX = Integer.parseInt(rallyPointStrSplit[0]);
+				int rpY = Integer.parseInt(rallyPointStrSplit[1]);
+				int rpZ = Integer.parseInt(rallyPointStrSplit[2]);
+				Location rallyPoint = new Location(world, rpX, rpY, rpZ);
+				warzone.setRallyPoint(rallyPoint);
+			}
+			
 			// dropLootOnDeath
 			//warzone.setDropLootOnDeath(warzoneConfig.getBoolean("dropLootOnDeath"));
 			
@@ -411,6 +423,14 @@ public class WarzoneMapper {
 		
 		// noCreatures
 		warzoneConfig.setBoolean("noCreatures", warzone.isNoCreatures());
+		
+		// rallyPoint
+		String rpStr = "";
+		Location rp = warzone.getRallyPoint();
+		if(rp != null) {
+			rpStr = rp.getBlockX() + "," + rp.getBlockY() + "," + rp.getBlockZ();
+		}
+		warzoneConfig.setString("rallyPoint", rpStr);
 		
 		// defaultDropLootOnDeath
 		//warzoneConfig.setBoolean("dropLootOnDeath", warzone.isDropLootOnDeath());

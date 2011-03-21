@@ -17,7 +17,6 @@ public class InitZoneJob implements Runnable {
 	public InitZoneJob(Warzone warzone, Player respawnExempted) {
 		zone = warzone;
 		this.respawnExempted = respawnExempted;
-		// TODO Auto-generated constructor stub
 	}
 
 	public void run() {

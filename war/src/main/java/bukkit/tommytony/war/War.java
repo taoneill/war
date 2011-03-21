@@ -1184,6 +1184,10 @@ public class War extends JavaPlugin {
 				//String rewardType = namedParams.get("reward");
 				inventoryToLoadout(player, this.getDefaultReward());
 			}
+			if(namedParams.containsKey("rallypoint")) {
+				//String rewardType = namedParams.get("reward");
+				setZoneRallyPoint(namedParams.get("rallypoint"), player);
+			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
 //				setDefaultDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
@@ -1191,6 +1195,16 @@ public class War extends JavaPlugin {
 			return true;
 		} catch (Exception e) {
 			return false;
+		}
+	}
+
+	private void setZoneRallyPoint(String warzoneName, Player player) {
+		Warzone zone = findWarzone(warzoneName);
+		if(zone == null) {
+			badMsg(player, "Can't set rally point. No such warzone.");			
+		} else {
+			zone.setRallyPoint(player.getLocation());
+			WarzoneMapper.save(this, zone, false);
 		}
 	}
 
@@ -1534,7 +1548,6 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean getDefaultNoCreatures() {
-		// TODO Auto-generated method stub
 		return isDefaultNoCreatures();
 	}
 
