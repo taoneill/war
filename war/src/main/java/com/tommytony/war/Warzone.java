@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -20,6 +19,7 @@ import com.tommytony.war.jobs.InitZoneJob;
 import com.tommytony.war.jobs.ResetCursorJob;
 import com.tommytony.war.jobs.ScoreCapReachedJob;
 import com.tommytony.war.utils.InventoryStash;
+import com.tommytony.war.volumes.BlockInfo;
 import com.tommytony.war.volumes.VerticalVolume;
 
 /**
@@ -124,14 +124,14 @@ public class Warzone {
 	
 	private void addNorthwestCursorBlocks() {
 		Block topNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), this.northwest.getBlockY()-1, this.northwest.getBlockZ());
-		Material[] originalNorthwestBlocks = new Material[3];
-		originalNorthwestBlocks[0] = topNWBlock.getType();	// save blocks for reset
-		originalNorthwestBlocks[1] = topNWBlock.getFace(BlockFace.EAST).getType();
-		originalNorthwestBlocks[2] = topNWBlock.getFace(BlockFace.SOUTH).getType();
+		BlockInfo[] originalNorthwestBlocks = new BlockInfo[3];
+		originalNorthwestBlocks[0] = new BlockInfo(topNWBlock);	// save blocks for reset
+		originalNorthwestBlocks[1] = new BlockInfo(topNWBlock.getFace(BlockFace.EAST));
+		originalNorthwestBlocks[2] = new BlockInfo(topNWBlock.getFace(BlockFace.SOUTH));
 		topNWBlock.setType(Material.GLASS);
 		topNWBlock.getFace(BlockFace.EAST).setType(Material.GLASS);
 		topNWBlock.getFace(BlockFace.SOUTH).setType(Material.GLASS);
-		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, new ResetCursorJob(topNWBlock, originalNorthwestBlocks, false), 40);
+		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, new ResetCursorJob(topNWBlock, originalNorthwestBlocks, false), 75);
 	}
 	
 	public Location getNorthwest() {
@@ -146,14 +146,14 @@ public class Warzone {
 	
 	private void addSoutheastCursorBlocks() {
 		Block topSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), this.southeast.getBlockY()-1, this.southeast.getBlockZ());
-		Material[] originalSoutheastBlocks = new Material[3];
-		originalSoutheastBlocks[0] = topSEBlock.getType();	// save block for reset
-		originalSoutheastBlocks[1] = topSEBlock.getFace(BlockFace.WEST).getType();
-		originalSoutheastBlocks[2] = topSEBlock.getFace(BlockFace.NORTH).getType();
+		BlockInfo[] originalSoutheastBlocks = new BlockInfo[3];
+		originalSoutheastBlocks[0] = new BlockInfo(topSEBlock);	// save block for reset
+		originalSoutheastBlocks[1] = new BlockInfo(topSEBlock.getFace(BlockFace.WEST));
+		originalSoutheastBlocks[2] = new BlockInfo(topSEBlock.getFace(BlockFace.NORTH));
 		topSEBlock.setType(Material.GLASS);
 		topSEBlock.getFace(BlockFace.WEST).setType(Material.GLASS);
 		topSEBlock.getFace(BlockFace.NORTH).setType(Material.GLASS);
-		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, new ResetCursorJob(topSEBlock, originalSoutheastBlocks, true), 40);
+		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, new ResetCursorJob(topSEBlock, originalSoutheastBlocks, true), 75);
 	}
 	
 	
