@@ -398,6 +398,8 @@ public class Warzone {
 		
 		// Fill hp
 		player.setHealth(20);
+		player.setFireTicks(0);
+		player.setRemainingAir(300);
 
 		// Teleport the player back to spawn
 //		Location playerLoc = player.getLocation();

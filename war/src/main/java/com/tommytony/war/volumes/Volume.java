@@ -400,15 +400,15 @@ public class Volume {
 			if(hasTwoCorners() && getBlockTypes() != null) {
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
-					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++){
+					int y = getMaxY();
+					for(int j = getSizeY(); j > 0; j--){
 						int z = getMinZ();
 						for(int k = 0;k < getSizeZ(); k++) {
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
 							currentBlock.setType(material);
 							z++;
 						}
-						y++;
+						y--;
 					}
 					x++;
 				}

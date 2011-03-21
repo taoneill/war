@@ -1,7 +1,6 @@
 package com.tommytony.war.jobs;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
@@ -9,7 +8,6 @@ import com.tommytony.war.Warzone;
 public class ScoreCapReachedJob implements Runnable {
 
 	private final Warzone zone;
-	private boolean giveReward;
 	private final String winnersStr;
 
 	public ScoreCapReachedJob(Warzone zone, String winnersStr) {
@@ -22,6 +20,8 @@ public class ScoreCapReachedJob implements Runnable {
 			t.teamcast(winnersStr);
 			for(Player tp : t.getPlayers()) {
 				tp.teleportTo(zone.getTeleport());	// TODO: change this to a more general rally point (which will enable linking zones together)
+				tp.setFireTicks(0);
+				tp.setRemainingAir(300);
 				if(zone.hasPlayerInventory(tp.getName())){
 					zone.restorePlayerInventory(tp);
 				}
@@ -36,11 +36,4 @@ public class ScoreCapReachedJob implements Runnable {
 			t.getPlayers().clear();	// empty the team
 		}
 	}
-
-	public void giveReward(boolean giveReward) {
-		this.giveReward = giveReward;
-		// TODO Auto-generated method stub
-		
-	}
-
 }
