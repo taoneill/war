@@ -172,6 +172,16 @@ public class Volume {
 									if(oldBlockType == Material.WALL_SIGN.getId() 
 											|| oldBlockType == Material.SIGN_POST.getId()) {
 										// Signs
+										if(oldBlockType == Material.SIGN_POST.getId() && ((oldBlockData & 0x04) == 0x04)
+												&& i+1 != getSizeX()) {
+											Block southBlock = currentBlock.getFace(BlockFace.SOUTH);
+											int oldSouthBlockType = getBlockTypes()[i+1][j][k];
+											byte oldSouthBlockData = getBlockDatas()[i+1][j][k];
+											if(southBlock.getTypeId() != oldSouthBlockType) {
+												southBlock.setTypeId(oldSouthBlockType);
+												southBlock.setData(oldSouthBlockData);
+											}
+										}
 										currentBlock.setType(Material.getMaterial(oldBlockType));
 										BlockState state = currentBlock.getState();
 										state.setData(new org.bukkit.material.Sign(oldBlockType, oldBlockData));
@@ -234,6 +244,25 @@ public class Volume {
 											blockAbove.setType(Material.getMaterial(oldBlockType));
 											blockAbove.setData(getBlockDatas()[i][j+1][k]);
 										}
+									} else if(((oldBlockType == Material.TORCH.getId() && ((oldBlockData & 0x02) == 0x02)) 
+											|| (oldBlockType == Material.REDSTONE_TORCH_OFF.getId() && ((oldBlockData & 0x02) == 0x02))
+											|| (oldBlockType == Material.REDSTONE_TORCH_ON.getId()  && ((oldBlockData & 0x02) == 0x02))
+											|| (oldBlockType == Material.LEVER.getId()  && ((oldBlockData & 0x02) == 0x02))
+											|| (oldBlockType == Material.STONE_BUTTON.getId() && ((oldBlockData & 0x02) == 0x02))
+											|| (oldBlockType == Material.LADDER.getId() && ((oldBlockData & 0x04) == 0x04))
+										    || (oldBlockType == Material.RAILS.getId() && ((oldBlockData & 0x02) == 0x02)))
+										    && i+1 != getSizeX()){
+										// Blocks that hang on a block south of themselves need to make sure that block is there before placing themselves... lol
+										Block southBlock = currentBlock.getFace(BlockFace.SOUTH);
+										int oldSouthBlockType = getBlockTypes()[i+1][j][k];
+										byte oldSouthBlockData = getBlockDatas()[i+1][j][k];
+										if(southBlock.getTypeId() != oldSouthBlockType) {
+											southBlock.setTypeId(oldSouthBlockType);
+											southBlock.setData(oldSouthBlockData);
+										}
+										// change the block itself, now that we have a block to set it on
+										currentBlock.setType(Material.getMaterial(oldBlockType));
+										currentBlock.setData(oldBlockData);
 									} else {
 										// regular block
 										currentBlock.setType(Material.getMaterial(oldBlockType));
@@ -453,8 +482,8 @@ public class Volume {
 			if(hasTwoCorners() && getBlockTypes() != null) {
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
-					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++){
+					int y = getMaxY();
+					for(int j = getSizeY(); j > 0; j--){
 						int z = getMinZ();
 						for(int k = 0;k < getSizeZ(); k++) {
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
@@ -470,7 +499,7 @@ public class Volume {
 							}
 							z++;
 						}
-						y++;
+						y--;
 					}
 					x++;
 				}
