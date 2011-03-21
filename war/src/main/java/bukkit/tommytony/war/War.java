@@ -333,8 +333,10 @@ public class War extends JavaPlugin {
 			VolumeMapper.delete(warHub.getVolume(), this);
 			this.warHub = null;
 			for(Warzone zone : warzones) {
-				zone.getLobby().getVolume().resetBlocks();
-				zone.getLobby().initialize();
+				if(zone.getLobby() != null) {
+					zone.getLobby().getVolume().resetBlocks();
+					zone.getLobby().initialize();
+				}
 			}
 			
 			this.msg(player, "War hub removed.");
@@ -356,8 +358,10 @@ public class War extends JavaPlugin {
 				warHub = new WarHub(this, player.getLocation());
 				warHub.initialize();
 				for(Warzone zone : warzones) {
-					zone.getLobby().getVolume().resetBlocks();
-					zone.getLobby().initialize();
+					if(zone.getLobby() != null) {
+						zone.getLobby().getVolume().resetBlocks();
+						zone.getLobby().initialize();
+					}
 				}
 				msg(player, "War hub created.");
 			}

@@ -304,7 +304,7 @@ public class WarPlayerListener extends PlayerListener {
 		WarHub hub = war.getWarHub();
 		if(hub != null && hub.getVolume().contains(playerLoc)) {
 			Warzone zone = hub.getDestinationWarzoneForLocation(playerLoc);
-				if(zone != null) {
+				if(zone != null && zone.getTeleport() != null) {
 					enteredGate = true;
 					event.setFrom(zone.getTeleport());
 							player.teleportTo(zone.getTeleport());
