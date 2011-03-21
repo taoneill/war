@@ -108,22 +108,20 @@ public class WarPlayerListener extends PlayerListener {
 				
 			} else {
 				Item item = event.getItemDrop();
-				if(item instanceof CraftItem) {
-					ItemStack itemStack =  ((CraftItem)item).getItemStack();
-					if(itemStack != null 
-							&& itemStack.getType() == team.getKind().getMaterial() 
-							&& itemStack.getData().getData() == team.getKind().getData()) {
-						// Can't drop your team's kind block
-						war.badMsg(player, "Can't drop " + team.getName() + " block blocks.");
-						event.setCancelled(true);
-						return;
-					}
-					
-					if(zone.isNearWall(player.getLocation()) && itemStack != null) {
-						war.badMsg(player, "Can't drop items near the zone border!");
-						event.setCancelled(true);
-						return;
-					}
+				ItemStack itemStack =  item.getItemStack();
+				if(itemStack != null 
+						&& itemStack.getType() == team.getKind().getMaterial() 
+						&& itemStack.getData().getData() == team.getKind().getData()) {
+					// Can't drop your team's kind block
+					war.badMsg(player, "Can't drop " + team.getName() + " block blocks.");
+					event.setCancelled(true);
+					return;
+				}
+				
+				if(zone.isNearWall(player.getLocation()) && itemStack != null) {
+					war.badMsg(player, "Can't drop items near the zone border!");
+					event.setCancelled(true);
+					return;
 				}
 			}
 		}
