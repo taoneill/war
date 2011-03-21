@@ -131,6 +131,7 @@ commands:
         - /setwarconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on  =>  Warzone defaults
         - /setwarconfig loadout:default  =>  sets the respawn inventory to your current items
         - /setwarconfig reward:default  =>  sets the winner's reward to your current items
+        - /setwarconfig rallypoint:<warzone-name>  =>  changes when players get teleported at the end of a match for that zone, useful for chaining warzones together in a sequence, or preventing players from rejoining immediately
   warcfg:
     description: (War) Alias for /setwarconfig
     usage:
