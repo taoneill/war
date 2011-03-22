@@ -1,6 +1,4 @@
 package bukkit.tommytony.war;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -17,11 +15,9 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.player.PlayerMoveEvent;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.jobs.LootDropperTask;
 
 /**
  * 
@@ -85,9 +81,15 @@ public class WarEntityListener extends EntityListener {
 					&& attacker.getEntityId() != defender.getEntityId()) {
 				// same team, but not same person
 				if(attackerWarzone.getFriendlyFire()) {
-					war.badMsg(a, "Friendly fire is on! Please, don't hurt your teammates."); // if ff is on, let the attack go through
+					if (!(a.equals(d))){
+						war.badMsg(a, "Friendly fire is on! Please, don't hurt your teammates."); // if ff is on, let the attack go through
+					}else {
+						war.badMsg(a, "Friendly fire is on! Please, don't kill yourself!");
+					}
 				} else {
+					if (!(a.equals(d))){
 					war.badMsg(a, "Your attack missed! Your target is on your team.");
+					}
 					event.setCancelled(true);	// ff is off
 				}
 			} else if (attackerTeam == null && defenderTeam == null && !war.isPvpInZonesOnly()){
@@ -96,7 +98,9 @@ public class WarEntityListener extends EntityListener {
 				war.badMsg(a, "Your attack missed! Global PVP is turned off. You can only attack other players in warzones. Try /warhub, /zones and /zone.");
 				event.setCancelled(true);	// global pvp is off
 			} else {
+				if (!(a.equals(d))){
 				war.badMsg(a, "Your attack missed!");
+				}
 				if(attackerTeam == null) {
 					war.badMsg(a, "You must join a team " +
 						", then you'll be able to damage people " +
@@ -104,7 +108,11 @@ public class WarEntityListener extends EntityListener {
 				} else if (defenderTeam == null) {
 					war.badMsg(a, "Your target is not in a team.");
 				} else if (attackerTeam == defenderTeam) {
-					war.badMsg(a, "Your target is on your team.");
+					if (!(a.equals(d))){
+						war.badMsg(a, "Your target is on your team.");
+					}else {
+						war.badMsg(a, "Your target is yourself.");
+					}
 				} else if (attackerWarzone != defenderWarzone) {
 					war.badMsg(a, "Your target is playing in another warzone.");
 				}
