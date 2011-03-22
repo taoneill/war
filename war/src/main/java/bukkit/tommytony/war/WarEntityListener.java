@@ -1,6 +1,5 @@
 package bukkit.tommytony.war;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -13,15 +12,13 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.player.PlayerMoveEvent;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.jobs.LootDropperTask;
 
 /**
  * 

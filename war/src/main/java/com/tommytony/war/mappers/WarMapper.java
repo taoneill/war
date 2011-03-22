@@ -12,6 +12,8 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.TeamSpawnStyles;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.jobs.RestoreWarhubJob;
+import com.tommytony.war.jobs.RestoreWarzonesJob;
 import com.tommytony.war.volumes.Volume;
 
 /**
@@ -49,21 +51,9 @@ public class WarMapper {
 		
 		// warzones
 		String warzonesStr = warConfig.getString("warzones");
-		String[] warzoneSplit = warzonesStr.split(",");
-		war.getWarzones().clear();
-		for(String warzoneName : warzoneSplit) {
-			if(warzoneName != null && !warzoneName.equals("")){
-				war.logInfo("Starting zone " + warzoneName + " restore...");
-				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWar);		// cascade load, only load blocks if warzone exists
-				if(zone != null) { // could have failed, would've been logged already 
-					war.getWarzones().add(zone);
-					zone.getVolume().resetBlocksAsJob();
-					if(zone.getLobby() != null) {
-						zone.getLobby().getVolume().resetBlocksAsJob();
-					}
-					zone.initializeZoneAsJob();
-				}
-			}
+		RestoreWarzonesJob restoreWarzones = new RestoreWarzonesJob(war, warzonesStr, newWar);
+		if(war.getServer().getScheduler().scheduleSyncDelayedTask(war, restoreWarzones) == -1) {
+			war.logWarn("Failed to schedule warzone-restore job. No warzone was loaded.");
 		}
 		
 		// zone makers
@@ -155,41 +145,16 @@ public class WarMapper {
 		// warhub
 		String hubStr = warConfig.getString("warhub");
 		if(hubStr != null && !hubStr.equals("")) {
-			String[] hubStrSplit = hubStr.split(",");
-			
-			int hubX = Integer.parseInt(hubStrSplit[0]);
-			int hubY = Integer.parseInt(hubStrSplit[1]);
-			int hubZ = Integer.parseInt(hubStrSplit[2]);
-			World world = null;
-			if(hubStrSplit.length > 3) {
-				String worldName = hubStrSplit[3];
-				world = war.getServer().getWorld(worldName);
-			} else {
-				world = war.getServer().getWorlds().get(0);		// default to first world
+			RestoreWarhubJob restoreWarhub = new RestoreWarhubJob(war, hubStr);
+			if(war.getServer().getScheduler().scheduleSyncDelayedTask(war, restoreWarhub) == -1) {
+				war.logWarn("Failed to schedule warhub-restore job. War hub was not loaded.");
 			}
-			Location hubLocation = new Location(world, hubX, hubY, hubZ);
-			WarHub hub = new WarHub(war, hubLocation);
-			war.setWarHub(hub);
-			Volume vol = VolumeMapper.loadVolume("warhub", "", war, world);
-			hub.setVolume(vol);
-			hub.getVolume().resetBlocks();
-			hub.initialize();
-			
-//			for(Warzone zone : war.getWarzones()) {
-//				if(zone.getLobby() != null) {
-//					zone.getLobby().getVolume().resetBlocksAsJob();
-//					zone.getLobby().initialize();	// adds the warhub link gate
-//				}
-//					
-//			}
 		}
 		
 		warConfig.close();
-		//war.getLogger().info("Loaded war config.");
 	}
 	
 	public static void save(War war) {
-		//war.getLogger().info("Saving war config...");
 		PropertiesFile warConfig = new PropertiesFile(war.getDataFolder().getPath() + "/war.txt");
 		String warzonesStr = "";
 		
@@ -275,6 +240,5 @@ public class WarMapper {
 		
 		warConfig.save();
 		warConfig.close();
-		//war.getLogger().info("Saved war config.");
 	}
 }

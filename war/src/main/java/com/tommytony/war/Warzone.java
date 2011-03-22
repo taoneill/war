@@ -16,7 +16,9 @@ import org.bukkit.inventory.PlayerInventory;
 import bukkit.tommytony.war.War;
 
 import com.tommytony.war.jobs.InitZoneJob;
+import com.tommytony.war.jobs.LoadoutResetJob;
 import com.tommytony.war.jobs.ResetCursorJob;
+import com.tommytony.war.jobs.RespawnPlayerJob;
 import com.tommytony.war.jobs.ScoreCapReachedJob;
 import com.tommytony.war.utils.InventoryStash;
 import com.tommytony.war.volumes.BlockInfo;
@@ -364,6 +366,19 @@ public class Warzone {
 	}
 	
 	private void handleRespawn(Team team, Player player){
+		// Fill hp
+		player.setFireTicks(0);
+		player.setRemainingAir(300);
+		player.setHealth(20);
+
+		// Teleport the player back to spawn
+		player.teleportTo(team.getTeamSpawn());
+		
+		LoadoutResetJob job = new LoadoutResetJob(this, team, player);
+		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
+	}
+
+	public void resetInventory(Team team, Player player) {
 		// Reset inventory to loadout
 		PlayerInventory playerInv = player.getInventory();
 		playerInv.clear();
@@ -395,27 +410,6 @@ public class Warzone {
 				playerInv.setHelmet(new ItemStack(Material.LEATHER_HELMET));
 			}
 		}
-		
-		// Fill hp
-		player.setHealth(20);
-		player.setFireTicks(0);
-		player.setRemainingAir(300);
-
-		// Teleport the player back to spawn
-//		Location playerLoc = player.getLocation();
-//		int x = playerLoc.getBlockX();
-//		int y = playerLoc.getBlockY();
-//		int z = playerLoc.getBlockZ();
-//		Block playerBlock = world.getBlockAt(x, y, z).getFace(BlockFace.UP);
-//		Material playerBlockType = playerBlock.getType();
-//		if(playerBlockType.getId() == Material.WATER.getId()
-//				|| playerBlockType.getId() == Material.STATIONARY_WATER.getId()) {
-//			// If in water, make arbitrary adjustments to fix drowning deaths causing "Player moved wrongly!" error
-//			player.teleportTo(new Location(playerLoc.getWorld(),
-//					team.getTeamSpawn().getX(), team.getTeamSpawn().getY() + 3, team.getTeamSpawn().getZ()));
-//		} else {
-			player.teleportTo(team.getTeamSpawn());
-//		}
 	}
 
 	public boolean isMonumentCenterBlock(Block block) {
@@ -862,82 +856,79 @@ public class Warzone {
 			war.msg(player, "You died.");
 			boolean newBattle = false;
 			boolean scoreCapReached = false;
-			//synchronized(playerWarzone) {
-				//synchronized(player) {
-					int remaining = playerTeam.getRemainingLifes();
-					if(remaining == 0) { // your death caused your team to lose
-						List<Team> teams = playerWarzone.getTeams();
-						String scores = "";
-						for(Team t : teams) {
-							t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " 
-									+ player.getName() + " died and there were no lives left in their life pool.");
-							
-							if(!t.getName().equals(playerTeam.getName())) {
-								// all other teams get a point
-								t.addPoint();
-								t.resetSign();
-							}
-							scores += t.getName() + "(" + t.getPoints() + ") " ;
-						}
-						if(!scores.equals("")){
-							for(Team t : teams) {
-								t.teamcast("New scores - " + scores + " (/" + getScoreCap() + ")" );
-							}
-						}
-						// detect score cap
-						List<Team> scoreCapTeams = new ArrayList<Team>();
-						for(Team t : teams) {
-							if(t.getPoints() == playerWarzone.getScoreCap()) {
-								scoreCapTeams.add(t);
-							}
-						}
-						if(!scoreCapTeams.isEmpty()) {
-							String winnersStr = "";
-							for(Team winner : scoreCapTeams) {
-								winnersStr += winner.getName() + " ";
-							}
-							
-							playerWarzone.handleScoreCapReached(player, winnersStr);
-							//player.teleportTo(playerWarzone.getTeleport());
-							// player will die because it took too long :(
-							// we dont restore his inventory in handleScoreCapReached
-							// check out PLAYER_MOVE for the rest of the fix
-							
-							scoreCapReached = true;
-						} else {
-							// A new battle starts. Reset the zone but not the teams.
-							for(Team t : teams) {
-								t.teamcast("A new battle begins. Resetting warzone...");
-							}
-							playerWarzone.getVolume().resetBlocksAsJob();
-							playerWarzone.initializeZoneAsJob(player);
-							newBattle = true;
-						}
-					} else {
-						// player died without causing his team's demise
-						if(playerWarzone.isFlagThief(player.getName())) {
-							// died while carrying flag.. dropped it
-							Team victim = playerWarzone.getVictimTeamForThief(player.getName());
-							victim.getFlagVolume().resetBlocks();
-							victim.initializeTeamFlag();
-							playerWarzone.removeThief(player.getName());
-							for(Team t : playerWarzone.getTeams()) {
-								t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
-							}
-						}
-						playerTeam.setRemainingLives(remaining - 1);
-						if(remaining - 1 == 0) {
-							for(Team t : playerWarzone.getTeams()) {
-								t.teamcast("Team " + playerTeam.getName() + "'s life pool is empty. One more death and they lose the battle!");
-							}
-						}
+			playerWarzone.respawnPlayer(playerTeam, player);
+			int remaining = playerTeam.getRemainingLifes();
+			if(remaining == 0) { // your death caused your team to lose
+				List<Team> teams = playerWarzone.getTeams();
+				String scores = "";
+				for(Team t : teams) {
+					t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " 
+							+ player.getName() + " died and there were no lives left in their life pool.");
+					
+					if(!t.getName().equals(playerTeam.getName())) {
+						// all other teams get a point
+						t.addPoint();
+						t.resetSign();
 					}
-				//if(!newBattle /*&& !scoreCapReached*/) {
-					playerTeam.resetSign();
-					playerWarzone.respawnPlayer(playerTeam, player);
-				//} 
+					scores += t.getName() + "(" + t.getPoints() + ") " ;
+				}
+				if(!scores.equals("")){
+					for(Team t : teams) {
+						t.teamcast("New scores - " + scores + " (/" + getScoreCap() + ")" );
+					}
+				}
+				// detect score cap
+				List<Team> scoreCapTeams = new ArrayList<Team>();
+				for(Team t : teams) {
+					if(t.getPoints() == playerWarzone.getScoreCap()) {
+						scoreCapTeams.add(t);
+					}
+				}
+				if(!scoreCapTeams.isEmpty()) {
+					String winnersStr = "";
+					for(Team winner : scoreCapTeams) {
+						winnersStr += winner.getName() + " ";
+					}
+					
+					playerWarzone.handleScoreCapReached(player, winnersStr);
+					//player.teleportTo(playerWarzone.getTeleport());
+					// player will die because it took too long :(
+					// we dont restore his inventory in handleScoreCapReached
+					// check out PLAYER_MOVE for the rest of the fix
+					
+					scoreCapReached = true;
+				} else {
+					// A new battle starts. Reset the zone but not the teams.
+					for(Team t : teams) {
+						t.teamcast("A new battle begins. Resetting warzone...");
+					}
+					playerWarzone.getVolume().resetBlocksAsJob();
+					playerWarzone.initializeZoneAsJob(player);
+					newBattle = true;
+				}
+			} else {
+				// player died without causing his team's demise
+				if(playerWarzone.isFlagThief(player.getName())) {
+					// died while carrying flag.. dropped it
+					Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+					victim.getFlagVolume().resetBlocks();
+					victim.initializeTeamFlag();
+					playerWarzone.removeThief(player.getName());
+					for(Team t : playerWarzone.getTeams()) {
+						t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
+					}
+				}
+				playerTeam.setRemainingLives(remaining - 1);
+				if(remaining - 1 == 0) {
+					for(Team t : playerWarzone.getTeams()) {
+						t.teamcast("Team " + playerTeam.getName() + "'s life pool is empty. One more death and they lose the battle!");
+					}
+				}
+			}
+			playerTeam.resetSign();
 		}
 	}
+
 
 	public void handlePlayerLeave(Player player, Location destination, boolean removeFromTeam) {
 		Team playerTeam = war.getPlayerTeam(player.getName());

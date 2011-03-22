@@ -139,7 +139,7 @@ public class War extends JavaPlugin {
 		this.defaultAutoAssignOnly = false;
 		this.getDefaultReward().put(0, new ItemStack(Material.CAKE, 1));
 		WarMapper.load(this);
-		this.logInfo("Done. War v"+ desc.getVersion() + " is on.");
+		this.logInfo("War v"+ desc.getVersion() + " is on.");
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
