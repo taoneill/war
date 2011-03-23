@@ -74,88 +74,97 @@ public class VolumeMapper {
 				
 				volume.setBlockTypes(new int[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
 				volume.setBlockDatas(new byte[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
+				int blockReads = 0;
 				for(int i = 0; i < volume.getSizeX(); i++){
 					for(int j = 0; j < volume.getSizeY(); j++) {
 						for(int k = 0; k < volume.getSizeZ(); k++) {
-							String blockLine = in.readLine();
-							if(blockLine != null && !blockLine.equals("")) {
-								String[] blockSplit = blockLine.split(",");
-								if(blockLine != null && !blockLine.equals("") && blockSplit.length > 1) {
-									int typeID = Integer.parseInt(blockSplit[0]);
-									byte data = Byte.parseByte(blockSplit[1]);
-									
-									volume.getBlockTypes()[i][j][k] = typeID;
-									volume.getBlockDatas()[i][j][k] = data;
-									
-									if(typeID == Material.WALL_SIGN.getId() 
-											|| typeID == Material.SIGN_POST.getId()) {
-										// Signs
-										String linesStr = "";
-										if(blockSplit.length > 2) {
-											for(int o = 2; o < blockSplit.length; o++) {
-												linesStr += blockSplit[o];
+							try {
+								String blockLine = in.readLine();
+								if(blockLine != null && !blockLine.equals("")) {
+									String[] blockSplit = blockLine.split(",");
+									if(blockLine != null && !blockLine.equals("") && blockSplit.length > 1) {
+										int typeID = Integer.parseInt(blockSplit[0]);
+										byte data = Byte.parseByte(blockSplit[1]);
+										
+										volume.getBlockTypes()[i][j][k] = typeID;
+										volume.getBlockDatas()[i][j][k] = data;
+										
+										if(typeID == Material.WALL_SIGN.getId() 
+												|| typeID == Material.SIGN_POST.getId()) {
+											// Signs
+											String linesStr = "";
+											if(blockSplit.length > 2) {
+												for(int o = 2; o < blockSplit.length; o++) {
+													linesStr += blockSplit[o];
+												}
+												String[] lines = linesStr.split(";;");
+												volume.getSignLines().put("sign-" + i + "-" + j + "-" + k, lines);
 											}
-											String[] lines = linesStr.split(";;");
-											volume.getSignLines().put("sign-" + i + "-" + j + "-" + k, lines);
-										}
-									} else if(typeID == Material.CHEST.getId()) {
-										// Chests
-										List<ItemStack> items = new ArrayList<ItemStack>();
-										if(blockSplit.length > 2) {
-											String itemsStr = blockSplit[2];
-											String[] itemsStrSplit = itemsStr.split(";;");
-											for(String itemStr : itemsStrSplit) {
-												String[] itemStrSplit = itemStr.split(";");
-												if(itemStrSplit.length == 4) {
-													ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-															Integer.parseInt(itemStrSplit[1]));
-													stack.setData(new MaterialData(stack.getTypeId(),Byte.parseByte(itemStrSplit[3])));
-													short durability = (short)Integer.parseInt(itemStrSplit[2]);
-													stack.setDurability(durability);
-													items.add(stack);
-												} else if(itemStrSplit.length == 3) {
-													ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-															Integer.parseInt(itemStrSplit[1]));
-													short durability = (short)Integer.parseInt(itemStrSplit[2]);
-													stack.setDurability(durability);
-													items.add(stack);
-												} else {
-													items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]),
+										} else if(typeID == Material.CHEST.getId()) {
+											// Chests
+											List<ItemStack> items = new ArrayList<ItemStack>();
+											if(blockSplit.length > 2) {
+												String itemsStr = blockSplit[2];
+												String[] itemsStrSplit = itemsStr.split(";;");
+												for(String itemStr : itemsStrSplit) {
+													String[] itemStrSplit = itemStr.split(";");
+													if(itemStrSplit.length == 4) {
+														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
+																Integer.parseInt(itemStrSplit[1]));
+														stack.setData(new MaterialData(stack.getTypeId(),Byte.parseByte(itemStrSplit[3])));
+														short durability = (short)Integer.parseInt(itemStrSplit[2]);
+														stack.setDurability(durability);
+														items.add(stack);
+													} else if(itemStrSplit.length == 3) {
+														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
+																Integer.parseInt(itemStrSplit[1]));
+														short durability = (short)Integer.parseInt(itemStrSplit[2]);
+														stack.setDurability(durability);
+														items.add(stack);
+													} else {
+														items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]),
+																Integer.parseInt(itemStrSplit[1])));
+													}
+												}
+											}
+											volume.getInvBlockContents().put("chest-" + i + "-" + j + "-" + k, items);
+										} else if(typeID == Material.DISPENSER.getId()) {
+											// Dispensers
+											List<ItemStack> items = new ArrayList<ItemStack>();
+											if(blockSplit.length > 2) {
+												String itemsStr = blockSplit[2];
+												String[] itemsStrSplit = itemsStr.split(";;");
+												for(String itemStr : itemsStrSplit) {
+													String[] itemStrSplit = itemStr.split(";");
+													if(itemStrSplit.length == 4) {
+														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
+																Integer.parseInt(itemStrSplit[1]));
+														stack.setData(new MaterialData(stack.getTypeId(),Byte.parseByte(itemStrSplit[3])));
+														short durability = (short)Integer.parseInt(itemStrSplit[2]);
+														stack.setDurability(durability);
+														items.add(stack);
+													} else if(itemStrSplit.length == 3) {
+														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
+																Integer.parseInt(itemStrSplit[1]));
+														short durability = (short)Integer.parseInt(itemStrSplit[2]);
+														stack.setDurability(durability);
+														items.add(stack);
+													} else {
+														items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]),
 															Integer.parseInt(itemStrSplit[1])));
+													}
 												}
 											}
-										}
-										volume.getInvBlockContents().put("chest-" + i + "-" + j + "-" + k, items);
-									} else if(typeID == Material.DISPENSER.getId()) {
-										// Dispensers
-										List<ItemStack> items = new ArrayList<ItemStack>();
-										if(blockSplit.length > 2) {
-											String itemsStr = blockSplit[2];
-											String[] itemsStrSplit = itemsStr.split(";;");
-											for(String itemStr : itemsStrSplit) {
-												String[] itemStrSplit = itemStr.split(";");
-												if(itemStrSplit.length == 4) {
-													ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-															Integer.parseInt(itemStrSplit[1]));
-													stack.setData(new MaterialData(stack.getTypeId(),Byte.parseByte(itemStrSplit[3])));
-													short durability = (short)Integer.parseInt(itemStrSplit[2]);
-													stack.setDurability(durability);
-													items.add(stack);
-												} else if(itemStrSplit.length == 3) {
-													ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-															Integer.parseInt(itemStrSplit[1]));
-													short durability = (short)Integer.parseInt(itemStrSplit[2]);
-													stack.setDurability(durability);
-													items.add(stack);
-												} else {
-													items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]),
-														Integer.parseInt(itemStrSplit[1])));
-												}
-											}
-										}
-										volume.getInvBlockContents().put("dispenser-" + i + "-" + j + "-" + k, items);
-									} 
+											volume.getInvBlockContents().put("dispenser-" + i + "-" + j + "-" + k, items);
+										} 
+									}
+									blockReads++;
 								}
+							} catch (Exception e) {
+								war.logWarn("Unexpected error while reading block from volume " + volume.getName() + 
+										" file for zone " + zoneName + ". Blocks read so far: " + blockReads
+										+ "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage());
+								e.printStackTrace();
 							}
 						}
 						if(height129Fix && j == volume.getSizeY() - 1) {
@@ -170,7 +179,11 @@ public class VolumeMapper {
 			war.logWarn("Failed to read volume file " + volume.getName() + 
 					" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
-		} finally {
+		} catch (Exception e) {
+			war.logWarn("Unexpected error caused failure to read volume file " + zoneName + 
+					" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+			e.printStackTrace();
+		}  finally {
 			if(in != null)
 				try {
 					in.close();
@@ -198,51 +211,64 @@ public class VolumeMapper {
 				out.write(Integer.toString(volume.getCornerTwo().getX())); out.newLine();
 				out.write(Integer.toString(volume.getCornerTwo().getY())); out.newLine();
 				out.write(Integer.toString(volume.getCornerTwo().getZ())); out.newLine();
-				
+				int blockWrites = 0;
 				for(int i = 0; i < volume.getSizeX(); i++){
 					for(int j = 0; j < volume.getSizeY(); j++) {
 						for(int k = 0; k < volume.getSizeZ(); k++) {
-							int typeId = volume.getBlockTypes()[i][j][k];
-							byte data = volume.getBlockDatas()[i][j][k];
-							out.write(typeId + "," + data + ",");
-							if(typeId == Material.WALL_SIGN.getId() 
-									|| typeId == Material.SIGN_POST.getId()) {
-								// Signs
-								String extra = "";
-								String[] lines = volume.getSignLines().get("sign-" + i + "-" + j + "-" + k);
-								if(lines != null) {
-									for(String line : lines) {
-										extra += line + ";;";
+							try {
+								int typeId = volume.getBlockTypes()[i][j][k];
+								byte data = volume.getBlockDatas()[i][j][k];
+								out.write(typeId + "," + data + ",");
+								if(typeId == Material.WALL_SIGN.getId() 
+										|| typeId == Material.SIGN_POST.getId()) {
+									// Signs
+									String extra = "";
+									String[] lines = volume.getSignLines().get("sign-" + i + "-" + j + "-" + k);
+									if(lines != null) {
+										for(String line : lines) {
+											extra += line + ";;";
+										}
+										out.write(extra);
 									}
-									out.write(extra);
-								}
-							} else if(typeId == Material.CHEST.getId()) {
-								// Chests
-								String extra = "";
-								List<ItemStack> contents = volume.getInvBlockContents().get("chest-" + i + "-" + j + "-" + k);
-								if(contents != null) {
-									for(ItemStack item : contents) {
-										extra += item.getTypeId() + ";" 
-										+ item.getAmount() + ";" 
-										+ item.getDurability(); 
-										if(item.getData() != null)
-											extra += ";" + item.getData().getData() ;
-										extra += ";;";
+								} else if(typeId == Material.CHEST.getId()) {
+									// Chests
+									String extra = "";
+									List<ItemStack> contents = volume.getInvBlockContents().get("chest-" + i + "-" + j + "-" + k);
+									if(contents != null) {
+										for(ItemStack item : contents) {
+											extra += item.getTypeId() + ";" 
+											+ item.getAmount() + ";" 
+											+ item.getDurability(); 
+											if(item.getData() != null)
+												extra += ";" + item.getData().getData() ;
+											extra += ";;";
+										}
+										out.write(extra);
 									}
-									out.write(extra);
-								}
-							} else if(typeId == Material.DISPENSER.getId()) {
-								// Dispensers
-								String extra = "";
-								List<ItemStack> contents = volume.getInvBlockContents().get("dispenser-" + i + "-" + j + "-" + k);
-								if(contents != null) {
-									for(ItemStack item : contents) {
-										extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability() + ";" + item.getData().getData() + ";;";
+								} else if(typeId == Material.DISPENSER.getId()) {
+									// Dispensers
+									String extra = "";
+									List<ItemStack> contents = volume.getInvBlockContents().get("dispenser-" + i + "-" + j + "-" + k);
+									if(contents != null) {
+										for(ItemStack item : contents) {
+											extra += item.getTypeId() + ";" 
+											+ item.getAmount() + ";" 
+											+ item.getDurability(); 
+											if(item.getData() != null)
+												extra += ";" + item.getData().getData() ;
+											extra += ";;";
+										}
+										out.write(extra);
 									}
-									out.write(extra);
 								}
+								out.newLine();
 							}
-							out.newLine();
+							catch (Exception e) {
+								war.logWarn("Unexpected error while writing block into volume " + volume.getName() + 
+										" file for zone " + zoneName + ". Blocks written so far: " + blockWrites 
+										+ "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage());
+								e.printStackTrace();
+							}
 						}
 					}
 				}
@@ -250,7 +276,11 @@ public class VolumeMapper {
 				war.logWarn("Failed to write volume file " + zoneName + 
 						" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 				e.printStackTrace();
-			} 
+			} catch (Exception e) {
+				war.logWarn("Unexpected error caused failure to write volume file " + zoneName + 
+						" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				e.printStackTrace();
+			}  
 			finally {
 				if(out != null)
 					try {
