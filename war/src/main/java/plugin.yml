@@ -1,5 +1,5 @@
 name: War
-version: 1.3.2 (Rokossovsky)
+version: 1.4 (Slim)
 description: Lets you create TDM and CTF (warzones) for a more structured PVP experience.
 author: tommytony
 website: war.tommytony.com
@@ -147,5 +147,5 @@ commands:
   War:
     description: (War) Same as /war. Used as fallback.
     usage: See /war. 
-#Note: When you /disable War with General, all warzone blocks will be reset and artifacts will disappear. 
+#Note: When you /disable War with Essentials, or at shutdown, all warzone blocks will be reset and artifacts will disappear. 
 #      When you /enable War, all blocks will be loaded from disk and the War-related artifacts will reappear.  

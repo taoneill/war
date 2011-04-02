@@ -17,6 +17,6 @@ public class RestoreDeadmanInventoryJob implements Runnable {
 
 	public void run() {
 		zone.restoreDeadmanInventory(player);
-		player.teleportTo(zone.getTeleport());
+		player.teleport(zone.getTeleport());
 	}
 }

@@ -8,9 +8,11 @@ import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInventoryEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -43,7 +45,7 @@ public class WarPlayerListener extends PlayerListener {
 		random = new Random();
 	}
 	
-	public void onPlayerJoin(PlayerEvent event) {
+	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		// Disconnected
 		if(disconnected.containsKey(player.getName())) {
@@ -77,7 +79,7 @@ public class WarPlayerListener extends PlayerListener {
 				}
 			}
 			
-			war.msg(player, "You were disconnected. Here's your inventory from last time.");
+			war.msg(player, "You were disconnected while playing War. Here's your inventory from last time.");
 		}
     }
 	
@@ -171,7 +173,7 @@ public class WarPlayerListener extends PlayerListener {
     	}
     }
     
-    public void onPlayerCommandPreprocess(PlayerChatEvent event) {
+    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
     	Player player = event.getPlayer();
     	Team talkingPlayerTeam = war.getPlayerTeam(player.getName());
     	if(talkingPlayerTeam != null) {
@@ -179,7 +181,7 @@ public class WarPlayerListener extends PlayerListener {
     		String[] split = msg.split(" ");
     		if(!war.isZoneMaker(player) && split.length > 0 && split[0].startsWith("/")) {
     			String command = split[0].substring(1);
-    			if(!command.equals("zones") && !command.equals("warzones")
+    			if(!command.equals("war") && !command.equals("zones") && !command.equals("warzones")
     				&& !command.equals("zone") && !command.equals("warzone")
     				&& !command.equals("teams")
     				&& !command.equals("join")
@@ -247,7 +249,7 @@ public class WarPlayerListener extends PlayerListener {
 							}
 						} else {
 							event.setFrom(zone.getTeleport());
-							player.teleportTo(zone.getTeleport());
+							player.teleport(zone.getTeleport());
 							event.setCancelled(true);
 							war.badMsg(player, "All teams are full.");
 						}
@@ -276,7 +278,7 @@ public class WarPlayerListener extends PlayerListener {
 							}
 						} else {
 							event.setFrom(zone.getTeleport());
-							player.teleportTo(zone.getTeleport());
+							player.teleport(zone.getTeleport());
 							event.setCancelled(true);
 							war.badMsg(player, "Team " + team.getName() + " is full.");
 						}
@@ -289,7 +291,7 @@ public class WarPlayerListener extends PlayerListener {
 					enteredGate = true;
 					dropFromOldTeamIfAny(player);
 					event.setFrom(war.getWarHub().getLocation());
-					player.teleportTo(war.getWarHub().getLocation());
+					player.teleport(war.getWarHub().getLocation());
 					event.setCancelled(true);
 					war.msg(player, "Welcome to the War hub.");
 					return;
@@ -305,7 +307,7 @@ public class WarPlayerListener extends PlayerListener {
 				if(zone != null && zone.getTeleport() != null) {
 					enteredGate = true;
 					event.setFrom(zone.getTeleport());
-							player.teleportTo(zone.getTeleport());
+							player.teleport(zone.getTeleport());
 					event.setCancelled(true);
 					war.msg(player, "Welcome to warzone " + zone.getName() + ".");
 					return;
@@ -332,7 +334,7 @@ public class WarPlayerListener extends PlayerListener {
 			if(locZone == null && team != null) {;
 				war.badMsg(player, "You can't sneak out of a zone while in a team. Use /leave or walk out the lobby to exit the zone, please.");
 				event.setFrom(team.getTeamSpawn());
-				player.teleportTo(team.getTeamSpawn());
+				player.teleport(team.getTeamSpawn());
 				event.setCancelled(true);
 				return;
 			}
@@ -367,7 +369,7 @@ public class WarPlayerListener extends PlayerListener {
 							}
 							playerWarzone.handleScoreCapReached(player, team.getName());
 							event.setFrom(playerWarzone.getTeleport());
-							player.teleportTo(playerWarzone.getTeleport());
+							player.teleport(playerWarzone.getTeleport());
 							event.setCancelled(true);
 						} else {
 							// added a point
@@ -392,7 +394,7 @@ public class WarPlayerListener extends PlayerListener {
 			// player is not in any team, but inside warzone boundaries, get him out
 			Warzone zone = war.warzone(playerLoc);
 			event.setFrom(zone.getTeleport());
-			player.teleportTo(zone.getTeleport());
+			player.teleport(zone.getTeleport());
 			event.setCancelled(true);
 			war.badMsg(player, "You can't be inside a warzone without a team.");
 			return;
@@ -416,7 +418,7 @@ public class WarPlayerListener extends PlayerListener {
 		if(zone.getLobby() != null) {
 			war.badMsg(player, "This warzone is disabled.");
 			event.setFrom(zone.getTeleport());
-			player.teleportTo(zone.getTeleport());
+			player.teleport(zone.getTeleport());
 			event.setCancelled(true);
 		}
 	}

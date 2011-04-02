@@ -372,7 +372,7 @@ public class Warzone {
 		player.setHealth(20);
 
 		// Teleport the player back to spawn
-		player.teleportTo(team.getTeamSpawn());
+		player.teleport(team.getTeamSpawn());
 		
 		LoadoutResetJob job = new LoadoutResetJob(this, team, player);
 		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
@@ -891,7 +891,7 @@ public class Warzone {
 					}
 					
 					playerWarzone.handleScoreCapReached(player, winnersStr);
-					//player.teleportTo(playerWarzone.getTeleport());
+					//player.teleport(playerWarzone.getTeleport());
 					// player will die because it took too long :(
 					// we dont restore his inventory in handleScoreCapReached
 					// check out PLAYER_MOVE for the rest of the fix
@@ -956,7 +956,7 @@ public class Warzone {
 			player.setHealth(20);
 			player.setFireTicks(0);
 			player.setRemainingAir(300);
-			player.teleportTo(destination);
+			player.teleport(destination);
 			war.msg(player, "Left the zone. Your inventory has (hopefully) been restored.");
 			if(war.getWarHub() != null) {
 				war.getWarHub().resetZoneSign(this);

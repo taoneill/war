@@ -116,14 +116,13 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Priority.Normal, this);
 		
-
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_COMBUST, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.Normal, this);
 		
-		pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
 		
 		//pm.registerEvent(Event.Type.CHUNK_UNLOADED, blockListener, Priority.Normal, this);
@@ -150,10 +149,10 @@ public class War extends JavaPlugin {
 			// Handle both /war <command> and /<war command>. I.e. "/war zone temple" == "/zone temple"
 			String helpMessage =  "War is on. Please pick your battle. " +
 									"Try /warhub, /zones and /zone. Further instructions at war.tommytony.com/instructions.";
-			if((command.equals("war") || command.equals("War")) && args.length > 1) {
-				command = args[1];
+			if((command.equals("war") || command.equals("War")) && args.length > 0) {
+				command = args[0];
 				arguments = new String[args.length - 1];
-				for(int i = 2; i <= arguments.length; i++) {
+				for(int i = 1; i <= arguments.length; i++) {
 					arguments[i-1] = args[i];
 				}
 				if(arguments.length == 1 && (arguments[0].equals("help") || arguments[0].equals("h"))) {
@@ -475,7 +474,7 @@ public class War extends JavaPlugin {
 				// new team flag
 				team.setTeamFlag(player.getLocation());
 				Location playerLoc = player.getLocation();
-				player.teleportTo(new Location(playerLoc.getWorld(), 
+				player.teleport(new Location(playerLoc.getWorld(), 
 						playerLoc.getBlockX()+1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
 				this.msg(player, "Team " + team.getName() + " flag added here.");
 				WarzoneMapper.save(this, warzone, false);
@@ -484,7 +483,7 @@ public class War extends JavaPlugin {
 				team.getFlagVolume().resetBlocks();
 				team.setTeamFlag(player.getLocation());
 				Location playerLoc = player.getLocation();
-				player.teleportTo(new Location(playerLoc.getWorld(), 
+				player.teleport(new Location(playerLoc.getWorld(), 
 						playerLoc.getBlockX()+1, playerLoc.getBlockY(), playerLoc.getBlockZ()+1));
 				this.msg(player, "Team " + team.getName() + " flag moved.");
 				WarzoneMapper.save(this, warzone, false);
@@ -577,7 +576,7 @@ public class War extends JavaPlugin {
 				team.teamcast("The war has ended. " + playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams...");
 				for(Player p : team.getPlayers()) {
 					warzone.restorePlayerInventory(p);
-					p.teleportTo(warzone.getTeleport());
+					p.teleport(warzone.getTeleport());
 					this.msg(player, "You have left the warzone. Your inventory has (hopefully) been restored.");
 				}
 				team.setPoints(0);
@@ -885,7 +884,7 @@ public class War extends JavaPlugin {
 			if(playerTeam != null) { // was in zone
 				playerWarzone.handlePlayerLeave(player, this.getWarHub().getLocation(), true);
 			}
-			player.teleportTo(this.getWarHub().getLocation());
+			player.teleport(this.getWarHub().getLocation());
 		}
 	}
 
@@ -1011,7 +1010,7 @@ public class War extends JavaPlugin {
 						Warzone playerWarzone = getPlayerTeamWarzone(player.getName());
 						playerWarzone.handlePlayerLeave(player, warzone.getTeleport(), true);
 					} else {					
-						player.teleportTo(warzone.getTeleport());
+						player.teleport(warzone.getTeleport());
 					}
 					warped = true;
 					break;
