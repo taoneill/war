@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -83,7 +84,7 @@ public class WarPlayerListener extends PlayerListener {
 		}
     }
 	
-	public void onPlayerQuit(PlayerEvent event) {
+	public void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		Team team = war.getPlayerTeam(player.getName());
 		if(team != null) {
