@@ -170,6 +170,9 @@ public class WarzoneMapper {
 			// life pool
 			warzone.setLifePool(warzoneConfig.getInt("lifePool"));
 			
+			// monument heal		//SY
+			warzone.setMonumentHeal(warzoneConfig.getInt("monumentHeal"));
+			
 			// drawZoneOutline
 			warzone.setDrawZoneOutline(warzoneConfig.getBoolean("drawZoneOutline"));
 			
@@ -387,6 +390,9 @@ public class WarzoneMapper {
 		
 		// life pool
 		warzoneConfig.setInt("lifePool", warzone.getLifePool());
+		
+		// monument heal 		//SY
+		warzoneConfig.setInt("monumentHeal", warzone.getMonumentHeal());
 		
 		// drawZoneOutline
 		warzoneConfig.setBoolean("drawZoneOutline", warzone.isDrawZoneOutline());

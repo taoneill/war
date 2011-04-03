@@ -340,17 +340,26 @@ public class WarPlayerListener extends PlayerListener {
 				return;
 			}
 
-			// Monuments
+			// Monuments	//SY
 			if(team != null
 					&& playerWarzone.nearAnyOwnedMonument(playerLoc, team) 
 					&& player.getHealth() < 20
 					&& player.getHealth() > 0	// don't heal the dead
 					&& random.nextInt(77) == 3 ) {	// one chance out of many of getting healed
 				int currentHp = player.getHealth();
-				int newHp = currentHp + 5;
+				int newHp = currentHp + locZone.getMonumentHeal();
 				if(newHp > 20) newHp = 20;
 				player.setHealth(newHp);
-				war.msg(player, "Your dance pleases the monument's voodoo. You gain health!");
+				String isS = "s";					// no 's' in 'hearts' when it's just one heart
+				if (newHp-currentHp==2) isS="";
+				String heartNum = "";			// since (newHp-currentHp)/2 won't give the right amount
+				if (newHp-currentHp==2)
+					heartNum="1 ";
+				else if (newHp-currentHp%2==0)		// for some reason
+					heartNum=((newHp-currentHp)/2)+" ";
+				else
+					heartNum=((newHp-currentHp-1)/2)+".5 ";
+				war.msg(player, "Your dance pleases the monument's voodoo. You gain "+heartNum+"heart"+isS+"!");
 				return;
 			}
 			
