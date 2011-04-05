@@ -44,6 +44,7 @@ public class Warzone {
 	private boolean drawZoneOutline;
 	private int teamCap = 5;
 	private int scoreCap = 5;
+	private int monumentHeal = 5;
 	private String spawnStyle = TeamSpawnStyles.BIG;
 	private HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
 	
@@ -74,6 +75,7 @@ public class Warzone {
 		this.setAutoAssignOnly(war.getDefaultAutoAssignOnly());
 		this.teamCap = war.getDefaultTeamCap();
 		this.scoreCap = war.getDefaultScoreCap();
+		this.monumentHeal = war.getDefaultMonumentHeal();
 		this.setBlockHeads(war.isDefaultBlockHeads());
 		this.setDropLootOnDeath(war.isDefaultDropLootOnDeath());
 		this.setUnbreakableZoneBlocks(war.isDefaultUnbreakableZoneBlocks());
@@ -472,6 +474,14 @@ public class Warzone {
 	public int getLifePool() {
 		return lifePool;
 	}
+	
+	public void setMonumentHeal(int monumentHeal) {	//SY
+		this.monumentHeal = monumentHeal;
+	}
+
+	public int getMonumentHeal() {	//SY
+		return monumentHeal;
+	}
 
 	public void setFriendlyFire(boolean ffOn) {
 		this.friendlyFire = ffOn;
@@ -865,12 +875,14 @@ public class Warzone {
 					t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " 
 							+ player.getName() + " died and there were no lives left in their life pool.");
 					
-					if(!t.getName().equals(playerTeam.getName())) {
-						// all other teams get a point
-						t.addPoint();
-						t.resetSign();
+					if (t.getPlayers().size() != 0) {
+						if(!t.getName().equals(playerTeam.getName())) {
+							// all other teams get a point
+							t.addPoint();
+							t.resetSign();
+						}
+						scores += t.getName() + "(" + t.getPoints() + ") " ;
 					}
-					scores += t.getName() + "(" + t.getPoints() + ") " ;
 				}
 				if(!scores.equals("")){
 					for(Team t : teams) {
@@ -887,7 +899,7 @@ public class Warzone {
 				if(!scoreCapTeams.isEmpty()) {
 					String winnersStr = "";
 					for(Team winner : scoreCapTeams) {
-						winnersStr += winner.getName() + " ";
+						if (winner.getPlayers().size() != 0) winnersStr += winner.getName() + " ";
 					}
 					
 					playerWarzone.handleScoreCapReached(player, winnersStr);
