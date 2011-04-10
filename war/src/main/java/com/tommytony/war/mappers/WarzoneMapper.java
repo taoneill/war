@@ -49,7 +49,7 @@ public class WarzoneMapper {
 		
 		
 		if(world == null) {
-			war.logWarn("Failed to restore warzone " + name + "! World " + worldStr + " was not loaded yet. Try /reload once the server is up and running.");
+			war.logWarn("Failed to restore warzone " + name + ". The specified world (name: " + worldStr + ") does not exist!");
 		} else {
 			// Create the zone	
 			Warzone warzone = new Warzone(war, world, name);

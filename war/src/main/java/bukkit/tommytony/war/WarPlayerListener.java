@@ -61,7 +61,7 @@ public class WarPlayerListener extends PlayerListener {
 				playerInv.clear();
 				
 				for(ItemStack item : originalContents.getContents()) {
-					if(item.getTypeId() != 0) {
+					if(item != null && item.getTypeId() != 0) {
 						playerInv.addItem(item);
 					}
 				}

@@ -504,7 +504,7 @@ public class Warzone {
 		playerInv.clear(playerInv.getSize() + 2);
 		playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
 		for(ItemStack item : originalContents.getContents()) {
-			if(item.getTypeId() != 0) {
+			if(item != null && item.getTypeId() != 0) {
 				playerInv.addItem(item);
 			}
 		}
