@@ -393,8 +393,11 @@ public class Warzone {
 				playerInv.setLeggings(loadout.get(slot));
 			} else if(slot == 102) {
 				playerInv.setChestplate(loadout.get(slot));
-			} else { 
-				playerInv.addItem(loadout.get(slot));
+			} else {
+				ItemStack item = loadout.get(slot);
+				if(item != null) {
+					playerInv.addItem(item);
+				}
 			}
 		}
 		if(isBlockHeads()) {
@@ -457,7 +460,9 @@ public class Warzone {
 		this.loadout.clear();
 		for(Integer slot : newLoadout.keySet()) {
 			ItemStack stack = newLoadout.get(slot);
-			this.loadout.put(slot, stack);
+			if(stack != null) {
+				this.loadout.put(slot, stack);
+			}
 		}
 	}
 

@@ -111,20 +111,22 @@ public class WarPlayerListener extends PlayerListener {
 				
 			} else {
 				Item item = event.getItemDrop();
-				ItemStack itemStack =  item.getItemStack();
-				if(itemStack != null 
-						&& itemStack.getType() == team.getKind().getMaterial() 
-						&& itemStack.getData().getData() == team.getKind().getData()) {
-					// Can't drop your team's kind block
-					war.badMsg(player, "Can't drop " + team.getName() + " block blocks.");
-					event.setCancelled(true);
-					return;
-				}
-				
-				if(zone.isNearWall(player.getLocation()) && itemStack != null) {
-					war.badMsg(player, "Can't drop items near the zone border!");
-					event.setCancelled(true);
-					return;
+				if(item != null) {
+					ItemStack itemStack =  item.getItemStack();
+					if(itemStack != null 
+							&& itemStack.getType() == team.getKind().getMaterial() 
+							&& itemStack.getData().getData() == team.getKind().getData()) {
+						// Can't drop your team's kind block
+						war.badMsg(player, "Can't drop " + team.getName() + " block blocks.");
+						event.setCancelled(true);
+						return;
+					}
+					
+					if(zone.isNearWall(player.getLocation()) && itemStack != null) {
+						war.badMsg(player, "Can't drop items near the zone border!");
+						event.setCancelled(true);
+						return;
+					}
 				}
 			}
 		}
@@ -141,15 +143,17 @@ public class WarPlayerListener extends PlayerListener {
 				event.setCancelled(true);
 			} else {
 				Item item = event.getItem();
-				if(item instanceof CraftItem) {
+				if(item != null && item instanceof CraftItem) {
 					CraftItem cItem = (CraftItem)item;
-					ItemStack itemStack = cItem.getItemStack();
-					if(itemStack != null && itemStack.getType() == team.getKind().getMaterial()
-							&& player.getInventory().contains(new ItemStack(team.getKind().getMaterial(), team.getKind().getData()))) {
-						// Can't pick up a second precious block
-						//war.badMsg(player, "You already have a " + team.getName() + " block.");
-						event.setCancelled(true);
-						return;
+					if(cItem != null) {
+						ItemStack itemStack = cItem.getItemStack();
+						if(itemStack != null && itemStack.getType() == team.getKind().getMaterial()
+								&& player.getInventory().contains(new ItemStack(team.getKind().getMaterial(), team.getKind().getData()))) {
+							// Can't pick up a second precious block
+							//war.badMsg(player, "You already have a " + team.getName() + " block.");
+							event.setCancelled(true);
+							return;
+						}
 					}
 				}
 				

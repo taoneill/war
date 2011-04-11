@@ -17,7 +17,9 @@ public class LootDropperTask implements Runnable {
 	
 	public void run() {
 		for(ItemStack item : drop) {
-			location.getWorld().dropItemNaturally(location, item);
+			if(item != null) {
+				location.getWorld().dropItemNaturally(location, item);
+			}
 		}
 	}
 }

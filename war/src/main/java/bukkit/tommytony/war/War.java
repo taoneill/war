@@ -244,10 +244,11 @@ public class War extends JavaPlugin {
 		PlayerInventory inv = player.getInventory();
 		int i = 0;
 		for(ItemStack stack : inv.getContents()){
-			if(stack.getType() != Material.AIR) {
+			if(stack != null && stack.getType() != Material.AIR) {
 				loadout.put(i, stack);
+				i++;
 			}
-			i++;
+			
 		}
 		if(inv.getBoots() != null && inv.getBoots().getType() != Material.AIR) {
 			loadout.put(100, inv.getBoots());

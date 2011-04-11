@@ -1,6 +1,5 @@
 package com.tommytony.war.volumes;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +15,10 @@ import org.bukkit.block.Dispenser;
 import org.bukkit.block.Sign;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
-
-import com.tommytony.war.jobs.BlockResetJob;
 
 import bukkit.tommytony.war.War;
+
+import com.tommytony.war.jobs.BlockResetJob;
 
 /**
  * 
@@ -208,8 +206,10 @@ public class Volume {
 												int ii = 0;
 												chest.getInventory().clear();
 												for(ItemStack item : contents) {
-													chest.getInventory().setItem(ii, item);
-													ii++;
+													if(item != null) {
+														chest.getInventory().setItem(ii, item);
+														ii++;
+													}
 												}
 												chest.update(true);
 											}
@@ -226,8 +226,10 @@ public class Volume {
 												int ii = 0;
 												dispenser.getInventory().clear();
 												for(ItemStack item : contents) {
-													dispenser.getInventory().setItem(ii, item);
-													ii++;
+													if(item != null) {
+														dispenser.getInventory().setItem(ii, item);
+														ii++;
+													}
 												}
 												dispenser.update(true);
 											}

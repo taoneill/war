@@ -381,7 +381,9 @@ public class WarzoneMapper {
 		HashMap<Integer, ItemStack> items = warzone.getLoadout();
 		for(Integer slot : items.keySet()) {
 			ItemStack item = items.get(slot);
-			loadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+			if(item != null) {
+				loadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+			}
 		}
 		warzoneConfig.setString("loadout", loadoutStr);
 		
@@ -411,7 +413,9 @@ public class WarzoneMapper {
 		HashMap<Integer, ItemStack> rewardItems = warzone.getReward();
 		for(Integer slot : rewardItems.keySet()) {
 			ItemStack item = rewardItems.get(slot);
-			rewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+			if(item != null) {
+				rewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+			}
 		}
 		warzoneConfig.setString("reward", rewardStr);
 		

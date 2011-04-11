@@ -3,8 +3,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
@@ -14,7 +12,6 @@ import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.jobs.RestoreWarhubJob;
 import com.tommytony.war.jobs.RestoreWarzonesJob;
-import com.tommytony.war.volumes.Volume;
 
 /**
  * 
@@ -176,7 +173,9 @@ public class WarMapper {
 		HashMap<Integer, ItemStack> items = war.getDefaultLoadout();
 		for(Integer slot : items.keySet()) {
 			ItemStack item = items.get(slot);
-			defaultLoadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+			if(item != null) {
+				defaultLoadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+			}
 		}
 		warConfig.setString("defaultLoadout", defaultLoadoutStr);
 		
@@ -215,7 +214,9 @@ public class WarMapper {
 		HashMap<Integer, ItemStack> rewardItems = war.getDefaultReward();
 		for(Integer slot : rewardItems.keySet()) {
 			ItemStack item = items.get(slot);
-			defaultRewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+			if(item != null) {
+				defaultRewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+			}
 		}
 		warConfig.setString("defaultReward", defaultRewardStr);
 

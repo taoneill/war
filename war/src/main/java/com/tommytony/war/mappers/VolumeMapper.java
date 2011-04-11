@@ -236,12 +236,14 @@ public class VolumeMapper {
 									List<ItemStack> contents = volume.getInvBlockContents().get("chest-" + i + "-" + j + "-" + k);
 									if(contents != null) {
 										for(ItemStack item : contents) {
-											extra += item.getTypeId() + ";" 
-											+ item.getAmount() + ";" 
-											+ item.getDurability(); 
-											if(item.getData() != null)
-												extra += ";" + item.getData().getData() ;
-											extra += ";;";
+											if(item != null) {
+												extra += item.getTypeId() + ";" 
+												+ item.getAmount() + ";" 
+												+ item.getDurability(); 
+												if(item.getData() != null)
+													extra += ";" + item.getData().getData() ;
+												extra += ";;";
+											}
 										}
 										out.write(extra);
 									}
@@ -251,12 +253,14 @@ public class VolumeMapper {
 									List<ItemStack> contents = volume.getInvBlockContents().get("dispenser-" + i + "-" + j + "-" + k);
 									if(contents != null) {
 										for(ItemStack item : contents) {
-											extra += item.getTypeId() + ";" 
-											+ item.getAmount() + ";" 
-											+ item.getDurability(); 
-											if(item.getData() != null)
-												extra += ";" + item.getData().getData() ;
-											extra += ";;";
+											if(item != null) {
+												extra += item.getTypeId() + ";" 
+												+ item.getAmount() + ";" 
+												+ item.getDurability(); 
+												if(item.getData() != null)
+													extra += ";" + item.getData().getData() ;
+												extra += ";;";
+											}
 										}
 										out.write(extra);
 									}

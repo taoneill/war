@@ -1,6 +1,7 @@
 package com.tommytony.war.jobs;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
@@ -30,7 +31,10 @@ public class ScoreCapReachedJob implements Runnable {
 				if(winnersStr.contains(t.getName())) {
 					// give reward
 					for(Integer slot : zone.getReward().keySet()){
-						tp.getInventory().addItem(zone.getReward().get(slot));
+						ItemStack item = zone.getReward().get(slot);
+						if(item != null) {
+							tp.getInventory().addItem(item);
+						}
 					}
 				}
 			}
