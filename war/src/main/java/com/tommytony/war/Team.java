@@ -351,7 +351,7 @@ public class Team {
 	}
 	
 	public void addPoint() {
-		points++;
+		if (players.size()!=0) points++;
 	}
 
 	public int getPoints() {
@@ -405,7 +405,7 @@ public class Team {
 	}
 
 	public void setPoints(int score) {
-		this.points = score;
+		if (players.size()!=0) this.points = score;
 	}
 
 	public void setFlagVolume(Volume flagVolume) {

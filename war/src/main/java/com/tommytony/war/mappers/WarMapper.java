@@ -79,6 +79,9 @@ public class WarMapper {
 		// defaultLifePool
 		war.setDefaultLifepool(warConfig.getInt("defaultLifePool"));
 		
+		// defaultMonumentHeal		//SY
+		war.setDefaultLifepool(warConfig.getInt("defaultMonumentHeal"));
+		
 		// defaultFriendlyFire
 		war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));
 		
@@ -181,6 +184,9 @@ public class WarMapper {
 		
 		// defaultLifepool
 		warConfig.setInt("defaultLifePool", war.getDefaultLifepool());
+		
+		// defaultMonumentHeal		//SY
+		warConfig.setInt("defaultMonumentHeal", war.getDefaultMonumentHeal());
 		
 		// defaultFriendlyFire
 		warConfig.setBoolean("defaultFriendlyFire", war.getDefaultFriendlyFire());

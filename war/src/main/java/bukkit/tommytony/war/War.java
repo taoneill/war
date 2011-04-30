@@ -67,6 +67,7 @@ public class War extends JavaPlugin {
 	private boolean defaultAutoAssignOnly = false;
 	private int defaultTeamCap = 7;
 	private int defaultScoreCap = 10;
+	private int defaultMonumentHeal = 5; //SY
 	private boolean defaultBlockHeads = true;
 	private boolean defaultDropLootOnDeath = false;
 	private String defaultSpawnStyle = TeamSpawnStyles.BIG;
@@ -1054,6 +1055,9 @@ public class War extends JavaPlugin {
 			if(namedParams.containsKey("lifepool")){
 				warzone.setLifePool(Integer.parseInt(namedParams.get("lifepool")));
 			}
+			if(namedParams.containsKey("monumentheal")){	//SY
+				warzone.setMonumentHeal(Integer.parseInt(namedParams.get("monumentheal")));
+			}
 			if(namedParams.containsKey("teamsize")){
 				warzone.setTeamCap(Integer.parseInt(namedParams.get("teamsize")));
 			}
@@ -1128,6 +1132,9 @@ public class War extends JavaPlugin {
 			if(namedParams.containsKey("lifepool")){
 				setDefaultLifepool(Integer.parseInt(namedParams.get("lifepool")));
 			} 
+			if(namedParams.containsKey("monumentheal")){		//SY
+				setDefaultMonumentHeal(Integer.parseInt(namedParams.get("monumentheal")));
+			}
 			if(namedParams.containsKey("teamsize")){
 				setDefaultTeamCap(Integer.parseInt(namedParams.get("teamsize")));
 			}
@@ -1317,6 +1324,14 @@ public class War extends JavaPlugin {
 		return defaultLifepool;
 	}
 
+	public void setDefaultMonumentHeal(int defaultMonumentHeal) {	//SY
+		this.defaultMonumentHeal = defaultMonumentHeal;
+	}
+
+	public int getDefaultMonumentHeal() {	//SY
+		return defaultMonumentHeal;
+	}
+	
 	public void setDefaultFriendlyFire(boolean defaultFriendlyFire) {
 		this.defaultFriendlyFire = defaultFriendlyFire;
 	}
