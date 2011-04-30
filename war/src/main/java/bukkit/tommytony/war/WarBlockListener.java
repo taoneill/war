@@ -170,21 +170,25 @@ public class WarBlockListener extends BlockListener {
     				// detect audacious thieves
     				war.badMsg(player, "You can only steal one flag at a time!");
     			} else {
-	    			// player just broke the flag block of other team: cancel to avoid drop, give player the block, set block to air
 	    			Team lostFlagTeam = warzone.getTeamForFlagBlock(block);
-	    			ItemStack teamKindBlock = new ItemStack(lostFlagTeam.getKind().getMaterial(), 1, (short)1, new Byte(lostFlagTeam.getKind().getData()));
-	    			player.getInventory().clear();
-	    			player.getInventory().addItem(teamKindBlock);
-	    			warzone.addFlagThief(lostFlagTeam, player.getName());
-	    			block.setType(Material.AIR);
-	    			
-	    			for(Team t : warzone.getTeams()) {
-						t.teamcast(player.getName() + " stole team " + lostFlagTeam.getName() + "'s flag.");
-						if(t.getName().equals(lostFlagTeam.getName())){
-							t.teamcast("Prevent " + player.getName() + " from reaching team " + team.getName() + "'s spawn or flag.");
+	    			if (lostFlagTeam.getPlayers().size() != 0) {
+	    				// player just broke the flag block of other team: cancel to avoid drop, give player the block, set block to air
+		    			ItemStack teamKindBlock = new ItemStack(lostFlagTeam.getKind().getMaterial(), 1, (short)1, new Byte(lostFlagTeam.getKind().getData()));
+		    			player.getInventory().clear();
+		    			player.getInventory().addItem(teamKindBlock);
+		    			warzone.addFlagThief(lostFlagTeam, player.getName());
+		    			block.setType(Material.AIR);
+		    			
+		    			for(Team t : warzone.getTeams()) {
+							t.teamcast(player.getName() + " stole team " + lostFlagTeam.getName() + "'s flag.");
+							if(t.getName().equals(lostFlagTeam.getName())){
+								t.teamcast("Prevent " + player.getName() + " from reaching team " + team.getName() + "'s spawn or flag.");
+							}
 						}
-					}
-	    			war.msg(player, "You have team " + lostFlagTeam.getName() + "'s flag. Reach your team spawn or flag to capture it!");
+		    			war.msg(player, "You have team " + lostFlagTeam.getName() + "'s flag. Reach your team spawn or flag to capture it!");
+	    			} else {
+	    				war.msg(player, "You can't steal team " + lostFlagTeam.getName() + "'s flag since there are no players there.");
+	    			}
     			}
     			event.setCancelled(true);
     			return;
