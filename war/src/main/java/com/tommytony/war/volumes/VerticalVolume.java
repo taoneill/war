@@ -12,6 +12,7 @@ import bukkit.tommytony.war.War;
  * @author tommytony
  *
  */
+@Deprecated
 public class VerticalVolume extends Volume{
 
 	public VerticalVolume(String name, War war, World world) {

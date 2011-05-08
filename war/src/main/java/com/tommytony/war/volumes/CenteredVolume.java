@@ -13,6 +13,7 @@ import bukkit.tommytony.war.War;
  * Broken, don't use.
  *
  */
+@Deprecated
 public class CenteredVolume extends Volume {
 
 	private Block center;
