@@ -55,6 +55,10 @@ public class Volume {
 		this.cornerOne = new BlockInfo(block);
 	}
 	
+	public void setCornerOne(BlockInfo blockInfo) {
+		this.cornerOne = blockInfo;
+	}
+	
 	public int saveBlocks() {
 //		BlockSaveJob job = new BlockSaveJob(this);
 //		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
@@ -310,19 +314,23 @@ public class Volume {
 		this.cornerTwo = new BlockInfo(block);
 	}
 	
-	public Block getMinXBlock() {
-		if(cornerOne.getX() < cornerTwo.getX()) return BlockInfo.getBlock(world, cornerOne);
-		return BlockInfo.getBlock(world, cornerTwo);
+	public void setCornerTwo(BlockInfo blockInfo) {
+		this.cornerTwo = blockInfo;
 	}
 	
-	public Block getMinYBlock() {
-		if(cornerOne.getY() < cornerTwo.getY()) return BlockInfo.getBlock(world, cornerOne);
-		return BlockInfo.getBlock(world, cornerTwo);
+	public BlockInfo getMinXBlock() {
+		if(cornerOne.getX() < cornerTwo.getX()) return cornerOne;
+		return cornerTwo;
 	}
 	
-	public Block getMinZBlock() {
-		if(cornerOne.getZ() < cornerTwo.getZ()) return BlockInfo.getBlock(world, cornerOne);
-		return BlockInfo.getBlock(world, cornerTwo);
+	public BlockInfo getMinYBlock() {
+		if(cornerOne.getY() < cornerTwo.getY()) return cornerOne;
+		return cornerTwo;
+	}
+	
+	public BlockInfo getMinZBlock() {
+		if(cornerOne.getZ() < cornerTwo.getZ()) return cornerOne;
+		return cornerTwo;
 	}
 	
 	public int getMinX() {
@@ -337,19 +345,19 @@ public class Volume {
 		return getMinZBlock().getZ();
 	}
 	
-	public Block getMaxXBlock() {
-		if(cornerOne.getX() < cornerTwo.getX()) return BlockInfo.getBlock(world, cornerTwo);
-		return BlockInfo.getBlock(world, cornerOne);
+	public BlockInfo getMaxXBlock() {
+		if(cornerOne.getX() < cornerTwo.getX()) return cornerTwo;
+		return cornerOne;
 	}
 	
-	public Block getMaxYBlock() {
-		if(cornerOne.getY() < cornerTwo.getY()) return BlockInfo.getBlock(world, cornerTwo);
-		return BlockInfo.getBlock(world, cornerOne);
+	public BlockInfo getMaxYBlock() {
+		if(cornerOne.getY() < cornerTwo.getY()) return cornerTwo;
+		return cornerOne;
 	}
 	
-	public Block getMaxZBlock() {
-		if(cornerOne.getZ() < cornerTwo.getZ()) return BlockInfo.getBlock(world, cornerTwo);
-		return BlockInfo.getBlock(world, cornerOne);
+	public BlockInfo getMaxZBlock() {
+		if(cornerOne.getZ() < cornerTwo.getZ()) return cornerTwo;
+		return cornerOne;
 	}
 	
 	public int getMaxX() {
@@ -384,12 +392,12 @@ public class Volume {
 		return blockTypes;
 	}
 	
-	public Block getCornerOne() {
-		return BlockInfo.getBlock(world, cornerOne);
+	public BlockInfo getCornerOne() {
+		return cornerOne;
 	}
 	
-	public Block getCornerTwo() {
-		return BlockInfo.getBlock(world, cornerTwo);
+	public BlockInfo getCornerTwo() {
+		return cornerTwo;
 	}
 
 	public boolean contains(Location location) {

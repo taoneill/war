@@ -4,8 +4,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 
 import bukkit.tommytony.war.War;
 
@@ -30,7 +28,7 @@ public class VerticalVolume extends Volume{
 	
 	@Override
 	public void setCornerTwo(Block block){
-		// corner one defaults to bottom most corner
+		// corner two defaults to bottom most corner
 		Block bottomBlock = getWorld().getBlockAt(block.getX(), 0, block.getZ());
 		super.setCornerTwo(bottomBlock);
 	}

@@ -73,13 +73,13 @@ public class ZoneLobby {
 		
 		// we're setting the zoneVolume directly, so we need to figure out the lobbyMiddleWallBlock on our own
 		if(wall == BlockFace.NORTH) {
-			lobbyMiddleWallBlock = new BlockInfo(volume.getCornerOne().getFace(BlockFace.UP).getFace(BlockFace.EAST, lobbyHalfSide)); 
+			lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.EAST, lobbyHalfSide)); 
 		} else if (wall == BlockFace.EAST){
-			lobbyMiddleWallBlock = new BlockInfo(volume.getCornerOne().getFace(BlockFace.UP).getFace(BlockFace.SOUTH, lobbyHalfSide));
+			lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.SOUTH, lobbyHalfSide));
  		} else if (wall == BlockFace.SOUTH){
- 			lobbyMiddleWallBlock = new BlockInfo(volume.getCornerOne().getFace(BlockFace.UP).getFace(BlockFace.WEST, lobbyHalfSide));
+ 			lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.WEST, lobbyHalfSide));
 		} else if (wall == BlockFace.WEST){
-			lobbyMiddleWallBlock = new BlockInfo(volume.getCornerOne().getFace(BlockFace.UP).getFace(BlockFace.NORTH, lobbyHalfSide));
+			lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.NORTH, lobbyHalfSide));
 		}
 	}
 	

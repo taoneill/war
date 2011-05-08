@@ -16,6 +16,7 @@ import org.bukkit.material.MaterialData;
 import bukkit.tommytony.war.War;
 
 import com.tommytony.war.utils.SignHelper;
+import com.tommytony.war.volumes.BlockInfo;
 import com.tommytony.war.volumes.Volume;
 
 /**
@@ -85,7 +86,7 @@ public class WarHub {
 			volume.setFaceMaterial(BlockFace.DOWN, Material.GLASS);
 			
 			// draw gates
-			Block currentGateBlock = volume.getCornerOne().getFace(BlockFace.UP).getFace(BlockFace.WEST, hubDepth).getFace(BlockFace.NORTH, 2);
+			Block currentGateBlock = BlockInfo.getBlock(location.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.WEST, hubDepth).getFace(BlockFace.NORTH, 2);
 			
 			for(Warzone zone : war.getWarzones()) {	// gonna use the index to find it again
 				if(!zone.isDisabled()) {

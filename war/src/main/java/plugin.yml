@@ -1,5 +1,5 @@
 name: War
-version: 1.4.2 (Slim)
+version: 1.5 (MacArthur)
 description: Lets you create TDM and CTF (warzones) for a more structured PVP experience.
 author: tommytony
 website: war.tommytony.com
@@ -48,11 +48,21 @@ commands:
         - /nextbattle
 # 2- Warzone creation commands
   setzone:
-    description: (War) Use to create a warzone by its Northwest and Southeast corners. Lobby is created and blocks are saved when the second corner is set.
+    description: (War) Use to create a warzone.  1) Classic: Northwest and Southeast corners. Lobby is created and blocks are saved when the second corner is set.
     usage: 
-        - /setzone <northwest/southeast/nw/se>, 
-        - e.g. first, /setzone ziggy se, then, /setzone ziggy nw
-        - Warzones must be at least 20 blocks wide in both directions.
+        - Classic/Northwest-Southeast mode -
+        - /setzone <zonename> <northwest/southeast/nw/se>
+        - ex: first, /setzone ziggy se, then, /setzone ziggy nw
+        - In classic mode, corner1 is at the topmost block (127) in the northwest and corner2 is at the bottommost block (0) in the southeast.     
+        - Wand Cuboid mode -
+        - 1) /setzone <name> wand
+        - 2) Left-click to select or move corner1
+        - 3) Right-click to select or move corner2
+        - Turn off wand by dropping the wooden sword.
+        - Wandless Cuboid mode -
+        - /setzone <name> <corner1/corner2/c1/c2>
+        - The three modes can be mixed and matched.
+        - Warzones must be at least 10 blocks wide in all directions.
   savezone:
     description: (War) Persists changes made to the warzone since the last save. Config can be set with named parameters. 
     usage: 

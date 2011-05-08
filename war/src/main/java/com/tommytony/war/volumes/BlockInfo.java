@@ -23,6 +23,15 @@ public class BlockInfo {
 		return world.getBlockAt(info.getX(), info.getY(), info.getZ());
 	}
 	
+	public BlockInfo(int x, int y, int z, int type, byte data)
+	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.type = type;
+		this.data = data;
+	}
+	
 	public BlockInfo(Block block) {
 		this.x = block.getX();
 		this.y = block.getY();
@@ -63,6 +72,19 @@ public class BlockInfo {
 	
 	public int getZ() {
 		return z;
+	}
+	
+	// letting us mutate the BlockInfos might be a bad idea; use setters with care
+	public void setX(int x) {
+		this.x = x;
+	}
+	
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+	public void setZ(int z) {
+		this.z = z;
 	}
 	
 	public int getTypeId() {
