@@ -17,6 +17,7 @@ import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.BlockInfo;
 import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
+import com.tommytony.war.volumes.ZoneVolume;
 
 /**
  * 
@@ -91,7 +92,7 @@ public class ZoneLobby {
 		
 		this.wall = newWall;
 		// find center of the wall and set the new volume corners
-		VerticalVolume zoneVolume = warzone.getVolume();
+		ZoneVolume zoneVolume = warzone.getVolume();
 		
 		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
 		lobbyHalfSide = lobbyWidth / 2;
@@ -110,7 +111,7 @@ public class ZoneLobby {
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x+1, wallCenterPos);
 			if(highestNonAirBlockAtCenter < 3 || highestNonAirBlockAtCenter > 125 - lobbyHeight) 
-				highestNonAirBlockAtCenter = warzone.getNorthwest().getBlockY();
+				highestNonAirBlockAtCenter = warzone.getVolume().getCenterY();
 			lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter, wallCenterPos));
 			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter - 1, wallCenterPos + lobbyHalfSide);
 			corner2 = warzone.getWorld().getBlockAt(x - lobbyDepth, 
@@ -123,7 +124,7 @@ public class ZoneLobby {
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z+1);
 			if(highestNonAirBlockAtCenter < 3 || highestNonAirBlockAtCenter > 125 - lobbyHeight) 
-				highestNonAirBlockAtCenter = warzone.getSoutheast().getBlockY();
+				highestNonAirBlockAtCenter = warzone.getVolume().getCenterY();
 			lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter, z));
 			corner1 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter - 1, z);
 			corner2 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, 
@@ -136,7 +137,7 @@ public class ZoneLobby {
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(x-1, wallCenterPos);
 			if(highestNonAirBlockAtCenter < 3 || highestNonAirBlockAtCenter > 125 - lobbyHeight) 
-				highestNonAirBlockAtCenter = warzone.getSoutheast().getBlockY();
+				highestNonAirBlockAtCenter = warzone.getVolume().getCenterY();
 			lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter, wallCenterPos));
 			corner1 = warzone.getWorld().getBlockAt(x, highestNonAirBlockAtCenter -1 , wallCenterPos - lobbyHalfSide);
 			corner2 = warzone.getWorld().getBlockAt(x + lobbyDepth, 
@@ -149,7 +150,7 @@ public class ZoneLobby {
 			int wallCenterPos = wallStart + wallLength / 2;
 			int highestNonAirBlockAtCenter = warzone.getWorld().getHighestBlockYAt(wallCenterPos, z-1);
 			if(highestNonAirBlockAtCenter < 3 || highestNonAirBlockAtCenter > 125 - lobbyHeight) 
-				highestNonAirBlockAtCenter = warzone.getNorthwest().getBlockY();
+				highestNonAirBlockAtCenter = warzone.getVolume().getCenterY();
 			lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(wallCenterPos, highestNonAirBlockAtCenter, z));
 			corner1 = warzone.getWorld().getBlockAt(wallCenterPos + lobbyHalfSide, highestNonAirBlockAtCenter - 1, z);
 			corner2 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, highestNonAirBlockAtCenter + 1 + lobbyHeight, z + lobbyDepth);

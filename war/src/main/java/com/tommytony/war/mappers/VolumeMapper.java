@@ -22,6 +22,7 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.volumes.BlockInfo;
 import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
+import com.tommytony.war.volumes.ZoneVolume;
 
 /**
  * 
@@ -40,6 +41,13 @@ public class VolumeMapper {
 	public static VerticalVolume loadVerticalVolume(String volumeName, String zoneName,
 			War war, World world) {
 		VerticalVolume volume = new VerticalVolume(volumeName, war, world);
+		load(volume, zoneName, war, world);
+		return volume;
+	}
+	
+	public static ZoneVolume loadZoneVolume(String volumeName, String zoneName,
+			War war, World world) {
+		ZoneVolume volume = new ZoneVolume(volumeName, war, world);
 		load(volume, zoneName, war, world);
 		return volume;
 	}

@@ -20,6 +20,7 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
+import com.tommytony.war.volumes.ZoneVolume;
 
 /**
  * 
@@ -64,29 +65,6 @@ public class WarzoneMapper {
 					//war.getLogger().info("Failed to reload warzone-" + name + ".txt file after creating it.");
 					e.printStackTrace();
 				}
-			}
-					
-			// northwest
-			String nwStr = warzoneConfig.getString("northWest");
-			if(nwStr != null && !nwStr.equals("")) {
-				String[] nwStrSplit = nwStr.split(",");
-				
-				int nwX = Integer.parseInt(nwStrSplit[0]);
-				int nwY = Integer.parseInt(nwStrSplit[1]);
-				int nwZ = Integer.parseInt(nwStrSplit[2]);
-				Location nw = new Location(world, nwX, nwY, nwZ);
-				warzone.setNorthwest(nw);
-			}
-			
-			// southeast
-			String seStr = warzoneConfig.getString("southEast");
-			if(nwStr != null && !nwStr.equals("")) {
-				String[] seStrSplit = seStr.split(",");
-				int seX = Integer.parseInt(seStrSplit[0]);
-				int seY = Integer.parseInt(seStrSplit[1]);
-				int seZ = Integer.parseInt(seStrSplit[2]);
-				Location se = new Location(world, seX, seY, seZ);
-				warzone.setSoutheast(se);
 			}
 			
 			// teleport
@@ -262,10 +240,10 @@ public class WarzoneMapper {
 			
 			warzoneConfig.close();
 			
-			if(loadBlocks && warzone.getNorthwest() != null && warzone.getSoutheast() != null) {
+			if(loadBlocks) {
 				
 				// zone blocks 
-				VerticalVolume zoneVolume = VolumeMapper.loadVerticalVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld());
+				ZoneVolume zoneVolume = VolumeMapper.loadZoneVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld());
 				warzone.setVolume(zoneVolume);
 			}
 		
@@ -314,22 +292,6 @@ public class WarzoneMapper {
 		
 		// world
 		warzoneConfig.setString("world", warzone.getWorld().getName());	// default for now
-		
-		// northwest
-		String nwStr = "";
-		Location nw = warzone.getNorthwest();
-		if(nw != null) {
-			nwStr = nw.getBlockX() + "," + nw.getBlockY() + "," + nw.getBlockZ();
-		}
-		warzoneConfig.setString("northWest", nwStr);
-		
-		// southeast
-		String seStr = "";
-		Location se = warzone.getSoutheast();
-		if(se != null) {
-			seStr = se.getBlockX() + "," + se.getBlockY() + "," + se.getBlockZ();
-		}
-		warzoneConfig.setString("southEast", seStr);
 		
 		// teleport
 		String teleportStr = "";

@@ -12,6 +12,8 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.volumes.BlockInfo;
 import com.tommytony.war.volumes.NotNorthwestException;
 import com.tommytony.war.volumes.NotSoutheastException;
+import com.tommytony.war.volumes.TooBigException;
+import com.tommytony.war.volumes.TooSmallException;
 import com.tommytony.war.volumes.ZoneVolume;
 
 public class ZoneVolumeSpec {
@@ -19,7 +21,7 @@ public class ZoneVolumeSpec {
 	// setNorthwest
 	
 	@Test
-	public void setNorthwest_whenCreatingAndNoCornersAreSet_shouldSetCorner1AtTop() throws NotNorthwestException{
+	public void setNorthwest_whenCreatingAndNoCornersAreSet_shouldSetCorner1AtTop() throws NotNorthwestException, TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -44,7 +46,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setNorthwest_whenCreating_AndNoCorner1IsSet_ButCorner2Set_AndNewCornerBlockIsToEastOfCorner2_shouldThrowNotNorthwestException(){
+	public void setNorthwest_whenCreating_AndNoCorner1IsSet_ButCorner2Set_AndNewCornerBlockIsToEastOfCorner2_shouldThrowNotNorthwestException() throws TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -75,7 +77,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setNorthwest_whenCreating_AndNoCorner1IsSet_ButCorner2Set_AndNewCornerBlockIsToSouthOfCorner2_shouldThrowNotNorthwestException(){
+	public void setNorthwest_whenCreating_AndNoCorner1IsSet_ButCorner2Set_AndNewCornerBlockIsToSouthOfCorner2_shouldThrowNotNorthwestException() throws TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -106,7 +108,69 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setNorthwest_whenCreatingAndCorner1AlreadySet_shouldSetCorner2AtTop() throws NotNorthwestException{  // nw always goes to top
+	public void setNorthwest_whenCreating_AndNoCorner1IsSet_ButCorner2Set_AndNewCornerBlockIsTooCloseToCorner2_shouldThrowTooSmallException() throws NotNorthwestException, TooBigException{
+		// Arrange
+		War warMock = mock(War.class);
+		World worldMock = mock(World.class);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Block blockMock = mock(Block.class);
+		when(blockMock.getX()).thenReturn(-5); // further south
+		when(blockMock.getY()).thenReturn(64);	// at sea level
+		when(blockMock.getZ()).thenReturn(5);	// further west
+		when(blockMock.getTypeId()).thenReturn(10);
+		when(blockMock.getData()).thenReturn((byte)2);
+		
+		// Act
+		BlockInfo existingCorner2 = new BlockInfo(0, 64, 0, 4, (byte)4);
+		volume.setCornerTwo(existingCorner2);	// corner 2 already set
+		boolean failed = false;
+		try {
+			volume.setNorthwest(blockMock);	
+		}
+		catch(TooSmallException e) {
+			failed = true;
+		}
+		
+		// Assert
+		// first corner shouldn't move
+		assertTrue(failed);
+		assertEquals(null, volume.getCornerOne());
+		assertEquals(existingCorner2, volume.getCornerTwo());
+	}
+	
+	@Test
+	public void setNorthwest_whenCreating_AndNoCorner1IsSet_ButCorner2Set_AndNewCornerBlockIsTooFarFromCorner2_shouldThrowTooBigException() throws NotNorthwestException, TooSmallException{
+		// Arrange
+		War warMock = mock(War.class);
+		World worldMock = mock(World.class);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Block blockMock = mock(Block.class);
+		when(blockMock.getX()).thenReturn(-1000); // further south
+		when(blockMock.getY()).thenReturn(64);	// at sea level
+		when(blockMock.getZ()).thenReturn(1000);	// further west
+		when(blockMock.getTypeId()).thenReturn(10);
+		when(blockMock.getData()).thenReturn((byte)2);
+		
+		// Act
+		BlockInfo existingCorner2 = new BlockInfo(0, 64, 0, 4, (byte)4);
+		volume.setCornerTwo(existingCorner2);	// corner 2 already set
+		boolean failed = false;
+		try {
+			volume.setNorthwest(blockMock);	
+		}
+		catch(TooBigException e) {
+			failed = true;
+		}
+		
+		// Assert
+		// first corner shouldn't move
+		assertTrue(failed);
+		assertEquals(null, volume.getCornerOne());
+		assertEquals(existingCorner2, volume.getCornerTwo());
+	}
+	
+	@Test
+	public void setNorthwest_whenCreatingAndCorner1AlreadySet_shouldSetCorner2AtTop() throws NotNorthwestException, TooSmallException, TooBigException{  // nw always goes to top
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -139,7 +203,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setNorthwest_whenCreating_AndCorner1AlreadySet_ButNewCornerBlockIsEastOfCorner1_shouldThrowNotNorthwestException(){
+	public void setNorthwest_whenCreating_AndCorner1AlreadySet_ButNewCornerBlockIsEastOfCorner1_shouldThrowNotNorthwestException() throws TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -170,7 +234,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setNorthwest_whenCreating_AndCorner1AlreadySet_ButNewCornerBlockIsSouthOfCorner1_shouldThrowNotNorthwestException(){
+	public void setNorthwest_whenCreating_AndCorner1AlreadySet_ButNewCornerBlockIsSouthOfCorner1_shouldThrowNotNorthwestException() throws TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -201,7 +265,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setNorthwest_whenChangingVolumeWithCorner1NwCorner2Se_shouldMoveCorner1() throws NotNorthwestException{
+	public void setNorthwest_whenChangingVolumeWithCorner1NwCorner2Se_shouldMoveCorner1() throws NotNorthwestException, TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -237,7 +301,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setNorthwest_whenChangingVolumeWithCorner1SeCorner2Nw_shouldMoveCorner2() throws NotNorthwestException{
+	public void setNorthwest_whenChangingVolumeWithCorner1SeCorner2Nw_shouldMoveCorner2() throws NotNorthwestException, TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -273,7 +337,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setNorthwest_whenChangingVolumeWithCorner1NeCorner2Sw_shouldMoveCorner1XAndCorner2Z() throws NotNorthwestException{
+	public void setNorthwest_whenChangingVolumeWithCorner1NeCorner2Sw_shouldMoveCorner1XAndCorner2Z() throws NotNorthwestException, TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -309,7 +373,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setNorthwest_whenChangingVolumeWithCorner1SwCorner2Ne_shouldMoveCorner1ZAndCorner2X() throws NotNorthwestException{
+	public void setNorthwest_whenChangingVolumeWithCorner1SwCorner2Ne_shouldMoveCorner1ZAndCorner2X() throws NotNorthwestException, TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -351,7 +415,7 @@ public class ZoneVolumeSpec {
 	// setSoutheast
 	
 	@Test
-	public void setSoutheast_whenCreatingAndNoCornersAreSet_shouldSetCorner2AtBottom() throws NotSoutheastException{
+	public void setSoutheast_whenCreatingAndNoCornersAreSet_shouldSetCorner2AtBottom() throws NotSoutheastException, TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -376,7 +440,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setSoutheast_whenCreatingAndNoCorner2IsSet_ButCorner1IsAlreadySet_AndNewCornerBlockIsToWestOfCorner1_shouldThrowNotSoutheastException(){
+	public void setSoutheast_whenCreatingAndNoCorner2IsSet_ButCorner1IsAlreadySet_AndNewCornerBlockIsToWestOfCorner1_shouldThrowNotSoutheastException() throws TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -407,7 +471,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setSoutheast_whenCreatingAndNoCorner2IsSet_ButCorner1IsAlreadySet_AndNewCornerBlockIsToNorthOfCorner1_shouldThrowNotSoutheastException(){
+	public void setSoutheast_whenCreatingAndNoCorner2IsSet_ButCorner1IsAlreadySet_AndNewCornerBlockIsToNorthOfCorner1_shouldThrowNotSoutheastException() throws TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -438,7 +502,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setSoutheast_whenCreatingAndCorner2AlreadySet_shouldSetCorner1AtBottom() throws NotSoutheastException{	// se always goes to bottom
+	public void setSoutheast_whenCreatingAndCorner2AlreadySet_shouldSetCorner1AtBottom() throws NotSoutheastException, TooSmallException, TooBigException{	// se always goes to bottom
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -471,7 +535,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setSoutheast_whenCreating_AndCorner2AlreadySet_ButNewCornerBlockIsToWestOfCorner2_shouldThrowNotSoutheastException(){
+	public void setSoutheast_whenCreating_AndCorner2AlreadySet_ButNewCornerBlockIsToWestOfCorner2_shouldThrowNotSoutheastException() throws TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -502,7 +566,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setSoutheast_whenCreating_AndCorner2AlreadySet_ButNewCornerBlockIsToNorthOfCorner2_shouldThrowNotSoutheastException(){
+	public void setSoutheast_whenCreating_AndCorner2AlreadySet_ButNewCornerBlockIsToNorthOfCorner2_shouldThrowNotSoutheastException() throws TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -533,7 +597,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setSoutheast_whenChangingVolumeWithCorner1NwCorner2Se_shouldMoveCorner2() throws NotSoutheastException{
+	public void setSoutheast_whenChangingVolumeWithCorner1NwCorner2Se_shouldMoveCorner2() throws NotSoutheastException, TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -569,7 +633,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setSoutheast_whenChangingVolumeWithCorner1SeCorner2Nw_shouldMoveCorner1() throws NotSoutheastException{
+	public void setSoutheast_whenChangingVolumeWithCorner1SeCorner2Nw_shouldMoveCorner1() throws NotSoutheastException, TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -605,7 +669,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setSoutheast_whenChangingVolumeWithCorner1NeCorner2Sw_shouldMoveCorner1ZAndCorner2X() throws NotSoutheastException{
+	public void setSoutheast_whenChangingVolumeWithCorner1NeCorner2Sw_shouldMoveCorner1ZAndCorner2X() throws NotSoutheastException, TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
@@ -641,7 +705,7 @@ public class ZoneVolumeSpec {
 	}
 	
 	@Test
-	public void setSoutheast_whenChangingVolumeWithCorner1SwCorner2Ne_shouldMoveCorner1XAndCorner2Z() throws NotSoutheastException{
+	public void setSoutheast_whenChangingVolumeWithCorner1SwCorner2Ne_shouldMoveCorner1XAndCorner2Z() throws NotSoutheastException, TooSmallException, TooBigException{
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);

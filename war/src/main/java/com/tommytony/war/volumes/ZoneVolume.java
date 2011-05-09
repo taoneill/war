@@ -7,16 +7,22 @@ import org.bukkit.block.BlockFace;
 
 import bukkit.tommytony.war.War;
 
+/**
+ * 
+ * @author tommytony
+ *
+ */
 public class ZoneVolume extends Volume {
 
 	public ZoneVolume(String name, War war, World world) {
 		super(name, war, world);
-		// TODO Auto-generated constructor stub
 	}
 
-	public void setNorthwest(Block block) throws NotNorthwestException {
+	public void setNorthwest(Block block) throws NotNorthwestException, TooSmallException, TooBigException {
 		// northwest defaults to top block
 		BlockInfo topBlock = new BlockInfo(block.getX(), 127, block.getZ(), block.getTypeId(), block.getData());
+		BlockInfo oldCornerOne = getCornerOne();
+		BlockInfo oldCornerTwo = getCornerTwo();
 		if(getCornerOne() == null)
 		{
 			if(getCornerTwo() == null) {
@@ -35,17 +41,45 @@ public class ZoneVolume extends Volume {
 			}
 			super.setCornerTwo(topBlock);
 		} else {
-			// both corners already set: we are resizing
+			// both corners already set: we are resizing (only if the new block is northwest relative to the southeasternmost block)
+			if (getSoutheastX() <= block.getX() || getSoutheastZ() >= block.getZ()) {
+				throw new NotNorthwestException();
+			}
 			BlockInfo minXBlock = getMinXBlock(); // north means min X
 			minXBlock.setX(block.getX());	// mutating, argh!
 			BlockInfo maxZBlock = getMaxZBlock(); // west means max Z
 			maxZBlock.setZ(block.getZ());
 		}
+		if(tooSmall()) {
+			super.setCornerOne(oldCornerOne);
+			super.setCornerTwo(oldCornerTwo);
+			throw new TooSmallException();
+		} else if (tooBig()) {
+			super.setCornerOne(oldCornerOne);
+			super.setCornerTwo(oldCornerTwo);
+			throw new TooBigException();
+		}
 	}
 	
-	public void setSoutheast(Block block) throws NotSoutheastException {
+	public int getNorthwestX() {
+		if(!hasTwoCorners())
+			return 0;
+		else
+			return getMinX();
+	}
+	
+	public int getNorthwestZ() {
+		if(!hasTwoCorners())
+			return 0;
+		else
+			return getMaxZ();
+	}
+	
+	public void setSoutheast(Block block) throws NotSoutheastException, TooSmallException, TooBigException {
 		// southeast defaults to bottom block
 		BlockInfo bottomBlock = new BlockInfo(block.getX(), 0, block.getZ(), block.getTypeId(), block.getData());
+		BlockInfo oldCornerOne = getCornerOne();
+		BlockInfo oldCornerTwo = getCornerTwo();
 		if(getCornerTwo() == null)
 		{
 			if(getCornerOne() == null) {
@@ -64,12 +98,85 @@ public class ZoneVolume extends Volume {
 			}
 			super.setCornerOne(bottomBlock);
 		} else {
-			// both corners already set: we are resizing
+			// both corners already set: we are resizing (only if the new block is southeast relative to the northwesternmost block)
+			if (getNorthwestX() >= block.getX() || getNorthwestZ() <= block.getZ()) {
+				throw new NotSoutheastException();
+			}
 			BlockInfo maxXBlock = getMaxXBlock(); // south means max X
 			maxXBlock.setX(block.getX());	// mutating, argh!
 			BlockInfo minZBlock = getMinZBlock(); // east means min Z
 			minZBlock.setZ(block.getZ());
 		}
+		if(tooSmall()) {
+			super.setCornerOne(oldCornerOne);
+			super.setCornerTwo(oldCornerTwo);
+			throw new TooSmallException();
+		} else if (tooBig()) {
+			super.setCornerOne(oldCornerOne);
+			super.setCornerTwo(oldCornerTwo);
+			throw new TooBigException();
+		}
+		
+	}
+	
+	public int getSoutheastX() {
+		if(!hasTwoCorners())
+			return 0;
+		else
+			return getMaxX();
+	}
+	
+	public int getSoutheastZ() {
+		if(!hasTwoCorners())
+			return 0;
+		else
+			return getMinZ();
+	}
+
+	public int getCenterY() {
+		if(!hasTwoCorners())
+			return 0;
+		else
+			return (getMaxY() - getMinY())/2;
+			
+	}
+	
+	public void setZoneCornerOne(Block block) throws TooSmallException, TooBigException {
+		BlockInfo oldCornerOne = getCornerOne();
+		super.setCornerOne(block);
+		if(tooSmall()) {
+			super.setCornerOne(oldCornerOne);
+			throw new TooSmallException();
+		} else if (tooBig()) {
+			super.setCornerOne(oldCornerOne);
+			throw new TooBigException();
+		}
+	}
+	
+	public void setZoneCornerTwo(Block block) throws TooSmallException, TooBigException {
+		BlockInfo oldCornerTwo = getCornerTwo();
+		super.setCornerTwo(block);
+		if(tooSmall()) {
+			super.setCornerTwo(oldCornerTwo);
+			throw new TooSmallException();
+		} else if (tooBig()) {
+			super.setCornerTwo(oldCornerTwo);
+			throw new TooBigException();
+		}
+	}
+	
+	public boolean tooSmall() {
+		if(hasTwoCorners() && ((getMaxX() - getMinX() < 10)
+			|| (getMaxY() - getMinY() < 10)
+			|| (getMaxZ() - getMinZ() < 10))) return true;
+		return false;
+	}
+	
+	public boolean tooBig() {
+		if(hasTwoCorners() && ((getMaxX() - getMinX() > 750)
+				|| (getMaxY() - getMinY() > 750)
+				|| (getMaxZ() - getMinZ() > 750))) return true;
+		return false;
 	}
 	
 	public boolean isWallBlock(Block block){
@@ -267,18 +374,11 @@ public class ZoneVolume extends Volume {
 			) {
 				currentBlock.setTypeId(oldBlockType);
 				currentBlock.setData(oldBlockData);
-//				if(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST)) {
-//					BlockState state = currentBlock.getState();
-//					Sign currentSign = (Sign) state;
-//					currentSign.setLine(0, oldBlockInfo.getSignLines()[0]);
-//					currentSign.setLine(1, oldBlockInfo.getSignLines()[0]);
-//					currentSign.setLine(2, oldBlockInfo.getSignLines()[0]);
-//					currentSign.setLine(3, oldBlockInfo.getSignLines()[0]);
-//					state.update();
-//				}
+				// TODO: reset wall signs, chests and dispensers properly like in resetBlocks
 				return true;
 			}
 		return false;
 	}
+
 
 }
