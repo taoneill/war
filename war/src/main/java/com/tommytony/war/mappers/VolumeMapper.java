@@ -11,16 +11,11 @@ import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Chest;
-import org.bukkit.block.Dispenser;
-import org.bukkit.block.Sign;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
 import bukkit.tommytony.war.War;
 
-import com.tommytony.war.volumes.BlockInfo;
-import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
 import com.tommytony.war.volumes.ZoneVolume;
 
@@ -34,13 +29,6 @@ public class VolumeMapper {
 	public static Volume loadVolume(String volumeName, String zoneName,
 			War war, World world) {
 		Volume volume = new Volume(volumeName, war, world);
-		load(volume, zoneName, war, world);
-		return volume;
-	}
-
-	public static VerticalVolume loadVerticalVolume(String volumeName, String zoneName,
-			War war, World world) {
-		VerticalVolume volume = new VerticalVolume(volumeName, war, world);
 		load(volume, zoneName, war, world);
 		return volume;
 	}

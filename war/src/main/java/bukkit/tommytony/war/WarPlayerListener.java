@@ -7,10 +7,8 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInventoryEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
@@ -22,11 +20,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamKinds;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.jobs.RestoreDeadmanInventoryJob;
 import com.tommytony.war.utils.InventoryStash;
 
 
@@ -232,7 +228,6 @@ public class WarPlayerListener extends PlayerListener {
 			Warzone zone = locLobby.getZone(); 
 			Team oldTeam = war.getPlayerTeam(player.getName());
 			boolean isAutoAssignGate = false;
-			boolean isSomeTeamGate = false;
 			if(oldTeam == null && canPlay) { // trying to counter spammy player move
 				isAutoAssignGate = zone.getLobby().isAutoAssignGate(playerLoc);
 				if(isAutoAssignGate) {
@@ -287,7 +282,6 @@ public class WarPlayerListener extends PlayerListener {
 							event.setCancelled(true);
 							war.badMsg(player, "Team " + team.getName() + " is full.");
 						}
-						isSomeTeamGate = true;
 						return;
 					}
 				}

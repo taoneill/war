@@ -8,7 +8,6 @@ public class RestoreDeadmanInventoryJob implements Runnable {
 
 	private final Player player;
 	private final Warzone zone;
-	private boolean giveReward;
 
 	public RestoreDeadmanInventoryJob(Player player, Warzone zone) {
 		this.player = player;

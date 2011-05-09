@@ -17,12 +17,8 @@ import bukkit.tommytony.war.War;
 
 import com.tommytony.war.jobs.InitZoneJob;
 import com.tommytony.war.jobs.LoadoutResetJob;
-import com.tommytony.war.jobs.ResetCursorJob;
-import com.tommytony.war.jobs.RespawnPlayerJob;
 import com.tommytony.war.jobs.ScoreCapReachedJob;
 import com.tommytony.war.utils.InventoryStash;
-import com.tommytony.war.volumes.BlockInfo;
-import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
@@ -624,20 +620,40 @@ public class Warzone {
 		if(volume.hasTwoCorners()) {
 			if(Math.abs(volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall 
 					&& latestPlayerLocation.getBlockX() <= volume.getSoutheastX()
-					&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()) {
+					&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()
+					&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+					&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 				return true; 	// near east wall
 			} else if (Math.abs(volume.getSoutheastX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
 					&& latestPlayerLocation.getBlockZ() <= volume.getNorthwestZ()
-					&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()) {
+					&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()
+					&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+					&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 				return true;	// near south wall
 			} else if (Math.abs(volume.getNorthwestX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
 					&& latestPlayerLocation.getBlockZ() <= volume.getNorthwestZ()
-					&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()) {
+					&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()
+					&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+					&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 				return true;	// near north wall
 			} else if (Math.abs(volume.getNorthwestZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall
 					&& latestPlayerLocation.getBlockX() <= volume.getSoutheastX()
-					&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()) {
+					&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()
+					&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+					&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 				return true;	// near west wall
+			} else if (Math.abs(volume.getMaxY() - latestPlayerLocation.getBlockY()) < minSafeDistanceFromWall
+					&& latestPlayerLocation.getBlockX() <= volume.getMaxX()
+					&& latestPlayerLocation.getBlockX() >= volume.getMinX()
+					&& latestPlayerLocation.getBlockZ() <= volume.getMaxZ()
+					&& latestPlayerLocation.getBlockZ() >= volume.getMinZ()) {
+				return true;	// near up wall
+			} else if (Math.abs(volume.getMinY() - latestPlayerLocation.getBlockY()) < minSafeDistanceFromWall
+					&& latestPlayerLocation.getBlockX() <= volume.getMaxX()
+					&& latestPlayerLocation.getBlockX() >= volume.getMinX()
+					&& latestPlayerLocation.getBlockZ() <= volume.getMaxZ()
+					&& latestPlayerLocation.getBlockZ() >= volume.getMinZ()) {
+				return true;	// near down wall
 			}
 		}
 		return false;
@@ -647,15 +663,19 @@ public class Warzone {
 		List<Block> nearestWallBlocks = new ArrayList<Block>();
 		if(Math.abs(volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall 
 				&& latestPlayerLocation.getBlockX() <= volume.getSoutheastX()
-				&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()) {
+				&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()
+				&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+				&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 			// near east wall
-			Block eastWallBlock = world.getBlockAt(latestPlayerLocation.getBlockX() + 1, latestPlayerLocation.getBlockY(), volume.getSoutheastZ());
+			Block eastWallBlock = world.getBlockAt(latestPlayerLocation.getBlockX() + 1, latestPlayerLocation.getBlockY() + 1, volume.getSoutheastZ());
 			nearestWallBlocks.add(eastWallBlock);
 		}
 		
 		if (Math.abs(volume.getSoutheastX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
 				&& latestPlayerLocation.getBlockZ() <= volume.getNorthwestZ()
-				&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()) {
+				&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()
+				&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+				&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 			// near south wall
 			Block southWallBlock = world.getBlockAt(volume.getSoutheastX(), latestPlayerLocation.getBlockY() + 1, latestPlayerLocation.getBlockZ());
 			nearestWallBlocks.add(southWallBlock);
@@ -663,7 +683,9 @@ public class Warzone {
 		
 		if (Math.abs(volume.getNorthwestX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
 				&& latestPlayerLocation.getBlockZ() <= volume.getNorthwestZ()
-				&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()) {
+				&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()
+				&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+				&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 			// near north wall
 			Block northWallBlock = world.getBlockAt(volume.getNorthwestX(), latestPlayerLocation.getBlockY() + 1, latestPlayerLocation.getBlockZ());
 			nearestWallBlocks.add(northWallBlock);
@@ -671,10 +693,32 @@ public class Warzone {
 		
 		if (Math.abs(volume.getNorthwestZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall
 				&& latestPlayerLocation.getBlockX() <= volume.getSoutheastX()
-				&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()) {
+				&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()
+				&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+				&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 			// near west wall
 			Block westWallBlock = world.getBlockAt(latestPlayerLocation.getBlockX(), latestPlayerLocation.getBlockY() + 1, volume.getNorthwestZ());
 			nearestWallBlocks.add(westWallBlock);
+		}
+		
+		if (Math.abs(volume.getMaxY() - latestPlayerLocation.getBlockY()) < minSafeDistanceFromWall
+				&& latestPlayerLocation.getBlockX() <= volume.getMaxX()
+				&& latestPlayerLocation.getBlockX() >= volume.getMinX()
+				&& latestPlayerLocation.getBlockZ() <= volume.getMaxZ()
+				&& latestPlayerLocation.getBlockZ() >= volume.getMinZ()) {
+			// near up wall
+			Block upWallBlock = world.getBlockAt(latestPlayerLocation.getBlockX(), volume.getMaxY(), latestPlayerLocation.getBlockZ());
+			nearestWallBlocks.add(upWallBlock);
+		}
+		
+		if (Math.abs(volume.getMinY() - latestPlayerLocation.getBlockY()) < minSafeDistanceFromWall
+				&& latestPlayerLocation.getBlockX() <= volume.getMaxX()
+				&& latestPlayerLocation.getBlockX() >= volume.getMinX()
+				&& latestPlayerLocation.getBlockZ() <= volume.getMaxZ()
+				&& latestPlayerLocation.getBlockZ() >= volume.getMinZ()) {
+			// near down wall
+			Block downWallBlock = world.getBlockAt(latestPlayerLocation.getBlockX(), volume.getMinY(), latestPlayerLocation.getBlockZ());
+			nearestWallBlocks.add(downWallBlock);
 		}
 		return nearestWallBlocks;
 		// note: y + 1 to line up 3 sided square with player eyes
@@ -684,30 +728,56 @@ public class Warzone {
 		List<BlockFace> walls = new ArrayList<BlockFace>();
 		if(Math.abs(volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall 
 				&& latestPlayerLocation.getBlockX() <= volume.getSoutheastX()
-				&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()) {
+				&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()
+				&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+				&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 			// near east wall
 			walls.add(BlockFace.EAST);
 		} 
 		
 		if (Math.abs(volume.getSoutheastX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
 				&& latestPlayerLocation.getBlockZ() <= volume.getNorthwestZ()
-				&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()) {
+				&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()
+				&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+				&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 			// near south wall
 			walls.add(BlockFace.SOUTH); 	
 		}
 
 		if (Math.abs(volume.getNorthwestX() - latestPlayerLocation.getBlockX()) < minSafeDistanceFromWall
 				&& latestPlayerLocation.getBlockZ() <= volume.getNorthwestZ()
-				&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()) {
+				&& latestPlayerLocation.getBlockZ() >= volume.getSoutheastZ()
+				&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+				&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 			// near north wall
 			walls.add(BlockFace.NORTH);
 		} 
 
 		if (Math.abs(volume.getNorthwestZ() - latestPlayerLocation.getBlockZ()) < minSafeDistanceFromWall
 				&& latestPlayerLocation.getBlockX() <= volume.getSoutheastX()
-				&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()) {
+				&& latestPlayerLocation.getBlockX() >= volume.getNorthwestX()
+				&& latestPlayerLocation.getBlockY() >= volume.getMinY()
+				&& latestPlayerLocation.getBlockY() <= volume.getMaxY()) {
 			// near west wall
 			walls.add(BlockFace.WEST);
+		}
+		
+		if (Math.abs(volume.getMaxY() - latestPlayerLocation.getBlockY()) < minSafeDistanceFromWall
+				&& latestPlayerLocation.getBlockX() <= volume.getMaxX()
+				&& latestPlayerLocation.getBlockX() >= volume.getMinX()
+				&& latestPlayerLocation.getBlockZ() <= volume.getMaxZ()
+				&& latestPlayerLocation.getBlockZ() >= volume.getMinZ()) {
+			// near up wall
+			walls.add(BlockFace.UP);
+		}
+		
+		if (Math.abs(volume.getMinY() - latestPlayerLocation.getBlockY()) < minSafeDistanceFromWall
+				&& latestPlayerLocation.getBlockX() <= volume.getMaxX()
+				&& latestPlayerLocation.getBlockX() >= volume.getMinX()
+				&& latestPlayerLocation.getBlockZ() <= volume.getMaxZ()
+				&& latestPlayerLocation.getBlockZ() >= volume.getMinZ()) {
+			// near down wall
+			walls.add(BlockFace.DOWN);
 		}
 		return walls;
 	}
@@ -742,7 +812,6 @@ public class Warzone {
 		for(ZoneWallGuard guard : zoneWallGuards) {
 			if(guard.getPlayer().getName().equals(player.getName())){
 				playerGuards.add(guard);
-				int reset = volume.resetWallBlocks(guard.getWall()); // this should restore old blocks
 				if(isDrawZoneOutline()) {
 					addZoneOutline(guard.getWall());
 				}
@@ -751,7 +820,6 @@ public class Warzone {
 													// because player can go around corner
 					lobby.initialize();
 				}
-				//war.getLogger().info("Reset " + reset + " blocks in " + guard.getWall() + " wall of warzone " + name);
 			}
 		}
 		// now remove those zone guards
@@ -835,8 +903,6 @@ public class Warzone {
 		if(playerTeam != null && playerWarzone != null) {
 	    	// teleport to team spawn upon death
 			war.msg(player, "You died.");
-			boolean newBattle = false;
-			boolean scoreCapReached = false;
 			playerWarzone.respawnPlayer(playerTeam, player);
 			int remaining = playerTeam.getRemainingLifes();
 			if(remaining == 0) { // your death caused your team to lose
@@ -879,7 +945,6 @@ public class Warzone {
 					// we dont restore his inventory in handleScoreCapReached
 					// check out PLAYER_MOVE for the rest of the fix
 					
-					scoreCapReached = true;
 				} else {
 					// A new battle starts. Reset the zone but not the teams.
 					for(Team t : teams) {
@@ -887,7 +952,6 @@ public class Warzone {
 					}
 					playerWarzone.getVolume().resetBlocksAsJob();
 					playerWarzone.initializeZoneAsJob(player);
-					newBattle = true;
 				}
 			} else {
 				// player died without causing his team's demise

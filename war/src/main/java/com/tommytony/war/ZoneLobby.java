@@ -6,16 +6,13 @@ import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.CraftWorld;
 
 import bukkit.tommytony.war.War;
 
 import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.BlockInfo;
-import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
 import com.tommytony.war.volumes.ZoneVolume;
 
@@ -192,7 +189,6 @@ public class ZoneLobby {
 			
 			// add team gates or single auto assign gate
 			placeAutoAssignGate();
-			int i = 0;
 			for(String teamName : teamGateBlocks.keySet()) {
 				BlockInfo gateInfo = teamGateBlocks.get(teamName);
 				placeGate(BlockInfo.getBlock(warzone.getWorld(), gateInfo), TeamKinds.teamKindFromString(teamName));

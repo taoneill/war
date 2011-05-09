@@ -7,10 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
-import org.bukkit.material.MaterialData;
 
 import bukkit.tommytony.war.War;
 
@@ -64,6 +61,7 @@ public class Team {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public void initializeTeamSpawn() {
 		// make air
 		this.spawnVolume.setToMaterial(Material.AIR);
@@ -426,6 +424,7 @@ public class Team {
 		this.flagVolume.setCornerTwo(warzone.getWorld().getBlockAt(x+1, y+3, z+1));
 	}
 
+	@SuppressWarnings("unused")
 	public void initializeTeamFlag() {
 		// make air
 		this.flagVolume.setToMaterial(Material.AIR);

@@ -439,7 +439,6 @@ public class War extends JavaPlugin {
 			} else {
 				lobby = warzone.getLobby();
 			}
-			List<Team> teams = warzone.getTeams();
 			Team team = warzone.getTeamByKind(TeamKinds.teamKindFromString(name));
 			if(team != null) {
 				if(team.getFlagVolume() != null) team.getFlagVolume().resetBlocks();
@@ -467,7 +466,6 @@ public class War extends JavaPlugin {
 					"Must be in a warzone (try /zones and /zone). ");
 		} else {
 			TeamKind kind = TeamKinds.teamKindFromString(arguments[0]);	
-			String name = arguments[0];
 			Warzone warzone = this.warzone(player.getLocation());
 			Team team = warzone.getTeamByKind(kind);
 			if(team == null) {
@@ -573,7 +571,6 @@ public class War extends JavaPlugin {
 			} else {
 				lobby = warzone.getLobby();
 			}
-			int resetBlocks = 0;
 			warzone.clearFlagThieves();
 			for(Team team: warzone.getTeams()) {
 				team.teamcast("The war has ended. " + playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams...");
@@ -1373,7 +1370,7 @@ public class War extends JavaPlugin {
 
 	public Warzone zoneOfZoneWallAtProximity(Location location) {
 		for(Warzone zone : warzones) {
-			if(zone.isNearWall(location)) return zone;
+			if(zone.getWorld() == location.getWorld() && zone.isNearWall(location)) return zone;
 		}
 		return null;
 	}
@@ -1382,6 +1379,7 @@ public class War extends JavaPlugin {
 		return zoneMakerNames;
 	}
 	
+	@SuppressWarnings("static-access")
 	public boolean canPlayWar(Player player) {
 		if(Permissions != null 
 				&& (Permissions.Security.permission(player, "war.player")
@@ -1395,6 +1393,7 @@ public class War extends JavaPlugin {
 		return false;
 	}
 	
+	@SuppressWarnings("static-access")
 	public boolean canWarp(Player player) {
 		if(Permissions != null 
 				&& (Permissions.Security.permission(player, "war.warp")
@@ -1408,6 +1407,7 @@ public class War extends JavaPlugin {
 		return false;
 	}
 	
+	@SuppressWarnings("static-access")
 	public boolean canBuildOutsideZone(Player player) {
 		if(isBuildInZonesOnly()) {
 			if(Permissions != null 
@@ -1422,6 +1422,7 @@ public class War extends JavaPlugin {
 		}
 	}
 	
+	@SuppressWarnings("static-access")
 	public boolean isZoneMaker(Player player) {
 		boolean isPlayerImpersonator = false;
 		for(String disguised : zoneMakersImpersonatingPlayers) {
@@ -1524,6 +1525,7 @@ public class War extends JavaPlugin {
 		return zoneMakersImpersonatingPlayers;
 	}
 	
+	@SuppressWarnings("static-access")
 	public void setupPermissions() {
 		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
 

@@ -18,7 +18,6 @@ import com.tommytony.war.TeamKinds;
 import com.tommytony.war.TeamSpawnStyles;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.volumes.VerticalVolume;
 import com.tommytony.war.volumes.Volume;
 import com.tommytony.war.volumes.ZoneVolume;
 

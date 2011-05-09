@@ -32,7 +32,6 @@ public class WarBlockListener extends BlockListener {
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
     	Block block = event.getBlock();
-    	boolean captured = false;
     	if(player != null && block != null) {
 			Team team = war.getPlayerTeam(player.getName()); 
 			Warzone zone = war.warzone(player.getLocation());
