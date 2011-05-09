@@ -241,7 +241,7 @@ public class ZoneVolume extends Volume {
 	}
 	
 	public boolean isDownWallBlock(Block block) {
-		if (getMaxY() == block.getY()
+		if (getMinY() == block.getY()
 				&& block.getX() <= getMaxX()
 				&& block.getX() >= getMinX()
 				&& block.getZ() >= getMinZ()

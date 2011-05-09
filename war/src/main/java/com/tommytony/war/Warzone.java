@@ -29,8 +29,6 @@ import com.tommytony.war.volumes.ZoneVolume;
 public class Warzone {
 	private String name;
 	private ZoneVolume volume;
-//	private Location northwest;
-//	private Location southeast;
 	private final List<Team> teams = new ArrayList<Team>();
 	private final List<Monument> monuments = new ArrayList<Monument>();
 	
@@ -104,51 +102,6 @@ public class Warzone {
 		return name;
 	}
 
-//	public void setNorthwest(Location northwest) {
-//		this.northwest = northwest;
-//		this.volume.setCornerOne(world.getBlockAt(northwest.getBlockX(), northwest.getBlockY(), northwest.getBlockZ()));
-//		addNorthwestCursorBlocks();
-//	}
-//	
-//	private void addNorthwestCursorBlocks() {
-//		Block topNWBlock = this.world.getBlockAt(this.northwest.getBlockX(), this.northwest.getBlockY()-1, this.northwest.getBlockZ());
-//		BlockInfo[] originalNorthwestBlocks = new BlockInfo[3];
-//		originalNorthwestBlocks[0] = new BlockInfo(topNWBlock);	// save blocks for reset
-//		originalNorthwestBlocks[1] = new BlockInfo(topNWBlock.getFace(BlockFace.EAST));
-//		originalNorthwestBlocks[2] = new BlockInfo(topNWBlock.getFace(BlockFace.SOUTH));
-//		topNWBlock.setType(Material.GLASS);
-//		topNWBlock.getFace(BlockFace.EAST).setType(Material.GLASS);
-//		topNWBlock.getFace(BlockFace.SOUTH).setType(Material.GLASS);
-//		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, new ResetCursorJob(topNWBlock, originalNorthwestBlocks, false), 75);
-//	}
-//	
-//	public Location getNorthwest() {
-//		return northwest;
-//	}
-//
-//	public void setSoutheast(Location southeast) {
-//		this.southeast = southeast;
-//		this.volume.setCornerTwo(world.getBlockAt(southeast.getBlockX(), southeast.getBlockY(), southeast.getBlockZ()));
-//		addSoutheastCursorBlocks();
-//	}
-//	
-//	private void addSoutheastCursorBlocks() {
-//		Block topSEBlock = this.world.getBlockAt(this.southeast.getBlockX(), this.southeast.getBlockY()-1, this.southeast.getBlockZ());
-//		BlockInfo[] originalSoutheastBlocks = new BlockInfo[3];
-//		originalSoutheastBlocks[0] = new BlockInfo(topSEBlock);	// save block for reset
-//		originalSoutheastBlocks[1] = new BlockInfo(topSEBlock.getFace(BlockFace.WEST));
-//		originalSoutheastBlocks[2] = new BlockInfo(topSEBlock.getFace(BlockFace.NORTH));
-//		topSEBlock.setType(Material.GLASS);
-//		topSEBlock.getFace(BlockFace.WEST).setType(Material.GLASS);
-//		topSEBlock.getFace(BlockFace.NORTH).setType(Material.GLASS);
-//		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, new ResetCursorJob(topSEBlock, originalSoutheastBlocks, true), 75);
-//	}
-//	
-//	
-//	public Location getSoutheast() {
-//		return southeast;
-//	}
-
 	public void setTeleport(Location location) {
 		this.teleport = location;
 	}
@@ -212,19 +165,6 @@ public class Warzone {
 			}
 			
 			initZone();
-			
-//			// Set the zone chunks to all players
-//			World world = this.getWorld();
-//			if(world instanceof CraftWorld) {
-//				CraftWorld craftWorld = (CraftWorld)world; 
-//				// team spawns
-//				for(Team team : teams) {
-//					if(team.getPlayers().size() > 0) {
-//						craftWorld.refreshChunk(team.getTeamSpawn().getBlockX(), team.getTeamSpawn().getBlockZ());
-//					}
-//				}
-//				// dont do all the zone chunks for now
-//			}
 		}
 	}
 
@@ -258,9 +198,6 @@ public class Warzone {
 		if(lobby != null) {
 			lobby.initialize();
 		}
-		
-//		this.setNorthwest(this.getNorthwest());
-//		this.setSoutheast(this.getSoutheast());
 		
 		this.flagThieves.clear();
 	}
@@ -566,30 +503,6 @@ public class Warzone {
 		return false;
 	}
 
-//	private boolean teleportNear(Block block) {
-//		if(teleport != null) {
-//			int x = (int)this.teleport.getBlockX();
-//			int y = (int)this.teleport.getBlockY();
-//			int z = (int)this.teleport.getBlockZ();
-//			int bx = block.getX();
-//			int by = block.getY();
-//			int bz = block.getZ();
-//			if((bx == x && by == y && bz == z) || 
-//					(bx == x+1 && by == y-1 && bz == z+1) ||
-//					(bx == x+1 && by == y-1 && bz == z) ||
-//					(bx == x+1 && by == y-1 && bz == z-1) ||
-//					(bx == x && by == y-1 && bz == z+1) ||
-//					(bx == x && by == y-1 && bz == z) ||
-//					(bx == x && by == y-1 && bz == z-1) ||
-//					(bx == x-1 && by == y-1 && bz == z+1) ||
-//					(bx == x-1 && by == y-1 && bz == z) ||
-//					(bx == x-1 && by == y-1 && bz == z-1) ) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-
 	public World getWorld() {
 		
 		return world;
@@ -789,7 +702,6 @@ public class Warzone {
 			}
 		}
 		return null;
-		
 	}
 
 	public void protectZoneWallAgainstPlayer(Player player) {
@@ -812,6 +724,8 @@ public class Warzone {
 		for(ZoneWallGuard guard : zoneWallGuards) {
 			if(guard.getPlayer().getName().equals(player.getName())){
 				playerGuards.add(guard);
+				BlockFace guardWall = guard.getWall();
+				getVolume().resetWallBlocks(guardWall);
 				if(isDrawZoneOutline()) {
 					addZoneOutline(guard.getWall());
 				}
@@ -830,7 +744,6 @@ public class Warzone {
 	}
 
 	public boolean getAutoAssignOnly() {
-		
 		return isAutoAssignOnly();
 	}
 
@@ -975,7 +888,6 @@ public class Warzone {
 			playerTeam.resetSign();
 		}
 	}
-
 
 	public void handlePlayerLeave(Player player, Location destination, boolean removeFromTeam) {
 		Team playerTeam = war.getPlayerTeam(player.getName());
@@ -1173,14 +1085,4 @@ public class Warzone {
 	public Location getRallyPoint() {
 		return this.rallyPoint;
 	}
-
-
-//	public Team getTeamByName(String name) {
-//		for(Team team : getTeams()) {
-//			if(team.getName().startsWith(name)) {
-//				return team;
-//			}
-//		}
-//		return null;
-//	}	
 }

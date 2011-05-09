@@ -37,13 +37,13 @@ public class ZoneSetter {
 				war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setNorthwest(northwestBlock);
 				war.msg(player, "Warzone " + warzone.getName() + " created. Northwesternmost point set to x:" 
-						+ (int)warzone.getVolume().getNorthwestX() + " z:" + (int)warzone.getVolume().getNorthwestZ() + ".");
+						+ (int)warzone.getVolume().getNorthwestX() + " z:" + (int)warzone.getVolume().getNorthwestZ() + ". ");
 			} else {
 				// change existing warzone
 				resetWarzone(warzone, msgString);
 				warzone.getVolume().setNorthwest(northwestBlock);
 				msgString.append("Warzone " + warzone.getName() + " modified. Northwesternmost point set to x:" 
-						+ (int)warzone.getVolume().getNorthwestX() + " z:" + (int)warzone.getVolume().getNorthwestZ() + ".");
+						+ (int)warzone.getVolume().getNorthwestX() + " z:" + (int)warzone.getVolume().getNorthwestZ() + ". ");
 			}
 			saveIfReady(warzone, msgString);
 		} catch (NotNorthwestException e) {
@@ -56,7 +56,6 @@ public class ZoneSetter {
 			handleTooBig();
 			if(warzone.getVolume().isSaved()) warzone.initializeZone();
 		}
-		saveIfReady(warzone, msgString);
 	}
 	
 	public void placeSoutheast() {
@@ -71,7 +70,7 @@ public class ZoneSetter {
 				war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setSoutheast(southeastBlock);
 				war.msg(player, "Warzone " + warzone.getName() + " created. Southeasternmost point set to x:" 
-						+ (int)warzone.getVolume().getSoutheastX() + " z:" + (int)warzone.getVolume().getSoutheastZ() + ".");
+						+ (int)warzone.getVolume().getSoutheastX() + " z:" + (int)warzone.getVolume().getSoutheastZ() + ". ");
 			} else {
 				// change existing warzone
 				resetWarzone(warzone, msgString);				
@@ -90,7 +89,6 @@ public class ZoneSetter {
 			handleTooBig();
 			if(warzone.getVolume().isSaved()) warzone.initializeZone();
 		}
-		saveIfReady(warzone, msgString);
 	}
 	
 	public void placeCorner1() {
@@ -105,13 +103,13 @@ public class ZoneSetter {
 				war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setZoneCornerOne(corner1Block);
 				war.msg(player, "Warzone " + warzone.getName() + " created. Corner 1 set to x:" 
-						+ (int)corner1Block.getX() + " y:" + (int)corner1Block.getY() + " z:" + (int)corner1Block.getZ() + ".");
+						+ (int)corner1Block.getX() + " y:" + (int)corner1Block.getY() + " z:" + (int)corner1Block.getZ() + ". ");
 			} else {
 				// change existing warzone
 				resetWarzone(warzone, msgString);				
 				warzone.getVolume().setZoneCornerOne(corner1Block);
 				msgString.append("Warzone " + warzone.getName() + " modified. Corner 1 set to x:" 
-						+ (int)corner1Block.getX() + " y:" + (int)corner1Block.getY() + " z:" + (int)corner1Block.getZ() + ".");
+						+ (int)corner1Block.getX() + " y:" + (int)corner1Block.getY() + " z:" + (int)corner1Block.getZ() + ". ");
 			}
 			saveIfReady(warzone, msgString);
 		} catch (TooSmallException e) {
@@ -121,7 +119,6 @@ public class ZoneSetter {
 			handleTooBig();
 			if(warzone.getVolume().isSaved()) warzone.initializeZone();
 		}
-		saveIfReady(warzone, msgString);
 	}
 	
 	public void placeCorner2() {
@@ -136,13 +133,13 @@ public class ZoneSetter {
 				war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setZoneCornerTwo(corner2Block);
 				war.msg(player, "Warzone " + warzone.getName() + " created. Corner 2 set to x:" 
-						+ (int)corner2Block.getX() + " y:" + (int)corner2Block.getY() + " z:" + (int)corner2Block.getZ() + ".");
+						+ (int)corner2Block.getX() + " y:" + (int)corner2Block.getY() + " z:" + (int)corner2Block.getZ() + ". ");
 			} else {
 				// change existing warzone
 				resetWarzone(warzone, msgString);				
 				warzone.getVolume().setZoneCornerTwo(corner2Block);
 				msgString.append("Warzone " + warzone.getName() + " modified. Corner 2 set to x:" 
-						+ (int)corner2Block.getX() + " y:" + (int)corner2Block.getY() + " z:" + (int)corner2Block.getZ() + ".");
+						+ (int)corner2Block.getX() + " y:" + (int)corner2Block.getY() + " z:" + (int)corner2Block.getZ() + ". ");
 			}
 			saveIfReady(warzone, msgString);
 		} catch (TooSmallException e) {
@@ -152,7 +149,6 @@ public class ZoneSetter {
 			handleTooBig();
 			if(warzone.getVolume().isSaved()) warzone.initializeZone();
 		}
-		saveIfReady(warzone, msgString);
 	}
 	
 	private void resetWarzone(Warzone warzone, StringBuilder msgString) {
