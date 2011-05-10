@@ -242,7 +242,7 @@ public class WarzoneMapper {
 			if(loadBlocks) {
 				
 				// zone blocks 
-				ZoneVolume zoneVolume = VolumeMapper.loadZoneVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld());
+				ZoneVolume zoneVolume = VolumeMapper.loadZoneVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld(), warzone);
 				warzone.setVolume(zoneVolume);
 			}
 		

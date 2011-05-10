@@ -5,6 +5,10 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
+import com.tommytony.war.Warzone;
+import com.tommytony.war.Team;
+import com.tommytony.war.Monument;
+
 import bukkit.tommytony.war.War;
 
 /**
@@ -14,8 +18,11 @@ import bukkit.tommytony.war.War;
  */
 public class ZoneVolume extends Volume {
 
-	public ZoneVolume(String name, War war, World world) {
+	private Warzone zone;
+
+	public ZoneVolume(String name, War war, World world, Warzone zone) {
 		super(name, war, world);
+		this.zone = zone;
 	}
 
 	public void setNorthwest(Block block) throws NotNorthwestException, TooSmallException, TooBigException {
@@ -50,7 +57,7 @@ public class ZoneVolume extends Volume {
 			BlockInfo maxZBlock = getMaxZBlock(); // west means max Z
 			maxZBlock.setZ(block.getZ());
 		}
-		if(tooSmall()) {
+		if(tooSmall() || zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooSmallException();
@@ -107,7 +114,7 @@ public class ZoneVolume extends Volume {
 			BlockInfo minZBlock = getMinZBlock(); // east means min Z
 			minZBlock.setZ(block.getZ());
 		}
-		if(tooSmall()) {
+		if(tooSmall() || zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooSmallException();
@@ -137,14 +144,13 @@ public class ZoneVolume extends Volume {
 		if(!hasTwoCorners())
 			return 0;
 		else
-			return (getMaxY() - getMinY())/2;
-			
+			return getMinY() + (getMaxY() - getMinY())/2;
 	}
 	
 	public void setZoneCornerOne(Block block) throws TooSmallException, TooBigException {
 		BlockInfo oldCornerOne = getCornerOne();
 		super.setCornerOne(block);
-		if(tooSmall()) {
+		if(tooSmall() || zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
 			throw new TooSmallException();
 		} else if (tooBig()) {
@@ -156,7 +162,7 @@ public class ZoneVolume extends Volume {
 	public void setZoneCornerTwo(Block block) throws TooSmallException, TooBigException {
 		BlockInfo oldCornerTwo = getCornerTwo();
 		super.setCornerTwo(block);
-		if(tooSmall()) {
+		if(tooSmall() || zoneStructuresAreOutside()) {
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooSmallException();
 		} else if (tooBig()) {
@@ -179,6 +185,42 @@ public class ZoneVolume extends Volume {
 		return false;
 	}
 	
+	public boolean zoneStructuresAreOutside() {
+		// check team spawns & flags
+		for(Team team : zone.getTeams()) {
+			if(team.getTeamSpawn() != null) {
+				if(!isInside(team.getSpawnVolume().getCornerOne())
+						|| !isInside(team.getSpawnVolume().getCornerTwo())) {
+					return true;
+				}
+			}
+			if(team.getTeamFlag() != null) {
+				if(!isInside(team.getFlagVolume().getCornerOne())
+						|| !isInside(team.getFlagVolume().getCornerTwo())) {
+					return true;
+				}
+			}
+		}
+		// check monuments
+		for(Monument monument : zone.getMonuments()) {
+			if(monument.getVolume() != null) {
+				if(!isInside(monument.getVolume().getCornerOne())
+						|| !isInside(monument.getVolume().getCornerTwo())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean isInside(BlockInfo info) {
+		if(info.getX() <= getMaxX() && info.getX() >= getMinX() && 
+				info.getY() <= getMaxY() && info.getY() >= getMinY() &&
+				info.getZ() <= getMaxZ() && info.getZ() >= getMinZ())
+			return true;
+		return false;
+	}
+
 	public boolean isWallBlock(Block block){
 		return isEastWallBlock(block) || isNorthWallBlock(block) 
 		|| isSouthWallBlock(block) || isWestWallBlock(block) 

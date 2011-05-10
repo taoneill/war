@@ -163,7 +163,7 @@ public class ZoneSetter {
 	}
 	
 	private void handleTooSmall() {
-		war.badMsg(player, "That would make the " + zoneName + " warzone too small. Sides must be at least 10 blocks.");
+		war.badMsg(player, "That would make the " + zoneName + " warzone too small. Sides must be at least 10 blocks and all existing structures (spawns, flags, etc) must fit inside.");
 	}
 	
 	private void handleTooBig() {
@@ -191,13 +191,20 @@ public class ZoneSetter {
 					war.getWarHub().initialize();
 				}
 				war.msg(player, "Default lobby created on south side of zone. Use /setzonelobby <n/s/e/w> to change its position.");
-			} else {
-				// gotta move the lobby
-				warzone.getLobby().changeWall(warzone.getLobby().getWall());
-			}
+			} //else {
+				// gotta move the lobby (or dont because zone.initzon does it for you)
+				//warzone.getLobby().changeWall(warzone.getLobby().getWall());
+			//}
 			warzone.initializeZone();
 			WarzoneMapper.save(war, warzone, true);
 			war.msg(player, "Warzone saved. Use /setteam, /setmonument and /savezone to configure the zone.");
+		} else {
+			if(warzone.getVolume().getCornerOne() == null) {
+				msgString.append("Still missing corner 1.");
+			} else if (warzone.getVolume().getCornerTwo() == null) {
+				msgString.append("Still missing corner 2.");
+			}
+			war.msg(player, msgString.toString());
 		}
 	}
 	

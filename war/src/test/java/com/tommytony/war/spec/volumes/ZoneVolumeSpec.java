@@ -1,5 +1,8 @@
 package com.tommytony.war.spec.volumes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.junit.Test;
@@ -9,6 +12,9 @@ import static org.mockito.Mockito.*;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.Monument;
+import com.tommytony.war.Team;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.volumes.BlockInfo;
 import com.tommytony.war.volumes.NotNorthwestException;
 import com.tommytony.war.volumes.NotSoutheastException;
@@ -25,7 +31,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(0);
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -50,7 +59,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64); // further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -81,7 +93,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -112,7 +127,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-5); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -143,7 +161,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-1000); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -174,7 +195,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64); // further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -207,7 +231,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64); // further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -238,7 +265,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -269,7 +299,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64);	// further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -305,7 +338,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64);	// further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -341,7 +377,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64);	// further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -377,7 +416,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64);	// further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -419,7 +461,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(0);
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -444,7 +489,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -475,7 +523,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64); // further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -506,7 +557,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64);  // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -539,7 +593,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -570,7 +627,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64); // further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -601,7 +661,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64);	// further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -637,7 +700,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64);	// further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -673,7 +739,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64);	// further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -709,7 +778,10 @@ public class ZoneVolumeSpec {
 		// Arrange
 		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
-		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock);
+		Warzone zoneMock = mock(Warzone.class);
+		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
+		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64);	// further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level

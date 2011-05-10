@@ -75,7 +75,7 @@ public class Warzone {
 		this.setDropLootOnDeath(war.isDefaultDropLootOnDeath());
 		this.setUnbreakableZoneBlocks(war.isDefaultUnbreakableZoneBlocks());
 		this.setNoCreatures(war.getDefaultNoCreatures());
-		this.volume = new ZoneVolume(name, war, this.getWorld());
+		this.volume = new ZoneVolume(name, war, this.getWorld(), this);
 	}
 	
 	public boolean ready() {
@@ -181,12 +181,12 @@ public class Warzone {
 		
 	private void initZone() {
 		// add wall outlines
-		if(isDrawZoneOutline()) {
-			addZoneOutline(BlockFace.NORTH);
-			addZoneOutline(BlockFace.EAST);
-			addZoneOutline(BlockFace.SOUTH);
-			addZoneOutline(BlockFace.WEST);
-		}
+//		if(isDrawZoneOutline()) {
+//			addZoneOutline(BlockFace.NORTH);
+//			addZoneOutline(BlockFace.EAST);
+//			addZoneOutline(BlockFace.SOUTH);
+//			addZoneOutline(BlockFace.WEST);
+//		}
 		
 		// reset monuments
 		for(Monument monument : monuments) {
@@ -194,7 +194,7 @@ public class Warzone {
 			monument.addMonumentBlocks();
 		}
 
-		// reset lobby
+		// reset lobby (here be demons)
 		if(lobby != null) {
 			lobby.initialize();
 		}
@@ -202,75 +202,75 @@ public class Warzone {
 		this.flagThieves.clear();
 	}
 
-	public void addZoneOutline(BlockFace wall) {
-		int c1maxY = world.getHighestBlockYAt(volume.getMinX(), volume.getMinZ());
-		int c2maxY = world.getHighestBlockYAt(volume.getMaxX(), volume.getMaxZ());
-		Block ne = world.getBlockAt(volume.getMinX(), c1maxY, volume.getMinZ());
-		Block nw = world.getBlockAt(volume.getMinX(), c2maxY, volume.getMaxZ());
-		Block se = world.getBlockAt(volume.getMaxX(), c2maxY, volume.getMinZ());
-		Block lastBlock = null;
-		if(BlockFace.NORTH == wall) {
-			for(int z = volume.getMinZ(); z < volume.getMaxZ(); z++) {
-				lastBlock = highestBlockToGlass(ne.getX(), z, lastBlock);
-			}
-		} else if (BlockFace.EAST == wall) {
-			for(int x = volume.getMinX(); x < volume.getMaxX(); x++) {
-				lastBlock = highestBlockToGlass(x, ne.getZ(), lastBlock);
-			}
-		} else if (BlockFace.SOUTH == wall) {
-			for(int z = volume.getMinZ(); z < volume.getMaxZ(); z++) {
-				lastBlock = highestBlockToGlass(se.getX(), z, lastBlock);
-			}
-		} else if (BlockFace.WEST == wall) {
-			for(int x = volume.getMinX(); x < volume.getMaxX(); x++) {
-				lastBlock = highestBlockToGlass(x, nw.getZ(), lastBlock);
-			}
-		}
-	}
+//	public void addZoneOutline(BlockFace wall) {
+//		int c1maxY = world.getHighestBlockYAt(volume.getMinX(), volume.getMinZ());
+//		int c2maxY = world.getHighestBlockYAt(volume.getMaxX(), volume.getMaxZ());
+//		Block ne = world.getBlockAt(volume.getMinX(), c1maxY, volume.getMinZ());
+//		Block nw = world.getBlockAt(volume.getMinX(), c2maxY, volume.getMaxZ());
+//		Block se = world.getBlockAt(volume.getMaxX(), c2maxY, volume.getMinZ());
+//		Block lastBlock = null;
+//		if(BlockFace.NORTH == wall) {
+//			for(int z = volume.getMinZ(); z < volume.getMaxZ(); z++) {
+//				lastBlock = highestBlockToGlass(ne.getX(), z, lastBlock);
+//			}
+//		} else if (BlockFace.EAST == wall) {
+//			for(int x = volume.getMinX(); x < volume.getMaxX(); x++) {
+//				lastBlock = highestBlockToGlass(x, ne.getZ(), lastBlock);
+//			}
+//		} else if (BlockFace.SOUTH == wall) {
+//			for(int z = volume.getMinZ(); z < volume.getMaxZ(); z++) {
+//				lastBlock = highestBlockToGlass(se.getX(), z, lastBlock);
+//			}
+//		} else if (BlockFace.WEST == wall) {
+//			for(int x = volume.getMinX(); x < volume.getMaxX(); x++) {
+//				lastBlock = highestBlockToGlass(x, nw.getZ(), lastBlock);
+//			}
+//		}
+//	}
 
-	private Block highestBlockToGlass(int x, int z, Block lastBlock) {
-		int highest = world.getHighestBlockYAt(x, z);
-		Block block = world.getBlockAt(x, highest -1 , z);
-		
-		if(block.getType() == Material.LEAVES) { // top of tree, lets find some dirt/ground
-			Block over = block.getFace(BlockFace.DOWN);
-			Block under = over.getFace(BlockFace.DOWN);
-			int treeHeight = 0;
-			while(!((over.getType() == Material.AIR && under.getType() != Material.AIR && under.getType() != Material.LEAVES) 
-					|| (over.getType() == Material.LEAVES && under.getType() != Material.LEAVES && under.getType() != Material.AIR)
-					|| (over.getType() == Material.WOOD && under.getType() != Material.WOOD && under.getType() != Material.AIR))
-				  && treeHeight < 40) {
-				over = under;
-				if(over.getY() <= 0) break; 	// reached bottom
-				under = over.getFace(BlockFace.DOWN);
-				treeHeight++;
-			}
-			block = under; // found the ground
-		}
-		
-		block.setType(Material.GLASS);
-
-		if(lastBlock != null) {
-			// link the new block and the old vertically if there's a big drop or rise
-			if(block.getY() - lastBlock.getY() > 1) {  // new block too high 
-				Block under = block.getFace(BlockFace.DOWN);
-				while(under.getY() != lastBlock.getY() - 1) {
-					under.setType(Material.GLASS);
-					if(under.getY() <= 0) break;	// reached bottom
-					under = under.getFace(BlockFace.DOWN);
-				}
-			} else if (lastBlock.getY() - block.getY() > 1) { // new block too low
-				Block over = block.getFace(BlockFace.UP);
-				while(over.getY() != lastBlock.getY() + 1) {
-					over.setType(Material.GLASS);
-					if(over.getY() >= 127) break;
-					over = over.getFace(BlockFace.UP);
-				}
-			}
-		}
-
-		return block;
-	}
+//	private Block highestBlockToGlass(int x, int z, Block lastBlock) {
+//		int highest = world.getHighestBlockYAt(x, z);
+//		Block block = world.getBlockAt(x, highest -1 , z);
+//		
+//		if(block.getType() == Material.LEAVES) { // top of tree, lets find some dirt/ground
+//			Block over = block.getFace(BlockFace.DOWN);
+//			Block under = over.getFace(BlockFace.DOWN);
+//			int treeHeight = 0;
+//			while(!((over.getType() == Material.AIR && under.getType() != Material.AIR && under.getType() != Material.LEAVES) 
+//					|| (over.getType() == Material.LEAVES && under.getType() != Material.LEAVES && under.getType() != Material.AIR)
+//					|| (over.getType() == Material.WOOD && under.getType() != Material.WOOD && under.getType() != Material.AIR))
+//				  && treeHeight < 40) {
+//				over = under;
+//				if(over.getY() <= 0) break; 	// reached bottom
+//				under = over.getFace(BlockFace.DOWN);
+//				treeHeight++;
+//			}
+//			block = under; // found the ground
+//		}
+//		
+//		block.setType(Material.GLASS);
+//
+//		if(lastBlock != null) {
+//			// link the new block and the old vertically if there's a big drop or rise
+//			if(block.getY() - lastBlock.getY() > 1) {  // new block too high 
+//				Block under = block.getFace(BlockFace.DOWN);
+//				while(under.getY() != lastBlock.getY() - 1) {
+//					under.setType(Material.GLASS);
+//					if(under.getY() <= 0) break;	// reached bottom
+//					under = under.getFace(BlockFace.DOWN);
+//				}
+//			} else if (lastBlock.getY() - block.getY() > 1) { // new block too low
+//				Block over = block.getFace(BlockFace.UP);
+//				while(over.getY() != lastBlock.getY() + 1) {
+//					over.setType(Material.GLASS);
+//					if(over.getY() >= 127) break;
+//					over = over.getFace(BlockFace.UP);
+//				}
+//			}
+//		}
+//
+//		return block;
+//	}
 
 	public void endRound() {
 		
@@ -726,9 +726,9 @@ public class Warzone {
 				playerGuards.add(guard);
 				BlockFace guardWall = guard.getWall();
 				getVolume().resetWallBlocks(guardWall);
-				if(isDrawZoneOutline()) {
-					addZoneOutline(guard.getWall());
-				}
+//				if(isDrawZoneOutline()) {
+//					addZoneOutline(guard.getWall());
+//				}
 				if(lobby != null) {
 					lobby.getVolume().resetBlocks(); // always reset the lobby even if the guard is on another wall
 													// because player can go around corner

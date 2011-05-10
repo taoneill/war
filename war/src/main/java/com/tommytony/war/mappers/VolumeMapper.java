@@ -16,6 +16,7 @@ import org.bukkit.material.MaterialData;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.Warzone;
 import com.tommytony.war.volumes.Volume;
 import com.tommytony.war.volumes.ZoneVolume;
 
@@ -34,8 +35,8 @@ public class VolumeMapper {
 	}
 	
 	public static ZoneVolume loadZoneVolume(String volumeName, String zoneName,
-			War war, World world) {
-		ZoneVolume volume = new ZoneVolume(volumeName, war, world);
+			War war, World world, Warzone zone) {
+		ZoneVolume volume = new ZoneVolume(volumeName, war, world, zone);
 		load(volume, zoneName, war, world);
 		return volume;
 	}

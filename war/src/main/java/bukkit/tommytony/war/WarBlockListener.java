@@ -54,8 +54,8 @@ public class WarBlockListener extends BlockListener {
 					return;
 				}
 			}
-			
-			if(zone != null && zone.isImportantBlock(block)){
+			boolean isZoneMaker = war.isZoneMaker(player);
+			if(zone != null && zone.isImportantBlock(block) && (!isZoneMaker || (isZoneMaker && team != null))) {
 				war.badMsg(player, "Can't build here.");
 				event.setCancelled(true);
 				return;
@@ -96,8 +96,7 @@ public class WarBlockListener extends BlockListener {
 				event.setCancelled(true);
 				
 			}
-	    	
-	    	boolean isZoneMaker = war.isZoneMaker(player);
+
 	    	// unbreakableZoneBlocks
 	    	if(zone != null && zone.isUnbreakableZoneBlocks() 
 	    			&& (!isZoneMaker

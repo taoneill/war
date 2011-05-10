@@ -34,7 +34,9 @@ public class RestoreWarzonesJob implements Runnable {
 				}
 			}
 		}
-		war.logInfo("Warzones ready.");
+		if(war.getWarzones().size() > 0) {
+			war.logInfo("Warzones ready.");
+		}
 	}
 
 }

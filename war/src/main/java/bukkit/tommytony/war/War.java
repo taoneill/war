@@ -447,7 +447,7 @@ public class War extends JavaPlugin {
 				if(warzone.getLobby() != null) {
 					warzone.getLobby().getVolume().resetBlocks();
 					warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
-					warzone.addZoneOutline(warzone.getLobby().getWall());
+					//warzone.addZoneOutline(warzone.getLobby().getWall());
 					warzone.getLobby().initialize();
 				}
 				WarzoneMapper.save(this, warzone, false);
@@ -514,7 +514,7 @@ public class War extends JavaPlugin {
 				if(warzone.getLobby() != null) {
 					warzone.getLobby().getVolume().resetBlocks();
 					warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
-					warzone.addZoneOutline(warzone.getLobby().getWall());
+					//warzone.addZoneOutline(warzone.getLobby().getWall());
 					warzone.getLobby().initialize();
 				}
 				newTeam.setTeamSpawn(player.getLocation());
@@ -707,7 +707,7 @@ public class War extends JavaPlugin {
 			if(lobby != null) {
 				// reset existing lobby
 				lobby.getVolume().resetBlocks();
-				lobby.changeWall(wall);
+				lobby.setWall(wall);
 				lobby.initialize();
 				this.msg(player, "Warzone lobby moved to " + wallStr + " side of zone.");
 			} else {
