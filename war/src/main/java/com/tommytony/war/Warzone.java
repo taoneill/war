@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -288,7 +289,7 @@ public class Warzone {
 		event.setCancelled(true);
 	}
 	
-	private void handleRespawn(Team team, Player player){
+	private void handleRespawn(Team team, Player player){		
 		// Fill hp
 		player.setFireTicks(0);
 		player.setRemainingAir(300);

@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInventoryEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -152,7 +153,6 @@ public class WarPlayerListener extends PlayerListener {
 						}
 					}
 				}
-				
 			}
 		}
     }
@@ -196,6 +196,23 @@ public class WarPlayerListener extends PlayerListener {
     		}
     	}
     	
+    }
+    
+    public void onPlayerKick(PlayerKickEvent event) {
+    	Player player = event.getPlayer();
+    	String reason = event.getReason();
+    	if(reason.contains("moved") || reason.contains("too quickly") || reason.contains("Hacking")) {
+	    	boolean inWarzone = war.inAnyWarzone(player.getLocation());
+	    	boolean inLobby = war.inAnyWarzone(player.getLocation());
+	    	boolean inWarhub = false;
+	    	if(war.getWarHub() != null && war.getWarHub().getVolume().contains(player.getLocation())) { 
+	    		inWarhub = true;
+	    	}
+	    	if(inWarzone || inLobby || inWarhub) {
+	    		event.setCancelled(true);
+	    		war.logWarn("Prevented " + player.getName() + " from getting kicked.");
+	    	}
+    	}
     }
 	
 	public void onPlayerMove(PlayerMoveEvent event) {

@@ -106,9 +106,9 @@ public class WarHub {
 			
 			String[] lines = new String[4];
 			lines[0] = "War hub";
-			lines[1] = "";
-			lines[2] = "Pick your battle!";
-			lines[3] = "";
+			lines[1] = "(/warhub)";
+			lines[2] = "Pick your";
+			lines[3] = "battle!";
 			SignHelper.setToSign(war, signBlock, (byte)8, lines);
 			
 			// Warzone signs

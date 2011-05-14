@@ -83,10 +83,12 @@ public class ZoneLobby {
 		this.wall = newWall;
 	}
 	
-	public void changeWall(BlockFace newWall) {
+	private void changeWall(BlockFace newWall) {
 		if(volume == null) {
 			// no previous wall
 			this.volume = new Volume("lobby", war, warzone.getWorld());
+		} else if(volume.isSaved()) {
+			volume.resetBlocks();
 		}
 		
 		this.wall = newWall;

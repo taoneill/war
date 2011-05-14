@@ -75,7 +75,12 @@ public class WarEntityListener extends EntityListener {
 					war.badMsg(a, "Can't attack a player from inside your spawn.");
 					event.setCancelled(true);
 				}
-				//}
+				
+				// Detect death, prevent it and respawn the player
+				if(event.getDamage() >= d.getHealth()) {
+					defenderWarzone.handleDeath(d);
+					event.setCancelled(true);
+				}
 			} else if (attackerTeam != null && defenderTeam != null 
 					&& attackerTeam == defenderTeam 			
 					&& attackerWarzone == defenderWarzone
@@ -111,6 +116,15 @@ public class WarEntityListener extends EntityListener {
 //			if(event.isCancelled() && event instanceof EntityDamageByProjectileEvent) {
 //				//((EntityDamageByProjectileEvent)event).setBounce(true);
 //			}
+		} else if (defender instanceof Player && event instanceof EntityDamageByProjectileEvent) {
+			// attacked by dispenser arrow most probably
+			// Detect death, prevent it and respawn the player
+			Player d = (Player) defender;
+			Warzone defenderWarzone = war.getPlayerTeamWarzone(d.getName());
+			if(event.getDamage() >= d.getHealth()) {
+				defenderWarzone.handleDeath(d);
+				event.setCancelled(true);
+			}
 		}
 	}
 
@@ -141,35 +155,51 @@ public class WarEntityListener extends EntityListener {
 		if(event instanceof EntityDamageByEntityEvent || 
 				event instanceof EntityDamageByProjectileEvent) {
 			handlerAttackDefend((EntityDamageByEntityEvent)event);
-		} else if(event.getCause() == DamageCause.FIRE_TICK) {
+		} else {
+			// Detect death (from , prevent it and respawn the player
 			Entity entity =  event.getEntity();
 			if(entity instanceof Player) {
 				Player player = (Player) entity;
-				Team team = war.getPlayerTeam(player.getName());
-				if(team != null && team.getSpawnVolume().contains(player.getLocation())) {
-					// smother out the fire that didn't burn out when you respawned
-					// Stop fire (upcast, watch out!)
-					if(player instanceof CraftPlayer) {
-						net.minecraft.server.Entity playerEntity = ((CraftPlayer)player).getHandle();
-						playerEntity.fireTicks = 0;
-					}
-					event.setCancelled(true);		
+				Warzone zone = war.getPlayerTeamWarzone(player.getName());
+				if(zone != null && event.getDamage() >= player.getHealth()) {
+					zone.handleDeath(player);
+					event.setCancelled(true);
 				}
-				
-			}
-			
-		} else if (event.getCause() == DamageCause.DROWNING) {
-			Entity entity =  event.getEntity();
-			if(entity instanceof Player) {
-				Player player = (Player) entity;
-				Team team = war.getPlayerTeam(player.getName());
-				if(team != null && player.getHealth() <= 0) {
-					// don't keep killing drowing player: trying to stop "Player moved wrongly!" error at respawn.
-					event.setCancelled(true);		
-				}
-				
 			}
 		}
+			
+			
+			
+//		if(event.getCause() == DamageCause.FIRE_TICK) {
+//			Entity entity =  event.getEntity();
+//			if(entity instanceof Player) {
+//				Player player = (Player) entity;
+//				Team team = war.getPlayerTeam(player.getName());
+//				if(team != null && team.getSpawnVolume().contains(player.getLocation())) {
+//					// smother out the fire that didn't burn out when you respawned
+//					// Stop fire (upcast, watch out!)
+//					if(player instanceof CraftPlayer) {
+//						net.minecraft.server.Entity playerEntity = ((CraftPlayer)player).getHandle();
+//						playerEntity.fireTicks = 0;
+//					}
+//					event.setCancelled(true);		
+//				}
+//			}
+//			
+//		} else if (event.getCause() == DamageCause.DROWNING) {
+//			Entity entity =  event.getEntity();
+//			if(entity instanceof Player) {
+//				Player player = (Player) entity;
+//				Team team = war.getPlayerTeam(player.getName());
+//				if(team != null && player.getHealth() <= 0) {
+//					// don't keep killing drowing player: trying to stop "Player moved wrongly!" error at respawn.
+//					event.setCancelled(true);		
+//				}
+//				
+//			}
+//		}
+		
+		
     }
 
 	public void onEntityCombust(EntityCombustEvent event) {
