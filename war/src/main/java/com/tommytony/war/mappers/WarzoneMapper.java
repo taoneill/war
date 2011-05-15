@@ -338,7 +338,7 @@ public class WarzoneMapper {
 		warzoneConfig.setString("teamFlags", teamFlagsStr);
 		
 		// ff
-		warzoneConfig.setBoolean("firendlyFire", warzone.getFriendlyFire());
+		warzoneConfig.setBoolean("friendlyFire", warzone.getFriendlyFire());
 		
 		// loadout
 		String loadoutStr = "";

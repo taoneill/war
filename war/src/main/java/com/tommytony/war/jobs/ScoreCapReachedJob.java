@@ -38,7 +38,7 @@ public class ScoreCapReachedJob implements Runnable {
 					}
 				}
 			}
-			t.setPoints(0);
+			t.resetPoints();
 			t.getPlayers().clear();	// empty the team
 		}
 	}

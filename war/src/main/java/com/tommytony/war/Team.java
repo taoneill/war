@@ -349,7 +349,19 @@ public class Team {
 	}
 	
 	public void addPoint() {
-		if (players.size()!=0) points++;
+		boolean atLeastOnePlayerOnTeam = players.size() != 0;
+		boolean atLeastOnePlayerOnOtherTeam = false;
+		for(Team team : warzone.getTeams()) {
+			if(!team.getName().equals(this.getName())
+					&& team.getPlayers().size() > 0) {
+				atLeastOnePlayerOnOtherTeam = true;
+			}
+		}
+		if (atLeastOnePlayerOnTeam && atLeastOnePlayerOnOtherTeam) { 
+			points++;
+		} else if (!atLeastOnePlayerOnOtherTeam) {
+			this.teamcast("Can't score until at least one player joins another team.");
+		}
 	}
 
 	public int getPoints() {
@@ -402,8 +414,8 @@ public class Team {
 		this.spawnVolume = volume;
 	}
 
-	public void setPoints(int score) {
-		if (players.size()!=0) this.points = score;
+	public void resetPoints() {
+		this.points = 0;
 	}
 
 	public void setFlagVolume(Volume flagVolume) {

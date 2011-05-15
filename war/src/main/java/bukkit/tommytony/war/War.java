@@ -582,7 +582,7 @@ public class War extends JavaPlugin {
 					p.teleport(warzone.getTeleport());
 					this.msg(player, "You have left the warzone. Your inventory has (hopefully) been restored.");
 				}
-				team.setPoints(0);
+				team.resetPoints();
 				team.getPlayers().clear();
 			}
 			
@@ -1235,7 +1235,7 @@ public class War extends JavaPlugin {
 				wandBearers.put(player.getName(), zoneName);
 				player.getInventory().addItem(new ItemStack(Material.WOOD_SWORD, 1, (byte) 8));
 				//player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.WOOD_SWORD));
-				this.msg(player, "You now have a wand for zone " + zoneName + ". Left-click for corner 1. Right-click for corner 2.");	
+				this.msg(player, "You now have a wand for zone " + zoneName + ". Left-click with wodden sword for corner 1. Right-click for corner 2.");	
 			}
 		}
 	}

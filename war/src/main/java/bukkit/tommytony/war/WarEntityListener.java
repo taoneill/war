@@ -105,6 +105,8 @@ public class WarEntityListener extends EntityListener {
 						"in the other teams in that warzone.");
 				} else if (defenderTeam == null) {
 					war.badMsg(a, "Your target is not in a team.");
+				} else if (attacker != null && defender != null && attacker.getEntityId() == defender.getEntityId()) {
+					// You just hit yourself, probably with a bouncing arrow
 				} else if (attackerTeam == defenderTeam) {
 					war.badMsg(a, "Your target is on your team.");
 				} else if (attackerWarzone != defenderWarzone) {
@@ -113,9 +115,6 @@ public class WarEntityListener extends EntityListener {
 				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 			}
 			
-//			if(event.isCancelled() && event instanceof EntityDamageByProjectileEvent) {
-//				//((EntityDamageByProjectileEvent)event).setBounce(true);
-//			}
 		} else if (defender instanceof Player && event instanceof EntityDamageByProjectileEvent) {
 			// attacked by dispenser arrow most probably
 			// Detect death, prevent it and respawn the player

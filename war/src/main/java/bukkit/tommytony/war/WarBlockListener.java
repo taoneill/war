@@ -185,7 +185,7 @@ public class WarBlockListener extends BlockListener {
 						}
 		    			war.msg(player, "You have team " + lostFlagTeam.getName() + "'s flag. Reach your team spawn or flag to capture it!");
 	    			} else {
-	    				war.msg(player, "You can't steal team " + lostFlagTeam.getName() + "'s flag since there are no players there.");
+	    				war.msg(player, "You can't steal team " + lostFlagTeam.getName() + "'s flag since no players are on that team.");
 	    			}
     			}
     			event.setCancelled(true);

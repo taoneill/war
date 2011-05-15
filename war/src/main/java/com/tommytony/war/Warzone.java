@@ -932,7 +932,7 @@ public class Warzone {
 			if(zoneEmpty) {
 				// reset the zone for a new game when the last player leaves
 				for(Team team : this.getTeams()) {
-					team.setPoints(0);
+					team.resetPoints();
 					team.setRemainingLives(this.getLifePool());
 				}
 				this.getVolume().resetBlocksAsJob();
