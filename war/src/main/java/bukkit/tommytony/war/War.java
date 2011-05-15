@@ -61,6 +61,7 @@ public class War extends JavaPlugin {
     private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
     private final List<String> zoneMakerNames = new ArrayList<String>();
     private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
+    private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
     private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
     private int defaultLifepool = 21;
     private boolean defaultFriendlyFire = false;
@@ -118,6 +119,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.INVENTORY_OPEN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
@@ -732,7 +734,8 @@ public class War extends JavaPlugin {
 														&& !arguments[1].equals("se") && !arguments[1].equals("nw")
 														&& !arguments[1].equals("corner1") && !arguments[1].equals("corner2")
 														&& !arguments[1].equals("c1") && !arguments[1].equals("c2")
-														&& !arguments[1].equals("pos1") && !arguments[1].equals("pos2")))) {
+														&& !arguments[1].equals("pos1") && !arguments[1].equals("pos2")
+														&& !arguments[1].equals("wand")))) {
 			this.badMsg(player, "Usage: =<Classic mode>= /setzone <warzone-name> <'northwest'/'southeast'/'nw'/'se'> (NW defaults to top block, SE to bottom). " +
 					"=<Wand Cuboid mode>= /setzone <warzone-name> wand (gives you a wooden sword to right and left click, drop to disable). " +
 					"=<Wandless Cuboid mode>= /setzone <warzone-name> <'corner1'/'corner2'/'c1'/'c2'/'pos1'/'pos2'> (block where you're standing). " +
@@ -748,7 +751,9 @@ public class War extends JavaPlugin {
 				setter.placeCorner1();
 			} else if (arguments[1].equals("corner2") || arguments[1].equals("c2") || arguments[1].equals("pos2")) {
 				setter.placeCorner2();
-			}				
+			} else if (arguments[1].equals("wand")) {
+				this.addWandBearer(player, arguments[0]);
+			}
 		}
 	}
 
@@ -1201,6 +1206,55 @@ public class War extends JavaPlugin {
 			}
 		}
 		return null;
+	}
+
+	public void addWandBearer(Player player, String zoneName) {
+		if(wandBearers.containsKey(player.getName())){
+			String alreadyHaveWand = wandBearers.get(player.getName());
+			if(player.getInventory().first(Material.WOOD_SWORD) != -1) {
+				if(zoneName.equals(alreadyHaveWand)) {
+					this.badMsg(player, "You already have a wand for zone " + alreadyHaveWand + ". Drop the wooden sword first.");	
+				} else {
+					// new zone, already have sword
+					wandBearers.remove(player.getName());
+					wandBearers.put(player.getName(), zoneName);
+					this.msg(player, "Switched wand to zone " + zoneName + ".");
+				}
+			} else {
+				// lost his sword, or new warzone
+				if(zoneName.equals(alreadyHaveWand)) {
+					// same zone, give him a new sword
+					player.getInventory().addItem(new ItemStack(Material.WOOD_SWORD, 1, (byte) 8));
+					this.msg(player, "Here's a new sword for zone " + zoneName + ".");
+				} 
+			}
+		} else {
+			if(player.getInventory().firstEmpty() == -1) {
+				this.badMsg(player, "Your inventory is full. Please drop an item and try again.");
+			} else {
+				wandBearers.put(player.getName(), zoneName);
+				player.getInventory().addItem(new ItemStack(Material.WOOD_SWORD, 1, (byte) 8));
+				//player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.WOOD_SWORD));
+				this.msg(player, "You now have a wand for zone " + zoneName + ". Left-click for corner 1. Right-click for corner 2.");	
+			}
+		}
+	}
+	
+	public boolean isWandBearer(Player player) {
+		return wandBearers.containsKey(player.getName());
+	}
+	
+	public String getWandBearerZone(Player player) {
+		if(isWandBearer(player)) {
+			return wandBearers.get(player.getName());
+		}
+		return "";
+	}
+	
+	public void removeWandBearer(Player player) {
+		if(wandBearers.containsKey(player.getName())){
+			wandBearers.remove(player.getName());
+		}
 	}
 
 	public HashMap<Integer, ItemStack> getDefaultLoadout() {

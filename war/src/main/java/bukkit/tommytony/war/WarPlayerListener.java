@@ -7,8 +7,11 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerInventoryEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -24,6 +27,7 @@ import com.tommytony.war.Team;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
+import com.tommytony.war.ZoneSetter;
 import com.tommytony.war.utils.InventoryStash;
 
 
@@ -92,6 +96,9 @@ public class WarPlayerListener extends PlayerListener {
 				}
 				zone.handlePlayerLeave(player, zone.getTeleport(), true);
 			}
+			if(war.isWandBearer(player)) {
+				war.removeWandBearer(player);
+			}
 		}
 	}
 
@@ -125,6 +132,14 @@ public class WarPlayerListener extends PlayerListener {
 						return;
 					}
 				}
+			}
+		}
+		if(war.isWandBearer(player)) {
+			Item item = event.getItemDrop();
+			if(item.getItemStack().getType() == Material.WOOD_SWORD) {
+				String zoneName = war.getWandBearerZone(player);
+				war.removeWandBearer(player);
+				war.msg(player, "You dropped the zone " + zoneName + " wand.");
 			}
 		}
     }
@@ -212,6 +227,25 @@ public class WarPlayerListener extends PlayerListener {
 	    		event.setCancelled(true);
 	    		war.logWarn("Prevented " + player.getName() + " from getting kicked.");
 	    	}
+    	}
+    }
+    
+    public void onPlayerInteract(PlayerInteractEvent event) {
+    	Player player = event.getPlayer();
+    	if(player.getItemInHand().getType() == Material.WOOD_SWORD && war.isWandBearer(player)) {
+    		String zoneName = war.getWandBearerZone(player);
+    		ZoneSetter setter = new ZoneSetter(war, player, zoneName);
+    		if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR) {
+    			war.badMsg(player, "Too far.");
+    		} else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+    			setter.placeCorner1(event.getClickedBlock());
+    			event.setUseItemInHand(Result.ALLOW);
+    		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+    			setter.placeCorner2(event.getClickedBlock());
+    			event.setUseItemInHand(Result.ALLOW);
+    			//player.getInventory().addItem(new ItemStack(Material.WOOD_SWORD));
+    		}
+    		
     	}
     }
 	

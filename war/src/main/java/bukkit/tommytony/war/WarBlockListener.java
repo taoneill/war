@@ -150,7 +150,7 @@ public class WarBlockListener extends BlockListener {
 			}
 			event.setCancelled(false);
 			return;
-		}else if(warzone != null && warzone.isImportantBlock(block)) {
+		}else if(warzone != null && warzone.isImportantBlock(block) && (!isZoneMaker || (isZoneMaker && team != null))) {
 			
     		if(team != null && team.getSpawnVolume().contains(block)) {
     			ItemStack teamKindBlock = new ItemStack(team.getKind().getMaterial(), team.getKind().getData());

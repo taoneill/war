@@ -92,8 +92,12 @@ public class ZoneSetter {
 	}
 	
 	public void placeCorner1() {
-		Warzone warzone = war.findWarzone(zoneName);
 		Block corner1Block = player.getLocation().getWorld().getBlockAt(player.getLocation());
+		placeCorner1(corner1Block);
+	}
+	
+	public void placeCorner1(Block corner1Block) {
+		Warzone warzone = war.findWarzone(zoneName);
 		StringBuilder msgString = new StringBuilder();
 		try
 		{
@@ -122,8 +126,12 @@ public class ZoneSetter {
 	}
 	
 	public void placeCorner2() {
-		Warzone warzone = war.findWarzone(zoneName);
 		Block corner2Block = player.getLocation().getWorld().getBlockAt(player.getLocation());
+		placeCorner2(corner2Block);
+	}
+	
+	public void placeCorner2(Block corner2Block) {
+		Warzone warzone = war.findWarzone(zoneName);
 		StringBuilder msgString = new StringBuilder();
 		try
 		{
@@ -197,7 +205,7 @@ public class ZoneSetter {
 			//}
 			warzone.initializeZone();
 			WarzoneMapper.save(war, warzone, true);
-			war.msg(player, "Warzone saved. Use /setteam, /setmonument and /savezone to configure the zone.");
+			war.msg(player, "Warzone saved.");
 		} else {
 			if(warzone.getVolume().getCornerOne() == null) {
 				msgString.append("Still missing corner 1.");
