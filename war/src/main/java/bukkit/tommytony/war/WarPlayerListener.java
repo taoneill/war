@@ -40,7 +40,7 @@ public class WarPlayerListener extends PlayerListener {
 
 	private final War war;
 	private Random random = null;
-	private HashMap<String, InventoryStash> disconnected = new HashMap<String, InventoryStash>();
+	
 
 	public WarPlayerListener(War war) {
 		this.war = war;
@@ -50,39 +50,39 @@ public class WarPlayerListener extends PlayerListener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		// Disconnected
-		if(disconnected.containsKey(player.getName())) {
-			// restore the disconnected player's inventory
-			InventoryStash originalContents = disconnected.remove(player.getName());
-			PlayerInventory playerInv = player.getInventory();
-			playerInv.clear(playerInv.getSize() + 0);
-			playerInv.clear(playerInv.getSize() + 1);
-			playerInv.clear(playerInv.getSize() + 2);
-			playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
-			if(originalContents != null) {
-				playerInv.clear();
-				
-				for(ItemStack item : originalContents.getContents()) {
-					if(item != null && item.getTypeId() != 0) {
-						playerInv.addItem(item);
-					}
-				}
-				
-				if(originalContents.getHelmet() != null && originalContents.getHelmet().getType() != Material.AIR) {
-					playerInv.setHelmet(originalContents.getHelmet());
-				}
-				if(originalContents.getChest() != null && originalContents.getHelmet().getType() != Material.AIR) {
-					playerInv.setChestplate(originalContents.getChest());
-				}
-				if(originalContents.getLegs() != null && originalContents.getHelmet().getType() != Material.AIR) {
-					playerInv.setLeggings(originalContents.getLegs());
-				}
-				if(originalContents.getFeet() != null && originalContents.getHelmet().getType() != Material.AIR) {
-					playerInv.setBoots(originalContents.getFeet());
-				}
-			}
-			
-			war.msg(player, "You were disconnected while playing War. Here's your inventory from last time.");
-		}
+//		if(war.getDisconnected().containsKey(player.getName())) {
+//			// restore the disconnected player's inventory
+//			InventoryStash originalContents = war.getDisconnected().remove(player.getName());
+//			PlayerInventory playerInv = player.getInventory();
+//			playerInv.clear(playerInv.getSize() + 0);
+//			playerInv.clear(playerInv.getSize() + 1);
+//			playerInv.clear(playerInv.getSize() + 2);
+//			playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
+//			if(originalContents != null) {
+//				playerInv.clear();
+//				
+//				for(ItemStack item : originalContents.getContents()) {
+//					if(item != null && item.getTypeId() != 0) {
+//						playerInv.addItem(item);
+//					}
+//				}
+//				
+//				if(originalContents.getHelmet() != null && originalContents.getHelmet().getType() != Material.AIR) {
+//					playerInv.setHelmet(originalContents.getHelmet());
+//				}
+//				if(originalContents.getChest() != null && originalContents.getHelmet().getType() != Material.AIR) {
+//					playerInv.setChestplate(originalContents.getChest());
+//				}
+//				if(originalContents.getLegs() != null && originalContents.getHelmet().getType() != Material.AIR) {
+//					playerInv.setLeggings(originalContents.getLegs());
+//				}
+//				if(originalContents.getFeet() != null && originalContents.getHelmet().getType() != Material.AIR) {
+//					playerInv.setBoots(originalContents.getFeet());
+//				}
+//			}
+//			
+//			war.msg(player, "You were disconnected while playing War. Here's your inventory from last time.");
+//		}
     }
 	
 	public void onPlayerQuit(PlayerQuitEvent event) {
@@ -91,9 +91,9 @@ public class WarPlayerListener extends PlayerListener {
 		if(team != null) {
 			Warzone zone = war.getPlayerTeamWarzone(player.getName());
 			if(zone != null) {
-				if(zone.hasPlayerInventory(player.getName())) {
-					disconnected.put(player.getName(), zone.getPlayerInventory(player.getName()));
-				}
+//				if(zone.hasPlayerInventory(player.getName())) {
+//					war.getDisconnected().put(player.getName(), zone.getPlayerInventory(player.getName()));
+//				}
 				zone.handlePlayerLeave(player, zone.getTeleport(), true);
 			}
 			if(war.isWandBearer(player)) {
@@ -243,7 +243,6 @@ public class WarPlayerListener extends PlayerListener {
     		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
     			setter.placeCorner2(event.getClickedBlock());
     			event.setUseItemInHand(Result.ALLOW);
-    			//player.getInventory().addItem(new ItemStack(Material.WOOD_SWORD));
     		}
     		
     	}

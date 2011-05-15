@@ -38,6 +38,7 @@ import com.tommytony.war.mappers.VolumeMapper;
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
 import com.tommytony.war.utils.ChatFixUtil;
+import com.tommytony.war.utils.InventoryStash;
 
 /**
  * 
@@ -61,6 +62,7 @@ public class War extends JavaPlugin {
     private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
     private final List<String> zoneMakerNames = new ArrayList<String>();
     private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
+    private HashMap<String, InventoryStash> disconnected = new HashMap<String, InventoryStash>();
     private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
     private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
     private int defaultLifepool = 21;
@@ -100,6 +102,8 @@ public class War extends JavaPlugin {
 		if(warHub != null) {
 			warHub.getVolume().resetBlocks();
 		}
+		// To save the disconnected users state
+		//WarMapper.saveDisconnected(this);
 		this.logInfo("Done. War v" + desc.getVersion() + " is off.");
 	}
 
@@ -1512,6 +1516,14 @@ public class War extends JavaPlugin {
 
 	public boolean isDefaultNoCreatures() {
 		return defaultNoCreatures;
+	}
+
+	public void setDisconnected(HashMap<String, InventoryStash> disconnected) {
+		this.disconnected = disconnected;
+	}
+
+	public HashMap<String, InventoryStash> getDisconnected() {
+		return disconnected;
 	}
 	
 }
