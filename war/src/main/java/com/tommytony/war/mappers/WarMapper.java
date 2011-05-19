@@ -1,17 +1,9 @@
 package com.tommytony.war.mappers;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 
 import bukkit.tommytony.war.War;
 
@@ -20,7 +12,6 @@ import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.jobs.RestoreWarhubJob;
 import com.tommytony.war.jobs.RestoreWarzonesJob;
-import com.tommytony.war.utils.InventoryStash;
 
 /**
  * 
@@ -161,8 +152,6 @@ public class WarMapper {
 		}
 		
 		warConfig.close();
-		
-		//loadDisconnected(war);
 	}
 	
 	public static void save(War war) {
@@ -259,108 +248,4 @@ public class WarMapper {
 		warConfig.save();
 		warConfig.close();
 	}
-
-//	private static void loadDisconnected(War war) {
-//		BufferedReader in = null;
-//		try {
-//			in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + 
-//													"/dat/disconnected.dat")));
-//			String blockLine = in.readLine();
-//			while(blockLine != null && !blockLine.equals("")) {
-//				String[] blockSplit = blockLine.split(",");
-//				if(blockLine != null && !blockLine.equals("") && blockSplit.length > 1) {
-//					String playerName = blockSplit[0];
-//					List<ItemStack> items = new ArrayList<ItemStack>();
-//					if(blockSplit.length > 1) {
-//						String itemsStr = blockSplit[1];
-//						String[] itemsStrSplit = itemsStr.split(";;");
-//						for(String itemStr : itemsStrSplit) {
-//							String[] itemStrSplit = itemStr.split(";");
-//							if(itemStrSplit.length == 4) {
-//								ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-//										Integer.parseInt(itemStrSplit[1]));
-//								stack.setData(new MaterialData(stack.getTypeId(),Byte.parseByte(itemStrSplit[3])));
-//								short durability = (short)Integer.parseInt(itemStrSplit[2]);
-//								stack.setDurability(durability);
-//								items.add(stack);
-//							} else if(itemStrSplit.length == 3) {
-//								ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-//										Integer.parseInt(itemStrSplit[1]));
-//								short durability = (short)Integer.parseInt(itemStrSplit[2]);
-//								stack.setDurability(durability);
-//								items.add(stack);
-//							} else {
-//								items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]),
-//										Integer.parseInt(itemStrSplit[1])));
-//							}
-//						}
-//					}
-//					war.getDisconnected().put(playerName, new InventoryStash(items));
-//				}
-//				
-//			}
-//		} catch (IOException e) {
-//			war.logWarn("Failed to read volume file " + volume.getName() + 
-//					" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
-//			e.printStackTrace();
-//		} catch (Exception e) {
-//			war.logWarn("Unexpected error caused failure to read volume file " + zoneName + 
-//					" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
-//			e.printStackTrace();
-//		}  finally {
-//			if(in != null)
-//				try {
-//					in.close();
-//				} catch (IOException e) {
-//					war.logWarn("Failed to close file reader for volume " + volume.getName() +
-//							" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
-//					e.printStackTrace();
-//				}
-//		}
-//	}
-//
-//	public static void saveDisconnected(War war) {
-//		BufferedWriter out = null;
-//		try {
-//			out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/disconnected.dat")));
-//			HashMap<String,InventoryStash> disconnected = war.getDisconnected();
-//			for(String key : disconnected.keySet()){
-//				String userString = key + ",";
-//				InventoryStash userInv = disconnected.get(userString);
-//				for(ItemStack item : userInv.getContents()) {
-//					String extra = "";
-//					if(item != null) {
-//						extra += item.getTypeId() + ";" 
-//						+ item.getAmount() + ";" 
-//						+ item.getDurability(); 
-//						if(item.getData() != null)
-//							extra += ";" + item.getData().getData() ;
-//						extra += ";;";
-//					}
-//					userString += extra;
-//				}
-//				if(userInv.getHelmet() != null) {
-//					
-//				}
-//				
-//				out.write(userString);
-//				out.newLine();
-//			}
-//		} catch (IOException e) {
-//			war.logWarn("Failed while writing disconnected user inventories. " + e.getMessage());
-//			e.printStackTrace();
-//		} catch (Exception e) {
-//			war.logWarn("Unexpected error caused failure while writing disconnected user inventories. " + e.getClass().getName() + " " + e.getMessage());
-//			e.printStackTrace();
-//		}  
-//		finally {
-//			if(out != null)
-//				try {
-//					out.close();
-//				} catch (IOException e) {
-//					war.logWarn("Failed to close file writer for disconnected user inventories. " + e.getMessage());
-//					e.printStackTrace();
-//				}	
-//		}
-//	}
 }

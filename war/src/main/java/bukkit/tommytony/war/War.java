@@ -57,8 +57,9 @@ public class War extends JavaPlugin {
 	private WarBlockListener blockListener = new WarBlockListener(this);
     private Logger log;
     private PluginDescriptionFile desc = null;
+    private boolean loaded = false;
     
-    private final List<Warzone> warzones = new ArrayList<Warzone>();
+    private List<Warzone> warzones;
     private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
     private final List<String> zoneMakerNames = new ArrayList<String>();
     private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
@@ -86,28 +87,54 @@ public class War extends JavaPlugin {
 	
 	
 	public void onDisable() {
+		unloadWar();
+	}
+	
+	public void unloadWar() {
+		setLoaded(false);
 		for(Warzone warzone : warzones) {
-			this.logInfo("Clearing zone " + warzone.getName() + "...");
-			for(Team team : warzone.getTeams()) {
-				for(Player player : team.getPlayers()) {
-					warzone.handlePlayerLeave(player, warzone.getTeleport(), false);
-				}
-				team.getPlayers().clear();
-			}
-			if(warzone.getLobby() != null) {
-				warzone.getLobby().getVolume().resetBlocks();
-			}
-			warzone.getVolume().resetBlocks();
+			warzone.unload();
 		}
+		warzones.clear();
+		
 		if(warHub != null) {
 			warHub.getVolume().resetBlocks();
 		}
-		// To save the disconnected users state
-		//WarMapper.saveDisconnected(this);
+		
+		Thread thread = new Thread(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					Thread.sleep(2000);
+					Runtime rt = Runtime.getRuntime();
+					double mem = rt.freeMemory();
+					rt.runFinalization();
+					rt.gc();
+					mem = rt.freeMemory() - mem;
+					mem /= 1024 * 1024;
+					logInfo("Freed " + mem + " MB.");
+				}
+				catch (InterruptedException ex)
+				{
+					return;
+				}
+			}
+		});
+		thread.setPriority(Thread.MIN_PRIORITY);
+		thread.start();
+		
 		this.logInfo("Done. War v" + desc.getVersion() + " is off.");
 	}
 
 	public void onEnable() {
+		this.loadWar();
+	}
+	
+	public void loadWar() {
+		setLoaded(true);
+		warzones = new ArrayList<Warzone>();
 		desc = this.getDescription();
 		this.log = this.getServer().getLogger();
 		this.setupPermissions();
@@ -115,7 +142,6 @@ public class War extends JavaPlugin {
 		// Register hooks		
 		PluginManager pm = getServer().getPluginManager();
 		
-		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_KICK, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Normal, this);
@@ -149,7 +175,7 @@ public class War extends JavaPlugin {
 		WarMapper.load(this);
 		this.logInfo("War v"+ desc.getVersion() + " is on.");
 	}
-	
+
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if(sender instanceof Player) {
 			Player player = (Player) sender;
@@ -224,6 +250,10 @@ public class War extends JavaPlugin {
 					performSetWarConfig(player, arguments);
 				} else if(command.equals("zonemaker")) {
 					performZonemakerAsZonemaker(player, arguments);
+				} else if(command.equals("unloadwar")) {
+					unloadWar();
+				} else if(command.equals("loadwar")) {
+					loadWar();
 				}
 			} else if (command.equals("setzone")		// Not a zone maker but War command.
 						|| command.equals("nextbattle")
@@ -238,7 +268,8 @@ public class War extends JavaPlugin {
 						|| command.equals("deletemonument")
 						|| command.equals("setwarhub")
 						|| command.equals("deletewarhub")
-						|| command.equals("setwarconfig")) {
+						|| command.equals("setwarconfig")
+						|| command.equals("unloadwar")) {
 				this.badMsg(player, "You can't do this if you are not a warzone maker.");
 			} else if (command.equals("zonemaker")) {
 				performZonemakerAsPlayer(player);
@@ -1524,6 +1555,14 @@ public class War extends JavaPlugin {
 
 	public HashMap<String, InventoryStash> getDisconnected() {
 		return disconnected;
+	}
+
+	public void setLoaded(boolean loaded) {
+		this.loaded = loaded;
+	}
+
+	public boolean isLoaded() {
+		return loaded;
 	}
 	
 }

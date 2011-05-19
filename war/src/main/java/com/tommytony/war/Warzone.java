@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -180,15 +179,7 @@ public class Warzone {
 		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
 	}
 		
-	private void initZone() {
-		// add wall outlines
-//		if(isDrawZoneOutline()) {
-//			addZoneOutline(BlockFace.NORTH);
-//			addZoneOutline(BlockFace.EAST);
-//			addZoneOutline(BlockFace.SOUTH);
-//			addZoneOutline(BlockFace.WEST);
-//		}
-		
+	private void initZone() {		
 		// reset monuments
 		for(Monument monument : monuments) {
 			monument.getVolume().resetBlocks();
@@ -202,76 +193,6 @@ public class Warzone {
 		
 		this.flagThieves.clear();
 	}
-
-//	public void addZoneOutline(BlockFace wall) {
-//		int c1maxY = world.getHighestBlockYAt(volume.getMinX(), volume.getMinZ());
-//		int c2maxY = world.getHighestBlockYAt(volume.getMaxX(), volume.getMaxZ());
-//		Block ne = world.getBlockAt(volume.getMinX(), c1maxY, volume.getMinZ());
-//		Block nw = world.getBlockAt(volume.getMinX(), c2maxY, volume.getMaxZ());
-//		Block se = world.getBlockAt(volume.getMaxX(), c2maxY, volume.getMinZ());
-//		Block lastBlock = null;
-//		if(BlockFace.NORTH == wall) {
-//			for(int z = volume.getMinZ(); z < volume.getMaxZ(); z++) {
-//				lastBlock = highestBlockToGlass(ne.getX(), z, lastBlock);
-//			}
-//		} else if (BlockFace.EAST == wall) {
-//			for(int x = volume.getMinX(); x < volume.getMaxX(); x++) {
-//				lastBlock = highestBlockToGlass(x, ne.getZ(), lastBlock);
-//			}
-//		} else if (BlockFace.SOUTH == wall) {
-//			for(int z = volume.getMinZ(); z < volume.getMaxZ(); z++) {
-//				lastBlock = highestBlockToGlass(se.getX(), z, lastBlock);
-//			}
-//		} else if (BlockFace.WEST == wall) {
-//			for(int x = volume.getMinX(); x < volume.getMaxX(); x++) {
-//				lastBlock = highestBlockToGlass(x, nw.getZ(), lastBlock);
-//			}
-//		}
-//	}
-
-//	private Block highestBlockToGlass(int x, int z, Block lastBlock) {
-//		int highest = world.getHighestBlockYAt(x, z);
-//		Block block = world.getBlockAt(x, highest -1 , z);
-//		
-//		if(block.getType() == Material.LEAVES) { // top of tree, lets find some dirt/ground
-//			Block over = block.getFace(BlockFace.DOWN);
-//			Block under = over.getFace(BlockFace.DOWN);
-//			int treeHeight = 0;
-//			while(!((over.getType() == Material.AIR && under.getType() != Material.AIR && under.getType() != Material.LEAVES) 
-//					|| (over.getType() == Material.LEAVES && under.getType() != Material.LEAVES && under.getType() != Material.AIR)
-//					|| (over.getType() == Material.WOOD && under.getType() != Material.WOOD && under.getType() != Material.AIR))
-//				  && treeHeight < 40) {
-//				over = under;
-//				if(over.getY() <= 0) break; 	// reached bottom
-//				under = over.getFace(BlockFace.DOWN);
-//				treeHeight++;
-//			}
-//			block = under; // found the ground
-//		}
-//		
-//		block.setType(Material.GLASS);
-//
-//		if(lastBlock != null) {
-//			// link the new block and the old vertically if there's a big drop or rise
-//			if(block.getY() - lastBlock.getY() > 1) {  // new block too high 
-//				Block under = block.getFace(BlockFace.DOWN);
-//				while(under.getY() != lastBlock.getY() - 1) {
-//					under.setType(Material.GLASS);
-//					if(under.getY() <= 0) break;	// reached bottom
-//					under = under.getFace(BlockFace.DOWN);
-//				}
-//			} else if (lastBlock.getY() - block.getY() > 1) { // new block too low
-//				Block over = block.getFace(BlockFace.UP);
-//				while(over.getY() != lastBlock.getY() + 1) {
-//					over.setType(Material.GLASS);
-//					if(over.getY() >= 127) break;
-//					over = over.getFace(BlockFace.UP);
-//				}
-//			}
-//		}
-//
-//		return block;
-//	}
 
 	public void endRound() {
 		
@@ -705,8 +626,9 @@ public class Warzone {
 		return null;
 	}
 
-	public void protectZoneWallAgainstPlayer(Player player) {
+	public boolean protectZoneWallAgainstPlayer(Player player) {
 		List<BlockFace> nearestWalls = getNearestWalls(player.getLocation());
+		boolean protecting = false;
 		for(BlockFace wall : nearestWalls) {
 			ZoneWallGuard guard = getPlayerZoneWallGuard(player.getName(), wall);
 			if(guard != null) { 
@@ -717,7 +639,9 @@ public class Warzone {
 				guard = new ZoneWallGuard(player, war, this, wall);
 				zoneWallGuards.add(guard);
 			}
+			protecting = true;
 		}
+		return protecting;
 	}
 	
 	public void dropZoneWallGuardIfAny(Player player) {
@@ -1085,5 +1009,22 @@ public class Warzone {
 	
 	public Location getRallyPoint() {
 		return this.rallyPoint;
+	}
+
+	public void unload() {
+		war.logInfo("Clearing zone " + this.getName() + "...");
+		for(Team team : this.getTeams()) {
+			for(Player player : team.getPlayers()) {
+				this.handlePlayerLeave(player, this.getTeleport(), false);
+			}
+			team.getPlayers().clear();
+		}
+		if(this.getLobby() != null)
+		{
+			this.getLobby().getVolume().resetBlocks();
+			this.getLobby().getVolume().finalize();
+		}
+		this.getVolume().resetBlocks();
+		this.getVolume().finalize();
 	}
 }

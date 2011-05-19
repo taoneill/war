@@ -134,6 +134,12 @@ commands:
     description: (War) Deletes the warhub if it exists. Resets all warzone lobbies.
     usage: /deletewarhub
 # 4- Defaults and server configuration
+  unloadwar:
+    description: (War) Disables the War plugin.
+    usage: /unloadwar
+  loadwar:
+    description: (War) Enables the War plugin.
+    usage: /loadwar
   setwarconfig:
     description: (War) Change gobal settings and the default warzone configuration values.
     usage: 

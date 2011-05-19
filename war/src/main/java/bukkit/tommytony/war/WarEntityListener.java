@@ -12,7 +12,6 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
@@ -34,19 +33,21 @@ public class WarEntityListener extends EntityListener {
 	}
 	
 	public void onEntityDeath(EntityDeathEvent event) {
-		Entity e = event.getEntity();
-		if(e instanceof Player) {
-			Player player = (Player)e;
-			Team team = war.getPlayerTeam(player.getName());
-			if(team != null) {
-				Warzone zone =  war.getPlayerTeamWarzone(player.getName());
-				zone.handleDeath(player);
-//				if(zone.isDropLootOnDeath()) {
-//					war.getServer().getScheduler().scheduleAsyncDelayedTask(war, 
-//							new LootDropperTask(player.getLocation(), event.getDrops()), 
-//							750);
-//				}	
-				event.getDrops().clear();	// no loot
+		if(war.isLoaded()) {
+			Entity e = event.getEntity();
+			if(e instanceof Player) {
+				Player player = (Player)e;
+				Team team = war.getPlayerTeam(player.getName());
+				if(team != null) {
+					Warzone zone =  war.getPlayerTeamWarzone(player.getName());
+					zone.handleDeath(player);
+	//				if(zone.isDropLootOnDeath()) {
+	//					war.getServer().getScheduler().scheduleAsyncDelayedTask(war, 
+	//							new LootDropperTask(player.getLocation(), event.getDrops()), 
+	//							750);
+	//				}	
+					event.getDrops().clear();	// no loot
+				}
 			}
 		}
     }
@@ -128,103 +129,77 @@ public class WarEntityListener extends EntityListener {
 	}
 
 	public void onEntityExplode(EntityExplodeEvent event) {
-		// protect zones elements, lobbies and warhub from creepers
-		List<Block> explodedBlocks = event.blockList();
-		for(Block block : explodedBlocks) {
-			if(war.getWarHub() != null && war.getWarHub().getVolume().contains(block)) {
-				event.setCancelled(true);
-				war.logInfo("Explosion prevented at warhub.");
-				return;
-			}
-			for(Warzone zone : war.getWarzones()) {
-				if(zone.isImportantBlock(block)) {
+		if(war.isLoaded()) {
+			// protect zones elements, lobbies and warhub from creepers
+			List<Block> explodedBlocks = event.blockList();
+			for(Block block : explodedBlocks) {
+				if(war.getWarHub() != null && war.getWarHub().getVolume().contains(block)) {
 					event.setCancelled(true);
-					war.logInfo("Explosion prevented in zone " + zone.getName() + ".");
+					war.logInfo("Explosion prevented at warhub.");
 					return;
-				} else if (zone.getLobby() != null && zone.getLobby().getVolume().contains(block)) {
-					event.setCancelled(true);
-					war.logInfo("Explosion prevented at zone " + zone.getName() + " lobby.");
-					return;
+				}
+				for(Warzone zone : war.getWarzones()) {
+					if(zone.isImportantBlock(block)) {
+						event.setCancelled(true);
+						war.logInfo("Explosion prevented in zone " + zone.getName() + ".");
+						return;
+					} else if (zone.getLobby() != null && zone.getLobby().getVolume().contains(block)) {
+						event.setCancelled(true);
+						war.logInfo("Explosion prevented at zone " + zone.getName() + " lobby.");
+						return;
+					}
 				}
 			}
 		}
     }
 	
 	public void onEntityDamage(EntityDamageEvent event) {
-		if(event instanceof EntityDamageByEntityEvent || 
-				event instanceof EntityDamageByProjectileEvent) {
-			handlerAttackDefend((EntityDamageByEntityEvent)event);
-		} else {
-			// Detect death (from , prevent it and respawn the player
-			Entity entity =  event.getEntity();
-			if(entity instanceof Player) {
-				Player player = (Player) entity;
-				Warzone zone = war.getPlayerTeamWarzone(player.getName());
-				if(zone != null && event.getDamage() >= player.getHealth()) {
-					zone.handleDeath(player);
-					event.setCancelled(true);
+		if(war.isLoaded()) {
+			if(event instanceof EntityDamageByEntityEvent || 
+					event instanceof EntityDamageByProjectileEvent) {
+				handlerAttackDefend((EntityDamageByEntityEvent)event);
+			} else {
+				// Detect death (from , prevent it and respawn the player
+				Entity entity =  event.getEntity();
+				if(entity instanceof Player) {
+					Player player = (Player) entity;
+					Warzone zone = war.getPlayerTeamWarzone(player.getName());
+					if(zone != null && event.getDamage() >= player.getHealth()) {
+						zone.handleDeath(player);
+						event.setCancelled(true);
+					}
 				}
 			}
 		}
-			
-			
-			
-//		if(event.getCause() == DamageCause.FIRE_TICK) {
-//			Entity entity =  event.getEntity();
-//			if(entity instanceof Player) {
-//				Player player = (Player) entity;
-//				Team team = war.getPlayerTeam(player.getName());
-//				if(team != null && team.getSpawnVolume().contains(player.getLocation())) {
-//					// smother out the fire that didn't burn out when you respawned
-//					// Stop fire (upcast, watch out!)
-//					if(player instanceof CraftPlayer) {
-//						net.minecraft.server.Entity playerEntity = ((CraftPlayer)player).getHandle();
-//						playerEntity.fireTicks = 0;
-//					}
-//					event.setCancelled(true);		
-//				}
-//			}
-//			
-//		} else if (event.getCause() == DamageCause.DROWNING) {
-//			Entity entity =  event.getEntity();
-//			if(entity instanceof Player) {
-//				Player player = (Player) entity;
-//				Team team = war.getPlayerTeam(player.getName());
-//				if(team != null && player.getHealth() <= 0) {
-//					// don't keep killing drowing player: trying to stop "Player moved wrongly!" error at respawn.
-//					event.setCancelled(true);		
-//				}
-//				
-//			}
-//		}
-		
-		
     }
 
 	public void onEntityCombust(EntityCombustEvent event) {
-		Entity entity =  event.getEntity();
-		if(entity instanceof Player) {
-			Player player = (Player) entity;
-			Team team = war.getPlayerTeam(player.getName());
-			if(team != null && team.getSpawnVolume().contains(player.getLocation())) {
-				// smother out the fire that didn't burn out when you respawned
-				//Stop fire (upcast, watch out!)
-				if(player instanceof CraftPlayer) {
-					net.minecraft.server.Entity playerEntity = ((CraftPlayer)player).getHandle();
-					playerEntity.fireTicks = 0;
+		if(war.isLoaded()) {
+			Entity entity =  event.getEntity();
+			if(entity instanceof Player) {
+				Player player = (Player) entity;
+				Team team = war.getPlayerTeam(player.getName());
+				if(team != null && team.getSpawnVolume().contains(player.getLocation())) {
+					// smother out the fire that didn't burn out when you respawned
+					//Stop fire (upcast, watch out!)
+					if(player instanceof CraftPlayer) {
+						net.minecraft.server.Entity playerEntity = ((CraftPlayer)player).getHandle();
+						playerEntity.fireTicks = 0;
+					}
+					event.setCancelled(true);		
 				}
-				event.setCancelled(true);		
 			}
-			
 		}
     }
 	
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
-		Location location = event.getLocation();
-		Warzone zone = war.warzone(location);
-		if(zone != null && zone.isNoCreatures()) {
-			event.setCancelled(true);
-			//war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
+		if(war.isLoaded()) {
+			Location location = event.getLocation();
+			Warzone zone = war.warzone(location);
+			if(zone != null && zone.isNoCreatures()) {
+				event.setCancelled(true);
+				//war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
+			}
 		}
     }
 

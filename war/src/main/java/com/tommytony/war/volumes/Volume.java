@@ -35,7 +35,7 @@ public class Volume {
 	private byte[][][] blockDatas = null;
 	private HashMap<String, String[]> signLines = new HashMap<String, String[]>();
 	private HashMap<String, List<ItemStack>> invBlockContents = new HashMap<String, List<ItemStack>>();
-	private final War war;	
+	private War war;	
 
 	public Volume(String name, War war, World world) {
 		this.name = name;
@@ -561,5 +561,14 @@ public class Volume {
 	public HashMap<String, List<ItemStack>> getInvBlockContents() {
 		return invBlockContents;
 	}
-
+	
+	public void finalize() {
+		this.blockDatas = null;
+		this.blockTypes = null;
+		this.signLines.clear();
+		this.signLines = null;
+		this.invBlockContents.clear();
+		this.invBlockContents = null;
+		this.war = null;
+	}
 }
