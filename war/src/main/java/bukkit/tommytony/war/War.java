@@ -709,17 +709,20 @@ public class War extends JavaPlugin {
 	}
 
 	public void performSetZoneLobby(Player player, String[] arguments) {
-		if((!this.inAnyWarzone(player.getLocation())
-				&& !this.inAnyWarzoneLobby(player.getLocation()))
-				|| arguments.length < 1 || arguments.length > 1 
-				|| (arguments.length == 1 && !arguments[0].equals("north") && !arguments[0].equals("n")
-														&& !arguments[0].equals("east") && !arguments[0].equals("e")
-														&& !arguments[0].equals("south") && !arguments[0].equals("s")
-														&& !arguments[0].equals("west") && !arguments[0].equals("w"))) {
-			this.badMsg(player, "Usage: /setzonelobby <north/n/east/e/south/s/west/w>. Must be in warzone." +
-					"Defines on which side the zone lobby lies. " +
-					"Removes any previously set lobby.");
-		} else {
+		String usageStr = "Usage: When inside a warzone - /setzonelobby <north/n/east/e/south/s/west/w>." +
+		"Attaches the lobby to the specified zone wall. When outside a warzone - /setzonelobby <zonename>. " +
+		"Moves the lobby to your current position.";
+		if(arguments.length < 1 || arguments.length > 1) {
+			this.badMsg(player, usageStr);
+		} else if (this.inAnyWarzone(player.getLocation()) || this.inAnyWarzoneLobby(player.getLocation())){
+			// Inside a warzone: use the classic n/s/e/w mode 
+			if(!arguments[0].equals("north") && !arguments[0].equals("n")
+					&& !arguments[0].equals("east") && !arguments[0].equals("e")
+					&& !arguments[0].equals("south") && !arguments[0].equals("s")
+					&& !arguments[0].equals("west") && !arguments[0].equals("w")){
+				this.badMsg(player, usageStr);
+				return;
+			}			
 			Warzone warzone = this.warzone(player.getLocation());
 			ZoneLobby lobby = this.lobby(player.getLocation());
 			if(warzone == null && lobby != null) {
@@ -760,6 +763,33 @@ public class War extends JavaPlugin {
 				this.msg(player, "Warzone lobby created on " + wallStr + "side of zone.");
 			}
 			WarzoneMapper.save(this, warzone, false);
+		} else {
+			// Not in a warzone: set the lobby position to where the player is standing
+			Warzone warzone = this.matchWarzone(arguments[0]);
+			if(warzone == null) {
+				this.badMsg(player, "No warzone matches " + arguments[0] + ".");
+			} else {
+				// Move the warzone lobby
+				ZoneLobby lobby =  warzone.getLobby();
+				if(lobby != null) {
+					// reset existing lobby
+					lobby.getVolume().resetBlocks();
+					lobby.setLocation(player.getLocation());
+					lobby.initialize();
+					this.msg(player, "Warzone lobby moved to your location.");
+				} else {
+					// new lobby
+					lobby = new ZoneLobby(this, warzone, player.getLocation());
+					warzone.setLobby(lobby);
+					lobby.initialize();
+					if(warHub != null) { // warhub has to change
+						warHub.getVolume().resetBlocks();
+						warHub.initialize();
+					}
+					this.msg(player, "Warzone lobby moved to your location.");
+				}
+				WarzoneMapper.save(this, warzone, false);
+			}			
 		}
 	}
 
@@ -771,11 +801,16 @@ public class War extends JavaPlugin {
 														&& !arguments[1].equals("c1") && !arguments[1].equals("c2")
 														&& !arguments[1].equals("pos1") && !arguments[1].equals("pos2")
 														&& !arguments[1].equals("wand")))) {
-			this.badMsg(player, "Usage: =<Classic mode>= /setzone <warzone-name> <'northwest'/'southeast'/'nw'/'se'> (NW defaults to top block, SE to bottom). " +
-					"=<Wand Cuboid mode>= /setzone <warzone-name> wand (gives you a wooden sword to right and left click, drop to disable). " +
-					"=<Wandless Cuboid mode>= /setzone <warzone-name> <'corner1'/'corner2'/'c1'/'c2'/'pos1'/'pos2'> (block where you're standing). " +
-					"Set one corner, then the next. Defines the outline of the warzone, which will be reset at the start of every battle. " +
-					"Saves the zone blocks if the outline is valid.");
+			if(arguments.length == 1) {
+				// we only have a zone name, default to wand mode
+				this.addWandBearer(player, arguments[0]);
+			} else {
+				this.badMsg(player, "Usage: =<Classic mode>= /setzone <warzone-name> <'northwest'/'southeast'/'nw'/'se'> (NW defaults to top block, SE to bottom). " +
+						"=<Wand Cuboid mode>= /setzone <warzone-name> wand (gives you a wooden sword to right and left click, drop to disable). " +
+						"=<Wandless Cuboid mode>= /setzone <warzone-name> <'corner1'/'corner2'/'c1'/'c2'/'pos1'/'pos2'> (block where you're standing). " +
+						"Set one corner, then the next. Defines the outline of the warzone, which will be reset at the start of every battle. " +
+						"Saves the zone blocks if the outline is valid.");	
+			}
 		} else {
 			ZoneSetter setter = new ZoneSetter(this, player, arguments[0]);
 			if(arguments[1].equals("northwest") || arguments[1].equals("nw")) {
@@ -1237,6 +1272,15 @@ public class War extends JavaPlugin {
 		}
 		for(Warzone warzone : incompleteZones) {	
 			if(warzone.getName().equals(warzoneName)) {
+				return warzone;
+			}
+		}
+		return null;
+	}
+	
+	public Warzone matchWarzone(String warzoneSubString) {
+		for(Warzone warzone : warzones) {
+			if(warzone.getName().toLowerCase().contains(warzoneSubString.toLowerCase())) {
 				return warzone;
 			}
 		}

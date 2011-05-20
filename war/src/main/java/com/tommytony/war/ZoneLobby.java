@@ -39,6 +39,12 @@ public class ZoneLobby {
 	private int lobbyHalfSide;
 	private final int lobbyDepth = 10;
 	
+	/**
+	 * Use this constructor with /setzonelobby <n/s/e/w>
+	 * @param war
+	 * @param warzone
+	 * @param wall On which wall of the warzone will the lobby be stuck to at mid-weight
+	 */
 	public ZoneLobby(War war, Warzone warzone, BlockFace wall) {
 		this.war = war;
 		this.warzone = warzone;
@@ -48,9 +54,27 @@ public class ZoneLobby {
 			lobbyHalfSide = 7;
 		}
 		this.wall = wall;
-		//this.changeWall(wall); 
 	}
 	
+	/**
+	 * Use this constructor with /setzonelobby <zonename>.
+	 * Makes sure the lobby is not sticking inside the zone.
+	 * @param war
+	 * @param warzone
+	 * @param wall On which wall of the warzone will the lobby be stuck to at mid-weight
+	 */
+	public ZoneLobby(War war, Warzone warzone, Location playerLocation) {
+		this.war = war;
+		this.warzone = warzone;
+		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
+		lobbyHalfSide = lobbyWidth / 2;
+		if(lobbyHalfSide < 7) {
+			lobbyHalfSide = 7;
+		}
+		setLocation(playerLocation);
+	}
+
+
 	/**
 	 * Convenience ctor when loading form disk.
 	 * This figures out the middle wall block of the lobby from the volume instead 
@@ -79,27 +103,74 @@ public class ZoneLobby {
 		}
 	}
 	
-	public void setWall(BlockFace newWall) {
-		this.wall = newWall;
+	/**
+	 * Changes the lobby's position. Orientation is determined from the player location.
+	 * Creates volume or resets. Saves new lobby blocks.
+	 * @param playerLocation
+	 */
+	public void setLocation(Location playerLocation) {
+		createVolumeOrReset();
+		BlockFace facing = null;
+		BlockFace opposite = null;
+		float yaw = playerLocation.getYaw();
+		if(yaw >= 45 && yaw < 135) {
+			facing = BlockFace.NORTH;
+			opposite = BlockFace.SOUTH;
+		} else if(yaw >= 135 && yaw < 225) {
+			facing = BlockFace.EAST;
+			opposite = BlockFace.WEST;
+		} else if(yaw >= 225 && yaw < 315) {
+			facing = BlockFace.SOUTH;
+			opposite = BlockFace.NORTH;
+		} else if(yaw >= 315 || yaw < 45) {
+			facing = BlockFace.WEST;
+			opposite = BlockFace.EAST;
+		} 
+		this.wall = opposite;	// a player facing south places a lobby that looks just like a lobby stuck to the north wall 
+		
+		ZoneVolume zoneVolume = warzone.getVolume();
+		calculateLobbyWidth();
+		
+		lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(playerLocation.getBlockX(), 
+																		playerLocation.getBlockY(), 
+																		playerLocation.getBlockZ())
+																	.getFace(facing, 6));
+		
+		Block corner1 = null;
+		Block corner2 = null;
+		int x = lobbyMiddleWallBlock.getX();
+		int y = lobbyMiddleWallBlock.getY();
+		int z = lobbyMiddleWallBlock.getZ();
+		
+		if(wall == BlockFace.NORTH) {
+			//lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(x, y, wallCenterPos));
+			corner1 = warzone.getWorld().getBlockAt(x, y - 1, z + lobbyHalfSide);
+			corner2 = warzone.getWorld().getBlockAt(x - lobbyDepth, y + 1 + lobbyHeight, z - lobbyHalfSide);
+		} else if (wall == BlockFace.EAST){
+			corner1 = warzone.getWorld().getBlockAt(x - lobbyHalfSide, y - 1, z);
+			corner2 = warzone.getWorld().getBlockAt(x + lobbyHalfSide, y + 1 + lobbyHeight, z - lobbyDepth);
+ 		} else if (wall == BlockFace.SOUTH){
+			corner1 = warzone.getWorld().getBlockAt(x, y -1 , z - lobbyHalfSide);
+			corner2 = warzone.getWorld().getBlockAt(x + lobbyDepth, y + 1 + lobbyHeight, z + lobbyHalfSide);
+		} else if (wall == BlockFace.WEST){
+			corner1 = warzone.getWorld().getBlockAt(x + lobbyHalfSide, y - 1, z);
+			corner2 = warzone.getWorld().getBlockAt(x - lobbyHalfSide, y + 1 + lobbyHeight, z + lobbyDepth);
+		}
+		
+		saveLobbyBlocks(corner1, corner2);
 	}
 	
-	private void changeWall(BlockFace newWall) {
-		if(volume == null) {
-			// no previous wall
-			this.volume = new Volume("lobby", war, warzone.getWorld());
-		} else if(volume.isSaved()) {
-			volume.resetBlocks();
-		}
-		
+	/**
+	 * Classic way of creating a lobby. Lobby position goes to middle of zone wall.
+	 * Creates volume or resets. Saves new lobby blocks.
+	 * @param newWall
+	 */
+	public void setWall(BlockFace newWall) {
+		createVolumeOrReset();
 		this.wall = newWall;
-		// find center of the wall and set the new volume corners
-		ZoneVolume zoneVolume = warzone.getVolume();
 		
-		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
-		lobbyHalfSide = lobbyWidth / 2;
-		if(lobbyHalfSide < 7) {
-			lobbyHalfSide = 7;
-		}
+		ZoneVolume zoneVolume = warzone.getVolume();
+		calculateLobbyWidth();
 		
 		Block corner1 = null;
 		Block corner2 = null;
@@ -148,17 +219,37 @@ public class ZoneLobby {
 			corner2 = warzone.getWorld().getBlockAt(wallCenterPos - lobbyHalfSide, y + 1 + lobbyHeight, z + lobbyDepth);
 		}
 		
+		saveLobbyBlocks(corner1, corner2);
+	}
+	
+	private void createVolumeOrReset() {
+		if(volume == null) {
+			// no previous wall
+			this.volume = new Volume("lobby", war, warzone.getWorld());
+		} else if(volume.isSaved()) {
+			volume.resetBlocks();
+		}
+	}
+	
+	private void calculateLobbyWidth() {
+		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
+		lobbyHalfSide = lobbyWidth / 2;
+		if(lobbyHalfSide < 7) {
+			lobbyHalfSide = 7;
+		}
+	}
+	
+	private void saveLobbyBlocks(Block corner1, Block corner2) {
 		if(corner1 != null && corner2 != null) {
 			// save the blocks, wide enough for three team gates, 3+1 high and 10 deep, extruding out from the zone wall.
 			this.volume.setCornerOne(corner1);
 			this.volume.setCornerTwo(corner2);
 			this.volume.saveBlocks();
-			//VolumeMapper.save(volume, warzone.getName(), war);
 		}
 	}
 	
 	public void initialize() {
-		changeWall(wall);	// watch out! this saves the lobby blocks (you gotta the lobby blocks before)
+		//changeWall(wall);	// watch out! this resets+saves the lobby blocks
 		
 		// maybe the number of teams change, now reset the gate positions
 		setGatePositions(BlockInfo.getBlock(warzone.getWorld(), lobbyMiddleWallBlock));
