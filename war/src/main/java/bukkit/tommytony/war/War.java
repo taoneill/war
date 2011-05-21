@@ -248,7 +248,7 @@ public class War extends JavaPlugin {
 					performDeleteWarhub(player);
 				} else if(command.equals("setwarconfig") || command.equals("warcfg")) {
 					performSetWarConfig(player, arguments);
-				} else if(command.equals("zonemaker")) {
+				} else if(command.equals("zonemaker") || command.equals("zm")) {
 					performZonemakerAsZonemaker(player, arguments);
 				} else if(command.equals("unloadwar")) {
 					unloadWar();
@@ -271,7 +271,7 @@ public class War extends JavaPlugin {
 						|| command.equals("setwarconfig")
 						|| command.equals("unloadwar")) {
 				this.badMsg(player, "You can't do this if you are not a warzone maker.");
-			} else if (command.equals("zonemaker")) {
+			} else if (command.equals("zonemaker") || command.equals("zm")) {
 				performZonemakerAsPlayer(player);
 			}
 		}
@@ -885,7 +885,7 @@ public class War extends JavaPlugin {
 	public void performJoin(Player player, String[] arguments) {
 		if(arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))
 				|| (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
-			this.badMsg(player, "Usage: /join <diamond/iron/gold/d/i/g>." +
+			this.badMsg(player, "Usage: /join <diamond/iron/gold/red/blue/green/etc.>." +
 					" Teams are warzone specific." +
 					" You must be inside a warzone or zone lobby to join a team." +
 					" Use as an alternative to walking through the team gate.");

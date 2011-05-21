@@ -126,6 +126,9 @@ commands:
     usage: 
         - /zonemaker
         - /zonemaker <new-or-kicked-zone-maker-name>
+  zm:
+    description: (War) Alias for /zonemaker
+    usage:
 # 3- War hub
   setwarhub:
     description: (War) Create or moves a West-facing wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
