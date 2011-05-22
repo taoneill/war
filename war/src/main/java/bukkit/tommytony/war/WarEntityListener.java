@@ -208,8 +208,18 @@ public class WarEntityListener extends EntityListener {
     }
     
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-		if(!war.isLoaded()) return;
-		if (((org.bukkit.craftbukkit.entity.CraftPlayer) event.getEntity()).getHandle().ticksLived % 20 * 12 == 0)
-		    event.setCancelled(true);
+		if(war.isLoaded()) {
+			Entity entity = event.getEntity();
+			if(entity instanceof Player) {
+				Player player = (Player) entity;
+				Location location = player.getLocation();
+				Warzone zone = war.warzone(location);
+				if(zone != null) {
+					if (((CraftPlayer) player).getHandle().ticksLived % 20 * 12 == 0) {
+						event.setCancelled(true);
+					}
+				}
+			}
+		}
 	}
 }
