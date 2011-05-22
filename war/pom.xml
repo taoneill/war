@@ -20,6 +20,16 @@
               </configuration>
           </plugin>
       </plugins>
+      <resources>
+        <resource>
+          <targetPath>.</targetPath>
+          <filtering>true</filtering>
+          <directory>${basedir}/src/main/java/</directory>
+          <includes>
+            <include>plugin.yml</include>
+          </includes>
+        </resource>    
+      </resources>
   </build>
   <dependencies>
     <dependency>
@@ -34,6 +44,12 @@
     	<artifactId>craftbukkit</artifactId>
     	<version>0.0.1-SNAPSHOT</version>
     	<scope>compile</scope>
+    </dependency>
+    <dependency>
+       <groupId>com.nijikokun.bukkit</groupId>
+       <artifactId>Permissions</artifactId>
+       <version>2.7.4</version>
+       <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
