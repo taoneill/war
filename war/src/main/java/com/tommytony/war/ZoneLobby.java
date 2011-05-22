@@ -660,7 +660,11 @@ public class ZoneLobby {
 			lines[0] =  "Team " + team.getName();
 			lines[1] = team.getPlayers().size() + "/" + warzone.getTeamCap() + " players";
 			lines[2] = team.getPoints() + "/" + warzone.getScoreCap() + " pts";
-			lines[3] = team.getRemainingLifes() + "/" + warzone.getLifePool() + " lives left";
+			if(warzone.getLifePool() == -1) {
+				lines[3] = "unlimited lives";
+			} else {
+				lines[3] = team.getRemainingLifes() + "/" + warzone.getLifePool() + " lives left";
+			}
 			resetGateSign(gate, lines, true);
 		}
 	}

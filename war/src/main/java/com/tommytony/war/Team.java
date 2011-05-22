@@ -276,9 +276,14 @@ public class Team {
 			
 			String[] lines = new String[4];
 			lines[0] = "Team " + name;
-			lines[1] = remainingLives + "/" + warzone.getLifePool() + " lives left";
+			lines[1] = players.size() + "/" + warzone.getTeamCap() + " players";
 			lines[2] = points + "/" + warzone.getScoreCap() + " pts";
-			lines[3] = players.size() + "/" + warzone.getTeamCap() + " players";
+			if(warzone.getLifePool() == -1) {
+				lines[3] = "unlimited lives";
+			} else {
+				lines[3] = remainingLives + "/" + warzone.getLifePool() + " lives left";
+			}
+			
 			SignHelper.setToSign(war, signBlock, (byte)signData, lines);
 		}
 	}
