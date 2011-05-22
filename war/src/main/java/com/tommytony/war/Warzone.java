@@ -740,7 +740,7 @@ public class Warzone {
 		Team playerTeam = war.getPlayerTeam(player.getName());
 		Warzone playerWarzone = war.getPlayerTeamWarzone(player.getName());
 		if(playerTeam != null && playerWarzone != null) {
-	    	// teleport to team spawn upon death
+			// teleport to team spawn upon death
 			war.msg(player, "You died.");
 			playerWarzone.respawnPlayer(playerTeam, player);
 			int remaining = playerTeam.getRemainingLifes();

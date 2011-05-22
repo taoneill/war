@@ -60,9 +60,9 @@ public class WarPlayerListener extends PlayerListener {
 		}
 	}
 
-    public void onPlayerDropItem(PlayerDropItemEvent event) {
-    	if(war.isLoaded()) {
-	    	Player player = event.getPlayer();
+	public void onPlayerDropItem(PlayerDropItemEvent event) {
+		if(war.isLoaded()) {
+			Player player = event.getPlayer();
 			Team team = war.getPlayerTeam(player.getName());
 			if(team != null) {
 				Warzone zone = war.getPlayerTeamWarzone(player.getName());
@@ -101,12 +101,12 @@ public class WarPlayerListener extends PlayerListener {
 					war.msg(player, "You dropped the zone " + zoneName + " wand.");
 				}
 			}
-    	}
-    }
+		}
+	}
 
-    public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-    	if(war.isLoaded()) {
-	    	Player player = event.getPlayer();
+	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+		if(war.isLoaded()) {
+			Player player = event.getPlayer();
 			Team team = war.getPlayerTeam(player.getName());
 			if(team != null) {
 				Warzone zone = war.getPlayerTeamWarzone(player.getName());
@@ -131,91 +131,91 @@ public class WarPlayerListener extends PlayerListener {
 					}
 				}
 			}
-    	}
-    }
-    
-    public void onInventoryOpen(PlayerInventoryEvent event) {
-    	if(war.isLoaded()) {
-	    	Player player = event.getPlayer();
-	    	Inventory inventory = event.getInventory();
-	    	Team team = war.getPlayerTeam(player.getName());
-	    	if(team != null && inventory instanceof PlayerInventory) {
-	    		// make sure the player doesn't have too many precious blocks
-	    		// or illegal armor (i.e. armor not found in loadout)
-	    		PlayerInventory playerInv = (PlayerInventory) inventory;
-	    		ItemStack teamKindBlock = new ItemStack(team.getKind().getMaterial(), team.getKind().getData());
-	    		if(playerInv.contains(teamKindBlock, 2)) {
-	    			playerInv.remove(teamKindBlock);
-	    			playerInv.addItem(teamKindBlock);
-	    			war.badMsg(player, "All that " + team.getName() + " must have been heavy!");
-	    		}
-	    	}
-    	}
-    }
-    
-    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-    	if(war.isLoaded()) {
-	    	Player player = event.getPlayer();
-	    	Team talkingPlayerTeam = war.getPlayerTeam(player.getName());
-	    	if(talkingPlayerTeam != null) {
-	    		String msg = event.getMessage();
-	    		String[] split = msg.split(" ");
-	    		if(!war.isZoneMaker(player) && split.length > 0 && split[0].startsWith("/")) {
-	    			String command = split[0].substring(1);
-	    			if(!command.equals("war") && !command.equals("zones") && !command.equals("warzones")
-	    				&& !command.equals("zone") && !command.equals("warzone")
-	    				&& !command.equals("teams")
-	    				&& !command.equals("join")
-	    				&& !command.equals("leave")
-	    				&& !command.equals("team")
-	    				&& !command.equals("warhub")
-	    				&& !command.equals("zonemaker")) {
-	    				war.badMsg(player, "Can't use anything but War commands (e.g. /leave, /warhub) while you're playing in a warzone.");
-	    				event.setCancelled(true);
-	    			}
-	    		}
-	    	}
-    	}
-    }
-    
-    public void onPlayerKick(PlayerKickEvent event) {
-    	if(war.isLoaded()) {
-	    	Player player = event.getPlayer();
-	    	String reason = event.getReason();
-	    	if(reason.contains("moved") || reason.contains("too quickly") || reason.contains("Hacking")) {
-		    	boolean inWarzone = war.inAnyWarzone(player.getLocation());
-		    	boolean inLobby = war.inAnyWarzone(player.getLocation());
-		    	boolean inWarhub = false;
-		    	if(war.getWarHub() != null && war.getWarHub().getVolume().contains(player.getLocation())) { 
-		    		inWarhub = true;
-		    	}
-		    	if(inWarzone || inLobby || inWarhub) {
-		    		event.setCancelled(true);
-		    		war.logWarn("Prevented " + player.getName() + " from getting kicked.");
-		    	}
-	    	}
-    	}
-    }
-    
-    public void onPlayerInteract(PlayerInteractEvent event) {
-    	if(war.isLoaded()) {
-	    	Player player = event.getPlayer();
-	    	if(player.getItemInHand().getType() == Material.WOOD_SWORD && war.isWandBearer(player)) {
-	    		String zoneName = war.getWandBearerZone(player);
-	    		ZoneSetter setter = new ZoneSetter(war, player, zoneName);
-	    		if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR) {
-	    			war.badMsg(player, "Too far.");
-	    		} else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-	    			setter.placeCorner1(event.getClickedBlock());
-	    			event.setUseItemInHand(Result.ALLOW);
-	    		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-	    			setter.placeCorner2(event.getClickedBlock());
-	    			event.setUseItemInHand(Result.ALLOW);
-	    		}
-	    		
-	    	}
-    	}
-    }
+		}
+	}
+	
+	public void onInventoryOpen(PlayerInventoryEvent event) {
+		if(war.isLoaded()) {
+			Player player = event.getPlayer();
+			Inventory inventory = event.getInventory();
+			Team team = war.getPlayerTeam(player.getName());
+			if(team != null && inventory instanceof PlayerInventory) {
+				// make sure the player doesn't have too many precious blocks
+				// or illegal armor (i.e. armor not found in loadout)
+				PlayerInventory playerInv = (PlayerInventory) inventory;
+				ItemStack teamKindBlock = new ItemStack(team.getKind().getMaterial(), team.getKind().getData());
+				if(playerInv.contains(teamKindBlock, 2)) {
+					playerInv.remove(teamKindBlock);
+					playerInv.addItem(teamKindBlock);
+					war.badMsg(player, "All that " + team.getName() + " must have been heavy!");
+				}
+			}
+		}
+	}
+	
+	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+		if(war.isLoaded()) {
+			Player player = event.getPlayer();
+			Team talkingPlayerTeam = war.getPlayerTeam(player.getName());
+			if(talkingPlayerTeam != null) {
+				String msg = event.getMessage();
+				String[] split = msg.split(" ");
+				if(!war.isZoneMaker(player) && split.length > 0 && split[0].startsWith("/")) {
+					String command = split[0].substring(1);
+					if(!command.equals("war") && !command.equals("zones") && !command.equals("warzones")
+						&& !command.equals("zone") && !command.equals("warzone")
+						&& !command.equals("teams")
+						&& !command.equals("join")
+						&& !command.equals("leave")
+						&& !command.equals("team")
+						&& !command.equals("warhub")
+						&& !command.equals("zonemaker")) {
+						war.badMsg(player, "Can't use anything but War commands (e.g. /leave, /warhub) while you're playing in a warzone.");
+						event.setCancelled(true);
+					}
+				}
+			}
+		}
+	}
+	
+	public void onPlayerKick(PlayerKickEvent event) {
+		if(war.isLoaded()) {
+			Player player = event.getPlayer();
+			String reason = event.getReason();
+			if(reason.contains("moved") || reason.contains("too quickly") || reason.contains("Hacking")) {
+				boolean inWarzone = war.inAnyWarzone(player.getLocation());
+				boolean inLobby = war.inAnyWarzone(player.getLocation());
+				boolean inWarhub = false;
+				if(war.getWarHub() != null && war.getWarHub().getVolume().contains(player.getLocation())) { 
+					inWarhub = true;
+				}
+				if(inWarzone || inLobby || inWarhub) {
+					event.setCancelled(true);
+					war.logWarn("Prevented " + player.getName() + " from getting kicked.");
+				}
+			}
+		}
+	}
+	
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		if(war.isLoaded()) {
+			Player player = event.getPlayer();
+			if(player.getItemInHand().getType() == Material.WOOD_SWORD && war.isWandBearer(player)) {
+				String zoneName = war.getWandBearerZone(player);
+				ZoneSetter setter = new ZoneSetter(war, player, zoneName);
+				if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR) {
+					war.badMsg(player, "Too far.");
+				} else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+					setter.placeCorner1(event.getClickedBlock());
+					event.setUseItemInHand(Result.ALLOW);
+				} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+					setter.placeCorner2(event.getClickedBlock());
+					event.setUseItemInHand(Result.ALLOW);
+				}
+				
+			}
+		}
+	}
 	
 	public void onPlayerMove(PlayerMoveEvent event) {
 		if(war.isLoaded()) {
@@ -437,7 +437,7 @@ public class WarPlayerListener extends PlayerListener {
 				return;
 			}
 		}
-    }
+	}
 	
 	private void handleDisabledZone(PlayerMoveEvent event, Player player, Warzone zone) {
 		if(zone.getLobby() != null) {

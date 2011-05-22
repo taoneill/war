@@ -55,19 +55,19 @@ public class War extends JavaPlugin {
 	private WarPlayerListener playerListener = new WarPlayerListener(this);
 	private WarEntityListener entityListener = new WarEntityListener(this);
 	private WarBlockListener blockListener = new WarBlockListener(this);
-    private Logger log;
-    private PluginDescriptionFile desc = null;
-    private boolean loaded = false;
-    
-    private List<Warzone> warzones;
-    private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
-    private final List<String> zoneMakerNames = new ArrayList<String>();
-    private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
-    private HashMap<String, InventoryStash> disconnected = new HashMap<String, InventoryStash>();
-    private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
-    private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
-    private int defaultLifepool = 21;
-    private boolean defaultFriendlyFire = false;
+	private Logger log;
+	private PluginDescriptionFile desc = null;
+	private boolean loaded = false;
+	
+	private List<Warzone> warzones;
+	private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
+	private final List<String> zoneMakerNames = new ArrayList<String>();
+	private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
+	private HashMap<String, InventoryStash> disconnected = new HashMap<String, InventoryStash>();
+	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
+	private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
+	private int defaultLifepool = 21;
+	private boolean defaultFriendlyFire = false;
 	private boolean defaultDrawZoneOutline = true;
 	private boolean defaultAutoAssignOnly = false;
 	private int defaultTeamCap = 7;
@@ -1526,13 +1526,13 @@ public class War extends JavaPlugin {
 	public void setupPermissions() {
 		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
 		if(Permissions == null) {
-		    if(test != null) {
-		    	Permissions = (Permissions)test;
-		    } else {
-		    	logInfo("Permissions system not enabled. Defaulting to regular War config.");
-		    }
+			if(test != null) {
+				Permissions = (Permissions)test;
+			} else {
+				logInfo("Permissions system not enabled. Defaulting to regular War config.");
+			}
 		}
-    }
+	}
 
 	public void setDefaultBlockHeads(boolean defaultBlockHeads) {
 		this.defaultBlockHeads = defaultBlockHeads;

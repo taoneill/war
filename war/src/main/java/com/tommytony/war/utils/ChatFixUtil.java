@@ -80,7 +80,7 @@ public class ChatFixUtil {
 				if (latestColor != null) {
 					row += deg+latestColor;
 				}
-		    }
+			}
 			char c = msg.charAt(i);
 			
 			if (c == deg) {

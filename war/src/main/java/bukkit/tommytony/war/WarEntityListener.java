@@ -52,12 +52,12 @@ public class WarEntityListener extends EntityListener {
 			}
 		}
 	}
-    
+	
 	private void handlerAttackDefend(EntityDamageByEntityEvent event) {
-    	Entity attacker = event.getDamager();
-    	Entity defender = event.getEntity();
-    	
-    	if(attacker != null && defender != null && attacker instanceof Player && defender instanceof Player) {
+		Entity attacker = event.getDamager();
+		Entity defender = event.getEntity();
+		
+		if(attacker != null && defender != null && attacker instanceof Player && defender instanceof Player) {
 			// only let adversaries (same warzone, different team) attack each other
 			Player a = (Player)attacker;
 			Player d = (Player)defender;
@@ -205,8 +205,8 @@ public class WarEntityListener extends EntityListener {
 				//war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
 			}
 		}
-    }
-    
+	}
+	
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
 		if(war.isLoaded()) {
 			Entity entity = event.getEntity();

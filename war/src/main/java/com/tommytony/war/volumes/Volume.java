@@ -256,8 +256,8 @@ public class Volume {
 											|| (oldBlockType == Material.LEVER.getId()  && ((oldBlockData & 0x02) == 0x02))
 											|| (oldBlockType == Material.STONE_BUTTON.getId() && ((oldBlockData & 0x02) == 0x02))
 											|| (oldBlockType == Material.LADDER.getId() && ((oldBlockData & 0x04) == 0x04))
-										    || (oldBlockType == Material.RAILS.getId() && ((oldBlockData & 0x02) == 0x02)))
-										    && i+1 != getSizeX()){
+											|| (oldBlockType == Material.RAILS.getId() && ((oldBlockData & 0x02) == 0x02)))
+											&& i+1 != getSizeX()){
 										// Blocks that hang on a block south of themselves need to make sure that block is there before placing themselves... lol
 										Block southBlock = currentBlock.getFace(BlockFace.SOUTH);
 										int oldSouthBlockType = getBlockTypes()[i+1][j][k];
