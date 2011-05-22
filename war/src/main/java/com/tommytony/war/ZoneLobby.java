@@ -53,7 +53,7 @@ public class ZoneLobby {
 		if(lobbyHalfSide < 7) {
 			lobbyHalfSide = 7;
 		}
-		this.wall = wall;
+		this.setWall(wall);
 	}
 	
 	/**
@@ -110,10 +110,20 @@ public class ZoneLobby {
 	 */
 	public void setLocation(Location playerLocation) {
 		createVolumeOrReset();
+		
+		// Lobby orientation
+		int yaw = 0;
+		if(playerLocation.getYaw() >= 0){
+			yaw = (int)(playerLocation.getYaw() % 360);
+		} else {
+			yaw = (int)(360 + (playerLocation.getYaw() % 360));
+		}
 		BlockFace facing = null;
 		BlockFace opposite = null;
-		float yaw = playerLocation.getYaw();
-		if(yaw >= 45 && yaw < 135) {
+		if((yaw >= 0 && yaw < 45) || (yaw >= 315 && yaw <= 360)) {
+			facing = BlockFace.WEST;
+			opposite = BlockFace.EAST;
+		} else if(yaw >= 45 && yaw < 135) {
 			facing = BlockFace.NORTH;
 			opposite = BlockFace.SOUTH;
 		} else if(yaw >= 135 && yaw < 225) {
@@ -122,10 +132,22 @@ public class ZoneLobby {
 		} else if(yaw >= 225 && yaw < 315) {
 			facing = BlockFace.SOUTH;
 			opposite = BlockFace.NORTH;
-		} else if(yaw >= 315 || yaw < 45) {
-			facing = BlockFace.WEST;
-			opposite = BlockFace.EAST;
-		} 
+		}
+		
+//		float yaw = playerLocation.getYaw() % 360;
+//		if(yaw >= 45 && yaw < 135) {
+//			facing = BlockFace.NORTH;
+//			opposite = BlockFace.SOUTH;
+//		} else if(yaw >= 135 && yaw < 225) {
+//			facing = BlockFace.EAST;
+//			opposite = BlockFace.WEST;
+//		} else if(yaw >= 225 && yaw < 315) {
+//			facing = BlockFace.SOUTH;
+//			opposite = BlockFace.NORTH;
+//		} else if(yaw >= 315 || yaw < 45) {
+//			facing = BlockFace.WEST;
+//			opposite = BlockFace.EAST;
+//		} 
 		this.wall = opposite;	// a player facing south places a lobby that looks just like a lobby stuck to the north wall 
 		
 		ZoneVolume zoneVolume = warzone.getVolume();
@@ -248,13 +270,10 @@ public class ZoneLobby {
 		}
 	}
 	
-	public void initialize() {
-		//changeWall(wall);	// watch out! this resets+saves the lobby blocks
-		
+	public void initialize() {		
 		// maybe the number of teams change, now reset the gate positions
-		setGatePositions(BlockInfo.getBlock(warzone.getWorld(), lobbyMiddleWallBlock));
-
 		if(lobbyMiddleWallBlock != null && volume != null /*&& volume.isSaved()*/) {
+			setGatePositions(BlockInfo.getBlock(warzone.getWorld(), lobbyMiddleWallBlock));
 			// flatten the area (set all but floor to air, then replace any floor air blocks with glass)
 			this.volume.clearBlocksThatDontFloat();
 			this.volume.setToMaterial(Material.AIR);

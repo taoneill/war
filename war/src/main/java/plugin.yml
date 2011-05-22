@@ -1,5 +1,5 @@
 name: War
-version: 1.5 (MacArthur)
+version: 1.5.1 (MacArthur)
 description: Lets you create TDM and CTF (warzones) for a more structured PVP experience.
 author: tommytony
 website: war.tommytony.com
@@ -68,7 +68,7 @@ commands:
     usage: 
         - Must be standing in warzone or lobby 
         - /savezone  =>  Basic save 
-        - /savezone lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on
+        - /savezone lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on disabled:on
         - /savezone loadout:default  =>  sets the respawn inventory to your current items
         - /savezone reward:default  =>  sets the winner's reward to your current items
   setzonelobby:
@@ -115,7 +115,7 @@ commands:
     description: (War) Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone.
     usage:
         - Must be standing in warzone or lobby.
-        - /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on
+        - /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on disabled:on
         - /setzoneconfig loadout:default  =>  sets the respawn inventory to your current items
         - /setzoneconfig reward:default  =>  sets the winner's reward to your current items
   zonecfg:

@@ -152,7 +152,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
+		//pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_COMBUST, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.Normal, this);
@@ -1280,7 +1280,7 @@ public class War extends JavaPlugin {
 	
 	public Warzone matchWarzone(String warzoneSubString) {
 		for(Warzone warzone : warzones) {
-			if(warzone.getName().toLowerCase().contains(warzoneSubString.toLowerCase())) {
+			if(warzone.getName().toLowerCase().startsWith(warzoneSubString.toLowerCase())) {
 				return warzone;
 			}
 		}
