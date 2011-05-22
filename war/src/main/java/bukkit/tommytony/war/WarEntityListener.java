@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
@@ -50,9 +51,9 @@ public class WarEntityListener extends EntityListener {
 				}
 			}
 		}
-    }
+	}
     
-    private void handlerAttackDefend(EntityDamageByEntityEvent event) {
+	private void handlerAttackDefend(EntityDamageByEntityEvent event) {
     	Entity attacker = event.getDamager();
     	Entity defender = event.getEntity();
     	
@@ -151,7 +152,7 @@ public class WarEntityListener extends EntityListener {
 				}
 			}
 		}
-    }
+	}
 	
 	public void onEntityDamage(EntityDamageEvent event) {
 		if(war.isLoaded()) {
@@ -171,7 +172,7 @@ public class WarEntityListener extends EntityListener {
 				}
 			}
 		}
-    }
+	}
 
 	public void onEntityCombust(EntityCombustEvent event) {
 		if(war.isLoaded()) {
@@ -190,7 +191,7 @@ public class WarEntityListener extends EntityListener {
 				}
 			}
 		}
-    }
+	}
 	
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
 		if(war.isLoaded()) {
@@ -202,5 +203,10 @@ public class WarEntityListener extends EntityListener {
 			}
 		}
     }
-
+    
+	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+		if(!war.isLoaded()) return;
+		if (((org.bukkit.craftbukkit.entity.CraftPlayer) event.getEntity()).getHandle().ticksLived % 20 * 12 == 0)
+		    event.setCancelled(true);
+	}
 }
