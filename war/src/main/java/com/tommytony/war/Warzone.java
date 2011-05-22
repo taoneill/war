@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.Plugin;
 
 import bukkit.tommytony.war.War;
 
@@ -811,6 +812,10 @@ public class Warzone {
 				}
 			}
 			playerTeam.resetSign();
+			Plugin heroicDeath = war.getServer().getPluginManager().getPlugin("HeroicDeath");
+			if(heroicDeath != null) {
+				
+			}
 		}
 	}
 

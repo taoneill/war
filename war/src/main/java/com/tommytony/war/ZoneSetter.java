@@ -162,7 +162,7 @@ public class ZoneSetter {
 	private void resetWarzone(Warzone warzone, StringBuilder msgString) {
 		if(warzone.getVolume().isSaved()) {
 			war.msg(player, "Resetting " + warzone.getName() + " blocks.");
-			if(warzone.getLobby() != null) {
+			if(warzone.getLobby() != null && warzone.getLobby().getVolume() != null) {
 				warzone.getLobby().getVolume().resetBlocks();
 			}
 			int reset = warzone.getVolume().resetBlocks();

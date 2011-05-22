@@ -63,7 +63,7 @@ public class WarBlockListener extends BlockListener {
 				}
 				// protect warzone lobbies
 		    	for(Warzone wz: war.getWarzones()) {
-		    		if(wz.getLobby() != null && wz.getLobby().getVolume().contains(block)) {
+		    		if(wz.getLobby() != null && wz.getLobby().getVolume() != null && wz.getLobby().getVolume().contains(block)) {
 		    			war.badMsg(player, "Can't build here.");
 			    		event.setCancelled(true);
 			    		return;
@@ -204,7 +204,7 @@ public class WarBlockListener extends BlockListener {
     	// protect warzone lobbies
     	if(block != null) {
 	    	for(Warzone zone: war.getWarzones()) {
-	    		if(zone.getLobby() != null && 
+	    		if(zone.getLobby() != null && zone.getLobby().getVolume() != null &&
 	    				zone.getLobby().getVolume().contains(block)) {
 	    			war.badMsg(player, "Can't destroy this.");
 		    		event.setCancelled(true);
