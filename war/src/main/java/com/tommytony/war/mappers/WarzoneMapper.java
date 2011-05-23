@@ -173,6 +173,8 @@ public class WarzoneMapper {
 					warzone.setSpawnStyle(spawnStyle);
 				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
 					warzone.setSpawnStyle(spawnStyle);
+				} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)){
+					warzone.setSpawnStyle(spawnStyle);
 				}
 				// default is already initialized to BIG (see Warzone)				
 			}

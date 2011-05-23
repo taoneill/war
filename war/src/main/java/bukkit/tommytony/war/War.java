@@ -1068,6 +1068,8 @@ public class War extends JavaPlugin {
 					warzone.setSpawnStyle(spawnStyle);
 				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
 					warzone.setSpawnStyle(spawnStyle);
+				} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)){
+					warzone.setSpawnStyle(spawnStyle);
 				} else {
 					warzone.setSpawnStyle(TeamSpawnStyles.BIG);
 				}
