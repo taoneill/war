@@ -15,7 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
+//import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
@@ -207,19 +207,19 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 	
-	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-		if(war.isLoaded()) {
-			Entity entity = event.getEntity();
-			if(entity instanceof Player) {
-				Player player = (Player) entity;
-				Location location = player.getLocation();
-				Warzone zone = war.warzone(location);
-				if(zone != null) {
-					if (((CraftPlayer) player).getHandle().ticksLived % 20 * 12 == 0) {
-						event.setCancelled(true);
-					}
-				}
-			}
-		}
-	}
+//	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+//		if(war.isLoaded()) {
+//			Entity entity = event.getEntity();
+//			if(entity instanceof Player) {
+//				Player player = (Player) entity;
+//				Location location = player.getLocation();
+//				Warzone zone = war.warzone(location);
+//				if(zone != null) {
+//					if (((CraftPlayer) player).getHandle().ticksLived % 20 * 12 == 0) {
+//						event.setCancelled(true);
+//					}
+//				}
+//			}
+//		}
+//	}
 }
