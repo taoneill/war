@@ -24,6 +24,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
@@ -46,7 +47,7 @@ import com.tommytony.war.utils.InventoryStash;
  *
  */
 public class War extends JavaPlugin {
-	public static Permissions Permissions = null;
+	public static PermissionHandler permissionHandler;
 	
 	public War(){
 		super();
@@ -1381,12 +1382,12 @@ public class War extends JavaPlugin {
 	}
 	
 	public boolean canPlayWar(Player player) {
-		if(Permissions != null 
-				&& (Permissions.Security.permission(player, "war.player")
-						|| Permissions.Security.permission(player, "War.player"))) {
+		if(War.permissionHandler != null 
+				&& (War.permissionHandler.has(player, "war.player")
+						|| War.permissionHandler.has(player, "War.player"))) {
 			return true;
 		}
-		if(Permissions == null) {
+		if(War.permissionHandler == null) {
 			// w/o Permissions, everyone can play
 			return true;
 		}
@@ -1394,12 +1395,12 @@ public class War extends JavaPlugin {
 	}
 	
 	public boolean canWarp(Player player) {
-		if(Permissions != null 
-				&& (Permissions.Security.permission(player, "war.warp")
-						|| Permissions.Security.permission(player, "War.warp"))) {
+		if(War.permissionHandler != null 
+				&& (War.permissionHandler.has(player, "war.warp")
+						|| War.permissionHandler.has(player, "War.warp"))) {
 			return true;
 		}
-		if(Permissions == null) {
+		if(War.permissionHandler == null) {
 			// w/o Permissions, everyone can warp
 			return true;
 		}
@@ -1408,9 +1409,9 @@ public class War extends JavaPlugin {
 	
 	public boolean canBuildOutsideZone(Player player) {
 		if(isBuildInZonesOnly()) {
-			if(Permissions != null 
-					&& (Permissions.Security.permission(player, "war.build")
-							|| Permissions.Security.permission(player, "War.build"))) {
+			if(War.permissionHandler != null 
+					&& (War.permissionHandler.has(player, "war.build")
+							|| War.permissionHandler.has(player, "War.build"))) {
 				return true;
 			}
 			// w/o Permissions, if buildInZonesOnly, no one can build outside the zone
@@ -1430,9 +1431,9 @@ public class War extends JavaPlugin {
 			for(String zoneMaker : zoneMakerNames) {
 				if(zoneMaker.equals(player.getName())) return true;
 			}
-			if(Permissions != null 
-					&& (Permissions.Security.permission(player, "war.*")
-							|| Permissions.Security.permission(player, "War.*"))) {
+			if(War.permissionHandler != null 
+					&& (War.permissionHandler.has(player, "war.*")
+							|| War.permissionHandler.has(player, "War.*"))) {
 				return true;
 			}
 		}
@@ -1524,10 +1525,10 @@ public class War extends JavaPlugin {
 	}
 	
 	public void setupPermissions() {
-		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
-		if(Permissions == null) {
-			if(test != null) {
-				Permissions = (Permissions)test;
+		Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
+		if(this.permissionHandler == null) {
+			if(permissionsPlugin != null) {
+				this.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
 			} else {
 				logInfo("Permissions system not enabled. Defaulting to regular War config.");
 			}
