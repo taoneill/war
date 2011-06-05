@@ -152,7 +152,7 @@ public class Volume {
 		int oldBlockType = 0;
 		clearBlocksThatDontFloat();
 		try {
-			if(hasTwoCorners() && getBlockTypes() != null) {
+			if(hasTwoCorners() && isSaved()) {
 				x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					y = getMinY();
@@ -436,7 +436,7 @@ public class Volume {
 
 	public void setToMaterial(Material material) {
 		try {
-			if(hasTwoCorners() && getBlockTypes() != null) {
+			if(hasTwoCorners() && isSaved()) {
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMaxY();
@@ -459,7 +459,7 @@ public class Volume {
 	
 	public void setFaceMaterial(BlockFace face, Material material) {
 		try {
-			if(hasTwoCorners() && getBlockTypes() != null) {
+			if(hasTwoCorners() && isSaved()) {
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMinY();
@@ -489,7 +489,7 @@ public class Volume {
 	
 	private void switchMaterials(Material[] oldTypes, Material newType) {
 		try {
-			if(hasTwoCorners() && getBlockTypes() != null) {
+			if(hasTwoCorners() && isSaved()) {
 				int x = getMinX();
 				for(int i = 0; i < getSizeX(); i++){
 					int y = getMaxY();

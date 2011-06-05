@@ -28,7 +28,7 @@ import com.tommytony.war.volumes.ZoneVolume;
  */
 public class WarzoneMapper {
 
-	public static Warzone load(War war, String name, boolean loadBlocks) {
+	public static Warzone load(War war, String name, boolean createNewVolume) {
 		//war.getLogger().info("Loading warzone " + name + " config and blocks...");
 		PropertiesFile warzoneConfig = new PropertiesFile(war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		try {
@@ -239,10 +239,8 @@ public class WarzoneMapper {
 			
 			warzoneConfig.close();
 			
-			if(loadBlocks) {
-				
-				// zone blocks 
-				ZoneVolume zoneVolume = VolumeMapper.loadZoneVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld(), warzone);
+			if(createNewVolume) {
+				ZoneVolume zoneVolume = new ZoneVolume(warzone.getName(), war, world, warzone); //VolumeMapper.loadZoneVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld(), warzone);
 				warzone.setVolume(zoneVolume);
 			}
 		

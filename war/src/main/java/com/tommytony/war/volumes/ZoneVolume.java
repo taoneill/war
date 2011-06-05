@@ -1,15 +1,14 @@
 package com.tommytony.war.volumes;
 
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-
-import com.tommytony.war.Warzone;
-import com.tommytony.war.Team;
-import com.tommytony.war.Monument;
 
 import bukkit.tommytony.war.War;
+
+import com.tommytony.war.Monument;
+import com.tommytony.war.Team;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.mappers.ZoneVolumeMapper;
 
 /**
  * 
@@ -19,10 +18,44 @@ import bukkit.tommytony.war.War;
 public class ZoneVolume extends Volume {
 
 	private Warzone zone;
+	private boolean isSaved = false;
 
 	public ZoneVolume(String name, War war, World world, Warzone zone) {
 		super(name, war, world);
 		this.zone = zone;
+	}
+	
+	@Override
+	public int saveBlocks()	{
+		// Save blocks directly to disk (i.e. don't put everything in memory)
+		int saved = ZoneVolumeMapper.save(this, zone.getName(), this.getWar());
+		
+		isSaved = true;
+		return saved;
+	}
+	
+	@Override
+	public boolean isSaved() {
+		return isSaved;
+	}
+	
+	@Override
+	public int resetBlocks()	{
+		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
+		int reset = ZoneVolumeMapper.load(this, zone.getName(), this.getWar(), this.getWorld());
+		
+		isSaved = true;
+		return reset;
+	}
+	
+	@Override
+	public void setBlockTypes(int[][][] blockTypes) {
+		return;
+	}
+	
+	@Override
+	public void setBlockDatas(byte[][][] blockData) {
+		return;
 	}
 
 	public void setNorthwest(Block block) throws NotNorthwestException, TooSmallException, TooBigException {
@@ -293,7 +326,7 @@ public class ZoneVolume extends Volume {
 		return false;
 	}
 
-	public int resetWallBlocks(BlockFace wall) {
+	/*public int resetWallBlocks(BlockFace wall) {
 		int noOfResetBlocks = 0;
 		try {
 			if(hasTwoCorners() && getBlockTypes() != null) {
@@ -407,6 +440,7 @@ public class ZoneVolume extends Volume {
 		return noOfResetBlocks;
 	}
 	
+	
 	private boolean resetBlock(int oldBlockType, byte oldBlockData, Block currentBlock) {
 		if(currentBlock.getTypeId() != oldBlockType ||
 				(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData) ||
@@ -421,6 +455,7 @@ public class ZoneVolume extends Volume {
 			}
 		return false;
 	}
+	*/
 
 
 }

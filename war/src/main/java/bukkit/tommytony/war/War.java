@@ -485,7 +485,7 @@ public class War extends JavaPlugin {
 				warzone.getTeams().remove(team);
 				if(warzone.getLobby() != null) {
 					warzone.getLobby().getVolume().resetBlocks();
-					warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
+					//warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
 					//warzone.addZoneOutline(warzone.getLobby().getWall());
 					warzone.getLobby().initialize();
 				}
@@ -552,7 +552,7 @@ public class War extends JavaPlugin {
 				warzone.getTeams().add(newTeam);
 				if(warzone.getLobby() != null) {
 					warzone.getLobby().getVolume().resetBlocks();
-					warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
+					//warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
 					//warzone.addZoneOutline(warzone.getLobby().getWall());
 					warzone.getLobby().initialize();
 				}
@@ -692,17 +692,20 @@ public class War extends JavaPlugin {
 			}
 			this.msg(player, "Saving warzone " + warzone.getName() + ".");
 			int savedBlocks = warzone.saveState(true);
-			updateZoneFromNamedParams(warzone, player, arguments);
-			WarzoneMapper.save(this, warzone, true);
-			warzone.getVolume().resetBlocks();
-			if(lobby != null) {
-				lobby.getVolume().resetBlocks();
-			}
-			warzone.initializeZone();	// bring back team spawns etc
-			
-			if(warHub != null) { // maybe the zone was disabled/enabled
-				warHub.getVolume().resetBlocks();
-				warHub.initialize();
+			if(arguments.length > 0) {
+				// changed settings: must reinitialize with new settings
+				updateZoneFromNamedParams(warzone, player, arguments);
+				WarzoneMapper.save(this, warzone, true);
+				warzone.getVolume().resetBlocks();
+				if(lobby != null) {
+					lobby.getVolume().resetBlocks();
+				}
+				warzone.initializeZone();	// bring back team spawns etc
+				
+				if(warHub != null) { // maybe the zone was disabled/enabled
+					warHub.getVolume().resetBlocks();
+					warHub.initialize();
+				}
 			}
 			
 			this.msg(player, "Warzone " + warzone.getName() + " initial state changed. Saved " + savedBlocks + " blocks.");

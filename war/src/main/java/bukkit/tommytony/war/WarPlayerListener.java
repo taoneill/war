@@ -250,7 +250,6 @@ public class WarPlayerListener extends PlayerListener {
 				}
 			}
 				
-			
 			boolean enteredGate = false;
 			// Warzone lobby gates
 			if(locLobby != null) {

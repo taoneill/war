@@ -115,10 +115,14 @@ public class Warzone {
 		if(ready()){
 			if(clearArtifacts) {
 				// removed everything to keep save clean
-				volume.resetWallBlocks(BlockFace.EAST);
-				volume.resetWallBlocks(BlockFace.WEST);
-				volume.resetWallBlocks(BlockFace.NORTH);
-				volume.resetWallBlocks(BlockFace.SOUTH);
+				for(ZoneWallGuard guard : zoneWallGuards) {
+					guard.deactivate();
+				}
+				zoneWallGuards.clear();
+//				volume.resetWallBlocks(BlockFace.EAST);
+//				volume.resetWallBlocks(BlockFace.WEST);
+//				volume.resetWallBlocks(BlockFace.NORTH);
+//				volume.resetWallBlocks(BlockFace.SOUTH);
 				
 				for(Team team : teams) {
 					team.getSpawnVolume().resetBlocks();
@@ -650,16 +654,17 @@ public class Warzone {
 		for(ZoneWallGuard guard : zoneWallGuards) {
 			if(guard.getPlayer().getName().equals(player.getName())){
 				playerGuards.add(guard);
-				BlockFace guardWall = guard.getWall();
-				getVolume().resetWallBlocks(guardWall);
+				guard.deactivate();
+//				BlockFace guardWall = guard.getWall();
+//				getVolume().resetWallBlocks(guardWall);
 //				if(isDrawZoneOutline()) {
 //					addZoneOutline(guard.getWall());
 //				}
-				if(lobby != null) {
-					lobby.getVolume().resetBlocks(); // always reset the lobby even if the guard is on another wall
-													// because player can go around corner
-					lobby.initialize();
-				}
+//				if(lobby != null) {
+//					lobby.getVolume().resetBlocks(); // always reset the lobby even if the guard is on another wall
+//													// because player can go around corner
+//					lobby.initialize();
+//				}
 			}
 		}
 		// now remove those zone guards

@@ -150,9 +150,7 @@ public class ZoneLobby {
 //		} 
 		this.wall = opposite;	// a player facing south places a lobby that looks just like a lobby stuck to the north wall 
 		
-		ZoneVolume zoneVolume = warzone.getVolume();
 		calculateLobbyWidth();
-		
 		lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(playerLocation.getBlockX(), 
 																		playerLocation.getBlockY(), 
 																		playerLocation.getBlockZ())
