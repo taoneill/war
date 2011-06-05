@@ -125,7 +125,7 @@ public class WarEntityListener extends EntityListener {
 			// Detect death, prevent it and respawn the player
 			Player d = (Player) defender;
 			Warzone defenderWarzone = war.getPlayerTeamWarzone(d.getName());
-			if(event.getDamage() >= d.getHealth()) {
+			if(d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
 				defenderWarzone.handleDeath(d);
 				event.setCancelled(true);
 			}

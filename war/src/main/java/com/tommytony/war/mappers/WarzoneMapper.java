@@ -433,7 +433,7 @@ public class WarzoneMapper {
 		
 		if(saveAllBlocks) {
 			// zone blocks
-			VolumeMapper.save(warzone.getVolume(), warzone.getName(), war);
+			//VolumeMapper.save(warzone.getVolume(), warzone.getName(), war);
 		}
 			
 		// monument blocks

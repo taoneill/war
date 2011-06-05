@@ -67,22 +67,26 @@ public class ZoneVolumeMapper {
 				
 				DeferredBlockResetsJob deferred = new DeferredBlockResetsJob(world);
 				int blockReads = 0, visitedBlocks = 0, x = 0, y = 0, z = 0;
+				int diskBlockType;
+				byte diskBlockData;
+				Block worldBlock;
+				int worldBlockId;
 				volume.clearBlocksThatDontFloat();
+				x = volume.getMinX();
 				for(int i = 0; i < volume.getSizeX(); i++){
-					x = volume.getMinX();
+					y = volume.getMinY();					
 					for(int j = 0; j < volume.getSizeY(); j++) {
-						y = volume.getMinY();
+						z = volume.getMinZ();
 						for(int k = 0; k < volume.getSizeZ(); k++) {
-							z = volume.getMinZ();
 							try {
 								String blockLine = in.readLine();
 								if(blockLine != null && !blockLine.equals("")) {
 									String[] blockSplit = blockLine.split(",");
 									if(blockLine != null && !blockLine.equals("") && blockSplit.length > 1) {
-										int diskBlockType = Integer.parseInt(blockSplit[0]);
-										byte diskBlockData = Byte.parseByte(blockSplit[1]);
-										Block worldBlock = volume.getWorld().getBlockAt(x, y, z);
-										int worldBlockId = worldBlock.getTypeId();
+										diskBlockType = Integer.parseInt(blockSplit[0]);
+										diskBlockData = Byte.parseByte(blockSplit[1]);
+										worldBlock = volume.getWorld().getBlockAt(x, y, z);
+										worldBlockId = worldBlock.getTypeId();
 										if(worldBlockId != diskBlockType ||
 											(worldBlockId == diskBlockType && worldBlock.getData() != diskBlockData ) ||
 											(worldBlockId == diskBlockType && worldBlock.getData() == diskBlockData &&
@@ -315,6 +319,7 @@ public class ZoneVolumeMapper {
 		if(volume.hasTwoCorners()) {
 			BufferedWriter out = null;
 			try {
+				(new File(war.getDataFolder().getPath() +"/dat/warzone-"+zoneName)).mkdir();
 				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
 				else out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + 
 												"/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
@@ -331,18 +336,22 @@ public class ZoneVolumeMapper {
 				int x = 0;
 				int y = 0;
 				int z = 0;
+				Block block;
+				int typeId;
+				byte data;
+				BlockState state;
 				
+				x = volume.getMinX();
 				for(int i = 0; i < volume.getSizeX(); i++){
-					x = volume.getMinX();
+					y = volume.getMinY();
 					for(int j = 0; j < volume.getSizeY(); j++) {
-						y = volume.getMinY();
+						z = volume.getMinZ();
 						for(int k = 0; k < volume.getSizeZ(); k++) {
-							z = volume.getMaxZ();
 							try {
-								Block block = volume.getWorld().getBlockAt(x, y, z);
-								int typeId = block.getTypeId();
-								byte data = block.getData();
-								BlockState state = block.getState();
+								block = volume.getWorld().getBlockAt(x, y, z);
+								typeId = block.getTypeId();
+								data = block.getData();
+								state = block.getState();
 								
 								out.write(typeId + "," + data + ",");
 								
