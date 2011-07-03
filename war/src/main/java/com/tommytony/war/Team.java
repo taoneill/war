@@ -75,7 +75,6 @@ public class Team {
 		int y = teamSpawn.getBlockY();
 		int z = teamSpawn.getBlockZ();
 		
-		
 		if(warzone.getSpawnStyle().equals(TeamSpawnStyles.INVISIBLE)) {
 			// nothing but glowstone
 			warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.GLOWSTONE);

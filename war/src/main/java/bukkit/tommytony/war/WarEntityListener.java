@@ -16,6 +16,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 //import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 import com.tommytony.war.Team;
@@ -213,7 +214,7 @@ public class WarEntityListener extends EntityListener {
 	}
 	
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-		if(war.isLoaded()) {
+		if(war.isLoaded() && event.getRegainReason() == RegainReason.REGEN) {
 			Entity entity = event.getEntity();
 			if(entity instanceof Player) {
 				Player player = (Player) entity;

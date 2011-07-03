@@ -23,7 +23,7 @@ public class RestoreWarzonesJob implements Runnable {
 		for(String warzoneName : warzoneSplit) {
 			if(warzoneName != null && !warzoneName.equals("")){
 				war.logInfo("Restoring zone " + warzoneName + "...");
-				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWarInstall);		// cascade load, only load blocks if warzone exists
+				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWarInstall);
 				if(zone != null) { // could have failed, would've been logged already 
 					war.getWarzones().add(zone);
 					//zone.getVolume().loadCorners();

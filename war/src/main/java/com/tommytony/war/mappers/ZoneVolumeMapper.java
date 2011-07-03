@@ -271,25 +271,27 @@ public class ZoneVolumeMapper {
 	
 	private static List<ItemStack> readInventoryString(String invString) {
 		List<ItemStack> items = new ArrayList<ItemStack>();
-		String[] itemsStrSplit = invString.split(";;");
-		for(String itemStr : itemsStrSplit) {
-			String[] itemStrSplit = itemStr.split(";");
-			if(itemStrSplit.length == 4) {
-				ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-						Integer.parseInt(itemStrSplit[1]));
-				stack.setData(new MaterialData(stack.getTypeId(),Byte.parseByte(itemStrSplit[3])));
-				short durability = (short)Integer.parseInt(itemStrSplit[2]);
-				stack.setDurability(durability);
-				items.add(stack);
-			} else if(itemStrSplit.length == 3) {
-				ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-						Integer.parseInt(itemStrSplit[1]));
-				short durability = (short)Integer.parseInt(itemStrSplit[2]);
-				stack.setDurability(durability);
-				items.add(stack);
-			} else {
-				items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]),
-						Integer.parseInt(itemStrSplit[1])));
+		if(invString != null && !invString.equals("")) {
+			String[] itemsStrSplit = invString.split(";;");
+			for(String itemStr : itemsStrSplit) {
+				String[] itemStrSplit = itemStr.split(";");
+				if(itemStrSplit.length == 4) {
+					ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
+							Integer.parseInt(itemStrSplit[1]));
+					stack.setData(new MaterialData(stack.getTypeId(),Byte.parseByte(itemStrSplit[3])));
+					short durability = (short)Integer.parseInt(itemStrSplit[2]);
+					stack.setDurability(durability);
+					items.add(stack);
+				} else if(itemStrSplit.length == 3) {
+					ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
+							Integer.parseInt(itemStrSplit[1]));
+					short durability = (short)Integer.parseInt(itemStrSplit[2]);
+					stack.setDurability(durability);
+					items.add(stack);
+				} else {
+					items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]),
+							Integer.parseInt(itemStrSplit[1])));
+				}
 			}
 		}
 		return items;

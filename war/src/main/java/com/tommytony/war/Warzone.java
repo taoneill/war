@@ -321,6 +321,9 @@ public class Warzone {
 
 	public void setLifePool(int lifePool) {
 		this.lifePool = lifePool;
+		for(Team team : teams) {
+			team.setRemainingLives(lifePool);
+		}
 	}
 
 	public int getLifePool() {

@@ -47,7 +47,6 @@ public class WarzoneMapper {
 			world = war.getServer().getWorld(worldStr);
 		}
 		
-		
 		if(world == null) {
 			war.logWarn("Failed to restore warzone " + name + ". The specified world (name: " + worldStr + ") does not exist!");
 		} else {
@@ -144,7 +143,7 @@ public class WarzoneMapper {
 				}
 			}
 			
-			// life pool
+			// life pool (always set after teams, so the teams' remaining lives get initialized properly by this setter)
 			warzone.setLifePool(warzoneConfig.getInt("lifePool"));
 			
 			// monument heal		//SY
