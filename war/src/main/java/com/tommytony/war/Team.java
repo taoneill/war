@@ -51,7 +51,11 @@ public class Team {
 		int x = teamSpawn.getBlockX();
 		int y = teamSpawn.getBlockY();
 		int z = teamSpawn.getBlockZ();
-		if(warzone.getSpawnStyle().equals(TeamSpawnStyles.SMALL)) {
+
+		if(warzone.getSpawnStyle().equals(TeamSpawnStyles.INVISIBLE)) {
+			this.spawnVolume.setCornerOne(warzone.getWorld().getBlockAt(x, y-1, z));
+			this.spawnVolume.setCornerTwo(warzone.getWorld().getBlockAt(x, y+3, z));
+		} else if(warzone.getSpawnStyle().equals(TeamSpawnStyles.SMALL)) {
 			this.spawnVolume.setCornerOne(warzone.getWorld().getBlockAt(x-1, y-1, z-1));
 			this.spawnVolume.setCornerTwo(warzone.getWorld().getBlockAt(x+1, y+3, z+1));
 		} else {
@@ -71,16 +75,22 @@ public class Team {
 		int y = teamSpawn.getBlockY();
 		int z = teamSpawn.getBlockZ();
 		
-		// first ring
-		setBlock(x+1, y-1, z+1, kind);
-		setBlock(x+1, y-1, z, kind);
-		setBlock(x+1, y-1, z-1, kind);
-		setBlock(x, y-1, z+1, kind);
-		warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.GLOWSTONE);
-		setBlock(x, y-1, z-1, kind);
-		setBlock(x-1, y-1, z+1, kind);
-		setBlock(x-1, y-1, z, kind);
-		setBlock(x-1, y-1, z-1, kind);
+		
+		if(warzone.getSpawnStyle().equals(TeamSpawnStyles.INVISIBLE)) {
+			// nothing but glowstone
+			warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.GLOWSTONE);
+		} else {
+			// first ring
+			setBlock(x+1, y-1, z+1, kind);
+			setBlock(x+1, y-1, z, kind);
+			setBlock(x+1, y-1, z-1, kind);
+			setBlock(x, y-1, z+1, kind);
+			warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.GLOWSTONE);
+			setBlock(x, y-1, z-1, kind);
+			setBlock(x-1, y-1, z+1, kind);
+			setBlock(x-1, y-1, z, kind);
+			setBlock(x-1, y-1, z-1, kind);
+		}
 		
 		// Orientation
 		int yaw = 0;
@@ -92,7 +102,19 @@ public class Team {
 		Block signBlock = null;
 		int signData = 0;
 		
-		if(warzone.getSpawnStyle().equals(TeamSpawnStyles.SMALL)){
+		if(warzone.getSpawnStyle().equals(TeamSpawnStyles.INVISIBLE)){
+			// INVISIBLE style
+			signBlock = warzone.getWorld().getBlockAt(x, y, z);
+			if(yaw >= 0 && yaw < 90) {
+				signData = 10;
+			}else if(yaw >= 90 && yaw <= 180) {
+				signData = 14;
+			} else if(yaw >= 180 && yaw < 270) {
+				signData = 2;
+			} else if(yaw >= 270 && yaw <= 360) {
+				signData = 6;
+			}
+		} else if(warzone.getSpawnStyle().equals(TeamSpawnStyles.SMALL)){
 			// SMALL style
 			if(yaw >= 0 && yaw < 90) {
 				signData = 10;

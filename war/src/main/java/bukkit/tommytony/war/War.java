@@ -233,7 +233,7 @@ public class War extends JavaPlugin {
 				} else if(command.equals("resetzone")) {
 					performResetZone(player, arguments);
 				} else if(command.equals("deletezone")) {
-					performDeleteZone(player);
+					performDeleteZone(player, arguments);
 				} else if(command.equals("setteam")) {
 					performSetTeam(player, arguments);
 				} else if(command.equals("setteamflag")) {
@@ -565,14 +565,29 @@ public class War extends JavaPlugin {
 		}
 	}
 
-	public void performDeleteZone(Player player) {
-		if(!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-			this.badMsg(player, "Usage: /deletezone. " +
+	public void performDeleteZone(Player player, String[] arguments) {
+		if(arguments.length == 0 && !this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
+			this.badMsg(player, "Usage: /deletezone [warzone-name]. " +
 					"Deletes the warzone. " +
-					"Must be in the warzone (try /zones and /zone). ");
+					"Must be in the warzone or name must be provided (try /zones and /zone). ");
 		} else {
-			Warzone warzone = this.warzone(player.getLocation());
-			ZoneLobby lobby = this.lobby(player.getLocation());
+			ZoneLobby lobby = null;
+			Warzone warzone = null;
+			if(arguments.length == 1) { // get zone by name
+				for(Warzone tmp : this.getWarzones()) {
+					if(tmp.getName().toLowerCase().startsWith(arguments[0].toLowerCase())) {
+						warzone = tmp;
+						break;
+					}
+				}
+				if (warzone == null) {
+					this.badMsg(player, "No such warzone.");
+					return;
+				}
+			} else { // get zone by position
+				warzone = this.warzone(player.getLocation());
+				lobby = this.lobby(player.getLocation());
+			}
 			if(warzone == null && lobby != null) {
 				warzone = lobby.getZone();
 			} else {
@@ -1056,6 +1071,8 @@ public class War extends JavaPlugin {
 				if(spawnStyle.equals(TeamSpawnStyles.SMALL)) {
 					warzone.setSpawnStyle(spawnStyle);
 				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
+					warzone.setSpawnStyle(spawnStyle);
+				} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)){
 					warzone.setSpawnStyle(spawnStyle);
 				} else {
 					warzone.setSpawnStyle(TeamSpawnStyles.BIG);
