@@ -114,6 +114,8 @@ public class WarMapper {
 				war.setDefaultSpawnStyle(spawnStyle);
 			} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
 				war.setDefaultSpawnStyle(spawnStyle);
+			} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)){
+				war.setDefaultSpawnStyle(spawnStyle);
 			}
 			// default is already initialized to BIG (see Warzone)				
 		}
