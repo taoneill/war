@@ -157,7 +157,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_COMBUST, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.Normal, this);
-		//pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener, Priority.Normal, this);
 		
 		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
@@ -632,7 +632,7 @@ public class War extends JavaPlugin {
 				for(Player p : team.getPlayers()) {
 					warzone.restorePlayerInventory(p);
 					p.teleport(warzone.getTeleport());
-					this.msg(player, "You have left the warzone. Your inventory has (hopefully) been restored.");
+					this.msg(player, "You have left the warzone. Your inventory has been restored.");
 				}
 				team.resetPoints();
 				team.getPlayers().clear();

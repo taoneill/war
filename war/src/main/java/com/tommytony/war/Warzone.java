@@ -206,14 +206,15 @@ public class Warzone {
 
 	public void respawnPlayer(Team team, Player player) {
 		handleRespawn(team, player);
-		
+		// Teleport the player back to spawn
+		player.teleport(team.getTeamSpawn());
 	}
 	
 	public void respawnPlayer(PlayerMoveEvent event, Team team, Player player) {
-		event.setFrom(team.getTeamSpawn());
 		handleRespawn(team, player);
-		
-		event.setCancelled(true);
+		// Teleport the player back to spawn
+		event.setTo(team.getTeamSpawn());
+		//player.teleport(team.getTeamSpawn());
 	}
 	
 	private void handleRespawn(Team team, Player player){		
@@ -222,9 +223,6 @@ public class Warzone {
 		player.setRemainingAir(300);
 		player.setHealth(20);
 
-		// Teleport the player back to spawn
-		player.teleport(team.getTeamSpawn());
-		
 		LoadoutResetJob job = new LoadoutResetJob(this, team, player);
 		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
 	}
@@ -824,8 +822,18 @@ public class Warzone {
 			}
 		}
 	}
-
+	
+	public void handlePlayerLeave(Player player, Location destination, PlayerMoveEvent event, boolean removeFromTeam) {
+		handlePlayerLeave(player, removeFromTeam);
+		event.setTo(destination);
+	}
+	
 	public void handlePlayerLeave(Player player, Location destination, boolean removeFromTeam) {
+		handlePlayerLeave(player, removeFromTeam);
+		player.teleport(destination);
+	}
+
+	private void handlePlayerLeave(Player player, boolean removeFromTeam) {
 		Team playerTeam = war.getPlayerTeam(player.getName());
 		if(playerTeam !=null) {
 			if(removeFromTeam) playerTeam.removePlayer(player.getName());
@@ -851,8 +859,8 @@ public class Warzone {
 			player.setHealth(20);
 			player.setFireTicks(0);
 			player.setRemainingAir(300);
-			player.teleport(destination);
-			war.msg(player, "Left the zone. Your inventory has (hopefully) been restored.");
+			
+			war.msg(player, "Left the zone. Your inventory has been restored.");
 			if(war.getWarHub() != null) {
 				war.getWarHub().resetZoneSign(this);
 			}
