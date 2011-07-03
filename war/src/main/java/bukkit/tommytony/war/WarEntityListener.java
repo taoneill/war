@@ -70,12 +70,16 @@ public class WarEntityListener extends EntityListener {
 					&& attackerWarzone == defenderWarzone) {
 				// Make sure one of the players isn't in the spawn
 				if(defenderTeam.getSpawnVolume().contains(d.getLocation())) {	// attacking person in spawn
-					war.badMsg(a, "Can't attack a player that's inside his team's spawn.");
-					event.setCancelled(true);
+					if(!defenderWarzone.isFlagThief(d.getName())) { // thiefs can always be attacked
+						war.badMsg(a, "Can't attack a player that's inside his team's spawn.");
+						event.setCancelled(true);
+					}
 				} else if(attackerTeam.getSpawnVolume().contains(a.getLocation()) && !attackerTeam.getSpawnVolume().contains(d.getLocation())) {
 					// only let a player inside spawn attack an enemy player if that player enters the spawn
-					war.badMsg(a, "Can't attack a player from inside your spawn.");
-					event.setCancelled(true);
+					if(!attackerWarzone.isFlagThief(a.getName())) { // thiefs can always attack
+						war.badMsg(a, "Can't attack a player from inside your spawn.");
+						event.setCancelled(true);
+					}
 				}
 				
 				// Detect death, prevent it and respawn the player
