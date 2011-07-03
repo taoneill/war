@@ -39,10 +39,14 @@ public class ZoneVolume extends Volume {
 		return isSaved;
 	}
 	
+	public void loadCorners() {
+		ZoneVolumeMapper.load(this, zone.getName(), this.getWar(), this.getWorld(), true);
+	}
+	
 	@Override
 	public int resetBlocks()	{
 		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
-		int reset = ZoneVolumeMapper.load(this, zone.getName(), this.getWar(), this.getWorld());
+		int reset = ZoneVolumeMapper.load(this, zone.getName(), this.getWar(), this.getWorld(), false);
 		getWar().logInfo("Reset " + reset + " blocks in warzone " + zone.getName() + ".");
 		isSaved = true;
 		return reset;

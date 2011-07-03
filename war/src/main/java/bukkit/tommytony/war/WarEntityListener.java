@@ -97,7 +97,7 @@ public class WarEntityListener extends EntityListener {
 					war.badMsg(a, "Your attack missed! Your target is on your team.");
 					event.setCancelled(true);	// ff is off
 				}
-			} else if (attackerTeam == null && defenderTeam == null && !war.isPvpInZonesOnly()){
+			} else if (attackerTeam == null && defenderTeam == null && (!war.isPvpInZonesOnly() || a.getLocation().getWorld().getName().equals("pvp"))){
 				// let normal PVP through is its not turned off
 			} else if (attackerTeam == null && defenderTeam == null && war.isPvpInZonesOnly()) {
 				war.badMsg(a, "Your attack missed! Global PVP is turned off. You can only attack other players in warzones. Try /warhub, /zones and /zone.");

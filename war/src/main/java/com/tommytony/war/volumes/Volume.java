@@ -489,14 +489,17 @@ public class Volume {
 	
 	private void switchMaterials(Material[] oldTypes, Material newType) {
 		try {
+			int i = 0, j = 0, k = 0;
+			int x, y, z;
+			Block currentBlock = null;
 			if(hasTwoCorners() && isSaved()) {
-				int x = getMinX();
-				for(int i = 0; i < getSizeX(); i++){
-					int y = getMaxY();
-					for(int j = getSizeY(); j > 0; j--){
-						int z = getMinZ();
-						for(int k = 0;k < getSizeZ(); k++) {
-							Block currentBlock = getWorld().getBlockAt(x, y, z);
+				x = getMinX();
+				for(i = 0; i < getSizeX(); i++){
+					y = getMaxY();
+					for(j = getSizeY(); j > 0; j--){
+						z = getMinZ();
+						for(k = 0;k < getSizeZ(); k++) {
+							currentBlock = getWorld().getBlockAt(x, y, z);
 							for(Material oldType : oldTypes) {
 								if(currentBlock.getType().getId() == oldType.getId()) {
 									currentBlock.setType(newType);

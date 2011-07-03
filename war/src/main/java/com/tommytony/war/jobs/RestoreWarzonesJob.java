@@ -26,7 +26,8 @@ public class RestoreWarzonesJob implements Runnable {
 				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWarInstall);		// cascade load, only load blocks if warzone exists
 				if(zone != null) { // could have failed, would've been logged already 
 					war.getWarzones().add(zone);
-					zone.getVolume().resetBlocks();
+					//zone.getVolume().loadCorners();
+					zone.getVolume().loadCorners();
 					if(zone.getLobby() != null) {
 						zone.getLobby().getVolume().resetBlocks();
 					}

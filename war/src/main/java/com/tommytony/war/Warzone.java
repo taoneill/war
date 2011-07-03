@@ -57,6 +57,7 @@ public class Warzone {
 	private boolean unbreakableZoneBlocks;
 	private boolean disabled = false;
 	private boolean noCreatures;
+	private boolean resetOnEmpty = false;
 	private HashMap<String, InventoryStash> deadMenInventories = new HashMap<String, InventoryStash>();
 	private Location rallyPoint;
 	
@@ -863,7 +864,7 @@ public class Warzone {
 					break;
 				}
 			}
-			if(zoneEmpty) {
+			if(zoneEmpty && resetOnEmpty) {
 				// reset the zone for a new game when the last player leaves
 				for(Team team : this.getTeams()) {
 					team.resetPoints();
@@ -1034,7 +1035,7 @@ public class Warzone {
 			this.getLobby().getVolume().resetBlocks();
 			this.getLobby().getVolume().finalize();
 		}
-		this.getVolume().resetBlocks();
+		//this.getVolume().resetBlocks();
 		this.getVolume().finalize();
 	}
 }
