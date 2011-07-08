@@ -588,14 +588,21 @@ public class War extends JavaPlugin {
 				warzone = this.warzone(player.getLocation());
 				lobby = this.lobby(player.getLocation());
 			}
+			
 			if(warzone == null && lobby != null) {
 				warzone = lobby.getZone();
 			} else {
 				lobby = warzone.getLobby();
 			}
+
 			for(Team t : warzone.getTeams()) {
 				if(t.getTeamFlag() != null) t.getFlagVolume().resetBlocks();
 				t.getSpawnVolume().resetBlocks();
+				
+				// reset inventory
+				for(Player p : t.getPlayers()) {
+					warzone.restorePlayerInventory(p);
+				}
 			}
 			for(Monument m : warzone.getMonuments()) {
 				m.getVolume().resetBlocks();
