@@ -22,7 +22,7 @@ import com.tommytony.war.volumes.TooBigException;
 import com.tommytony.war.volumes.TooSmallException;
 import com.tommytony.war.volumes.ZoneVolume;
 
-public class ZoneVolumeSpec {
+public class ZoneVolumeSpecTest {
 
 	// setNorthwest
 	
