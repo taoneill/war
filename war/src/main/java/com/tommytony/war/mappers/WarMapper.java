@@ -106,6 +106,9 @@ public class WarMapper {
 		// buildInZonesOnly
 		war.setBuildInZonesOnly(warConfig.getBoolean("buildInZonesOnly"));
 		
+		// disablePVPMessage
+		war.setDisablePVPMessage(warConfig.getBoolean("disablePVPMessage"));
+		
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
 		if(spawnStyle != null && !spawnStyle.equals("")){
@@ -213,6 +216,9 @@ public class WarMapper {
 		
 		// buildInZonesOnly
 		warConfig.setBoolean("buildInZonesOnly", war.isBuildInZonesOnly());
+		
+		// disablePVPMessage
+		warConfig.setBoolean("disablePVPMessage", war.isDisablePVPMessage());
 		
 		// spawnStyle
 		warConfig.setString("spawnStyle", war.getDefaultSpawnStyle());

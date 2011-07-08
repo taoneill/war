@@ -83,6 +83,7 @@ public class War extends JavaPlugin {
 	
 	private boolean pvpInZonesOnly = false;
 	private boolean buildInZonesOnly = false;
+	private boolean disablePVPMessage = false;
 	
 	private WarHub warHub;
 	
@@ -1593,6 +1594,14 @@ public class War extends JavaPlugin {
 
 	public boolean isBuildInZonesOnly() {
 		return buildInZonesOnly;
+	}
+	
+	public void setDisablePVPMessage(boolean disablePVPMessage) {
+		this.disablePVPMessage = disablePVPMessage;
+	}
+
+	public boolean isDisablePVPMessage() {
+		return disablePVPMessage;
 	}
 
 	public void setDefaultUnbreakableZoneBlocks(boolean defaultUnbreakableZoneBlocks) {
