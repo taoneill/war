@@ -210,21 +210,3 @@ public class ChatFixUtil {
 		sendMessage(players, messages, true);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
