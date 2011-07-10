@@ -355,7 +355,7 @@ public class WarPlayerListener extends PlayerListener {
 					return;
 				}
 	
-				// Monuments	//SY
+				// Monuments
 				if(playerTeam != null
 						&& playerWarzone.nearAnyOwnedMonument(playerLoc, playerTeam) 
 						&& player.getHealth() < 20
