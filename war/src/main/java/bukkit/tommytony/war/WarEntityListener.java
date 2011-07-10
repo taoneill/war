@@ -165,12 +165,16 @@ public class WarEntityListener extends EntityListener {
 	
 	public void onEntityDamage(EntityDamageEvent event) {
 		if(war.isLoaded()) {
+			Entity entity = event.getEntity();
+			if(entity instanceof Player && war.getPlayerTeamWarzone(((Player) entity).getName()) != null) {
+				event.setCancelled(false);
+			}
+
 			if(event instanceof EntityDamageByEntityEvent || 
 					event instanceof EntityDamageByProjectileEvent) {
 				handlerAttackDefend((EntityDamageByEntityEvent)event);
 			} else {
 				// Detect death (from , prevent it and respawn the player
-				Entity entity =  event.getEntity();
 				if(entity instanceof Player) {
 					Player player = (Player) entity;
 					Warzone zone = war.getPlayerTeamWarzone(player.getName());
