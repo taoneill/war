@@ -1,9 +1,5 @@
 package com.tommytony.war.utils;
 
-import java.util.List;
-
-import org.bukkit.inventory.ItemStack;
-
 public class DeferredBlockReset {
 
 	private final int x;
@@ -12,7 +8,6 @@ public class DeferredBlockReset {
 	private final int blockType;
 	private final byte blockData;
 	private String[] lines;
-	private List<ItemStack> items;
 
 	public DeferredBlockReset(int x, int y, int z, int blockType, byte blockData) {
 		this.x = x;
@@ -21,7 +16,7 @@ public class DeferredBlockReset {
 		this.blockType = blockType;
 		this.blockData = blockData;
 	}
-	
+
 	// Signs
 	public DeferredBlockReset(int x, int y, int z, int blockType, byte blockData, String[] signLines) {
 		this.x = x;
@@ -55,7 +50,4 @@ public class DeferredBlockReset {
 	public String[] getLines() {
 		return lines;
 	}
-
-	
-	
 }
