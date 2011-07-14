@@ -146,7 +146,7 @@ public class WarzoneMapper {
 			// life pool (always set after teams, so the teams' remaining lives get initialized properly by this setter)
 			warzone.setLifePool(warzoneConfig.getInt("lifePool"));
 			
-			// monument heal		//SY
+			// monument heal
 			warzone.setMonumentHeal(warzoneConfig.getInt("monumentHeal"));
 			
 			// drawZoneOutline
@@ -353,7 +353,7 @@ public class WarzoneMapper {
 		// life pool
 		warzoneConfig.setInt("lifePool", warzone.getLifePool());
 		
-		// monument heal 		//SY
+		// monument heal
 		warzoneConfig.setInt("monumentHeal", warzone.getMonumentHeal());
 		
 		// drawZoneOutline

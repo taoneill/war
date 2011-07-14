@@ -16,35 +16,33 @@ import org.bukkit.material.MaterialData;
 
 import bukkit.tommytony.war.War;
 
-import com.tommytony.war.Warzone;
 import com.tommytony.war.volumes.Volume;
-import com.tommytony.war.volumes.ZoneVolume;
 
 /**
- * 
+ *
  * @author tommytony
  *
  */
 public class VolumeMapper {
-	
+
 	public static Volume loadVolume(String volumeName, String zoneName,
 			War war, World world) {
 		Volume volume = new Volume(volumeName, war, world);
 		load(volume, zoneName, war, world);
 		return volume;
 	}
-	
+
 //	public static ZoneVolume loadZoneVolume(String volumeName, String zoneName,
 //			War war, World world, Warzone zone) {
 //		ZoneVolume volume = new ZoneVolume(volumeName, war, world, zone);
 //		load(volume, zoneName, war, world);
 //		return volume;
 //	}
-	
+
 	public static void load(Volume volume, String zoneName, War war, World world) {
 		BufferedReader in = null;
 		try {
-			if(zoneName.equals("")) in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + 
+			if(zoneName.equals("")) in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() +
 												"/dat/volume-" + volume.getName() + ".dat"))); // for the warhub
 			else in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 			String firstLine = in.readLine();
@@ -65,10 +63,10 @@ public class VolumeMapper {
 					y2 = 127;
 				}
 				int z2 = Integer.parseInt(in.readLine());
-				
+
 				volume.setCornerOne(world.getBlockAt(x1, y1, z1));
-				volume.setCornerTwo(world.getBlockAt(x2, y2, z2));	
-				
+				volume.setCornerTwo(world.getBlockAt(x2, y2, z2));
+
 				volume.setBlockTypes(new int[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
 				volume.setBlockDatas(new byte[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
 				int blockReads = 0;
@@ -82,11 +80,11 @@ public class VolumeMapper {
 									if(blockLine != null && !blockLine.equals("") && blockSplit.length > 1) {
 										int typeID = Integer.parseInt(blockSplit[0]);
 										byte data = Byte.parseByte(blockSplit[1]);
-										
+
 										volume.getBlockTypes()[i][j][k] = typeID;
 										volume.getBlockDatas()[i][j][k] = data;
-										
-										if(typeID == Material.WALL_SIGN.getId() 
+
+										if(typeID == Material.WALL_SIGN.getId()
 												|| typeID == Material.SIGN_POST.getId()) {
 											// Signs
 											String linesStr = "";
@@ -153,12 +151,12 @@ public class VolumeMapper {
 												}
 											}
 											volume.getInvBlockContents().put("dispenser-" + i + "-" + j + "-" + k, items);
-										} 
+										}
 									}
 									blockReads++;
 								}
 							} catch (Exception e) {
-								war.logWarn("Unexpected error while reading block from volume " + volume.getName() + 
+								war.logWarn("Unexpected error while reading block from volume " + volume.getName() +
 										" file for zone " + zoneName + ". Blocks read so far: " + blockReads
 										+ "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage());
 								e.printStackTrace();
@@ -173,11 +171,11 @@ public class VolumeMapper {
 				}
 			}
 		} catch (IOException e) {
-			war.logWarn("Failed to read volume file " + volume.getName() + 
+			war.logWarn("Failed to read volume file " + volume.getName() +
 					" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
-			war.logWarn("Unexpected error caused failure to read volume file " + zoneName + 
+			war.logWarn("Unexpected error caused failure to read volume file " + zoneName +
 					" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		}  finally {
@@ -191,15 +189,15 @@ public class VolumeMapper {
 				}
 		}
 	}
-	
+
 	public static void save(Volume volume, String zoneName, War war) {
 		if(volume.hasTwoCorners()) {
 			BufferedWriter out = null;
 			try {
 				if(zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
-				else out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + 
+				else out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() +
 												"/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
-				
+
 				out.write("corner1"); out.newLine();
 				out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
 				out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
@@ -216,7 +214,7 @@ public class VolumeMapper {
 								int typeId = volume.getBlockTypes()[i][j][k];
 								byte data = volume.getBlockDatas()[i][j][k];
 								out.write(typeId + "," + data + ",");
-								if(typeId == Material.WALL_SIGN.getId() 
+								if(typeId == Material.WALL_SIGN.getId()
 										|| typeId == Material.SIGN_POST.getId()) {
 									// Signs
 									String extra = "";
@@ -234,9 +232,9 @@ public class VolumeMapper {
 									if(contents != null) {
 										for(ItemStack item : contents) {
 											if(item != null) {
-												extra += item.getTypeId() + ";" 
-												+ item.getAmount() + ";" 
-												+ item.getDurability(); 
+												extra += item.getTypeId() + ";"
+												+ item.getAmount() + ";"
+												+ item.getDurability();
 												if(item.getData() != null)
 													extra += ";" + item.getData().getData() ;
 												extra += ";;";
@@ -251,9 +249,9 @@ public class VolumeMapper {
 									if(contents != null) {
 										for(ItemStack item : contents) {
 											if(item != null) {
-												extra += item.getTypeId() + ";" 
-												+ item.getAmount() + ";" 
-												+ item.getDurability(); 
+												extra += item.getTypeId() + ";"
+												+ item.getAmount() + ";"
+												+ item.getDurability();
 												if(item.getData() != null)
 													extra += ";" + item.getData().getData() ;
 												extra += ";;";
@@ -265,8 +263,8 @@ public class VolumeMapper {
 								out.newLine();
 							}
 							catch (Exception e) {
-								war.logWarn("Unexpected error while writing block into volume " + volume.getName() + 
-										" file for zone " + zoneName + ". Blocks written so far: " + blockWrites 
+								war.logWarn("Unexpected error while writing block into volume " + volume.getName() +
+										" file for zone " + zoneName + ". Blocks written so far: " + blockWrites
 										+ "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage());
 								e.printStackTrace();
 							}
@@ -274,14 +272,14 @@ public class VolumeMapper {
 					}
 				}
 			} catch (IOException e) {
-				war.logWarn("Failed to write volume file " + zoneName + 
+				war.logWarn("Failed to write volume file " + zoneName +
 						" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 				e.printStackTrace();
 			} catch (Exception e) {
-				war.logWarn("Unexpected error caused failure to write volume file " + zoneName + 
+				war.logWarn("Unexpected error caused failure to write volume file " + zoneName +
 						" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 				e.printStackTrace();
-			}  
+			}
 			finally {
 				if(out != null)
 					try {
@@ -290,7 +288,7 @@ public class VolumeMapper {
 						war.logWarn("Failed to close file writer for volume " + volume.getName() +
 								" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 						e.printStackTrace();
-					}	
+					}
 			}
 		}
 	}
