@@ -106,7 +106,9 @@ public class WarEntityListener extends EntityListener {
 			} else if (attackerTeam == null && defenderTeam == null && (!war.isPvpInZonesOnly() || a.getLocation().getWorld().getName().equals("pvp"))){
 				// let normal PVP through is its not turned off
 			} else if (attackerTeam == null && defenderTeam == null && war.isPvpInZonesOnly()) {
-				war.badMsg(a, "Your attack missed! Global PVP is turned off. You can only attack other players in warzones. Try /warhub, /zones and /zone.");
+				if (!war.isDisablePVPMessage()) {
+					war.badMsg(a, "Your attack missed! Global PVP is turned off. You can only attack other players in warzones. Try /warhub, /zones and /zone.");
+				}
 				event.setCancelled(true);	// global pvp is off
 			} else {
 				war.badMsg(a, "Your attack missed!");
@@ -165,12 +167,16 @@ public class WarEntityListener extends EntityListener {
 	
 	public void onEntityDamage(EntityDamageEvent event) {
 		if(war.isLoaded()) {
+			Entity entity = event.getEntity();
+			if(entity instanceof Player && war.getPlayerTeamWarzone(((Player) entity).getName()) != null) {
+				event.setCancelled(false);
+			}
+
 			if(event instanceof EntityDamageByEntityEvent || 
 					event instanceof EntityDamageByProjectileEvent) {
 				handlerAttackDefend((EntityDamageByEntityEvent)event);
 			} else {
 				// Detect death (from , prevent it and respawn the player
-				Entity entity =  event.getEntity();
 				if(entity instanceof Player) {
 					Player player = (Player) entity;
 					Warzone zone = war.getPlayerTeamWarzone(player.getName());

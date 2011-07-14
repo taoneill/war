@@ -73,6 +73,7 @@ public class War extends JavaPlugin {
 	private boolean pvpInZonesOnly = false;
 	private boolean buildInZonesOnly = false;
 
+	private boolean disablePVPMessage = false;
 	private WarHub warHub;
 
 
@@ -143,7 +144,7 @@ public class War extends JavaPlugin {
 
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal, this);
 		//pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Priority.High, this);
 		pm.registerEvent(Event.Type.ENTITY_COMBUST, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener, Priority.Normal, this);
@@ -577,14 +578,21 @@ public class War extends JavaPlugin {
 				warzone = this.warzone(player.getLocation());
 				lobby = this.lobby(player.getLocation());
 			}
+			
 			if(warzone == null && lobby != null) {
 				warzone = lobby.getZone();
 			} else {
 				lobby = warzone.getLobby();
 			}
+
 			for(Team t : warzone.getTeams()) {
 				if(t.getTeamFlag() != null) t.getFlagVolume().resetBlocks();
 				t.getSpawnVolume().resetBlocks();
+				
+				// reset inventory
+				for(Player p : t.getPlayers()) {
+					warzone.restorePlayerInventory(p);
+				}
 			}
 			for(Monument m : warzone.getMonuments()) {
 				m.getVolume().resetBlocks();
@@ -1581,6 +1589,14 @@ public class War extends JavaPlugin {
 
 	public boolean isBuildInZonesOnly() {
 		return buildInZonesOnly;
+	}
+	
+	public void setDisablePVPMessage(boolean disablePVPMessage) {
+		this.disablePVPMessage = disablePVPMessage;
+	}
+
+	public boolean isDisablePVPMessage() {
+		return disablePVPMessage;
 	}
 
 	public void setDefaultUnbreakableZoneBlocks(boolean defaultUnbreakableZoneBlocks) {

@@ -80,7 +80,7 @@ public class WarMapper {
 		war.setDefaultLifepool(warConfig.getInt("defaultLifePool"));
 		
 		// defaultMonumentHeal
-		war.setDefaultLifepool(warConfig.getInt("defaultMonumentHeal"));
+		war.setDefaultMonumentHeal(warConfig.getInt("defaultMonumentHeal"));
 		
 		// defaultFriendlyFire
 		war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));
@@ -105,6 +105,9 @@ public class WarMapper {
 		
 		// buildInZonesOnly
 		war.setBuildInZonesOnly(warConfig.getBoolean("buildInZonesOnly"));
+		
+		// disablePVPMessage
+		war.setDisablePVPMessage(warConfig.getBoolean("disablePVPMessage"));
 		
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
@@ -213,6 +216,9 @@ public class WarMapper {
 		
 		// buildInZonesOnly
 		warConfig.setBoolean("buildInZonesOnly", war.isBuildInZonesOnly());
+		
+		// disablePVPMessage
+		warConfig.setBoolean("disablePVPMessage", war.isDisablePVPMessage());
 		
 		// spawnStyle
 		warConfig.setString("spawnStyle", war.getDefaultSpawnStyle());
