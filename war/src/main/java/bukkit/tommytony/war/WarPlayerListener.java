@@ -29,7 +29,7 @@ import com.tommytony.war.ZoneSetter;
 
 
 /**
- * 
+ *
  * @author tommytony
  *
  */
@@ -37,7 +37,7 @@ public class WarPlayerListener extends PlayerListener {
 
 	private final War war;
 	private Random random = null;
-	
+
 
 	public WarPlayerListener(War war) {
 		this.war = war;
@@ -66,25 +66,25 @@ public class WarPlayerListener extends PlayerListener {
 			Team team = war.getPlayerTeam(player.getName());
 			if(team != null) {
 				Warzone zone = war.getPlayerTeamWarzone(player.getName());
-				
+
 				if(zone.isFlagThief(player.getName())) {
 					// a flag thief can't drop his flag
 					war.badMsg(player, "Can't drop items while stealing flag. What are you doing?! Run!");
 					event.setCancelled(true);
-					
+
 				} else {
 					Item item = event.getItemDrop();
 					if(item != null) {
 						ItemStack itemStack =  item.getItemStack();
-						if(itemStack != null 
-								&& itemStack.getType() == team.getKind().getMaterial() 
+						if(itemStack != null
+								&& itemStack.getType() == team.getKind().getMaterial()
 								&& itemStack.getData().getData() == team.getKind().getData()) {
 							// Can't drop your team's kind block
 							war.badMsg(player, "Can't drop " + team.getName() + " block blocks.");
 							event.setCancelled(true);
 							return;
 						}
-						
+
 						if(zone.isNearWall(player.getLocation()) && itemStack != null) {
 							war.badMsg(player, "Can't drop items near the zone border!");
 							event.setCancelled(true);
@@ -110,7 +110,7 @@ public class WarPlayerListener extends PlayerListener {
 			Team team = war.getPlayerTeam(player.getName());
 			if(team != null) {
 				Warzone zone = war.getPlayerTeamWarzone(player.getName());
-				
+
 				if(zone.isFlagThief(player.getName())) {
 					// a flag thief can't pick up anything
 					event.setCancelled(true);
@@ -133,7 +133,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 		}
 	}
-	
+
 	public void onInventoryOpen(PlayerInventoryEvent event) {
 		if(war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -152,7 +152,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 		}
 	}
-	
+
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		if(war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -177,7 +177,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 		}
 	}
-	
+
 	public void onPlayerKick(PlayerKickEvent event) {
 		if(war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -186,7 +186,7 @@ public class WarPlayerListener extends PlayerListener {
 				boolean inWarzone = war.inAnyWarzone(player.getLocation());
 				boolean inLobby = war.inAnyWarzone(player.getLocation());
 				boolean inWarhub = false;
-				if(war.getWarHub() != null && war.getWarHub().getVolume().contains(player.getLocation())) { 
+				if(war.getWarHub() != null && war.getWarHub().getVolume().contains(player.getLocation())) {
 					inWarhub = true;
 				}
 				if(inWarzone || inLobby || inWarhub) {
@@ -196,7 +196,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 		}
 	}
-	
+
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if(war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -215,7 +215,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 		}
 	}
-	
+
 	public void onPlayerMove(PlayerMoveEvent event) {
 		if(war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -226,7 +226,7 @@ public class WarPlayerListener extends PlayerListener {
 			locLobby = war.lobby(playerLoc);
 			boolean canPlay = war.canPlayWar(player);
 			boolean isMaker = war.isZoneMaker(player);
-			
+
 			// Zone walls
 			Team currentTeam = war.getPlayerTeam(player.getName());
 			Warzone playerWarzone = war.getPlayerTeamWarzone(player.getName());	// this uses the teams, so it asks: get the player's team's warzone
@@ -240,7 +240,7 @@ public class WarPlayerListener extends PlayerListener {
 					protecting = nearbyZone.protectZoneWallAgainstPlayer(player);
 				}
 			}
-			
+
 			if(!protecting) {
 				// zone makers still need to delete their walls
 				// make sure to delete any wall guards as you leave
@@ -248,10 +248,10 @@ public class WarPlayerListener extends PlayerListener {
 					zone.dropZoneWallGuardIfAny(player);
 				}
 			}
-				
+
 			// Warzone lobby gates
 			if(locLobby != null) {
-				Warzone zone = locLobby.getZone(); 
+				Warzone zone = locLobby.getZone();
 				Team oldTeam = war.getPlayerTeam(player.getName());
 				boolean isAutoAssignGate = false;
 				if(oldTeam == null && canPlay) { // trying to counter spammy player move
@@ -266,8 +266,8 @@ public class WarPlayerListener extends PlayerListener {
 								noOfPlayers += t.getPlayers().size();
 							}
 							if(noOfPlayers < zone.getTeams().size() * zone.getTeamCap()) {
-								Team team = zone.autoAssign(player);
-								
+								zone.autoAssign(player);
+
 								if(war.getWarHub() != null) {
 									war.getWarHub().resetZoneSign(zone);
 								}
@@ -279,7 +279,7 @@ public class WarPlayerListener extends PlayerListener {
 						}
 						return;
 					}
-					
+
 					// go through all the team gates
 					for(Team team : zone.getTeams()){
 						if(zone.getLobby().isInTeamGate(team, playerLoc)) {
@@ -305,8 +305,8 @@ public class WarPlayerListener extends PlayerListener {
 							return;
 						}
 					}
-									
-					if (war.getWarHub() != null && zone.getLobby().isInWarHubLinkGate(playerLoc) 
+
+					if (war.getWarHub() != null && zone.getLobby().isInWarHubLinkGate(playerLoc)
 							&& !war.getWarHub().getVolume().contains(player.getLocation())){
 						dropFromOldTeamIfAny(player);
 						event.setTo(war.getWarHub().getLocation());
@@ -315,9 +315,9 @@ public class WarPlayerListener extends PlayerListener {
 						return;
 					}
 				}
-				
+
 			}
-			
+
 			// Warhub zone gates
 			WarHub hub = war.getWarHub();
 			if(hub != null && hub.getVolume().contains(player.getLocation())) {
@@ -329,7 +329,7 @@ public class WarPlayerListener extends PlayerListener {
 						return;
 					}
 			}
-			
+
 			boolean isLeaving = playerWarzone != null && playerWarzone.getLobby().isLeavingZone(playerLoc);
 			Team playerTeam = war.getPlayerTeam(player.getName());
 			if(isLeaving) { // already in a team and in warzone, leaving
@@ -338,26 +338,26 @@ public class WarPlayerListener extends PlayerListener {
 					boolean atSpawnAlready = playerTeam.getTeamSpawn().getBlockX() == player.getLocation().getBlockX() &&
 					playerTeam.getTeamSpawn().getBlockY() == player.getLocation().getBlockY() &&
 					playerTeam.getTeamSpawn().getBlockZ() == player.getLocation().getBlockZ();
-					if(!atSpawnAlready) { 
+					if(!atSpawnAlready) {
 						playerWarzone.handlePlayerLeave(player, playerWarzone.getTeleport(), event, true);
 						return;
 					}
 				}
 			}
-		
+
 			if(playerWarzone != null) {
 				// Player belongs to a warzone team but is outside: he snuck out or is at spawn and died
-				if(locZone == null && playerTeam != null && playerWarzone.getLobby() != null 
+				if(locZone == null && playerTeam != null && playerWarzone.getLobby() != null
 						&& !playerWarzone.getLobby().getVolume().contains(playerLoc)
 						&& !isLeaving) {
 					war.badMsg(player, "Use /leave to exit the zone.");
 					event.setTo(playerTeam.getTeamSpawn());
 					return;
 				}
-	
-				// Monuments	//SY
+
+				// Monuments
 				if(playerTeam != null
-						&& playerWarzone.nearAnyOwnedMonument(playerLoc, playerTeam) 
+						&& playerWarzone.nearAnyOwnedMonument(playerLoc, playerTeam)
 						&& player.getHealth() < 20
 						&& player.getHealth() > 0	// don't heal the dead
 						&& random.nextInt(77) == 3 ) {	// one chance out of many of getting healed
@@ -377,9 +377,9 @@ public class WarPlayerListener extends PlayerListener {
 					war.msg(player, "Your dance pleases the monument's voodoo. You gain "+heartNum+"heart"+isS+"!");
 					return;
 				}
-				
+
 				// Flag capture
-				if(playerWarzone.isFlagThief(player.getName()) 
+				if(playerWarzone.isFlagThief(player.getName())
 						&& (playerTeam.getSpawnVolume().contains(player.getLocation())
 								|| (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation())))) {
 					if(playerWarzone.isTeamFlagStolen(playerTeam)) {
@@ -407,14 +407,14 @@ public class WarPlayerListener extends PlayerListener {
 								playerWarzone.respawnPlayer(event, playerTeam, player);
 								playerTeam.resetSign();
 								playerWarzone.getLobby().resetTeamGateSign(playerTeam);
-							}				
+							}
 							playerWarzone.removeThief(player.getName());
 						}
 					}
 					return;
 				}
-			} else if (locZone != null && locZone.getLobby() != null 
-					&&  !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker) { 
+			} else if (locZone != null && locZone.getLobby() != null
+					&&  !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker) {
 				// player is not in any team, but inside warzone boundaries, get him out
 				Warzone zone = war.warzone(playerLoc);
 				event.setTo(zone.getTeleport());
@@ -424,7 +424,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 		}
 	}
-	
+
 	private void handleDisabledZone(PlayerMoveEvent event, Player player, Warzone zone) {
 		if(zone.getLobby() != null) {
 			war.badMsg(player, "This warzone is disabled.");

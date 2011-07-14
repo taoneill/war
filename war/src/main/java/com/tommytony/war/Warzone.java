@@ -330,11 +330,11 @@ public class Warzone {
 		return lifePool;
 	}
 	
-	public void setMonumentHeal(int monumentHeal) {	//SY
+	public void setMonumentHeal(int monumentHeal) {
 		this.monumentHeal = monumentHeal;
 	}
 
-	public int getMonumentHeal() {	//SY
+	public int getMonumentHeal() {
 		return monumentHeal;
 	}
 
