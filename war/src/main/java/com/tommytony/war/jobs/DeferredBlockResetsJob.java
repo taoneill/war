@@ -29,7 +29,6 @@ public class DeferredBlockResetsJob implements Runnable {
 		return this.deferred.isEmpty();
 	}
 
-
 	public void run() {
 		for (DeferredBlockReset reset : this.deferred) {
 			Block worldBlock = this.world.getBlockAt(reset.getX(), reset.getY(), reset.getZ());
@@ -39,20 +38,20 @@ public class DeferredBlockResetsJob implements Runnable {
 				BlockState state = worldBlock.getState();
 				state.setData(new org.bukkit.material.Sign(reset.getBlockType(), reset.getBlockData()));
 				if (state instanceof Sign) {
-					Sign sign = (Sign)state;
-					//String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "-" + k);
+					Sign sign = (Sign) state;
+					// String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "-" + k);
 					if (reset.getLines() != null && sign.getLines() != null) {
-						if (reset.getLines().length>0) {
-						    sign.setLine(0, reset.getLines()[0]);
+						if (reset.getLines().length > 0) {
+							sign.setLine(0, reset.getLines()[0]);
 						}
-						if (reset.getLines().length>1) {
-						    sign.setLine(1, reset.getLines()[1]);
+						if (reset.getLines().length > 1) {
+							sign.setLine(1, reset.getLines()[1]);
 						}
-						if (reset.getLines().length>2) {
-						    sign.setLine(2, reset.getLines()[2]);
+						if (reset.getLines().length > 2) {
+							sign.setLine(2, reset.getLines()[2]);
 						}
-						if (reset.getLines().length>3) {
-						    sign.setLine(3, reset.getLines()[3]);
+						if (reset.getLines().length > 3) {
+							sign.setLine(3, reset.getLines()[3]);
 						}
 						sign.update(true);
 					}
@@ -61,9 +60,6 @@ public class DeferredBlockResetsJob implements Runnable {
 				// normal data reset
 				worldBlock.setData(reset.getBlockData());
 			}
-
-
-
 
 		}
 	}

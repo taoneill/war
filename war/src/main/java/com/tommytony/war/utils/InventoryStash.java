@@ -63,5 +63,4 @@ public class InventoryStash {
 		return this.feet;
 	}
 
-
 }

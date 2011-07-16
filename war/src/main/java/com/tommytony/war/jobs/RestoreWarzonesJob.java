@@ -21,12 +21,12 @@ public class RestoreWarzonesJob implements Runnable {
 		String[] warzoneSplit = this.warzonesStr.split(",");
 		this.war.getWarzones().clear();
 		for (String warzoneName : warzoneSplit) {
-			if (warzoneName != null && !warzoneName.equals("")){
+			if (warzoneName != null && !warzoneName.equals("")) {
 				this.war.logInfo("Loading zone " + warzoneName + "...");
 				Warzone zone = WarzoneMapper.load(this.war, warzoneName, !this.newWarInstall);
 				if (zone != null) { // could have failed, would've been logged already
 					this.war.getWarzones().add(zone);
-					//zone.getVolume().loadCorners();
+					// zone.getVolume().loadCorners();
 					zone.getVolume().loadCorners();
 					if (zone.getLobby() != null) {
 						zone.getLobby().getVolume().resetBlocks();

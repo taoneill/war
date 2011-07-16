@@ -1,4 +1,5 @@
 package com.tommytony.war.mappers;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,14 +15,14 @@ import com.tommytony.war.jobs.RestoreWarhubJob;
 import com.tommytony.war.jobs.RestoreWarzonesJob;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class WarMapper {
 
 	public static void load(War war) {
-		//war.getLogger().info("Loading war config...");
+		// war.getLogger().info("Loading war config...");
 		(war.getDataFolder()).mkdir();
 		(new File(war.getDataFolder().getPath() + "/dat")).mkdir();
 		PropertiesFile warConfig = new PropertiesFile(war.getDataFolder().getPath() + "/war.txt");
@@ -58,7 +59,7 @@ public class WarMapper {
 		String[] makersSplit = makersStr.split(",");
 		war.getZoneMakerNames().clear();
 		for (String makerName : makersSplit) {
-			if (makerName != null && !makerName.equals("")){
+			if (makerName != null && !makerName.equals("")) {
 				war.getZoneMakerNames().add(makerName);
 			}
 		}
@@ -70,8 +71,7 @@ public class WarMapper {
 		for (String itemStr : defaultLoadoutSplit) {
 			if (itemStr != null && !itemStr.equals("")) {
 				String[] itemStrSplit = itemStr.split(",");
-				ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-						Integer.parseInt(itemStrSplit[1]));
+				ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
 				war.getDefaultLoadout().put(Integer.parseInt(itemStrSplit[2]), item);
 			}
 		}
@@ -108,13 +108,13 @@ public class WarMapper {
 
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
-		if (spawnStyle != null && !spawnStyle.equals("")){
+		if (spawnStyle != null && !spawnStyle.equals("")) {
 			spawnStyle = spawnStyle.toLowerCase();
 			if (spawnStyle.equals(TeamSpawnStyles.SMALL)) {
 				war.setDefaultSpawnStyle(spawnStyle);
-			} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
+			} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)) {
 				war.setDefaultSpawnStyle(spawnStyle);
-			} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)){
+			} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)) {
 				war.setDefaultSpawnStyle(spawnStyle);
 			}
 			// default is already initialized to BIG (see Warzone)
@@ -128,8 +128,7 @@ public class WarMapper {
 			for (String itemStr : defaultRewardStrSplit) {
 				if (itemStr != null && !itemStr.equals("")) {
 					String[] itemStrSplit = itemStr.split(",");
-					ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-							Integer.parseInt(itemStrSplit[1]));
+					ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
 					war.getDefaultReward().put(Integer.parseInt(itemStrSplit[2]), item);
 				}
 			}
@@ -142,7 +141,7 @@ public class WarMapper {
 		war.setDefaultNoCreatures(warConfig.getBoolean("defaultNoCreatures"));
 
 		// defaultDropLootOnDeath
-		//war.setDefaultDropLootOnDeath(warConfig.getBoolean("defaultDropLootOnDeath"));
+		// war.setDefaultDropLootOnDeath(warConfig.getBoolean("defaultDropLootOnDeath"));
 
 		// defaultResetOnEmpty
 		war.setDefaultResetOnEmpty(warConfig.getBoolean("defaultResetOnEmpty"));
@@ -176,7 +175,7 @@ public class WarMapper {
 		warConfig.setString("warzones", warzonesStr);
 
 		// zone makers: default is none and it means everyone can use /setzone
-		String makersStr = "";	// everyone
+		String makersStr = ""; // everyone
 		for (String name : war.getZoneMakerNames()) {
 			makersStr += name + ",";
 		}
@@ -253,14 +252,13 @@ public class WarMapper {
 		warConfig.setBoolean("defaultResetOnUnload", war.isDefaultResetOnUnload());
 
 		// defaultDropLootOnDeath
-		//warConfig.setBoolean("defaultDropLootOnDeath", war.isDefaultDropLootOnDeath());
+		// warConfig.setBoolean("defaultDropLootOnDeath", war.isDefaultDropLootOnDeath());
 
 		// warhub
 		String hubStr = "";
 		WarHub hub = war.getWarHub();
 		if (hub != null) {
-			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + ","
-						+ hub.getLocation().getWorld().getName();
+			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + "," + hub.getLocation().getWorld().getName();
 			VolumeMapper.save(hub.getVolume(), "", war);
 		}
 		warConfig.setString("warhub", hubStr);

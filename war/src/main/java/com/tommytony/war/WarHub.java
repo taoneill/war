@@ -15,9 +15,9 @@ import com.tommytony.war.volumes.BlockInfo;
 import com.tommytony.war.volumes.Volume;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class WarHub {
 	private final War war;
@@ -47,9 +47,7 @@ public class WarHub {
 		Warzone zone = null;
 		for (String zoneName : this.zoneGateBlocks.keySet()) {
 			Block gate = this.zoneGateBlocks.get(zoneName);
-			if (gate.getX() == playerLocation.getBlockX()
-					&& gate.getY() == playerLocation.getBlockY()
-					&& gate.getZ() == playerLocation.getBlockZ()) {
+			if (gate.getX() == playerLocation.getBlockX() && gate.getY() == playerLocation.getBlockY() && gate.getZ() == playerLocation.getBlockZ()) {
 				zone = this.war.findWarzone(zoneName);
 			}
 		}
@@ -62,7 +60,7 @@ public class WarHub {
 		int disabled = 0;
 		for (Warzone zone : this.war.getWarzones()) {
 			if (zone.isDisabled()) {
-			    disabled++;
+				disabled++;
 			}
 		}
 		int noOfWarzones = this.war.getWarzones().size() - disabled;
@@ -85,7 +83,7 @@ public class WarHub {
 			// draw gates
 			Block currentGateBlock = BlockInfo.getBlock(this.location.getWorld(), this.volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.WEST, hubDepth).getFace(BlockFace.NORTH, 2);
 
-			for (Warzone zone : this.war.getWarzones()) {	// gonna use the index to find it again
+			for (Warzone zone : this.war.getWarzones()) { // gonna use the index to find it again
 				if (!zone.isDisabled()) {
 					this.zoneGateBlocks.put(zone.getName(), currentGateBlock);
 					currentGateBlock.getFace(BlockFace.DOWN).setType(Material.GLOWSTONE);
@@ -111,7 +109,7 @@ public class WarHub {
 			lines[1] = "(/warhub)";
 			lines[2] = "Pick your";
 			lines[3] = "battle!";
-			SignHelper.setToSign(this.war, signBlock, (byte)8, lines);
+			SignHelper.setToSign(this.war, signBlock, (byte) 8, lines);
 
 			// Warzone signs
 			for (Warzone zone : this.war.getWarzones()) {
@@ -127,9 +125,9 @@ public class WarHub {
 		Block zoneGate = this.zoneGateBlocks.get(zone.getName());
 		Block block = zoneGate.getFace(BlockFace.SOUTH).getFace(BlockFace.EAST, 1);
 		if (block.getType() != Material.SIGN_POST) {
-		    block.setType(Material.SIGN_POST);
+			block.setType(Material.SIGN_POST);
 		}
-		block.setData((byte)8);
+		block.setData((byte) 8);
 
 		int zoneCap = 0;
 		int zonePlayers = 0;
@@ -142,7 +140,7 @@ public class WarHub {
 		lines[1] = zone.getName();
 		lines[2] = zonePlayers + "/" + zoneCap + " players";
 		lines[3] = zone.getTeams().size() + " teams";
-		SignHelper.setToSign(this.war, block, (byte)8, lines);
+		SignHelper.setToSign(this.war, block, (byte) 8, lines);
 	}
 
 	public void setVolume(Volume vol) {

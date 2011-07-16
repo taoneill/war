@@ -7,11 +7,11 @@ import org.bukkit.block.Block;
 import bukkit.tommytony.war.War;
 
 /**
- *
+ * 
  * @author tommytony
- *
- * Broken, don't use.
- *
+ * 
+ *         Broken, don't use.
+ * 
  */
 @Deprecated
 public class CenteredVolume extends Volume {
@@ -28,10 +28,7 @@ public class CenteredVolume extends Volume {
 	}
 
 	public void changeCenter(Location newCenter) {
-		this.changeCenter(this.world.getBlockAt(newCenter.getBlockX(),
-														newCenter.getBlockY(),
-														newCenter.getBlockZ()),
-															this.sideSize);
+		this.changeCenter(this.world.getBlockAt(newCenter.getBlockX(), newCenter.getBlockY(), newCenter.getBlockZ()), this.sideSize);
 	}
 
 	public void changeCenter(Block newCenter, int sideSize) {
@@ -54,7 +51,7 @@ public class CenteredVolume extends Volume {
 		Block cornerOne = this.world.getBlockAt(x, y, z);
 		this.setCornerOne(cornerOne);
 
-		if (this.sideSize % 2 == 0) {	// not a real center, bottom half is larger by 1
+		if (this.sideSize % 2 == 0) { // not a real center, bottom half is larger by 1
 			int bottomHalfOfSide = this.sideSize - topHalfOfSide;
 			x = this.center.getX() - bottomHalfOfSide;
 			y = this.center.getY() - bottomHalfOfSide;

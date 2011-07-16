@@ -7,9 +7,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class TeamKinds {
 	private static final List<TeamKind> teamKinds = new ArrayList<TeamKind>();
@@ -37,7 +37,7 @@ public class TeamKinds {
 		String lowered = str.toLowerCase();
 		for (TeamKind kind : TeamKinds.getTeamkinds()) {
 			if (kind.getDefaultName().startsWith(lowered)) {
-			    return kind;
+				return kind;
 			}
 		}
 		return null;
@@ -47,4 +47,3 @@ public class TeamKinds {
 		return TeamKinds.teamKinds;
 	}
 }
-

@@ -33,7 +33,7 @@ public class RestoreWarhubJob implements Runnable {
 			world = this.war.getServer().getWorld(worldName);
 		} else {
 			worldName = "DEFAULT";
-			world = this.war.getServer().getWorlds().get(0);		// default to first world
+			world = this.war.getServer().getWorlds().get(0); // default to first world
 		}
 		if (world != null) {
 			Location hubLocation = new Location(world, hubX, hubY, hubZ);

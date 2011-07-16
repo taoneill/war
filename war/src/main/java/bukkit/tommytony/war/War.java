@@ -31,14 +31,14 @@ import com.tommytony.war.mappers.*;
 import com.tommytony.war.utils.*;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class War extends JavaPlugin {
 	public static PermissionHandler permissionHandler;
 
-	public War(){
+	public War() {
 		super();
 	}
 
@@ -80,7 +80,6 @@ public class War extends JavaPlugin {
 	private boolean buildInZonesOnly = false;
 
 	private WarHub warHub;
-
 
 	public void onDisable() {
 		this.unloadWar();
@@ -124,7 +123,7 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Priority.Normal, this);
 
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Priority.Normal, this);
-		//pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
+		// pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Priority.High, this);
 		pm.registerEvent(Event.Type.ENTITY_COMBUST, this.entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Priority.Normal, this);
@@ -133,10 +132,10 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
 
-		//pm.registerEvent(Event.Type.CHUNK_UNLOADED, blockListener, Priority.Normal, this);
+		// pm.registerEvent(Event.Type.CHUNK_UNLOADED, blockListener, Priority.Normal, this);
 
 		// Load files from disk or create them (using these defaults)
-		this.defaultLoadout.put(0, new ItemStack(Material.STONE_SWORD, 1,  (byte) 8));
+		this.defaultLoadout.put(0, new ItemStack(Material.STONE_SWORD, 1, (byte) 8));
 		this.defaultLoadout.put(1, new ItemStack(Material.BOW, 1, (byte) 8));
 		this.defaultLoadout.put(2, new ItemStack(Material.ARROW, 7));
 		this.defaultLoadout.put(3, new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8));
@@ -146,7 +145,7 @@ public class War extends JavaPlugin {
 		this.defaultAutoAssignOnly = false;
 		this.getDefaultReward().put(0, new ItemStack(Material.CAKE, 1));
 		WarMapper.load(this);
-		this.logInfo("War v"+ this.desc.getVersion() + " is on.");
+		this.logInfo("War v" + this.desc.getVersion() + " is on.");
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -155,13 +154,12 @@ public class War extends JavaPlugin {
 			String command = cmd.getName();
 			String[] arguments = null;
 			// Handle both /war <command> and /<war command>. I.e. "/war zone temple" == "/zone temple"
-			String helpMessage =  "War is on. Please pick your battle. " +
-									"Try /warhub, /zones and /zone. Further instructions at war.tommytony.com/instructions.";
+			String helpMessage = "War is on. Please pick your battle. " + "Try /warhub, /zones and /zone. Further instructions at war.tommytony.com/instructions.";
 			if ((command.equals("war") || command.equals("War")) && args.length > 0) {
 				command = args[0];
 				arguments = new String[args.length - 1];
 				for (int i = 1; i <= arguments.length; i++) {
-					arguments[i-1] = args[i];
+					arguments[i - 1] = args[i];
 				}
 				if (arguments.length == 1 && (arguments[0].equals("help") || arguments[0].equals("h"))) {
 					this.msg(player, helpMessage);
@@ -173,11 +171,11 @@ public class War extends JavaPlugin {
 			}
 
 			// Player commands: /warzones, /warzone, /teams, /join, /leave
-			if (command.equals("zones") || command.equals("warzones")){
+			if (command.equals("zones") || command.equals("warzones")) {
 				this.performZones(player);
 			} else if (command.equals("zone") || command.equals("warzone")) {
 				this.performZone(player, arguments);
-			} else if (command.equals("teams")){
+			} else if (command.equals("teams")) {
 				this.performTeams(player);
 			} else if (command.equals("join") && this.canPlayWar(player)) {
 				this.performJoin(player, arguments);
@@ -228,21 +226,8 @@ public class War extends JavaPlugin {
 				} else if (command.equals("loadwar")) {
 					this.loadWar();
 				}
-			} else if (command.equals("setzone")		// Not a zone maker but War command.
-						|| command.equals("nextbattle")
-						|| command.equals("setzonelobby")
-						|| command.equals("savezone")
-						|| command.equals("setzoneconfig")
-						|| command.equals("resetzone")
-						|| command.equals("deletezone")
-						|| command.equals("setteam")
-						|| command.equals("deleteteam")
-						|| command.equals("setmonument")
-						|| command.equals("deletemonument")
-						|| command.equals("setwarhub")
-						|| command.equals("deletewarhub")
-						|| command.equals("setwarconfig")
-						|| command.equals("unloadwar")) {
+			} else if (command.equals("setzone") // Not a zone maker but War command.
+					|| command.equals("nextbattle") || command.equals("setzonelobby") || command.equals("savezone") || command.equals("setzoneconfig") || command.equals("resetzone") || command.equals("deletezone") || command.equals("setteam") || command.equals("deleteteam") || command.equals("setmonument") || command.equals("deletemonument") || command.equals("setwarhub") || command.equals("deletewarhub") || command.equals("setwarconfig") || command.equals("unloadwar")) {
 				this.badMsg(player, "You can't do this if you are not a warzone maker.");
 			} else if (command.equals("zonemaker") || command.equals("zm")) {
 				this.performZonemakerAsPlayer(player);
@@ -251,12 +236,11 @@ public class War extends JavaPlugin {
 		return true;
 	}
 
-	private void inventoryToLoadout(Player player,
-			HashMap<Integer, ItemStack> loadout) {
+	private void inventoryToLoadout(Player player, HashMap<Integer, ItemStack> loadout) {
 		loadout.clear();
 		PlayerInventory inv = player.getInventory();
 		int i = 0;
-		for (ItemStack stack : inv.getContents()){
+		for (ItemStack stack : inv.getContents()) {
 			if (stack != null && stack.getType() != Material.AIR) {
 				loadout.put(i, stack);
 				i++;
@@ -290,9 +274,7 @@ public class War extends JavaPlugin {
 
 	public void performZonemakerAsZonemaker(Player player, String[] arguments) {
 		if (arguments.length > 2) {
-			this.badMsg(player, "Usage: /zonemaker <player-name>, /zonemaker" +
-					"Elevates the player to zone maker or removes his rights. " +
-					"If you are already a zonemaker, you can toggle between player and zone maker modes by using the command without arguments.");
+			this.badMsg(player, "Usage: /zonemaker <player-name>, /zonemaker" + "Elevates the player to zone maker or removes his rights. " + "If you are already a zonemaker, you can toggle between player and zone maker modes by using the command without arguments.");
 		} else {
 			if (arguments.length == 1) {
 				// make someone zonemaker or remove the right
@@ -327,8 +309,7 @@ public class War extends JavaPlugin {
 
 	public void performSetWarConfig(Player player, String[] arguments) {
 		if (arguments.length == 0) {
-			this.badMsg(player, "Usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " +
-					"Changes the server defaults for new warzones. Please give at leaset one named parameter.");
+			this.badMsg(player, "Usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " + "Changes the server defaults for new warzones. Please give at leaset one named parameter.");
 		} else {
 			if (this.updateFromNamedParams(player, arguments)) {
 				WarMapper.save(this);
@@ -385,11 +366,8 @@ public class War extends JavaPlugin {
 	}
 
 	public void performDeleteMonument(Player player, String[] arguments) {
-		if (arguments.length < 1 || (!this.inAnyWarzone(player.getLocation())
-										&& !this.inAnyWarzoneLobby(player.getLocation()))) {
-			this.badMsg(player, "Usage: /deletemonument <name>." +
-					" Deletes the monument. " +
-					"Must be in a warzone or lobby (try /warzones and /warzone). ");
+		if (arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))) {
+			this.badMsg(player, "Usage: /deletemonument <name>." + " Deletes the monument. " + "Must be in a warzone or lobby (try /warzones and /warzone). ");
 		} else {
 			String name = arguments[0];
 			Warzone warzone = this.warzone(player.getLocation());
@@ -412,9 +390,7 @@ public class War extends JavaPlugin {
 	}
 
 	public void performSetMonument(Player player, String[] arguments) {
-		if (!this.inAnyWarzone(player.getLocation()) || arguments.length < 1 || arguments.length > 1
-				|| (arguments.length == 1 && this.warzone(player.getLocation()) != null
-						&& arguments[0].equals(this.warzone(player.getLocation()).getName()))) {
+		if (!this.inAnyWarzone(player.getLocation()) || arguments.length < 1 || arguments.length > 1 || (arguments.length == 1 && this.warzone(player.getLocation()) != null && arguments[0].equals(this.warzone(player.getLocation()).getName()))) {
 			this.badMsg(player, "Usage: /setmonument <name>. Creates or moves a monument. Monument can't have same name as zone. Must be in warzone.");
 		} else {
 			Warzone warzone = this.warzone(player.getLocation());
@@ -436,11 +412,8 @@ public class War extends JavaPlugin {
 	}
 
 	public void performDeleteTeam(Player player, String[] arguments) {
-		if (arguments.length < 1 || (!this.inAnyWarzone(player.getLocation())
-										&& !this.inAnyWarzoneLobby(player.getLocation()))) {
-			this.badMsg(player, "Usage: /deleteteam <team-name/color>." +
-					" Deletes the team and its spawn. " +
-					"Must be in a warzone or lobby (try /zones and /zone). ");
+		if (arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))) {
+			this.badMsg(player, "Usage: /deleteteam <team-name/color>." + " Deletes the team and its spawn. " + "Must be in a warzone or lobby (try /zones and /zone). ");
 		} else {
 			String name = arguments[0];
 			Warzone warzone = this.warzone(player.getLocation());
@@ -453,14 +426,14 @@ public class War extends JavaPlugin {
 			Team team = warzone.getTeamByKind(TeamKinds.teamKindFromString(name));
 			if (team != null) {
 				if (team.getFlagVolume() != null) {
-				    team.getFlagVolume().resetBlocks();
+					team.getFlagVolume().resetBlocks();
 				}
 				team.getSpawnVolume().resetBlocks();
 				warzone.getTeams().remove(team);
 				if (warzone.getLobby() != null) {
 					warzone.getLobby().getVolume().resetBlocks();
-					//warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
-					//warzone.addZoneOutline(warzone.getLobby().getWall());
+					// warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
+					// warzone.addZoneOutline(warzone.getLobby().getWall());
 					warzone.getLobby().initialize();
 				}
 				WarzoneMapper.save(this, warzone, false);
@@ -472,11 +445,8 @@ public class War extends JavaPlugin {
 	}
 
 	public void performSetTeamFlag(Player player, String[] arguments) {
-		if (arguments.length < 1 || !this.inAnyWarzone(player.getLocation())
-				|| (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
-			this.badMsg(player, "Usage: /setteamflag <team-name/color>, e.g. /setteamflag diamond. " +
-					"Sets the team flag post to the current location. " +
-					"Must be in a warzone (try /zones and /zone). ");
+		if (arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) || (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
+			this.badMsg(player, "Usage: /setteamflag <team-name/color>, e.g. /setteamflag diamond. " + "Sets the team flag post to the current location. " + "Must be in a warzone (try /zones and /zone). ");
 		} else {
 			TeamKind kind = TeamKinds.teamKindFromString(arguments[0]);
 			Warzone warzone = this.warzone(player.getLocation());
@@ -484,12 +454,11 @@ public class War extends JavaPlugin {
 			if (team == null) {
 				// no such team yet
 				this.badMsg(player, "Place the team spawn first.");
-			} else if (team.getFlagVolume() == null){
+			} else if (team.getFlagVolume() == null) {
 				// new team flag
 				team.setTeamFlag(player.getLocation());
 				Location playerLoc = player.getLocation();
-				player.teleport(new Location(playerLoc.getWorld(),
-						playerLoc.getBlockX()+1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
+				player.teleport(new Location(playerLoc.getWorld(), playerLoc.getBlockX() + 1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
 				this.msg(player, "Team " + team.getName() + " flag added here.");
 				WarzoneMapper.save(this, warzone, false);
 			} else {
@@ -497,8 +466,7 @@ public class War extends JavaPlugin {
 				team.getFlagVolume().resetBlocks();
 				team.setTeamFlag(player.getLocation());
 				Location playerLoc = player.getLocation();
-				player.teleport(new Location(playerLoc.getWorld(),
-						playerLoc.getBlockX()+1, playerLoc.getBlockY(), playerLoc.getBlockZ()+1));
+				player.teleport(new Location(playerLoc.getWorld(), playerLoc.getBlockX() + 1, playerLoc.getBlockY(), playerLoc.getBlockZ() + 1));
 				this.msg(player, "Team " + team.getName() + " flag moved.");
 				WarzoneMapper.save(this, warzone, false);
 			}
@@ -506,11 +474,8 @@ public class War extends JavaPlugin {
 	}
 
 	public void performSetTeam(Player player, String[] arguments) {
-		if (arguments.length < 1 || !this.inAnyWarzone(player.getLocation())
-				|| (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
-			this.badMsg(player, "Usage: /setteam <team-kind/color>, e.g. /setteam red." +
-					"Sets the team spawn to the current location. " +
-					"Must be in a warzone (try /zones and /zone). ");
+		if (arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) || (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
+			this.badMsg(player, "Usage: /setteam <team-kind/color>, e.g. /setteam red." + "Sets the team spawn to the current location. " + "Must be in a warzone (try /zones and /zone). ");
 		} else {
 			TeamKind teamKind = TeamKinds.teamKindFromString(arguments[0]);
 			Warzone warzone = this.warzone(player.getLocation());
@@ -526,8 +491,8 @@ public class War extends JavaPlugin {
 				warzone.getTeams().add(newTeam);
 				if (warzone.getLobby() != null) {
 					warzone.getLobby().getVolume().resetBlocks();
-					//warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
-					//warzone.addZoneOutline(warzone.getLobby().getWall());
+					// warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
+					// warzone.addZoneOutline(warzone.getLobby().getWall());
 					warzone.getLobby().initialize();
 				}
 				newTeam.setTeamSpawn(player.getLocation());
@@ -540,9 +505,7 @@ public class War extends JavaPlugin {
 
 	public void performDeleteZone(Player player, String[] arguments) {
 		if (arguments.length == 0 && !this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-			this.badMsg(player, "Usage: /deletezone [warzone-name]. " +
-					"Deletes the warzone. " +
-					"Must be in the warzone or name must be provided (try /zones and /zone). ");
+			this.badMsg(player, "Usage: /deletezone [warzone-name]. " + "Deletes the warzone. " + "Must be in the warzone or name must be provided (try /zones and /zone). ");
 		} else {
 			ZoneLobby lobby = null;
 			Warzone warzone = null;
@@ -570,7 +533,7 @@ public class War extends JavaPlugin {
 
 			for (Team t : warzone.getTeams()) {
 				if (t.getTeamFlag() != null) {
-				    t.getFlagVolume().resetBlocks();
+					t.getFlagVolume().resetBlocks();
 				}
 				t.getSpawnVolume().resetBlocks();
 
@@ -589,7 +552,7 @@ public class War extends JavaPlugin {
 			this.getWarzones().remove(warzone);
 			WarMapper.save(this);
 			WarzoneMapper.delete(this, warzone.getName());
-			if (this.warHub != null) {	// warhub has to change
+			if (this.warHub != null) { // warhub has to change
 				this.warHub.getVolume().resetBlocks();
 				this.warHub.initialize();
 			}
@@ -609,7 +572,7 @@ public class War extends JavaPlugin {
 				lobby = warzone.getLobby();
 			}
 			warzone.clearFlagThieves();
-			for (Team team: warzone.getTeams()) {
+			for (Team team : warzone.getTeams()) {
 				team.teamcast("The war has ended. " + this.playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams...");
 				for (Player p : team.getPlayers()) {
 					warzone.restorePlayerInventory(p);
@@ -628,13 +591,13 @@ public class War extends JavaPlugin {
 				resetWarzone = WarzoneMapper.load(this, warzone.getName(), true);
 				this.getWarzones().add(resetWarzone);
 				warzone.getVolume().resetBlocksAsJob();
-				if (lobby!=null) {
+				if (lobby != null) {
 					lobby.getVolume().resetBlocksAsJob();
 				}
 				resetWarzone.initializeZoneAsJob();
 			} else {
 				warzone.getVolume().resetBlocksAsJob();
-				if (lobby!=null) {
+				if (lobby != null) {
 					lobby.getVolume().resetBlocksAsJob();
 				}
 				warzone.initializeZoneAsJob();
@@ -644,10 +607,8 @@ public class War extends JavaPlugin {
 	}
 
 	public void performSetZoneConfig(Player player, String[] arguments) {
-		if ((!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))
-			|| arguments.length == 0) {
-			this.badMsg(player, "Usage: /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " +
-					"Please give at leaset one named parameter. Does not save the blocks of the warzone. Resets the zone with the new config. Must be in warzone.");
+		if ((!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) || arguments.length == 0) {
+			this.badMsg(player, "Usage: /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " + "Please give at leaset one named parameter. Does not save the blocks of the warzone. Resets the zone with the new config. Must be in warzone.");
 		} else {
 			Warzone warzone = this.warzone(player.getLocation());
 			ZoneLobby lobby = this.lobby(player.getLocation());
@@ -663,7 +624,7 @@ public class War extends JavaPlugin {
 				if (lobby != null) {
 					lobby.getVolume().resetBlocks();
 				}
-				warzone.initializeZone();	// bring back team spawns etc
+				warzone.initializeZone(); // bring back team spawns etc
 				this.msg(player, "Warzone config saved. Zone reset.");
 
 				if (this.warHub != null) { // maybe the zone was disabled/enabled
@@ -678,8 +639,7 @@ public class War extends JavaPlugin {
 
 	public void performSaveZone(Player player, String[] arguments) {
 		if (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-			this.badMsg(player, "Usage: /savezone lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on " +
-					"All named params optional. Saves the blocks of the warzone (i.e. the current zone state will be reloaded at each battle start). Must be in warzone.");
+			this.badMsg(player, "Usage: /savezone lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on " + "All named params optional. Saves the blocks of the warzone (i.e. the current zone state will be reloaded at each battle start). Must be in warzone.");
 		} else {
 			Warzone warzone = this.warzone(player.getLocation());
 			ZoneLobby lobby = this.lobby(player.getLocation());
@@ -698,7 +658,7 @@ public class War extends JavaPlugin {
 				if (lobby != null) {
 					lobby.getVolume().resetBlocks();
 				}
-				warzone.initializeZone();	// bring back team spawns etc
+				warzone.initializeZone(); // bring back team spawns etc
 
 				if (this.warHub != null) { // maybe the zone was disabled/enabled
 					this.warHub.getVolume().resetBlocks();
@@ -711,17 +671,12 @@ public class War extends JavaPlugin {
 	}
 
 	public void performSetZoneLobby(Player player, String[] arguments) {
-		String usageStr = "Usage: When inside a warzone - /setzonelobby <north/n/east/e/south/s/west/w>." +
-		"Attaches the lobby to the specified zone wall. When outside a warzone - /setzonelobby <zonename>. " +
-		"Moves the lobby to your current position.";
+		String usageStr = "Usage: When inside a warzone - /setzonelobby <north/n/east/e/south/s/west/w>." + "Attaches the lobby to the specified zone wall. When outside a warzone - /setzonelobby <zonename>. " + "Moves the lobby to your current position.";
 		if (arguments.length < 1 || arguments.length > 1) {
 			this.badMsg(player, usageStr);
-		} else if (this.inAnyWarzone(player.getLocation()) || this.inAnyWarzoneLobby(player.getLocation())){
+		} else if (this.inAnyWarzone(player.getLocation()) || this.inAnyWarzoneLobby(player.getLocation())) {
 			// Inside a warzone: use the classic n/s/e/w mode
-			if (!arguments[0].equals("north") && !arguments[0].equals("n")
-					&& !arguments[0].equals("east") && !arguments[0].equals("e")
-					&& !arguments[0].equals("south") && !arguments[0].equals("s")
-					&& !arguments[0].equals("west") && !arguments[0].equals("w")){
+			if (!arguments[0].equals("north") && !arguments[0].equals("n") && !arguments[0].equals("east") && !arguments[0].equals("e") && !arguments[0].equals("south") && !arguments[0].equals("s") && !arguments[0].equals("west") && !arguments[0].equals("w")) {
 				this.badMsg(player, usageStr);
 				return;
 			}
@@ -772,7 +727,7 @@ public class War extends JavaPlugin {
 				this.badMsg(player, "No warzone matches " + arguments[0] + ".");
 			} else {
 				// Move the warzone lobby
-				ZoneLobby lobby =  warzone.getLobby();
+				ZoneLobby lobby = warzone.getLobby();
 				if (lobby != null) {
 					// reset existing lobby
 					lobby.getVolume().resetBlocks();
@@ -796,22 +751,12 @@ public class War extends JavaPlugin {
 	}
 
 	public void performSetZone(Player player, String[] arguments) {
-		if (arguments.length < 2 || arguments.length > 2
-				|| (arguments.length == 2 && (!arguments[1].equals("southeast") && !arguments[1].equals("northwest")
-														&& !arguments[1].equals("se") && !arguments[1].equals("nw")
-														&& !arguments[1].equals("corner1") && !arguments[1].equals("corner2")
-														&& !arguments[1].equals("c1") && !arguments[1].equals("c2")
-														&& !arguments[1].equals("pos1") && !arguments[1].equals("pos2")
-														&& !arguments[1].equals("wand")))) {
+		if (arguments.length < 2 || arguments.length > 2 || (arguments.length == 2 && (!arguments[1].equals("southeast") && !arguments[1].equals("northwest") && !arguments[1].equals("se") && !arguments[1].equals("nw") && !arguments[1].equals("corner1") && !arguments[1].equals("corner2") && !arguments[1].equals("c1") && !arguments[1].equals("c2") && !arguments[1].equals("pos1") && !arguments[1].equals("pos2") && !arguments[1].equals("wand")))) {
 			if (arguments.length == 1) {
 				// we only have a zone name, default to wand mode
 				this.addWandBearer(player, arguments[0]);
 			} else {
-				this.badMsg(player, "Usage: =<Classic mode>= /setzone <warzone-name> <'northwest'/'southeast'/'nw'/'se'> (NW defaults to top block, SE to bottom). " +
-						"=<Wand Cuboid mode>= /setzone <warzone-name> wand (gives you a wooden sword to right and left click, drop to disable). " +
-						"=<Wandless Cuboid mode>= /setzone <warzone-name> <'corner1'/'corner2'/'c1'/'c2'/'pos1'/'pos2'> (block where you're standing). " +
-						"Set one corner, then the next. Defines the outline of the warzone, which will be reset at the start of every battle. " +
-						"Saves the zone blocks if the outline is valid.");
+				this.badMsg(player, "Usage: =<Classic mode>= /setzone <warzone-name> <'northwest'/'southeast'/'nw'/'se'> (NW defaults to top block, SE to bottom). " + "=<Wand Cuboid mode>= /setzone <warzone-name> wand (gives you a wooden sword to right and left click, drop to disable). " + "=<Wandless Cuboid mode>= /setzone <warzone-name> <'corner1'/'corner2'/'c1'/'c2'/'pos1'/'pos2'> (block where you're standing). " + "Set one corner, then the next. Defines the outline of the warzone, which will be reset at the start of every battle. " + "Saves the zone blocks if the outline is valid.");
 			}
 		} else {
 			ZoneSetter setter = new ZoneSetter(this, player, arguments[0]);
@@ -835,7 +780,7 @@ public class War extends JavaPlugin {
 		} else {
 			Warzone warzone = this.warzone(player.getLocation());
 			warzone.clearFlagThieves();
-			for (Team team: warzone.getTeams()) {
+			for (Team team : warzone.getTeams()) {
 				team.teamcast("The battle was interrupted. " + this.playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and life pools...");
 			}
 			warzone.getVolume().resetBlocksAsJob();
@@ -861,8 +806,7 @@ public class War extends JavaPlugin {
 	public void performTeam(Player player, String[] arguments) {
 		Team playerTeam = this.getPlayerTeam(player.getName());
 		if (playerTeam == null) {
-			this.badMsg(player, "Usage: /team <message>. " +
-					"Sends a message only to your teammates.");
+			this.badMsg(player, "Usage: /team <message>. " + "Sends a message only to your teammates.");
 		} else {
 			ChatColor color = playerTeam.getKind().getColor();
 			String teamMessage = color + player.getName() + ": " + ChatColor.WHITE;
@@ -875,8 +819,7 @@ public class War extends JavaPlugin {
 
 	public void performLeave(Player player) {
 		if (!this.inAnyWarzone(player.getLocation()) || this.getPlayerTeam(player.getName()) == null) {
-			this.badMsg(player, "Usage: /leave. " +
-					"Must be in a team already.");
+			this.badMsg(player, "Usage: /leave. " + "Must be in a team already.");
 		} else {
 			Warzone zone = this.getPlayerTeamWarzone(player.getName());
 			zone.handlePlayerLeave(player, zone.getTeleport(), true);
@@ -884,18 +827,14 @@ public class War extends JavaPlugin {
 	}
 
 	public void performJoin(Player player, String[] arguments) {
-		if (arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))
-				|| (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
-			this.badMsg(player, "Usage: /join <diamond/iron/gold/red/blue/green/etc.>." +
-					" Teams are warzone specific." +
-					" You must be inside a warzone or zone lobby to join a team." +
-					" Use as an alternative to walking through the team gate.");
+		if (arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) || (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
+			this.badMsg(player, "Usage: /join <diamond/iron/gold/red/blue/green/etc.>." + " Teams are warzone specific." + " You must be inside a warzone or zone lobby to join a team." + " Use as an alternative to walking through the team gate.");
 		} else {
 			// drop from old team if any
 			Team previousTeam = this.getPlayerTeam(player.getName());
 			if (previousTeam != null) {
 				Warzone zone = this.getPlayerTeamWarzone(player.getName());
-				if (!previousTeam.removePlayer(player.getName())){
+				if (!previousTeam.removePlayer(player.getName())) {
 					this.logWarn("Could not remove player " + player.getName() + " from team " + previousTeam.getName());
 				}
 				if (zone.isFlagThief(player.getName())) {
@@ -912,7 +851,7 @@ public class War extends JavaPlugin {
 
 			// join new team
 			String name = arguments[0];
-			TeamKind kind =	TeamKinds.teamKindFromString(arguments[0]);
+			TeamKind kind = TeamKinds.teamKindFromString(arguments[0]);
 			Warzone warzone = this.warzone(player.getLocation());
 			ZoneLobby lobby = this.lobby(player.getLocation());
 			if (warzone == null && lobby != null) {
@@ -946,7 +885,7 @@ public class War extends JavaPlugin {
 					}
 				}
 				if (foundTeam) {
-					for (Team team : teams){
+					for (Team team : teams) {
 						team.teamcast("" + player.getName() + " joined " + team.getName());
 					}
 				} else {
@@ -958,8 +897,7 @@ public class War extends JavaPlugin {
 
 	public void performTeams(Player player) {
 		if (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-			this.badMsg(player, "Usage: /teams. " +
-					"Must be in a warzone or zone lobby (try /war, /zones and /zone).");
+			this.badMsg(player, "Usage: /teams. " + "Must be in a warzone or zone lobby (try /war, /zones and /zone).");
 		} else {
 			this.msg(player, "" + this.playerListener.getAllTeamsMsg(player));
 		}
@@ -973,7 +911,7 @@ public class War extends JavaPlugin {
 		} else {
 			boolean warped = false;
 			for (Warzone warzone : this.getWarzones()) {
-				if (warzone.getName().toLowerCase().startsWith(arguments[0].toLowerCase()) && warzone.getTeleport() != null){
+				if (warzone.getName().toLowerCase().startsWith(arguments[0].toLowerCase()) && warzone.getTeleport() != null) {
 					Team playerTeam = this.getPlayerTeam(player.getName());
 					if (playerTeam != null) {
 						Warzone playerWarzone = this.getPlayerTeamWarzone(player.getName());
@@ -993,53 +931,51 @@ public class War extends JavaPlugin {
 
 	private void performZones(Player player) {
 		String warzonesMessage = "Warzones: ";
-		if (this.getWarzones().isEmpty()){
+		if (this.getWarzones().isEmpty()) {
 			warzonesMessage += "none.";
 		}
 		for (Warzone warzone : this.getWarzones()) {
 
-			warzonesMessage += warzone.getName() + " ("
-			+ warzone.getTeams().size() + " teams, ";
+			warzonesMessage += warzone.getName() + " (" + warzone.getTeams().size() + " teams, ";
 			int playerTotal = 0;
 			for (Team team : warzone.getTeams()) {
 				playerTotal += team.getPlayers().size();
 			}
 			warzonesMessage += playerTotal + " players)  ";
 		}
-		this.msg(player, warzonesMessage + "  Use /zone <zone-name> to " +
-				"teleport to a warzone. ");
+		this.msg(player, warzonesMessage + "  Use /zone <zone-name> to " + "teleport to a warzone. ");
 	}
 
 	private boolean updateZoneFromNamedParams(Warzone warzone, Player player, String[] arguments) {
 		try {
-			Map<String,String> namedParams = new HashMap<String,String>();
+			Map<String, String> namedParams = new HashMap<String, String>();
 			for (String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if (pairSplit.length == 2) {
 					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
 				}
 			}
-			if (namedParams.containsKey("lifepool")){
+			if (namedParams.containsKey("lifepool")) {
 				warzone.setLifePool(Integer.parseInt(namedParams.get("lifepool")));
 			}
-			if (namedParams.containsKey("monumentheal")){
+			if (namedParams.containsKey("monumentheal")) {
 				warzone.setMonumentHeal(Integer.parseInt(namedParams.get("monumentheal")));
 			}
-			if (namedParams.containsKey("teamsize")){
+			if (namedParams.containsKey("teamsize")) {
 				warzone.setTeamCap(Integer.parseInt(namedParams.get("teamsize")));
 			}
-			if (namedParams.containsKey("maxscore")){
+			if (namedParams.containsKey("maxscore")) {
 				warzone.setScoreCap(Integer.parseInt(namedParams.get("maxscore")));
 			}
-			if (namedParams.containsKey("ff")){
+			if (namedParams.containsKey("ff")) {
 				String onOff = namedParams.get("ff");
 				warzone.setFriendlyFire(onOff.equals("on") || onOff.equals("true"));
 			}
-			if (namedParams.containsKey("autoassign")){
+			if (namedParams.containsKey("autoassign")) {
 				String onOff = namedParams.get("autoassign");
 				warzone.setAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
 			}
-			if (namedParams.containsKey("blockheads")){
+			if (namedParams.containsKey("blockheads")) {
 				String onOff = namedParams.get("blockheads");
 				warzone.setBlockHeads(onOff.equals("on") || onOff.equals("true"));
 			}
@@ -1047,9 +983,9 @@ public class War extends JavaPlugin {
 				String spawnStyle = namedParams.get("spawnstyle").toLowerCase();
 				if (spawnStyle.equals(TeamSpawnStyles.SMALL)) {
 					warzone.setSpawnStyle(spawnStyle);
-				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
+				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)) {
 					warzone.setSpawnStyle(spawnStyle);
-				} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)){
+				} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)) {
 					warzone.setSpawnStyle(spawnStyle);
 				} else {
 					warzone.setSpawnStyle(TeamSpawnStyles.BIG);
@@ -1068,11 +1004,11 @@ public class War extends JavaPlugin {
 				warzone.setNoCreatures(onOff.equals("on") || onOff.equals("true"));
 			}
 			if (namedParams.containsKey("loadout")) {
-				//String loadoutType = namedParams.get("loadout");
+				// String loadoutType = namedParams.get("loadout");
 				this.inventoryToLoadout(player, warzone.getLoadout());
 			}
 			if (namedParams.containsKey("reward")) {
-				//String rewardType = namedParams.get("reward");
+				// String rewardType = namedParams.get("reward");
 				this.inventoryToLoadout(player, warzone.getReward());
 			}
 			if (namedParams.containsKey("resetonempty")) {
@@ -1087,10 +1023,10 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("resetonunload");
 				warzone.setResetOnUnload(onOff.equals("on") || onOff.equals("true"));
 			}
-//			if (namedParams.containsKey("dropLootOnDeath")){
-//				String onOff = namedParams.get("dropLootOnDeath");
-//				warzone.setDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
-//			}
+			// if (namedParams.containsKey("dropLootOnDeath")){
+			// String onOff = namedParams.get("dropLootOnDeath");
+			// warzone.setDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
+			// }
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -1099,50 +1035,50 @@ public class War extends JavaPlugin {
 
 	private boolean updateFromNamedParams(Player player, String[] arguments) {
 		try {
-			Map<String,String> namedParams = new HashMap<String,String>();
+			Map<String, String> namedParams = new HashMap<String, String>();
 			for (String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if (pairSplit.length == 2) {
 					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
 				}
 			}
-			if (namedParams.containsKey("lifepool")){
+			if (namedParams.containsKey("lifepool")) {
 				this.setDefaultLifepool(Integer.parseInt(namedParams.get("lifepool")));
 			}
-			if (namedParams.containsKey("monumentheal")){
+			if (namedParams.containsKey("monumentheal")) {
 				this.setDefaultMonumentHeal(Integer.parseInt(namedParams.get("monumentheal")));
 			}
-			if (namedParams.containsKey("teamsize")){
+			if (namedParams.containsKey("teamsize")) {
 				this.setDefaultTeamCap(Integer.parseInt(namedParams.get("teamsize")));
 			}
-			if (namedParams.containsKey("maxscore")){
+			if (namedParams.containsKey("maxscore")) {
 				this.setDefaultScoreCap(Integer.parseInt(namedParams.get("maxscore")));
 			}
-			if (namedParams.containsKey("ff")){
+			if (namedParams.containsKey("ff")) {
 				String onOff = namedParams.get("ff");
 				this.setDefaultFriendlyFire(onOff.equals("on"));
 			}
-			if (namedParams.containsKey("autoassign")){
+			if (namedParams.containsKey("autoassign")) {
 				String onOff = namedParams.get("autoassign");
 				this.setDefaultAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
 			}
-			if (namedParams.containsKey("pvpinzonesonly")){
+			if (namedParams.containsKey("pvpinzonesonly")) {
 				String onOff = namedParams.get("pvpinzonesonly");
 				this.setPvpInZonesOnly(onOff.equals("on") || onOff.equals("true"));
 			}
-			if (namedParams.containsKey("disablepvpmessage")){
+			if (namedParams.containsKey("disablepvpmessage")) {
 				String onOff = namedParams.get("disablepvpmessage");
 				this.setDisablePvpMessage(onOff.equals("on") || onOff.equals("true"));
 			}
-			if (namedParams.containsKey("blockheads")){
+			if (namedParams.containsKey("blockheads")) {
 				String onOff = namedParams.get("blockheads");
 				this.setDefaultBlockHeads(onOff.equals("on") || onOff.equals("true"));
 			}
-			if (namedParams.containsKey("spawnstyle")){
+			if (namedParams.containsKey("spawnstyle")) {
 				String spawnStyle = namedParams.get("spawnstyle").toLowerCase();
 				if (spawnStyle.equals(TeamSpawnStyles.SMALL)) {
 					this.setDefaultSpawnStyle(spawnStyle);
-				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
+				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)) {
 					this.setDefaultSpawnStyle(spawnStyle);
 				} else {
 					this.setDefaultSpawnStyle(TeamSpawnStyles.BIG);
@@ -1161,11 +1097,11 @@ public class War extends JavaPlugin {
 				this.setDefaultNoCreatures(onOff.equals("on") || onOff.equals("true"));
 			}
 			if (namedParams.containsKey("loadout")) {
-				//String loadoutType = namedParams.get("loadout");
+				// String loadoutType = namedParams.get("loadout");
 				this.inventoryToLoadout(player, this.getDefaultLoadout());
 			}
 			if (namedParams.containsKey("reward")) {
-				//String rewardType = namedParams.get("reward");
+				// String rewardType = namedParams.get("reward");
 				this.inventoryToLoadout(player, this.getDefaultReward());
 			}
 			if (namedParams.containsKey("resetonempty")) {
@@ -1181,13 +1117,13 @@ public class War extends JavaPlugin {
 				this.setDefaultResetOnUnload(onOff.equals("on") || onOff.equals("true"));
 			}
 			if (namedParams.containsKey("rallypoint")) {
-				//String rewardType = namedParams.get("reward");
+				// String rewardType = namedParams.get("reward");
 				this.setZoneRallyPoint(namedParams.get("rallypoint"), player);
 			}
-//			if (namedParams.containsKey("dropLootOnDeath")){
-//				String onOff = namedParams.get("dropLootOnDeath");
-//				setDefaultDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
-//			}
+			// if (namedParams.containsKey("dropLootOnDeath")){
+			// String onOff = namedParams.get("dropLootOnDeath");
+			// setDefaultDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
+			// }
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -1208,7 +1144,7 @@ public class War extends JavaPlugin {
 		for (Warzone warzone : this.warzones) {
 			Team team = warzone.getPlayerTeam(playerName);
 			if (team != null) {
-			    return team;
+				return team;
 			}
 		}
 		return null;
@@ -1218,7 +1154,7 @@ public class War extends JavaPlugin {
 		for (Warzone warzone : this.warzones) {
 			Team team = warzone.getPlayerTeam(playerName);
 			if (team != null) {
-			    return warzone;
+				return warzone;
 			}
 		}
 		return null;
@@ -1230,9 +1166,8 @@ public class War extends JavaPlugin {
 
 	public Warzone warzone(Location location) {
 		for (Warzone warzone : this.warzones) {
-			if (location.getWorld().getName().equals(warzone.getWorld().getName())
-					&& warzone.getVolume() != null && warzone.getVolume().contains(location)) {
-			    return warzone;
+			if (location.getWorld().getName().equals(warzone.getWorld().getName()) && warzone.getVolume() != null && warzone.getVolume().contains(location)) {
+				return warzone;
 			}
 		}
 		return null;
@@ -1242,10 +1177,9 @@ public class War extends JavaPlugin {
 		Block locBlock = location.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 		Warzone currentZone = this.warzone(location);
 		if (currentZone == null) {
-		    return false;
-		} else if (currentZone.getVolume().isWallBlock(locBlock))
-		 {
-		    return false;	// wall block doesnt count. this lets people in at the lobby side wall because wall gates overlap with the zone.
+			return false;
+		} else if (currentZone.getVolume().isWallBlock(locBlock)) {
+			return false; // wall block doesnt count. this lets people in at the lobby side wall because wall gates overlap with the zone.
 		}
 		return true;
 	}
@@ -1253,9 +1187,9 @@ public class War extends JavaPlugin {
 	public boolean inWarzone(String warzoneName, Location location) {
 		Warzone currentZone = this.warzone(location);
 		if (currentZone == null) {
-		    return false;
+			return false;
 		} else if (warzoneName.toLowerCase().equals(currentZone.getName().toLowerCase())) {
-		    return true;
+			return true;
 		}
 		return false;
 	}
@@ -1297,12 +1231,12 @@ public class War extends JavaPlugin {
 	public Warzone findWarzone(String warzoneName) {
 		for (Warzone warzone : this.warzones) {
 			if (warzone.getName().toLowerCase().equals(warzoneName.toLowerCase())) {
-			    return warzone;
+				return warzone;
 			}
 		}
 		for (Warzone warzone : this.incompleteZones) {
 			if (warzone.getName().equals(warzoneName)) {
-			    return warzone;
+				return warzone;
 			}
 		}
 		return null;
@@ -1311,14 +1245,14 @@ public class War extends JavaPlugin {
 	public Warzone matchWarzone(String warzoneSubString) {
 		for (Warzone warzone : this.warzones) {
 			if (warzone.getName().toLowerCase().startsWith(warzoneSubString.toLowerCase())) {
-			    return warzone;
+				return warzone;
 			}
 		}
 		return null;
 	}
 
 	public void addWandBearer(Player player, String zoneName) {
-		if (this.wandBearers.containsKey(player.getName())){
+		if (this.wandBearers.containsKey(player.getName())) {
 			String alreadyHaveWand = this.wandBearers.get(player.getName());
 			if (player.getInventory().first(Material.WOOD_SWORD) != -1) {
 				if (zoneName.equals(alreadyHaveWand)) {
@@ -1343,7 +1277,7 @@ public class War extends JavaPlugin {
 			} else {
 				this.wandBearers.put(player.getName(), zoneName);
 				player.getInventory().addItem(new ItemStack(Material.WOOD_SWORD, 1, (byte) 8));
-				//player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.WOOD_SWORD));
+				// player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.WOOD_SWORD));
 				this.msg(player, "You now have a wand for zone " + zoneName + ". Left-click with wodden sword for corner 1. Right-click for corner 2.");
 			}
 		}
@@ -1355,13 +1289,13 @@ public class War extends JavaPlugin {
 
 	public String getWandBearerZone(Player player) {
 		if (this.isWandBearer(player)) {
-		    return this.wandBearers.get(player.getName());
+			return this.wandBearers.get(player.getName());
 		}
 		return "";
 	}
 
 	public void removeWandBearer(Player player) {
-		if (this.wandBearers.containsKey(player.getName())){
+		if (this.wandBearers.containsKey(player.getName())) {
 			this.wandBearers.remove(player.getName());
 		}
 	}
@@ -1401,7 +1335,7 @@ public class War extends JavaPlugin {
 	public Warzone zoneOfZoneWallAtProximity(Location location) {
 		for (Warzone zone : this.warzones) {
 			if (zone.getWorld() == location.getWorld() && zone.isNearWall(location)) {
-			    return zone;
+				return zone;
 			}
 		}
 		return null;
@@ -1412,80 +1346,67 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean canPlayWar(Player player) {
-		if (War.permissionHandler != null
-				&& (War.permissionHandler.has(player, "war.player")
-						|| War.permissionHandler.has(player, "War.player"))) {
-		    return true;
+		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.player") || War.permissionHandler.has(player, "War.player"))) {
+			return true;
 		}
 		if (War.permissionHandler == null) {
-		    // w/o Permissions, everyone can play
-		    return true;
+			// w/o Permissions, everyone can play
+			return true;
 		}
 		return false;
 	}
 
 	public boolean canWarp(Player player) {
-		if (War.permissionHandler != null
-				&& (War.permissionHandler.has(player, "war.warp")
-						|| War.permissionHandler.has(player, "War.warp"))) {
-		    return true;
+		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.warp") || War.permissionHandler.has(player, "War.warp"))) {
+			return true;
 		}
 		if (War.permissionHandler == null) {
-		    // w/o Permissions, everyone can warp
-		    return true;
+			// w/o Permissions, everyone can warp
+			return true;
 		}
 		return false;
 	}
 
 	public boolean canBuildOutsideZone(Player player) {
 		if (this.isBuildInZonesOnly()) {
-			if (War.permissionHandler != null
-					&& (War.permissionHandler.has(player, "war.build")
-							|| War.permissionHandler.has(player, "War.build"))) {
-			    return true;
+			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.build") || War.permissionHandler.has(player, "War.build"))) {
+				return true;
 			}
 			// w/o Permissions, if buildInZonesOnly, no one can build outside the zone except Zonemakers
 			return this.isZoneMaker(player);
 		} else {
-		    return true;
+			return true;
 		}
 	}
 
 	public boolean canPvpOutsideZones(Player player) {
 		if (this.isPvpInZonesOnly()) {
-			if (War.permissionHandler != null
-					&& (War.permissionHandler.has(player, "war.pvp")
-							|| War.permissionHandler.has(player, "War.pvp"))) {
-			    return true;
+			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.pvp") || War.permissionHandler.has(player, "War.pvp"))) {
+				return true;
 			}
 			// w/o Permissions, if pvpInZoneOnly, no one can pvp outside the zone
 			return false;
 		} else {
-		    return true;
+			return true;
 		}
 	}
 
 	public boolean isZoneMaker(Player player) {
 		for (String disguised : this.zoneMakersImpersonatingPlayers) {
 			if (disguised.equals(player.getName())) {
-			    return false;
+				return false;
 			}
 		}
 
 		for (String zoneMaker : this.zoneMakerNames) {
 			if (zoneMaker.equals(player.getName())) {
-			    return true;
+				return true;
 			}
 		}
-		if (	War.permissionHandler != null
-		&& 	(
-				War.permissionHandler.has(player, "war.*")
-			|| 	War.permissionHandler.has(player, "War.*")
-			)
-		) {
-		    return true;
+		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "War.*"))) {
+			return true;
 		} else {
-		    return player.isOp();
+			return player.isOp();
 		}
 	}
 
@@ -1508,10 +1429,8 @@ public class War extends JavaPlugin {
 
 	public ZoneLobby lobby(Location location) {
 		for (Warzone warzone : this.warzones) {
-			if (warzone.getLobby() != null
-					&& warzone.getLobby().getVolume() != null
-					&& warzone.getLobby().getVolume().contains(location)) {
-			    return warzone.getLobby();
+			if (warzone.getLobby() != null && warzone.getLobby().getVolume() != null && warzone.getLobby().getVolume().contains(location)) {
+				return warzone.getLobby();
 			}
 		}
 		return null;
@@ -1519,7 +1438,7 @@ public class War extends JavaPlugin {
 
 	public boolean inAnyWarzoneLobby(Location location) {
 		if (this.lobby(location) == null) {
-		    return false;
+			return false;
 		}
 		return true;
 	}
@@ -1527,9 +1446,9 @@ public class War extends JavaPlugin {
 	public boolean inWarzoneLobby(String warzoneName, Location location) {
 		ZoneLobby currentLobby = this.lobby(location);
 		if (currentLobby == null) {
-		    return false;
+			return false;
 		} else if (warzoneName.toLowerCase().equals(currentLobby.getZone().getName().toLowerCase())) {
-		    return true;
+			return true;
 		}
 		return false;
 	}

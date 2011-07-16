@@ -28,11 +28,10 @@ import com.tommytony.war.volumes.Volume;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
- * The ZoneVolumeMapper take the blocks from disk and sets them in the worlds, since
- * the ZoneVolume doesn't hold its blocks in memory like regular Volumes.
- *
+ * The ZoneVolumeMapper take the blocks from disk and sets them in the worlds, since the ZoneVolume doesn't hold its blocks in memory like regular Volumes.
+ * 
  * @author tommytony
- *
+ * 
  */
 public class PreDeGaulleZoneVolumeMapper {
 
@@ -42,28 +41,24 @@ public class PreDeGaulleZoneVolumeMapper {
 		for (String itemStr : itemsStrSplit) {
 			String[] itemStrSplit = itemStr.split(";");
 			if (itemStrSplit.length == 4) {
-				ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-						Integer.parseInt(itemStrSplit[1]));
-				stack.setData(new MaterialData(stack.getTypeId(),Byte.parseByte(itemStrSplit[3])));
-				short durability = (short)Integer.parseInt(itemStrSplit[2]);
+				ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
+				stack.setData(new MaterialData(stack.getTypeId(), Byte.parseByte(itemStrSplit[3])));
+				short durability = (short) Integer.parseInt(itemStrSplit[2]);
 				stack.setDurability(durability);
 				items.add(stack);
 			} else if (itemStrSplit.length == 3) {
-				ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-						Integer.parseInt(itemStrSplit[1]));
-				short durability = (short)Integer.parseInt(itemStrSplit[2]);
+				ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
+				short durability = (short) Integer.parseInt(itemStrSplit[2]);
 				stack.setDurability(durability);
 				items.add(stack);
 			} else {
-				items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]),
-						Integer.parseInt(itemStrSplit[1])));
+				items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1])));
 			}
 		}
 		return items;
 	}
 
-	public static int load(ZoneVolume volume, String zoneName, War war,
-			World world, boolean onlyLoadCorners) {
+	public static int load(ZoneVolume volume, String zoneName, War war, World world, boolean onlyLoadCorners) {
 		BufferedReader in = null;
 		int noOfResetBlocks = 0;
 		try {
@@ -93,7 +88,7 @@ public class PreDeGaulleZoneVolumeMapper {
 
 				if (!onlyLoadCorners) {
 					DeferredBlockResetsJob deferred = new DeferredBlockResetsJob(world);
-					int blockReads = 0, visitedBlocks = 0, x = 0, y = 0, z = 0, i = 0, j = 0 , k = 0;
+					int blockReads = 0, visitedBlocks = 0, x = 0, y = 0, z = 0, i = 0, j = 0, k = 0;
 					int diskBlockType;
 					byte diskBlockData;
 					Block worldBlock;
@@ -102,7 +97,7 @@ public class PreDeGaulleZoneVolumeMapper {
 					x = volume.getMinX();
 					String blockLine;
 					String[] blockSplit;
-					for (i = 0; i < volume.getSizeX(); i++){
+					for (i = 0; i < volume.getSizeX(); i++) {
 						y = volume.getMinY();
 						for (j = 0; j < volume.getSizeY(); j++) {
 							z = volume.getMinZ();
@@ -117,15 +112,8 @@ public class PreDeGaulleZoneVolumeMapper {
 											diskBlockData = Byte.parseByte(blockSplit[1]);
 											worldBlock = volume.getWorld().getBlockAt(x, y, z);
 											worldBlockId = worldBlock.getTypeId();
-											if (worldBlockId != diskBlockType ||
-												(worldBlockId == diskBlockType && worldBlock.getData() != diskBlockData ) ||
-												(worldBlockId == diskBlockType && worldBlock.getData() == diskBlockData &&
-														(diskBlockType == Material.WALL_SIGN.getId() || diskBlockType == Material.SIGN_POST.getId()
-																|| diskBlockType == Material.CHEST.getId() || diskBlockType == Material.DISPENSER.getId())
-												)
-											) {
-												if (diskBlockType == Material.WALL_SIGN.getId()
-														|| diskBlockType == Material.SIGN_POST.getId()) {
+											if (worldBlockId != diskBlockType || (worldBlockId == diskBlockType && worldBlock.getData() != diskBlockData) || (worldBlockId == diskBlockType && worldBlock.getData() == diskBlockData && (diskBlockType == Material.WALL_SIGN.getId() || diskBlockType == Material.SIGN_POST.getId() || diskBlockType == Material.CHEST.getId() || diskBlockType == Material.DISPENSER.getId()))) {
+												if (diskBlockType == Material.WALL_SIGN.getId() || diskBlockType == Material.SIGN_POST.getId()) {
 													// Signs read
 													String linesStr = "";
 													if (blockSplit.length > 2) {
@@ -136,27 +124,26 @@ public class PreDeGaulleZoneVolumeMapper {
 
 														// Signs set
 														// A sign post hanging on a wall south of here will
-														if (diskBlockType == Material.SIGN_POST.getId() && ((diskBlockData & 0x04) == 0x04)
-																&& i+1 != volume.getSizeX()) {
+														if (diskBlockType == Material.SIGN_POST.getId() && ((diskBlockData & 0x04) == 0x04) && i + 1 != volume.getSizeX()) {
 															deferred.add(new DeferredBlockReset(x, y, z, diskBlockType, diskBlockData, lines));
 														} else {
 															worldBlock.setType(Material.getMaterial(diskBlockType));
 															BlockState state = worldBlock.getState();
 															state.setData(new org.bukkit.material.Sign(diskBlockType, diskBlockData));
 															if (state instanceof Sign) {
-																Sign sign = (Sign)state;
+																Sign sign = (Sign) state;
 																if (lines != null && sign.getLines() != null) {
-																	if (lines.length>0) {
-																	    sign.setLine(0, lines[0]);
+																	if (lines.length > 0) {
+																		sign.setLine(0, lines[0]);
 																	}
-																	if (lines.length>1) {
-																	    sign.setLine(1, lines[1]);
+																	if (lines.length > 1) {
+																		sign.setLine(1, lines[1]);
 																	}
-																	if (lines.length>2) {
-																	    sign.setLine(2, lines[2]);
+																	if (lines.length > 2) {
+																		sign.setLine(2, lines[2]);
 																	}
-																	if (lines.length>3) {
-																	    sign.setLine(3, lines[3]);
+																	if (lines.length > 3) {
+																		sign.setLine(3, lines[3]);
 																	}
 																	sign.update(true);
 																}
@@ -176,7 +163,7 @@ public class PreDeGaulleZoneVolumeMapper {
 													worldBlock.setData(diskBlockData);
 													BlockState state = worldBlock.getState();
 													if (state instanceof Chest) {
-														Chest chest = (Chest)state;
+														Chest chest = (Chest) state;
 														if (items != null) {
 															int ii = 0;
 															chest.getInventory().clear();
@@ -194,7 +181,7 @@ public class PreDeGaulleZoneVolumeMapper {
 													List<ItemStack> items = null;
 													if (blockSplit.length > 2) {
 														String itemsStr = blockSplit[2];
-														//String itemsStr = lineScanner.nextLine();
+														// String itemsStr = lineScanner.nextLine();
 														items = PreDeGaulleZoneVolumeMapper.readInventoryString(itemsStr);
 													}
 
@@ -203,7 +190,7 @@ public class PreDeGaulleZoneVolumeMapper {
 													worldBlock.setData(diskBlockData);
 													BlockState state = worldBlock.getState();
 													if (state instanceof Dispenser) {
-														Dispenser dispenser = (Dispenser)state;
+														Dispenser dispenser = (Dispenser) state;
 														if (items != null) {
 															int ii = 0;
 															dispenser.getInventory().clear();
@@ -216,11 +203,11 @@ public class PreDeGaulleZoneVolumeMapper {
 															dispenser.update(true);
 														}
 													}
-												} else if (diskBlockType == Material.WOODEN_DOOR.getId() || diskBlockType == Material.IRON_DOOR_BLOCK.getId()){
+												} else if (diskBlockType == Material.WOODEN_DOOR.getId() || diskBlockType == Material.IRON_DOOR_BLOCK.getId()) {
 													// Door blocks
 
-													if (j-1 > 0) {
-														Block blockBelow = world.getBlockAt(x, y-1, z);
+													if (j - 1 > 0) {
+														Block blockBelow = world.getBlockAt(x, y - 1, z);
 														boolean belowIsGlass = blockBelow.getTypeId() == Material.GLASS.getId();
 														// Set current block to glass if block below isn't glass.
 														// Having a glass block below means the current block is a door top.
@@ -235,14 +222,7 @@ public class PreDeGaulleZoneVolumeMapper {
 														}
 													}
 
-												} else if (((diskBlockType == Material.TORCH.getId() && ((diskBlockData & 0x02) == 0x02))
-														|| (diskBlockType == Material.REDSTONE_TORCH_OFF.getId() && ((diskBlockData & 0x02) == 0x02))
-														|| (diskBlockType == Material.REDSTONE_TORCH_ON.getId()  && ((diskBlockData & 0x02) == 0x02))
-														|| (diskBlockType == Material.LEVER.getId()  && ((diskBlockData & 0x02) == 0x02))
-														|| (diskBlockType == Material.STONE_BUTTON.getId() && ((diskBlockData & 0x02) == 0x02))
-														|| (diskBlockType == Material.LADDER.getId() && ((diskBlockData & 0x04) == 0x04))
-														|| (diskBlockType == Material.RAILS.getId() && ((diskBlockData & 0x02) == 0x02)))
-														&& i+1 != volume.getSizeX()){
+												} else if (((diskBlockType == Material.TORCH.getId() && ((diskBlockData & 0x02) == 0x02)) || (diskBlockType == Material.REDSTONE_TORCH_OFF.getId() && ((diskBlockData & 0x02) == 0x02)) || (diskBlockType == Material.REDSTONE_TORCH_ON.getId() && ((diskBlockData & 0x02) == 0x02)) || (diskBlockType == Material.LEVER.getId() && ((diskBlockData & 0x02) == 0x02)) || (diskBlockType == Material.STONE_BUTTON.getId() && ((diskBlockData & 0x02) == 0x02)) || (diskBlockType == Material.LADDER.getId() && ((diskBlockData & 0x04) == 0x04)) || (diskBlockType == Material.RAILS.getId() && ((diskBlockData & 0x02) == 0x02))) && i + 1 != volume.getSizeX()) {
 													// Blocks that hang on a block south of themselves need to make sure that block is there before placing themselves... lol
 													// Change the block itself later on:
 													deferred.add(new DeferredBlockReset(x, y, z, diskBlockType, diskBlockData));
@@ -259,11 +239,7 @@ public class PreDeGaulleZoneVolumeMapper {
 									}
 
 								} catch (Exception e) {
-									volume.getWar().getLogger().warning("Failed to reset block in zone volume " + volume.getName() + ". "
-											+ "Blocks read: " + blockReads
-											+ ". Visited blocks so far:" + visitedBlocks
-											+ ". Blocks reset: "+ noOfResetBlocks +
-											". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
+									volume.getWar().getLogger().warning("Failed to reset block in zone volume " + volume.getName() + ". " + "Blocks read: " + blockReads + ". Visited blocks so far:" + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
 									e.printStackTrace();
 								} finally {
 									z++;
@@ -271,8 +247,8 @@ public class PreDeGaulleZoneVolumeMapper {
 							}
 							if (height129Fix && j == volume.getSizeY() - 1) {
 								for (int skip = 0; skip < volume.getSizeZ(); skip++) {
-									in.readLine();	// throw away the extra vertical block I used to save pre 0.8
-									//scanner.nextLine();
+									in.readLine(); // throw away the extra vertical block I used to save pre 0.8
+									// scanner.nextLine();
 								}
 							}
 							y++;
@@ -285,26 +261,23 @@ public class PreDeGaulleZoneVolumeMapper {
 				}
 			}
 		} catch (IOException e) {
-			war.logWarn("Failed to read volume file " + volume.getName() +
-					" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+			war.logWarn("Failed to read volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
-			war.logWarn("Unexpected error caused failure to read volume file " + zoneName +
-					" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+			war.logWarn("Unexpected error caused failure to read volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
-		}  finally {
+		} finally {
 			if (in != null) {
-			    //if (scanner != null)
-			    try {
-			    	in.close();
-			    	in = null;
-			    	//scanner.close();
-			    	//scanner = null;
-			    } catch (IOException e) {
-			    	war.logWarn("Failed to close file reader for volume " + volume.getName() +
-			    			" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
-			    	e.printStackTrace();
-			    }
+				// if (scanner != null)
+				try {
+					in.close();
+					in = null;
+					// scanner.close();
+					// scanner = null;
+				} catch (IOException e) {
+					war.logWarn("Failed to close file reader for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+					e.printStackTrace();
+				}
 			}
 		}
 		return noOfResetBlocks;
@@ -315,22 +288,29 @@ public class PreDeGaulleZoneVolumeMapper {
 		if (volume.hasTwoCorners()) {
 			BufferedWriter out = null;
 			try {
-				(new File(war.getDataFolder().getPath() +"/dat/warzone-"+zoneName)).mkdir();
+				(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName)).mkdir();
 				if (zoneName.equals("")) {
-				    out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
+					out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
 				} else {
-				    out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() +
-				    								"/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+					out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 				}
 
-				out.write("corner1"); out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getZ())); out.newLine();
-				out.write("corner2"); out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getX())); out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getY())); out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getZ())); out.newLine();
+				out.write("corner1");
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerOne().getX()));
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerOne().getY()));
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerOne().getZ()));
+				out.newLine();
+				out.write("corner2");
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerTwo().getX()));
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerTwo().getY()));
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerTwo().getZ()));
+				out.newLine();
 
 				int x = 0;
 				int y = 0;
@@ -341,7 +321,7 @@ public class PreDeGaulleZoneVolumeMapper {
 				BlockState state;
 
 				x = volume.getMinX();
-				for (int i = 0; i < volume.getSizeX(); i++){
+				for (int i = 0; i < volume.getSizeX(); i++) {
 					y = volume.getMinY();
 					for (int j = 0; j < volume.getSizeY(); j++) {
 						z = volume.getMinZ();
@@ -357,7 +337,7 @@ public class PreDeGaulleZoneVolumeMapper {
 								if (state instanceof Sign) {
 									// Signs
 									String extra = "";
-									Sign sign = (Sign)state;
+									Sign sign = (Sign) state;
 									if (sign.getLines() != null) {
 										for (String line : sign.getLines()) {
 											extra += line + ";;";
@@ -367,11 +347,11 @@ public class PreDeGaulleZoneVolumeMapper {
 
 								} else if (state instanceof Chest) {
 									// Chests
-									Chest chest = (Chest)state;
+									Chest chest = (Chest) state;
 									Inventory inv = chest.getInventory();
 									int size = inv.getSize();
 									List<ItemStack> items = new ArrayList<ItemStack>();
-									for (int invIndex = 0; invIndex < size; invIndex++){
+									for (int invIndex = 0; invIndex < size; invIndex++) {
 										ItemStack item = inv.getItem(invIndex);
 										if (item != null && item.getType().getId() != Material.AIR.getId()) {
 											items.add(item);
@@ -381,11 +361,9 @@ public class PreDeGaulleZoneVolumeMapper {
 									if (items != null) {
 										for (ItemStack item : items) {
 											if (item != null) {
-												extra += item.getTypeId() + ";"
-												+ item.getAmount() + ";"
-												+ item.getDurability();
+												extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
 												if (item.getData() != null) {
-												    extra += ";" + item.getData().getData() ;
+													extra += ";" + item.getData().getData();
 												}
 												extra += ";;";
 											}
@@ -394,11 +372,11 @@ public class PreDeGaulleZoneVolumeMapper {
 									}
 								} else if (state instanceof Dispenser) {
 									// Dispensers
-									Dispenser dispenser = (Dispenser)state;
+									Dispenser dispenser = (Dispenser) state;
 									Inventory inv = dispenser.getInventory();
 									int size = inv.getSize();
 									List<ItemStack> items = new ArrayList<ItemStack>();
-									for (int invIndex = 0; invIndex < size; invIndex++){
+									for (int invIndex = 0; invIndex < size; invIndex++) {
 										ItemStack item = inv.getItem(invIndex);
 										if (item != null && item.getType().getId() != Material.AIR.getId()) {
 											items.add(item);
@@ -408,11 +386,9 @@ public class PreDeGaulleZoneVolumeMapper {
 									if (items != null) {
 										for (ItemStack item : items) {
 											if (item != null) {
-												extra += item.getTypeId() + ";"
-												+ item.getAmount() + ";"
-												+ item.getDurability();
+												extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
 												if (item.getData() != null) {
-												    extra += ";" + item.getData().getData() ;
+													extra += ";" + item.getData().getData();
 												}
 												extra += ";;";
 											}
@@ -422,11 +398,8 @@ public class PreDeGaulleZoneVolumeMapper {
 								}
 								noOfSavedBlocks++;
 								out.newLine();
-							}
-							catch (Exception e) {
-								war.logWarn("Unexpected error while saving a block to " +
-										" file for zone " + zoneName + ". Blocks saved so far: " + noOfSavedBlocks
-										+ "Position: x:" + x + " y:" + y + " z:" + z + ". " + e.getClass().getName() + " " + e.getMessage());
+							} catch (Exception e) {
+								war.logWarn("Unexpected error while saving a block to " + " file for zone " + zoneName + ". Blocks saved so far: " + noOfSavedBlocks + "Position: x:" + x + " y:" + y + " z:" + z + ". " + e.getClass().getName() + " " + e.getMessage());
 								e.printStackTrace();
 							} finally {
 								z++;
@@ -437,29 +410,23 @@ public class PreDeGaulleZoneVolumeMapper {
 					x++;
 				}
 			} catch (IOException e) {
-				war.logWarn("Failed to write volume file " + zoneName +
-						" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				war.logWarn("Failed to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 				e.printStackTrace();
 			} catch (Exception e) {
-				war.logWarn("Unexpected error caused failure to write volume file " + zoneName +
-						" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				war.logWarn("Unexpected error caused failure to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 				e.printStackTrace();
-			}
-			finally {
+			} finally {
 				if (out != null) {
-				    try {
-				    	out.close();
-				    } catch (IOException e) {
-				    	war.logWarn("Failed to close file writer for volume " + volume.getName() +
-				    			" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
-				    	e.printStackTrace();
-				    }
+					try {
+						out.close();
+					} catch (IOException e) {
+						war.logWarn("Failed to close file writer for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+						e.printStackTrace();
+					}
 				}
 			}
 		}
 		return noOfSavedBlocks;
 	}
 
-
 }
-

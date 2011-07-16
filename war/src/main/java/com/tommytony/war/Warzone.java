@@ -1,4 +1,5 @@
 package com.tommytony.war;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +24,9 @@ import com.tommytony.war.utils.InventoryStash;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class Warzone {
 	private String name;
@@ -87,7 +88,7 @@ public class Warzone {
 
 	public boolean ready() {
 		if (this.volume.hasTwoCorners() && !this.volume.tooSmall() && !this.volume.tooBig()) {
-		    return true;
+			return true;
 		}
 		return false;
 	}
@@ -100,7 +101,7 @@ public class Warzone {
 		for (Team team : this.teams) {
 			for (Player player : team.getPlayers()) {
 				if (player.getName().equals(playerName)) {
-				    return team;
+					return team;
 				}
 			}
 		}
@@ -120,7 +121,7 @@ public class Warzone {
 	}
 
 	public int saveState(boolean clearArtifacts) {
-		if (this.ready()){
+		if (this.ready()) {
 			if (clearArtifacts) {
 				// removed everything to keep save clean
 				for (ZoneWallGuard guard : this.zoneWallGuards) {
@@ -131,7 +132,7 @@ public class Warzone {
 				for (Team team : this.teams) {
 					team.getSpawnVolume().resetBlocks();
 					if (team.getTeamFlag() != null) {
-					    team.getFlagVolume().resetBlocks();
+						team.getFlagVolume().resetBlocks();
 					}
 				}
 
@@ -146,7 +147,7 @@ public class Warzone {
 
 			int saved = this.volume.saveBlocks();
 			if (clearArtifacts) {
-				this.initializeZone();	// bring back stuff
+				this.initializeZone(); // bring back stuff
 			}
 			return saved;
 		}
@@ -154,8 +155,8 @@ public class Warzone {
 	}
 
 	/**
-	 * Goes back to the saved state of the warzone (resets only block types, not physics).
-	 * Also teleports all players back to their respective spawns.
+	 * Goes back to the saved state of the warzone (resets only block types, not physics). Also teleports all players back to their respective spawns.
+	 * 
 	 * @return
 	 */
 	public void initializeZone() {
@@ -163,27 +164,25 @@ public class Warzone {
 	}
 
 	public void initializeZone(Player respawnExempted) {
-		if (this.ready() && this.volume.isSaved()){
+		if (this.ready() && this.volume.isSaved()) {
 			// everyone back to team spawn with full health
 			for (Team team : this.teams) {
 				for (Player player : team.getPlayers()) {
 					if (player != respawnExempted) {
-					    this.respawnPlayer(team, player);
+						this.respawnPlayer(team, player);
 					}
 				}
 				team.setRemainingLives(this.lifePool);
 				team.initializeTeamSpawn();
-				if (team.getTeamFlag() != null)
-				 {
-				    team.setTeamFlag(team.getTeamFlag());
-				    //team.resetSign();
+				if (team.getTeamFlag() != null) {
+					team.setTeamFlag(team.getTeamFlag());
+					// team.resetSign();
 				}
 			}
 
 			this.initZone();
 		}
 	}
-
 
 	public void initializeZoneAsJob(Player respawnExempted) {
 		InitZoneJob job = new InitZoneJob(this, respawnExempted);
@@ -224,10 +223,10 @@ public class Warzone {
 		this.handleRespawn(team, player);
 		// Teleport the player back to spawn
 		event.setTo(team.getTeamSpawn());
-		//player.teleport(team.getTeamSpawn());
+		// player.teleport(team.getTeamSpawn());
 	}
 
-	private void handleRespawn(Team team, Player player){
+	private void handleRespawn(Team team, Player player) {
 		// Fill hp
 		player.setFireTicks(0);
 		player.setRemainingAir(300);
@@ -244,7 +243,7 @@ public class Warzone {
 		playerInv.clear(playerInv.getSize() + 0);
 		playerInv.clear(playerInv.getSize() + 1);
 		playerInv.clear(playerInv.getSize() + 2);
-		playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
+		playerInv.clear(playerInv.getSize() + 3); // helmet/blockHead
 		for (Integer slot : this.loadout.keySet()) {
 			if (slot == 100) {
 				playerInv.setBoots(this.loadout.get(slot));
@@ -260,7 +259,7 @@ public class Warzone {
 			}
 		}
 		if (this.isBlockHeads()) {
-			playerInv.setHelmet(new ItemStack(team.getKind().getMaterial(), 1, (short)1, new Byte(team.getKind().getData())));
+			playerInv.setHelmet(new ItemStack(team.getKind().getMaterial(), 1, (short) 1, new Byte(team.getKind().getData())));
 		} else {
 			if (team.getKind() == TeamKinds.teamKindFromString("gold")) {
 				playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
@@ -280,7 +279,7 @@ public class Warzone {
 			int y = monument.getLocation().getBlockY() + 1;
 			int z = monument.getLocation().getBlockZ();
 			if (x == block.getX() && y == block.getY() && z == block.getZ()) {
-			    return true;
+				return true;
 			}
 		}
 		return false;
@@ -292,7 +291,7 @@ public class Warzone {
 			int y = monument.getLocation().getBlockY() + 1;
 			int z = monument.getLocation().getBlockZ();
 			if (x == block.getX() && y == block.getY() && z == block.getZ()) {
-			    return monument;
+				return monument;
 			}
 		}
 		return null;
@@ -301,7 +300,7 @@ public class Warzone {
 	public boolean nearAnyOwnedMonument(Location to, Team team) {
 		for (Monument monument : this.monuments) {
 			if (monument.isNear(to) && monument.isOwner(team)) {
-			    return true;
+				return true;
 			}
 		}
 		return false;
@@ -359,8 +358,7 @@ public class Warzone {
 	public void keepPlayerInventory(Player player) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack[] contents = inventory.getContents();
-		this.inventories.put(player.getName(), new InventoryStash(contents, inventory.getHelmet(), inventory.getChestplate(),
-																inventory.getLeggings(), inventory.getBoots()));
+		this.inventories.put(player.getName(), new InventoryStash(contents, inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots()));
 	}
 
 	public void restorePlayerInventory(Player player) {
@@ -371,13 +369,12 @@ public class Warzone {
 		}
 	}
 
-	private void playerInvFromInventoryStash(PlayerInventory playerInv,
-			InventoryStash originalContents) {
+	private void playerInvFromInventoryStash(PlayerInventory playerInv, InventoryStash originalContents) {
 		playerInv.clear();
 		playerInv.clear(playerInv.getSize() + 0);
 		playerInv.clear(playerInv.getSize() + 1);
 		playerInv.clear(playerInv.getSize() + 2);
-		playerInv.clear(playerInv.getSize() + 3);	// helmet/blockHead
+		playerInv.clear(playerInv.getSize() + 3); // helmet/blockHead
 		for (ItemStack item : originalContents.getContents()) {
 			if (item != null && item.getTypeId() != 0) {
 				playerInv.addItem(item);
@@ -399,24 +396,24 @@ public class Warzone {
 
 	public InventoryStash getPlayerInventory(String playerName) {
 		if (this.inventories.containsKey(playerName)) {
-		    return this.inventories.get(playerName);
+			return this.inventories.get(playerName);
 		}
 		return null;
 	}
 
 	public boolean hasMonument(String monumentName) {
-		for (Monument monument: this.monuments) {
+		for (Monument monument : this.monuments) {
 			if (monument.getName().equals(monumentName)) {
-			    return true;
+				return true;
 			}
 		}
 		return false;
 	}
 
 	public Monument getMonument(String monumentName) {
-		for (Monument monument: this.monuments) {
+		for (Monument monument : this.monuments) {
 			if (monument.getName().startsWith(monumentName)) {
-			    return monument;
+				return monument;
 			}
 		}
 		return null;
@@ -426,19 +423,18 @@ public class Warzone {
 		if (this.ready()) {
 			for (Monument m : this.monuments) {
 				if (m.getVolume().contains(block)) {
-				    return true;
+					return true;
 				}
 			}
 			for (Team t : this.teams) {
 				if (t.getSpawnVolume().contains(block)) {
-				    return true;
-				} else if (t.getFlagVolume() != null
-						&& t.getFlagVolume().contains(block)) {
-				    return true;
+					return true;
+				} else if (t.getFlagVolume() != null && t.getFlagVolume().contains(block)) {
+					return true;
 				}
 			}
 			if (this.volume.isWallBlock(block)) {
-			    return true;
+				return true;
 			}
 		}
 		return false;
@@ -464,7 +460,7 @@ public class Warzone {
 	public Team getTeamByKind(TeamKind kind) {
 		for (Team t : this.teams) {
 			if (t.getKind() == kind) {
-			    return t;
+				return t;
 			}
 		}
 		return null;
@@ -472,43 +468,18 @@ public class Warzone {
 
 	public boolean isNearWall(Location latestPlayerLocation) {
 		if (this.volume.hasTwoCorners()) {
-			if (Math.abs(this.volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall
-					&& latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX()
-					&& latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX()
-					&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-					&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
-			    return true; 	// near east wall
-			} else if (Math.abs(this.volume.getSoutheastX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall
-					&& latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ()
-					&& latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ()
-					&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-					&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
-			    return true;	// near south wall
-			} else if (Math.abs(this.volume.getNorthwestX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall
-					&& latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ()
-					&& latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ()
-					&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-					&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
-			    return true;	// near north wall
-			} else if (Math.abs(this.volume.getNorthwestZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall
-					&& latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX()
-					&& latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX()
-					&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-					&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
-			    return true;	// near west wall
-			} else if (Math.abs(this.volume.getMaxY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall
-					&& latestPlayerLocation.getBlockX() <= this.volume.getMaxX()
-					&& latestPlayerLocation.getBlockX() >= this.volume.getMinX()
-					&& latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ()
-					&& latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
-			    return true;	// near up wall
-			} else if (Math.abs(this.volume.getMinY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall
-					&& latestPlayerLocation.getBlockX() <= this.volume.getMaxX()
-					&& latestPlayerLocation.getBlockX() >= this.volume.getMinX()
-					&& latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ()
-					&& latestPlayerLocation.getBlockZ() >= this.volume.getMinZ())
-			 {
-			    return true;	// near down wall
+			if (Math.abs(this.volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX() && latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+				return true; // near east wall
+			} else if (Math.abs(this.volume.getSoutheastX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ() && latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+				return true; // near south wall
+			} else if (Math.abs(this.volume.getNorthwestX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ() && latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+				return true; // near north wall
+			} else if (Math.abs(this.volume.getNorthwestZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX() && latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+				return true; // near west wall
+			} else if (Math.abs(this.volume.getMaxY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getMaxX() && latestPlayerLocation.getBlockX() >= this.volume.getMinX() && latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ() && latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
+				return true; // near up wall
+			} else if (Math.abs(this.volume.getMinY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getMaxX() && latestPlayerLocation.getBlockX() >= this.volume.getMinX() && latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ() && latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
+				return true; // near down wall
 			}
 		}
 		return false;
@@ -516,61 +487,37 @@ public class Warzone {
 
 	public List<Block> getNearestWallBlocks(Location latestPlayerLocation) {
 		List<Block> nearestWallBlocks = new ArrayList<Block>();
-		if (Math.abs(this.volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX()
-				&& latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX()
-				&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-				&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+		if (Math.abs(this.volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX() && latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near east wall
 			Block eastWallBlock = this.world.getBlockAt(latestPlayerLocation.getBlockX() + 1, latestPlayerLocation.getBlockY() + 1, this.volume.getSoutheastZ());
 			nearestWallBlocks.add(eastWallBlock);
 		}
 
-		if (Math.abs(this.volume.getSoutheastX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ()
-				&& latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ()
-				&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-				&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+		if (Math.abs(this.volume.getSoutheastX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ() && latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near south wall
 			Block southWallBlock = this.world.getBlockAt(this.volume.getSoutheastX(), latestPlayerLocation.getBlockY() + 1, latestPlayerLocation.getBlockZ());
 			nearestWallBlocks.add(southWallBlock);
 		}
 
-		if (Math.abs(this.volume.getNorthwestX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ()
-				&& latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ()
-				&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-				&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+		if (Math.abs(this.volume.getNorthwestX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ() && latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near north wall
 			Block northWallBlock = this.world.getBlockAt(this.volume.getNorthwestX(), latestPlayerLocation.getBlockY() + 1, latestPlayerLocation.getBlockZ());
 			nearestWallBlocks.add(northWallBlock);
 		}
 
-		if (Math.abs(this.volume.getNorthwestZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX()
-				&& latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX()
-				&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-				&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+		if (Math.abs(this.volume.getNorthwestZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX() && latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near west wall
 			Block westWallBlock = this.world.getBlockAt(latestPlayerLocation.getBlockX(), latestPlayerLocation.getBlockY() + 1, this.volume.getNorthwestZ());
 			nearestWallBlocks.add(westWallBlock);
 		}
 
-		if (Math.abs(this.volume.getMaxY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockX() <= this.volume.getMaxX()
-				&& latestPlayerLocation.getBlockX() >= this.volume.getMinX()
-				&& latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ()
-				&& latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
+		if (Math.abs(this.volume.getMaxY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getMaxX() && latestPlayerLocation.getBlockX() >= this.volume.getMinX() && latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ() && latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
 			// near up wall
 			Block upWallBlock = this.world.getBlockAt(latestPlayerLocation.getBlockX(), this.volume.getMaxY(), latestPlayerLocation.getBlockZ());
 			nearestWallBlocks.add(upWallBlock);
 		}
 
-		if (Math.abs(this.volume.getMinY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockX() <= this.volume.getMaxX()
-				&& latestPlayerLocation.getBlockX() >= this.volume.getMinX()
-				&& latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ()
-				&& latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
+		if (Math.abs(this.volume.getMinY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getMaxX() && latestPlayerLocation.getBlockX() >= this.volume.getMinX() && latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ() && latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
 			// near down wall
 			Block downWallBlock = this.world.getBlockAt(latestPlayerLocation.getBlockX(), this.volume.getMinY(), latestPlayerLocation.getBlockZ());
 			nearestWallBlocks.add(downWallBlock);
@@ -581,56 +528,32 @@ public class Warzone {
 
 	public List<BlockFace> getNearestWalls(Location latestPlayerLocation) {
 		List<BlockFace> walls = new ArrayList<BlockFace>();
-		if (Math.abs(this.volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX()
-				&& latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX()
-				&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-				&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+		if (Math.abs(this.volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX() && latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near east wall
 			walls.add(BlockFace.EAST);
 		}
 
-		if (Math.abs(this.volume.getSoutheastX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ()
-				&& latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ()
-				&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-				&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+		if (Math.abs(this.volume.getSoutheastX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ() && latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near south wall
 			walls.add(BlockFace.SOUTH);
 		}
 
-		if (Math.abs(this.volume.getNorthwestX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ()
-				&& latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ()
-				&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-				&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+		if (Math.abs(this.volume.getNorthwestX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ() && latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near north wall
 			walls.add(BlockFace.NORTH);
 		}
 
-		if (Math.abs(this.volume.getNorthwestZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX()
-				&& latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX()
-				&& latestPlayerLocation.getBlockY() >= this.volume.getMinY()
-				&& latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
+		if (Math.abs(this.volume.getNorthwestZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX() && latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near west wall
 			walls.add(BlockFace.WEST);
 		}
 
-		if (Math.abs(this.volume.getMaxY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockX() <= this.volume.getMaxX()
-				&& latestPlayerLocation.getBlockX() >= this.volume.getMinX()
-				&& latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ()
-				&& latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
+		if (Math.abs(this.volume.getMaxY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getMaxX() && latestPlayerLocation.getBlockX() >= this.volume.getMinX() && latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ() && latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
 			// near up wall
 			walls.add(BlockFace.UP);
 		}
 
-		if (Math.abs(this.volume.getMinY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall
-				&& latestPlayerLocation.getBlockX() <= this.volume.getMaxX()
-				&& latestPlayerLocation.getBlockX() >= this.volume.getMinX()
-				&& latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ()
-				&& latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
+		if (Math.abs(this.volume.getMinY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getMaxX() && latestPlayerLocation.getBlockX() >= this.volume.getMinX() && latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ() && latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {
 			// near down wall
 			walls.add(BlockFace.DOWN);
 		}
@@ -640,7 +563,7 @@ public class Warzone {
 	public ZoneWallGuard getPlayerZoneWallGuard(String name, BlockFace wall) {
 		for (ZoneWallGuard guard : this.zoneWallGuards) {
 			if (guard.getPlayer().getName().equals(name) && wall == guard.getWall()) {
-			    return guard;
+				return guard;
 			}
 		}
 		return null;
@@ -667,19 +590,19 @@ public class Warzone {
 	public void dropZoneWallGuardIfAny(Player player) {
 		List<ZoneWallGuard> playerGuards = new ArrayList<ZoneWallGuard>();
 		for (ZoneWallGuard guard : this.zoneWallGuards) {
-			if (guard.getPlayer().getName().equals(player.getName())){
+			if (guard.getPlayer().getName().equals(player.getName())) {
 				playerGuards.add(guard);
 				guard.deactivate();
-//				BlockFace guardWall = guard.getWall();
-//				getVolume().resetWallBlocks(guardWall);
-//				if (isDrawZoneOutline()) {
-//					addZoneOutline(guard.getWall());
-//				}
-//				if (lobby != null) {
-//					lobby.getVolume().resetBlocks(); // always reset the lobby even if the guard is on another wall
-//													// because player can go around corner
-//					lobby.initialize();
-//				}
+				// BlockFace guardWall = guard.getWall();
+				// getVolume().resetWallBlocks(guardWall);
+				// if (isDrawZoneOutline()) {
+				// addZoneOutline(guard.getWall());
+				// }
+				// if (lobby != null) {
+				// lobby.getVolume().resetBlocks(); // always reset the lobby even if the guard is on another wall
+				// // because player can go around corner
+				// lobby.initialize();
+				// }
 			}
 		}
 		// now remove those zone guards
@@ -704,8 +627,7 @@ public class Warzone {
 	public Team autoAssign(Player player) {
 		Team lowestNoOfPlayers = null;
 		for (Team t : this.teams) {
-			if (lowestNoOfPlayers == null
-					|| (lowestNoOfPlayers != null && lowestNoOfPlayers.getPlayers().size() > t.getPlayers().size())) {
+			if (lowestNoOfPlayers == null || (lowestNoOfPlayers != null && lowestNoOfPlayers.getPlayers().size() > t.getPlayers().size())) {
 				lowestNoOfPlayers = t;
 			}
 		}
@@ -717,7 +639,7 @@ public class Warzone {
 			}
 			this.war.msg(player, "Your inventory is in storage until you /leave.");
 			this.respawnPlayer(lowestNoOfPlayers, player);
-			for (Team team : this.teams){
+			for (Team team : this.teams) {
 				team.teamcast("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + ".");
 			}
 		}
@@ -760,8 +682,7 @@ public class Warzone {
 				List<Team> teams = playerWarzone.getTeams();
 				String scores = "";
 				for (Team t : teams) {
-					t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: "
-							+ player.getName() + " died and there were no lives left in their life pool.");
+					t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " + player.getName() + " died and there were no lives left in their life pool.");
 
 					if (t.getPlayers().size() != 0) {
 						if (!t.getName().equals(playerTeam.getName())) {
@@ -769,12 +690,12 @@ public class Warzone {
 							t.addPoint();
 							t.resetSign();
 						}
-						scores += t.getName() + "(" + t.getPoints() + ") " ;
+						scores += t.getName() + "(" + t.getPoints() + ") ";
 					}
 				}
-				if (!scores.equals("")){
+				if (!scores.equals("")) {
 					for (Team t : teams) {
-						t.teamcast("New scores - " + scores + " (/" + this.getScoreCap() + ")" );
+						t.teamcast("New scores - " + scores + " (/" + this.getScoreCap() + ")");
 					}
 				}
 				// detect score cap
@@ -788,12 +709,12 @@ public class Warzone {
 					String winnersStr = "";
 					for (Team winner : scoreCapTeams) {
 						if (winner.getPlayers().size() != 0) {
-						    winnersStr += winner.getName() + " ";
+							winnersStr += winner.getName() + " ";
 						}
 					}
 
 					playerWarzone.handleScoreCapReached(player, winnersStr);
-					//player.teleport(playerWarzone.getTeleport());
+					// player.teleport(playerWarzone.getTeleport());
 					// player will die because it took too long :(
 					// we dont restore his inventory in handleScoreCapReached
 					// check out PLAYER_MOVE for the rest of the fix
@@ -845,9 +766,9 @@ public class Warzone {
 
 	private void handlePlayerLeave(Player player, boolean removeFromTeam) {
 		Team playerTeam = this.war.getPlayerTeam(player.getName());
-		if (playerTeam !=null) {
+		if (playerTeam != null) {
 			if (removeFromTeam) {
-			    playerTeam.removePlayer(player.getName());
+				playerTeam.removePlayer(player.getName());
 			}
 			for (Team t : this.getTeams()) {
 				t.teamcast(player.getName() + " left the zone.");
@@ -899,9 +820,8 @@ public class Warzone {
 
 	public boolean isEnemyTeamFlagBlock(Team playerTeam, Block block) {
 		for (Team team : this.teams) {
-			if (!team.getName().equals(playerTeam.getName())
-					&& team.isTeamFlagBlock(block)) {
-			    return true;
+			if (!team.getName().equals(playerTeam.getName()) && team.isTeamFlagBlock(block)) {
+				return true;
 			}
 		}
 		return false;
@@ -910,7 +830,7 @@ public class Warzone {
 	public Team getTeamForFlagBlock(Block block) {
 		for (Team team : this.teams) {
 			if (team.isTeamFlagBlock(block)) {
-			    return team;
+				return team;
 			}
 		}
 		return null;
@@ -922,7 +842,7 @@ public class Warzone {
 
 	public boolean isFlagThief(String suspect) {
 		if (this.flagThieves.containsKey(suspect)) {
-		    return true;
+			return true;
 		}
 		return false;
 	}
@@ -942,7 +862,7 @@ public class Warzone {
 	public boolean isTeamFlagStolen(Team team) {
 		for (String playerKey : this.flagThieves.keySet()) {
 			if (this.flagThieves.get(playerKey).getName().equals(team.getName())) {
-			    return true;
+				return true;
 			}
 		}
 		return false;
@@ -1023,7 +943,7 @@ public class Warzone {
 
 	public boolean isDeadMan(String playerName) {
 		if (this.deadMenInventories.containsKey(playerName)) {
-		    return true;
+			return true;
 		}
 		return false;
 	}
@@ -1052,8 +972,7 @@ public class Warzone {
 			}
 			team.getPlayers().clear();
 		}
-		if (this.getLobby() != null)
-		{
+		if (this.getLobby() != null) {
 			this.getLobby().getVolume().resetBlocks();
 			this.getLobby().getVolume().finalize();
 		}
