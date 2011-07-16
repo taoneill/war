@@ -39,7 +39,7 @@ public class VerticalVolume extends Volume{
 	}
 	
 	public boolean isEastWallBlock(Block block) {
-		if(getMinZ() == block.getZ()
+		if (getMinZ() == block.getZ()
 				&& block.getX() <= getMaxX()
 				&& block.getX() >= getMinX()) {
 			return true; 	// east wall
@@ -77,69 +77,69 @@ public class VerticalVolume extends Volume{
 	public int resetWallBlocks(BlockFace wall) {
 		int noOfResetBlocks = 0;
 		try {
-			if(hasTwoCorners() && getBlockTypes() != null) {
-				if(wall == BlockFace.EAST) {
+			if (hasTwoCorners() && getBlockTypes() != null) {
+				if (wall == BlockFace.EAST) {
 					int z = getMinZ();
 					int k = 0;
 					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++) {
+					for (int j = 0; j < getSizeY(); j++) {
 						int x = getMinX();
-						for(int i = 0; i < getSizeX(); i++) {
+						for (int i = 0; i < getSizeX(); i++) {
 							int oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}							
 							x++;
 						}
 						y++;
 					}
-				} else if(wall == BlockFace.WEST) {
+				} else if (wall == BlockFace.WEST) {
 					int z = getMaxZ();
 					int k = getSizeZ()-1;
 					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++) {
+					for (int j = 0; j < getSizeY(); j++) {
 						int x = getMinX();
-						for(int i = 0; i < getSizeX(); i++) {
+						for (int i = 0; i < getSizeX(); i++) {
 							int oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}
 							x++;
 						}
 						y++;
 					}
-				} else if(wall == BlockFace.NORTH) {
+				} else if (wall == BlockFace.NORTH) {
 					int x = getMinX();
 					int i = 0;
 					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++) {
+					for (int j = 0; j < getSizeY(); j++) {
 						int z = getMinZ();
-						for(int k = 0; k < getSizeZ(); k++) {
+						for (int k = 0; k < getSizeZ(); k++) {
 							int oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}
 							z++;
 						}
 						y++;
 					}
-				} else if(wall == BlockFace.SOUTH) {
+				} else if (wall == BlockFace.SOUTH) {
 					int x = getMaxX();
 					int i = getSizeX()-1;
 					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++) {
+					for (int j = 0; j < getSizeY(); j++) {
 						int z = getMinZ();
-						for(int k = 0; k < getSizeZ(); k++) {
+						for (int k = 0; k < getSizeZ(); k++) {
 							int oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}
 							z++;
@@ -155,7 +155,7 @@ public class VerticalVolume extends Volume{
 	}
 	
 	private boolean resetBlock(int oldBlockType, byte oldBlockData, Block currentBlock) {
-		if(currentBlock.getTypeId() != oldBlockType ||
+		if (currentBlock.getTypeId() != oldBlockType ||
 				(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData) ||
 				(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() == oldBlockData &&
 						(oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId())
@@ -163,7 +163,7 @@ public class VerticalVolume extends Volume{
 			) {
 				currentBlock.setTypeId(oldBlockType);
 				currentBlock.setData(oldBlockData);
-//				if(oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST)) {
+//				if (oldBlockInfo.is(Material.SIGN) || oldBlockInfo.is(Material.SIGN_POST)) {
 //					BlockState state = currentBlock.getState();
 //					Sign currentSign = (Sign) state;
 //					currentSign.setLine(0, oldBlockInfo.getSignLines()[0]);

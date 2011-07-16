@@ -31,7 +31,7 @@ public class ZoneSetter {
 		StringBuilder msgString = new StringBuilder();
 		try
 		{
-			if(warzone == null) {
+			if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(war, player.getLocation().getWorld(), zoneName);
 				war.getIncompleteZones().add(warzone);
@@ -48,13 +48,13 @@ public class ZoneSetter {
 			saveIfReady(warzone, msgString);
 		} catch (NotNorthwestException e) {
 			war.badMsg(player, "The block you selected is not to the northwest of the existing southeasternmost block.");
-			if(warzone.getVolume().isSaved()) warzone.initializeZone();	// was reset before changing
+			if (warzone.getVolume().isSaved()) warzone.initializeZone();	// was reset before changing
 		} catch (TooSmallException e) {
 			handleTooSmall();
-			if(warzone.getVolume().isSaved()) warzone.initializeZone();
+			if (warzone.getVolume().isSaved()) warzone.initializeZone();
 		} catch (TooBigException e) {
 			handleTooBig();
-			if(warzone.getVolume().isSaved()) warzone.initializeZone();
+			if (warzone.getVolume().isSaved()) warzone.initializeZone();
 		}
 	}
 	
@@ -64,7 +64,7 @@ public class ZoneSetter {
 		StringBuilder msgString = new StringBuilder();
 		try
 		{
-			if(warzone == null) {
+			if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(war, player.getLocation().getWorld(), zoneName);
 				war.getIncompleteZones().add(warzone);
@@ -81,13 +81,13 @@ public class ZoneSetter {
 			saveIfReady(warzone, msgString);
 		} catch (NotSoutheastException e) {
 			war.badMsg(player, "The block you selected is not to the southeast of the existing northwestnmost block.");
-			if(warzone.getVolume().isSaved()) warzone.initializeZone();	// was reset before changing
+			if (warzone.getVolume().isSaved()) warzone.initializeZone();	// was reset before changing
 		} catch (TooSmallException e) {
 			handleTooSmall();
-			if(warzone.getVolume().isSaved()) warzone.initializeZone();
+			if (warzone.getVolume().isSaved()) warzone.initializeZone();
 		} catch (TooBigException e) {
 			handleTooBig();
-			if(warzone.getVolume().isSaved()) warzone.initializeZone();
+			if (warzone.getVolume().isSaved()) warzone.initializeZone();
 		}
 	}
 	
@@ -101,7 +101,7 @@ public class ZoneSetter {
 		StringBuilder msgString = new StringBuilder();
 		try
 		{
-			if(warzone == null) {
+			if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(war, player.getLocation().getWorld(), zoneName);
 				war.getIncompleteZones().add(warzone);
@@ -118,10 +118,10 @@ public class ZoneSetter {
 			saveIfReady(warzone, msgString);
 		} catch (TooSmallException e) {
 			handleTooSmall();
-			if(warzone.getVolume().isSaved()) warzone.initializeZone();
+			if (warzone.getVolume().isSaved()) warzone.initializeZone();
 		} catch (TooBigException e) {
 			handleTooBig();
-			if(warzone.getVolume().isSaved()) warzone.initializeZone();
+			if (warzone.getVolume().isSaved()) warzone.initializeZone();
 		}
 	}
 	
@@ -135,7 +135,7 @@ public class ZoneSetter {
 		StringBuilder msgString = new StringBuilder();
 		try
 		{
-			if(warzone == null) {
+			if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(war, player.getLocation().getWorld(), zoneName);
 				war.getIncompleteZones().add(warzone);
@@ -152,17 +152,17 @@ public class ZoneSetter {
 			saveIfReady(warzone, msgString);
 		} catch (TooSmallException e) {
 			handleTooSmall();
-			if(warzone.getVolume().isSaved()) warzone.initializeZone();
+			if (warzone.getVolume().isSaved()) warzone.initializeZone();
 		} catch (TooBigException e) {
 			handleTooBig();
-			if(warzone.getVolume().isSaved()) warzone.initializeZone();
+			if (warzone.getVolume().isSaved()) warzone.initializeZone();
 		}
 	}
 	
 	private void resetWarzone(Warzone warzone, StringBuilder msgString) {
-		if(warzone.getVolume().isSaved()) {
+		if (warzone.getVolume().isSaved()) {
 			war.msg(player, "Resetting " + warzone.getName() + " blocks.");
-			if(warzone.getLobby() != null && warzone.getLobby().getVolume() != null) {
+			if (warzone.getLobby() != null && warzone.getLobby().getVolume() != null) {
 				warzone.getLobby().getVolume().resetBlocks();
 			}
 			int reset = warzone.getVolume().resetBlocks();
@@ -179,22 +179,22 @@ public class ZoneSetter {
 	}
 	
 	private void saveIfReady(Warzone warzone, StringBuilder msgString) {
-		if(warzone.ready()) {
-			if(!war.getWarzones().contains(warzone)) {
+		if (warzone.ready()) {
+			if (!war.getWarzones().contains(warzone)) {
 				war.addWarzone(warzone);
 			}
-			if(war.getIncompleteZones().contains(warzone)) {
+			if (war.getIncompleteZones().contains(warzone)) {
 				war.getIncompleteZones().remove(warzone);
 			}
 			WarMapper.save(war);
 			msgString.append("Saving new warzone blocks...");
 			war.msg(player, msgString.toString());
 			warzone.saveState(false); // we just changed the volume, cant reset walls 
-			if(warzone.getLobby() == null) {
+			if (warzone.getLobby() == null) {
 				// Set default lobby on south side
 				ZoneLobby lobby = new ZoneLobby(war, warzone, BlockFace.SOUTH);
 				warzone.setLobby(lobby);
-				if(war.getWarHub() != null) {	// warhub has to change
+				if (war.getWarHub() != null) {	// warhub has to change
 					war.getWarHub().getVolume().resetBlocks();
 					war.getWarHub().initialize();
 				}
@@ -207,7 +207,7 @@ public class ZoneSetter {
 			WarzoneMapper.save(war, warzone, true);
 			war.msg(player, "Warzone saved.");
 		} else {
-			if(warzone.getVolume().getCornerOne() == null) {
+			if (warzone.getVolume().getCornerOne() == null) {
 				msgString.append("Still missing corner 1.");
 			} else if (warzone.getVolume().getCornerTwo() == null) {
 				msgString.append("Still missing corner 2.");

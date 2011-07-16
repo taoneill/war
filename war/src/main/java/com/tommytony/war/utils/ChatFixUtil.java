@@ -98,7 +98,7 @@ public class ChatFixUtil {
 	
 	public static ArrayList<String> fix(List<String> messages) {
 		ArrayList<String> ret = new ArrayList<String>();
-		for(String message : messages) {
+		for (String message : messages) {
 			ret.addAll(fix(message));
 		}
 		return ret;

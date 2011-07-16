@@ -68,9 +68,9 @@ public class ZoneVolume extends Volume {
 		BlockInfo topBlock = new BlockInfo(block.getX(), 127, block.getZ(), block.getTypeId(), block.getData());
 		BlockInfo oldCornerOne = getCornerOne();
 		BlockInfo oldCornerTwo = getCornerTwo();
-		if(getCornerOne() == null)
+		if (getCornerOne() == null)
 		{
-			if(getCornerTwo() == null) {
+			if (getCornerTwo() == null) {
 				// northwest defaults to corner 1			
 				super.setCornerOne(topBlock);
 			} else if (getCornerTwo().getX() <= block.getX() || getCornerTwo().getZ() >= block.getZ()) {
@@ -95,7 +95,7 @@ public class ZoneVolume extends Volume {
 			BlockInfo maxZBlock = getMaxZBlock(); // west means max Z
 			maxZBlock.setZ(block.getZ());
 		}
-		if(tooSmall() || zoneStructuresAreOutside()) {
+		if (tooSmall() || zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooSmallException();
@@ -107,14 +107,14 @@ public class ZoneVolume extends Volume {
 	}
 	
 	public int getNorthwestX() {
-		if(!hasTwoCorners())
+		if (!hasTwoCorners())
 			return 0;
 		else
 			return getMinX();
 	}
 	
 	public int getNorthwestZ() {
-		if(!hasTwoCorners())
+		if (!hasTwoCorners())
 			return 0;
 		else
 			return getMaxZ();
@@ -125,9 +125,9 @@ public class ZoneVolume extends Volume {
 		BlockInfo bottomBlock = new BlockInfo(block.getX(), 0, block.getZ(), block.getTypeId(), block.getData());
 		BlockInfo oldCornerOne = getCornerOne();
 		BlockInfo oldCornerTwo = getCornerTwo();
-		if(getCornerTwo() == null)
+		if (getCornerTwo() == null)
 		{
-			if(getCornerOne() == null) {
+			if (getCornerOne() == null) {
 				// southeast defaults to corner 2			
 				super.setCornerTwo(bottomBlock);
 			} else if (getCornerOne().getX() >= block.getX() || getCornerOne().getZ() <= block.getZ()) {
@@ -152,7 +152,7 @@ public class ZoneVolume extends Volume {
 			BlockInfo minZBlock = getMinZBlock(); // east means min Z
 			minZBlock.setZ(block.getZ());
 		}
-		if(tooSmall() || zoneStructuresAreOutside()) {
+		if (tooSmall() || zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooSmallException();
@@ -165,21 +165,21 @@ public class ZoneVolume extends Volume {
 	}
 	
 	public int getSoutheastX() {
-		if(!hasTwoCorners())
+		if (!hasTwoCorners())
 			return 0;
 		else
 			return getMaxX();
 	}
 	
 	public int getSoutheastZ() {
-		if(!hasTwoCorners())
+		if (!hasTwoCorners())
 			return 0;
 		else
 			return getMinZ();
 	}
 
 	public int getCenterY() {
-		if(!hasTwoCorners())
+		if (!hasTwoCorners())
 			return 0;
 		else
 			return getMinY() + (getMaxY() - getMinY())/2;
@@ -188,7 +188,7 @@ public class ZoneVolume extends Volume {
 	public void setZoneCornerOne(Block block) throws TooSmallException, TooBigException {
 		BlockInfo oldCornerOne = getCornerOne();
 		super.setCornerOne(block);
-		if(tooSmall() || zoneStructuresAreOutside()) {
+		if (tooSmall() || zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
 			throw new TooSmallException();
 		} else if (tooBig()) {
@@ -200,7 +200,7 @@ public class ZoneVolume extends Volume {
 	public void setZoneCornerTwo(Block block) throws TooSmallException, TooBigException {
 		BlockInfo oldCornerTwo = getCornerTwo();
 		super.setCornerTwo(block);
-		if(tooSmall() || zoneStructuresAreOutside()) {
+		if (tooSmall() || zoneStructuresAreOutside()) {
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooSmallException();
 		} else if (tooBig()) {
@@ -210,14 +210,14 @@ public class ZoneVolume extends Volume {
 	}
 	
 	public boolean tooSmall() {
-		if(hasTwoCorners() && ((getMaxX() - getMinX() < 10)
+		if (hasTwoCorners() && ((getMaxX() - getMinX() < 10)
 			|| (getMaxY() - getMinY() < 10)
 			|| (getMaxZ() - getMinZ() < 10))) return true;
 		return false;
 	}
 	
 	public boolean tooBig() {
-		if(hasTwoCorners() && ((getMaxX() - getMinX() > 750)
+		if (hasTwoCorners() && ((getMaxX() - getMinX() > 750)
 				|| (getMaxY() - getMinY() > 750)
 				|| (getMaxZ() - getMinZ() > 750))) return true;
 		return false;
@@ -225,24 +225,24 @@ public class ZoneVolume extends Volume {
 	
 	public boolean zoneStructuresAreOutside() {
 		// check team spawns & flags
-		for(Team team : zone.getTeams()) {
-			if(team.getTeamSpawn() != null) {
-				if(!isInside(team.getSpawnVolume().getCornerOne())
+		for (Team team : zone.getTeams()) {
+			if (team.getTeamSpawn() != null) {
+				if (!isInside(team.getSpawnVolume().getCornerOne())
 						|| !isInside(team.getSpawnVolume().getCornerTwo())) {
 					return true;
 				}
 			}
-			if(team.getTeamFlag() != null) {
-				if(!isInside(team.getFlagVolume().getCornerOne())
+			if (team.getTeamFlag() != null) {
+				if (!isInside(team.getFlagVolume().getCornerOne())
 						|| !isInside(team.getFlagVolume().getCornerTwo())) {
 					return true;
 				}
 			}
 		}
 		// check monuments
-		for(Monument monument : zone.getMonuments()) {
-			if(monument.getVolume() != null) {
-				if(!isInside(monument.getVolume().getCornerOne())
+		for (Monument monument : zone.getMonuments()) {
+			if (monument.getVolume() != null) {
+				if (!isInside(monument.getVolume().getCornerOne())
 						|| !isInside(monument.getVolume().getCornerTwo())) {
 					return true;
 				}
@@ -252,7 +252,7 @@ public class ZoneVolume extends Volume {
 	}
 	
 	private boolean isInside(BlockInfo info) {
-		if(info.getX() <= getMaxX() && info.getX() >= getMinX() && 
+		if (info.getX() <= getMaxX() && info.getX() >= getMinX() && 
 				info.getY() <= getMaxY() && info.getY() >= getMinY() &&
 				info.getZ() <= getMaxZ() && info.getZ() >= getMinZ())
 			return true;
@@ -266,7 +266,7 @@ public class ZoneVolume extends Volume {
 	}
 	
 	public boolean isEastWallBlock(Block block) {
-		if(getMinZ() == block.getZ()
+		if (getMinZ() == block.getZ()
 				&& block.getX() <= getMaxX()
 				&& block.getX() >= getMinX()
 				&& block.getY() >= getMinY()
@@ -334,103 +334,103 @@ public class ZoneVolume extends Volume {
 	/*public int resetWallBlocks(BlockFace wall) {
 		int noOfResetBlocks = 0;
 		try {
-			if(hasTwoCorners() && getBlockTypes() != null) {
-				if(wall == BlockFace.EAST) {
+			if (hasTwoCorners() && getBlockTypes() != null) {
+				if (wall == BlockFace.EAST) {
 					int z = getMinZ();
 					int k = 0;
 					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++) {
+					for (int j = 0; j < getSizeY(); j++) {
 						int x = getMinX();
-						for(int i = 0; i < getSizeX(); i++) {
+						for (int i = 0; i < getSizeX(); i++) {
 							int oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}							
 							x++;
 						}
 						y++;
 					}
-				} else if(wall == BlockFace.WEST) {
+				} else if (wall == BlockFace.WEST) {
 					int z = getMaxZ();
 					int k = getSizeZ()-1;
 					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++) {
+					for (int j = 0; j < getSizeY(); j++) {
 						int x = getMinX();
-						for(int i = 0; i < getSizeX(); i++) {
+						for (int i = 0; i < getSizeX(); i++) {
 							int oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}
 							x++;
 						}
 						y++;
 					}
-				} else if(wall == BlockFace.NORTH) {
+				} else if (wall == BlockFace.NORTH) {
 					int x = getMinX();
 					int i = 0;
 					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++) {
+					for (int j = 0; j < getSizeY(); j++) {
 						int z = getMinZ();
-						for(int k = 0; k < getSizeZ(); k++) {
+						for (int k = 0; k < getSizeZ(); k++) {
 							int oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}
 							z++;
 						}
 						y++;
 					}
-				} else if(wall == BlockFace.SOUTH) {
+				} else if (wall == BlockFace.SOUTH) {
 					int x = getMaxX();
 					int i = getSizeX()-1;
 					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++) {
+					for (int j = 0; j < getSizeY(); j++) {
 						int z = getMinZ();
-						for(int k = 0; k < getSizeZ(); k++) {
+						for (int k = 0; k < getSizeZ(); k++) {
 							int oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}
 							z++;
 						}
 						y++;
 					}
-				} else if(wall == BlockFace.UP) {
+				} else if (wall == BlockFace.UP) {
 					int x = getMinX();
 					int y = getMaxY();
 					int j = getSizeY()-1;
-					for(int i = 0;i < getSizeX(); i++) {
+					for (int i = 0;i < getSizeX(); i++) {
 						int z = getMinZ();
-						for(int k = 0; k < getSizeZ(); k++) {
+						for (int k = 0; k < getSizeZ(); k++) {
 							int oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}							
 							z++;
 						}
 						x++;
 					}
-				} else if(wall == BlockFace.DOWN) {
+				} else if (wall == BlockFace.DOWN) {
 					int x = getMinX();
 					int y = getMinY();
 					int j = 0;
-					for(int i = 0;i < getSizeX(); i++) {
+					for (int i = 0;i < getSizeX(); i++) {
 						int z = getMinZ();
-						for(int k = 0; k < getSizeZ(); k++) {
+						for (int k = 0; k < getSizeZ(); k++) {
 							int oldBlockType = getBlockTypes()[i][j][k];
 							byte oldBlockData = getBlockDatas()[i][j][k];
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if(resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}							
 							z++;
@@ -447,7 +447,7 @@ public class ZoneVolume extends Volume {
 	
 	
 	private boolean resetBlock(int oldBlockType, byte oldBlockData, Block currentBlock) {
-		if(currentBlock.getTypeId() != oldBlockType ||
+		if (currentBlock.getTypeId() != oldBlockType ||
 				(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData) ||
 				(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() == oldBlockData &&
 						(oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId())

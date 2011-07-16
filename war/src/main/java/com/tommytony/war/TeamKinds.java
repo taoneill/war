@@ -35,8 +35,8 @@ public class TeamKinds {
 	
 	public static TeamKind teamKindFromString(String str) {
 		String lowered = str.toLowerCase();
-		for(TeamKind kind : getTeamkinds()) {
-			if(kind.getDefaultName().startsWith(lowered)) {
+		for (TeamKind kind : getTeamkinds()) {
+			if (kind.getDefaultName().startsWith(lowered)) {
 				return kind;
 			}
 		}

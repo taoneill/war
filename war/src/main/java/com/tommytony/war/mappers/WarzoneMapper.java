@@ -41,20 +41,20 @@ public class WarzoneMapper {
 		// world
 		String worldStr = warzoneConfig.getProperty("world");
 		World world = null;
-		if(worldStr == null || worldStr.equals("")){
+		if (worldStr == null || worldStr.equals("")){
 			world = war.getServer().getWorlds().get(0); // default to first world
 		} else {
 			world = war.getServer().getWorld(worldStr);
 		}
 		
-		if(world == null) {
+		if (world == null) {
 			war.logWarn("Failed to restore warzone " + name + ". The specified world (name: " + worldStr + ") does not exist!");
 		} else {
 			// Create the zone	
 			Warzone warzone = new Warzone(war, world, name);
 			
 			// Create file if needed 
-			if(!warzoneConfig.containsKey("name")) {
+			if (!warzoneConfig.containsKey("name")) {
 				WarzoneMapper.save(war, warzone, false);
 				war.getLogger().info("Warzone " + name + " config file created.");
 				try {
@@ -67,7 +67,7 @@ public class WarzoneMapper {
 			
 			// teleport
 			String teleportStr = warzoneConfig.getString("teleport");
-			if(teleportStr != null && !teleportStr.equals("")) {
+			if (teleportStr != null && !teleportStr.equals("")) {
 				String[] teleportSplit = teleportStr.split(",");
 				int teleX = Integer.parseInt(teleportSplit[0]);
 				int teleY = Integer.parseInt(teleportSplit[1]);
@@ -78,17 +78,17 @@ public class WarzoneMapper {
 			
 			// teams
 			String teamsStr = warzoneConfig.getString("teams");
-			if(teamsStr != null && !teamsStr.equals("")) {
+			if (teamsStr != null && !teamsStr.equals("")) {
 				String[] teamsSplit = teamsStr.split(";");
 				warzone.getTeams().clear();
-				for(String teamStr : teamsSplit) {
-					if(teamStr != null && !teamStr.equals("")){
+				for (String teamStr : teamsSplit) {
+					if (teamStr != null && !teamStr.equals("")){
 						String[] teamStrSplit = teamStr.split(",");
 						int teamX = Integer.parseInt(teamStrSplit[1]);
 						int teamY = Integer.parseInt(teamStrSplit[2]);
 						int teamZ = Integer.parseInt(teamStrSplit[3]);
 						Location teamLocation = new Location(world, teamX, teamY, teamZ);
-						if(teamStrSplit.length > 4) {
+						if (teamStrSplit.length > 4) {
 							int yaw = Integer.parseInt(teamStrSplit[4]);
 							teamLocation.setYaw(yaw);
 						}
@@ -104,18 +104,18 @@ public class WarzoneMapper {
 			
 			// teamFlags
 			String teamFlagsStr = warzoneConfig.getString("teamFlags");
-			if(teamFlagsStr != null && !teamFlagsStr.equals("")) {
+			if (teamFlagsStr != null && !teamFlagsStr.equals("")) {
 				String[] teamFlagsSplit = teamFlagsStr.split(";");
-				for(String teamFlagStr : teamFlagsSplit) {
-					if(teamFlagStr != null && !teamFlagStr.equals("")){
+				for (String teamFlagStr : teamFlagsSplit) {
+					if (teamFlagStr != null && !teamFlagStr.equals("")){
 						String[] teamFlagStrSplit =teamFlagStr.split(",");
 						Team team = warzone.getTeamByKind(TeamKinds.teamKindFromString(teamFlagStrSplit[0]));
-						if(team != null) {
+						if (team != null) {
 							int teamFlagX = Integer.parseInt(teamFlagStrSplit[1]);
 							int teamFlagY = Integer.parseInt(teamFlagStrSplit[2]);
 							int teamFlagZ = Integer.parseInt(teamFlagStrSplit[3]);
 							Location teamFlagLocation = new Location(world, teamFlagX, teamFlagY, teamFlagZ);
-							if(teamFlagStrSplit.length > 4) {
+							if (teamFlagStrSplit.length > 4) {
 								int yaw = Integer.parseInt(teamFlagStrSplit[4]);
 								teamFlagLocation.setYaw(yaw);
 							}
@@ -130,11 +130,11 @@ public class WarzoneMapper {
 			
 			// loadout
 			String loadoutStr = warzoneConfig.getString("loadout");
-			if(loadoutStr != null && !loadoutStr.equals("")) {
+			if (loadoutStr != null && !loadoutStr.equals("")) {
 				String[] loadoutStrSplit = loadoutStr.split(";");
 				warzone.getLoadout().clear();
-				for(String itemStr : loadoutStrSplit) {
-					if(itemStr != null && !itemStr.equals("")) {
+				for (String itemStr : loadoutStrSplit) {
+					if (itemStr != null && !itemStr.equals("")) {
 						String[] itemStrSplit = itemStr.split(",");
 						ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
 								Integer.parseInt(itemStrSplit[1]));
@@ -163,9 +163,9 @@ public class WarzoneMapper {
 			
 			// spawnStyle
 			String spawnStyle = warzoneConfig.getString("spawnStyle");
-			if(spawnStyle != null && !spawnStyle.equals("")){
+			if (spawnStyle != null && !spawnStyle.equals("")){
 				spawnStyle = spawnStyle.toLowerCase();
-				if(spawnStyle.equals(TeamSpawnStyles.SMALL)) {
+				if (spawnStyle.equals(TeamSpawnStyles.SMALL)) {
 					warzone.setSpawnStyle(spawnStyle);
 				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
 					warzone.setSpawnStyle(spawnStyle);
@@ -177,11 +177,11 @@ public class WarzoneMapper {
 			
 			// reward
 			String rewardStr = warzoneConfig.getString("reward");
-			if(rewardStr != null && !rewardStr.equals("")) {
+			if (rewardStr != null && !rewardStr.equals("")) {
 				String[] rewardStrSplit = rewardStr.split(";");
 				warzone.getReward().clear();
-				for(String itemStr : rewardStrSplit) {
-					if(itemStr != null && !itemStr.equals("")) {
+				for (String itemStr : rewardStrSplit) {
+					if (itemStr != null && !itemStr.equals("")) {
 						String[] itemStrSplit = itemStr.split(",");
 						ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
 								Integer.parseInt(itemStrSplit[1]));
@@ -210,7 +210,7 @@ public class WarzoneMapper {
 			
 			// rallyPoint
 			String rallyPointStr = warzoneConfig.getString("rallyPoint");
-			if(rallyPointStr != null && !rallyPointStr.equals("")) {
+			if (rallyPointStr != null && !rallyPointStr.equals("")) {
 				String[] rallyPointStrSplit = rallyPointStr.split(",");
 				
 				int rpX = Integer.parseInt(rallyPointStrSplit[0]);
@@ -225,11 +225,11 @@ public class WarzoneMapper {
 			
 			// monuments
 			String monumentsStr = warzoneConfig.getString("monuments");
-			if(monumentsStr != null && !monumentsStr.equals("")) {
+			if (monumentsStr != null && !monumentsStr.equals("")) {
 				String[] monumentsSplit = monumentsStr.split(";");
 				warzone.getMonuments().clear();
-				for(String monumentStr  : monumentsSplit) {
-					if(monumentStr != null && !monumentStr.equals("")){
+				for (String monumentStr  : monumentsSplit) {
+					if (monumentStr != null && !monumentStr.equals("")){
 						String[] monumentStrSplit = monumentStr.split(",");
 						int monumentX = Integer.parseInt(monumentStrSplit[1]);
 						int monumentY = Integer.parseInt(monumentStrSplit[2]);
@@ -246,34 +246,34 @@ public class WarzoneMapper {
 			
 			warzoneConfig.close();
 			
-			if(createNewVolume) {
+			if (createNewVolume) {
 				ZoneVolume zoneVolume = new ZoneVolume(warzone.getName(), war, world, warzone); //VolumeMapper.loadZoneVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld(), warzone);
 				warzone.setVolume(zoneVolume);
 			}
 		
 			// monument blocks
-			for(Monument monument: warzone.getMonuments()) {
+			for (Monument monument: warzone.getMonuments()) {
 				monument.setVolume(VolumeMapper.loadVolume(monument.getName(),warzone.getName(), war, world));
 			}
 			
 			// team spawn blocks
-			for(Team team : warzone.getTeams()) {
+			for (Team team : warzone.getTeams()) {
 				team.setSpawnVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), war, world));
-				if(team.getTeamFlag() != null) {
+				if (team.getTeamFlag() != null) {
 					team.setFlagVolume(VolumeMapper.loadVolume(team.getName()+"flag", warzone.getName(), war, world));
 				}
 			}
 			
 			// lobby
 			BlockFace lobbyFace = null;
-			if(lobbyStr != null && !lobbyStr.equals("")){
-				if(lobbyStr.equals("south")) {
+			if (lobbyStr != null && !lobbyStr.equals("")){
+				if (lobbyStr.equals("south")) {
 					lobbyFace = BlockFace.SOUTH;
-				} else if(lobbyStr.equals("east")) {
+				} else if (lobbyStr.equals("east")) {
 					lobbyFace = BlockFace.EAST;
-				} else if(lobbyStr.equals("north")) {
+				} else if (lobbyStr.equals("north")) {
 					lobbyFace = BlockFace.NORTH;
-				} else if(lobbyStr.equals("west")) {
+				} else if (lobbyStr.equals("west")) {
 					lobbyFace = BlockFace.WEST;
 				}
 				Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), war, world);
@@ -300,9 +300,9 @@ public class WarzoneMapper {
 		// teleport
 		String teleportStr = "";
 		Location tele = warzone.getTeleport();
-		if(tele != null) {
+		if (tele != null) {
 			int intYaw = 0;
-			if(tele.getYaw() >= 0){
+			if (tele.getYaw() >= 0){
 				intYaw = (int)(tele.getYaw() % 360);
 			} else {
 				intYaw = (int)(360 + (tele.getYaw() % 360));
@@ -314,10 +314,10 @@ public class WarzoneMapper {
 		// teams
 		String teamsStr = "";
 		List<Team> teams = warzone.getTeams();
-		for(Team team : teams) {
+		for (Team team : teams) {
 			Location spawn = team.getTeamSpawn();
 			int intYaw = 0;
-			if(spawn.getYaw() >= 0){
+			if (spawn.getYaw() >= 0){
 				intYaw = (int)(spawn.getYaw() % 360);
 			} else {
 				intYaw = (int)(360 + (spawn.getYaw() % 360));
@@ -328,11 +328,11 @@ public class WarzoneMapper {
 		
 		// team flags
 		String teamFlagsStr = "";;
-		for(Team team : teams) {
-			if(team.getFlagVolume() != null) {
+		for (Team team : teams) {
+			if (team.getFlagVolume() != null) {
 				Location flag = team.getTeamFlag();
 				int intYaw = 0;
-				if(flag.getYaw() >= 0){
+				if (flag.getYaw() >= 0){
 					intYaw = (int)(flag.getYaw() % 360);
 				} else {
 					intYaw = (int)(360 + (flag.getYaw() % 360));
@@ -348,9 +348,9 @@ public class WarzoneMapper {
 		// loadout
 		String loadoutStr = "";
 		HashMap<Integer, ItemStack> items = warzone.getLoadout();
-		for(Integer slot : items.keySet()) {
+		for (Integer slot : items.keySet()) {
 			ItemStack item = items.get(slot);
-			if(item != null) {
+			if (item != null) {
 				loadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 			}
 		}
@@ -380,9 +380,9 @@ public class WarzoneMapper {
 		// reward
 		String rewardStr = "";
 		HashMap<Integer, ItemStack> rewardItems = warzone.getReward();
-		for(Integer slot : rewardItems.keySet()) {
+		for (Integer slot : rewardItems.keySet()) {
 			ItemStack item = rewardItems.get(slot);
-			if(item != null) {
+			if (item != null) {
 				rewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 			}
 		}
@@ -409,7 +409,7 @@ public class WarzoneMapper {
 		// rallyPoint
 		String rpStr = "";
 		Location rp = warzone.getRallyPoint();
-		if(rp != null) {
+		if (rp != null) {
 			rpStr = rp.getBlockX() + "," + rp.getBlockY() + "," + rp.getBlockZ();
 		}
 		warzoneConfig.setString("rallyPoint", rpStr);
@@ -420,7 +420,7 @@ public class WarzoneMapper {
 		// monuments
 		String monumentsStr = "";
 		List<Monument> monuments = warzone.getMonuments();
-		for(Monument monument : monuments) {
+		for (Monument monument : monuments) {
 			Location monumentLoc = monument.getLocation();
 			monumentsStr += monument.getName() + "," + monumentLoc.getBlockX() + "," + monumentLoc.getBlockY() + "," + monumentLoc.getBlockZ() + ";";
 		}
@@ -428,14 +428,14 @@ public class WarzoneMapper {
 		
 		// lobby
 		String lobbyStr = "";
-		if(warzone.getLobby() != null) {
-			if(BlockFace.SOUTH == warzone.getLobby().getWall()) {
+		if (warzone.getLobby() != null) {
+			if (BlockFace.SOUTH == warzone.getLobby().getWall()) {
 				lobbyStr = "south";
-			} else if(BlockFace.EAST == warzone.getLobby().getWall()) {
+			} else if (BlockFace.EAST == warzone.getLobby().getWall()) {
 				lobbyStr = "east";
-			} else if(BlockFace.NORTH == warzone.getLobby().getWall()) {
+			} else if (BlockFace.NORTH == warzone.getLobby().getWall()) {
 				lobbyStr = "north";
-			} else if(BlockFace.WEST == warzone.getLobby().getWall()) {
+			} else if (BlockFace.WEST == warzone.getLobby().getWall()) {
 				lobbyStr = "west";
 			} 
 		}
@@ -444,29 +444,29 @@ public class WarzoneMapper {
 		warzoneConfig.save();
 		warzoneConfig.close();
 		
-		if(saveAllBlocks) {
+		if (saveAllBlocks) {
 			// zone blocks
 			//VolumeMapper.save(warzone.getVolume(), warzone.getName(), war);
 		}
 			
 		// monument blocks
-		for(Monument monument: monuments) {
+		for (Monument monument: monuments) {
 			VolumeMapper.save(monument.getVolume(), warzone.getName(), war);
 		}
 		
 		// team spawn & flag blocks
-		for(Team team : teams) {
+		for (Team team : teams) {
 			VolumeMapper.save(team.getSpawnVolume(), warzone.getName(), war);
-			if(team.getFlagVolume() != null) {
+			if (team.getFlagVolume() != null) {
 				VolumeMapper.save(team.getFlagVolume(),	warzone.getName(), war);
 			}
 		}	
 		
-		if(warzone.getLobby() != null) {
+		if (warzone.getLobby() != null) {
 			VolumeMapper.save(warzone.getLobby().getVolume(), warzone.getName(), war);
 		}
 		
-//		if(saveBlocks) {
+//		if (saveBlocks) {
 //			war.getLogger().info("Saved warzone " + warzone.getName() + " config and blocks.");
 //		} else {
 //			war.getLogger().info("Saved warzone " + warzone.getName() + " config.");
@@ -476,19 +476,19 @@ public class WarzoneMapper {
 	public static void delete(War war, String name) {
 		File zoneFolder = new File(war.getDataFolder().getPath() + "/dat/warzone-" + name);
 		File[] files = zoneFolder.listFiles();
-		for(File file : files) {
+		for (File file : files) {
 			boolean deletedData = file.delete();
-			if(!deletedData) {
+			if (!deletedData) {
 				war.logWarn("Failed to delete file " + file.getName());
 			}
 		}
 		boolean deletedData = zoneFolder.delete();
-		if(!deletedData) {
+		if (!deletedData) {
 			war.logWarn("Failed to delete folder " + zoneFolder.getName());
 		}
 		File zoneFile = new File(war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		deletedData = zoneFile.delete();
-		if(!deletedData) {
+		if (!deletedData) {
 			war.logWarn("Failed to delete file " + zoneFile.getName());
 		}
 	}

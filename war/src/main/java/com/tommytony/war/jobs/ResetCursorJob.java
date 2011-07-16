@@ -19,7 +19,7 @@ public class ResetCursorJob implements Runnable {
 	}
 
 	public void run() {
-		if(isSoutheast) {
+		if (isSoutheast) {
 			cornerBlock.setType(originalCursorBlocks[0].getType());
 			cornerBlock.setData(originalCursorBlocks[0].getData());
 			cornerBlock.getFace(BlockFace.WEST).setType(originalCursorBlocks[1].getType());

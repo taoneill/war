@@ -54,7 +54,7 @@ public class CenteredVolume extends Volume {
 		Block cornerOne = world.getBlockAt(x, y, z);
 		setCornerOne(cornerOne);
 		
-		if(sideSize % 2 == 0) {	// not a real center, bottom half is larger by 1
+		if (sideSize % 2 == 0) {	// not a real center, bottom half is larger by 1
 			int bottomHalfOfSide = sideSize - topHalfOfSide;
 			x = center.getX() - bottomHalfOfSide;
 			y = center.getY() - bottomHalfOfSide;

@@ -50,7 +50,7 @@ public class ZoneLobby {
 		this.warzone = warzone;
 		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
 		lobbyHalfSide = lobbyWidth / 2;
-		if(lobbyHalfSide < 7) {
+		if (lobbyHalfSide < 7) {
 			lobbyHalfSide = 7;
 		}
 		this.setWall(wall);
@@ -68,7 +68,7 @@ public class ZoneLobby {
 		this.warzone = warzone;
 		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
 		lobbyHalfSide = lobbyWidth / 2;
-		if(lobbyHalfSide < 7) {
+		if (lobbyHalfSide < 7) {
 			lobbyHalfSide = 7;
 		}
 		setLocation(playerLocation);
@@ -85,14 +85,14 @@ public class ZoneLobby {
 		this.warzone = warzone;
 		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
 		lobbyHalfSide = lobbyWidth / 2;
-		if(lobbyHalfSide < 7) {
+		if (lobbyHalfSide < 7) {
 			lobbyHalfSide = 7;
 		}
 		this.wall = wall;
 		this.setVolume(volume);
 		
 		// we're setting the zoneVolume directly, so we need to figure out the lobbyMiddleWallBlock on our own
-		if(wall == BlockFace.NORTH) {
+		if (wall == BlockFace.NORTH) {
 			lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.EAST, lobbyHalfSide)); 
 		} else if (wall == BlockFace.EAST){
 			lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.SOUTH, lobbyHalfSide));
@@ -113,38 +113,38 @@ public class ZoneLobby {
 		
 		// Lobby orientation
 		int yaw = 0;
-		if(playerLocation.getYaw() >= 0){
+		if (playerLocation.getYaw() >= 0){
 			yaw = (int)(playerLocation.getYaw() % 360);
 		} else {
 			yaw = (int)(360 + (playerLocation.getYaw() % 360));
 		}
 		BlockFace facing = null;
 		BlockFace opposite = null;
-		if((yaw >= 0 && yaw < 45) || (yaw >= 315 && yaw <= 360)) {
+		if ((yaw >= 0 && yaw < 45) || (yaw >= 315 && yaw <= 360)) {
 			facing = BlockFace.WEST;
 			opposite = BlockFace.EAST;
-		} else if(yaw >= 45 && yaw < 135) {
+		} else if (yaw >= 45 && yaw < 135) {
 			facing = BlockFace.NORTH;
 			opposite = BlockFace.SOUTH;
-		} else if(yaw >= 135 && yaw < 225) {
+		} else if (yaw >= 135 && yaw < 225) {
 			facing = BlockFace.EAST;
 			opposite = BlockFace.WEST;
-		} else if(yaw >= 225 && yaw < 315) {
+		} else if (yaw >= 225 && yaw < 315) {
 			facing = BlockFace.SOUTH;
 			opposite = BlockFace.NORTH;
 		}
 		
 //		float yaw = playerLocation.getYaw() % 360;
-//		if(yaw >= 45 && yaw < 135) {
+//		if (yaw >= 45 && yaw < 135) {
 //			facing = BlockFace.NORTH;
 //			opposite = BlockFace.SOUTH;
-//		} else if(yaw >= 135 && yaw < 225) {
+//		} else if (yaw >= 135 && yaw < 225) {
 //			facing = BlockFace.EAST;
 //			opposite = BlockFace.WEST;
-//		} else if(yaw >= 225 && yaw < 315) {
+//		} else if (yaw >= 225 && yaw < 315) {
 //			facing = BlockFace.SOUTH;
 //			opposite = BlockFace.NORTH;
-//		} else if(yaw >= 315 || yaw < 45) {
+//		} else if (yaw >= 315 || yaw < 45) {
 //			facing = BlockFace.WEST;
 //			opposite = BlockFace.EAST;
 //		} 
@@ -162,7 +162,7 @@ public class ZoneLobby {
 		int y = lobbyMiddleWallBlock.getY();
 		int z = lobbyMiddleWallBlock.getZ();
 		
-		if(wall == BlockFace.NORTH) {
+		if (wall == BlockFace.NORTH) {
 			//lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(x, y, wallCenterPos));
 			corner1 = warzone.getWorld().getBlockAt(x, y - 1, z + lobbyHalfSide);
 			corner2 = warzone.getWorld().getBlockAt(x - lobbyDepth, y + 1 + lobbyHeight, z - lobbyHalfSide);
@@ -195,7 +195,7 @@ public class ZoneLobby {
 		Block corner1 = null;
 		Block corner2 = null;
 		
-		if(wall == BlockFace.NORTH) {
+		if (wall == BlockFace.NORTH) {
 			int wallStart = zoneVolume.getMinZ();
 			int wallEnd = zoneVolume.getMaxZ();
 			int x = zoneVolume.getMinX();
@@ -243,10 +243,10 @@ public class ZoneLobby {
 	}
 	
 	private void createVolumeOrReset() {
-		if(volume == null) {
+		if (volume == null) {
 			// no previous wall
 			this.volume = new Volume("lobby", war, warzone.getWorld());
-		} else if(volume.isSaved()) {
+		} else if (volume.isSaved()) {
 			volume.resetBlocks();
 		}
 	}
@@ -254,13 +254,13 @@ public class ZoneLobby {
 	private void calculateLobbyWidth() {
 		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
 		lobbyHalfSide = lobbyWidth / 2;
-		if(lobbyHalfSide < 7) {
+		if (lobbyHalfSide < 7) {
 			lobbyHalfSide = 7;
 		}
 	}
 	
 	private void saveLobbyBlocks(Block corner1, Block corner2) {
-		if(corner1 != null && corner2 != null) {
+		if (corner1 != null && corner2 != null) {
 			// save the blocks, wide enough for three team gates, 3+1 high and 10 deep, extruding out from the zone wall.
 			this.volume.setCornerOne(corner1);
 			this.volume.setCornerTwo(corner2);
@@ -270,7 +270,7 @@ public class ZoneLobby {
 	
 	public void initialize() {		
 		// maybe the number of teams change, now reset the gate positions
-		if(lobbyMiddleWallBlock != null && volume != null /*&& volume.isSaved()*/) {
+		if (lobbyMiddleWallBlock != null && volume != null /*&& volume.isSaved()*/) {
 			setGatePositions(BlockInfo.getBlock(warzone.getWorld(), lobbyMiddleWallBlock));
 			// flatten the area (set all but floor to air, then replace any floor air blocks with glass)
 			this.volume.clearBlocksThatDontFloat();
@@ -278,7 +278,7 @@ public class ZoneLobby {
 			this.volume.setFaceMaterial(BlockFace.DOWN, Material.GLASS);	// beautiful
 			
 			// add war hub link gate
-			if(war.getWarHub() != null) {
+			if (war.getWarHub() != null) {
 				Block linkGateBlock = BlockInfo.getBlock(warzone.getWorld(), warHubLinkGate);
 				placeGate(linkGateBlock, Material.OBSIDIAN);
 				// add warhub sign
@@ -292,18 +292,18 @@ public class ZoneLobby {
 			
 			// add team gates or single auto assign gate
 			placeAutoAssignGate();
-			for(String teamName : teamGateBlocks.keySet()) {
+			for (String teamName : teamGateBlocks.keySet()) {
 				BlockInfo gateInfo = teamGateBlocks.get(teamName);
 				placeGate(BlockInfo.getBlock(warzone.getWorld(), gateInfo), TeamKinds.teamKindFromString(teamName));
 			}
-			for(Team t : warzone.getTeams()) {
+			for (Team t : warzone.getTeams()) {
 				resetTeamGateSign(t);
 			}
 			
 			// set zone tp
 			zoneTeleportBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), lobbyMiddleWallBlock).getFace(wall, 6));
 			int yaw = 0;
-			if(wall == BlockFace.WEST) {
+			if (wall == BlockFace.WEST) {
 				yaw = 180;
 			} else if (wall == BlockFace.SOUTH) {
 				yaw = 90;
@@ -317,19 +317,19 @@ public class ZoneLobby {
 			// set zone sign
 			Block zoneSignBlock = BlockInfo.getBlock(warzone.getWorld(), lobbyMiddleWallBlock).getFace(wall, 4);
 			byte data = 0;
-			if(wall == BlockFace.NORTH) {
+			if (wall == BlockFace.NORTH) {
 				data = (byte)4;
-			} else if(wall == BlockFace.EAST) {
+			} else if (wall == BlockFace.EAST) {
 				data = (byte)8;
-			} else if(wall == BlockFace.SOUTH) {
+			} else if (wall == BlockFace.SOUTH) {
 				data = (byte)12;
-			} else if(wall == BlockFace.WEST) {
+			} else if (wall == BlockFace.WEST) {
 				data = (byte)0;
 			}
 			String[] lines = new String[4];
 			lines[0] = "Warzone";
 			lines[1] = warzone.getName();
-			if(autoAssignGate != null) {
+			if (autoAssignGate != null) {
 				lines[2] = "Walk in the";
 				lines[3] = "auto-assign gate.";
 			} else {
@@ -339,7 +339,7 @@ public class ZoneLobby {
 			SignHelper.setToSign(war, zoneSignBlock, data, lines);
 			
 			// lets get some light in here
-			if(wall == BlockFace.NORTH || wall == BlockFace.SOUTH) {
+			if (wall == BlockFace.NORTH || wall == BlockFace.SOUTH) {
 				BlockInfo.getBlock(warzone.getWorld(), lobbyMiddleWallBlock).getFace(BlockFace.DOWN).getFace(BlockFace.WEST, lobbyHalfSide - 1).getFace(wall, 9).setType(Material.GLOWSTONE);
 				BlockInfo.getBlock(warzone.getWorld(), lobbyMiddleWallBlock).getFace(BlockFace.DOWN).getFace(BlockFace.EAST, lobbyHalfSide - 1).getFace(wall, 9).setType(Material.GLOWSTONE);
 			} else {
@@ -354,40 +354,40 @@ public class ZoneLobby {
 	private void setGatePositions(Block lobbyMiddleWallBlock) {
 		BlockFace leftSide = null;	// look at the zone
 		BlockFace rightSide = null;
-		if(wall == BlockFace.NORTH) {
+		if (wall == BlockFace.NORTH) {
 			leftSide = BlockFace.EAST;
 			rightSide = BlockFace.WEST;
-		} else if(wall == BlockFace.EAST) {
+		} else if (wall == BlockFace.EAST) {
 			leftSide = BlockFace.SOUTH;
 			rightSide = BlockFace.NORTH;
-		} else if(wall == BlockFace.SOUTH) {
+		} else if (wall == BlockFace.SOUTH) {
 			leftSide = BlockFace.WEST;
 			rightSide = BlockFace.EAST;
-		} else if(wall == BlockFace.WEST) {
+		} else if (wall == BlockFace.WEST) {
 			leftSide = BlockFace.NORTH;
 			rightSide = BlockFace.SOUTH;
 		}  
 		teamGateBlocks.clear();
-		if(warzone.getAutoAssignOnly()){
+		if (warzone.getAutoAssignOnly()){
 			autoAssignGate = new BlockInfo(lobbyMiddleWallBlock);
 		} else {
 			autoAssignGate = null;
-			for(int doorIndex = 0; doorIndex < warzone.getTeams().size(); doorIndex++) {
+			for (int doorIndex = 0; doorIndex < warzone.getTeams().size(); doorIndex++) {
 				// 0 at center, 1 to the left, 2 to the right, 3 to the left, etc
 				Team team = warzone.getTeams().get(doorIndex);
-				if(warzone.getTeams().size() % 2 == 0) {
+				if (warzone.getTeams().size() % 2 == 0) {
 					// even number of teams
-					if(doorIndex % 2 == 0) {
+					if (doorIndex % 2 == 0) {
 						teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getFace(rightSide, doorIndex * 2 + 2)));
 					} else {
 						teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getFace(leftSide, doorIndex * 2)));
 					}
 					
 				} else {
-					if(doorIndex == 0) {
+					if (doorIndex == 0) {
 						teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock));
 					}
-					else if(doorIndex % 2 == 0) {
+					else if (doorIndex % 2 == 0) {
 						teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getFace(rightSide, doorIndex * 2)));
 					} else {
 						teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getFace(leftSide, doorIndex * 2 + 2)));
@@ -400,19 +400,19 @@ public class ZoneLobby {
 
 	private void placeGate(Block block,
 			TeamKind teamKind) {
-		if(block != null) {
+		if (block != null) {
 			BlockFace leftSide = null;	// look at the zone
 			BlockFace rightSide = null;
-			if(wall == BlockFace.NORTH) {
+			if (wall == BlockFace.NORTH) {
 				leftSide = BlockFace.EAST;
 				rightSide = BlockFace.WEST;
-			} else if(wall == BlockFace.EAST) {
+			} else if (wall == BlockFace.EAST) {
 				leftSide = BlockFace.SOUTH;
 				rightSide = BlockFace.NORTH;
-			} else if(wall == BlockFace.SOUTH) {
+			} else if (wall == BlockFace.SOUTH) {
 				leftSide = BlockFace.WEST;
 				rightSide = BlockFace.EAST;
-			} else if(wall == BlockFace.WEST) {
+			} else if (wall == BlockFace.WEST) {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}  
@@ -429,19 +429,19 @@ public class ZoneLobby {
 	
 	private void placeGate(Block block,
 			Material material) {
-		if(block != null) {
+		if (block != null) {
 			BlockFace leftSide = null;	// look at the zone
 			BlockFace rightSide = null;
-			if(wall == BlockFace.NORTH) {
+			if (wall == BlockFace.NORTH) {
 				leftSide = BlockFace.EAST;
 				rightSide = BlockFace.WEST;
-			} else if(wall == BlockFace.EAST) {
+			} else if (wall == BlockFace.EAST) {
 				leftSide = BlockFace.SOUTH;
 				rightSide = BlockFace.NORTH;
-			} else if(wall == BlockFace.SOUTH) {
+			} else if (wall == BlockFace.SOUTH) {
 				leftSide = BlockFace.WEST;
 				rightSide = BlockFace.EAST;
-			} else if(wall == BlockFace.WEST) {
+			} else if (wall == BlockFace.WEST) {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}  
@@ -466,19 +466,19 @@ public class ZoneLobby {
 	}
 	
 	private void placeAutoAssignGate() {
-		if(autoAssignGate != null) {
+		if (autoAssignGate != null) {
 			BlockFace leftSide = null;	// look at the zone
 			BlockFace rightSide = null;
-			if(wall == BlockFace.NORTH) {
+			if (wall == BlockFace.NORTH) {
 				leftSide = BlockFace.EAST;
 				rightSide = BlockFace.WEST;
-			} else if(wall == BlockFace.EAST) {
+			} else if (wall == BlockFace.EAST) {
 				leftSide = BlockFace.SOUTH;
 				rightSide = BlockFace.NORTH;
-			} else if(wall == BlockFace.SOUTH) {
+			} else if (wall == BlockFace.SOUTH) {
 				leftSide = BlockFace.WEST;
 				rightSide = BlockFace.EAST;
-			} else if(wall == BlockFace.WEST) {
+			} else if (wall == BlockFace.WEST) {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}  
@@ -488,31 +488,31 @@ public class ZoneLobby {
 			int size = teams.size();
 			int index = 0;
 			TeamKind kind = null; 
-			if(index >= size) kind = TeamKinds.teamKindFromString("diamond");
+			if (index >= size) kind = TeamKinds.teamKindFromString("diamond");
 			else kind = teams.get(index).getKind();
 			setBlock(autoAssignGateBlock.getFace(leftSide), kind);
 			index++;
-			if(index >= size) kind = TeamKinds.teamKindFromString("iron");
+			if (index >= size) kind = TeamKinds.teamKindFromString("iron");
 			else kind = teams.get(index).getKind();
 			setBlock(autoAssignGateBlock.getFace(leftSide).getFace(BlockFace.UP), kind);
 			index++;
-			if(index >= size) kind = TeamKinds.teamKindFromString("gold");
+			if (index >= size) kind = TeamKinds.teamKindFromString("gold");
 			else kind = teams.get(index).getKind();
 			setBlock(autoAssignGateBlock.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP), kind);
 			index++;
-			if(index >= size) kind = TeamKinds.teamKindFromString("diamond");
+			if (index >= size) kind = TeamKinds.teamKindFromString("diamond");
 			else kind = teams.get(index).getKind();
 			setBlock(autoAssignGateBlock.getFace(BlockFace.UP).getFace(BlockFace.UP), kind);
 			index++;
-			if(index >= size) kind = TeamKinds.teamKindFromString("iron");
+			if (index >= size) kind = TeamKinds.teamKindFromString("iron");
 			else kind = teams.get(index).getKind();
 			setBlock(autoAssignGateBlock.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP), kind);
 			index++;
-			if(index >= size) kind = TeamKinds.teamKindFromString("gold");
+			if (index >= size) kind = TeamKinds.teamKindFromString("gold");
 			else kind = teams.get(index).getKind();
 			setBlock(autoAssignGateBlock.getFace(rightSide).getFace(BlockFace.UP), kind);
 			index++;
-			if(index >= size) kind = TeamKinds.teamKindFromString("diamond");
+			if (index >= size) kind = TeamKinds.teamKindFromString("diamond");
 			else kind = teams.get(index).getKind();
 			setBlock(autoAssignGateBlock.getFace(rightSide), kind);			
 		}
@@ -520,8 +520,8 @@ public class ZoneLobby {
 
 	public boolean isInTeamGate(Team team, Location location) {
 		 BlockInfo info = teamGateBlocks.get(team.getName());
-		 if(info != null) {
-			 if(location.getBlockX() == info.getX()
+		 if (info != null) {
+			 if (location.getBlockX() == info.getX()
 						&& location.getBlockY() == info.getY()
 						&& location.getBlockZ() == info.getZ()) { 
 				 return true;
@@ -531,7 +531,7 @@ public class ZoneLobby {
 	}
 	
 	public boolean isAutoAssignGate(Location location) {
-		if(autoAssignGate != null
+		if (autoAssignGate != null
 				&& (location.getBlockX() == autoAssignGate.getX()
 					&& location.getBlockY() == autoAssignGate.getY()
 					&& location.getBlockZ() == autoAssignGate.getZ()) )
@@ -555,7 +555,7 @@ public class ZoneLobby {
 	}
 
 	public boolean isInWarHubLinkGate(Location location) {
-		if(warHubLinkGate != null
+		if (warHubLinkGate != null
 				&& location.getBlockX() == warHubLinkGate.getX()
 				&& location.getBlockY() == warHubLinkGate.getY()
 				&& location.getBlockZ() == warHubLinkGate.getZ()) {
@@ -565,14 +565,14 @@ public class ZoneLobby {
 	}
 
 	public boolean blockIsAGateBlock(Block block, BlockFace blockWall) {
-		if(blockWall == wall) {
-			for(String teamName: teamGateBlocks.keySet()) {
+		if (blockWall == wall) {
+			for (String teamName: teamGateBlocks.keySet()) {
 				BlockInfo gateInfo = teamGateBlocks.get(teamName); 
-				if(isPartOfGate(BlockInfo.getBlock(warzone.getWorld(), gateInfo), block)) {
+				if (isPartOfGate(BlockInfo.getBlock(warzone.getWorld(), gateInfo), block)) {
 					return true;
 				}
 			}
-			if(autoAssignGate != null && isPartOfGate(BlockInfo.getBlock(warzone.getWorld(), autoAssignGate), block)) {
+			if (autoAssignGate != null && isPartOfGate(BlockInfo.getBlock(warzone.getWorld(), autoAssignGate), block)) {
 				// auto assign
 				return true;
 			}
@@ -581,19 +581,19 @@ public class ZoneLobby {
 	}
 
 	private boolean isPartOfGate(Block gateBlock, Block block) {
-		if(gateBlock != null) {
+		if (gateBlock != null) {
 			BlockFace leftSide = null;	// look at the zone
 			BlockFace rightSide = null;
-			if(wall == BlockFace.NORTH) {
+			if (wall == BlockFace.NORTH) {
 				leftSide = BlockFace.EAST;
 				rightSide = BlockFace.WEST;
-			} else if(wall == BlockFace.EAST) {
+			} else if (wall == BlockFace.EAST) {
 				leftSide = BlockFace.SOUTH;
 				rightSide = BlockFace.NORTH;
-			} else if(wall == BlockFace.SOUTH) {
+			} else if (wall == BlockFace.SOUTH) {
 				leftSide = BlockFace.WEST;
 				rightSide = BlockFace.EAST;
-			} else if(wall == BlockFace.WEST) {
+			} else if (wall == BlockFace.WEST) {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}
@@ -647,18 +647,18 @@ public class ZoneLobby {
 
 	public void resetTeamGateSign(Team team) {
 		BlockInfo info = teamGateBlocks.get(team.getName());
-		if(info != null) {
+		if (info != null) {
 			resetTeamGateSign(team, BlockInfo.getBlock(warzone.getWorld(), info));
 		}
 	}
 
 	private void resetTeamGateSign(Team team, Block gate) {
-		if(gate != null) {
+		if (gate != null) {
 			String[] lines = new String[4];
 			lines[0] =  "Team " + team.getName();
 			lines[1] = team.getPlayers().size() + "/" + warzone.getTeamCap() + " players";
 			lines[2] = team.getPoints() + "/" + warzone.getScoreCap() + " pts";
-			if(warzone.getLifePool() == -1) {
+			if (warzone.getLifePool() == -1) {
 				lines[3] = "unlimited lives";
 			} else {
 				lines[3] = team.getRemainingLifes() + "/" + warzone.getLifePool() + " lives left";
@@ -670,7 +670,7 @@ public class ZoneLobby {
 	private void resetGateSign(Block gate, String[] lines, boolean awayFromWall) {
 		Block block = null;
 		BlockFace direction = null;
-		if(awayFromWall) {
+		if (awayFromWall) {
 			direction = wall;
 		} else if (wall == BlockFace.NORTH) {
 			direction = BlockFace.SOUTH;
@@ -682,21 +682,21 @@ public class ZoneLobby {
 			direction = BlockFace.EAST;
 		}
 		byte data = 0;
-		if(wall == BlockFace.NORTH) {
+		if (wall == BlockFace.NORTH) {
 			block = gate.getFace(direction).getFace(BlockFace.EAST);
-			if(awayFromWall) data = (byte)4;
+			if (awayFromWall) data = (byte)4;
 			else data = (byte)12;
-		} else if(wall == BlockFace.EAST) {
+		} else if (wall == BlockFace.EAST) {
 			block = gate.getFace(direction).getFace(BlockFace.SOUTH);
-			if(awayFromWall) data = (byte)8;
+			if (awayFromWall) data = (byte)8;
 			else data = (byte)0;
-		} else if(wall == BlockFace.SOUTH) {
+		} else if (wall == BlockFace.SOUTH) {
 			block = gate.getFace(direction).getFace(BlockFace.WEST);
-			if(awayFromWall) data = (byte)12;
+			if (awayFromWall) data = (byte)12;
 			else data = (byte)4;
-		} else if(wall == BlockFace.WEST) {
+		} else if (wall == BlockFace.WEST) {
 			block = gate.getFace(direction).getFace(BlockFace.NORTH);
-			if(awayFromWall) data = (byte)0;
+			if (awayFromWall) data = (byte)0;
 			else data = (byte)8;
 		}		
 	
@@ -725,13 +725,13 @@ public class ZoneLobby {
 			left = BlockFace.SOUTH;
 			right = BlockFace.NORTH;
 		}		
-		if(autoAssignGate != null){
-			if(leaving(location, BlockInfo.getBlock(warzone.getWorld(), autoAssignGate), inside, left, right)) return true;
+		if (autoAssignGate != null){
+			if (leaving(location, BlockInfo.getBlock(warzone.getWorld(), autoAssignGate), inside, left, right)) return true;
 		}
-		for(String teamName : teamGateBlocks.keySet()) {
+		for (String teamName : teamGateBlocks.keySet()) {
 			
 			BlockInfo info = teamGateBlocks.get(teamName);
-			if(leaving(location, BlockInfo.getBlock(warzone.getWorld(), info), inside, left, right)) return true;
+			if (leaving(location, BlockInfo.getBlock(warzone.getWorld(), info), inside, left, right)) return true;
 		}
 		return false;
 	}
@@ -748,7 +748,7 @@ public class ZoneLobby {
 		gateExitVolume.setCornerOne(out.getFace(left).getFace(BlockFace.DOWN));
 		gateExitVolume.setCornerTwo(gate.getFace(right, 1).getFace(BlockFace.UP, 3));
 		
-		if(gateExitVolume.contains(location)) {
+		if (gateExitVolume.contains(location)) {
 			return true;
 		}
 		
@@ -762,23 +762,23 @@ public class ZoneLobby {
 //		Block out2L = out2.getFace(left);
 //		Block out2R = out2.getFace(right);
 //		Block out3 = gate.getFace(inside, 3);
-//		if(out.getX() == x && out.getY() == y && out.getZ() == z) {
+//		if (out.getX() == x && out.getY() == y && out.getZ() == z) {
 //			return true;
-//		} else if(outL.getX() == x && outL.getY() == y && outL.getZ() == z) {
+//		} else if (outL.getX() == x && outL.getY() == y && outL.getZ() == z) {
 //			return true;
-//		} else if(outR.getX() == x && outR.getY() == y && outR.getZ() == z) {
+//		} else if (outR.getX() == x && outR.getY() == y && outR.getZ() == z) {
 //			return true;
-//		} else if(outLL.getX() == x && outLL.getY() == y && outLL.getZ() == z) {
+//		} else if (outLL.getX() == x && outLL.getY() == y && outLL.getZ() == z) {
 //			return true;
-//		} else if(outRR.getX() == x && outRR.getY() == y && outRR.getZ() == z) {
+//		} else if (outRR.getX() == x && outRR.getY() == y && outRR.getZ() == z) {
 //			return true;
-//		} else if(out2.getX() == x && out2.getY() == y && out2.getZ() == z) {
+//		} else if (out2.getX() == x && out2.getY() == y && out2.getZ() == z) {
 //			return true;
-//		} else if(out2L.getX() == x && out2L.getY() == y && out2L.getZ() == z) {
+//		} else if (out2L.getX() == x && out2L.getY() == y && out2L.getZ() == z) {
 //			return true;
-//		} else if(out2R.getX() == x && out2R.getY() == y && out2R.getZ() == z) {
+//		} else if (out2R.getX() == x && out2R.getY() == y && out2R.getZ() == z) {
 //			return true;
-//		} else if(out3.getX() == x && out3.getY() == y && out3.getZ() == z) {
+//		} else if (out3.getX() == x && out3.getY() == y && out3.getZ() == z) {
 //			return true;
 //		}
 		return false;

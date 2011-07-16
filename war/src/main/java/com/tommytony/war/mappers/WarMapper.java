@@ -34,7 +34,7 @@ public class WarMapper {
 		
 		// Create file if need be
 		boolean newWar = false;
-		if(!warConfig.containsKey("warzones")) {
+		if (!warConfig.containsKey("warzones")) {
 			newWar = true;
 			WarMapper.save(war);
 			war.logInfo("war.txt settings file created.");
@@ -49,7 +49,7 @@ public class WarMapper {
 		// warzones
 		String warzonesStr = warConfig.getString("warzones");
 		RestoreWarzonesJob restoreWarzones = new RestoreWarzonesJob(war, warzonesStr, newWar);
-		if(war.getServer().getScheduler().scheduleSyncDelayedTask(war, restoreWarzones) == -1) {
+		if (war.getServer().getScheduler().scheduleSyncDelayedTask(war, restoreWarzones) == -1) {
 			war.logWarn("Failed to schedule warzone-restore job. No warzone was loaded.");
 		}
 		
@@ -57,8 +57,8 @@ public class WarMapper {
 		String makersStr = warConfig.getString("zoneMakers");
 		String[] makersSplit = makersStr.split(",");
 		war.getZoneMakerNames().clear();
-		for(String makerName : makersSplit) {
-			if(makerName != null && !makerName.equals("")){
+		for (String makerName : makersSplit) {
+			if (makerName != null && !makerName.equals("")){
 				war.getZoneMakerNames().add(makerName);
 			}
 		}
@@ -67,8 +67,8 @@ public class WarMapper {
 		String defaultLoadoutStr = warConfig.getString("defaultLoadout");
 		String[] defaultLoadoutSplit = defaultLoadoutStr.split(";");
 		war.getDefaultLoadout().clear();
-		for(String itemStr : defaultLoadoutSplit) {
-			if(itemStr != null && !itemStr.equals("")) {
+		for (String itemStr : defaultLoadoutSplit) {
+			if (itemStr != null && !itemStr.equals("")) {
 				String[] itemStrSplit = itemStr.split(",");
 				ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
 						Integer.parseInt(itemStrSplit[1]));
@@ -108,9 +108,9 @@ public class WarMapper {
 		
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
-		if(spawnStyle != null && !spawnStyle.equals("")){
+		if (spawnStyle != null && !spawnStyle.equals("")){
 			spawnStyle = spawnStyle.toLowerCase();
-			if(spawnStyle.equals(TeamSpawnStyles.SMALL)) {
+			if (spawnStyle.equals(TeamSpawnStyles.SMALL)) {
 				war.setDefaultSpawnStyle(spawnStyle);
 			} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)){
 				war.setDefaultSpawnStyle(spawnStyle);
@@ -122,11 +122,11 @@ public class WarMapper {
 		
 		// defaultReward
 		String defaultRewardStr = warConfig.getString("defaultReward");
-		if(defaultRewardStr != null && !defaultRewardStr.equals("")) {
+		if (defaultRewardStr != null && !defaultRewardStr.equals("")) {
 			String[] defaultRewardStrSplit = defaultRewardStr.split(";");
 			war.getDefaultReward().clear();
-			for(String itemStr : defaultRewardStrSplit) {
-				if(itemStr != null && !itemStr.equals("")) {
+			for (String itemStr : defaultRewardStrSplit) {
+				if (itemStr != null && !itemStr.equals("")) {
 					String[] itemStrSplit = itemStr.split(",");
 					ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]),
 							Integer.parseInt(itemStrSplit[1]));
@@ -155,9 +155,9 @@ public class WarMapper {
 		
 		// warhub
 		String hubStr = warConfig.getString("warhub");
-		if(hubStr != null && !hubStr.equals("")) {
+		if (hubStr != null && !hubStr.equals("")) {
 			RestoreWarhubJob restoreWarhub = new RestoreWarhubJob(war, hubStr);
-			if(war.getServer().getScheduler().scheduleSyncDelayedTask(war, restoreWarhub) == -1) {
+			if (war.getServer().getScheduler().scheduleSyncDelayedTask(war, restoreWarhub) == -1) {
 				war.logWarn("Failed to schedule warhub-restore job. War hub was not loaded.");
 			}
 		}
@@ -170,14 +170,14 @@ public class WarMapper {
 		String warzonesStr = "";
 		
 		// warzones
-		for(Warzone zone : war.getWarzones()) {
+		for (Warzone zone : war.getWarzones()) {
 			warzonesStr += zone.getName() + ",";
 		}
 		warConfig.setString("warzones", warzonesStr);
 		
 		// zone makers: default is none and it means everyone can use /setzone
 		String makersStr = "";	// everyone
-		for(String name : war.getZoneMakerNames()) {
+		for (String name : war.getZoneMakerNames()) {
 			makersStr += name + ",";
 		}
 		warConfig.setString("zoneMakers", makersStr);
@@ -185,9 +185,9 @@ public class WarMapper {
 		// defaultLoadout
 		String defaultLoadoutStr = "";
 		HashMap<Integer, ItemStack> items = war.getDefaultLoadout();
-		for(Integer slot : items.keySet()) {
+		for (Integer slot : items.keySet()) {
 			ItemStack item = items.get(slot);
-			if(item != null) {
+			if (item != null) {
 				defaultLoadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 			}
 		}
@@ -229,9 +229,9 @@ public class WarMapper {
 		// defaultReward
 		String defaultRewardStr = "";
 		HashMap<Integer, ItemStack> rewardItems = war.getDefaultReward();
-		for(Integer slot : rewardItems.keySet()) {
+		for (Integer slot : rewardItems.keySet()) {
 			ItemStack item = items.get(slot);
-			if(item != null) {
+			if (item != null) {
 				defaultRewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 			}
 		}
@@ -258,7 +258,7 @@ public class WarMapper {
 		// warhub
 		String hubStr = "";
 		WarHub hub = war.getWarHub();
-		if(hub != null) {
+		if (hub != null) {
 			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + "," 
 						+ hub.getLocation().getWorld().getName();
 			VolumeMapper.save(hub.getVolume(), "", war);

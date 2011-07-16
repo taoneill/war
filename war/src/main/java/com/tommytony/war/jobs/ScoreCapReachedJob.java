@@ -17,22 +17,22 @@ public class ScoreCapReachedJob implements Runnable {
 	}
 
 	public void run() {
-		for(Team t : zone.getTeams()) {
+		for (Team t : zone.getTeams()) {
 			t.teamcast(winnersStr);
-			for(Player tp : t.getPlayers()) {
+			for (Player tp : t.getPlayers()) {
 				// Send everyone to rally point (or zone lobby if not rally point)
-				if(zone.getRallyPoint() != null) tp.teleport(zone.getRallyPoint());
+				if (zone.getRallyPoint() != null) tp.teleport(zone.getRallyPoint());
 				else tp.teleport(zone.getTeleport());
 				tp.setFireTicks(0);
 				tp.setRemainingAir(300);
-				if(zone.hasPlayerInventory(tp.getName())){
+				if (zone.hasPlayerInventory(tp.getName())){
 					zone.restorePlayerInventory(tp);
 				}
-				if(winnersStr.contains(t.getName())) {
+				if (winnersStr.contains(t.getName())) {
 					// give reward
-					for(Integer slot : zone.getReward().keySet()){
+					for (Integer slot : zone.getReward().keySet()){
 						ItemStack item = zone.getReward().get(slot);
-						if(item != null) {
+						if (item != null) {
 							tp.getInventory().addItem(item);
 						}
 					}

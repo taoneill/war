@@ -45,9 +45,9 @@ public class WarHub {
 	
 	public Warzone getDestinationWarzoneForLocation(Location playerLocation) {
 		Warzone zone = null;
-		for(String zoneName : zoneGateBlocks.keySet()) {
+		for (String zoneName : zoneGateBlocks.keySet()) {
 			Block gate = zoneGateBlocks.get(zoneName);
-			if(gate.getX() == playerLocation.getBlockX()
+			if (gate.getX() == playerLocation.getBlockX()
 					&& gate.getY() == playerLocation.getBlockY()
 					&& gate.getZ() == playerLocation.getBlockZ()) {
 				zone = war.findWarzone(zoneName);
@@ -60,11 +60,11 @@ public class WarHub {
 		// for now, draw the wall of gates to the west
 		zoneGateBlocks.clear();
 		int disabled = 0;
-		for(Warzone zone : war.getWarzones()) {
-			if(zone.isDisabled()) disabled++;
+		for (Warzone zone : war.getWarzones()) {
+			if (zone.isDisabled()) disabled++;
 		}
 		int noOfWarzones = war.getWarzones().size() - disabled;
-		if(noOfWarzones > 0) {
+		if (noOfWarzones > 0) {
 			int hubWidth = noOfWarzones * 4 + 2;
 			int halfHubWidth = hubWidth / 2;
 			int hubDepth = 6;
@@ -83,8 +83,8 @@ public class WarHub {
 			// draw gates
 			Block currentGateBlock = BlockInfo.getBlock(location.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.WEST, hubDepth).getFace(BlockFace.NORTH, 2);
 			
-			for(Warzone zone : war.getWarzones()) {	// gonna use the index to find it again
-				if(!zone.isDisabled()) {
+			for (Warzone zone : war.getWarzones()) {	// gonna use the index to find it again
+				if (!zone.isDisabled()) {
 					zoneGateBlocks.put(zone.getName(), currentGateBlock);
 					currentGateBlock.getFace(BlockFace.DOWN).setType(Material.GLOWSTONE);
 					currentGateBlock.setType(Material.PORTAL);
@@ -112,8 +112,8 @@ public class WarHub {
 			SignHelper.setToSign(war, signBlock, (byte)8, lines);
 			
 			// Warzone signs
-			for(Warzone zone : war.getWarzones()) {
-				if(!zone.isDisabled() && zone.ready()) {
+			for (Warzone zone : war.getWarzones()) {
+				if (!zone.isDisabled() && zone.ready()) {
 					this.resetZoneSign(zone);
 				}
 			}
@@ -124,12 +124,12 @@ public class WarHub {
 		
 		Block zoneGate = zoneGateBlocks.get(zone.getName());
 		Block block = zoneGate.getFace(BlockFace.SOUTH).getFace(BlockFace.EAST, 1);
-		if(block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
+		if (block.getType() != Material.SIGN_POST) block.setType(Material.SIGN_POST);
 		block.setData((byte)8);
 		
 		int zoneCap = 0;
 		int zonePlayers = 0;
-		for(Team t : zone.getTeams()) {
+		for (Team t : zone.getTeams()) {
 			zonePlayers += t.getPlayers().size();
 			zoneCap += zone.getTeamCap();
 		}

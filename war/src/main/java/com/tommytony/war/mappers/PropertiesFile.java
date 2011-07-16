@@ -71,7 +71,7 @@ public final class PropertiesFile {
 	}
 	
 	public void close() {
-		if(outputStream != null) {
+		if (outputStream != null) {
 			try {
 				outputStream.close();
 			} catch (IOException e) {

@@ -28,14 +28,14 @@ public class RestoreWarhubJob implements Runnable {
 		int hubZ = Integer.parseInt(hubStrSplit[2]);
 		World world = null;
 		String worldName;
-		if(hubStrSplit.length > 3) {
+		if (hubStrSplit.length > 3) {
 			worldName = hubStrSplit[3];
 			world = war.getServer().getWorld(worldName);
 		} else {
 			worldName = "DEFAULT";
 			world = war.getServer().getWorlds().get(0);		// default to first world
 		}
-		if(world != null) {
+		if (world != null) {
 			Location hubLocation = new Location(world, hubX, hubY, hubZ);
 			WarHub hub = new WarHub(war, hubLocation);
 			war.setWarHub(hub);
@@ -45,8 +45,8 @@ public class RestoreWarhubJob implements Runnable {
 			hub.initialize();
 			
 			// In the previous job started by the mapper, warzones were created, but their lobbies are missing the war hub gate (because it didn't exist yet)
-			for(Warzone zone : war.getWarzones()) {
-				if(zone.getLobby() != null) {
+			for (Warzone zone : war.getWarzones()) {
+				if (zone.getLobby() != null) {
 					zone.getLobby().getVolume().resetBlocks();
 					zone.getLobby().initialize();
 				}

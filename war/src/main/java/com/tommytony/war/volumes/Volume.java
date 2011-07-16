@@ -68,51 +68,51 @@ public class Volume {
 		int y = 0;
 		int z = 0;
 		try {
-			if(hasTwoCorners()) {
+			if (hasTwoCorners()) {
 				this.setBlockTypes(new int[getSizeX()][getSizeY()][getSizeZ()]);
 				this.setBlockDatas(new byte[getSizeX()][getSizeY()][getSizeZ()]);
 				this.getSignLines().clear();
 				this.getInvBlockContents().clear();
 				x = getMinX();
-				for(int i = 0; i < getSizeX(); i++){
+				for (int i = 0; i < getSizeX(); i++){
 					y = getMinY();
-					for(int j = 0; j < getSizeY(); j++){
+					for (int j = 0; j < getSizeY(); j++){
 						z = getMinZ();
-						for(int k = 0;k < getSizeZ(); k++) {
+						for (int k = 0;k < getSizeZ(); k++) {
 							try {
 								Block block = getWorld().getBlockAt(x, y, z);
 								this.getBlockTypes()[i][j][k] = block.getTypeId();
 								this.getBlockDatas()[i][j][k] = block.getData();
 								BlockState state = block.getState();
-								if(state instanceof Sign) {
+								if (state instanceof Sign) {
 									// Signs
 									Sign sign = (Sign)state;
-									if(sign.getLines() != null) {
+									if (sign.getLines() != null) {
 										this.getSignLines().put("sign-" + i + "-" + j + "-" + k, sign.getLines());
 									}
 									
-								} else if(state instanceof Chest) {
+								} else if (state instanceof Chest) {
 									// Chests
 									Chest chest = (Chest)state;
 									Inventory inv = chest.getInventory();
 									int size = inv.getSize();
 									List<ItemStack> items = new ArrayList<ItemStack>();
-									for(int invIndex = 0; invIndex < size; invIndex++){
+									for (int invIndex = 0; invIndex < size; invIndex++){
 										ItemStack item = inv.getItem(invIndex);
-										if(item != null && item.getType().getId() != Material.AIR.getId()) {
+										if (item != null && item.getType().getId() != Material.AIR.getId()) {
 											items.add(item);
 										}
 									}
 									this.getInvBlockContents().put("chest-" + i + "-" + j + "-" + k, items);
-								} else if(state instanceof Dispenser) {
+								} else if (state instanceof Dispenser) {
 									// Dispensers							
 									Dispenser dispenser = (Dispenser)state;
 									Inventory inv = dispenser.getInventory();
 									int size = inv.getSize();
 									List<ItemStack> items = new ArrayList<ItemStack>();
-									for(int invIndex = 0; invIndex < size; invIndex++){
+									for (int invIndex = 0; invIndex < size; invIndex++){
 										ItemStack item = inv.getItem(invIndex);
-										if(item != null && item.getType().getId() != Material.AIR.getId()) {
+										if (item != null && item.getType().getId() != Material.AIR.getId()) {
 											items.add(item);
 										}
 									}
@@ -152,34 +152,34 @@ public class Volume {
 		int oldBlockType = 0;
 		clearBlocksThatDontFloat();
 		try {
-			if(hasTwoCorners() && isSaved()) {
+			if (hasTwoCorners() && isSaved()) {
 				x = getMinX();
-				for(int i = 0; i < getSizeX(); i++){
+				for (int i = 0; i < getSizeX(); i++){
 					y = getMinY();
-					for(int j = 0; j < getSizeY(); j++){
+					for (int j = 0; j < getSizeY(); j++){
 						z = getMinZ();
-						for(int k = 0;k < getSizeZ(); k++) {
+						for (int k = 0;k < getSizeZ(); k++) {
 							try {
 								oldBlockType = getBlockTypes()[i][j][k];
 								byte oldBlockData = getBlockDatas()[i][j][k];
 								Block currentBlock = getWorld().getBlockAt(x, y, z);
 								currentBlockId = currentBlock.getTypeId();
-								if(currentBlockId != oldBlockType ||
+								if (currentBlockId != oldBlockType ||
 									(currentBlockId == oldBlockType && currentBlock.getData() != oldBlockData ) ||
 									(currentBlockId == oldBlockType && currentBlock.getData() == oldBlockData &&
 											(oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId() 
 													|| oldBlockType == Material.CHEST.getId() || oldBlockType == Material.DISPENSER.getId())
 									)
 								) {
-									if(oldBlockType == Material.WALL_SIGN.getId() 
+									if (oldBlockType == Material.WALL_SIGN.getId() 
 											|| oldBlockType == Material.SIGN_POST.getId()) {
 										// Signs
-										if(oldBlockType == Material.SIGN_POST.getId() && ((oldBlockData & 0x04) == 0x04)
+										if (oldBlockType == Material.SIGN_POST.getId() && ((oldBlockData & 0x04) == 0x04)
 												&& i+1 != getSizeX()) {
 											Block southBlock = currentBlock.getFace(BlockFace.SOUTH);
 											int oldSouthBlockType = getBlockTypes()[i+1][j][k];
 											byte oldSouthBlockData = getBlockDatas()[i+1][j][k];
-											if(southBlock.getTypeId() != oldSouthBlockType) {
+											if (southBlock.getTypeId() != oldSouthBlockType) {
 												southBlock.setTypeId(oldSouthBlockType);
 												southBlock.setData(oldSouthBlockData);
 											}
@@ -187,30 +187,30 @@ public class Volume {
 										currentBlock.setType(Material.getMaterial(oldBlockType));
 										BlockState state = currentBlock.getState();
 										state.setData(new org.bukkit.material.Sign(oldBlockType, oldBlockData));
-										if(state instanceof Sign) {
+										if (state instanceof Sign) {
 											Sign sign = (Sign)state;
 											String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "-" + k);
-											if(lines != null && sign.getLines() != null) {
-												if(lines.length>0)sign.setLine(0, lines[0]);
-												if(lines.length>1)sign.setLine(1, lines[1]);
-												if(lines.length>2)sign.setLine(2, lines[2]);
-												if(lines.length>3)sign.setLine(3, lines[3]);
+											if (lines != null && sign.getLines() != null) {
+												if (lines.length>0)sign.setLine(0, lines[0]);
+												if (lines.length>1)sign.setLine(1, lines[1]);
+												if (lines.length>2)sign.setLine(2, lines[2]);
+												if (lines.length>3)sign.setLine(3, lines[3]);
 												sign.update(true);
 											}
 										}
-									} else if(oldBlockType == Material.CHEST.getId()) {
+									} else if (oldBlockType == Material.CHEST.getId()) {
 										// Chests
 										currentBlock.setType(Material.getMaterial(oldBlockType));
 										currentBlock.setData(oldBlockData);
 										BlockState state = currentBlock.getState();
-										if(state instanceof Chest) {
+										if (state instanceof Chest) {
 											Chest chest = (Chest)state;
 											List<ItemStack> contents = this.getInvBlockContents().get("chest-" + i + "-" + j + "-" + k);
-											if(contents != null) {
+											if (contents != null) {
 												int ii = 0;
 												chest.getInventory().clear();
-												for(ItemStack item : contents) {
-													if(item != null) {
+												for (ItemStack item : contents) {
+													if (item != null) {
 														chest.getInventory().setItem(ii, item);
 														ii++;
 													}
@@ -218,19 +218,19 @@ public class Volume {
 												chest.update(true);
 											}
 										}
-									} else if(oldBlockType == Material.DISPENSER.getId()) {
+									} else if (oldBlockType == Material.DISPENSER.getId()) {
 										// Dispensers		
 										currentBlock.setType(Material.getMaterial(oldBlockType));
 										currentBlock.setData(oldBlockData);
 										BlockState state = currentBlock.getState();
-										if(state instanceof Dispenser) {
+										if (state instanceof Dispenser) {
 											Dispenser dispenser = (Dispenser)state;
 											List<ItemStack> contents = this.getInvBlockContents().get("dispenser-" + i + "-" + j + "-" + k);
-											if(contents != null) {
+											if (contents != null) {
 												int ii = 0;
 												dispenser.getInventory().clear();
-												for(ItemStack item : contents) {
-													if(item != null) {
+												for (ItemStack item : contents) {
+													if (item != null) {
 														dispenser.getInventory().setItem(ii, item);
 														ii++;
 													}
@@ -238,11 +238,11 @@ public class Volume {
 												dispenser.update(true);
 											}
 										}
-									} else if(oldBlockType == Material.WOODEN_DOOR.getId() || oldBlockType == Material.IRON_DOOR_BLOCK.getId()){
+									} else if (oldBlockType == Material.WOODEN_DOOR.getId() || oldBlockType == Material.IRON_DOOR_BLOCK.getId()){
 										// Door blocks
 										
 										// Check if is bottom door block
-										if(j+1 < getSizeY() && getBlockTypes()[i][j+1][k] == oldBlockType) {
+										if (j+1 < getSizeY() && getBlockTypes()[i][j+1][k] == oldBlockType) {
 											// set both door blocks right away
 											currentBlock.setType(Material.getMaterial(oldBlockType));
 											currentBlock.setData(oldBlockData);
@@ -250,7 +250,7 @@ public class Volume {
 											blockAbove.setType(Material.getMaterial(oldBlockType));
 											blockAbove.setData(getBlockDatas()[i][j+1][k]);
 										}
-									} else if(((oldBlockType == Material.TORCH.getId() && ((oldBlockData & 0x02) == 0x02)) 
+									} else if (((oldBlockType == Material.TORCH.getId() && ((oldBlockData & 0x02) == 0x02)) 
 											|| (oldBlockType == Material.REDSTONE_TORCH_OFF.getId() && ((oldBlockData & 0x02) == 0x02))
 											|| (oldBlockType == Material.REDSTONE_TORCH_ON.getId()  && ((oldBlockData & 0x02) == 0x02))
 											|| (oldBlockType == Material.LEVER.getId()  && ((oldBlockData & 0x02) == 0x02))
@@ -262,7 +262,7 @@ public class Volume {
 										Block southBlock = currentBlock.getFace(BlockFace.SOUTH);
 										int oldSouthBlockType = getBlockTypes()[i+1][j][k];
 										byte oldSouthBlockData = getBlockDatas()[i+1][j][k];
-										if(southBlock.getTypeId() != oldSouthBlockType) {
+										if (southBlock.getTypeId() != oldSouthBlockType) {
 											southBlock.setTypeId(oldSouthBlockType);
 											southBlock.setData(oldSouthBlockData);
 										}
@@ -319,17 +319,17 @@ public class Volume {
 	}
 	
 	public BlockInfo getMinXBlock() {
-		if(cornerOne.getX() < cornerTwo.getX()) return cornerOne;
+		if (cornerOne.getX() < cornerTwo.getX()) return cornerOne;
 		return cornerTwo;
 	}
 	
 	public BlockInfo getMinYBlock() {
-		if(cornerOne.getY() < cornerTwo.getY()) return cornerOne;
+		if (cornerOne.getY() < cornerTwo.getY()) return cornerOne;
 		return cornerTwo;
 	}
 	
 	public BlockInfo getMinZBlock() {
-		if(cornerOne.getZ() < cornerTwo.getZ()) return cornerOne;
+		if (cornerOne.getZ() < cornerTwo.getZ()) return cornerOne;
 		return cornerTwo;
 	}
 	
@@ -346,17 +346,17 @@ public class Volume {
 	}
 	
 	public BlockInfo getMaxXBlock() {
-		if(cornerOne.getX() < cornerTwo.getX()) return cornerTwo;
+		if (cornerOne.getX() < cornerTwo.getX()) return cornerTwo;
 		return cornerOne;
 	}
 	
 	public BlockInfo getMaxYBlock() {
-		if(cornerOne.getY() < cornerTwo.getY()) return cornerTwo;
+		if (cornerOne.getY() < cornerTwo.getY()) return cornerTwo;
 		return cornerOne;
 	}
 	
 	public BlockInfo getMaxZBlock() {
-		if(cornerOne.getZ() < cornerTwo.getZ()) return cornerTwo;
+		if (cornerOne.getZ() < cornerTwo.getZ()) return cornerTwo;
 		return cornerOne;
 	}
 	
@@ -436,13 +436,13 @@ public class Volume {
 
 	public void setToMaterial(Material material) {
 		try {
-			if(hasTwoCorners() && isSaved()) {
+			if (hasTwoCorners() && isSaved()) {
 				int x = getMinX();
-				for(int i = 0; i < getSizeX(); i++){
+				for (int i = 0; i < getSizeX(); i++){
 					int y = getMaxY();
-					for(int j = getSizeY(); j > 0; j--){
+					for (int j = getSizeY(); j > 0; j--){
 						int z = getMinZ();
-						for(int k = 0;k < getSizeZ(); k++) {
+						for (int k = 0;k < getSizeZ(); k++) {
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
 							currentBlock.setType(material);
 							z++;
@@ -459,14 +459,14 @@ public class Volume {
 	
 	public void setFaceMaterial(BlockFace face, Material material) {
 		try {
-			if(hasTwoCorners() && isSaved()) {
+			if (hasTwoCorners() && isSaved()) {
 				int x = getMinX();
-				for(int i = 0; i < getSizeX(); i++){
+				for (int i = 0; i < getSizeX(); i++){
 					int y = getMinY();
-					for(int j = 0; j < getSizeY(); j++){
+					for (int j = 0; j < getSizeY(); j++){
 						int z = getMinZ();
-						for(int k = 0;k < getSizeZ(); k++) {
-							if((face == BlockFace.DOWN && y == getMinY()) 
+						for (int k = 0;k < getSizeZ(); k++) {
+							if ((face == BlockFace.DOWN && y == getMinY()) 
 									|| (face == BlockFace.UP && y == getMaxY())
 									|| (face == BlockFace.NORTH && x == getMinX())
 									|| (face == BlockFace.EAST && z == getMinZ())
@@ -492,19 +492,19 @@ public class Volume {
 			int i = 0, j = 0, k = 0;
 			int x, y, z;
 			Block currentBlock = null;
-			if(hasTwoCorners() && isSaved()) {
+			if (hasTwoCorners() && isSaved()) {
 				x = getMinX();
-				for(i = 0; i < getSizeX(); i++){
+				for (i = 0; i < getSizeX(); i++){
 					y = getMaxY();
-					for(j = getSizeY(); j > 0; j--){
+					for (j = getSizeY(); j > 0; j--){
 						z = getMinZ();
-						for(k = 0;k < getSizeZ(); k++) {
+						for (k = 0;k < getSizeZ(); k++) {
 							currentBlock = getWorld().getBlockAt(x, y, z);
-							for(Material oldType : oldTypes) {
-								if(currentBlock.getType().getId() == oldType.getId()) {
+							for (Material oldType : oldTypes) {
+								if (currentBlock.getType().getId() == oldType.getId()) {
 									currentBlock.setType(newType);
 //									BlockState state = currentBlock.getState();
-//									if(state != null) {
+//									if (state != null) {
 //										state.setType(newType);
 //										state.update(true);
 //									}
