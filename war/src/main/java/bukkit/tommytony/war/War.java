@@ -55,7 +55,7 @@ public class War extends JavaPlugin {
 	private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
 	private HashMap<String, InventoryStash> disconnected = new HashMap<String, InventoryStash>();
 	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
-	
+
 	// Default warzone settings
 	private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
 	private int defaultLifepool = 21;
@@ -78,7 +78,7 @@ public class War extends JavaPlugin {
 	private boolean pvpInZonesOnly = false;
 	private boolean disablePvpMessage = false;
 	private boolean buildInZonesOnly = false;
-	
+
 	private WarHub warHub;
 
 
@@ -559,7 +559,7 @@ public class War extends JavaPlugin {
 				warzone = this.warzone(player.getLocation());
 				lobby = this.lobby(player.getLocation());
 			}
-			
+
 			if(warzone == null && lobby != null) {
 				warzone = lobby.getZone();
 			} else {
@@ -569,7 +569,7 @@ public class War extends JavaPlugin {
 			for(Team t : warzone.getTeams()) {
 				if(t.getTeamFlag() != null) t.getFlagVolume().resetBlocks();
 				t.getSpawnVolume().resetBlocks();
-				
+
 				// reset inventory
 				for(Player p : t.getPlayers()) {
 					warzone.restorePlayerInventory(p);
@@ -1433,8 +1433,7 @@ public class War extends JavaPlugin {
 				return true;
 			}
 			// w/o Permissions, if buildInZonesOnly, no one can build outside the zone except Zonemakers
-			if(isZoneMaker(player)) return true;
-			else return false;
+			return isZoneMaker(player);
 		} else {
 			return true;
 		}
@@ -1455,24 +1454,24 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isZoneMaker(Player player) {
-		boolean isPlayerImpersonator = false;
 		for(String disguised : zoneMakersImpersonatingPlayers) {
-			if(disguised.equals(player.getName())) isPlayerImpersonator = true;
+			if(disguised.equals(player.getName())) return false;
 		}
-		if(!isPlayerImpersonator) {
-			if(player.isOp()) {
-				return true;
-			}
-			for(String zoneMaker : zoneMakerNames) {
-				if(zoneMaker.equals(player.getName())) return true;
-			}
-			if(War.permissionHandler != null
-					&& (War.permissionHandler.has(player, "war.*")
-							|| War.permissionHandler.has(player, "War.*"))) {
-				return true;
-			}
+
+		for(String zoneMaker : zoneMakerNames) {
+			if(zoneMaker.equals(player.getName())) return true;
 		}
-		return false;
+		if(	War.permissionHandler != null
+		&& 	(
+				War.permissionHandler.has(player, "war.*")
+			|| 	War.permissionHandler.has(player, "War.*")
+			)
+		) {
+			return true;
+		}
+		else {
+		    return player.isOp();
+		}
 	}
 
 	public boolean getDefaultAutoAssignOnly() {
@@ -1597,7 +1596,7 @@ public class War extends JavaPlugin {
 	public boolean isBuildInZonesOnly() {
 		return buildInZonesOnly;
 	}
-	
+
 	public void setDisablePvpMessage(boolean disablePvpMessage) {
 		this.disablePvpMessage = disablePvpMessage;
 	}
