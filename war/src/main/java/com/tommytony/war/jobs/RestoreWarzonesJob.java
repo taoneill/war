@@ -22,7 +22,7 @@ public class RestoreWarzonesJob implements Runnable {
 		war.getWarzones().clear();
 		for(String warzoneName : warzoneSplit) {
 			if(warzoneName != null && !warzoneName.equals("")){
-				war.logInfo("Restoring zone " + warzoneName + "...");
+				war.logInfo("Loading zone " + warzoneName + "...");
 				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWarInstall);
 				if(zone != null) { // could have failed, would've been logged already 
 					war.getWarzones().add(zone);
@@ -30,6 +30,9 @@ public class RestoreWarzonesJob implements Runnable {
 					zone.getVolume().loadCorners();
 					if(zone.getLobby() != null) {
 						zone.getLobby().getVolume().resetBlocks();
+					}
+					if(zone.isResetOnLoad()) {
+						zone.getVolume().resetBlocks();
 					}
 					zone.initializeZone();
 				}

@@ -144,6 +144,15 @@ public class WarMapper {
 		// defaultDropLootOnDeath
 		//war.setDefaultDropLootOnDeath(warConfig.getBoolean("defaultDropLootOnDeath"));
 		
+		// defaultResetOnEmpty
+		war.setDefaultResetOnEmpty(warConfig.getBoolean("defaultResetOnEmpty"));
+
+		// defaultResetOnLoad
+		war.setDefaultResetOnLoad(warConfig.getBoolean("defaultResetOnLoad"));
+		
+		// defaultResetOnUnload
+		war.setDefaultResetOnUnload(warConfig.getBoolean("defaultResetOnUnload"));
+		
 		// warhub
 		String hubStr = warConfig.getString("warhub");
 		if(hubStr != null && !hubStr.equals("")) {
@@ -233,6 +242,15 @@ public class WarMapper {
 		
 		// defaultNoCreatures
 		warConfig.setBoolean("defaultNoCreatures", war.isDefaultNoCreatures());
+		
+		// defaultResetOnEmpty
+		warConfig.setBoolean("defaultResetOnEmpty", war.isDefaultResetOnEmpty());
+		
+		// defaultResetOnLoad
+		warConfig.setBoolean("defaultResetOnLoad", war.isDefaultResetOnLoad());
+		
+		// defaultResetOnUnload
+		warConfig.setBoolean("defaultResetOnUnload", war.isDefaultResetOnUnload());
 		
 		// defaultDropLootOnDeath
 		//warConfig.setBoolean("defaultDropLootOnDeath", war.isDefaultDropLootOnDeath());

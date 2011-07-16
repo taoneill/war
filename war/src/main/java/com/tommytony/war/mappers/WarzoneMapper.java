@@ -199,6 +199,15 @@ public class WarzoneMapper {
 			// defaultNoCreatures
 			warzone.setNoCreatures(warzoneConfig.getBoolean("noCreatures"));
 			
+			// resetOnEmpty
+			warzone.setResetOnEmpty(warzoneConfig.getBoolean("resetOnEmpty"));
+
+			// resetOnLoad
+			warzone.setResetOnLoad(warzoneConfig.getBoolean("resetOnLoad"));
+			
+			// resetOnUnload
+			warzone.setResetOnUnload(warzoneConfig.getBoolean("resetOnUnload"));
+			
 			// rallyPoint
 			String rallyPointStr = warzoneConfig.getString("rallyPoint");
 			if(rallyPointStr != null && !rallyPointStr.equals("")) {
@@ -388,6 +397,15 @@ public class WarzoneMapper {
 		// noCreatures
 		warzoneConfig.setBoolean("noCreatures", warzone.isNoCreatures());
 		
+		// resetOnEmpty
+		warzoneConfig.setBoolean("resetOnEmpty", warzone.isResetOnEmpty());
+		
+		// resetOnLoad
+		warzoneConfig.setBoolean("resetOnLoad", warzone.isResetOnLoad());
+		
+		// resetOnUnload
+		warzoneConfig.setBoolean("resetOnUnload", warzone.isResetOnUnload());
+				
 		// rallyPoint
 		String rpStr = "";
 		Location rp = warzone.getRallyPoint();

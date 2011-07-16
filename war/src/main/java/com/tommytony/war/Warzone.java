@@ -56,7 +56,11 @@ public class Warzone {
 	private boolean unbreakableZoneBlocks;
 	private boolean disabled = false;
 	private boolean noCreatures;
+	
 	private boolean resetOnEmpty = false;
+	private boolean resetOnLoad = false;
+	private boolean resetOnUnload = false;
+	
 	private HashMap<String, InventoryStash> deadMenInventories = new HashMap<String, InventoryStash>();
 	private Location rallyPoint;
 	
@@ -75,6 +79,9 @@ public class Warzone {
 		this.setDropLootOnDeath(war.isDefaultDropLootOnDeath());
 		this.setUnbreakableZoneBlocks(war.isDefaultUnbreakableZoneBlocks());
 		this.setNoCreatures(war.getDefaultNoCreatures());
+		this.setResetOnEmpty(war.isDefaultResetOnEmpty());
+		this.setResetOnLoad(war.isDefaultResetOnLoad());
+		this.setResetOnUnload(war.isDefaultResetOnUnload());
 		this.volume = new ZoneVolume(name, war, this.getWorld(), this);
 	}
 	
@@ -861,7 +868,7 @@ public class Warzone {
 					break;
 				}
 			}
-			if(zoneEmpty && resetOnEmpty) {
+			if(zoneEmpty && isResetOnEmpty()) {
 				// reset the zone for a new game when the last player leaves
 				for(Team team : this.getTeams()) {
 					team.resetPoints();
@@ -1020,7 +1027,7 @@ public class Warzone {
 	}
 
 	public void unload() {
-		war.logInfo("Clearing zone " + this.getName() + "...");
+		war.logInfo("Unloading zone " + this.getName() + "...");
 		for(Team team : this.getTeams()) {
 			for(Player player : team.getPlayers()) {
 				this.handlePlayerLeave(player, this.getTeleport(), false);
@@ -1032,7 +1039,33 @@ public class Warzone {
 			this.getLobby().getVolume().resetBlocks();
 			this.getLobby().getVolume().finalize();
 		}
-		//this.getVolume().resetBlocks();
+		if(this.isResetOnUnload()) {
+			this.getVolume().resetBlocks();
+		}
 		this.getVolume().finalize();
+	}
+
+	public void setResetOnLoad(boolean resetOnLoad) {
+		this.resetOnLoad = resetOnLoad;
+	}
+
+	public boolean isResetOnLoad() {
+		return resetOnLoad;
+	}
+
+	public void setResetOnUnload(boolean resetOnUnload) {
+		this.resetOnUnload = resetOnUnload;
+	}
+
+	public boolean isResetOnUnload() {
+		return resetOnUnload;
+	}
+
+	public void setResetOnEmpty(boolean resetOnEmpty) {
+		this.resetOnEmpty = resetOnEmpty;
+	}
+
+	public boolean isResetOnEmpty() {
+		return resetOnEmpty;
 	}
 }

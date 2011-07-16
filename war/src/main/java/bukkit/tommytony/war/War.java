@@ -55,6 +55,8 @@ public class War extends JavaPlugin {
 	private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
 	private HashMap<String, InventoryStash> disconnected = new HashMap<String, InventoryStash>();
 	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
+	
+	// Default warzone settings
 	private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
 	private int defaultLifepool = 21;
 	private boolean defaultFriendlyFire = false;
@@ -68,11 +70,15 @@ public class War extends JavaPlugin {
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
+	private boolean defaultResetOnEmpty = false;
+	private boolean defaultResetOnLoad = false;
+	private boolean defaultResetOnUnload = false;
 
+	// Global settings
 	private boolean pvpInZonesOnly = false;
-	private boolean buildInZonesOnly = false;
-
 	private boolean disablePvpMessage = false;
+	private boolean buildInZonesOnly = false;
+	
 	private WarHub warHub;
 
 
@@ -322,7 +328,7 @@ public class War extends JavaPlugin {
 	public void performSetWarConfig(Player player, String[] arguments) {
 		if(arguments.length == 0) {
 			this.badMsg(player, "Usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " +
-					"Changes the server defaults for new warzones. Please give at leaset one named parameter. Must be in warzone.");
+					"Changes the server defaults for new warzones. Please give at leaset one named parameter.");
 		} else {
 			if(updateFromNamedParams(player, arguments)) {
 				WarMapper.save(this);
@@ -1066,6 +1072,18 @@ public class War extends JavaPlugin {
 				//String rewardType = namedParams.get("reward");
 				inventoryToLoadout(player, warzone.getReward());
 			}
+			if(namedParams.containsKey("resetonempty")) {
+				String onOff = namedParams.get("resetonempty");
+				warzone.setResetOnEmpty(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("resetonload")) {
+				String onOff = namedParams.get("resetonload");
+				warzone.setResetOnLoad(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("resetonunload")) {
+				String onOff = namedParams.get("resetonunload");
+				warzone.setResetOnUnload(onOff.equals("on") || onOff.equals("true"));
+			}
 //			if(namedParams.containsKey("dropLootOnDeath")){
 //				String onOff = namedParams.get("dropLootOnDeath");
 //				warzone.setDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
@@ -1146,6 +1164,18 @@ public class War extends JavaPlugin {
 			if(namedParams.containsKey("reward")) {
 				//String rewardType = namedParams.get("reward");
 				inventoryToLoadout(player, this.getDefaultReward());
+			}
+			if(namedParams.containsKey("resetonempty")) {
+				String onOff = namedParams.get("resetonempty");
+				setDefaultResetOnEmpty(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("resetonload")) {
+				String onOff = namedParams.get("resetonload");
+				setDefaultResetOnLoad(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("resetonunload")) {
+				String onOff = namedParams.get("resetonunload");
+				setDefaultResetOnUnload(onOff.equals("on") || onOff.equals("true"));
 			}
 			if(namedParams.containsKey("rallypoint")) {
 				//String rewardType = namedParams.get("reward");
@@ -1402,8 +1432,9 @@ public class War extends JavaPlugin {
 							|| War.permissionHandler.has(player, "War.build"))) {
 				return true;
 			}
-			// w/o Permissions, if buildInZonesOnly, no one can build outside the zone
-			return false;
+			// w/o Permissions, if buildInZonesOnly, no one can build outside the zone except Zonemakers
+			if(isZoneMaker(player)) return true;
+			else return false;
 		} else {
 			return true;
 		}
@@ -1429,6 +1460,9 @@ public class War extends JavaPlugin {
 			if(disguised.equals(player.getName())) isPlayerImpersonator = true;
 		}
 		if(!isPlayerImpersonator) {
+			if(player.isOp()) {
+				return true;
+			}
 			for(String zoneMaker : zoneMakerNames) {
 				if(zoneMaker.equals(player.getName())) return true;
 			}
@@ -1606,6 +1640,30 @@ public class War extends JavaPlugin {
 
 	public boolean isLoaded() {
 		return loaded;
+	}
+
+	public void setDefaultResetOnEmpty(boolean defaultResetOnEmpty) {
+		this.defaultResetOnEmpty = defaultResetOnEmpty;
+	}
+
+	public boolean isDefaultResetOnEmpty() {
+		return defaultResetOnEmpty;
+	}
+
+	public void setDefaultResetOnLoad(boolean defaultResetOnLoad) {
+		this.defaultResetOnLoad = defaultResetOnLoad;
+	}
+
+	public boolean isDefaultResetOnLoad() {
+		return defaultResetOnLoad;
+	}
+
+	public void setDefaultResetOnUnload(boolean defaultResetOnUnload) {
+		this.defaultResetOnUnload = defaultResetOnUnload;
+	}
+
+	public boolean isDefaultResetOnUnload() {
+		return defaultResetOnUnload;
 	}
 
 }
