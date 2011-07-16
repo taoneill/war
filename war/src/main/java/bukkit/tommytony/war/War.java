@@ -31,9 +31,9 @@ import com.tommytony.war.mappers.*;
 import com.tommytony.war.utils.*;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class War extends JavaPlugin {
 	public static PermissionHandler permissionHandler;
@@ -562,7 +562,7 @@ public class War extends JavaPlugin {
 
 	public void performResetZone(Player player, String[] arguments) {
 		if (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-			this.badMsg(player, "Usage: /resetzone <hard/h>. Reloads the zone (from disk if the hard option is specified). Must be in warzone or lobby.");
+			this.badMsg(player, "Usage: /resetzone. Reloads the zone. Must be in warzone or lobby.");
 		} else {
 			Warzone warzone = this.warzone(player.getLocation());
 			ZoneLobby lobby = this.lobby(player.getLocation());
@@ -583,26 +583,12 @@ public class War extends JavaPlugin {
 				team.getPlayers().clear();
 			}
 
-			Warzone resetWarzone = null;
 			this.msg(player, "Reloading warzone " + warzone.getName() + ".");
-			if (arguments.length == 1 && (arguments[0].equals("hard") || arguments[0].equals("h"))) {
-				// reset from disk
-				this.getWarzones().remove(warzone);
-				resetWarzone = WarzoneMapper.load(this, warzone.getName(), true);
-				this.getWarzones().add(resetWarzone);
-				warzone.getVolume().resetBlocksAsJob();
-				if (lobby != null) {
-					lobby.getVolume().resetBlocksAsJob();
-				}
-				resetWarzone.initializeZoneAsJob();
-			} else {
-				warzone.getVolume().resetBlocksAsJob();
-				if (lobby != null) {
-					lobby.getVolume().resetBlocksAsJob();
-				}
-				warzone.initializeZoneAsJob();
-
+			warzone.getVolume().resetBlocksAsJob();
+			if (lobby != null) {
+				lobby.getVolume().resetBlocksAsJob();
 			}
+			warzone.initializeZoneAsJob();
 		}
 	}
 
