@@ -92,15 +92,15 @@ commands:
         - Must be standing in warzone.
         - /setteamflag <team-color>
   resetzone:
-    description: (War) Reloads zone blocks from memory. Reloads from disk with "hard" option. Everyone back to the lobby. 
+    description: (War) Reloads zone blocks from memory. Everyone back to the lobby. 
     usage:
         - Must be standing in warzone or lobby. 
-        - /resetzone, /resetzone <hard/h>
+        - /resetzone
   deletezone:
     description: (War) Deletes the zone, resets all blocks.  
     usage:
-        - Must be standing in warzone or lobby. 
-        - /deletezone
+        - Must be standing in warzone or lobby, or provide name
+        - /deletezone, /deletezone <zone-name>
   deleteteam:
     description: (War) Deletes the team. Team must exist. 
     usage:
