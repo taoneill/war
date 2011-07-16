@@ -903,6 +903,9 @@ public class Warzone {
 
 	public void setSpawnStyle(String spawnStyle) {
 		this.spawnStyle = spawnStyle;
+		for(Team team : teams) {
+			team.setTeamSpawn(team.getTeamSpawn());
+		}
 	}
 
 	public String getSpawnStyle() {
