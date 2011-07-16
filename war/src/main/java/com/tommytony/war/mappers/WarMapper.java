@@ -15,9 +15,9 @@ import com.tommytony.war.jobs.RestoreWarhubJob;
 import com.tommytony.war.jobs.RestoreWarzonesJob;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class WarMapper {
 
@@ -55,12 +55,20 @@ public class WarMapper {
 		}
 
 		// zone makers
-		String makersStr = warConfig.getString("zoneMakers");
-		String[] makersSplit = makersStr.split(",");
+		String[] makers = warConfig.getString("zoneMakers").split(",");
 		war.getZoneMakerNames().clear();
-		for (String makerName : makersSplit) {
+		for (String makerName : makers) {
 			if (makerName != null && !makerName.equals("")) {
 				war.getZoneMakerNames().add(makerName);
+			}
+		}
+
+		// command whitelist
+		String[] whitelist = warConfig.getString("commandWhitelist").split(",");
+		war.getCommandWhitelist().clear();
+		for (String command : whitelist) {
+			if (command != null && !command.equals("")) {
+				war.getCommandWhitelist().add(command);
 			}
 		}
 
@@ -180,6 +188,13 @@ public class WarMapper {
 			makersStr += name + ",";
 		}
 		warConfig.setString("zoneMakers", makersStr);
+
+		// whitelisted commands during a game
+		String commandWhitelistStr = ""; // everyone
+		for (String command : war.getCommandWhitelist()) {
+			commandWhitelistStr += command + ",";
+		}
+		warConfig.setString("commandWhitelist", makersStr);
 
 		// defaultLoadout
 		String defaultLoadoutStr = "";

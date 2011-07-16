@@ -29,9 +29,9 @@ import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.ZoneSetter;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class WarPlayerListener extends PlayerListener {
 
@@ -164,6 +164,11 @@ public class WarPlayerListener extends PlayerListener {
 				if (!this.war.isZoneMaker(player) && split.length > 0 && split[0].startsWith("/")) {
 					String command = split[0].substring(1);
 					if (!command.equals("war") && !command.equals("zones") && !command.equals("warzones") && !command.equals("zone") && !command.equals("warzone") && !command.equals("teams") && !command.equals("join") && !command.equals("leave") && !command.equals("team") && !command.equals("warhub") && !command.equals("zonemaker")) {
+						for (String whiteCommand : this.war.getCommandWhitelist()) {
+							if (whiteCommand.equals(command)) {
+								return;
+							}
+						}
 						this.war.badMsg(player, "Can't use anything but War commands (e.g. /leave, /warhub) while you're playing in a warzone.");
 						event.setCancelled(true);
 					}

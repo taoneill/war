@@ -52,6 +52,7 @@ public class War extends JavaPlugin {
 	private List<Warzone> warzones;
 	private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
 	private final List<String> zoneMakerNames = new ArrayList<String>();
+	private final List<String> commandWhitelist = new ArrayList<String>();
 	private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
 	private HashMap<String, InventoryStash> disconnected = new HashMap<String, InventoryStash>();
 	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
@@ -1329,6 +1330,10 @@ public class War extends JavaPlugin {
 
 	public List<String> getZoneMakerNames() {
 		return this.zoneMakerNames;
+	}
+
+	public List<String> getCommandWhitelist() {
+		return this.commandWhitelist;
 	}
 
 	public boolean canPlayWar(Player player) {
