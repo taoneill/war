@@ -1,6 +1,7 @@
 package bukkit.tommytony.war;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -24,18 +25,29 @@ import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 
 /**
- * 
- * @author tommytony
- * 
+ * Handles Entity-Events
+ *
+ * @author 	tommytony, Tim Düsterhus
+ * @package	bukkit.tommytony.war
  */
 public class WarEntityListener extends EntityListener {
 
+	/**
+	 * Instance of war
+	 *
+	 * @var War
+	 */
 	private final War war;
 
 	public WarEntityListener(War war) {
 		this.war = war;
 	}
 
+	/**
+	 * Handles PVP-Damage
+	 *
+	 * @param EntityDamageByEntityEvent	event	fired event
+	 */
 	private void handlerAttackDefend(EntityDamageByEntityEvent event) {
 		Entity attacker = event.getDamager();
 		Entity defender = event.getEntity();
@@ -116,7 +128,7 @@ public class WarEntityListener extends EntityListener {
 					deathMessage = "A dispenser killed " + this.war.getPlayerTeam(d.getName()).getKind().getColor() + d.getDisplayName();
 				else if (event.getDamager() instanceof CraftTNTPrimed)
 					deathMessage = this.war.getPlayerTeam(d.getName()).getKind().getColor() + d.getDisplayName() + ChatColor.WHITE + " exploded";
-				else 
+				else
 					deathMessage = this.war.getPlayerTeam(d.getName()).getKind().getColor() + d.getDisplayName() + ChatColor.WHITE + " died";
 				for (Team team : defenderWarzone.getTeams()) {
 					team.teamcast(deathMessage);
@@ -127,6 +139,9 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 
+	/**
+	 * Protects important structures from explosions
+	 */
 	@Override
 	public void onEntityExplode(EntityExplodeEvent event) {
 		if (this.war.isLoaded()) {
@@ -135,17 +150,17 @@ public class WarEntityListener extends EntityListener {
 			for (Block block : explodedBlocks) {
 				if (this.war.getWarHub() != null && this.war.getWarHub().getVolume().contains(block)) {
 					event.setCancelled(true);
-					this.war.logInfo("Explosion prevented at warhub.");
+					this.war.log("Explosion prevented at warhub.", Level.INFO);
 					return;
 				}
 				for (Warzone zone : this.war.getWarzones()) {
 					if (zone.isImportantBlock(block)) {
 						event.setCancelled(true);
-						this.war.logInfo("Explosion prevented in zone " + zone.getName() + ".");
+						this.war.log("Explosion prevented in zone " + zone.getName() + ".", Level.INFO);
 						return;
 					} else if (zone.getLobby() != null && zone.getLobby().getVolume().contains(block)) {
 						event.setCancelled(true);
-						this.war.logInfo("Explosion prevented at zone " + zone.getName() + " lobby.");
+						this.war.log("Explosion prevented at zone " + zone.getName() + " lobby.", Level.INFO);
 						return;
 					}
 				}
@@ -153,18 +168,23 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 
+	/**
+	 * Handles damage on Players
+	 */
 	@Override
 	public void onEntityDamage(EntityDamageEvent event) {
 		if (this.war.isLoaded()) {
 			Entity entity = event.getEntity();
+			// prevent godmode
 			if (entity instanceof Player && this.war.getPlayerTeamWarzone(((Player) entity).getName()) != null) {
 				event.setCancelled(false);
 			}
 
+			// pass pvp-damage
 			if (event instanceof EntityDamageByEntityEvent || event instanceof EntityDamageByProjectileEvent) {
 				this.handlerAttackDefend((EntityDamageByEntityEvent) event);
 			} else {
-				// Detect death (from , prevent it and respawn the player
+				// Detect death, prevent it and respawn the player
 				if (entity instanceof Player) {
 					Player player = (Player) entity;
 					Warzone zone = this.war.getPlayerTeamWarzone(player.getName());
@@ -202,6 +222,9 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 
+	/**
+	 * Prevents creatures from spawning in warzones if no creatures is active
+	 */
 	@Override
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
 		if (this.war.isLoaded()) {
@@ -214,6 +237,9 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 
+	/**
+	 * Prevents health regaining caused by peaceful mode
+	 */
 	@Override
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
 		if (this.war.isLoaded() && event.getRegainReason() == RegainReason.REGEN) {

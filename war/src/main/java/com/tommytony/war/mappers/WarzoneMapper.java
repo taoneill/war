@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -22,9 +23,9 @@ import com.tommytony.war.volumes.Volume;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class WarzoneMapper {
 
@@ -48,7 +49,7 @@ public class WarzoneMapper {
 		}
 
 		if (world == null) {
-			war.logWarn("Failed to restore warzone " + name + ". The specified world (name: " + worldStr + ") does not exist!");
+			war.log("Failed to restore warzone " + name + ". The specified world (name: " + worldStr + ") does not exist!", Level.WARNING);
 		} else {
 			// Create the zone
 			Warzone warzone = new Warzone(war, world, name);
@@ -473,17 +474,17 @@ public class WarzoneMapper {
 		for (File file : files) {
 			boolean deletedData = file.delete();
 			if (!deletedData) {
-				war.logWarn("Failed to delete file " + file.getName());
+				war.log("Failed to delete file " + file.getName(), Level.WARNING);
 			}
 		}
 		boolean deletedData = zoneFolder.delete();
 		if (!deletedData) {
-			war.logWarn("Failed to delete folder " + zoneFolder.getName());
+			war.log("Failed to delete folder " + zoneFolder.getName(), Level.WARNING);
 		}
 		File zoneFile = new File(war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		deletedData = zoneFile.delete();
 		if (!deletedData) {
-			war.logWarn("Failed to delete file " + zoneFile.getName());
+			war.log("Failed to delete file " + zoneFile.getName(), Level.WARNING);
 		}
 	}
 

@@ -3,6 +3,7 @@ package com.tommytony.war.mappers;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -30,7 +31,7 @@ public class WarMapper {
 		try {
 			warConfig.load();
 		} catch (IOException e) {
-			war.logWarn("Failed to load war.txt file.");
+			war.log("Failed to load war.txt file.", Level.WARNING);
 			e.printStackTrace();
 		}
 
@@ -39,11 +40,11 @@ public class WarMapper {
 		if (!warConfig.containsKey("warzones")) {
 			newWar = true;
 			WarMapper.save(war);
-			war.logInfo("war.txt settings file created.");
+			war.log("war.txt settings file created.", Level.INFO);
 			try {
 				warConfig.load();
 			} catch (IOException e) {
-				war.logWarn("Failed to reload war.txt file after creating it.");
+				war.log("Failed to reload war.txt file after creating it.", Level.WARNING);
 				e.printStackTrace();
 			}
 		}
@@ -52,7 +53,7 @@ public class WarMapper {
 		String warzonesStr = warConfig.getString("warzones");
 		RestoreWarzonesJob restoreWarzones = new RestoreWarzonesJob(war, warzonesStr, newWar);
 		if (war.getServer().getScheduler().scheduleSyncDelayedTask(war, restoreWarzones) == -1) {
-			war.logWarn("Failed to schedule warzone-restore job. No warzone was loaded.");
+			war.log("Failed to schedule warzone-restore job. No warzone was loaded.", Level.WARNING);
 		}
 
 		// zone makers
@@ -166,7 +167,7 @@ public class WarMapper {
 		if (hubStr != null && !hubStr.equals("")) {
 			RestoreWarhubJob restoreWarhub = new RestoreWarhubJob(war, hubStr);
 			if (war.getServer().getScheduler().scheduleSyncDelayedTask(war, restoreWarhub) == -1) {
-				war.logWarn("Failed to schedule warhub-restore job. War hub was not loaded.");
+				war.log("Failed to schedule warhub-restore job. War hub was not loaded.", Level.WARNING);
 			}
 		}
 
@@ -284,7 +285,7 @@ public class WarMapper {
 			} else {
 				orientationStr = "west";
 			}
-			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + "," 
+			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + ","
 			+ hub.getLocation().getWorld().getName() + "," + orientationStr;
 			VolumeMapper.save(hub.getVolume(), "", war);
 		}

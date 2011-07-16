@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -33,12 +34,22 @@ import com.tommytony.war.volumes.ZoneVolume;
 
 /**
  * The ZoneVolumeMapper take the blocks from disk and sets them in the worlds, since the ZoneVolume doesn't hold its blocks in memory like regular Volumes.
- * 
- * @author tommytony
- * 
+ *
+ * @author 	tommytony, Tim Düsterhus
+ * @package 	com.tommytony.war.mappers
  */
 public class ZoneVolumeMapper {
 
+	/**
+	 * Loads the given volume
+	 *
+	 * @param 	ZoneVolume	volume		Volume to load
+	 * @param 	String		zoneName	Zone to load the volume from
+	 * @param 	War		war		Instance of War
+	 * @param 	World		world		The world the zone is located
+	 * @param 	boolean		onlyLoadCorners	Should only the corners be loaded
+	 * @return	integer				Changed blocks
+	 */
 	public static int load(ZoneVolume volume, String zoneName, War war, World world, boolean onlyLoadCorners) {
 		File cornersFile = new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".corners");
 		File blocksFile = new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".blocks");
@@ -53,7 +64,7 @@ public class ZoneVolumeMapper {
 			// The new 1.6 files aren't created yet. We just reset the zone (except deferred blocks which will soon execute on main thread ),
 			// so let's save to the new format as soon as the zone is fully reset.
 			ZoneVolumeMapper.saveAsJob(volume, zoneName, war, 2);
-			war.logInfo("Warzone " + zoneName + " file converted!");
+			war.log("Warzone " + zoneName + " file converted!", Level.INFO);
 
 			return noOfResetBlocks;
 		} else {
@@ -234,10 +245,10 @@ public class ZoneVolumeMapper {
 					}
 				}
 			} catch (FileNotFoundException e) {
-				war.logWarn("Failed to find volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+				war.log("Failed to find volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 				e.printStackTrace();
 			} catch (IOException e) {
-				war.logWarn("Failed to read volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+				war.log("Failed to read volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 				e.printStackTrace();
 			} finally {
 				try {
@@ -254,7 +265,7 @@ public class ZoneVolumeMapper {
 						invsReader.close();
 					}
 				} catch (IOException e) {
-					war.logWarn("Failed to close volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+					war.log("Failed to close volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 					e.printStackTrace();
 				}
 			}
@@ -262,6 +273,12 @@ public class ZoneVolumeMapper {
 		}
 	}
 
+	/**
+	 * Parses an inventory string
+	 *
+	 * @param 	String		invString	string to parse
+	 * @return	List<ItemStack>			Parsed items
+	 */
 	private static List<ItemStack> readInventoryString(String invString) {
 		List<ItemStack> items = new ArrayList<ItemStack>();
 		if (invString != null && !invString.equals("")) {
@@ -287,6 +304,14 @@ public class ZoneVolumeMapper {
 		return items;
 	}
 
+	/**
+	 * Saves the given volume
+	 *
+	 * @param 	Volume	volume		Volume to save
+	 * @param 	String	zoneName	The warzone the volume is located
+	 * @param 	War	war		Instance of war
+	 * @return	integer			Number of written blocks
+	 */
 	public static int save(Volume volume, String zoneName, War war) {
 		int noOfSavedBlocks = 0;
 		if (volume.hasTwoCorners()) {
@@ -408,7 +433,7 @@ public class ZoneVolumeMapper {
 								}
 								noOfSavedBlocks++;
 							} catch (Exception e) {
-								war.logWarn("Unexpected error while saving a block to " + " file for zone " + zoneName + ". Blocks saved so far: " + noOfSavedBlocks + "Position: x:" + x + " y:" + y + " z:" + z + ". " + e.getClass().getName() + " " + e.getMessage());
+								war.log("Unexpected error while saving a block to " + " file for zone " + zoneName + ". Blocks saved so far: " + noOfSavedBlocks + "Position: x:" + x + " y:" + y + " z:" + z + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 								e.printStackTrace();
 							} finally {
 								z++;
@@ -419,10 +444,10 @@ public class ZoneVolumeMapper {
 					x++;
 				}
 			} catch (IOException e) {
-				war.logWarn("Failed to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				war.log("Failed to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 				e.printStackTrace();
 			} catch (Exception e) {
-				war.logWarn("Unexpected error caused failure to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				war.log("Unexpected error caused failure to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 				e.printStackTrace();
 			} finally {
 				try {
@@ -439,7 +464,7 @@ public class ZoneVolumeMapper {
 						invsWriter.close();
 					}
 				} catch (IOException e) {
-					war.logWarn("Failed to close volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+					war.log("Failed to close volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 					e.printStackTrace();
 				}
 			}
@@ -447,11 +472,25 @@ public class ZoneVolumeMapper {
 		return noOfSavedBlocks;
 	}
 
+	/**
+	 * Saves the Volume as a background-job
+	 *
+	 * @param 	ZoneVolme	volume		volume to save
+	 * @param 	String		zoneName	The zone the volume is located
+	 * @param 	War		war		Instance of war
+	 * @param 	long		tickDelay	delay before beginning the task
+	 */
 	private static void saveAsJob(ZoneVolume volume, String zoneName, War war, long tickDelay) {
 		ZoneVolumeSaveJob job = new ZoneVolumeSaveJob(volume, zoneName, war);
 		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job, tickDelay);
 	}
 
+	/**
+	 * Deletes the given volume
+	 *
+	 * @param 	Volume	volume	volume to delete
+	 * @param 	War	war	Instance of war
+	 */
 	public static void delete(Volume volume, War war) {
 		ZoneVolumeMapper.deleteFile("War/dat/volume-" + volume.getName() + ".dat", war);
 		ZoneVolumeMapper.deleteFile("War/dat/volume-" + volume.getName() + ".corners", war);
@@ -460,14 +499,19 @@ public class ZoneVolumeMapper {
 		ZoneVolumeMapper.deleteFile("War/dat/volume-" + volume.getName() + ".invs", war);
 	}
 
+	/**
+	 * Deletes a volume file
+	 *
+	 * @param	String	path	path of file
+	 * @param 	War	war	Instance of war
+	 */
 	private static void deleteFile(String path, War war) {
 		File volFile = new File(path);
 		if (volFile.exists()) {
 			boolean deletedData = volFile.delete();
 			if (!deletedData) {
-				war.logWarn("Failed to delete file " + volFile.getName());
+				war.log("Failed to delete file " + volFile.getName(), Level.WARNING);
 			}
 		}
 	}
-
 }

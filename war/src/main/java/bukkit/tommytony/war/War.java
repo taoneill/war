@@ -31,9 +31,10 @@ import com.tommytony.war.mappers.*;
 import com.tommytony.war.utils.*;
 
 /**
+ * Main class of War
  *
- * @author tommytony
- *
+ * @author tommytony, Tim Düsterhus
+ * @package bukkit.tommytony.war
  */
 public class War extends JavaPlugin {
 	public static PermissionHandler permissionHandler;
@@ -86,6 +87,9 @@ public class War extends JavaPlugin {
 		this.unloadWar();
 	}
 
+	/**
+	 * Cleans up war
+	 */
 	public void unloadWar() {
 		this.setLoaded(false);
 		for (Warzone warzone : this.warzones) {
@@ -104,6 +108,9 @@ public class War extends JavaPlugin {
 		this.loadWar();
 	}
 
+	/**
+	 * Initializes war
+	 */
 	public void loadWar() {
 		this.setLoaded(true);
 		this.warzones = new ArrayList<Warzone>();
@@ -113,7 +120,6 @@ public class War extends JavaPlugin {
 
 		// Register hooks
 		PluginManager pm = this.getServer().getPluginManager();
-
 		pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_KICK, this.playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Priority.Normal, this);
@@ -124,7 +130,6 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Priority.Normal, this);
 
 		pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Priority.Normal, this);
-		// pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Priority.High, this);
 		pm.registerEvent(Event.Type.ENTITY_COMBUST, this.entityListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Priority.Normal, this);
@@ -133,7 +138,6 @@ public class War extends JavaPlugin {
 		pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
 
-		// pm.registerEvent(Event.Type.CHUNK_UNLOADED, blockListener, Priority.Normal, this);
 
 		// Load files from disk or create them (using these defaults)
 		this.defaultLoadout.put(0, new ItemStack(Material.STONE_SWORD, 1, (byte) 8));
@@ -149,6 +153,23 @@ public class War extends JavaPlugin {
 		this.logInfo("War v" + this.desc.getVersion() + " is on.");
 	}
 
+	/**
+	 * Initializes Permissions
+	 */
+	public void setupPermissions() {
+		Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
+		if (War.permissionHandler == null) {
+			if (permissionsPlugin != null) {
+				War.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
+			} else {
+				this.logInfo("Permissions system not enabled. Defaulting to regular War config.");
+			}
+		}
+	}
+
+	/**
+	 * Handles war commands
+	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
@@ -237,9 +258,14 @@ public class War extends JavaPlugin {
 		return true;
 	}
 
-	private void inventoryToLoadout(Player player, HashMap<Integer, ItemStack> loadout) {
+	/**
+	 * Converts the player-inventory to a loadout hashmap
+	 *
+	 * @param PlayerInventory		inv		inventory to get the items from
+	 * @param HashMap<Integer, ItemStack>	loadout		the hashmap to save to
+	 */
+	private void inventoryToLoadout(PlayerInventory inv, HashMap<Integer, ItemStack> loadout) {
 		loadout.clear();
-		PlayerInventory inv = player.getInventory();
 		int i = 0;
 		for (ItemStack stack : inv.getContents()) {
 			if (stack != null && stack.getType() != Material.AIR) {
@@ -257,6 +283,16 @@ public class War extends JavaPlugin {
 		if (inv.getChestplate() != null && inv.getChestplate().getType() != Material.AIR) {
 			loadout.put(102, inv.getChestplate());
 		}
+	}
+
+	/**
+	 * Converts the player-inventory to a loadout hashmap
+	 *
+	 * @param Player			player		player to get the inventory to get the items from
+	 * @param HashMap<Integer, ItemStack>	loadout		the hashmap to save to
+	 */
+	private void inventoryToLoadout(Player player, HashMap<Integer, ItemStack> loadout) {
+		this.inventoryToLoadout(player.getInventory(), loadout);
 	}
 
 	public void performZonemakerAsPlayer(Player player) {
@@ -1199,6 +1235,13 @@ public class War extends JavaPlugin {
 		ChatFixUtil.sendMessage(player, out);
 	}
 
+	/**
+	 * Colors the teams in messages
+	 *
+	 * @param 	String	str		message-string
+	 * @param 	String	msgColor	current message-color
+	 * @return	String			Message with colored teams
+	 */
 	private String colorTeams(String str, ChatColor msgColor) {
 		for (TeamKind kind : TeamKinds.getTeamkinds()) {
 			str = str.replaceAll(" " + kind.getDefaultName(), " " + kind.getColor() + kind.getDefaultName() + msgColor);
@@ -1206,12 +1249,36 @@ public class War extends JavaPlugin {
 		return str;
 	}
 
+	/**
+	 * Sends a message of Level Info to the logger
+	 *
+	 * @param 	String	str	message to send
+	 * @deprecated	Use War.log() now
+	 */
+	@Deprecated
 	public void logInfo(String str) {
-		this.getLogger().log(Level.INFO, "War> " + str);
+		this.log(str, Level.INFO);
 	}
 
+	/**
+	 * Sends a message of Level Warning to the logger
+	 *
+	 * @param 	String	str	message to send
+	 * @deprecated	Use War.log() now
+	 */
+	@Deprecated
 	public void logWarn(String str) {
-		this.getLogger().log(Level.WARNING, "War> " + str);
+		this.log(str, Level.WARNING);
+	}
+
+	/**
+	 * Logs a specified message with a specified level
+	 *
+	 * @param 	String	str	message to log
+	 * @param 	Level	lvl	level to use
+	 */
+	public void log(String str, Level lvl) {
+		this.getLogger().log(lvl, "War> " + str);
 	}
 
 	// the only way to find a zone that has only one corner
@@ -1472,17 +1539,6 @@ public class War extends JavaPlugin {
 		return this.zoneMakersImpersonatingPlayers;
 	}
 
-	public void setupPermissions() {
-		Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
-		if (War.permissionHandler == null) {
-			if (permissionsPlugin != null) {
-				War.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-			} else {
-				this.logInfo("Permissions system not enabled. Defaulting to regular War config.");
-			}
-		}
-	}
-
 	public void setDefaultBlockHeads(boolean defaultBlockHeads) {
 		this.defaultBlockHeads = defaultBlockHeads;
 	}
@@ -1590,5 +1646,4 @@ public class War extends JavaPlugin {
 	public boolean isDefaultResetOnUnload() {
 		return this.defaultResetOnUnload;
 	}
-
 }

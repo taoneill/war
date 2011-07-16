@@ -11,9 +11,9 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.ZoneVolumeMapper;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class ZoneVolume extends Volume {
 
@@ -29,7 +29,7 @@ public class ZoneVolume extends Volume {
 	public int saveBlocks() {
 		// Save blocks directly to disk (i.e. don't put everything in memory)
 		int saved = ZoneVolumeMapper.save(this, this.zone.getName(), this.getWar());
-		this.getWar().logInfo("Saved " + saved + " blocks in warzone " + this.zone.getName() + ".");
+		this.getWar().log("Saved " + saved + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
 		this.isSaved = true;
 		return saved;
 	}
@@ -48,7 +48,7 @@ public class ZoneVolume extends Volume {
 	public int resetBlocks() {
 		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
 		int reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWar(), this.getWorld(), false);
-		this.getWar().logInfo("Reset " + reset + " blocks in warzone " + this.zone.getName() + ".");
+		this.getWar().log("Reset " + reset + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
 		this.isSaved = true;
 		return reset;
 	}
@@ -303,12 +303,4 @@ public class ZoneVolume extends Volume {
 		}
 		return false;
 	}
-
-	/*
-	 * public int resetWallBlocks(BlockFace wall) { int noOfResetBlocks = 0; try { if (hasTwoCorners() && getBlockTypes() != null) { if (wall == BlockFace.EAST) { int z = getMinZ(); int k = 0; int y = getMinY(); for (int j = 0; j < getSizeY(); j++) { int x = getMinX(); for (int i = 0; i < getSizeX(); i++) { int oldBlockType = getBlockTypes()[i][j][k]; byte oldBlockData = getBlockDatas()[i][j][k]; Block currentBlock = getWorld().getBlockAt(x, y, z); if (resetBlock(oldBlockType, oldBlockData, currentBlock)) { noOfResetBlocks++; } x++; } y++; } } else if (wall == BlockFace.WEST) { int z = getMaxZ(); int k = getSizeZ()-1; int y = getMinY(); for (int j = 0; j < getSizeY(); j++) { int x = getMinX(); for (int i = 0; i < getSizeX(); i++) { int oldBlockType = getBlockTypes()[i][j][k]; byte oldBlockData = getBlockDatas()[i][j][k]; Block currentBlock = getWorld().getBlockAt(x, y, z); if (resetBlock(oldBlockType, oldBlockData, currentBlock)) { noOfResetBlocks++; } x++; } y++; } } else if (wall == BlockFace.NORTH) { int x = getMinX(); int i = 0; int y = getMinY(); for (int j = 0; j < getSizeY(); j++) { int z = getMinZ(); for (int k = 0; k < getSizeZ(); k++) { int oldBlockType = getBlockTypes()[i][j][k]; byte oldBlockData = getBlockDatas()[i][j][k]; Block currentBlock = getWorld().getBlockAt(x, y, z); if (resetBlock(oldBlockType, oldBlockData, currentBlock)) { noOfResetBlocks++; } z++; } y++; } } else if (wall == BlockFace.SOUTH) { int x = getMaxX(); int i = getSizeX()-1; int y = getMinY(); for (int j = 0; j < getSizeY(); j++) { int z = getMinZ(); for (int k = 0; k < getSizeZ(); k++) { int oldBlockType = getBlockTypes()[i][j][k]; byte oldBlockData = getBlockDatas()[i][j][k]; Block currentBlock = getWorld().getBlockAt(x, y, z); if (resetBlock(oldBlockType, oldBlockData, currentBlock)) { noOfResetBlocks++; } z++; } y++; } } else if (wall == BlockFace.UP) { int x = getMinX(); int y = getMaxY(); int j = getSizeY()-1; for (int i = 0;i < getSizeX(); i++) { int z = getMinZ(); for (int k = 0; k < getSizeZ(); k++) { int oldBlockType = getBlockTypes()[i][j][k]; byte oldBlockData = getBlockDatas()[i][j][k]; Block currentBlock = getWorld().getBlockAt(x, y, z); if (resetBlock(oldBlockType, oldBlockData, currentBlock)) { noOfResetBlocks++; } z++; } x++; } } else if (wall == BlockFace.DOWN) { int x = getMinX(); int y = getMinY(); int j = 0; for (int i = 0;i < getSizeX(); i++) { int z = getMinZ(); for (int k = 0; k < getSizeZ(); k++) { int oldBlockType = getBlockTypes()[i][j][k]; byte oldBlockData = getBlockDatas()[i][j][k]; Block currentBlock = getWorld().getBlockAt(x, y, z); if (resetBlock(oldBlockType, oldBlockData, currentBlock)) { noOfResetBlocks++; } z++; } x++; } } } } catch (Exception e) { this.getWar().logWarn("Failed to reset wall " + wall + " in volume " + getName() + ". " + e.getClass().toString() + " " + e.getMessage()); } return noOfResetBlocks; }
-	 * 
-	 * 
-	 * private boolean resetBlock(int oldBlockType, byte oldBlockData, Block currentBlock) { if (currentBlock.getTypeId() != oldBlockType || (currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData) || (currentBlock.getTypeId() == oldBlockType && currentBlock.getData() == oldBlockData && (oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId()) ) ) { currentBlock.setTypeId(oldBlockType); currentBlock.setData(oldBlockData); // TODO: reset wall signs, chests and dispensers properly like in resetBlocks return true; } return false; }
-	 */
-
 }

@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -19,9 +20,9 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.volumes.Volume;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class VolumeMapper {
 
@@ -150,7 +151,7 @@ public class VolumeMapper {
 									blockReads++;
 								}
 							} catch (Exception e) {
-								war.logWarn("Unexpected error while reading block from volume " + volume.getName() + " file for zone " + zoneName + ". Blocks read so far: " + blockReads + "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage());
+								war.log("Unexpected error while reading block from volume " + volume.getName() + " file for zone " + zoneName + ". Blocks read so far: " + blockReads + "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 								e.printStackTrace();
 							}
 						}
@@ -163,17 +164,17 @@ public class VolumeMapper {
 				}
 			}
 		} catch (IOException e) {
-			war.logWarn("Failed to read volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+			war.log("Failed to read volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();
 		} catch (Exception e) {
-			war.logWarn("Unexpected error caused failure to read volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+			war.log("Unexpected error caused failure to read volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();
 		} finally {
 			if (in != null) {
 				try {
 					in.close();
 				} catch (IOException e) {
-					war.logWarn("Failed to close file reader for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+					war.log("Failed to close file reader for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 					e.printStackTrace();
 				}
 			}
@@ -259,24 +260,24 @@ public class VolumeMapper {
 								}
 								out.newLine();
 							} catch (Exception e) {
-								war.logWarn("Unexpected error while writing block into volume " + volume.getName() + " file for zone " + zoneName + ". Blocks written so far: " + blockWrites + "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage());
+								war.log("Unexpected error while writing block into volume " + volume.getName() + " file for zone " + zoneName + ". Blocks written so far: " + blockWrites + "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 								e.printStackTrace();
 							}
 						}
 					}
 				}
 			} catch (IOException e) {
-				war.logWarn("Failed to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				war.log("Failed to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 				e.printStackTrace();
 			} catch (Exception e) {
-				war.logWarn("Unexpected error caused failure to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				war.log("Unexpected error caused failure to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 				e.printStackTrace();
 			} finally {
 				if (out != null) {
 					try {
 						out.close();
 					} catch (IOException e) {
-						war.logWarn("Failed to close file writer for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+						war.log("Failed to close file writer for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 						e.printStackTrace();
 					}
 				}
@@ -288,7 +289,7 @@ public class VolumeMapper {
 		File volFile = new File("War/dat/volume-" + volume.getName());
 		boolean deletedData = volFile.delete();
 		if (!deletedData) {
-			war.logWarn("Failed to delete file " + volFile.getName());
+			war.log("Failed to delete file " + volFile.getName(), Level.WARNING);
 		}
 	}
 

@@ -3,6 +3,7 @@ package com.tommytony.war;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,9 +26,9 @@ import com.tommytony.war.utils.InventoryStash;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class Warzone {
 	private String name;
@@ -157,7 +158,7 @@ public class Warzone {
 
 	/**
 	 * Goes back to the saved state of the warzone (resets only block types, not physics). Also teleports all players back to their respective spawns.
-	 * 
+	 *
 	 * @return
 	 */
 	public void initializeZone() {
@@ -813,7 +814,7 @@ public class Warzone {
 				}
 				this.getVolume().resetBlocksAsJob();
 				this.initializeZoneAsJob();
-				this.war.logInfo("Last player left warzone " + this.getName() + ". Warzone blocks resetting automatically...");
+				this.war.log("Last player left warzone " + this.getName() + ". Warzone blocks resetting automatically...", Level.INFO);
 			}
 		}
 	}
@@ -968,7 +969,7 @@ public class Warzone {
 	}
 
 	public void unload() {
-		this.war.logInfo("Unloading zone " + this.getName() + "...");
+		this.war.log("Unloading zone " + this.getName() + "...", Level.INFO);
 		for (Team team : this.getTeams()) {
 			for (Player player : team.getPlayers()) {
 				this.handlePlayerLeave(player, this.getTeleport(), false);

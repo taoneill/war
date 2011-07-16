@@ -3,6 +3,7 @@ package com.tommytony.war.volumes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,9 +22,9 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.jobs.BlockResetJob;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class Volume {
 	private final String name;
@@ -281,7 +282,7 @@ public class Volume {
 				}
 			}
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to reset volume " + this.getName() + " blocks. Blocks visited: " + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Current block: " + currentBlockId + ". Old block: " + oldBlockType + ". Exception: " + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().log("Failed to reset volume " + this.getName() + " blocks. Blocks visited: " + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Current block: " + currentBlockId + ". Old block: " + oldBlockType + ". Exception: " + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();
 		}
 		return noOfResetBlocks;
@@ -443,7 +444,7 @@ public class Volume {
 				}
 			}
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().log("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
 
@@ -468,7 +469,7 @@ public class Volume {
 				}
 			}
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().log("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
 
@@ -503,7 +504,7 @@ public class Volume {
 				}
 			}
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to switch block to " + newType + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().log("Failed to switch block to " + newType + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
 

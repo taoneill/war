@@ -1,5 +1,7 @@
 package com.tommytony.war.jobs;
 
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -55,9 +57,9 @@ public class RestoreWarhubJob implements Runnable {
 					zone.getLobby().initialize();
 				}
 			}
-			this.war.logInfo("Warhub ready.");
+			this.war.log("Warhub ready.", Level.INFO);
 		} else {
-			this.war.logWarn("Failed to restore warhub. The specified world (name: " + worldName + ") does not exist!");
+			this.war.log("Failed to restore warhub. The specified world (name: " + worldName + ") does not exist!", Level.WARNING);
 		}
 	}
 }

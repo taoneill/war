@@ -192,7 +192,7 @@ public class WarPlayerListener extends PlayerListener {
 				}
 				if (inWarzone || inLobby || inWarhub) {
 					event.setCancelled(true);
-					this.war.logWarn("Prevented " + player.getName() + " from getting kicked.");
+					this.war.log("Prevented " + player.getName() + " from getting kicked.", java.util.logging.Level.WARNING);
 				}
 			}
 		}
@@ -434,7 +434,7 @@ public class WarPlayerListener extends PlayerListener {
 		Team previousTeam = this.war.getPlayerTeam(player.getName());
 		if (previousTeam != null) {
 			if (!previousTeam.removePlayer(player.getName())) {
-				this.war.logWarn("Could not remove player " + player.getName() + " from team " + previousTeam.getName());
+				this.war.log("Could not remove player " + player.getName() + " from team " + previousTeam.getName(), java.util.logging.Level.WARNING);
 			}
 		}
 	}

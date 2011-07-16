@@ -17,9 +17,9 @@ import com.tommytony.war.volumes.Volume;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class ZoneLobby {
 	private final War war;
@@ -41,7 +41,7 @@ public class ZoneLobby {
 
 	/**
 	 * Use this constructor with /setzonelobby <n/s/e/w>
-	 * 
+	 *
 	 * @param war
 	 * @param warzone
 	 * @param wall
@@ -60,7 +60,7 @@ public class ZoneLobby {
 
 	/**
 	 * Use this constructor with /setzonelobby <zonename>. Makes sure the lobby is not sticking inside the zone.
-	 * 
+	 *
 	 * @param war
 	 * @param warzone
 	 * @param wall
@@ -105,7 +105,7 @@ public class ZoneLobby {
 
 	/**
 	 * Changes the lobby's position. Orientation is determined from the player location. Creates volume or resets. Saves new lobby blocks.
-	 * 
+	 *
 	 * @param playerLocation
 	 */
 	public void setLocation(Location playerLocation) {
@@ -165,7 +165,7 @@ public class ZoneLobby {
 
 	/**
 	 * Classic way of creating a lobby. Lobby position goes to middle of zone wall. Creates volume or resets. Saves new lobby blocks.
-	 * 
+	 *
 	 * @param newWall
 	 */
 	public void setWall(BlockFace newWall) {
@@ -328,7 +328,7 @@ public class ZoneLobby {
 				BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getFace(BlockFace.DOWN).getFace(BlockFace.SOUTH, this.lobbyHalfSide - 1).getFace(this.wall, 9).setType(Material.GLOWSTONE);
 			}
 		} else {
-			this.war.logWarn("Failed to initalize zone lobby for zone " + this.warzone.getName());
+			this.war.log("Failed to initalize zone lobby for zone " + this.warzone.getName(), java.util.logging.Level.WARNING);
 		}
 	}
 

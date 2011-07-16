@@ -1,5 +1,7 @@
 package com.tommytony.war.jobs;
 
+import java.util.logging.Level;
+
 import bukkit.tommytony.war.War;
 
 import com.tommytony.war.Warzone;
@@ -22,7 +24,7 @@ public class RestoreWarzonesJob implements Runnable {
 		this.war.getWarzones().clear();
 		for (String warzoneName : warzoneSplit) {
 			if (warzoneName != null && !warzoneName.equals("")) {
-				this.war.logInfo("Loading zone " + warzoneName + "...");
+				this.war.log("Loading zone " + warzoneName + "...", Level.INFO);
 				Warzone zone = WarzoneMapper.load(this.war, warzoneName, !this.newWarInstall);
 				if (zone != null) { // could have failed, would've been logged already
 					this.war.getWarzones().add(zone);
@@ -39,7 +41,7 @@ public class RestoreWarzonesJob implements Runnable {
 			}
 		}
 		if (this.war.getWarzones().size() > 0) {
-			this.war.logInfo("Warzones ready.");
+			this.war.log("Warzones ready.", Level.INFO);
 		}
 	}
 
