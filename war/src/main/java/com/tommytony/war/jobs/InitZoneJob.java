@@ -11,16 +11,16 @@ public class InitZoneJob implements Runnable {
 
 	public InitZoneJob(Warzone zone) {
 		this.zone = zone;
-		respawnExempted = null;
+		this.respawnExempted = null;
 	}
-	
+
 	public InitZoneJob(Warzone warzone, Player respawnExempted) {
-		zone = warzone;
+		this.zone = warzone;
 		this.respawnExempted = respawnExempted;
 	}
 
 	public void run() {
-		zone.initializeZone(respawnExempted);
+		this.zone.initializeZone(this.respawnExempted);
 	}
 
 }

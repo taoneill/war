@@ -18,28 +18,28 @@ public class RestoreWarzonesJob implements Runnable {
 	}
 
 	public void run() {
-		String[] warzoneSplit = warzonesStr.split(",");
-		war.getWarzones().clear();
-		for(String warzoneName : warzoneSplit) {
-			if(warzoneName != null && !warzoneName.equals("")){
-				war.logInfo("Loading zone " + warzoneName + "...");
-				Warzone zone = WarzoneMapper.load(war, warzoneName, !newWarInstall);
-				if(zone != null) { // could have failed, would've been logged already 
-					war.getWarzones().add(zone);
+		String[] warzoneSplit = this.warzonesStr.split(",");
+		this.war.getWarzones().clear();
+		for (String warzoneName : warzoneSplit) {
+			if (warzoneName != null && !warzoneName.equals("")){
+				this.war.logInfo("Loading zone " + warzoneName + "...");
+				Warzone zone = WarzoneMapper.load(this.war, warzoneName, !this.newWarInstall);
+				if (zone != null) { // could have failed, would've been logged already
+					this.war.getWarzones().add(zone);
 					//zone.getVolume().loadCorners();
 					zone.getVolume().loadCorners();
-					if(zone.getLobby() != null) {
+					if (zone.getLobby() != null) {
 						zone.getLobby().getVolume().resetBlocks();
 					}
-					if(zone.isResetOnLoad()) {
+					if (zone.isResetOnLoad()) {
 						zone.getVolume().resetBlocks();
 					}
 					zone.initializeZone();
 				}
 			}
 		}
-		if(war.getWarzones().size() > 0) {
-			war.logInfo("Warzones ready.");
+		if (this.war.getWarzones().size() > 0) {
+			this.war.logInfo("Warzones ready.");
 		}
 	}
 

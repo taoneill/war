@@ -14,12 +14,12 @@ public class RespawnPlayerJob implements Runnable {
 	public RespawnPlayerJob(Warzone zone, Team playerTeam, Player player) {
 		this.zone = zone;
 		// TODO Auto-generated constructor stub
-		team = playerTeam;
+		this.team = playerTeam;
 		this.player = player;
 	}
 
 	public void run() {
-		zone.respawnPlayer(team, player);
+		this.zone.respawnPlayer(this.team, this.player);
 	}
 
 }

@@ -11,16 +11,16 @@ public class InventoryStash {
 
 	public InventoryStash(ItemStack[] contents) {
 		this.setContents(contents);
-		
+
 	}
-	
+
 	public InventoryStash(ItemStack[] contents, ItemStack helmet, ItemStack chest, ItemStack legs, ItemStack feet) {
 		this.setContents(contents);
 		this.setHelmet(helmet);
 		this.setChest(chest);
 		this.setLegs(legs);
 		this.setFeet(feet);
-		
+
 	}
 
 	public void setContents(ItemStack[] contents) {
@@ -28,7 +28,7 @@ public class InventoryStash {
 	}
 
 	public ItemStack[] getContents() {
-		return contents;
+		return this.contents;
 	}
 
 	public void setHelmet(ItemStack helmet) {
@@ -36,7 +36,7 @@ public class InventoryStash {
 	}
 
 	public ItemStack getHelmet() {
-		return helmet;
+		return this.helmet;
 	}
 
 	public void setChest(ItemStack chest) {
@@ -44,7 +44,7 @@ public class InventoryStash {
 	}
 
 	public ItemStack getChest() {
-		return chest;
+		return this.chest;
 	}
 
 	public void setLegs(ItemStack legs) {
@@ -52,7 +52,7 @@ public class InventoryStash {
 	}
 
 	public ItemStack getLegs() {
-		return legs;
+		return this.legs;
 	}
 
 	public void setFeet(ItemStack feet) {
@@ -60,8 +60,8 @@ public class InventoryStash {
 	}
 
 	public ItemStack getFeet() {
-		return feet;
+		return this.feet;
 	}
-	
-	
+
+
 }

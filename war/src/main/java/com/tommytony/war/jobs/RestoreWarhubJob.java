@@ -21,39 +21,39 @@ public class RestoreWarhubJob implements Runnable {
 	}
 
 	public void run() {
-		String[] hubStrSplit = hubStr.split(",");
-		
+		String[] hubStrSplit = this.hubStr.split(",");
+
 		int hubX = Integer.parseInt(hubStrSplit[0]);
 		int hubY = Integer.parseInt(hubStrSplit[1]);
 		int hubZ = Integer.parseInt(hubStrSplit[2]);
 		World world = null;
 		String worldName;
-		if(hubStrSplit.length > 3) {
+		if (hubStrSplit.length > 3) {
 			worldName = hubStrSplit[3];
-			world = war.getServer().getWorld(worldName);
+			world = this.war.getServer().getWorld(worldName);
 		} else {
 			worldName = "DEFAULT";
-			world = war.getServer().getWorlds().get(0);		// default to first world
+			world = this.war.getServer().getWorlds().get(0);		// default to first world
 		}
-		if(world != null) {
+		if (world != null) {
 			Location hubLocation = new Location(world, hubX, hubY, hubZ);
-			WarHub hub = new WarHub(war, hubLocation);
-			war.setWarHub(hub);
-			Volume vol = VolumeMapper.loadVolume("warhub", "", war, world);
+			WarHub hub = new WarHub(this.war, hubLocation);
+			this.war.setWarHub(hub);
+			Volume vol = VolumeMapper.loadVolume("warhub", "", this.war, world);
 			hub.setVolume(vol);
 			hub.getVolume().resetBlocks();
 			hub.initialize();
-			
+
 			// In the previous job started by the mapper, warzones were created, but their lobbies are missing the war hub gate (because it didn't exist yet)
-			for(Warzone zone : war.getWarzones()) {
-				if(zone.getLobby() != null) {
+			for (Warzone zone : this.war.getWarzones()) {
+				if (zone.getLobby() != null) {
 					zone.getLobby().getVolume().resetBlocks();
 					zone.getLobby().initialize();
 				}
 			}
-			war.logInfo("Warhub ready.");
+			this.war.logInfo("Warhub ready.");
 		} else {
-			war.logWarn("Failed to restore warhub. The specified world (name: " + worldName + ") does not exist!");
+			this.war.logWarn("Failed to restore warhub. The specified world (name: " + worldName + ") does not exist!");
 		}
 	}
 }
