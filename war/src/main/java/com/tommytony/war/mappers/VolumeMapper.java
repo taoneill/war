@@ -28,7 +28,7 @@ public class VolumeMapper {
 	public static Volume loadVolume(String volumeName, String zoneName,
 			War war, World world) {
 		Volume volume = new Volume(volumeName, war, world);
-		load(volume, zoneName, war, world);
+		VolumeMapper.load(volume, zoneName, war, world);
 		return volume;
 	}
 
@@ -42,9 +42,12 @@ public class VolumeMapper {
 	public static void load(Volume volume, String zoneName, War war, World world) {
 		BufferedReader in = null;
 		try {
-			if (zoneName.equals("")) in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() +
-												"/dat/volume-" + volume.getName() + ".dat"))); // for the warhub
-			else in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+			if (zoneName.equals("")) {
+			    in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() +
+			    									"/dat/volume-" + volume.getName() + ".dat"))); // for the warhub
+			} else {
+			    in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+			}
 			String firstLine = in.readLine();
 			if (firstLine != null && !firstLine.equals("")) {
 				boolean height129Fix = false;
@@ -179,14 +182,15 @@ public class VolumeMapper {
 					" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		}  finally {
-			if (in != null)
-				try {
-					in.close();
-				} catch (IOException e) {
-					war.logWarn("Failed to close file reader for volume " + volume.getName() +
-							" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
-					e.printStackTrace();
-				}
+			if (in != null) {
+			    try {
+			    	in.close();
+			    } catch (IOException e) {
+			    	war.logWarn("Failed to close file reader for volume " + volume.getName() +
+			    			" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+			    	e.printStackTrace();
+			    }
+			}
 		}
 	}
 
@@ -194,9 +198,12 @@ public class VolumeMapper {
 		if (volume.hasTwoCorners()) {
 			BufferedWriter out = null;
 			try {
-				if (zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
-				else out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() +
-												"/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+				if (zoneName.equals("")) {
+				    out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
+				} else {
+				    out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() +
+				    								"/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+				}
 
 				out.write("corner1"); out.newLine();
 				out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
@@ -235,8 +242,9 @@ public class VolumeMapper {
 												extra += item.getTypeId() + ";"
 												+ item.getAmount() + ";"
 												+ item.getDurability();
-												if (item.getData() != null)
-													extra += ";" + item.getData().getData() ;
+												if (item.getData() != null) {
+												    extra += ";" + item.getData().getData() ;
+												}
 												extra += ";;";
 											}
 										}
@@ -252,8 +260,9 @@ public class VolumeMapper {
 												extra += item.getTypeId() + ";"
 												+ item.getAmount() + ";"
 												+ item.getDurability();
-												if (item.getData() != null)
-													extra += ";" + item.getData().getData() ;
+												if (item.getData() != null) {
+												    extra += ";" + item.getData().getData() ;
+												}
 												extra += ";;";
 											}
 										}
@@ -281,14 +290,15 @@ public class VolumeMapper {
 				e.printStackTrace();
 			}
 			finally {
-				if (out != null)
-					try {
-						out.close();
-					} catch (IOException e) {
-						war.logWarn("Failed to close file writer for volume " + volume.getName() +
-								" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
-						e.printStackTrace();
-					}
+				if (out != null) {
+				    try {
+				    	out.close();
+				    } catch (IOException e) {
+				    	war.logWarn("Failed to close file writer for volume " + volume.getName() +
+				    			" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+				    	e.printStackTrace();
+				    }
+				}
 			}
 		}
 	}

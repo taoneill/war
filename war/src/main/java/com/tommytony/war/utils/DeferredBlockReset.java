@@ -24,30 +24,30 @@ public class DeferredBlockReset {
 		this.z = z;
 		this.blockType = blockType;
 		this.blockData = blockData;
-		lines = signLines;
+		this.lines = signLines;
 	}
 
 	public int getX() {
-		return x;
+		return this.x;
 	}
 
 	public int getY() {
-		return y;
+		return this.y;
 	}
 
 	public int getZ() {
-		return z;
+		return this.z;
 	}
 
 	public int getBlockType() {
-		return blockType;
+		return this.blockType;
 	}
 
 	public byte getBlockData() {
-		return blockData;
+		return this.blockData;
 	}
 
 	public String[] getLines() {
-		return lines;
+		return this.lines;
 	}
 }

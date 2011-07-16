@@ -14,11 +14,11 @@ public class LootDropperTask implements Runnable {
 		this.location = location;
 		this.drop = drop;
 	}
-	
+
 	public void run() {
-		for (ItemStack item : drop) {
+		for (ItemStack item : this.drop) {
 			if (item != null) {
-				location.getWorld().dropItemNaturally(location, item);
+				this.location.getWorld().dropItemNaturally(this.location, item);
 			}
 		}
 	}

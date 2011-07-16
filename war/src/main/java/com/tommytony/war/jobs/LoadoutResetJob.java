@@ -18,7 +18,7 @@ public class LoadoutResetJob implements Runnable {
 	}
 
 	public void run() {
-		zone.resetInventory(team, player);
+		this.zone.resetInventory(this.team, this.player);
 	}
 
 }

@@ -14,22 +14,22 @@ public class TeamKind {
 		this.material = material;
 		this.data = data;
 		this.color = color;
-		
+
 	}
 
 	public Material getMaterial() {
-		return material;
+		return this.material;
 	}
 
 	public byte getData() {
-		return data;
+		return this.data;
 	}
 
 	public String getDefaultName() {
-		return defaultName;
+		return this.defaultName;
 	}
-	
+
 	public ChatColor getColor() {
-		return color;
+		return this.color;
 	}
 }

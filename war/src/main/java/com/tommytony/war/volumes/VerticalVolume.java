@@ -8,7 +8,7 @@ import org.bukkit.block.BlockFace;
 import bukkit.tommytony.war.War;
 
 /**
- * 
+ *
  * @author tommytony
  *
  */
@@ -19,93 +19,89 @@ public class VerticalVolume extends Volume{
 		super(name, war, world);
 
 	}
-	
+
 	@Override
 	public void setCornerOne(Block block){
 		// corner one defaults to topmost corner
-		Block topBlock = getWorld().getBlockAt(block.getX(), 127, block.getZ());
+		Block topBlock = this.getWorld().getBlockAt(block.getX(), 127, block.getZ());
 		super.setCornerOne(topBlock);
 	}
-	
+
 	@Override
 	public void setCornerTwo(Block block){
 		// corner two defaults to bottom most corner
-		Block bottomBlock = getWorld().getBlockAt(block.getX(), 0, block.getZ());
+		Block bottomBlock = this.getWorld().getBlockAt(block.getX(), 0, block.getZ());
 		super.setCornerTwo(bottomBlock);
 	}
-	
+
 	public boolean isWallBlock(Block block){
-		return isEastWallBlock(block) || isNorthWallBlock(block) || isSouthWallBlock(block) || isWestWallBlock(block);
+		return this.isEastWallBlock(block) || this.isNorthWallBlock(block) || this.isSouthWallBlock(block) || this.isWestWallBlock(block);
 	}
-	
+
 	public boolean isEastWallBlock(Block block) {
-		if (getMinZ() == block.getZ()
-				&& block.getX() <= getMaxX()
-				&& block.getX() >= getMinX()) {
-			return true; 	// east wall
-		}
+		if (this.getMinZ() == block.getZ()
+				&& block.getX() <= this.getMaxX()
+				&& block.getX() >= this.getMinX())
+		    return true; 	// east wall
 		return false;
 	}
-	
+
 	public boolean isSouthWallBlock(Block block) {
-		if (getMaxX() == block.getX()
-				&& block.getZ() <= getMaxZ()
-				&& block.getZ() >= getMinZ()) {
-			return true;	// south wall
-		}
+		if (this.getMaxX() == block.getX()
+				&& block.getZ() <= this.getMaxZ()
+				&& block.getZ() >= this.getMinZ())
+		    return true;	// south wall
 		return false;
 	}
-	
+
 	public boolean isNorthWallBlock(Block block) {
-		if (getMinX() == block.getX()
-				&& block.getZ() <= getMaxZ()
-				&& block.getZ() >= getMinZ()) {
-			return true;	// north wall
-		}
+		if (this.getMinX() == block.getX()
+				&& block.getZ() <= this.getMaxZ()
+				&& block.getZ() >= this.getMinZ())
+		    return true;	// north wall
 		return false;
 	}
-	
+
 	public boolean isWestWallBlock(Block block) {
-		if (getMaxZ() == block.getZ()
-				&& block.getX() <= getMaxX()
-				&& block.getX() >= getMinX()) {
-			return true;	// west wall
-		}
+		if (this.getMaxZ() == block.getZ()
+				&& block.getX() <= this.getMaxX()
+				&& block.getX() >= this.getMinX())
+		    return true;	// west wall
 		return false;
 	}
 
 	public int resetWallBlocks(BlockFace wall) {
 		int noOfResetBlocks = 0;
 		try {
-			if (hasTwoCorners() && getBlockTypes() != null) {
+			if (this.hasTwoCorners() && this.getBlockTypes() != null) {
 				if (wall == BlockFace.EAST) {
-					int z = getMinZ();
+					int z = this.getMinZ();
 					int k = 0;
-					int y = getMinY();
-					for (int j = 0; j < getSizeY(); j++) {
-						int x = getMinX();
-						for (int i = 0; i < getSizeX(); i++) {
-							int oldBlockType = getBlockTypes()[i][j][k];
-							byte oldBlockData = getBlockDatas()[i][j][k];
-							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+					int y = this.getMinY();
+					for (int j = 0; j < this.getSizeY(); j++) {
+						int x = this.getMinX();
+						for (int i = 0; i < this.getSizeX(); i++) {
+							int oldBlockType = this.getBlockTypes()[i][j][k];
+							byte oldBlockData = this.getBlockDatas()[i][j][k];
+							Block currentBlock = this.getWorld().getBlockAt(x, y, z);
+							if (this.resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
-							}							
+							}
 							x++;
 						}
 						y++;
 					}
 				} else if (wall == BlockFace.WEST) {
-					int z = getMaxZ();
-					int k = getSizeZ()-1;
-					int y = getMinY();
-					for (int j = 0; j < getSizeY(); j++) {
-						int x = getMinX();
-						for (int i = 0; i < getSizeX(); i++) {
-							int oldBlockType = getBlockTypes()[i][j][k];
-							byte oldBlockData = getBlockDatas()[i][j][k];
-							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+					int z = this.getMaxZ();
+					int k = this.getSizeZ()-1;
+					int y = this.getMinY();
+					for (int j = 0; j < this.getSizeY(); j++) {
+						int x = this.getMinX();
+						for (int i = 0; i < this.getSizeX(); i++) {
+							int oldBlockType = this.getBlockTypes()[i][j][k];
+							byte oldBlockData = this.getBlockDatas()[i][j][k];
+							Block currentBlock = this.getWorld().getBlockAt(x, y, z);
+							if (this.resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}
 							x++;
@@ -113,16 +109,16 @@ public class VerticalVolume extends Volume{
 						y++;
 					}
 				} else if (wall == BlockFace.NORTH) {
-					int x = getMinX();
+					int x = this.getMinX();
 					int i = 0;
-					int y = getMinY();
-					for (int j = 0; j < getSizeY(); j++) {
-						int z = getMinZ();
-						for (int k = 0; k < getSizeZ(); k++) {
-							int oldBlockType = getBlockTypes()[i][j][k];
-							byte oldBlockData = getBlockDatas()[i][j][k];
-							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+					int y = this.getMinY();
+					for (int j = 0; j < this.getSizeY(); j++) {
+						int z = this.getMinZ();
+						for (int k = 0; k < this.getSizeZ(); k++) {
+							int oldBlockType = this.getBlockTypes()[i][j][k];
+							byte oldBlockData = this.getBlockDatas()[i][j][k];
+							Block currentBlock = this.getWorld().getBlockAt(x, y, z);
+							if (this.resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}
 							z++;
@@ -130,16 +126,16 @@ public class VerticalVolume extends Volume{
 						y++;
 					}
 				} else if (wall == BlockFace.SOUTH) {
-					int x = getMaxX();
-					int i = getSizeX()-1;
-					int y = getMinY();
-					for (int j = 0; j < getSizeY(); j++) {
-						int z = getMinZ();
-						for (int k = 0; k < getSizeZ(); k++) {
-							int oldBlockType = getBlockTypes()[i][j][k];
-							byte oldBlockData = getBlockDatas()[i][j][k];
-							Block currentBlock = getWorld().getBlockAt(x, y, z);
-							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
+					int x = this.getMaxX();
+					int i = this.getSizeX()-1;
+					int y = this.getMinY();
+					for (int j = 0; j < this.getSizeY(); j++) {
+						int z = this.getMinZ();
+						for (int k = 0; k < this.getSizeZ(); k++) {
+							int oldBlockType = this.getBlockTypes()[i][j][k];
+							byte oldBlockData = this.getBlockDatas()[i][j][k];
+							Block currentBlock = this.getWorld().getBlockAt(x, y, z);
+							if (this.resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
 							}
 							z++;
@@ -147,13 +143,13 @@ public class VerticalVolume extends Volume{
 						y++;
 					}
 				}
-			}		
+			}
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to reset wall " + wall + " in volume " + getName() + ". " + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().logWarn("Failed to reset wall " + wall + " in volume " + this.getName() + ". " + e.getClass().toString() + " " + e.getMessage());
 		}
 		return noOfResetBlocks;
 	}
-	
+
 	private boolean resetBlock(int oldBlockType, byte oldBlockData, Block currentBlock) {
 		if (currentBlock.getTypeId() != oldBlockType ||
 				(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData) ||
@@ -176,5 +172,5 @@ public class VerticalVolume extends Volume{
 			}
 		return false;
 	}
-	
+
 }

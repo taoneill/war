@@ -21,7 +21,7 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.jobs.BlockResetJob;
 
 /**
- * 
+ *
  * @author tommytony
  *
  */
@@ -35,30 +35,30 @@ public class Volume {
 	private byte[][][] blockDatas = null;
 	private HashMap<String, String[]> signLines = new HashMap<String, String[]>();
 	private HashMap<String, List<ItemStack>> invBlockContents = new HashMap<String, List<ItemStack>>();
-	private War war;	
+	private War war;
 
 	public Volume(String name, War war, World world) {
 		this.name = name;
 		this.war = war;
 		this.world = world;
 	}
-	
+
 	public World getWorld() {
-		return world;
+		return this.world;
 	}
-	
+
 	public boolean hasTwoCorners() {
-		return cornerOne != null && cornerTwo != null;
+		return this.cornerOne != null && this.cornerTwo != null;
 	}
-	
+
 	public void setCornerOne(Block block) {
 		this.cornerOne = new BlockInfo(block);
 	}
-	
+
 	public void setCornerOne(BlockInfo blockInfo) {
 		this.cornerOne = blockInfo;
 	}
-	
+
 	public int saveBlocks() {
 //		BlockSaveJob job = new BlockSaveJob(this);
 //		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
@@ -68,19 +68,19 @@ public class Volume {
 		int y = 0;
 		int z = 0;
 		try {
-			if (hasTwoCorners()) {
-				this.setBlockTypes(new int[getSizeX()][getSizeY()][getSizeZ()]);
-				this.setBlockDatas(new byte[getSizeX()][getSizeY()][getSizeZ()]);
+			if (this.hasTwoCorners()) {
+				this.setBlockTypes(new int[this.getSizeX()][this.getSizeY()][this.getSizeZ()]);
+				this.setBlockDatas(new byte[this.getSizeX()][this.getSizeY()][this.getSizeZ()]);
 				this.getSignLines().clear();
 				this.getInvBlockContents().clear();
-				x = getMinX();
-				for (int i = 0; i < getSizeX(); i++){
-					y = getMinY();
-					for (int j = 0; j < getSizeY(); j++){
-						z = getMinZ();
-						for (int k = 0;k < getSizeZ(); k++) {
+				x = this.getMinX();
+				for (int i = 0; i < this.getSizeX(); i++){
+					y = this.getMinY();
+					for (int j = 0; j < this.getSizeY(); j++){
+						z = this.getMinZ();
+						for (int k = 0;k < this.getSizeZ(); k++) {
 							try {
-								Block block = getWorld().getBlockAt(x, y, z);
+								Block block = this.getWorld().getBlockAt(x, y, z);
 								this.getBlockTypes()[i][j][k] = block.getTypeId();
 								this.getBlockDatas()[i][j][k] = block.getData();
 								BlockState state = block.getState();
@@ -90,7 +90,7 @@ public class Volume {
 									if (sign.getLines() != null) {
 										this.getSignLines().put("sign-" + i + "-" + j + "-" + k, sign.getLines());
 									}
-									
+
 								} else if (state instanceof Chest) {
 									// Chests
 									Chest chest = (Chest)state;
@@ -105,7 +105,7 @@ public class Volume {
 									}
 									this.getInvBlockContents().put("chest-" + i + "-" + j + "-" + k, items);
 								} else if (state instanceof Dispenser) {
-									// Dispensers							
+									// Dispensers
 									Dispenser dispenser = (Dispenser)state;
 									Inventory inv = dispenser.getInventory();
 									int size = inv.getSize();
@@ -118,10 +118,10 @@ public class Volume {
 									}
 									this.getInvBlockContents().put("dispenser-" + i + "-" + j + "-" + k, items);
 								}
-								
+
 								noOfSavedBlocks++;
 							} catch (Exception e) {
-								this.getWar().getLogger().warning("Failed to save block in volume " + getName() + ". Saved blocks so far:" + noOfSavedBlocks 
+								this.getWar().getLogger().warning("Failed to save block in volume " + this.getName() + ". Saved blocks so far:" + noOfSavedBlocks
 										+ ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + e.getMessage());
 								e.printStackTrace();
 							} finally {
@@ -132,53 +132,53 @@ public class Volume {
 					}
 					x++;
 				}
-			}		
+			}
 		} catch (Exception e) {
-			this.getWar().getLogger().warning("Failed to save volume " + getName() + " blocks. Saved blocks:" + noOfSavedBlocks 
+			this.getWar().getLogger().warning("Failed to save volume " + this.getName() + " blocks. Saved blocks:" + noOfSavedBlocks
 					+ ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " "+ e.getMessage());
 			e.printStackTrace();
 		}
 		return noOfSavedBlocks;
 	}
-	
+
 	public void resetBlocksAsJob() {
 		BlockResetJob job = new BlockResetJob(this);
-		war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
+		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, job);
 	}
-	
+
 	public int resetBlocks() {
 		int visitedBlocks = 0, noOfResetBlocks = 0, x = 0, y = 0, z = 0;
 		int currentBlockId = 0;
 		int oldBlockType = 0;
-		clearBlocksThatDontFloat();
+		this.clearBlocksThatDontFloat();
 		try {
-			if (hasTwoCorners() && isSaved()) {
-				x = getMinX();
-				for (int i = 0; i < getSizeX(); i++){
-					y = getMinY();
-					for (int j = 0; j < getSizeY(); j++){
-						z = getMinZ();
-						for (int k = 0;k < getSizeZ(); k++) {
+			if (this.hasTwoCorners() && this.isSaved()) {
+				x = this.getMinX();
+				for (int i = 0; i < this.getSizeX(); i++){
+					y = this.getMinY();
+					for (int j = 0; j < this.getSizeY(); j++){
+						z = this.getMinZ();
+						for (int k = 0;k < this.getSizeZ(); k++) {
 							try {
-								oldBlockType = getBlockTypes()[i][j][k];
-								byte oldBlockData = getBlockDatas()[i][j][k];
-								Block currentBlock = getWorld().getBlockAt(x, y, z);
+								oldBlockType = this.getBlockTypes()[i][j][k];
+								byte oldBlockData = this.getBlockDatas()[i][j][k];
+								Block currentBlock = this.getWorld().getBlockAt(x, y, z);
 								currentBlockId = currentBlock.getTypeId();
 								if (currentBlockId != oldBlockType ||
 									(currentBlockId == oldBlockType && currentBlock.getData() != oldBlockData ) ||
 									(currentBlockId == oldBlockType && currentBlock.getData() == oldBlockData &&
-											(oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId() 
+											(oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId()
 													|| oldBlockType == Material.CHEST.getId() || oldBlockType == Material.DISPENSER.getId())
 									)
 								) {
-									if (oldBlockType == Material.WALL_SIGN.getId() 
+									if (oldBlockType == Material.WALL_SIGN.getId()
 											|| oldBlockType == Material.SIGN_POST.getId()) {
 										// Signs
 										if (oldBlockType == Material.SIGN_POST.getId() && ((oldBlockData & 0x04) == 0x04)
-												&& i+1 != getSizeX()) {
+												&& i+1 != this.getSizeX()) {
 											Block southBlock = currentBlock.getFace(BlockFace.SOUTH);
-											int oldSouthBlockType = getBlockTypes()[i+1][j][k];
-											byte oldSouthBlockData = getBlockDatas()[i+1][j][k];
+											int oldSouthBlockType = this.getBlockTypes()[i+1][j][k];
+											byte oldSouthBlockData = this.getBlockDatas()[i+1][j][k];
 											if (southBlock.getTypeId() != oldSouthBlockType) {
 												southBlock.setTypeId(oldSouthBlockType);
 												southBlock.setData(oldSouthBlockData);
@@ -191,10 +191,18 @@ public class Volume {
 											Sign sign = (Sign)state;
 											String[] lines = this.getSignLines().get("sign-" + i + "-" + j + "-" + k);
 											if (lines != null && sign.getLines() != null) {
-												if (lines.length>0)sign.setLine(0, lines[0]);
-												if (lines.length>1)sign.setLine(1, lines[1]);
-												if (lines.length>2)sign.setLine(2, lines[2]);
-												if (lines.length>3)sign.setLine(3, lines[3]);
+												if (lines.length>0) {
+												    sign.setLine(0, lines[0]);
+												}
+												if (lines.length>1) {
+												    sign.setLine(1, lines[1]);
+												}
+												if (lines.length>2) {
+												    sign.setLine(2, lines[2]);
+												}
+												if (lines.length>3) {
+												    sign.setLine(3, lines[3]);
+												}
 												sign.update(true);
 											}
 										}
@@ -219,7 +227,7 @@ public class Volume {
 											}
 										}
 									} else if (oldBlockType == Material.DISPENSER.getId()) {
-										// Dispensers		
+										// Dispensers
 										currentBlock.setType(Material.getMaterial(oldBlockType));
 										currentBlock.setData(oldBlockData);
 										BlockState state = currentBlock.getState();
@@ -240,28 +248,28 @@ public class Volume {
 										}
 									} else if (oldBlockType == Material.WOODEN_DOOR.getId() || oldBlockType == Material.IRON_DOOR_BLOCK.getId()){
 										// Door blocks
-										
+
 										// Check if is bottom door block
-										if (j+1 < getSizeY() && getBlockTypes()[i][j+1][k] == oldBlockType) {
+										if (j+1 < this.getSizeY() && this.getBlockTypes()[i][j+1][k] == oldBlockType) {
 											// set both door blocks right away
 											currentBlock.setType(Material.getMaterial(oldBlockType));
 											currentBlock.setData(oldBlockData);
-											Block blockAbove = getWorld().getBlockAt(x, y+1, z);
+											Block blockAbove = this.getWorld().getBlockAt(x, y+1, z);
 											blockAbove.setType(Material.getMaterial(oldBlockType));
-											blockAbove.setData(getBlockDatas()[i][j+1][k]);
+											blockAbove.setData(this.getBlockDatas()[i][j+1][k]);
 										}
-									} else if (((oldBlockType == Material.TORCH.getId() && ((oldBlockData & 0x02) == 0x02)) 
+									} else if (((oldBlockType == Material.TORCH.getId() && ((oldBlockData & 0x02) == 0x02))
 											|| (oldBlockType == Material.REDSTONE_TORCH_OFF.getId() && ((oldBlockData & 0x02) == 0x02))
 											|| (oldBlockType == Material.REDSTONE_TORCH_ON.getId()  && ((oldBlockData & 0x02) == 0x02))
 											|| (oldBlockType == Material.LEVER.getId()  && ((oldBlockData & 0x02) == 0x02))
 											|| (oldBlockType == Material.STONE_BUTTON.getId() && ((oldBlockData & 0x02) == 0x02))
 											|| (oldBlockType == Material.LADDER.getId() && ((oldBlockData & 0x04) == 0x04))
 											|| (oldBlockType == Material.RAILS.getId() && ((oldBlockData & 0x02) == 0x02)))
-											&& i+1 != getSizeX()){
+											&& i+1 != this.getSizeX()){
 										// Blocks that hang on a block south of themselves need to make sure that block is there before placing themselves... lol
 										Block southBlock = currentBlock.getFace(BlockFace.SOUTH);
-										int oldSouthBlockType = getBlockTypes()[i+1][j][k];
-										byte oldSouthBlockData = getBlockDatas()[i+1][j][k];
+										int oldSouthBlockType = this.getBlockTypes()[i+1][j][k];
+										byte oldSouthBlockData = this.getBlockDatas()[i+1][j][k];
 										if (southBlock.getTypeId() != oldSouthBlockType) {
 											southBlock.setTypeId(oldSouthBlockType);
 											southBlock.setData(oldSouthBlockData);
@@ -278,8 +286,8 @@ public class Volume {
 								}
 								visitedBlocks++;
 							} catch (Exception e) {
-								this.getWar().getLogger().warning("Failed to reset block in volume " + getName() + ". Visited blocks so far:" + visitedBlocks 
-										+ ". Blocks reset: "+ noOfResetBlocks + 
+								this.getWar().getLogger().warning("Failed to reset block in volume " + this.getName() + ". Visited blocks so far:" + visitedBlocks
+										+ ". Blocks reset: "+ noOfResetBlocks +
 										". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
 								e.printStackTrace();
 							} finally {
@@ -290,10 +298,10 @@ public class Volume {
 					}
 					x++;
 				}
-			}		
+			}
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to reset volume " + getName() + " blocks. Blocks visited: " + visitedBlocks 
-					+ ". Blocks reset: "+ noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z 
+			this.getWar().logWarn("Failed to reset volume " + this.getName() + " blocks. Blocks visited: " + visitedBlocks
+					+ ". Blocks reset: "+ noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z
 					+ ". Current block: " + currentBlockId + ". Old block: " + oldBlockType + ". Exception: " + e.getClass().toString() + " " + e.getMessage());
 			e.printStackTrace();
 		}
@@ -304,122 +312,122 @@ public class Volume {
 		// TODO Auto-generated method stub
 		return this.blockDatas;
 	}
-	
+
 	public void setBlockDatas(byte[][][] data) {
 		this.blockDatas = data;
 	}
-	
+
 
 	public void setCornerTwo(Block block) {
 		this.cornerTwo = new BlockInfo(block);
 	}
-	
+
 	public void setCornerTwo(BlockInfo blockInfo) {
 		this.cornerTwo = blockInfo;
 	}
-	
+
 	public BlockInfo getMinXBlock() {
-		if (cornerOne.getX() < cornerTwo.getX()) return cornerOne;
-		return cornerTwo;
+		if (this.cornerOne.getX() < this.cornerTwo.getX()) return this.cornerOne;
+		return this.cornerTwo;
 	}
-	
+
 	public BlockInfo getMinYBlock() {
-		if (cornerOne.getY() < cornerTwo.getY()) return cornerOne;
-		return cornerTwo;
+		if (this.cornerOne.getY() < this.cornerTwo.getY()) return this.cornerOne;
+		return this.cornerTwo;
 	}
-	
+
 	public BlockInfo getMinZBlock() {
-		if (cornerOne.getZ() < cornerTwo.getZ()) return cornerOne;
-		return cornerTwo;
+		if (this.cornerOne.getZ() < this.cornerTwo.getZ()) return this.cornerOne;
+		return this.cornerTwo;
 	}
-	
+
 	public int getMinX() {
-		return getMinXBlock().getX();
+		return this.getMinXBlock().getX();
 	}
-	
+
 	public int getMinY() {
-		return getMinYBlock().getY();
+		return this.getMinYBlock().getY();
 	}
-	
+
 	public int getMinZ() {
-		return getMinZBlock().getZ();
+		return this.getMinZBlock().getZ();
 	}
-	
+
 	public BlockInfo getMaxXBlock() {
-		if (cornerOne.getX() < cornerTwo.getX()) return cornerTwo;
-		return cornerOne;
+		if (this.cornerOne.getX() < this.cornerTwo.getX()) return this.cornerTwo;
+		return this.cornerOne;
 	}
-	
+
 	public BlockInfo getMaxYBlock() {
-		if (cornerOne.getY() < cornerTwo.getY()) return cornerTwo;
-		return cornerOne;
+		if (this.cornerOne.getY() < this.cornerTwo.getY()) return this.cornerTwo;
+		return this.cornerOne;
 	}
-	
+
 	public BlockInfo getMaxZBlock() {
-		if (cornerOne.getZ() < cornerTwo.getZ()) return cornerTwo;
-		return cornerOne;
+		if (this.cornerOne.getZ() < this.cornerTwo.getZ()) return this.cornerTwo;
+		return this.cornerOne;
 	}
-	
+
 	public int getMaxX() {
-		return getMaxXBlock().getX();
+		return this.getMaxXBlock().getX();
 	}
-	
+
 	public int getMaxY() {
-		return getMaxYBlock().getY();
+		return this.getMaxYBlock().getY();
 	}
-	
+
 	public int getMaxZ() {
-		return getMaxZBlock().getZ();
+		return this.getMaxZBlock().getZ();
 	}
-	
+
 	public int getSizeX() {
-		return getMaxX() - getMinX() + 1;
+		return this.getMaxX() - this.getMinX() + 1;
 	}
-	
+
 	public int getSizeY() {
-		return getMaxY() - getMinY() + 1;
+		return this.getMaxY() - this.getMinY() + 1;
 	}
-	
+
 	public int getSizeZ() {
-		return getMaxZ() - getMinZ() + 1;
-	}	
+		return this.getMaxZ() - this.getMinZ() + 1;
+	}
 
 	public boolean isSaved() {
-		return getBlockTypes() != null;
+		return this.getBlockTypes() != null;
 	}
 
 	public int[][][] getBlockTypes() {
-		return blockTypes;
+		return this.blockTypes;
 	}
-	
+
 	public BlockInfo getCornerOne() {
-		return cornerOne;
+		return this.cornerOne;
 	}
-	
+
 	public BlockInfo getCornerTwo() {
-		return cornerTwo;
+		return this.cornerTwo;
 	}
 
 	public boolean contains(Location location) {
 		int x = location.getBlockX();
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
-		return hasTwoCorners() &&
-				location.getWorld().getName().equals(world.getName()) &&
-				x <= getMaxX() && x >= getMinX() && 
-				y <= getMaxY() && y >= getMinY() &&
-				z <= getMaxZ() && z >= getMinZ();
+		return this.hasTwoCorners() &&
+				location.getWorld().getName().equals(this.world.getName()) &&
+				x <= this.getMaxX() && x >= this.getMinX() &&
+				y <= this.getMaxY() && y >= this.getMinY() &&
+				z <= this.getMaxZ() && z >= this.getMinZ();
 	}
 
 	public boolean contains(Block block) {
 		int x = block.getX();
 		int y = block.getY();
 		int z = block.getZ();
-		return hasTwoCorners() &&
-				block.getWorld().getName().equals(world.getName()) &&
-				x <= getMaxX() && x >= getMinX() && 
-				y <= getMaxY() && y >= getMinY() &&
-				z <= getMaxZ() && z >= getMinZ();
+		return this.hasTwoCorners() &&
+				block.getWorld().getName().equals(this.world.getName()) &&
+				x <= this.getMaxX() && x >= this.getMinX() &&
+				y <= this.getMaxY() && y >= this.getMinY() &&
+				z <= this.getMaxZ() && z >= this.getMinZ();
 	}
 
 	public void setBlockTypes(int[][][] blockTypes) {
@@ -427,23 +435,23 @@ public class Volume {
 	}
 
 	public War getWar() {
-		return war;
+		return this.war;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setToMaterial(Material material) {
 		try {
-			if (hasTwoCorners() && isSaved()) {
-				int x = getMinX();
-				for (int i = 0; i < getSizeX(); i++){
-					int y = getMaxY();
-					for (int j = getSizeY(); j > 0; j--){
-						int z = getMinZ();
-						for (int k = 0;k < getSizeZ(); k++) {
-							Block currentBlock = getWorld().getBlockAt(x, y, z);
+			if (this.hasTwoCorners() && this.isSaved()) {
+				int x = this.getMinX();
+				for (int i = 0; i < this.getSizeX(); i++){
+					int y = this.getMaxY();
+					for (int j = this.getSizeY(); j > 0; j--){
+						int z = this.getMinZ();
+						for (int k = 0;k < this.getSizeZ(); k++) {
+							Block currentBlock = this.getWorld().getBlockAt(x, y, z);
 							currentBlock.setType(material);
 							z++;
 						}
@@ -451,28 +459,28 @@ public class Volume {
 					}
 					x++;
 				}
-			}		
+			}
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to set block to " + material + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().logWarn("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage());
 		}
 	}
-	
+
 	public void setFaceMaterial(BlockFace face, Material material) {
 		try {
-			if (hasTwoCorners() && isSaved()) {
-				int x = getMinX();
-				for (int i = 0; i < getSizeX(); i++){
-					int y = getMinY();
-					for (int j = 0; j < getSizeY(); j++){
-						int z = getMinZ();
-						for (int k = 0;k < getSizeZ(); k++) {
-							if ((face == BlockFace.DOWN && y == getMinY()) 
-									|| (face == BlockFace.UP && y == getMaxY())
-									|| (face == BlockFace.NORTH && x == getMinX())
-									|| (face == BlockFace.EAST && z == getMinZ())
-									|| (face == BlockFace.SOUTH && x == getMaxX())
-									|| (face == BlockFace.WEST && z == getMaxZ())) {
-								Block currentBlock = getWorld().getBlockAt(x, y, z);
+			if (this.hasTwoCorners() && this.isSaved()) {
+				int x = this.getMinX();
+				for (int i = 0; i < this.getSizeX(); i++){
+					int y = this.getMinY();
+					for (int j = 0; j < this.getSizeY(); j++){
+						int z = this.getMinZ();
+						for (int k = 0;k < this.getSizeZ(); k++) {
+							if ((face == BlockFace.DOWN && y == this.getMinY())
+									|| (face == BlockFace.UP && y == this.getMaxY())
+									|| (face == BlockFace.NORTH && x == this.getMinX())
+									|| (face == BlockFace.EAST && z == this.getMinZ())
+									|| (face == BlockFace.SOUTH && x == this.getMaxX())
+									|| (face == BlockFace.WEST && z == this.getMaxZ())) {
+								Block currentBlock = this.getWorld().getBlockAt(x, y, z);
 								currentBlock.setType(material);
 							}
 							z++;
@@ -481,25 +489,25 @@ public class Volume {
 					}
 					x++;
 				}
-			}		
+			}
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to set block to " + material + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().logWarn("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage());
 		}
 	}
-	
+
 	private void switchMaterials(Material[] oldTypes, Material newType) {
 		try {
 			int i = 0, j = 0, k = 0;
 			int x, y, z;
 			Block currentBlock = null;
-			if (hasTwoCorners() && isSaved()) {
-				x = getMinX();
-				for (i = 0; i < getSizeX(); i++){
-					y = getMaxY();
-					for (j = getSizeY(); j > 0; j--){
-						z = getMinZ();
-						for (k = 0;k < getSizeZ(); k++) {
-							currentBlock = getWorld().getBlockAt(x, y, z);
+			if (this.hasTwoCorners() && this.isSaved()) {
+				x = this.getMinX();
+				for (i = 0; i < this.getSizeX(); i++){
+					y = this.getMaxY();
+					for (j = this.getSizeY(); j > 0; j--){
+						z = this.getMinZ();
+						for (k = 0;k < this.getSizeZ(); k++) {
+							currentBlock = this.getWorld().getBlockAt(x, y, z);
 							for (Material oldType : oldTypes) {
 								if (currentBlock.getType().getId() == oldType.getId()) {
 									currentBlock.setType(newType);
@@ -516,9 +524,9 @@ public class Volume {
 					}
 					x++;
 				}
-			}	
+			}
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to switch block to " + newType + "in volume " + name + "." + e.getClass().toString() + " " + e.getMessage());
+			this.getWar().logWarn("Failed to switch block to " + newType + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage());
 		}
 	}
 
@@ -546,7 +554,7 @@ public class Volume {
 		toAirMaterials[19] = Material.CACTUS;
 		toAirMaterials[20] = Material.SNOW;
 		toAirMaterials[21] = Material.ICE;
-		switchMaterials(toAirMaterials, Material.AIR);
+		this.switchMaterials(toAirMaterials, Material.AIR);
 	}
 
 	public void setSignLines(HashMap<String, String[]> signLines) {
@@ -554,7 +562,7 @@ public class Volume {
 	}
 
 	public HashMap<String, String[]> getSignLines() {
-		return signLines;
+		return this.signLines;
 	}
 
 	public void setInvBlockContents(HashMap<String, List<ItemStack>> invBlockContents) {
@@ -562,9 +570,10 @@ public class Volume {
 	}
 
 	public HashMap<String, List<ItemStack>> getInvBlockContents() {
-		return invBlockContents;
+		return this.invBlockContents;
 	}
-	
+
+	@Override
 	public void finalize() {
 		this.blockDatas = null;
 		this.blockTypes = null;

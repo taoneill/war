@@ -11,7 +11,7 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.ZoneVolumeMapper;
 
 /**
- * 
+ *
  * @author tommytony
  *
  */
@@ -24,40 +24,40 @@ public class ZoneVolume extends Volume {
 		super(name, war, world);
 		this.zone = zone;
 	}
-	
+
 	@Override
 	public int saveBlocks()	{
 		// Save blocks directly to disk (i.e. don't put everything in memory)
-		int saved = ZoneVolumeMapper.save(this, zone.getName(), this.getWar());
-		getWar().logInfo("Saved " + saved + " blocks in warzone " + zone.getName() + ".");
-		isSaved = true;
+		int saved = ZoneVolumeMapper.save(this, this.zone.getName(), this.getWar());
+		this.getWar().logInfo("Saved " + saved + " blocks in warzone " + this.zone.getName() + ".");
+		this.isSaved = true;
 		return saved;
 	}
-	
+
 	@Override
 	public boolean isSaved() {
-		return isSaved;
+		return this.isSaved;
 	}
-	
+
 	public void loadCorners() {
-		ZoneVolumeMapper.load(this, zone.getName(), this.getWar(), this.getWorld(), true);
-		isSaved = true;
+		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWar(), this.getWorld(), true);
+		this.isSaved = true;
 	}
-	
+
 	@Override
 	public int resetBlocks()	{
 		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
-		int reset = ZoneVolumeMapper.load(this, zone.getName(), this.getWar(), this.getWorld(), false);
-		getWar().logInfo("Reset " + reset + " blocks in warzone " + zone.getName() + ".");
-		isSaved = true;
+		int reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWar(), this.getWorld(), false);
+		this.getWar().logInfo("Reset " + reset + " blocks in warzone " + this.zone.getName() + ".");
+		this.isSaved = true;
 		return reset;
 	}
-	
+
 	@Override
 	public void setBlockTypes(int[][][] blockTypes) {
 		return;
 	}
-	
+
 	@Override
 	public void setBlockDatas(byte[][][] blockData) {
 		return;
@@ -66,268 +66,255 @@ public class ZoneVolume extends Volume {
 	public void setNorthwest(Block block) throws NotNorthwestException, TooSmallException, TooBigException {
 		// northwest defaults to top block
 		BlockInfo topBlock = new BlockInfo(block.getX(), 127, block.getZ(), block.getTypeId(), block.getData());
-		BlockInfo oldCornerOne = getCornerOne();
-		BlockInfo oldCornerTwo = getCornerTwo();
-		if (getCornerOne() == null)
+		BlockInfo oldCornerOne = this.getCornerOne();
+		BlockInfo oldCornerTwo = this.getCornerTwo();
+		if (this.getCornerOne() == null)
 		{
-			if (getCornerTwo() == null) {
-				// northwest defaults to corner 1			
+			if (this.getCornerTwo() == null) {
+				// northwest defaults to corner 1
 				super.setCornerOne(topBlock);
-			} else if (getCornerTwo().getX() <= block.getX() || getCornerTwo().getZ() >= block.getZ()) {
-				throw new NotNorthwestException();
-			} else {
+			} else if (this.getCornerTwo().getX() <= block.getX() || this.getCornerTwo().getZ() >= block.getZ())
+			    throw new NotNorthwestException();
+			else {
 				// corner 2 already set, but we're sure we're located at the northwest of it
 				super.setCornerOne(topBlock);
 			}
-		} else if (getCornerTwo() == null){
+		} else if (this.getCornerTwo() == null){
 			// corner 1 already exists, set northwest as corner 2 (only if it's at the northwest of corner 1)
-			if (getCornerOne().getX() <= block.getX() || getCornerOne().getZ() >= block.getZ()) {
-				throw new NotNorthwestException();
-			}
+			if (this.getCornerOne().getX() <= block.getX() || this.getCornerOne().getZ() >= block.getZ())
+			    throw new NotNorthwestException();
 			super.setCornerTwo(topBlock);
 		} else {
 			// both corners already set: we are resizing (only if the new block is northwest relative to the southeasternmost block)
-			if (getSoutheastX() <= block.getX() || getSoutheastZ() >= block.getZ()) {
-				throw new NotNorthwestException();
-			}
-			BlockInfo minXBlock = getMinXBlock(); // north means min X
+			if (this.getSoutheastX() <= block.getX() || this.getSoutheastZ() >= block.getZ())
+			    throw new NotNorthwestException();
+			BlockInfo minXBlock = this.getMinXBlock(); // north means min X
 			minXBlock.setX(block.getX());	// mutating, argh!
-			BlockInfo maxZBlock = getMaxZBlock(); // west means max Z
+			BlockInfo maxZBlock = this.getMaxZBlock(); // west means max Z
 			maxZBlock.setZ(block.getZ());
 		}
-		if (tooSmall() || zoneStructuresAreOutside()) {
+		if (this.tooSmall() || this.zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooSmallException();
-		} else if (tooBig()) {
+		} else if (this.tooBig()) {
 			super.setCornerOne(oldCornerOne);
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooBigException();
 		}
 	}
-	
+
 	public int getNorthwestX() {
-		if (!hasTwoCorners())
+		if (!this.hasTwoCorners())
 			return 0;
 		else
-			return getMinX();
+			return this.getMinX();
 	}
-	
+
 	public int getNorthwestZ() {
-		if (!hasTwoCorners())
+		if (!this.hasTwoCorners())
 			return 0;
 		else
-			return getMaxZ();
+			return this.getMaxZ();
 	}
-	
+
 	public void setSoutheast(Block block) throws NotSoutheastException, TooSmallException, TooBigException {
 		// southeast defaults to bottom block
 		BlockInfo bottomBlock = new BlockInfo(block.getX(), 0, block.getZ(), block.getTypeId(), block.getData());
-		BlockInfo oldCornerOne = getCornerOne();
-		BlockInfo oldCornerTwo = getCornerTwo();
-		if (getCornerTwo() == null)
+		BlockInfo oldCornerOne = this.getCornerOne();
+		BlockInfo oldCornerTwo = this.getCornerTwo();
+		if (this.getCornerTwo() == null)
 		{
-			if (getCornerOne() == null) {
-				// southeast defaults to corner 2			
+			if (this.getCornerOne() == null) {
+				// southeast defaults to corner 2
 				super.setCornerTwo(bottomBlock);
-			} else if (getCornerOne().getX() >= block.getX() || getCornerOne().getZ() <= block.getZ()) {
-				throw new NotSoutheastException();
-			} else {
+			} else if (this.getCornerOne().getX() >= block.getX() || this.getCornerOne().getZ() <= block.getZ())
+			    throw new NotSoutheastException();
+			else {
 				// corner 1 already set, but we're sure we're located at the southeast of it
 				super.setCornerTwo(bottomBlock);
 			}
-		}  else if (getCornerOne() == null){
+		}  else if (this.getCornerOne() == null){
 			// corner 2 already exists, set northwest as corner 1 (only if it's at the southeast of corner 2)
-			if (getCornerTwo().getX() >= block.getX() || getCornerTwo().getZ() <= block.getZ()) {
-				throw new NotSoutheastException();
-			}
+			if (this.getCornerTwo().getX() >= block.getX() || this.getCornerTwo().getZ() <= block.getZ())
+			    throw new NotSoutheastException();
 			super.setCornerOne(bottomBlock);
 		} else {
 			// both corners already set: we are resizing (only if the new block is southeast relative to the northwesternmost block)
-			if (getNorthwestX() >= block.getX() || getNorthwestZ() <= block.getZ()) {
-				throw new NotSoutheastException();
-			}
-			BlockInfo maxXBlock = getMaxXBlock(); // south means max X
+			if (this.getNorthwestX() >= block.getX() || this.getNorthwestZ() <= block.getZ())
+			    throw new NotSoutheastException();
+			BlockInfo maxXBlock = this.getMaxXBlock(); // south means max X
 			maxXBlock.setX(block.getX());	// mutating, argh!
-			BlockInfo minZBlock = getMinZBlock(); // east means min Z
+			BlockInfo minZBlock = this.getMinZBlock(); // east means min Z
 			minZBlock.setZ(block.getZ());
 		}
-		if (tooSmall() || zoneStructuresAreOutside()) {
+		if (this.tooSmall() || this.zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooSmallException();
-		} else if (tooBig()) {
+		} else if (this.tooBig()) {
 			super.setCornerOne(oldCornerOne);
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooBigException();
 		}
-		
+
 	}
-	
+
 	public int getSoutheastX() {
-		if (!hasTwoCorners())
+		if (!this.hasTwoCorners())
 			return 0;
 		else
-			return getMaxX();
+			return this.getMaxX();
 	}
-	
+
 	public int getSoutheastZ() {
-		if (!hasTwoCorners())
+		if (!this.hasTwoCorners())
 			return 0;
 		else
-			return getMinZ();
+			return this.getMinZ();
 	}
 
 	public int getCenterY() {
-		if (!hasTwoCorners())
+		if (!this.hasTwoCorners())
 			return 0;
 		else
-			return getMinY() + (getMaxY() - getMinY())/2;
+			return this.getMinY() + (this.getMaxY() - this.getMinY())/2;
 	}
-	
+
 	public void setZoneCornerOne(Block block) throws TooSmallException, TooBigException {
-		BlockInfo oldCornerOne = getCornerOne();
+		BlockInfo oldCornerOne = this.getCornerOne();
 		super.setCornerOne(block);
-		if (tooSmall() || zoneStructuresAreOutside()) {
+		if (this.tooSmall() || this.zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
 			throw new TooSmallException();
-		} else if (tooBig()) {
+		} else if (this.tooBig()) {
 			super.setCornerOne(oldCornerOne);
 			throw new TooBigException();
 		}
 	}
-	
+
 	public void setZoneCornerTwo(Block block) throws TooSmallException, TooBigException {
-		BlockInfo oldCornerTwo = getCornerTwo();
+		BlockInfo oldCornerTwo = this.getCornerTwo();
 		super.setCornerTwo(block);
-		if (tooSmall() || zoneStructuresAreOutside()) {
+		if (this.tooSmall() || this.zoneStructuresAreOutside()) {
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooSmallException();
-		} else if (tooBig()) {
+		} else if (this.tooBig()) {
 			super.setCornerTwo(oldCornerTwo);
 			throw new TooBigException();
 		}
 	}
-	
+
 	public boolean tooSmall() {
-		if (hasTwoCorners() && ((getMaxX() - getMinX() < 10)
-			|| (getMaxY() - getMinY() < 10)
-			|| (getMaxZ() - getMinZ() < 10))) return true;
+		if (this.hasTwoCorners() && ((this.getMaxX() - this.getMinX() < 10)
+			|| (this.getMaxY() - this.getMinY() < 10)
+			|| (this.getMaxZ() - this.getMinZ() < 10))) return true;
 		return false;
 	}
-	
+
 	public boolean tooBig() {
-		if (hasTwoCorners() && ((getMaxX() - getMinX() > 750)
-				|| (getMaxY() - getMinY() > 750)
-				|| (getMaxZ() - getMinZ() > 750))) return true;
+		if (this.hasTwoCorners() && ((this.getMaxX() - this.getMinX() > 750)
+				|| (this.getMaxY() - this.getMinY() > 750)
+				|| (this.getMaxZ() - this.getMinZ() > 750))) return true;
 		return false;
 	}
-	
+
 	public boolean zoneStructuresAreOutside() {
 		// check team spawns & flags
-		for (Team team : zone.getTeams()) {
+		for (Team team : this.zone.getTeams()) {
 			if (team.getTeamSpawn() != null) {
-				if (!isInside(team.getSpawnVolume().getCornerOne())
-						|| !isInside(team.getSpawnVolume().getCornerTwo())) {
-					return true;
-				}
+				if (!this.isInside(team.getSpawnVolume().getCornerOne())
+						|| !this.isInside(team.getSpawnVolume().getCornerTwo()))
+				    return true;
 			}
 			if (team.getTeamFlag() != null) {
-				if (!isInside(team.getFlagVolume().getCornerOne())
-						|| !isInside(team.getFlagVolume().getCornerTwo())) {
-					return true;
-				}
+				if (!this.isInside(team.getFlagVolume().getCornerOne())
+						|| !this.isInside(team.getFlagVolume().getCornerTwo()))
+				    return true;
 			}
 		}
 		// check monuments
-		for (Monument monument : zone.getMonuments()) {
+		for (Monument monument : this.zone.getMonuments()) {
 			if (monument.getVolume() != null) {
-				if (!isInside(monument.getVolume().getCornerOne())
-						|| !isInside(monument.getVolume().getCornerTwo())) {
-					return true;
-				}
+				if (!this.isInside(monument.getVolume().getCornerOne())
+						|| !this.isInside(monument.getVolume().getCornerTwo()))
+				    return true;
 			}
 		}
 		return false;
 	}
-	
+
 	private boolean isInside(BlockInfo info) {
-		if (info.getX() <= getMaxX() && info.getX() >= getMinX() && 
-				info.getY() <= getMaxY() && info.getY() >= getMinY() &&
-				info.getZ() <= getMaxZ() && info.getZ() >= getMinZ())
+		if (info.getX() <= this.getMaxX() && info.getX() >= this.getMinX() &&
+				info.getY() <= this.getMaxY() && info.getY() >= this.getMinY() &&
+				info.getZ() <= this.getMaxZ() && info.getZ() >= this.getMinZ())
 			return true;
 		return false;
 	}
 
 	public boolean isWallBlock(Block block){
-		return isEastWallBlock(block) || isNorthWallBlock(block) 
-		|| isSouthWallBlock(block) || isWestWallBlock(block) 
-		|| isUpWallBlock(block) || isDownWallBlock(block);
+		return this.isEastWallBlock(block) || this.isNorthWallBlock(block)
+		|| this.isSouthWallBlock(block) || this.isWestWallBlock(block)
+		|| this.isUpWallBlock(block) || this.isDownWallBlock(block);
 	}
-	
+
 	public boolean isEastWallBlock(Block block) {
-		if (getMinZ() == block.getZ()
-				&& block.getX() <= getMaxX()
-				&& block.getX() >= getMinX()
-				&& block.getY() >= getMinY()
-				&& block.getY() <= getMaxY()) {
-			return true; 	// east wall
-		}
+		if (this.getMinZ() == block.getZ()
+				&& block.getX() <= this.getMaxX()
+				&& block.getX() >= this.getMinX()
+				&& block.getY() >= this.getMinY()
+				&& block.getY() <= this.getMaxY())
+		    return true; 	// east wall
 		return false;
 	}
-	
+
 	public boolean isSouthWallBlock(Block block) {
-		if (getMaxX() == block.getX()
-				&& block.getZ() <= getMaxZ()
-				&& block.getZ() >= getMinZ()
-				&& block.getY() >= getMinY()
-				&& block.getY() <= getMaxY()) {
-			return true;	// south wall
-		}
+		if (this.getMaxX() == block.getX()
+				&& block.getZ() <= this.getMaxZ()
+				&& block.getZ() >= this.getMinZ()
+				&& block.getY() >= this.getMinY()
+				&& block.getY() <= this.getMaxY())
+		    return true;	// south wall
 		return false;
 	}
-	
+
 	public boolean isNorthWallBlock(Block block) {
-		if (getMinX() == block.getX()
-				&& block.getZ() <= getMaxZ()
-				&& block.getZ() >= getMinZ()
-				&& block.getY() >= getMinY()
-				&& block.getY() <= getMaxY()) {
-			return true;	// north wall
-		}
+		if (this.getMinX() == block.getX()
+				&& block.getZ() <= this.getMaxZ()
+				&& block.getZ() >= this.getMinZ()
+				&& block.getY() >= this.getMinY()
+				&& block.getY() <= this.getMaxY())
+		    return true;	// north wall
 		return false;
 	}
-	
+
 	public boolean isWestWallBlock(Block block) {
-		if (getMaxZ() == block.getZ()
-				&& block.getX() <= getMaxX()
-				&& block.getX() >= getMinX()
-				&& block.getY() >= getMinY()
-				&& block.getY() <= getMaxY()) {
-			return true;	// west wall
-		}
+		if (this.getMaxZ() == block.getZ()
+				&& block.getX() <= this.getMaxX()
+				&& block.getX() >= this.getMinX()
+				&& block.getY() >= this.getMinY()
+				&& block.getY() <= this.getMaxY())
+		    return true;	// west wall
 		return false;
 	}
-	
+
 	public boolean isUpWallBlock(Block block) {
-		if (getMaxY() == block.getY()
-				&& block.getX() <= getMaxX()
-				&& block.getX() >= getMinX()
-				&& block.getZ() >= getMinZ()
-				&& block.getZ() <= getMaxZ()) {
-			return true;	// top wall
-		}
+		if (this.getMaxY() == block.getY()
+				&& block.getX() <= this.getMaxX()
+				&& block.getX() >= this.getMinX()
+				&& block.getZ() >= this.getMinZ()
+				&& block.getZ() <= this.getMaxZ())
+		    return true;	// top wall
 		return false;
 	}
-	
+
 	public boolean isDownWallBlock(Block block) {
-		if (getMinY() == block.getY()
-				&& block.getX() <= getMaxX()
-				&& block.getX() >= getMinX()
-				&& block.getZ() >= getMinZ()
-				&& block.getZ() <= getMaxZ()) {
-			return true;	// bottom wall
-		}
+		if (this.getMinY() == block.getY()
+				&& block.getX() <= this.getMaxX()
+				&& block.getX() >= this.getMinX()
+				&& block.getZ() >= this.getMinZ()
+				&& block.getZ() <= this.getMaxZ())
+		    return true;	// bottom wall
 		return false;
 	}
 
@@ -347,7 +334,7 @@ public class ZoneVolume extends Volume {
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
 							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
-							}							
+							}
 							x++;
 						}
 						y++;
@@ -415,7 +402,7 @@ public class ZoneVolume extends Volume {
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
 							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
-							}							
+							}
 							z++;
 						}
 						x++;
@@ -432,20 +419,20 @@ public class ZoneVolume extends Volume {
 							Block currentBlock = getWorld().getBlockAt(x, y, z);
 							if (resetBlock(oldBlockType, oldBlockData, currentBlock)) {
 								noOfResetBlocks++;
-							}							
+							}
 							z++;
 						}
 						x++;
 					}
 				}
-			}		
+			}
 		} catch (Exception e) {
 			this.getWar().logWarn("Failed to reset wall " + wall + " in volume " + getName() + ". " + e.getClass().toString() + " " + e.getMessage());
 		}
 		return noOfResetBlocks;
 	}
-	
-	
+
+
 	private boolean resetBlock(int oldBlockType, byte oldBlockData, Block currentBlock) {
 		if (currentBlock.getTypeId() != oldBlockType ||
 				(currentBlock.getTypeId() == oldBlockType && currentBlock.getData() != oldBlockData) ||

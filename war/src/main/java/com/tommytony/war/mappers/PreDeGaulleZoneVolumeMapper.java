@@ -146,10 +146,18 @@ public class PreDeGaulleZoneVolumeMapper {
 															if (state instanceof Sign) {
 																Sign sign = (Sign)state;
 																if (lines != null && sign.getLines() != null) {
-																	if (lines.length>0)sign.setLine(0, lines[0]);
-																	if (lines.length>1)sign.setLine(1, lines[1]);
-																	if (lines.length>2)sign.setLine(2, lines[2]);
-																	if (lines.length>3)sign.setLine(3, lines[3]);
+																	if (lines.length>0) {
+																	    sign.setLine(0, lines[0]);
+																	}
+																	if (lines.length>1) {
+																	    sign.setLine(1, lines[1]);
+																	}
+																	if (lines.length>2) {
+																	    sign.setLine(2, lines[2]);
+																	}
+																	if (lines.length>3) {
+																	    sign.setLine(3, lines[3]);
+																	}
 																	sign.update(true);
 																}
 															}
@@ -160,7 +168,7 @@ public class PreDeGaulleZoneVolumeMapper {
 													List<ItemStack> items = null;
 													if (blockSplit.length > 2) {
 														String itemsStr = blockSplit[2];
-														items = readInventoryString(itemsStr);
+														items = PreDeGaulleZoneVolumeMapper.readInventoryString(itemsStr);
 													}
 
 													// Chests set
@@ -187,7 +195,7 @@ public class PreDeGaulleZoneVolumeMapper {
 													if (blockSplit.length > 2) {
 														String itemsStr = blockSplit[2];
 														//String itemsStr = lineScanner.nextLine();
-														items = readInventoryString(itemsStr);
+														items = PreDeGaulleZoneVolumeMapper.readInventoryString(itemsStr);
 													}
 
 													// Dispensers set
@@ -285,18 +293,19 @@ public class PreDeGaulleZoneVolumeMapper {
 					" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		}  finally {
-			if (in != null)
-			//if (scanner != null)
-				try {
-					in.close();
-					in = null;
-					//scanner.close();
-					//scanner = null;
-				} catch (IOException e) {
-					war.logWarn("Failed to close file reader for volume " + volume.getName() +
-							" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
-					e.printStackTrace();
-				}
+			if (in != null) {
+			    //if (scanner != null)
+			    try {
+			    	in.close();
+			    	in = null;
+			    	//scanner.close();
+			    	//scanner = null;
+			    } catch (IOException e) {
+			    	war.logWarn("Failed to close file reader for volume " + volume.getName() +
+			    			" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+			    	e.printStackTrace();
+			    }
+			}
 		}
 		return noOfResetBlocks;
 	}
@@ -307,9 +316,12 @@ public class PreDeGaulleZoneVolumeMapper {
 			BufferedWriter out = null;
 			try {
 				(new File(war.getDataFolder().getPath() +"/dat/warzone-"+zoneName)).mkdir();
-				if (zoneName.equals("")) out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
-				else out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() +
-												"/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+				if (zoneName.equals("")) {
+				    out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
+				} else {
+				    out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() +
+				    								"/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+				}
 
 				out.write("corner1"); out.newLine();
 				out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
@@ -372,8 +384,9 @@ public class PreDeGaulleZoneVolumeMapper {
 												extra += item.getTypeId() + ";"
 												+ item.getAmount() + ";"
 												+ item.getDurability();
-												if (item.getData() != null)
-													extra += ";" + item.getData().getData() ;
+												if (item.getData() != null) {
+												    extra += ";" + item.getData().getData() ;
+												}
 												extra += ";;";
 											}
 										}
@@ -398,8 +411,9 @@ public class PreDeGaulleZoneVolumeMapper {
 												extra += item.getTypeId() + ";"
 												+ item.getAmount() + ";"
 												+ item.getDurability();
-												if (item.getData() != null)
-													extra += ";" + item.getData().getData() ;
+												if (item.getData() != null) {
+												    extra += ";" + item.getData().getData() ;
+												}
 												extra += ";;";
 											}
 										}
@@ -432,14 +446,15 @@ public class PreDeGaulleZoneVolumeMapper {
 				e.printStackTrace();
 			}
 			finally {
-				if (out != null)
-					try {
-						out.close();
-					} catch (IOException e) {
-						war.logWarn("Failed to close file writer for volume " + volume.getName() +
-								" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
-						e.printStackTrace();
-					}
+				if (out != null) {
+				    try {
+				    	out.close();
+				    } catch (IOException e) {
+				    	war.logWarn("Failed to close file writer for volume " + volume.getName() +
+				    			" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+				    	e.printStackTrace();
+				    }
+				}
 			}
 		}
 		return noOfSavedBlocks;

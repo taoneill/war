@@ -37,12 +37,12 @@ public final class PropertiesFile {
 
 		try {
 			if (file.exists()) {
-				load();
+				this.load();
 			} else {
-				save();
+				this.save();
 			}
 		} catch (IOException ex) {
-			log.severe("[PropertiesFile] Unable to load " + fileName + "!");
+			PropertiesFile.log.severe("[PropertiesFile] Unable to load " + fileName + "!");
 		}
 	}
 
@@ -53,8 +53,8 @@ public final class PropertiesFile {
 	 * @throws IOException
 	 */
 	public void load() throws IOException {
-		inputStream = new FileInputStream(fileName);
-		props.load(inputStream);
+		this.inputStream = new FileInputStream(this.fileName);
+		this.props.load(this.inputStream);
 	}
 
 	/**
@@ -63,25 +63,25 @@ public final class PropertiesFile {
 	 */
 	public void save() {
 		try {
-		outputStream = new FileOutputStream(fileName);
-		props.store(outputStream, null);
+		this.outputStream = new FileOutputStream(this.fileName);
+		this.props.store(this.outputStream, null);
 		}catch(IOException ex) {
-			log.severe("[PropertiesFile] Unable to save " + fileName + "!");
+			PropertiesFile.log.severe("[PropertiesFile] Unable to save " + this.fileName + "!");
 		}
 	}
-	
+
 	public void close() {
-		if (outputStream != null) {
+		if (this.outputStream != null) {
 			try {
-				outputStream.close();
+				this.outputStream.close();
 			} catch (IOException e) {
-				log.severe("[PropertiesFile] Failed to close " + fileName + " writer!");
+				PropertiesFile.log.severe("[PropertiesFile] Failed to close " + this.fileName + " writer!");
 			}
-		} else if (inputStream != null) {
+		} else if (this.inputStream != null) {
 			try {
-				inputStream.close();
+				this.inputStream.close();
 			} catch (IOException e) {
-				log.severe("[PropertiesFile] Failed to close " + fileName + " reader!");
+				PropertiesFile.log.severe("[PropertiesFile] Failed to close " + this.fileName + " reader!");
 			}
 		}
 	}
@@ -93,7 +93,7 @@ public final class PropertiesFile {
 	 * <blockquote><pre>
 	 * PropertiesFile settings = new PropertiesFile("settings.properties");
 	 * Map<String, String> mappedSettings;
-	 * 
+	 *
 	 * try {
 	 * 	 mappedSettings = settings.returnMap();
 	 * } catch (Exception ex) {
@@ -106,7 +106,7 @@ public final class PropertiesFile {
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, String> returnMap() throws Exception {
-		return (Map<String, String>) props.clone();
+		return (Map<String, String>) this.props.clone();
 	}
 
 	/**
@@ -116,7 +116,7 @@ public final class PropertiesFile {
 	 * @return <code>Boolean</code> - True if the <code>key</code> exists, false if it cannot be found.
 	 */
 	public boolean containsKey(String var) {
-		return props.containsKey(var);
+		return this.props.containsKey(var);
 	}
 
 	/**
@@ -126,7 +126,7 @@ public final class PropertiesFile {
 	 * @return <code>java.lang.String</code> - True if the <code>key</code> exists, false if it cannot be found.
 	 */
 	public String getProperty(String var) {
-		return (String)props.getProperty(var);
+		return this.props.getProperty(var);
 	}
 
 	/**
@@ -139,7 +139,7 @@ public final class PropertiesFile {
 	public void removeKey(String var) {
 		if (this.props.containsKey(var)) {
 			this.props.remove(var);
-			save();
+			this.save();
 		}
 	}
 
@@ -151,7 +151,7 @@ public final class PropertiesFile {
 	 * @return <code>Boolean</code> - True for existance, false for <code>key</code> found.
 	 */
 	public boolean keyExists(String key) {
-		return containsKey(key);
+		return this.containsKey(key);
 	}
 
 	/**
@@ -162,9 +162,8 @@ public final class PropertiesFile {
 	 * @param key The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to "" or empty.
 	 */
 	public String getString(String key) {
-		if (this.containsKey(key)) {
-			return this.getProperty(key);
-		}
+		if (this.containsKey(key))
+		    return this.getProperty(key);
 
 		return "";
 	}
@@ -180,11 +179,10 @@ public final class PropertiesFile {
 	 * @return java.lang.String Either we will return the default value or a prior existing value depending on existance.
 	 */
 	public String getString(String key, String value) {
-		if (this.containsKey(key)) {
-			return this.getProperty(key);
-		}
+		if (this.containsKey(key))
+		    return this.getProperty(key);
 
-		setString(key, value);
+		this.setString(key, value);
 		return value;
 	}
 
@@ -196,8 +194,8 @@ public final class PropertiesFile {
 	 * @param value The <code>value</code> we will be setting inside the <code>.[properties]</code> file.
 	 */
 	public void setString(String key, String value) {
-		props.put(key, value);
-		save();
+		this.props.put(key, value);
+		this.save();
 	}
 
 	/**
@@ -208,9 +206,8 @@ public final class PropertiesFile {
 	 * @param key The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to 0
 	 */
 	public int getInt(String key) {
-		if (this.containsKey(key)) {
-			return Integer.parseInt(this.getProperty(key));
-		}
+		if (this.containsKey(key))
+		    return Integer.parseInt(this.getProperty(key));
 
 		return 0;
 	}
@@ -224,11 +221,10 @@ public final class PropertiesFile {
 	 * @return <code>Integer</code> - Either we will return the default value or a prior existing value depending on existance.
 	 */
 	public int getInt(String key, int value) {
-		if (this.containsKey(key)) {
-			return Integer.parseInt(this.getProperty(key));
-		}
+		if (this.containsKey(key))
+		    return Integer.parseInt(this.getProperty(key));
 
-		setInt(key, value);
+		this.setInt(key, value);
 		return value;
 
 	}
@@ -241,9 +237,9 @@ public final class PropertiesFile {
 	 * @param value The <code>value</code> we will be setting inside the <code>.[properties]</code> file.
 	 */
 	public void setInt(String key, int value) {
-		props.put(key, String.valueOf(value));
+		this.props.put(key, String.valueOf(value));
 
-		save();
+		this.save();
 	}
 
 	/**
@@ -254,9 +250,8 @@ public final class PropertiesFile {
 	 * @param key The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to 0.0
 	 */
 	public double getDouble(String key) {
-		if (this.containsKey(key)) {
-			return Double.parseDouble(this.getProperty(key));
-		}
+		if (this.containsKey(key))
+		    return Double.parseDouble(this.getProperty(key));
 
 		return 0;
 	}
@@ -270,11 +265,10 @@ public final class PropertiesFile {
 	 * @return <code>Double</code> - Either we will return the default value or a prior existing value depending on existance.
 	 */
 	public double getDouble(String key, double value) {
-		if (this.containsKey(key)) {
-			return Double.parseDouble(this.getProperty(key));
-		}
+		if (this.containsKey(key))
+		    return Double.parseDouble(this.getProperty(key));
 
-		setDouble(key, value);
+		this.setDouble(key, value);
 		return value;
 	}
 
@@ -286,9 +280,9 @@ public final class PropertiesFile {
 	 * @param value The <code>value</code> we will be setting inside the <code>.[properties]</code> file.
 	 */
 	public void setDouble(String key, double value) {
-		props.put(key, String.valueOf(value));
+		this.props.put(key, String.valueOf(value));
 
-		save();
+		this.save();
 	}
 
 	/**
@@ -299,9 +293,8 @@ public final class PropertiesFile {
 	 * @param key The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to 0L
 	 */
 	public long getLong(String key) {
-		if (this.containsKey(key)) {
-			return Long.parseLong(this.getProperty(key));
-		}
+		if (this.containsKey(key))
+		    return Long.parseLong(this.getProperty(key));
 
 		return 0;
 	}
@@ -315,11 +308,10 @@ public final class PropertiesFile {
 	 * @return <code>Long</code> - Either we will return the default value or a prior existing value depending on existance.
 	 */
 	public long getLong(String key, long value) {
-		if (this.containsKey(key)) {
-			return Long.parseLong(this.getProperty(key));
-		}
+		if (this.containsKey(key))
+		    return Long.parseLong(this.getProperty(key));
 
-		setLong(key, value);
+		this.setLong(key, value);
 		return value;
 	}
 
@@ -331,9 +323,9 @@ public final class PropertiesFile {
 	 * @param value The <code>value</code> we will be setting inside the <code>.[properties]</code> file.
 	 */
 	public void setLong(String key, long value) {
-		props.put(key, String.valueOf(value));
+		this.props.put(key, String.valueOf(value));
 
-		save();
+		this.save();
 	}
 
 	/**
@@ -344,9 +336,8 @@ public final class PropertiesFile {
 	 * @param key The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to false
 	 */
 	public boolean getBoolean(String key) {
-		if (this.containsKey(key)) {
-			return Boolean.parseBoolean(this.getProperty(key));
-		}
+		if (this.containsKey(key))
+		    return Boolean.parseBoolean(this.getProperty(key));
 
 		return false;
 	}
@@ -360,11 +351,10 @@ public final class PropertiesFile {
 	 * @return <code>Boolean</code> - Either we will return the default value or a prior existing value depending on existance.
 	 */
 	public boolean getBoolean(String key, boolean value) {
-		if (this.containsKey(key)) {
-			return Boolean.parseBoolean(this.getProperty(key));
-		}
+		if (this.containsKey(key))
+		    return Boolean.parseBoolean(this.getProperty(key));
 
-		setBoolean(key, value);
+		this.setBoolean(key, value);
 		return value;
 	}
 
@@ -376,8 +366,8 @@ public final class PropertiesFile {
 	 * @param value The <code>value</code> we will be setting inside the <code>.[properties]</code> file.
 	 */
 	public void setBoolean(String key, boolean value) {
-		props.put(key, String.valueOf(value));
+		this.props.put(key, String.valueOf(value));
 
-		save();
+		this.save();
 	}
 }

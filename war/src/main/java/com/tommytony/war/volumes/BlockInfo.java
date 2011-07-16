@@ -5,7 +5,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 /**
- * 
+ *
  * @author tommytony
  *
  */
@@ -20,7 +20,7 @@ public class BlockInfo {
 	public static Block getBlock(World world, BlockInfo info) {
 		return world.getBlockAt(info.getX(), info.getY(), info.getZ());
 	}
-	
+
 	public BlockInfo(int x, int y, int z, int type, byte data)
 	{
 		this.x = x;
@@ -29,7 +29,7 @@ public class BlockInfo {
 		this.type = type;
 		this.data = data;
 	}
-	
+
 	public BlockInfo(Block block) {
 		this.x = block.getX();
 		this.y = block.getY();
@@ -41,7 +41,7 @@ public class BlockInfo {
 //			this.signLines = sign.getLines();
 //		}
 	}
-	
+
 //	public BlockInfo(BlockState blockState) {
 //		this.x = blockState.getX();
 //		this.y = blockState.getY();
@@ -53,7 +53,7 @@ public class BlockInfo {
 ////			this.signLines = sign.getLines();
 ////		}
 //	}
-	
+
 //	public BlockInfo(int typeID, byte data, String[] lines) {
 //		type = typeID;
 //		this.data = data;
@@ -61,46 +61,46 @@ public class BlockInfo {
 //	}
 
 	public int getX() {
-		return x;
+		return this.x;
 	}
-	
+
 	public int getY() {
-		return y;
+		return this.y;
 	}
-	
+
 	public int getZ() {
-		return z;
+		return this.z;
 	}
-	
+
 	// letting us mutate the BlockInfos might be a bad idea; use setters with care
 	public void setX(int x) {
 		this.x = x;
 	}
-	
+
 	public void setY(int y) {
 		this.y = y;
 	}
-	
+
 	public void setZ(int z) {
 		this.z = z;
 	}
-	
+
 	public int getTypeId() {
-		return type;
+		return this.type;
 	}
-	
+
 	public Material getType() {
-		return Material.getMaterial(type);
-	}	
-	
+		return Material.getMaterial(this.type);
+	}
+
 	public byte getData() {
-		return data;
+		return this.data;
 	}
-	
+
 	public boolean is(Material material) {
-		return getType() == material;
+		return this.getType() == material;
 	}
-	
+
 //	public String[] getSignLines() {
 //		if (is(Material.SIGN) || is(Material.SIGN_POST)){
 //			return new String[4] {"", ""};

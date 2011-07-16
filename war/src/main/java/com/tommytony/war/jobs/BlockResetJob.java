@@ -9,9 +9,9 @@ public class BlockResetJob implements Runnable {
 	public BlockResetJob(Volume volume) {
 		this.volume = volume;
 	}
-	
+
 	public void run() {
-		volume.resetBlocks();
+		this.volume.resetBlocks();
 	}
 
 }
