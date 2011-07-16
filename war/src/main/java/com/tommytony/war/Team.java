@@ -15,9 +15,9 @@ import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.Volume;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
@@ -48,22 +48,22 @@ public class Team {
 
 	private void setSpawnVolume() {
 		if (this.spawnVolume.isSaved()) {
-		    this.spawnVolume.resetBlocks();
+			this.spawnVolume.resetBlocks();
 		}
 		int x = this.teamSpawn.getBlockX();
 		int y = this.teamSpawn.getBlockY();
 		int z = this.teamSpawn.getBlockZ();
 
 		if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.INVISIBLE)) {
-			this.spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x, y-1, z));
-			this.spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x, y+3, z));
+			this.spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x, y - 1, z));
+			this.spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x, y + 3, z));
 		} else if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.SMALL)) {
-			this.spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x-1, y-1, z-1));
-			this.spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x+1, y+3, z+1));
+			this.spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1));
+			this.spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x + 1, y + 3, z + 1));
 		} else {
 			// flat or big
-			this.spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x-2, y-1, z-2));
-			this.spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x+2, y+3, z+2));
+			this.spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x - 2, y - 1, z - 2));
+			this.spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x + 2, y + 3, z + 2));
 		}
 	}
 
@@ -79,48 +79,48 @@ public class Team {
 
 		if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.INVISIBLE)) {
 			// nothing but glowstone
-			this.warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.GLOWSTONE);
+			this.warzone.getWorld().getBlockAt(x, y - 1, z).setType(Material.GLOWSTONE);
 		} else {
 			// first ring
-			this.setBlock(x+1, y-1, z+1, this.kind);
-			this.setBlock(x+1, y-1, z, this.kind);
-			this.setBlock(x+1, y-1, z-1, this.kind);
-			this.setBlock(x, y-1, z+1, this.kind);
-			this.warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.GLOWSTONE);
-			this.setBlock(x, y-1, z-1, this.kind);
-			this.setBlock(x-1, y-1, z+1, this.kind);
-			this.setBlock(x-1, y-1, z, this.kind);
-			this.setBlock(x-1, y-1, z-1, this.kind);
+			this.setBlock(x + 1, y - 1, z + 1, this.kind);
+			this.setBlock(x + 1, y - 1, z, this.kind);
+			this.setBlock(x + 1, y - 1, z - 1, this.kind);
+			this.setBlock(x, y - 1, z + 1, this.kind);
+			this.warzone.getWorld().getBlockAt(x, y - 1, z).setType(Material.GLOWSTONE);
+			this.setBlock(x, y - 1, z - 1, this.kind);
+			this.setBlock(x - 1, y - 1, z + 1, this.kind);
+			this.setBlock(x - 1, y - 1, z, this.kind);
+			this.setBlock(x - 1, y - 1, z - 1, this.kind);
 		}
 
 		// Orientation
 		int yaw = 0;
-		if (this.teamSpawn.getYaw() >= 0){
-			yaw = (int)(this.teamSpawn.getYaw() % 360);
+		if (this.teamSpawn.getYaw() >= 0) {
+			yaw = (int) (this.teamSpawn.getYaw() % 360);
 		} else {
-			yaw = (int)(360 + (this.teamSpawn.getYaw() % 360));
+			yaw = (int) (360 + (this.teamSpawn.getYaw() % 360));
 		}
 		Block signBlock = null;
 		int signData = 0;
 
-		if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.INVISIBLE)){
+		if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.INVISIBLE)) {
 			// INVISIBLE style
 			signBlock = this.warzone.getWorld().getBlockAt(x, y, z);
 			if (yaw >= 0 && yaw < 90) {
 				signData = 10;
-			}else if (yaw >= 90 && yaw <= 180) {
+			} else if (yaw >= 90 && yaw <= 180) {
 				signData = 14;
 			} else if (yaw >= 180 && yaw < 270) {
 				signData = 2;
 			} else if (yaw >= 270 && yaw <= 360) {
 				signData = 6;
 			}
-		} else if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.SMALL)){
+		} else if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.SMALL)) {
 			// SMALL style
 			if (yaw >= 0 && yaw < 90) {
 				signData = 10;
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH).getFace(BlockFace.WEST);
-			}else if (yaw >= 90 && yaw <= 180) {
+			} else if (yaw >= 90 && yaw <= 180) {
 				signData = 14;
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH).getFace(BlockFace.EAST);
 			} else if (yaw >= 180 && yaw < 270) {
@@ -132,26 +132,26 @@ public class Team {
 			}
 		} else {
 			// outer ring (FLAT or BIG)
-			this.setBlock(x+2, y-1, z+2, this.kind);
-			this.setBlock(x+2, y-1, z+1, this.kind);
-			this.setBlock(x+2, y-1, z, this.kind);
-			this.setBlock(x+2, y-1, z-1, this.kind);
-			this.setBlock(x+2, y-1, z-2, this.kind);
+			this.setBlock(x + 2, y - 1, z + 2, this.kind);
+			this.setBlock(x + 2, y - 1, z + 1, this.kind);
+			this.setBlock(x + 2, y - 1, z, this.kind);
+			this.setBlock(x + 2, y - 1, z - 1, this.kind);
+			this.setBlock(x + 2, y - 1, z - 2, this.kind);
 
-			this.setBlock(x-1, y-1, z+2, this.kind);
-			this.setBlock(x-1, y-1, z-2, this.kind);
+			this.setBlock(x - 1, y - 1, z + 2, this.kind);
+			this.setBlock(x - 1, y - 1, z - 2, this.kind);
 
-			this.setBlock(x, y-1, z+2, this.kind);
-			this.setBlock(x, y-1, z-2, this.kind);
+			this.setBlock(x, y - 1, z + 2, this.kind);
+			this.setBlock(x, y - 1, z - 2, this.kind);
 
-			this.setBlock(x+1, y-1, z+2, this.kind);
-			this.setBlock(x+1, y-1, z-2, this.kind);
+			this.setBlock(x + 1, y - 1, z + 2, this.kind);
+			this.setBlock(x + 1, y - 1, z - 2, this.kind);
 
-			this.setBlock(x-2, y-1, z+2, this.kind);
-			this.setBlock(x-2, y-1, z+1, this.kind);
-			this.setBlock(x-2, y-1, z, this.kind);
-			this.setBlock(x-2, y-1, z-1, this.kind);
-			this.setBlock(x-2, y-1, z-2, this.kind);
+			this.setBlock(x - 2, y - 1, z + 2, this.kind);
+			this.setBlock(x - 2, y - 1, z + 1, this.kind);
+			this.setBlock(x - 2, y - 1, z, this.kind);
+			this.setBlock(x - 2, y - 1, z - 1, this.kind);
+			this.setBlock(x - 2, y - 1, z - 2, this.kind);
 
 			BlockFace facing = null;
 			BlockFace opposite = null;
@@ -163,30 +163,30 @@ public class Team {
 
 				if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.BIG)) {
 					// rim
-					this.setBlock(x-2, y, z-1, this.kind);
-					this.setBlock(x-2, y, z-2, this.kind);
-					this.setBlock(x-1, y, z-2, this.kind);
-					this.setBlock(x, y, z-2, this.kind);
-					this.setBlock(x+1, y, z-2, this.kind);
-					this.setBlock(x+2, y, z-2, this.kind);
-					this.setBlock(x+2, y, z-1, this.kind);
-					this.setBlock(x+2, y, z, this.kind);
-					this.setBlock(x+2, y, z+1, this.kind);
-					this.setBlock(x+2, y, z+2, this.kind);
-					this.setBlock(x+1, y, z+2, this.kind);
+					this.setBlock(x - 2, y, z - 1, this.kind);
+					this.setBlock(x - 2, y, z - 2, this.kind);
+					this.setBlock(x - 1, y, z - 2, this.kind);
+					this.setBlock(x, y, z - 2, this.kind);
+					this.setBlock(x + 1, y, z - 2, this.kind);
+					this.setBlock(x + 2, y, z - 2, this.kind);
+					this.setBlock(x + 2, y, z - 1, this.kind);
+					this.setBlock(x + 2, y, z, this.kind);
+					this.setBlock(x + 2, y, z + 1, this.kind);
+					this.setBlock(x + 2, y, z + 2, this.kind);
+					this.setBlock(x + 1, y, z + 2, this.kind);
 
 					// tower
-					this.setBlock(x, y+1, z-2, this.kind);
-					this.setBlock(x+1, y+1, z-2, this.kind);
-					this.setBlock(x+2, y+1, z-2, this.kind);
-					this.setBlock(x+2, y+1, z-1, this.kind);
-					this.setBlock(x+2, y+1, z, this.kind);
+					this.setBlock(x, y + 1, z - 2, this.kind);
+					this.setBlock(x + 1, y + 1, z - 2, this.kind);
+					this.setBlock(x + 2, y + 1, z - 2, this.kind);
+					this.setBlock(x + 2, y + 1, z - 1, this.kind);
+					this.setBlock(x + 2, y + 1, z, this.kind);
 
-					this.setBlock(x+1, y+2, z-2, this.kind);
-					this.setBlock(x+2, y+2, z-2, this.kind);
-					this.setBlock(x+2, y+2, z-1, this.kind);
+					this.setBlock(x + 1, y + 2, z - 2, this.kind);
+					this.setBlock(x + 2, y + 2, z - 2, this.kind);
+					this.setBlock(x + 2, y + 2, z - 1, this.kind);
 
-					this.setBlock(x+2, y+3, z-2, this.kind);
+					this.setBlock(x + 2, y + 3, z - 2, this.kind);
 				}
 			} else if (yaw >= 90 && yaw <= 180) {
 				facing = BlockFace.NORTH_EAST;
@@ -195,30 +195,30 @@ public class Team {
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH, 2).getFace(BlockFace.EAST, 2);
 				if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.BIG)) {
 					// rim
-					this.setBlock(x+1, y, z-2, this.kind);
-					this.setBlock(x+2, y, z-2, this.kind);
-					this.setBlock(x+2, y, z-1, this.kind);
-					this.setBlock(x+2, y, z, this.kind);
-					this.setBlock(x+2, y, z+1, this.kind);
-					this.setBlock(x+2, y, z+2, this.kind);
-					this.setBlock(x+1, y, z+2, this.kind);
-					this.setBlock(x, y, z+2, this.kind);
-					this.setBlock(x-1, y, z+2, this.kind);
-					this.setBlock(x-2, y, z+2, this.kind);
-					this.setBlock(x-2, y, z+1, this.kind);
+					this.setBlock(x + 1, y, z - 2, this.kind);
+					this.setBlock(x + 2, y, z - 2, this.kind);
+					this.setBlock(x + 2, y, z - 1, this.kind);
+					this.setBlock(x + 2, y, z, this.kind);
+					this.setBlock(x + 2, y, z + 1, this.kind);
+					this.setBlock(x + 2, y, z + 2, this.kind);
+					this.setBlock(x + 1, y, z + 2, this.kind);
+					this.setBlock(x, y, z + 2, this.kind);
+					this.setBlock(x - 1, y, z + 2, this.kind);
+					this.setBlock(x - 2, y, z + 2, this.kind);
+					this.setBlock(x - 2, y, z + 1, this.kind);
 
 					// tower
-					this.setBlock(x+2, y+1, z, this.kind);
-					this.setBlock(x+2, y+1, z+1, this.kind);
-					this.setBlock(x+2, y+1, z+2, this.kind);
-					this.setBlock(x+1, y+1, z+2, this.kind);
-					this.setBlock(x, y+1, z+2, this.kind);
+					this.setBlock(x + 2, y + 1, z, this.kind);
+					this.setBlock(x + 2, y + 1, z + 1, this.kind);
+					this.setBlock(x + 2, y + 1, z + 2, this.kind);
+					this.setBlock(x + 1, y + 1, z + 2, this.kind);
+					this.setBlock(x, y + 1, z + 2, this.kind);
 
-					this.setBlock(x+2, y+2, z+1, this.kind);
-					this.setBlock(x+2, y+2, z+2, this.kind);
-					this.setBlock(x+1, y+2, z+2, this.kind);
+					this.setBlock(x + 2, y + 2, z + 1, this.kind);
+					this.setBlock(x + 2, y + 2, z + 2, this.kind);
+					this.setBlock(x + 1, y + 2, z + 2, this.kind);
 
-					this.setBlock(x+2, y+3, z+2, this.kind);
+					this.setBlock(x + 2, y + 3, z + 2, this.kind);
 				}
 			} else if (yaw >= 180 && yaw < 270) {
 				facing = BlockFace.SOUTH_EAST;
@@ -227,30 +227,30 @@ public class Team {
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.EAST, 2);
 				if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.BIG)) {
 					// rim
-					this.setBlock(x+2, y, z+1, this.kind);
-					this.setBlock(x+2, y, z+2, this.kind);
-					this.setBlock(x+1, y, z+2, this.kind);
-					this.setBlock(x, y, z+2, this.kind);
-					this.setBlock(x-1, y, z+2, this.kind);
-					this.setBlock(x-2, y, z+2, this.kind);
-					this.setBlock(x-2, y, z+1, this.kind);
-					this.setBlock(x-2, y, z, this.kind);
-					this.setBlock(x-2, y, z-1, this.kind);
-					this.setBlock(x-2, y, z-2, this.kind);
-					this.setBlock(x-1, y, z-2, this.kind);
+					this.setBlock(x + 2, y, z + 1, this.kind);
+					this.setBlock(x + 2, y, z + 2, this.kind);
+					this.setBlock(x + 1, y, z + 2, this.kind);
+					this.setBlock(x, y, z + 2, this.kind);
+					this.setBlock(x - 1, y, z + 2, this.kind);
+					this.setBlock(x - 2, y, z + 2, this.kind);
+					this.setBlock(x - 2, y, z + 1, this.kind);
+					this.setBlock(x - 2, y, z, this.kind);
+					this.setBlock(x - 2, y, z - 1, this.kind);
+					this.setBlock(x - 2, y, z - 2, this.kind);
+					this.setBlock(x - 1, y, z - 2, this.kind);
 
 					// tower
-					this.setBlock(x, y+1, z+2, this.kind);
-					this.setBlock(x-1, y+1, z+2, this.kind);
-					this.setBlock(x-2, y+1, z+2, this.kind);
-					this.setBlock(x-2, y+1, z+1, this.kind);
-					this.setBlock(x-2, y+1, z, this.kind);
+					this.setBlock(x, y + 1, z + 2, this.kind);
+					this.setBlock(x - 1, y + 1, z + 2, this.kind);
+					this.setBlock(x - 2, y + 1, z + 2, this.kind);
+					this.setBlock(x - 2, y + 1, z + 1, this.kind);
+					this.setBlock(x - 2, y + 1, z, this.kind);
 
-					this.setBlock(x-1, y+2, z+2, this.kind);
-					this.setBlock(x-2, y+2, z+2, this.kind);
-					this.setBlock(x-2, y+2, z+1, this.kind);
+					this.setBlock(x - 1, y + 2, z + 2, this.kind);
+					this.setBlock(x - 2, y + 2, z + 2, this.kind);
+					this.setBlock(x - 2, y + 2, z + 1, this.kind);
 
-					this.setBlock(x-2, y+3, z+2, this.kind);
+					this.setBlock(x - 2, y + 3, z + 2, this.kind);
 				}
 			} else if (yaw >= 270 && yaw <= 360) {
 				facing = BlockFace.SOUTH_WEST;
@@ -259,43 +259,43 @@ public class Team {
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
 				if (this.warzone.getSpawnStyle().equals(TeamSpawnStyles.BIG)) {
 					// rim
-					this.setBlock(x-1, y, z+2, this.kind);
-					this.setBlock(x-2, y, z+2, this.kind);
-					this.setBlock(x-2, y, z+1, this.kind);
-					this.setBlock(x-2, y, z, this.kind);
-					this.setBlock(x-2, y, z-1, this.kind);
-					this.setBlock(x-2, y, z-2, this.kind);
-					this.setBlock(x-1, y, z-2, this.kind);
-					this.setBlock(x, y, z-2, this.kind);
-					this.setBlock(x+1, y, z-2, this.kind);
-					this.setBlock(x+2, y, z-2, this.kind);
-					this.setBlock(x+2, y, z-1, this.kind);
+					this.setBlock(x - 1, y, z + 2, this.kind);
+					this.setBlock(x - 2, y, z + 2, this.kind);
+					this.setBlock(x - 2, y, z + 1, this.kind);
+					this.setBlock(x - 2, y, z, this.kind);
+					this.setBlock(x - 2, y, z - 1, this.kind);
+					this.setBlock(x - 2, y, z - 2, this.kind);
+					this.setBlock(x - 1, y, z - 2, this.kind);
+					this.setBlock(x, y, z - 2, this.kind);
+					this.setBlock(x + 1, y, z - 2, this.kind);
+					this.setBlock(x + 2, y, z - 2, this.kind);
+					this.setBlock(x + 2, y, z - 1, this.kind);
 
 					// tower
-					this.setBlock(x-2, y+1, z, this.kind);
-					this.setBlock(x-2, y+1, z-1, this.kind);
-					this.setBlock(x-2, y+1, z-2, this.kind);
-					this.setBlock(x-1, y+1, z-2, this.kind);
-					this.setBlock(x, y+1, z-2, this.kind);
+					this.setBlock(x - 2, y + 1, z, this.kind);
+					this.setBlock(x - 2, y + 1, z - 1, this.kind);
+					this.setBlock(x - 2, y + 1, z - 2, this.kind);
+					this.setBlock(x - 1, y + 1, z - 2, this.kind);
+					this.setBlock(x, y + 1, z - 2, this.kind);
 
-					this.setBlock(x-2, y+2, z-1, this.kind);
-					this.setBlock(x-2, y+2, z-2, this.kind);
-					this.setBlock(x-1, y+2, z-2, this.kind);
+					this.setBlock(x - 2, y + 2, z - 1, this.kind);
+					this.setBlock(x - 2, y + 2, z - 2, this.kind);
+					this.setBlock(x - 1, y + 2, z - 2, this.kind);
 
-					this.setBlock(x-2, y+3, z-2, this.kind);
+					this.setBlock(x - 2, y + 3, z - 2, this.kind);
 				}
 			}
 		}
 
 		if (signBlock != null) {
-//			if (signBlock.getType() != Material.SIGN_POST) {
-//				signBlock.setType(Material.SIGN_POST);
-//			}
-//			else {
-//				// already a signpost, gotta delete it and create a new one
-//				signBlock.setType(Material.AIR);
-//				signBlock.setType(Material.SIGN_POST);
-//			}
+			// if (signBlock.getType() != Material.SIGN_POST) {
+			// signBlock.setType(Material.SIGN_POST);
+			// }
+			// else {
+			// // already a signpost, gotta delete it and create a new one
+			// signBlock.setType(Material.AIR);
+			// signBlock.setType(Material.SIGN_POST);
+			// }
 
 			String[] lines = new String[4];
 			lines[0] = "Team " + this.name;
@@ -307,7 +307,7 @@ public class Team {
 				lines[3] = this.remainingLives + "/" + this.warzone.getLifePool() + " lives left";
 			}
 
-			SignHelper.setToSign(this.war, signBlock, (byte)signData, lines);
+			SignHelper.setToSign(this.war, signBlock, (byte) signData, lines);
 		}
 	}
 
@@ -380,8 +380,7 @@ public class Team {
 		boolean atLeastOnePlayerOnTeam = this.players.size() != 0;
 		boolean atLeastOnePlayerOnOtherTeam = false;
 		for (Team team : this.warzone.getTeams()) {
-			if (!team.getName().equals(this.getName())
-					&& team.getPlayers().size() > 0) {
+			if (!team.getName().equals(this.getName()) && team.getPlayers().size() > 0) {
 				atLeastOnePlayerOnOtherTeam = true;
 			}
 		}
@@ -401,37 +400,37 @@ public class Team {
 		return this.spawnVolume;
 	}
 
-	public void resetSign(){
+	public void resetSign() {
 		this.getSpawnVolume().resetBlocks();
 		this.initializeTeamSpawn(); // reset everything instead of just sign
 
 		// BUKKIT
-//		int x = teamSpawn.getBlockX();
-//		int y = teamSpawn.getBlockY();
-//		int z = teamSpawn.getBlockZ();
-//
-//		Block block = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
-//		if (block.getType() != Material.SIGN_POST) {
-//			block.setType(Material.SIGN_POST);
-//		}
-////		else {
-////			// already a signpost, gotta delete it and create a new one
-////			block.setType(Material.AIR);
-////			block.setType(Material.SIGN_POST);
-////		}
-////		block.setData((byte)6);
-//
-//		BlockState state = block.getState();
-//		if (state instanceof Sign) {
-//			Sign sign = (Sign) state;
-//			sign.setType(Material.SIGN_POST);
-//			sign.setData(new MaterialData(Material.SIGN_POST, (byte)6));
-//			sign.setLine(0, "Team " + name);
-//			sign.setLine(1, remainingTickets + "/" + warzone.getLifePool() + " lives left");
-//			sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
-//			sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
-//			state.update(true);
-//		}
+		// int x = teamSpawn.getBlockX();
+		// int y = teamSpawn.getBlockY();
+		// int z = teamSpawn.getBlockZ();
+		//
+		// Block block = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
+		// if (block.getType() != Material.SIGN_POST) {
+		// block.setType(Material.SIGN_POST);
+		// }
+		// // else {
+		// // // already a signpost, gotta delete it and create a new one
+		// // block.setType(Material.AIR);
+		// // block.setType(Material.SIGN_POST);
+		// // }
+		// // block.setData((byte)6);
+		//
+		// BlockState state = block.getState();
+		// if (state instanceof Sign) {
+		// Sign sign = (Sign) state;
+		// sign.setType(Material.SIGN_POST);
+		// sign.setData(new MaterialData(Material.SIGN_POST, (byte)6));
+		// sign.setLine(0, "Team " + name);
+		// sign.setLine(1, remainingTickets + "/" + warzone.getLifePool() + " lives left");
+		// sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
+		// sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
+		// state.update(true);
+		// }
 
 		if (this.warzone.getLobby() != null) {
 			this.warzone.getLobby().resetTeamGateSign(this);
@@ -456,16 +455,16 @@ public class Team {
 
 	private void setFlagVolume() {
 		if (this.flagVolume == null) {
-		    this.flagVolume = new Volume(this.getName() + "flag", this.war, this.warzone.getWorld());
+			this.flagVolume = new Volume(this.getName() + "flag", this.war, this.warzone.getWorld());
 		}
 		if (this.flagVolume.isSaved()) {
-		    this.flagVolume.resetBlocks();
+			this.flagVolume.resetBlocks();
 		}
 		int x = this.teamFlag.getBlockX();
 		int y = this.teamFlag.getBlockY();
 		int z = this.teamFlag.getBlockZ();
-		this.flagVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x-1, y-1, z-1));
-		this.flagVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x+1, y+3, z+1));
+		this.flagVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1));
+		this.flagVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x + 1, y + 3, z + 1));
 	}
 
 	@SuppressWarnings("unused")
@@ -479,54 +478,54 @@ public class Team {
 		int z = this.teamFlag.getBlockZ();
 
 		// first ring
-		this.warzone.getWorld().getBlockAt(x+1, y-1, z+1).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x+1, y-1, z).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x+1, y-1, z-1).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x, y-1, z+1).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x, y-1, z).setType(Material.GLOWSTONE);
-		this.warzone.getWorld().getBlockAt(x, y-1, z-1).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x-1, y-1, z+1).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x-1, y-1, z).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x-1, y-1, z-1).setType(Material.OBSIDIAN);
+		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z + 1).setType(Material.OBSIDIAN);
+		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z).setType(Material.OBSIDIAN);
+		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z - 1).setType(Material.OBSIDIAN);
+		this.warzone.getWorld().getBlockAt(x, y - 1, z + 1).setType(Material.OBSIDIAN);
+		this.warzone.getWorld().getBlockAt(x, y - 1, z).setType(Material.GLOWSTONE);
+		this.warzone.getWorld().getBlockAt(x, y - 1, z - 1).setType(Material.OBSIDIAN);
+		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z + 1).setType(Material.OBSIDIAN);
+		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z).setType(Material.OBSIDIAN);
+		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1).setType(Material.OBSIDIAN);
 
 		// flag
-		this.warzone.getWorld().getBlockAt(x, y+1, z).setType(this.kind.getMaterial());
-		this.warzone.getWorld().getBlockAt(x, y+1, z).setData(this.kind.getData());
-		this.warzone.getWorld().getBlockAt(x, y+2, z).setType(Material.FENCE);
+		this.warzone.getWorld().getBlockAt(x, y + 1, z).setType(this.kind.getMaterial());
+		this.warzone.getWorld().getBlockAt(x, y + 1, z).setData(this.kind.getData());
+		this.warzone.getWorld().getBlockAt(x, y + 2, z).setType(Material.FENCE);
 
 		// Flag post using Orientation
 		int yaw = 0;
-		if (this.teamFlag.getYaw() >= 0){
-			yaw = (int)(this.teamFlag.getYaw() % 360);
+		if (this.teamFlag.getYaw() >= 0) {
+			yaw = (int) (this.teamFlag.getYaw() % 360);
 		} else {
-			yaw = (int)(360 + (this.teamFlag.getYaw() % 360));
+			yaw = (int) (360 + (this.teamFlag.getYaw() % 360));
 		}
 		BlockFace facing = null;
 		BlockFace opposite = null;
 		if ((yaw >= 0 && yaw < 45) || (yaw >= 315 && yaw <= 360)) {
 			facing = BlockFace.WEST;
 			opposite = BlockFace.EAST;
-			this.warzone.getWorld().getBlockAt(x, y, z-1).setType(Material.FENCE);
-			this.warzone.getWorld().getBlockAt(x, y+1, z-1).setType(Material.FENCE);
-			this.warzone.getWorld().getBlockAt(x, y+2, z-1).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x, y, z - 1).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x, y + 1, z - 1).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x, y + 2, z - 1).setType(Material.FENCE);
 		} else if (yaw >= 45 && yaw < 135) {
 			facing = BlockFace.NORTH;
 			opposite = BlockFace.SOUTH;
-			this.warzone.getWorld().getBlockAt(x+1, y, z).setType(Material.FENCE);
-			this.warzone.getWorld().getBlockAt(x+1, y+1, z).setType(Material.FENCE);
-			this.warzone.getWorld().getBlockAt(x+1, y+2, z).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x + 1, y, z).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x + 1, y + 1, z).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x + 1, y + 2, z).setType(Material.FENCE);
 		} else if (yaw >= 135 && yaw < 225) {
 			facing = BlockFace.EAST;
 			opposite = BlockFace.WEST;
-			this.warzone.getWorld().getBlockAt(x, y, z+1).setType(Material.FENCE);
-			this.warzone.getWorld().getBlockAt(x, y+1, z+1).setType(Material.FENCE);
-			this.warzone.getWorld().getBlockAt(x, y+2, z+1).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x, y, z + 1).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x, y + 1, z + 1).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x, y + 2, z + 1).setType(Material.FENCE);
 		} else if (yaw >= 225 && yaw < 315) {
 			facing = BlockFace.SOUTH;
 			opposite = BlockFace.NORTH;
-			this.warzone.getWorld().getBlockAt(x-1, y, z).setType(Material.FENCE);
-			this.warzone.getWorld().getBlockAt(x-1, y+1, z).setType(Material.FENCE);
-			this.warzone.getWorld().getBlockAt(x-1, y+2, z).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x - 1, y, z).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x - 1, y + 1, z).setType(Material.FENCE);
+			this.warzone.getWorld().getBlockAt(x - 1, y + 2, z).setType(Material.FENCE);
 		}
 	}
 
@@ -546,10 +545,8 @@ public class Team {
 			int flagX = this.teamFlag.getBlockX();
 			int flagY = this.teamFlag.getBlockY() + 1;
 			int flagZ = this.teamFlag.getBlockZ();
-			if (block.getX() == flagX
-					&& block.getY() == flagY
-					&& block.getZ() == flagZ) {
-			    return true;
+			if (block.getX() == flagX && block.getY() == flagY && block.getZ() == flagZ) {
+				return true;
 			}
 		}
 		return false;

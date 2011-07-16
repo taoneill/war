@@ -17,9 +17,9 @@ import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class WarBlockListener extends BlockListener {
 
@@ -37,10 +37,7 @@ public class WarBlockListener extends BlockListener {
 			if (player != null && block != null) {
 				Team team = this.war.getPlayerTeam(player.getName());
 				Warzone zone = this.war.warzone(player.getLocation());
-				if (team != null && block != null && zone != null
-						&& zone.isMonumentCenterBlock(block)
-						&& block.getType() == team.getKind().getMaterial()
-						&& block.getData() == team.getKind().getData()) {
+				if (team != null && block != null && zone != null && zone.isMonumentCenterBlock(block) && block.getType() == team.getKind().getMaterial() && block.getData() == team.getKind().getData()) {
 					Monument monument = zone.getMonumentFromCenterBlock(block);
 					if (monument != null && !monument.hasOwner()) {
 						monument.capture(team);
@@ -63,7 +60,7 @@ public class WarBlockListener extends BlockListener {
 					return;
 				}
 				// protect warzone lobbies
-				for (Warzone wz: this.war.getWarzones()) {
+				for (Warzone wz : this.war.getWarzones()) {
 					if (wz.getLobby() != null && wz.getLobby().getVolume() != null && wz.getLobby().getVolume().contains(block)) {
 						this.war.badMsg(player, "Can't build here.");
 						event.setCancelled(true);
@@ -85,8 +82,7 @@ public class WarBlockListener extends BlockListener {
 				}
 
 				// can't place a block of your team's color
-				if (team != null && block.getType() == team.getKind().getMaterial()
-						&& block.getData() == team.getKind().getData()) {
+				if (team != null && block.getType() == team.getKind().getMaterial() && block.getData() == team.getKind().getData()) {
 					this.war.badMsg(player, "You can only use your team's blocks to capture monuments.");
 					event.setCancelled(true);
 					return;
@@ -100,10 +96,7 @@ public class WarBlockListener extends BlockListener {
 				}
 
 				// unbreakableZoneBlocks
-				if (zone != null && zone.isUnbreakableZoneBlocks()
-						&& (!isZoneMaker
-								|| (isZoneMaker && team != null))
-								) {
+				if (zone != null && zone.isUnbreakableZoneBlocks() && (!isZoneMaker || (isZoneMaker && team != null))) {
 					// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks)
 					this.war.badMsg(player, "The blocks in this zone are unbreakable - this also means you can't build!");
 					event.setCancelled(true);
@@ -124,14 +117,14 @@ public class WarBlockListener extends BlockListener {
 		}
 	}
 
-//	public void onBlockDamage(BlockDamageEvent event) {
-//		Player player = event.getPlayer();
-//		Block block = event.getBlock();
-//		if (player != null && block != null && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
-//			handleBreakOrDamage(player,block, event);
-//
-//		}
-//	}
+	// public void onBlockDamage(BlockDamageEvent event) {
+	// Player player = event.getPlayer();
+	// Block block = event.getBlock();
+	// if (player != null && block != null && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
+	// handleBreakOrDamage(player,block, event);
+	//
+	// }
+	// }
 
 	private void handleBreakOrDamage(Player player, Block block, Cancellable event) {
 		Warzone warzone = this.war.warzone(player.getLocation());
@@ -143,8 +136,7 @@ public class WarBlockListener extends BlockListener {
 			this.war.badMsg(player, "Can't destroy part of a warzone if you're not in a team.");
 			event.setCancelled(true);
 			return;
-		} else if (team != null && block != null && warzone != null
-				&& warzone.isMonumentCenterBlock(block)){
+		} else if (team != null && block != null && warzone != null && warzone.isMonumentCenterBlock(block)) {
 			Monument monument = warzone.getMonumentFromCenterBlock(block);
 			if (monument.hasOwner()) {
 
@@ -156,7 +148,7 @@ public class WarBlockListener extends BlockListener {
 			}
 			event.setCancelled(false);
 			return;
-		}else if (warzone != null && warzone.isImportantBlock(block) && (!isZoneMaker || (isZoneMaker && team != null))) {
+		} else if (warzone != null && warzone.isImportantBlock(block) && (!isZoneMaker || (isZoneMaker && team != null))) {
 
 			if (team != null && team.getSpawnVolume().contains(block)) {
 				ItemStack teamKindBlock = new ItemStack(team.getKind().getMaterial(), team.getKind().getData());
@@ -165,7 +157,7 @@ public class WarBlockListener extends BlockListener {
 					event.setCancelled(true);
 					return;
 				} else {
-					event.setCancelled(false);		// very important, otherwise could get cancelled but unbreakableZoneBlocks further down
+					event.setCancelled(false); // very important, otherwise could get cancelled but unbreakableZoneBlocks further down
 					return;
 				}
 				// let team members loot one block the spawn for monument captures
@@ -177,7 +169,7 @@ public class WarBlockListener extends BlockListener {
 					Team lostFlagTeam = warzone.getTeamForFlagBlock(block);
 					if (lostFlagTeam.getPlayers().size() != 0) {
 						// player just broke the flag block of other team: cancel to avoid drop, give player the block, set block to air
-						ItemStack teamKindBlock = new ItemStack(lostFlagTeam.getKind().getMaterial(), 1, (short)1, new Byte(lostFlagTeam.getKind().getData()));
+						ItemStack teamKindBlock = new ItemStack(lostFlagTeam.getKind().getMaterial(), 1, (short) 1, new Byte(lostFlagTeam.getKind().getData()));
 						player.getInventory().clear();
 						player.getInventory().addItem(teamKindBlock);
 						warzone.addFlagThief(lostFlagTeam, player.getName());
@@ -185,7 +177,7 @@ public class WarBlockListener extends BlockListener {
 
 						for (Team t : warzone.getTeams()) {
 							t.teamcast(player.getName() + " stole team " + lostFlagTeam.getName() + "'s flag.");
-							if (t.getName().equals(lostFlagTeam.getName())){
+							if (t.getName().equals(lostFlagTeam.getName())) {
 								t.teamcast("Prevent " + player.getName() + " from reaching team " + team.getName() + "'s spawn or flag.");
 							}
 						}
@@ -196,7 +188,7 @@ public class WarBlockListener extends BlockListener {
 				}
 				event.setCancelled(true);
 				return;
-			} else if (!warzone.isMonumentCenterBlock(block)){
+			} else if (!warzone.isMonumentCenterBlock(block)) {
 				this.war.badMsg(player, "Can't destroy this.");
 				event.setCancelled(true);
 				return;
@@ -205,9 +197,8 @@ public class WarBlockListener extends BlockListener {
 
 		// protect warzone lobbies
 		if (block != null) {
-			for (Warzone zone: this.war.getWarzones()) {
-				if (zone.getLobby() != null && zone.getLobby().getVolume() != null &&
-						zone.getLobby().getVolume().contains(block)) {
+			for (Warzone zone : this.war.getWarzones()) {
+				if (zone.getLobby() != null && zone.getLobby().getVolume() != null && zone.getLobby().getVolume().contains(block)) {
 					this.war.badMsg(player, "Can't destroy this.");
 					event.setCancelled(true);
 					return;
@@ -224,19 +215,14 @@ public class WarBlockListener extends BlockListener {
 
 		// buildInZonesOnly
 		Warzone blockZone = this.war.warzone(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ()));
-		if (blockZone == null
-				&& this.war.isBuildInZonesOnly()
-				&& !this.war.canBuildOutsideZone(player)) {
+		if (blockZone == null && this.war.isBuildInZonesOnly() && !this.war.canBuildOutsideZone(player)) {
 			this.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
 			event.setCancelled(true);
 			return;
 		}
 
 		// unbreakableZoneBlocks
-		if (blockZone != null && blockZone.isUnbreakableZoneBlocks()
-				&& (!isZoneMaker
-						|| (isZoneMaker && team != null))
-						) {
+		if (blockZone != null && blockZone.isUnbreakableZoneBlocks() && (!isZoneMaker || (isZoneMaker && team != null))) {
 			// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks
 			this.war.badMsg(player, "The blocks in this zone are unbreakable!");
 			event.setCancelled(true);

@@ -14,9 +14,9 @@ import com.tommytony.war.volumes.BlockInfo;
 import bukkit.tommytony.war.War;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class ZoneWallGuard {
 	private Player player;
@@ -162,8 +162,7 @@ public class ZoneWallGuard {
 	private void glassify(Block block, BlockFace wall) {
 		// face here means which wall we are working on
 
-		if ((block.getTypeId() == Material.AIR.getId() || block.getTypeId() == Material.WATER.getId()) &&
-				(this.warzone.getLobby() == null || (this.warzone.getLobby() != null && !this.warzone.getLobby().blockIsAGateBlock(block, wall)))){
+		if ((block.getTypeId() == Material.AIR.getId() || block.getTypeId() == Material.WATER.getId()) && (this.warzone.getLobby() == null || (this.warzone.getLobby() != null && !this.warzone.getLobby().blockIsAGateBlock(block, wall)))) {
 			if (wall == BlockFace.NORTH) {
 				if (this.warzone.getVolume().isNorthWallBlock(block)) {
 					this.glassified.add(new BlockInfo(block));

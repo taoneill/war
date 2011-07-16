@@ -19,34 +19,32 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.volumes.Volume;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class VolumeMapper {
 
-	public static Volume loadVolume(String volumeName, String zoneName,
-			War war, World world) {
+	public static Volume loadVolume(String volumeName, String zoneName, War war, World world) {
 		Volume volume = new Volume(volumeName, war, world);
 		VolumeMapper.load(volume, zoneName, war, world);
 		return volume;
 	}
 
-//	public static ZoneVolume loadZoneVolume(String volumeName, String zoneName,
-//			War war, World world, Warzone zone) {
-//		ZoneVolume volume = new ZoneVolume(volumeName, war, world, zone);
-//		load(volume, zoneName, war, world);
-//		return volume;
-//	}
+	// public static ZoneVolume loadZoneVolume(String volumeName, String zoneName,
+	// War war, World world, Warzone zone) {
+	// ZoneVolume volume = new ZoneVolume(volumeName, war, world, zone);
+	// load(volume, zoneName, war, world);
+	// return volume;
+	// }
 
 	public static void load(Volume volume, String zoneName, War war, World world) {
 		BufferedReader in = null;
 		try {
 			if (zoneName.equals("")) {
-			    in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() +
-			    									"/dat/volume-" + volume.getName() + ".dat"))); // for the warhub
+				in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat"))); // for the warhub
 			} else {
-			    in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+				in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 			}
 			String firstLine = in.readLine();
 			if (firstLine != null && !firstLine.equals("")) {
@@ -73,7 +71,7 @@ public class VolumeMapper {
 				volume.setBlockTypes(new int[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
 				volume.setBlockDatas(new byte[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
 				int blockReads = 0;
-				for (int i = 0; i < volume.getSizeX(); i++){
+				for (int i = 0; i < volume.getSizeX(); i++) {
 					for (int j = 0; j < volume.getSizeY(); j++) {
 						for (int k = 0; k < volume.getSizeZ(); k++) {
 							try {
@@ -87,8 +85,7 @@ public class VolumeMapper {
 										volume.getBlockTypes()[i][j][k] = typeID;
 										volume.getBlockDatas()[i][j][k] = data;
 
-										if (typeID == Material.WALL_SIGN.getId()
-												|| typeID == Material.SIGN_POST.getId()) {
+										if (typeID == Material.WALL_SIGN.getId() || typeID == Material.SIGN_POST.getId()) {
 											// Signs
 											String linesStr = "";
 											if (blockSplit.length > 2) {
@@ -107,21 +104,18 @@ public class VolumeMapper {
 												for (String itemStr : itemsStrSplit) {
 													String[] itemStrSplit = itemStr.split(";");
 													if (itemStrSplit.length == 4) {
-														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-																Integer.parseInt(itemStrSplit[1]));
-														stack.setData(new MaterialData(stack.getTypeId(),Byte.parseByte(itemStrSplit[3])));
-														short durability = (short)Integer.parseInt(itemStrSplit[2]);
+														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
+														stack.setData(new MaterialData(stack.getTypeId(), Byte.parseByte(itemStrSplit[3])));
+														short durability = (short) Integer.parseInt(itemStrSplit[2]);
 														stack.setDurability(durability);
 														items.add(stack);
 													} else if (itemStrSplit.length == 3) {
-														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-																Integer.parseInt(itemStrSplit[1]));
-														short durability = (short)Integer.parseInt(itemStrSplit[2]);
+														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
+														short durability = (short) Integer.parseInt(itemStrSplit[2]);
 														stack.setDurability(durability);
 														items.add(stack);
 													} else {
-														items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]),
-																Integer.parseInt(itemStrSplit[1])));
+														items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1])));
 													}
 												}
 											}
@@ -135,21 +129,18 @@ public class VolumeMapper {
 												for (String itemStr : itemsStrSplit) {
 													String[] itemStrSplit = itemStr.split(";");
 													if (itemStrSplit.length == 4) {
-														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-																Integer.parseInt(itemStrSplit[1]));
-														stack.setData(new MaterialData(stack.getTypeId(),Byte.parseByte(itemStrSplit[3])));
-														short durability = (short)Integer.parseInt(itemStrSplit[2]);
+														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
+														stack.setData(new MaterialData(stack.getTypeId(), Byte.parseByte(itemStrSplit[3])));
+														short durability = (short) Integer.parseInt(itemStrSplit[2]);
 														stack.setDurability(durability);
 														items.add(stack);
 													} else if (itemStrSplit.length == 3) {
-														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]),
-																Integer.parseInt(itemStrSplit[1]));
-														short durability = (short)Integer.parseInt(itemStrSplit[2]);
+														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
+														short durability = (short) Integer.parseInt(itemStrSplit[2]);
 														stack.setDurability(durability);
 														items.add(stack);
 													} else {
-														items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]),
-															Integer.parseInt(itemStrSplit[1])));
+														items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1])));
 													}
 												}
 											}
@@ -159,37 +150,32 @@ public class VolumeMapper {
 									blockReads++;
 								}
 							} catch (Exception e) {
-								war.logWarn("Unexpected error while reading block from volume " + volume.getName() +
-										" file for zone " + zoneName + ". Blocks read so far: " + blockReads
-										+ "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage());
+								war.logWarn("Unexpected error while reading block from volume " + volume.getName() + " file for zone " + zoneName + ". Blocks read so far: " + blockReads + "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage());
 								e.printStackTrace();
 							}
 						}
 						if (height129Fix && j == volume.getSizeY() - 1) {
 							for (int skip = 0; skip < volume.getSizeZ(); skip++) {
-								in.readLine();	// throw away the extra vertical block I used to save pre 0.8
+								in.readLine(); // throw away the extra vertical block I used to save pre 0.8
 							}
 						}
 					}
 				}
 			}
 		} catch (IOException e) {
-			war.logWarn("Failed to read volume file " + volume.getName() +
-					" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+			war.logWarn("Failed to read volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
-			war.logWarn("Unexpected error caused failure to read volume file " + zoneName +
-					" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+			war.logWarn("Unexpected error caused failure to read volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 			e.printStackTrace();
-		}  finally {
+		} finally {
 			if (in != null) {
-			    try {
-			    	in.close();
-			    } catch (IOException e) {
-			    	war.logWarn("Failed to close file reader for volume " + volume.getName() +
-			    			" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
-			    	e.printStackTrace();
-			    }
+				try {
+					in.close();
+				} catch (IOException e) {
+					war.logWarn("Failed to close file reader for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -199,30 +185,36 @@ public class VolumeMapper {
 			BufferedWriter out = null;
 			try {
 				if (zoneName.equals("")) {
-				    out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
+					out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
 				} else {
-				    out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() +
-				    								"/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+					out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 				}
 
-				out.write("corner1"); out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getX())); out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getY())); out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getZ())); out.newLine();
-				out.write("corner2"); out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getX())); out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getY())); out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getZ())); out.newLine();
+				out.write("corner1");
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerOne().getX()));
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerOne().getY()));
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerOne().getZ()));
+				out.newLine();
+				out.write("corner2");
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerTwo().getX()));
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerTwo().getY()));
+				out.newLine();
+				out.write(Integer.toString(volume.getCornerTwo().getZ()));
+				out.newLine();
 				int blockWrites = 0;
-				for (int i = 0; i < volume.getSizeX(); i++){
+				for (int i = 0; i < volume.getSizeX(); i++) {
 					for (int j = 0; j < volume.getSizeY(); j++) {
 						for (int k = 0; k < volume.getSizeZ(); k++) {
 							try {
 								int typeId = volume.getBlockTypes()[i][j][k];
 								byte data = volume.getBlockDatas()[i][j][k];
 								out.write(typeId + "," + data + ",");
-								if (typeId == Material.WALL_SIGN.getId()
-										|| typeId == Material.SIGN_POST.getId()) {
+								if (typeId == Material.WALL_SIGN.getId() || typeId == Material.SIGN_POST.getId()) {
 									// Signs
 									String extra = "";
 									String[] lines = volume.getSignLines().get("sign-" + i + "-" + j + "-" + k);
@@ -239,11 +231,9 @@ public class VolumeMapper {
 									if (contents != null) {
 										for (ItemStack item : contents) {
 											if (item != null) {
-												extra += item.getTypeId() + ";"
-												+ item.getAmount() + ";"
-												+ item.getDurability();
+												extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
 												if (item.getData() != null) {
-												    extra += ";" + item.getData().getData() ;
+													extra += ";" + item.getData().getData();
 												}
 												extra += ";;";
 											}
@@ -257,11 +247,9 @@ public class VolumeMapper {
 									if (contents != null) {
 										for (ItemStack item : contents) {
 											if (item != null) {
-												extra += item.getTypeId() + ";"
-												+ item.getAmount() + ";"
-												+ item.getDurability();
+												extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
 												if (item.getData() != null) {
-												    extra += ";" + item.getData().getData() ;
+													extra += ";" + item.getData().getData();
 												}
 												extra += ";;";
 											}
@@ -270,46 +258,38 @@ public class VolumeMapper {
 									}
 								}
 								out.newLine();
-							}
-							catch (Exception e) {
-								war.logWarn("Unexpected error while writing block into volume " + volume.getName() +
-										" file for zone " + zoneName + ". Blocks written so far: " + blockWrites
-										+ "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage());
+							} catch (Exception e) {
+								war.logWarn("Unexpected error while writing block into volume " + volume.getName() + " file for zone " + zoneName + ". Blocks written so far: " + blockWrites + "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage());
 								e.printStackTrace();
 							}
 						}
 					}
 				}
 			} catch (IOException e) {
-				war.logWarn("Failed to write volume file " + zoneName +
-						" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				war.logWarn("Failed to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 				e.printStackTrace();
 			} catch (Exception e) {
-				war.logWarn("Unexpected error caused failure to write volume file " + zoneName +
-						" for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
+				war.logWarn("Unexpected error caused failure to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage());
 				e.printStackTrace();
-			}
-			finally {
+			} finally {
 				if (out != null) {
-				    try {
-				    	out.close();
-				    } catch (IOException e) {
-				    	war.logWarn("Failed to close file writer for volume " + volume.getName() +
-				    			" for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
-				    	e.printStackTrace();
-				    }
+					try {
+						out.close();
+					} catch (IOException e) {
+						war.logWarn("Failed to close file writer for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage());
+						e.printStackTrace();
+					}
 				}
 			}
 		}
 	}
 
 	public static void delete(Volume volume, War war) {
-		File volFile= new File("War/dat/volume-" + volume.getName());
+		File volFile = new File("War/dat/volume-" + volume.getName());
 		boolean deletedData = volFile.delete();
 		if (!deletedData) {
 			war.logWarn("Failed to delete file " + volFile.getName());
 		}
 	}
-
 
 }

@@ -22,9 +22,9 @@ import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class WarEntityListener extends EntityListener {
 
@@ -39,17 +39,17 @@ public class WarEntityListener extends EntityListener {
 		if (this.war.isLoaded()) {
 			Entity e = event.getEntity();
 			if (e instanceof Player) {
-				Player player = (Player)e;
+				Player player = (Player) e;
 				Team team = this.war.getPlayerTeam(player.getName());
 				if (team != null) {
-					Warzone zone =  this.war.getPlayerTeamWarzone(player.getName());
+					Warzone zone = this.war.getPlayerTeamWarzone(player.getName());
 					zone.handleDeath(player);
-	//				if (zone.isDropLootOnDeath()) {
-	//					war.getServer().getScheduler().scheduleAsyncDelayedTask(war,
-	//							new LootDropperTask(player.getLocation(), event.getDrops()),
-	//							750);
-	//				}
-					event.getDrops().clear();	// no loot
+					// if (zone.isDropLootOnDeath()) {
+					// war.getServer().getScheduler().scheduleAsyncDelayedTask(war,
+					// new LootDropperTask(player.getLocation(), event.getDrops()),
+					// 750);
+					// }
+					event.getDrops().clear(); // no loot
 				}
 			}
 		}
@@ -61,17 +61,15 @@ public class WarEntityListener extends EntityListener {
 
 		if (attacker != null && defender != null && attacker instanceof Player && defender instanceof Player) {
 			// only let adversaries (same warzone, different team) attack each other
-			Player a = (Player)attacker;
-			Player d = (Player)defender;
+			Player a = (Player) attacker;
+			Player d = (Player) defender;
 			Warzone attackerWarzone = this.war.getPlayerTeamWarzone(a.getName());
 			Team attackerTeam = this.war.getPlayerTeam(a.getName());
 			Warzone defenderWarzone = this.war.getPlayerTeamWarzone(d.getName());
 			Team defenderTeam = this.war.getPlayerTeam(d.getName());
-			if (attackerTeam != null && defenderTeam != null
-					&& attackerTeam != defenderTeam
-					&& attackerWarzone == defenderWarzone) {
+			if (attackerTeam != null && defenderTeam != null && attackerTeam != defenderTeam && attackerWarzone == defenderWarzone) {
 				// Make sure one of the players isn't in the spawn
-				if (defenderTeam.getSpawnVolume().contains(d.getLocation())) {	// attacking person in spawn
+				if (defenderTeam.getSpawnVolume().contains(d.getLocation())) { // attacking person in spawn
 					if (!defenderWarzone.isFlagThief(d.getName())) { // thiefs can always be attacked
 						this.war.badMsg(a, "Can't attack a player that's inside his team's spawn.");
 						event.setCancelled(true);
@@ -92,30 +90,25 @@ public class WarEntityListener extends EntityListener {
 					}
 					event.setCancelled(true);
 				}
-			} else if (attackerTeam != null && defenderTeam != null
-					&& attackerTeam == defenderTeam
-					&& attackerWarzone == defenderWarzone
-					&& attacker.getEntityId() != defender.getEntityId()) {
+			} else if (attackerTeam != null && defenderTeam != null && attackerTeam == defenderTeam && attackerWarzone == defenderWarzone && attacker.getEntityId() != defender.getEntityId()) {
 				// same team, but not same person
 				if (attackerWarzone.getFriendlyFire()) {
 					this.war.badMsg(a, "Friendly fire is on! Please, don't hurt your teammates."); // if ff is on, let the attack go through
 				} else {
 					this.war.badMsg(a, "Your attack missed! Your target is on your team.");
-					event.setCancelled(true);	// ff is off
+					event.setCancelled(true); // ff is off
 				}
-			} else if (attackerTeam == null && defenderTeam == null && this.war.canPvpOutsideZones(a)){
+			} else if (attackerTeam == null && defenderTeam == null && this.war.canPvpOutsideZones(a)) {
 				// let normal PVP through is its not turned off or if you have perms
 			} else if (attackerTeam == null && defenderTeam == null && !this.war.canPvpOutsideZones(a)) {
 				if (!this.war.isDisablePvpMessage()) {
 					this.war.badMsg(a, "You need the 'war.pvp' permission to attack players outside warzones.");
 				}
-				event.setCancelled(true);	// global pvp is off
+				event.setCancelled(true); // global pvp is off
 			} else {
 				this.war.badMsg(a, "Your attack missed!");
 				if (attackerTeam == null) {
-					this.war.badMsg(a, "You must join a team " +
-						", then you'll be able to damage people " +
-						"in the other teams in that warzone.");
+					this.war.badMsg(a, "You must join a team " + ", then you'll be able to damage people " + "in the other teams in that warzone.");
 				} else if (defenderTeam == null) {
 					this.war.badMsg(a, "Your target is not in a team.");
 				} else if (attacker != null && defender != null && attacker.getEntityId() == defender.getEntityId()) {
@@ -174,9 +167,8 @@ public class WarEntityListener extends EntityListener {
 				event.setCancelled(false);
 			}
 
-			if (event instanceof EntityDamageByEntityEvent ||
-					event instanceof EntityDamageByProjectileEvent) {
-				this.handlerAttackDefend((EntityDamageByEntityEvent)event);
+			if (event instanceof EntityDamageByEntityEvent || event instanceof EntityDamageByProjectileEvent) {
+				this.handlerAttackDefend((EntityDamageByEntityEvent) event);
 			} else {
 				// Detect death (from , prevent it and respawn the player
 				if (entity instanceof Player) {
@@ -194,15 +186,15 @@ public class WarEntityListener extends EntityListener {
 	@Override
 	public void onEntityCombust(EntityCombustEvent event) {
 		if (this.war.isLoaded()) {
-			Entity entity =  event.getEntity();
+			Entity entity = event.getEntity();
 			if (entity instanceof Player) {
 				Player player = (Player) entity;
 				Team team = this.war.getPlayerTeam(player.getName());
 				if (team != null && team.getSpawnVolume().contains(player.getLocation())) {
 					// smother out the fire that didn't burn out when you respawned
-					//Stop fire (upcast, watch out!)
+					// Stop fire (upcast, watch out!)
 					if (player instanceof CraftPlayer) {
-						net.minecraft.server.Entity playerEntity = ((CraftPlayer)player).getHandle();
+						net.minecraft.server.Entity playerEntity = ((CraftPlayer) player).getHandle();
 						playerEntity.fireTicks = 0;
 					}
 					event.setCancelled(true);
@@ -218,7 +210,7 @@ public class WarEntityListener extends EntityListener {
 			Warzone zone = this.war.warzone(location);
 			if (zone != null && zone.isNoCreatures()) {
 				event.setCancelled(true);
-				//war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
+				// war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
 			}
 		}
 	}

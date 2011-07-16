@@ -7,7 +7,6 @@ import com.tommytony.war.volumes.BlockInfo;
 
 public class ResetCursorJob implements Runnable {
 
-
 	private final Block cornerBlock;
 	private final BlockInfo[] originalCursorBlocks;
 	private final boolean isSoutheast;
