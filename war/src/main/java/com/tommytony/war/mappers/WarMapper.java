@@ -85,9 +85,6 @@ public class WarMapper {
 		// defaultFriendlyFire
 		war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));
 		
-		// defaultDrawZoneOutline
-		war.setDefaultDrawZoneOutline(warConfig.getBoolean("defaultDrawZoneOutline"));
-		
 		// defaultAutoAssignOnly
 		war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
 		
@@ -107,7 +104,7 @@ public class WarMapper {
 		war.setBuildInZonesOnly(warConfig.getBoolean("buildInZonesOnly"));
 		
 		// disablePVPMessage
-		war.setDisablePVPMessage(warConfig.getBoolean("disablePVPMessage"));
+		war.setDisablePvpMessage(warConfig.getBoolean("disablePvpMessage"));
 		
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
@@ -195,10 +192,7 @@ public class WarMapper {
 		
 		// defaultFriendlyFire
 		warConfig.setBoolean("defaultFriendlyFire", war.getDefaultFriendlyFire());
-		
-		// defaultFriendlyFire
-		warConfig.setBoolean("defaultDrawZoneOutline", war.getDefaultDrawZoneOutline());
-		
+	
 		// defaultAutoAssignOnly
 		warConfig.setBoolean("defaultAutoAssignOnly", war.getDefaultAutoAssignOnly());
 		
@@ -218,7 +212,7 @@ public class WarMapper {
 		warConfig.setBoolean("buildInZonesOnly", war.isBuildInZonesOnly());
 		
 		// disablePVPMessage
-		warConfig.setBoolean("disablePVPMessage", war.isDisablePVPMessage());
+		warConfig.setBoolean("disablePvpMessage", war.isDisablePvpMessage());
 		
 		// spawnStyle
 		warConfig.setString("spawnStyle", war.getDefaultSpawnStyle());

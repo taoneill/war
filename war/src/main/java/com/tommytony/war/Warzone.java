@@ -37,7 +37,6 @@ public class Warzone {
 	private boolean friendlyFire;
 	private int lifePool;
 	private HashMap<Integer, ItemStack> loadout = new HashMap<Integer, ItemStack>();
-	private boolean drawZoneOutline;
 	private int teamCap = 5;
 	private int scoreCap = 5;
 	private int monumentHeal = 5;
@@ -68,7 +67,6 @@ public class Warzone {
 		this.friendlyFire = war.getDefaultFriendlyFire();
 		this.setLifePool(war.getDefaultLifepool());
 		this.setLoadout(war.getDefaultLoadout());
-		this.setDrawZoneOutline(war.getDefaultDrawZoneOutline());
 		this.setAutoAssignOnly(war.getDefaultAutoAssignOnly());
 		this.teamCap = war.getDefaultTeamCap();
 		this.scoreCap = war.getDefaultScoreCap();
@@ -733,14 +731,6 @@ public class Warzone {
 
 	public boolean isAutoAssignOnly() {
 		return autoAssignOnly;
-	}
-
-	public void setDrawZoneOutline(boolean drawZoneOutline) {
-		this.drawZoneOutline = drawZoneOutline;
-	}
-
-	public boolean isDrawZoneOutline() {
-		return drawZoneOutline;
 	}
 	
 	public void handleDeath(Player player) {

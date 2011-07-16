@@ -149,9 +149,6 @@ public class WarzoneMapper {
 			// monument heal
 			warzone.setMonumentHeal(warzoneConfig.getInt("monumentHeal"));
 			
-			// drawZoneOutline
-			warzone.setDrawZoneOutline(warzoneConfig.getBoolean("drawZoneOutline"));
-			
 			// autoAssignOnly
 			warzone.setAutoAssignOnly(warzoneConfig.getBoolean("autoAssignOnly"));
 			
@@ -355,10 +352,7 @@ public class WarzoneMapper {
 		
 		// monument heal
 		warzoneConfig.setInt("monumentHeal", warzone.getMonumentHeal());
-		
-		// drawZoneOutline
-		warzoneConfig.setBoolean("drawZoneOutline", warzone.isDrawZoneOutline());
-		
+
 		// autoAssignOnly
 		warzoneConfig.setBoolean("autoAssignOnly", warzone.isAutoAssignOnly());
 		

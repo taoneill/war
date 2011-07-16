@@ -58,7 +58,6 @@ public class War extends JavaPlugin {
 	private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
 	private int defaultLifepool = 21;
 	private boolean defaultFriendlyFire = false;
-	private boolean defaultDrawZoneOutline = true;
 	private boolean defaultAutoAssignOnly = false;
 	private int defaultTeamCap = 7;
 	private int defaultScoreCap = 10;
@@ -73,7 +72,7 @@ public class War extends JavaPlugin {
 	private boolean pvpInZonesOnly = false;
 	private boolean buildInZonesOnly = false;
 
-	private boolean disablePVPMessage = false;
+	private boolean disablePvpMessage = false;
 	private WarHub warHub;
 
 
@@ -91,30 +90,6 @@ public class War extends JavaPlugin {
 		if(warHub != null) {
 			warHub.getVolume().resetBlocks();
 		}
-
-		Thread thread = new Thread(new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					Thread.sleep(2000);
-					Runtime rt = Runtime.getRuntime();
-					double mem = rt.freeMemory();
-					rt.runFinalization();
-					rt.gc();
-					mem = rt.freeMemory() - mem;
-					mem /= 1024 * 1024;
-					logInfo("Freed " + mem + " MB.");
-				}
-				catch (InterruptedException ex)
-				{
-					return;
-				}
-			}
-		});
-		thread.setPriority(Thread.MIN_PRIORITY);
-		thread.start();
 
 		this.logInfo("Done. War v" + desc.getVersion() + " is off.");
 	}
@@ -1055,10 +1030,6 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("autoassign");
 				warzone.setAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
 			}
-			if(namedParams.containsKey("outline")){
-				String onOff = namedParams.get("outline");
-				warzone.setDrawZoneOutline(onOff.equals("on") || onOff.equals("true"));
-			}
 			if(namedParams.containsKey("blockheads")){
 				String onOff = namedParams.get("blockheads");
 				warzone.setBlockHeads(onOff.equals("on") || onOff.equals("true"));
@@ -1134,13 +1105,13 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("autoassign");
 				setDefaultAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
 			}
-			if(namedParams.containsKey("outline")){
-				String onOff = namedParams.get("outline");
-				setDefaultDrawZoneOutline(onOff.equals("on") || onOff.equals("true"));
-			}
 			if(namedParams.containsKey("pvpinzonesonly")){
 				String onOff = namedParams.get("pvpinzonesonly");
 				setPvpInZonesOnly(onOff.equals("on") || onOff.equals("true"));
+			}
+			if(namedParams.containsKey("disablepvpmessage")){
+				String onOff = namedParams.get("disablepvpmessage");
+				setDisablePvpMessage(onOff.equals("on") || onOff.equals("true"));
 			}
 			if(namedParams.containsKey("blockheads")){
 				String onOff = namedParams.get("blockheads");
@@ -1438,6 +1409,20 @@ public class War extends JavaPlugin {
 		}
 	}
 
+	public boolean canPvpOutsideZones(Player player) {
+		if(isPvpInZonesOnly()) {
+			if(War.permissionHandler != null
+					&& (War.permissionHandler.has(player, "war.pvp")
+							|| War.permissionHandler.has(player, "War.pvp"))) {
+				return true;
+			}
+			// w/o Permissions, if pvpInZoneOnly, no one can pvp outside the zone
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	public boolean isZoneMaker(Player player) {
 		boolean isPlayerImpersonator = false;
 		for(String disguised : zoneMakersImpersonatingPlayers) {
@@ -1454,10 +1439,6 @@ public class War extends JavaPlugin {
 			}
 		}
 		return false;
-	}
-
-	public boolean getDefaultDrawZoneOutline() {
-		return isDefaultDrawZoneOutline() ;
 	}
 
 	public boolean getDefaultAutoAssignOnly() {
@@ -1528,14 +1509,6 @@ public class War extends JavaPlugin {
 		return defaultScoreCap;
 	}
 
-	public void setDefaultDrawZoneOutline(boolean defaultDrawZoneOutline) {
-		this.defaultDrawZoneOutline = defaultDrawZoneOutline;
-	}
-
-	public boolean isDefaultDrawZoneOutline() {
-		return defaultDrawZoneOutline;
-	}
-
 	public List<String> getZoneMakersImpersonatingPlayers() {
 		return zoneMakersImpersonatingPlayers;
 	}
@@ -1591,12 +1564,12 @@ public class War extends JavaPlugin {
 		return buildInZonesOnly;
 	}
 	
-	public void setDisablePVPMessage(boolean disablePVPMessage) {
-		this.disablePVPMessage = disablePVPMessage;
+	public void setDisablePvpMessage(boolean disablePvpMessage) {
+		this.disablePvpMessage = disablePvpMessage;
 	}
 
-	public boolean isDisablePVPMessage() {
-		return disablePVPMessage;
+	public boolean isDisablePvpMessage() {
+		return disablePvpMessage;
 	}
 
 	public void setDefaultUnbreakableZoneBlocks(boolean defaultUnbreakableZoneBlocks) {
@@ -1634,4 +1607,5 @@ public class War extends JavaPlugin {
 	public boolean isLoaded() {
 		return loaded;
 	}
+
 }

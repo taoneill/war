@@ -17,7 +17,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
-//import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
@@ -103,11 +102,11 @@ public class WarEntityListener extends EntityListener {
 					war.badMsg(a, "Your attack missed! Your target is on your team.");
 					event.setCancelled(true);	// ff is off
 				}
-			} else if (attackerTeam == null && defenderTeam == null && (!war.isPvpInZonesOnly() || a.getLocation().getWorld().getName().equals("pvp"))){
-				// let normal PVP through is its not turned off
-			} else if (attackerTeam == null && defenderTeam == null && war.isPvpInZonesOnly()) {
-				if (!war.isDisablePVPMessage()) {
-					war.badMsg(a, "Your attack missed! Global PVP is turned off. You can only attack other players in warzones. Try /warhub, /zones and /zone.");
+			} else if (attackerTeam == null && defenderTeam == null && war.canPvpOutsideZones(a)){
+				// let normal PVP through is its not turned off or if you have perms
+			} else if (attackerTeam == null && defenderTeam == null && !war.canPvpOutsideZones(a)) {
+				if (!war.isDisablePvpMessage()) {
+					war.badMsg(a, "You need the 'war.pvp' permission to attack players outside warzones.");
 				}
 				event.setCancelled(true);	// global pvp is off
 			} else {
@@ -227,9 +226,7 @@ public class WarEntityListener extends EntityListener {
 				Location location = player.getLocation();
 				Warzone zone = war.warzone(location);
 				if(zone != null) {
-					if (((CraftPlayer) player).getHandle().ticksLived % 20 * 12 == 0) {
-						event.setCancelled(true);
-					}
+					event.setCancelled(true);
 				}
 			}
 		}
