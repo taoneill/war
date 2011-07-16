@@ -15,9 +15,9 @@ import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.Volume;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
@@ -288,15 +288,6 @@ public class Team {
 		}
 
 		if (signBlock != null) {
-			// if (signBlock.getType() != Material.SIGN_POST) {
-			// signBlock.setType(Material.SIGN_POST);
-			// }
-			// else {
-			// // already a signpost, gotta delete it and create a new one
-			// signBlock.setType(Material.AIR);
-			// signBlock.setType(Material.SIGN_POST);
-			// }
-
 			String[] lines = new String[4];
 			lines[0] = "Team " + this.name;
 			lines[1] = this.players.size() + "/" + this.warzone.getTeamCap() + " players";
@@ -403,34 +394,6 @@ public class Team {
 	public void resetSign() {
 		this.getSpawnVolume().resetBlocks();
 		this.initializeTeamSpawn(); // reset everything instead of just sign
-
-		// BUKKIT
-		// int x = teamSpawn.getBlockX();
-		// int y = teamSpawn.getBlockY();
-		// int z = teamSpawn.getBlockZ();
-		//
-		// Block block = warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
-		// if (block.getType() != Material.SIGN_POST) {
-		// block.setType(Material.SIGN_POST);
-		// }
-		// // else {
-		// // // already a signpost, gotta delete it and create a new one
-		// // block.setType(Material.AIR);
-		// // block.setType(Material.SIGN_POST);
-		// // }
-		// // block.setData((byte)6);
-		//
-		// BlockState state = block.getState();
-		// if (state instanceof Sign) {
-		// Sign sign = (Sign) state;
-		// sign.setType(Material.SIGN_POST);
-		// sign.setData(new MaterialData(Material.SIGN_POST, (byte)6));
-		// sign.setLine(0, "Team " + name);
-		// sign.setLine(1, remainingTickets + "/" + warzone.getLifePool() + " lives left");
-		// sign.setLine(2, points + "/" + warzone.getScoreCap() + " pts");
-		// sign.setLine(3, players.size() + "/" + warzone.getTeamCap() + " players");
-		// state.update(true);
-		// }
 
 		if (this.warzone.getLobby() != null) {
 			this.warzone.getLobby().resetTeamGateSign(this);
