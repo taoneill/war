@@ -2,6 +2,7 @@ package bukkit.tommytony.war;
 
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -117,15 +118,6 @@ public class WarBlockListener extends BlockListener {
 		}
 	}
 
-	// public void onBlockDamage(BlockDamageEvent event) {
-	// Player player = event.getPlayer();
-	// Block block = event.getBlock();
-	// if (player != null && block != null && event.getDamageLevel() == BlockDamageLevel.BROKEN) {
-	// handleBreakOrDamage(player,block, event);
-	//
-	// }
-	// }
-
 	private void handleBreakOrDamage(Player player, Block block, Cancellable event) {
 		Warzone warzone = this.war.warzone(player.getLocation());
 		Team team = this.war.getPlayerTeam(player.getName());
@@ -176,9 +168,10 @@ public class WarBlockListener extends BlockListener {
 						block.setType(Material.AIR);
 
 						for (Team t : warzone.getTeams()) {
-							t.teamcast(player.getName() + " stole team " + lostFlagTeam.getName() + "'s flag.");
+							t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " stole team " + lostFlagTeam.getName() + "'s flag.");
 							if (t.getName().equals(lostFlagTeam.getName())) {
-								t.teamcast("Prevent " + player.getName() + " from reaching team " + team.getName() + "'s spawn or flag.");
+								t.teamcast("Prevent " + team.getKind().getColor() + player.getName() + ChatColor.WHITE 
+										+ " from reaching team " + team.getName() + "'s spawn or flag.");
 							}
 						}
 						this.war.msg(player, "You have team " + lostFlagTeam.getName() + "'s flag. Reach your team spawn or flag to capture it!");

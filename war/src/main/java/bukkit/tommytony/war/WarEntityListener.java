@@ -2,6 +2,7 @@ package bukkit.tommytony.war;
 
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -34,27 +35,6 @@ public class WarEntityListener extends EntityListener {
 		this.war = war;
 	}
 
-	@Override
-	public void onEntityDeath(EntityDeathEvent event) {
-		if (this.war.isLoaded()) {
-			Entity e = event.getEntity();
-			if (e instanceof Player) {
-				Player player = (Player) e;
-				Team team = this.war.getPlayerTeam(player.getName());
-				if (team != null) {
-					Warzone zone = this.war.getPlayerTeamWarzone(player.getName());
-					zone.handleDeath(player);
-					// if (zone.isDropLootOnDeath()) {
-					// war.getServer().getScheduler().scheduleAsyncDelayedTask(war,
-					// new LootDropperTask(player.getLocation(), event.getDrops()),
-					// 750);
-					// }
-					event.getDrops().clear(); // no loot
-				}
-			}
-		}
-	}
-
 	private void handlerAttackDefend(EntityDamageByEntityEvent event) {
 		Entity attacker = event.getDamager();
 		Entity defender = event.getEntity();
@@ -84,10 +64,13 @@ public class WarEntityListener extends EntityListener {
 
 				// Detect death, prevent it and respawn the player
 				if (event.getDamage() >= d.getHealth()) {
-					defenderWarzone.handleDeath(d);
-					if (this.war.getServer().getPluginManager().getPlugin("HeroicDeath") != null) {
-
+					String killMessage = "";
+					killMessage = attackerTeam.getKind().getColor() + a.getDisplayName() + ChatColor.WHITE +
+									" killed " + defenderTeam.getKind().getColor() + d.getDisplayName();
+					for (Team team : defenderWarzone.getTeams()) {
+						team.teamcast(killMessage);
 					}
+					defenderWarzone.handleDeath(d);
 					event.setCancelled(true);
 				}
 			} else if (attackerTeam != null && defenderTeam != null && attackerTeam == defenderTeam && attackerWarzone == defenderWarzone && attacker.getEntityId() != defender.getEntityId()) {
@@ -175,6 +158,11 @@ public class WarEntityListener extends EntityListener {
 					Player player = (Player) entity;
 					Warzone zone = this.war.getPlayerTeamWarzone(player.getName());
 					if (zone != null && event.getDamage() >= player.getHealth()) {
+						String deathMessage = "";
+						deathMessage = this.war.getPlayerTeam(player.getName()).getKind().getColor() + player.getDisplayName() + ChatColor.WHITE + " died";
+						for (Team team : zone.getTeams()) {
+							team.teamcast(deathMessage);
+						}
 						zone.handleDeath(player);
 						event.setCancelled(true);
 					}

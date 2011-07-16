@@ -2,6 +2,7 @@ package bukkit.tommytony.war;
 
 import java.util.Random;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftItem;
@@ -398,7 +399,8 @@ public class WarPlayerListener extends PlayerListener {
 								victim.getFlagVolume().resetBlocks(); // bring back flag to team that lost it
 								victim.initializeTeamFlag();
 								for (Team t : playerWarzone.getTeams()) {
-									t.teamcast(player.getName() + " captured team " + victim.getName() + "'s flag. Team " + playerTeam.getName() + " scores one point.");
+									t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE 
+											+ " captured team " + victim.getName() + "'s flag. Team " + playerTeam.getName() + " scores one point.");
 								}
 								playerWarzone.respawnPlayer(event, playerTeam, player);
 								playerTeam.resetSign();

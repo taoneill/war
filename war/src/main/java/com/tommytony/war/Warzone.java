@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -675,7 +676,6 @@ public class Warzone {
 		Warzone playerWarzone = this.war.getPlayerTeamWarzone(player.getName());
 		if (playerTeam != null && playerWarzone != null) {
 			// teleport to team spawn upon death
-			this.war.msg(player, "You died.");
 			playerWarzone.respawnPlayer(playerTeam, player);
 			int remaining = playerTeam.getRemainingLifes();
 			if (remaining == 0) { // your death caused your team to lose
@@ -771,7 +771,7 @@ public class Warzone {
 				playerTeam.removePlayer(player.getName());
 			}
 			for (Team t : this.getTeams()) {
-				t.teamcast(player.getName() + " left the zone.");
+				t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE + " left the zone.");
 			}
 			playerTeam.resetSign();
 			if (this.isFlagThief(player.getName())) {
