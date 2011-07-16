@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.entity.CraftTNTPrimed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
@@ -104,12 +105,22 @@ public class WarEntityListener extends EntityListener {
 				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 			}
 
-		} else if (defender instanceof Player && event instanceof EntityDamageByProjectileEvent) {
+		} else if (defender instanceof Player) {
 			// attacked by dispenser arrow most probably
 			// Detect death, prevent it and respawn the player
 			Player d = (Player) defender;
 			Warzone defenderWarzone = this.war.getPlayerTeamWarzone(d.getName());
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
+				String deathMessage = "";
+				if (event instanceof EntityDamageByProjectileEvent)
+					deathMessage = "A dispenser killed " + this.war.getPlayerTeam(d.getName()).getKind().getColor() + d.getDisplayName();
+				else if (event.getDamager() instanceof CraftTNTPrimed)
+					deathMessage = this.war.getPlayerTeam(d.getName()).getKind().getColor() + d.getDisplayName() + ChatColor.WHITE + " exploded";
+				else 
+					deathMessage = this.war.getPlayerTeam(d.getName()).getKind().getColor() + d.getDisplayName() + ChatColor.WHITE + " died";
+				for (Team team : defenderWarzone.getTeams()) {
+					team.teamcast(deathMessage);
+				}
 				defenderWarzone.handleDeath(d);
 				event.setCancelled(true);
 			}
