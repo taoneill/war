@@ -41,6 +41,7 @@ public class ZoneVolume extends Volume {
 	
 	public void loadCorners() {
 		ZoneVolumeMapper.load(this, zone.getName(), this.getWar(), this.getWorld(), true);
+		isSaved = true;
 	}
 	
 	@Override

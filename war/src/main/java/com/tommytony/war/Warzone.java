@@ -118,10 +118,6 @@ public class Warzone {
 					guard.deactivate();
 				}
 				zoneWallGuards.clear();
-//				volume.resetWallBlocks(BlockFace.EAST);
-//				volume.resetWallBlocks(BlockFace.WEST);
-//				volume.resetWallBlocks(BlockFace.NORTH);
-//				volume.resetWallBlocks(BlockFace.SOUTH);
 				
 				for(Team team : teams) {
 					team.getSpawnVolume().resetBlocks();
