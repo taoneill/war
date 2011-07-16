@@ -73,21 +73,23 @@ public class ZoneVolume extends Volume {
 			if (this.getCornerTwo() == null) {
 				// northwest defaults to corner 1
 				super.setCornerOne(topBlock);
-			} else if (this.getCornerTwo().getX() <= block.getX() || this.getCornerTwo().getZ() >= block.getZ())
+			} else if (this.getCornerTwo().getX() <= block.getX() || this.getCornerTwo().getZ() >= block.getZ()) {
 			    throw new NotNorthwestException();
-			else {
+			} else {
 				// corner 2 already set, but we're sure we're located at the northwest of it
 				super.setCornerOne(topBlock);
 			}
 		} else if (this.getCornerTwo() == null){
 			// corner 1 already exists, set northwest as corner 2 (only if it's at the northwest of corner 1)
-			if (this.getCornerOne().getX() <= block.getX() || this.getCornerOne().getZ() >= block.getZ())
+			if (this.getCornerOne().getX() <= block.getX() || this.getCornerOne().getZ() >= block.getZ()) {
 			    throw new NotNorthwestException();
+			}
 			super.setCornerTwo(topBlock);
 		} else {
 			// both corners already set: we are resizing (only if the new block is northwest relative to the southeasternmost block)
-			if (this.getSoutheastX() <= block.getX() || this.getSoutheastZ() >= block.getZ())
+			if (this.getSoutheastX() <= block.getX() || this.getSoutheastZ() >= block.getZ()) {
 			    throw new NotNorthwestException();
+			}
 			BlockInfo minXBlock = this.getMinXBlock(); // north means min X
 			minXBlock.setX(block.getX());	// mutating, argh!
 			BlockInfo maxZBlock = this.getMaxZBlock(); // west means max Z
@@ -105,17 +107,19 @@ public class ZoneVolume extends Volume {
 	}
 
 	public int getNorthwestX() {
-		if (!this.hasTwoCorners())
-			return 0;
-		else
-			return this.getMinX();
+		if (!this.hasTwoCorners()) {
+		    return 0;
+		} else {
+		    return this.getMinX();
+		}
 	}
 
 	public int getNorthwestZ() {
-		if (!this.hasTwoCorners())
-			return 0;
-		else
-			return this.getMaxZ();
+		if (!this.hasTwoCorners()) {
+		    return 0;
+		} else {
+		    return this.getMaxZ();
+		}
 	}
 
 	public void setSoutheast(Block block) throws NotSoutheastException, TooSmallException, TooBigException {
@@ -128,21 +132,23 @@ public class ZoneVolume extends Volume {
 			if (this.getCornerOne() == null) {
 				// southeast defaults to corner 2
 				super.setCornerTwo(bottomBlock);
-			} else if (this.getCornerOne().getX() >= block.getX() || this.getCornerOne().getZ() <= block.getZ())
+			} else if (this.getCornerOne().getX() >= block.getX() || this.getCornerOne().getZ() <= block.getZ()) {
 			    throw new NotSoutheastException();
-			else {
+			} else {
 				// corner 1 already set, but we're sure we're located at the southeast of it
 				super.setCornerTwo(bottomBlock);
 			}
 		}  else if (this.getCornerOne() == null){
 			// corner 2 already exists, set northwest as corner 1 (only if it's at the southeast of corner 2)
-			if (this.getCornerTwo().getX() >= block.getX() || this.getCornerTwo().getZ() <= block.getZ())
+			if (this.getCornerTwo().getX() >= block.getX() || this.getCornerTwo().getZ() <= block.getZ()) {
 			    throw new NotSoutheastException();
+			}
 			super.setCornerOne(bottomBlock);
 		} else {
 			// both corners already set: we are resizing (only if the new block is southeast relative to the northwesternmost block)
-			if (this.getNorthwestX() >= block.getX() || this.getNorthwestZ() <= block.getZ())
+			if (this.getNorthwestX() >= block.getX() || this.getNorthwestZ() <= block.getZ()) {
 			    throw new NotSoutheastException();
+			}
 			BlockInfo maxXBlock = this.getMaxXBlock(); // south means max X
 			maxXBlock.setX(block.getX());	// mutating, argh!
 			BlockInfo minZBlock = this.getMinZBlock(); // east means min Z
@@ -161,24 +167,27 @@ public class ZoneVolume extends Volume {
 	}
 
 	public int getSoutheastX() {
-		if (!this.hasTwoCorners())
-			return 0;
-		else
-			return this.getMaxX();
+		if (!this.hasTwoCorners()) {
+		    return 0;
+		} else {
+		    return this.getMaxX();
+		}
 	}
 
 	public int getSoutheastZ() {
-		if (!this.hasTwoCorners())
-			return 0;
-		else
-			return this.getMinZ();
+		if (!this.hasTwoCorners()) {
+		    return 0;
+		} else {
+		    return this.getMinZ();
+		}
 	}
 
 	public int getCenterY() {
-		if (!this.hasTwoCorners())
-			return 0;
-		else
-			return this.getMinY() + (this.getMaxY() - this.getMinY())/2;
+		if (!this.hasTwoCorners()) {
+		    return 0;
+		} else {
+		    return this.getMinY() + (this.getMaxY() - this.getMinY())/2;
+		}
 	}
 
 	public void setZoneCornerOne(Block block) throws TooSmallException, TooBigException {
@@ -208,14 +217,18 @@ public class ZoneVolume extends Volume {
 	public boolean tooSmall() {
 		if (this.hasTwoCorners() && ((this.getMaxX() - this.getMinX() < 10)
 			|| (this.getMaxY() - this.getMinY() < 10)
-			|| (this.getMaxZ() - this.getMinZ() < 10))) return true;
+			|| (this.getMaxZ() - this.getMinZ() < 10))) {
+		    return true;
+		}
 		return false;
 	}
 
 	public boolean tooBig() {
 		if (this.hasTwoCorners() && ((this.getMaxX() - this.getMinX() > 750)
 				|| (this.getMaxY() - this.getMinY() > 750)
-				|| (this.getMaxZ() - this.getMinZ() > 750))) return true;
+				|| (this.getMaxZ() - this.getMinZ() > 750))) {
+		    return true;
+		}
 		return false;
 	}
 
@@ -224,21 +237,24 @@ public class ZoneVolume extends Volume {
 		for (Team team : this.zone.getTeams()) {
 			if (team.getTeamSpawn() != null) {
 				if (!this.isInside(team.getSpawnVolume().getCornerOne())
-						|| !this.isInside(team.getSpawnVolume().getCornerTwo()))
+						|| !this.isInside(team.getSpawnVolume().getCornerTwo())) {
 				    return true;
+				}
 			}
 			if (team.getTeamFlag() != null) {
 				if (!this.isInside(team.getFlagVolume().getCornerOne())
-						|| !this.isInside(team.getFlagVolume().getCornerTwo()))
+						|| !this.isInside(team.getFlagVolume().getCornerTwo())) {
 				    return true;
+				}
 			}
 		}
 		// check monuments
 		for (Monument monument : this.zone.getMonuments()) {
 			if (monument.getVolume() != null) {
 				if (!this.isInside(monument.getVolume().getCornerOne())
-						|| !this.isInside(monument.getVolume().getCornerTwo()))
+						|| !this.isInside(monument.getVolume().getCornerTwo())) {
 				    return true;
+				}
 			}
 		}
 		return false;
@@ -247,8 +263,9 @@ public class ZoneVolume extends Volume {
 	private boolean isInside(BlockInfo info) {
 		if (info.getX() <= this.getMaxX() && info.getX() >= this.getMinX() &&
 				info.getY() <= this.getMaxY() && info.getY() >= this.getMinY() &&
-				info.getZ() <= this.getMaxZ() && info.getZ() >= this.getMinZ())
-			return true;
+				info.getZ() <= this.getMaxZ() && info.getZ() >= this.getMinZ()) {
+		    return true;
+		}
 		return false;
 	}
 
@@ -264,7 +281,9 @@ public class ZoneVolume extends Volume {
 				&& block.getX() >= this.getMinX()
 				&& block.getY() >= this.getMinY()
 				&& block.getY() <= this.getMaxY())
+		 {
 		    return true; 	// east wall
+		}
 		return false;
 	}
 
@@ -274,7 +293,9 @@ public class ZoneVolume extends Volume {
 				&& block.getZ() >= this.getMinZ()
 				&& block.getY() >= this.getMinY()
 				&& block.getY() <= this.getMaxY())
+		 {
 		    return true;	// south wall
+		}
 		return false;
 	}
 
@@ -284,7 +305,9 @@ public class ZoneVolume extends Volume {
 				&& block.getZ() >= this.getMinZ()
 				&& block.getY() >= this.getMinY()
 				&& block.getY() <= this.getMaxY())
+		 {
 		    return true;	// north wall
+		}
 		return false;
 	}
 
@@ -294,7 +317,9 @@ public class ZoneVolume extends Volume {
 				&& block.getX() >= this.getMinX()
 				&& block.getY() >= this.getMinY()
 				&& block.getY() <= this.getMaxY())
+		 {
 		    return true;	// west wall
+		}
 		return false;
 	}
 
@@ -304,7 +329,9 @@ public class ZoneVolume extends Volume {
 				&& block.getX() >= this.getMinX()
 				&& block.getZ() >= this.getMinZ()
 				&& block.getZ() <= this.getMaxZ())
+		 {
 		    return true;	// top wall
+		}
 		return false;
 	}
 
@@ -314,7 +341,9 @@ public class ZoneVolume extends Volume {
 				&& block.getX() >= this.getMinX()
 				&& block.getZ() >= this.getMinZ()
 				&& block.getZ() <= this.getMaxZ())
+		 {
 		    return true;	// bottom wall
+		}
 		return false;
 	}
 

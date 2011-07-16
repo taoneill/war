@@ -544,8 +544,9 @@ public class ZoneLobby {
 		 if (info != null) {
 			 if (location.getBlockX() == info.getX()
 						&& location.getBlockY() == info.getY()
-						&& location.getBlockZ() == info.getZ())
+						&& location.getBlockZ() == info.getZ()) {
 			    return true;
+			}
 		 }
 		return false;
 	}
@@ -554,8 +555,9 @@ public class ZoneLobby {
 		if (this.autoAssignGate != null
 				&& (location.getBlockX() == this.autoAssignGate.getX()
 					&& location.getBlockY() == this.autoAssignGate.getY()
-					&& location.getBlockZ() == this.autoAssignGate.getZ()) )
+					&& location.getBlockZ() == this.autoAssignGate.getZ()) ) {
 		    return true;
+		}
 		return false;
 	}
 
@@ -576,8 +578,9 @@ public class ZoneLobby {
 		if (this.warHubLinkGate != null
 				&& location.getBlockX() == this.warHubLinkGate.getX()
 				&& location.getBlockY() == this.warHubLinkGate.getY()
-				&& location.getBlockZ() == this.warHubLinkGate.getZ())
+				&& location.getBlockZ() == this.warHubLinkGate.getZ()) {
 		    return true;
+		}
 		return false;
 	}
 
@@ -585,12 +588,14 @@ public class ZoneLobby {
 		if (blockWall == this.wall) {
 			for (String teamName: this.teamGateBlocks.keySet()) {
 				BlockInfo gateInfo = this.teamGateBlocks.get(teamName);
-				if (this.isPartOfGate(BlockInfo.getBlock(this.warzone.getWorld(), gateInfo), block))
+				if (this.isPartOfGate(BlockInfo.getBlock(this.warzone.getWorld(), gateInfo), block)) {
 				    return true;
+				}
 			}
-			if (this.autoAssignGate != null && this.isPartOfGate(BlockInfo.getBlock(this.warzone.getWorld(), this.autoAssignGate), block))
+			if (this.autoAssignGate != null && this.isPartOfGate(BlockInfo.getBlock(this.warzone.getWorld(), this.autoAssignGate), block)) {
 			    // auto assign
 			    return true;
+			}
 		}
 		return false;
 	}
@@ -753,12 +758,16 @@ public class ZoneLobby {
 			right = BlockFace.NORTH;
 		}
 		if (this.autoAssignGate != null){
-			if (this.leaving(location, BlockInfo.getBlock(this.warzone.getWorld(), this.autoAssignGate), inside, left, right)) return true;
+			if (this.leaving(location, BlockInfo.getBlock(this.warzone.getWorld(), this.autoAssignGate), inside, left, right)) {
+			    return true;
+			}
 		}
 		for (String teamName : this.teamGateBlocks.keySet()) {
 
 			BlockInfo info = this.teamGateBlocks.get(teamName);
-			if (this.leaving(location, BlockInfo.getBlock(this.warzone.getWorld(), info), inside, left, right)) return true;
+			if (this.leaving(location, BlockInfo.getBlock(this.warzone.getWorld(), info), inside, left, right)) {
+			    return true;
+			}
 		}
 		return false;
 	}
@@ -775,8 +784,9 @@ public class ZoneLobby {
 		gateExitVolume.setCornerOne(out.getFace(left).getFace(BlockFace.DOWN));
 		gateExitVolume.setCornerTwo(gate.getFace(right, 1).getFace(BlockFace.UP, 3));
 
-		if (gateExitVolume.contains(location))
+		if (gateExitVolume.contains(location)) {
 		    return true;
+		}
 
 		// 1 block thick arrow like detection grid:
 //		Block out = gate.getFace(inside);

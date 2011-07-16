@@ -327,17 +327,23 @@ public class Volume {
 	}
 
 	public BlockInfo getMinXBlock() {
-		if (this.cornerOne.getX() < this.cornerTwo.getX()) return this.cornerOne;
+		if (this.cornerOne.getX() < this.cornerTwo.getX()) {
+		    return this.cornerOne;
+		}
 		return this.cornerTwo;
 	}
 
 	public BlockInfo getMinYBlock() {
-		if (this.cornerOne.getY() < this.cornerTwo.getY()) return this.cornerOne;
+		if (this.cornerOne.getY() < this.cornerTwo.getY()) {
+		    return this.cornerOne;
+		}
 		return this.cornerTwo;
 	}
 
 	public BlockInfo getMinZBlock() {
-		if (this.cornerOne.getZ() < this.cornerTwo.getZ()) return this.cornerOne;
+		if (this.cornerOne.getZ() < this.cornerTwo.getZ()) {
+		    return this.cornerOne;
+		}
 		return this.cornerTwo;
 	}
 
@@ -354,17 +360,23 @@ public class Volume {
 	}
 
 	public BlockInfo getMaxXBlock() {
-		if (this.cornerOne.getX() < this.cornerTwo.getX()) return this.cornerTwo;
+		if (this.cornerOne.getX() < this.cornerTwo.getX()) {
+		    return this.cornerTwo;
+		}
 		return this.cornerOne;
 	}
 
 	public BlockInfo getMaxYBlock() {
-		if (this.cornerOne.getY() < this.cornerTwo.getY()) return this.cornerTwo;
+		if (this.cornerOne.getY() < this.cornerTwo.getY()) {
+		    return this.cornerTwo;
+		}
 		return this.cornerOne;
 	}
 
 	public BlockInfo getMaxZBlock() {
-		if (this.cornerOne.getZ() < this.cornerTwo.getZ()) return this.cornerTwo;
+		if (this.cornerOne.getZ() < this.cornerTwo.getZ()) {
+		    return this.cornerTwo;
+		}
 		return this.cornerOne;
 	}
 

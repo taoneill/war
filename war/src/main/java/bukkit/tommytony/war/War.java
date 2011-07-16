@@ -1207,7 +1207,9 @@ public class War extends JavaPlugin {
 	public Team getPlayerTeam(String playerName) {
 		for (Warzone warzone : this.warzones) {
 			Team team = warzone.getPlayerTeam(playerName);
-			if (team != null) return team;
+			if (team != null) {
+			    return team;
+			}
 		}
 		return null;
 	}
@@ -1215,7 +1217,9 @@ public class War extends JavaPlugin {
 	public Warzone getPlayerTeamWarzone(String playerName) {
 		for (Warzone warzone : this.warzones) {
 			Team team = warzone.getPlayerTeam(playerName);
-			if (team != null) return warzone;
+			if (team != null) {
+			    return warzone;
+			}
 		}
 		return null;
 	}
@@ -1227,7 +1231,9 @@ public class War extends JavaPlugin {
 	public Warzone warzone(Location location) {
 		for (Warzone warzone : this.warzones) {
 			if (location.getWorld().getName().equals(warzone.getWorld().getName())
-					&& warzone.getVolume() != null && warzone.getVolume().contains(location)) return warzone;
+					&& warzone.getVolume() != null && warzone.getVolume().contains(location)) {
+			    return warzone;
+			}
 		}
 		return null;
 	}
@@ -1235,19 +1241,22 @@ public class War extends JavaPlugin {
 	public boolean inAnyWarzone(Location location) {
 		Block locBlock = location.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 		Warzone currentZone = this.warzone(location);
-		if (currentZone == null)
+		if (currentZone == null) {
 		    return false;
-		else if (currentZone.getVolume().isWallBlock(locBlock))
+		} else if (currentZone.getVolume().isWallBlock(locBlock))
+		 {
 		    return false;	// wall block doesnt count. this lets people in at the lobby side wall because wall gates overlap with the zone.
+		}
 		return true;
 	}
 
 	public boolean inWarzone(String warzoneName, Location location) {
 		Warzone currentZone = this.warzone(location);
-		if (currentZone == null)
+		if (currentZone == null) {
 		    return false;
-		else if (warzoneName.toLowerCase().equals(currentZone.getName().toLowerCase()))
+		} else if (warzoneName.toLowerCase().equals(currentZone.getName().toLowerCase())) {
 		    return true;
+		}
 		return false;
 	}
 
@@ -1287,20 +1296,23 @@ public class War extends JavaPlugin {
 	// the only way to find a zone that has only one corner
 	public Warzone findWarzone(String warzoneName) {
 		for (Warzone warzone : this.warzones) {
-			if (warzone.getName().toLowerCase().equals(warzoneName.toLowerCase()))
+			if (warzone.getName().toLowerCase().equals(warzoneName.toLowerCase())) {
 			    return warzone;
+			}
 		}
 		for (Warzone warzone : this.incompleteZones) {
-			if (warzone.getName().equals(warzoneName))
+			if (warzone.getName().equals(warzoneName)) {
 			    return warzone;
+			}
 		}
 		return null;
 	}
 
 	public Warzone matchWarzone(String warzoneSubString) {
 		for (Warzone warzone : this.warzones) {
-			if (warzone.getName().toLowerCase().startsWith(warzoneSubString.toLowerCase()))
+			if (warzone.getName().toLowerCase().startsWith(warzoneSubString.toLowerCase())) {
 			    return warzone;
+			}
 		}
 		return null;
 	}
@@ -1342,8 +1354,9 @@ public class War extends JavaPlugin {
 	}
 
 	public String getWandBearerZone(Player player) {
-		if (this.isWandBearer(player))
+		if (this.isWandBearer(player)) {
 		    return this.wandBearers.get(player.getName());
+		}
 		return "";
 	}
 
@@ -1387,7 +1400,9 @@ public class War extends JavaPlugin {
 
 	public Warzone zoneOfZoneWallAtProximity(Location location) {
 		for (Warzone zone : this.warzones) {
-			if (zone.getWorld() == location.getWorld() && zone.isNearWall(location)) return zone;
+			if (zone.getWorld() == location.getWorld() && zone.isNearWall(location)) {
+			    return zone;
+			}
 		}
 		return null;
 	}
@@ -1399,22 +1414,26 @@ public class War extends JavaPlugin {
 	public boolean canPlayWar(Player player) {
 		if (War.permissionHandler != null
 				&& (War.permissionHandler.has(player, "war.player")
-						|| War.permissionHandler.has(player, "War.player")))
+						|| War.permissionHandler.has(player, "War.player"))) {
 		    return true;
-		if (War.permissionHandler == null)
+		}
+		if (War.permissionHandler == null) {
 		    // w/o Permissions, everyone can play
 		    return true;
+		}
 		return false;
 	}
 
 	public boolean canWarp(Player player) {
 		if (War.permissionHandler != null
 				&& (War.permissionHandler.has(player, "war.warp")
-						|| War.permissionHandler.has(player, "War.warp")))
+						|| War.permissionHandler.has(player, "War.warp"))) {
 		    return true;
-		if (War.permissionHandler == null)
+		}
+		if (War.permissionHandler == null) {
 		    // w/o Permissions, everyone can warp
 		    return true;
+		}
 		return false;
 	}
 
@@ -1422,43 +1441,52 @@ public class War extends JavaPlugin {
 		if (this.isBuildInZonesOnly()) {
 			if (War.permissionHandler != null
 					&& (War.permissionHandler.has(player, "war.build")
-							|| War.permissionHandler.has(player, "War.build")))
+							|| War.permissionHandler.has(player, "War.build"))) {
 			    return true;
+			}
 			// w/o Permissions, if buildInZonesOnly, no one can build outside the zone except Zonemakers
 			return this.isZoneMaker(player);
-		} else
+		} else {
 		    return true;
+		}
 	}
 
 	public boolean canPvpOutsideZones(Player player) {
 		if (this.isPvpInZonesOnly()) {
 			if (War.permissionHandler != null
 					&& (War.permissionHandler.has(player, "war.pvp")
-							|| War.permissionHandler.has(player, "War.pvp")))
+							|| War.permissionHandler.has(player, "War.pvp"))) {
 			    return true;
+			}
 			// w/o Permissions, if pvpInZoneOnly, no one can pvp outside the zone
 			return false;
-		} else
+		} else {
 		    return true;
+		}
 	}
 
 	public boolean isZoneMaker(Player player) {
 		for (String disguised : this.zoneMakersImpersonatingPlayers) {
-			if (disguised.equals(player.getName())) return false;
+			if (disguised.equals(player.getName())) {
+			    return false;
+			}
 		}
 
 		for (String zoneMaker : this.zoneMakerNames) {
-			if (zoneMaker.equals(player.getName())) return true;
+			if (zoneMaker.equals(player.getName())) {
+			    return true;
+			}
 		}
 		if (	War.permissionHandler != null
 		&& 	(
 				War.permissionHandler.has(player, "war.*")
 			|| 	War.permissionHandler.has(player, "War.*")
 			)
-		)
+		) {
 		    return true;
-		else
+		} else {
 		    return player.isOp();
+		}
 	}
 
 	public boolean getDefaultAutoAssignOnly() {
@@ -1482,24 +1510,27 @@ public class War extends JavaPlugin {
 		for (Warzone warzone : this.warzones) {
 			if (warzone.getLobby() != null
 					&& warzone.getLobby().getVolume() != null
-					&& warzone.getLobby().getVolume().contains(location))
-				return warzone.getLobby();
+					&& warzone.getLobby().getVolume().contains(location)) {
+			    return warzone.getLobby();
+			}
 		}
 		return null;
 	}
 
 	public boolean inAnyWarzoneLobby(Location location) {
-		if (this.lobby(location) == null)
+		if (this.lobby(location) == null) {
 		    return false;
+		}
 		return true;
 	}
 
 	public boolean inWarzoneLobby(String warzoneName, Location location) {
 		ZoneLobby currentLobby = this.lobby(location);
-		if (currentLobby == null)
+		if (currentLobby == null) {
 		    return false;
-		else if (warzoneName.toLowerCase().equals(currentLobby.getZone().getName().toLowerCase()))
+		} else if (warzoneName.toLowerCase().equals(currentLobby.getZone().getName().toLowerCase())) {
 		    return true;
+		}
 		return false;
 	}
 

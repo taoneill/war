@@ -548,8 +548,9 @@ public class Team {
 			int flagZ = this.teamFlag.getBlockZ();
 			if (block.getX() == flagX
 					&& block.getY() == flagY
-					&& block.getZ() == flagZ)
+					&& block.getZ() == flagZ) {
 			    return true;
+			}
 		}
 		return false;
 	}

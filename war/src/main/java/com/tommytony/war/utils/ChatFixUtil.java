@@ -130,18 +130,19 @@ public class ChatFixUtil {
 	 */
 	public static String thisMsgWouldCrashClient(String str) {
 		// There would always be crash if we end with deg or deg+'anychar'
-		if (str.length() >= 1 && str.charAt(str.length() - 1) == ChatFixUtil.deg)
+		if (str.length() >= 1 && str.charAt(str.length() - 1) == ChatFixUtil.deg) {
 		    return "Crash: The str ends with deg.";
-		else if (str.length() >= 2 && str.charAt(str.length() - 2) == ChatFixUtil.deg)
+		} else if (str.length() >= 2 && str.charAt(str.length() - 2) == ChatFixUtil.deg) {
 		    return "Crash: The str ends with deg+'anychar'.";
+		}
 
 		int displayedChars = 0;
 
 		for (int i = 0; i < str.length(); i++) {
 			char c = str.charAt(i);
-			if (c == ChatFixUtil.deg && displayedChars == ChatFixUtil.lineLength)
+			if (c == ChatFixUtil.deg && displayedChars == ChatFixUtil.lineLength) {
 			    return "Crash: Deg as fiftyforth \"displayed\" char";
-			else if (c == ChatFixUtil.deg) {
+			} else if (c == ChatFixUtil.deg) {
 				i++; // this and next: they are not displayed... skip them...
 			} else {
 				displayedChars += 1;

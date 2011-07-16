@@ -42,7 +42,9 @@ public class VerticalVolume extends Volume{
 		if (this.getMinZ() == block.getZ()
 				&& block.getX() <= this.getMaxX()
 				&& block.getX() >= this.getMinX())
+		 {
 		    return true; 	// east wall
+		}
 		return false;
 	}
 
@@ -50,7 +52,9 @@ public class VerticalVolume extends Volume{
 		if (this.getMaxX() == block.getX()
 				&& block.getZ() <= this.getMaxZ()
 				&& block.getZ() >= this.getMinZ())
+		 {
 		    return true;	// south wall
+		}
 		return false;
 	}
 
@@ -58,7 +62,9 @@ public class VerticalVolume extends Volume{
 		if (this.getMinX() == block.getX()
 				&& block.getZ() <= this.getMaxZ()
 				&& block.getZ() >= this.getMinZ())
+		 {
 		    return true;	// north wall
+		}
 		return false;
 	}
 
@@ -66,7 +72,9 @@ public class VerticalVolume extends Volume{
 		if (this.getMaxZ() == block.getZ()
 				&& block.getX() <= this.getMaxX()
 				&& block.getX() >= this.getMinX())
+		 {
 		    return true;	// west wall
+		}
 		return false;
 	}
 

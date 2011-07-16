@@ -162,8 +162,9 @@ public final class PropertiesFile {
 	 * @param key The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to "" or empty.
 	 */
 	public String getString(String key) {
-		if (this.containsKey(key))
+		if (this.containsKey(key)) {
 		    return this.getProperty(key);
+		}
 
 		return "";
 	}
@@ -179,8 +180,9 @@ public final class PropertiesFile {
 	 * @return java.lang.String Either we will return the default value or a prior existing value depending on existance.
 	 */
 	public String getString(String key, String value) {
-		if (this.containsKey(key))
+		if (this.containsKey(key)) {
 		    return this.getProperty(key);
+		}
 
 		this.setString(key, value);
 		return value;
@@ -206,8 +208,9 @@ public final class PropertiesFile {
 	 * @param key The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to 0
 	 */
 	public int getInt(String key) {
-		if (this.containsKey(key))
+		if (this.containsKey(key)) {
 		    return Integer.parseInt(this.getProperty(key));
+		}
 
 		return 0;
 	}
@@ -221,8 +224,9 @@ public final class PropertiesFile {
 	 * @return <code>Integer</code> - Either we will return the default value or a prior existing value depending on existance.
 	 */
 	public int getInt(String key, int value) {
-		if (this.containsKey(key))
+		if (this.containsKey(key)) {
 		    return Integer.parseInt(this.getProperty(key));
+		}
 
 		this.setInt(key, value);
 		return value;
@@ -250,8 +254,9 @@ public final class PropertiesFile {
 	 * @param key The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to 0.0
 	 */
 	public double getDouble(String key) {
-		if (this.containsKey(key))
+		if (this.containsKey(key)) {
 		    return Double.parseDouble(this.getProperty(key));
+		}
 
 		return 0;
 	}
@@ -265,8 +270,9 @@ public final class PropertiesFile {
 	 * @return <code>Double</code> - Either we will return the default value or a prior existing value depending on existance.
 	 */
 	public double getDouble(String key, double value) {
-		if (this.containsKey(key))
+		if (this.containsKey(key)) {
 		    return Double.parseDouble(this.getProperty(key));
+		}
 
 		this.setDouble(key, value);
 		return value;
@@ -293,8 +299,9 @@ public final class PropertiesFile {
 	 * @param key The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to 0L
 	 */
 	public long getLong(String key) {
-		if (this.containsKey(key))
+		if (this.containsKey(key)) {
 		    return Long.parseLong(this.getProperty(key));
+		}
 
 		return 0;
 	}
@@ -308,8 +315,9 @@ public final class PropertiesFile {
 	 * @return <code>Long</code> - Either we will return the default value or a prior existing value depending on existance.
 	 */
 	public long getLong(String key, long value) {
-		if (this.containsKey(key))
+		if (this.containsKey(key)) {
 		    return Long.parseLong(this.getProperty(key));
+		}
 
 		this.setLong(key, value);
 		return value;
@@ -336,8 +344,9 @@ public final class PropertiesFile {
 	 * @param key The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to false
 	 */
 	public boolean getBoolean(String key) {
-		if (this.containsKey(key))
+		if (this.containsKey(key)) {
 		    return Boolean.parseBoolean(this.getProperty(key));
+		}
 
 		return false;
 	}
@@ -351,8 +360,9 @@ public final class PropertiesFile {
 	 * @return <code>Boolean</code> - Either we will return the default value or a prior existing value depending on existance.
 	 */
 	public boolean getBoolean(String key, boolean value) {
-		if (this.containsKey(key))
+		if (this.containsKey(key)) {
 		    return Boolean.parseBoolean(this.getProperty(key));
+		}
 
 		this.setBoolean(key, value);
 		return value;
