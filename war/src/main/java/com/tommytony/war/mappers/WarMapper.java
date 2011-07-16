@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
@@ -273,7 +274,18 @@ public class WarMapper {
 		String hubStr = "";
 		WarHub hub = war.getWarHub();
 		if (hub != null) {
-			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + "," + hub.getLocation().getWorld().getName();
+			String orientationStr = "";
+			if (BlockFace.SOUTH == hub.getOrientation()) {
+				orientationStr = "south";
+			} else if (BlockFace.EAST == hub.getOrientation()) {
+				orientationStr = "east";
+			} else if (BlockFace.NORTH == hub.getOrientation()) {
+				orientationStr = "north";
+			} else {
+				orientationStr = "west";
+			}
+			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + "," 
+			+ hub.getLocation().getWorld().getName() + "," + orientationStr;
 			VolumeMapper.save(hub.getVolume(), "", war);
 		}
 		warConfig.setString("warhub", hubStr);

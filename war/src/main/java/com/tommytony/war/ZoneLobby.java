@@ -134,20 +134,6 @@ public class ZoneLobby {
 			opposite = BlockFace.NORTH;
 		}
 
-		// float yaw = playerLocation.getYaw() % 360;
-		// if (yaw >= 45 && yaw < 135) {
-		// facing = BlockFace.NORTH;
-		// opposite = BlockFace.SOUTH;
-		// } else if (yaw >= 135 && yaw < 225) {
-		// facing = BlockFace.EAST;
-		// opposite = BlockFace.WEST;
-		// } else if (yaw >= 225 && yaw < 315) {
-		// facing = BlockFace.SOUTH;
-		// opposite = BlockFace.NORTH;
-		// } else if (yaw >= 315 || yaw < 45) {
-		// facing = BlockFace.WEST;
-		// opposite = BlockFace.EAST;
-		// }
 		this.wall = opposite; // a player facing south places a lobby that looks just like a lobby stuck to the north wall
 
 		this.calculateLobbyWidth();

@@ -28,16 +28,20 @@ public class RestoreWarhubJob implements Runnable {
 		int hubZ = Integer.parseInt(hubStrSplit[2]);
 		World world = null;
 		String worldName;
+		String hubOrientation = "west";
 		if (hubStrSplit.length > 3) {
 			worldName = hubStrSplit[3];
 			world = this.war.getServer().getWorld(worldName);
+			if(hubStrSplit.length > 4) {
+				hubOrientation = hubStrSplit[4];
+			}
 		} else {
 			worldName = "DEFAULT";
 			world = this.war.getServer().getWorlds().get(0); // default to first world
 		}
 		if (world != null) {
 			Location hubLocation = new Location(world, hubX, hubY, hubZ);
-			WarHub hub = new WarHub(this.war, hubLocation);
+			WarHub hub = new WarHub(this.war, hubLocation, hubOrientation);
 			this.war.setWarHub(hub);
 			Volume vol = VolumeMapper.loadVolume("warhub", "", this.war, world);
 			hub.setVolume(vol);
