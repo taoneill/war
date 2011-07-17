@@ -3,11 +3,12 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
 import com.tommytony.war.Warzone;
 
-public class TeamsCommand extends AbstractWarzoneCommand {
+public class TeamsCommand extends AbstractWarCommand {
 	public TeamsCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		super(handler, sender, args);
 	}
@@ -15,12 +16,12 @@ public class TeamsCommand extends AbstractWarzoneCommand {
 	public boolean handle() {
 		Warzone zone;
 		if (this.args.length == 1) {
-			zone = this.getWarzoneFromName(this.args[0]);
+			zone = War.war.getWarzoneFromName(this.args[0]);
 		} else {
 			if (!(this.sender instanceof Player)) {
 				return false;
 			}
-			zone = this.getWarzoneFromLocation((Player) this.sender);
+			zone = War.war.getWarzoneFromLocation((Player) this.sender);
 		}
 		if (zone == null) {
 			return true;
