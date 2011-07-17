@@ -36,6 +36,12 @@ public class WarCommandHandler {
 		else if (command.equals("zone") || command.equals("warzone")) {
 			commandObj = new WarzoneCommand(this, sender, arguments);
 		}
+		else if (command.equals("teams")) {
+			commandObj = new TeamsCommand(this, sender, arguments);
+		}
+		else if (command.equals("join")) {
+			commandObj = new JoinCommand(this, sender, arguments);
+		}
 		else {
 			// we are not responsible for this command
 			return true;
