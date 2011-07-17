@@ -45,6 +45,9 @@ public class WarCommandHandler {
 		else if (command.equals("leave")) {
 			commandObj = new LeaveCommand(this, sender, arguments);
 		}
+		else if (command.equals("team")) {
+			commandObj = new TeamCommand(this, sender, arguments);
+		}
 		else {
 			// we are not responsible for this command
 			return true;

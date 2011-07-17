@@ -177,9 +177,7 @@ public class War extends JavaPlugin {
 		return this.commandHandler.handle(sender, cmd, commandLabel, args);
 
 		if (sender instanceof Player) {
-			if (command.equals("leave")) {
-				this.performLeave(player);
-			} else if (command.equals("team")) {
+			if (command.equals("team")) {
 				this.performTeam(player, arguments);
 			} else if (command.equals("warhub")) {
 				this.performWarhub(player);
