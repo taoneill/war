@@ -176,12 +176,8 @@ public class War extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		return this.commandHandler.handle(sender, cmd, commandLabel, args);
 
-		if (sender instanceof Player) {
-			if (command.equals("team")) {
-				this.performTeam(player, arguments);
-			} else if (command.equals("warhub")) {
-				this.performWarhub(player);
-			} else if (this.isZoneMaker(player)) {
+		/*if (sender instanceof Player) {
+			if (this.isZoneMaker(player)) {
 				// Mod commands : /nextbattle
 				if (command.equals("nextbattle")) {
 					this.performNextBattle(player);
@@ -229,7 +225,7 @@ public class War extends JavaPlugin {
 				this.performZonemakerAsPlayer(player);
 			}
 		}
-		return true;
+		return true;*/
 	}
 
 	/**
@@ -782,35 +778,6 @@ public class War extends JavaPlugin {
 			}
 			warzone.getVolume().resetBlocksAsJob();
 			warzone.initializeZoneAsJob();
-		}
-	}
-
-	public void performWarhub(Player player) {
-		if (this.getWarHub() == null) {
-			this.badMsg(player, "No warhub on this War server. Try /zones and /zone.");
-		} else if (!this.canWarp(player)) {
-			this.badMsg(player, "Can't warp to warhub. You need the 'war.warp' permission.");
-		} else {
-			Team playerTeam = this.getPlayerTeam(player.getName());
-			Warzone playerWarzone = this.getPlayerTeamWarzone(player.getName());
-			if (playerTeam != null) { // was in zone
-				playerWarzone.handlePlayerLeave(player, this.getWarHub().getLocation(), true);
-			}
-			player.teleport(this.getWarHub().getLocation());
-		}
-	}
-
-	public void performTeam(Player player, String[] arguments) {
-		Team playerTeam = this.getPlayerTeam(player.getName());
-		if (playerTeam == null) {
-			this.badMsg(player, "Usage: /team <message>. " + "Sends a message only to your teammates.");
-		} else {
-			ChatColor color = playerTeam.getKind().getColor();
-			String teamMessage = color + player.getName() + ": " + ChatColor.WHITE;
-			for (String part : arguments) {
-				teamMessage += part + " ";
-			}
-			playerTeam.teamcast(teamMessage);
 		}
 	}
 
