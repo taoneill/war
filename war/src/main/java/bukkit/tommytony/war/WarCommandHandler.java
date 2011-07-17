@@ -3,8 +3,7 @@ package bukkit.tommytony.war;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import bukkit.tommytony.war.command.AbstractWarCommand;
-import bukkit.tommytony.war.command.WarzonesCommand;
+import bukkit.tommytony.war.command.*;
 
 /**
  * @author 	Tim Düsterhus
@@ -33,6 +32,13 @@ public class WarCommandHandler {
 		AbstractWarCommand commandObj = null;
 		if (command.equals("zones") || command.equals("warzones")) {
 			commandObj = new WarzonesCommand(this, sender, arguments);
+		}
+		else if (command.equals("zone") || command.equals("warzone")) {
+			commandObj = new WarzoneCommand(this, sender, arguments);
+		}
+		else {
+			// we are not responsible for this command
+			return true;
 		}
 
 		return commandObj.handle();
