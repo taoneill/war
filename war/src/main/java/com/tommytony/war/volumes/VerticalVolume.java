@@ -1,5 +1,7 @@
 package com.tommytony.war.volumes;
 
+import java.util.logging.Level;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -8,15 +10,15 @@ import org.bukkit.block.BlockFace;
 import bukkit.tommytony.war.War;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 @Deprecated
 public class VerticalVolume extends Volume {
 
-	public VerticalVolume(String name, War war, World world) {
-		super(name, war, world);
+	public VerticalVolume(String name, World world) {
+		super(name, world);
 
 	}
 
@@ -141,7 +143,7 @@ public class VerticalVolume extends Volume {
 				}
 			}
 		} catch (Exception e) {
-			this.getWar().logWarn("Failed to reset wall " + wall + " in volume " + this.getName() + ". " + e.getClass().toString() + " " + e.getMessage());
+			War.war.log("Failed to reset wall " + wall + " in volume " + this.getName() + ". " + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 		return noOfResetBlocks;
 	}

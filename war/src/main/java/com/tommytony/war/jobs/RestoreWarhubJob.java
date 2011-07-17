@@ -1,5 +1,7 @@
 package com.tommytony.war.jobs;
 
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -12,11 +14,9 @@ import com.tommytony.war.volumes.Volume;
 
 public class RestoreWarhubJob implements Runnable {
 
-	private final War war;
 	private final String hubStr;
 
-	public RestoreWarhubJob(War war, String hubStr) {
-		this.war = war;
+	public RestoreWarhubJob(String hubStr) {
 		this.hubStr = hubStr;
 	}
 
@@ -31,33 +31,33 @@ public class RestoreWarhubJob implements Runnable {
 		String hubOrientation = "west";
 		if (hubStrSplit.length > 3) {
 			worldName = hubStrSplit[3];
-			world = this.war.getServer().getWorld(worldName);
+			world = War.war.getServer().getWorld(worldName);
 			if(hubStrSplit.length > 4) {
 				hubOrientation = hubStrSplit[4];
 			}
 		} else {
 			worldName = "DEFAULT";
-			world = this.war.getServer().getWorlds().get(0); // default to first world
+			world = War.war.getServer().getWorlds().get(0); // default to first world
 		}
 		if (world != null) {
 			Location hubLocation = new Location(world, hubX, hubY, hubZ);
-			WarHub hub = new WarHub(this.war, hubLocation, hubOrientation);
-			this.war.setWarHub(hub);
-			Volume vol = VolumeMapper.loadVolume("warhub", "", this.war, world);
+			WarHub hub = new WarHub(hubLocation, hubOrientation);
+			War.war.setWarHub(hub);
+			Volume vol = VolumeMapper.loadVolume("warhub", "", world);
 			hub.setVolume(vol);
 			hub.getVolume().resetBlocks();
 			hub.initialize();
 
 			// In the previous job started by the mapper, warzones were created, but their lobbies are missing the war hub gate (because it didn't exist yet)
-			for (Warzone zone : this.war.getWarzones()) {
+			for (Warzone zone : War.war.getWarzones()) {
 				if (zone.getLobby() != null) {
 					zone.getLobby().getVolume().resetBlocks();
 					zone.getLobby().initialize();
 				}
 			}
-			this.war.logInfo("Warhub ready.");
+			War.war.log("Warhub ready.", Level.INFO);
 		} else {
-			this.war.logWarn("Failed to restore warhub. The specified world (name: " + worldName + ") does not exist!");
+			War.war.log("Failed to restore warhub. The specified world (name: " + worldName + ") does not exist!", Level.WARNING);
 		}
 	}
 }
