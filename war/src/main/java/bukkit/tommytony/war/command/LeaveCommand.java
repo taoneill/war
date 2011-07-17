@@ -8,7 +8,7 @@ import bukkit.tommytony.war.WarCommandHandler;
 
 import com.tommytony.war.Warzone;
 
-public class LeaveCommand extends AbstractWarzoneCommand {
+public class LeaveCommand extends AbstractWarCommand {
 	public LeaveCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		super(handler, sender, args);
 	}

@@ -7,7 +7,7 @@ import bukkit.tommytony.war.WarCommandHandler;
 
 import com.tommytony.war.Warzone;
 
-public class TeamsCommand extends AbstractWarzoneCommand {
+public class TeamsCommand extends AbstractWarCommand {
 	public TeamsCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		super(handler, sender, args);
 	}
@@ -20,7 +20,7 @@ public class TeamsCommand extends AbstractWarzoneCommand {
 			if (!(this.sender instanceof Player)) {
 				return false;
 			}
-			zone = this.getWarzoneFromLocation((Player) this.sender);
+			zone = War.war.getWarzoneFromLocation((Player) this.sender);
 		}
 		if (zone == null) {
 			return true;

@@ -9,7 +9,7 @@ import bukkit.tommytony.war.WarCommandHandler;
 
 import com.tommytony.war.Team;
 
-public class TeamCommand extends AbstractWarzoneCommand {
+public class TeamCommand extends AbstractWarCommand {
 	public TeamCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		super(handler, sender, args);
 	}

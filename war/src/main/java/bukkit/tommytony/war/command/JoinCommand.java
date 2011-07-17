@@ -13,7 +13,7 @@ import com.tommytony.war.TeamKind;
 import com.tommytony.war.TeamKinds;
 import com.tommytony.war.Warzone;
 
-public class JoinCommand extends AbstractWarzoneCommand {
+public class JoinCommand extends AbstractWarCommand {
 	public JoinCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		super(handler, sender, args);
 	}
@@ -29,7 +29,7 @@ public class JoinCommand extends AbstractWarzoneCommand {
 		if (this.args.length < 1) {
 			return false;
 		}
-		Warzone zone = this.getWarzoneFromLocation(player);
+		Warzone zone = War.war.getWarzoneFromLocation(player);
 		if (zone == null) {
 			War.war.badMsg(player, "No such warzone.");
 			return true;
