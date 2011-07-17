@@ -22,7 +22,6 @@ import com.tommytony.war.volumes.ZoneVolume;
  *
  */
 public class ZoneLobby {
-	private final War war;
 	private final Warzone warzone;
 	private BlockFace wall;
 	private Volume volume;
@@ -47,8 +46,7 @@ public class ZoneLobby {
 	 * @param wall
 	 *                On which wall of the warzone will the lobby be stuck to at mid-weight
 	 */
-	public ZoneLobby(War war, Warzone warzone, BlockFace wall) {
-		this.war = war;
+	public ZoneLobby(Warzone warzone, BlockFace wall) {
 		this.warzone = warzone;
 		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
 		this.lobbyHalfSide = lobbyWidth / 2;
@@ -66,8 +64,7 @@ public class ZoneLobby {
 	 * @param wall
 	 *                On which wall of the warzone will the lobby be stuck to at mid-weight
 	 */
-	public ZoneLobby(War war, Warzone warzone, Location playerLocation) {
-		this.war = war;
+	public ZoneLobby(Warzone warzone, Location playerLocation) {
 		this.warzone = warzone;
 		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
 		this.lobbyHalfSide = lobbyWidth / 2;
@@ -80,8 +77,7 @@ public class ZoneLobby {
 	/**
 	 * Convenience ctor when loading form disk. This figures out the middle wall block of the lobby from the volume instead of the other way around.
 	 */
-	public ZoneLobby(War war, Warzone warzone, BlockFace wall, Volume volume) {
-		this.war = war;
+	public ZoneLobby(Warzone warzone, BlockFace wall, Volume volume) {
 		this.warzone = warzone;
 		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
 		this.lobbyHalfSide = lobbyWidth / 2;
@@ -226,7 +222,7 @@ public class ZoneLobby {
 	private void createVolumeOrReset() {
 		if (this.volume == null) {
 			// no previous wall
-			this.volume = new Volume("lobby", this.war, this.warzone.getWorld());
+			this.volume = new Volume("lobby", this.warzone.getWorld());
 		} else if (this.volume.isSaved()) {
 			this.volume.resetBlocks();
 		}
@@ -259,7 +255,7 @@ public class ZoneLobby {
 			this.volume.setFaceMaterial(BlockFace.DOWN, Material.GLASS); // beautiful
 
 			// add war hub link gate
-			if (this.war.getWarHub() != null) {
+			if (War.war.getWarHub() != null) {
 				Block linkGateBlock = BlockInfo.getBlock(this.warzone.getWorld(), this.warHubLinkGate);
 				this.placeGate(linkGateBlock, Material.OBSIDIAN);
 				// add warhub sign
@@ -317,7 +313,7 @@ public class ZoneLobby {
 				lines[2] = "";
 				lines[3] = "Pick your team.";
 			}
-			SignHelper.setToSign(this.war, zoneSignBlock, data, lines);
+			SignHelper.setToSign(War.war, zoneSignBlock, data, lines);
 
 			// lets get some light in here
 			if (this.wall == BlockFace.NORTH || this.wall == BlockFace.SOUTH) {
@@ -328,7 +324,7 @@ public class ZoneLobby {
 				BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getFace(BlockFace.DOWN).getFace(BlockFace.SOUTH, this.lobbyHalfSide - 1).getFace(this.wall, 9).setType(Material.GLOWSTONE);
 			}
 		} else {
-			this.war.log("Failed to initalize zone lobby for zone " + this.warzone.getName(), java.util.logging.Level.WARNING);
+			War.war.log("Failed to initalize zone lobby for zone " + this.warzone.getName(), java.util.logging.Level.WARNING);
 		}
 	}
 
@@ -662,7 +658,7 @@ public class ZoneLobby {
 			}
 		}
 
-		SignHelper.setToSign(this.war, block, data, lines);
+		SignHelper.setToSign(War.war, block, data, lines);
 	}
 
 	public boolean isLeavingZone(Location location) {
@@ -708,7 +704,7 @@ public class ZoneLobby {
 		// int z = location.getBlockZ();
 		//
 		// 3x4x1 deep
-		Volume gateExitVolume = new Volume("tempGateExit", this.war, location.getWorld());
+		Volume gateExitVolume = new Volume("tempGateExit", location.getWorld());
 		Block out = gate.getFace(inside);
 		gateExitVolume.setCornerOne(out.getFace(left).getFace(BlockFace.DOWN));
 		gateExitVolume.setCornerTwo(gate.getFace(right, 1).getFace(BlockFace.UP, 3));

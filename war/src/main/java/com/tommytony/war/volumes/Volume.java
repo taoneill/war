@@ -36,11 +36,9 @@ public class Volume {
 	private byte[][][] blockDatas = null;
 	private HashMap<String, String[]> signLines = new HashMap<String, String[]>();
 	private HashMap<String, List<ItemStack>> invBlockContents = new HashMap<String, List<ItemStack>>();
-	private War war;
 
-	public Volume(String name, War war, World world) {
+	public Volume(String name, World world) {
 		this.name = name;
-		this.war = war;
 		this.world = world;
 	}
 
@@ -122,7 +120,7 @@ public class Volume {
 
 								noOfSavedBlocks++;
 							} catch (Exception e) {
-								this.getWar().getLogger().warning("Failed to save block in volume " + this.getName() + ". Saved blocks so far:" + noOfSavedBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + e.getMessage());
+								War.war.getLogger().warning("Failed to save block in volume " + this.getName() + ". Saved blocks so far:" + noOfSavedBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + e.getMessage());
 								e.printStackTrace();
 							} finally {
 								z++;
@@ -134,7 +132,7 @@ public class Volume {
 				}
 			}
 		} catch (Exception e) {
-			this.getWar().getLogger().warning("Failed to save volume " + this.getName() + " blocks. Saved blocks:" + noOfSavedBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
+			War.war.getLogger().warning("Failed to save volume " + this.getName() + " blocks. Saved blocks:" + noOfSavedBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
 			e.printStackTrace();
 		}
 		return noOfSavedBlocks;
@@ -142,7 +140,7 @@ public class Volume {
 
 	public void resetBlocksAsJob() {
 		BlockResetJob job = new BlockResetJob(this);
-		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, job);
+		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
 	}
 
 	public int resetBlocks() {
@@ -270,7 +268,7 @@ public class Volume {
 								}
 								visitedBlocks++;
 							} catch (Exception e) {
-								this.getWar().getLogger().warning("Failed to reset block in volume " + this.getName() + ". Visited blocks so far:" + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
+								War.war.getLogger().warning("Failed to reset block in volume " + this.getName() + ". Visited blocks so far:" + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
 								e.printStackTrace();
 							} finally {
 								z++;
@@ -282,7 +280,7 @@ public class Volume {
 				}
 			}
 		} catch (Exception e) {
-			this.getWar().log("Failed to reset volume " + this.getName() + " blocks. Blocks visited: " + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Current block: " + currentBlockId + ". Old block: " + oldBlockType + ". Exception: " + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
+			War.war.log("Failed to reset volume " + this.getName() + " blocks. Blocks visited: " + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Current block: " + currentBlockId + ". Old block: " + oldBlockType + ". Exception: " + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();
 		}
 		return noOfResetBlocks;
@@ -417,10 +415,6 @@ public class Volume {
 		this.blockTypes = blockTypes;
 	}
 
-	public War getWar() {
-		return this.war;
-	}
-
 	public String getName() {
 		return this.name;
 	}
@@ -444,7 +438,7 @@ public class Volume {
 				}
 			}
 		} catch (Exception e) {
-			this.getWar().log("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
+			War.war.log("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
 
@@ -469,7 +463,7 @@ public class Volume {
 				}
 			}
 		} catch (Exception e) {
-			this.getWar().log("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
+			War.war.log("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
 
@@ -504,7 +498,7 @@ public class Volume {
 				}
 			}
 		} catch (Exception e) {
-			this.getWar().log("Failed to switch block to " + newType + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
+			War.war.log("Failed to switch block to " + newType + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
 
@@ -559,6 +553,6 @@ public class Volume {
 		this.signLines = null;
 		this.invBlockContents.clear();
 		this.invBlockContents = null;
-		this.war = null;
+		War.war = null;
 	}
 }

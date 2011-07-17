@@ -5,14 +5,12 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-import bukkit.tommytony.war.War;
-
 import com.tommytony.war.volumes.Volume;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class Monument {
 	private Location location;
@@ -22,11 +20,11 @@ public class Monument {
 	private final String name;
 	private Warzone warzone;
 
-	public Monument(String name, War war, Warzone warzone, Location location) {
+	public Monument(String name, Warzone warzone, Location location) {
 		this.name = name;
 		this.location = location;
 		this.warzone = warzone;
-		this.volume = new Volume(name, war, warzone.getWorld());
+		this.volume = new Volume(name, warzone.getWorld());
 		this.setLocation(location);
 
 		this.addMonumentBlocks();

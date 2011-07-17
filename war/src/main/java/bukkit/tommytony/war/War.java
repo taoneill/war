@@ -33,17 +33,17 @@ import com.tommytony.war.utils.*;
 /**
  * Main class of War
  *
- * @author tommytony, Tim Düsterhus
- * @package bukkit.tommytony.war
+ * @author 	tommytony, Tim Düsterhus
+ * @package 	bukkit.tommytony.war
  */
 public class War extends JavaPlugin {
 	public static PermissionHandler permissionHandler;
 	public static War war;
 
 	// general
-	private WarPlayerListener playerListener = new WarPlayerListener(this);
-	private WarEntityListener entityListener = new WarEntityListener(this);
-	private WarBlockListener blockListener = new WarBlockListener(this);
+	private WarPlayerListener playerListener = new WarPlayerListener();
+	private WarEntityListener entityListener = new WarEntityListener();
+	private WarBlockListener blockListener = new WarBlockListener();
 	private Logger log;
 	private PluginDescriptionFile desc = null;
 	private boolean loaded = false;
@@ -134,7 +134,7 @@ public class War extends JavaPlugin {
 		this.getDefaultLoadout().put(4, new ItemStack(Material.STONE_SPADE, 1, (byte) 8));
 		this.getDefaultReward().put(0, new ItemStack(Material.CAKE, 1));
 
-		WarMapper.load(this);
+		WarMapper.load();
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
 	}
 
@@ -308,7 +308,7 @@ public class War extends JavaPlugin {
 			this.getZoneMakersImpersonatingPlayers().remove(player.getName());
 			this.msg(player, "You are back as a zone maker.");
 		}
-		WarMapper.save(this);
+		WarMapper.save();
 	}
 
 	public void performZonemakerAsZonemaker(Player player, String[] arguments) {
@@ -342,7 +342,7 @@ public class War extends JavaPlugin {
 				this.msg(player, "You are now impersonating a regular player. Type /zonemaker again to toggle back to war maker mode.");
 			}
 
-			WarMapper.save(this);
+			WarMapper.save();
 		}
 	}
 
@@ -351,7 +351,7 @@ public class War extends JavaPlugin {
 			this.badMsg(player, "Usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " + "Changes the server defaults for new warzones. Please give at leaset one named parameter.");
 		} else {
 			if (this.updateFromNamedParams(player, arguments)) {
-				WarMapper.save(this);
+				WarMapper.save();
 				this.msg(player, "War config saved.");
 			} else {
 				this.badMsg(player, "Failed to read named parameters.");
@@ -376,7 +376,7 @@ public class War extends JavaPlugin {
 		} else {
 			this.badMsg(player, "No War hub to delete.");
 		}
-		WarMapper.save(this);
+		WarMapper.save();
 	}
 
 	public void performSetWarhub(Player player) {
@@ -388,7 +388,7 @@ public class War extends JavaPlugin {
 				this.warHub.initialize();
 				this.msg(player, "War hub moved.");
 			} else {
-				this.warHub = new WarHub(this, player.getLocation());
+				this.warHub = new WarHub(player.getLocation());
 				this.warHub.initialize();
 				for (Warzone zone : this.warzones) {
 					if (zone.getLobby() != null) {
@@ -398,7 +398,7 @@ public class War extends JavaPlugin {
 				}
 				this.msg(player, "War hub created.");
 			}
-			WarMapper.save(this);
+			WarMapper.save();
 		} else {
 			this.badMsg(player, "No warzones yet.");
 		}
@@ -420,7 +420,7 @@ public class War extends JavaPlugin {
 			if (monument != null) {
 				monument.getVolume().resetBlocks();
 				warzone.getMonuments().remove(monument);
-				WarzoneMapper.save(this, warzone, false);
+				WarzoneMapper.save(warzone, false);
 				this.msg(player, "Monument " + monument.getName() + " removed.");
 			} else {
 				this.badMsg(player, "No such monument.");
@@ -442,11 +442,11 @@ public class War extends JavaPlugin {
 				this.msg(player, "Monument " + monument.getName() + " was moved.");
 			} else {
 				// create a new monument
-				Monument monument = new Monument(arguments[0], this, warzone, player.getLocation());
+				Monument monument = new Monument(arguments[0], warzone, player.getLocation());
 				warzone.getMonuments().add(monument);
 				this.msg(player, "Monument " + monument.getName() + " created.");
 			}
-			WarzoneMapper.save(this, warzone, false);
+			WarzoneMapper.save(warzone, false);
 		}
 	}
 
@@ -475,7 +475,7 @@ public class War extends JavaPlugin {
 					// warzone.addZoneOutline(warzone.getLobby().getWall());
 					warzone.getLobby().initialize();
 				}
-				WarzoneMapper.save(this, warzone, false);
+				WarzoneMapper.save(warzone, false);
 				this.msg(player, "Team " + team.getName() + " removed.");
 			} else {
 				this.badMsg(player, "No such team.");
@@ -499,7 +499,7 @@ public class War extends JavaPlugin {
 				Location playerLoc = player.getLocation();
 				player.teleport(new Location(playerLoc.getWorld(), playerLoc.getBlockX() + 1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
 				this.msg(player, "Team " + team.getName() + " flag added here.");
-				WarzoneMapper.save(this, warzone, false);
+				WarzoneMapper.save(warzone, false);
 			} else {
 				// relocate flag
 				team.getFlagVolume().resetBlocks();
@@ -507,7 +507,7 @@ public class War extends JavaPlugin {
 				Location playerLoc = player.getLocation();
 				player.teleport(new Location(playerLoc.getWorld(), playerLoc.getBlockX() + 1, playerLoc.getBlockY(), playerLoc.getBlockZ() + 1));
 				this.msg(player, "Team " + team.getName() + " flag moved.");
-				WarzoneMapper.save(this, warzone, false);
+				WarzoneMapper.save(warzone, false);
 			}
 		}
 	}
@@ -525,7 +525,7 @@ public class War extends JavaPlugin {
 				this.msg(player, "Team " + existingTeam.getName() + " spawn relocated.");
 			} else {
 				// new team (use default TeamKind name for now)
-				Team newTeam = new Team(teamKind.getDefaultName(), teamKind, player.getLocation(), this, warzone);
+				Team newTeam = new Team(teamKind.getDefaultName(), teamKind, player.getLocation(), warzone);
 				newTeam.setRemainingLives(warzone.getLifePool());
 				warzone.getTeams().add(newTeam);
 				if (warzone.getLobby() != null) {
@@ -538,7 +538,7 @@ public class War extends JavaPlugin {
 				this.msg(player, "Team " + newTeam.getName() + " created with spawn here.");
 			}
 
-			WarzoneMapper.save(this, warzone, false);
+			WarzoneMapper.save(warzone, false);
 		}
 	}
 
@@ -589,8 +589,8 @@ public class War extends JavaPlugin {
 			}
 			warzone.getVolume().resetBlocks();
 			this.getWarzones().remove(warzone);
-			WarMapper.save(this);
-			WarzoneMapper.delete(this, warzone.getName());
+			WarMapper.save();
+			WarzoneMapper.delete(warzone.getName());
 			if (this.warHub != null) { // warhub has to change
 				this.warHub.getVolume().resetBlocks();
 				this.warHub.initialize();
@@ -644,7 +644,7 @@ public class War extends JavaPlugin {
 			}
 			if (this.updateZoneFromNamedParams(warzone, player, arguments)) {
 				this.msg(player, "Saving config and resetting warzone " + warzone.getName() + ".");
-				WarzoneMapper.save(this, warzone, false);
+				WarzoneMapper.save(warzone, false);
 				warzone.getVolume().resetBlocks();
 				if (lobby != null) {
 					lobby.getVolume().resetBlocks();
@@ -678,7 +678,7 @@ public class War extends JavaPlugin {
 			if (arguments.length > 0) {
 				// changed settings: must reinitialize with new settings
 				this.updateZoneFromNamedParams(warzone, player, arguments);
-				WarzoneMapper.save(this, warzone, true);
+				WarzoneMapper.save(warzone, true);
 				warzone.getVolume().resetBlocks();
 				if (lobby != null) {
 					lobby.getVolume().resetBlocks();
@@ -735,7 +735,7 @@ public class War extends JavaPlugin {
 				this.msg(player, "Warzone lobby moved to " + wallStr + " side of zone.");
 			} else {
 				// new lobby
-				lobby = new ZoneLobby(this, warzone, wall);
+				lobby = new ZoneLobby(warzone, wall);
 				warzone.setLobby(lobby);
 				lobby.initialize();
 				if (this.warHub != null) { // warhub has to change
@@ -744,7 +744,7 @@ public class War extends JavaPlugin {
 				}
 				this.msg(player, "Warzone lobby created on " + wallStr + "side of zone.");
 			}
-			WarzoneMapper.save(this, warzone, false);
+			WarzoneMapper.save(warzone, false);
 		} else {
 			// Not in a warzone: set the lobby position to where the player is standing
 			Warzone warzone = this.matchWarzone(arguments[0]);
@@ -761,7 +761,7 @@ public class War extends JavaPlugin {
 					this.msg(player, "Warzone lobby moved to your location.");
 				} else {
 					// new lobby
-					lobby = new ZoneLobby(this, warzone, player.getLocation());
+					lobby = new ZoneLobby(warzone, player.getLocation());
 					warzone.setLobby(lobby);
 					lobby.initialize();
 					if (this.warHub != null) { // warhub has to change
@@ -770,7 +770,7 @@ public class War extends JavaPlugin {
 					}
 					this.msg(player, "Warzone lobby moved to your location.");
 				}
-				WarzoneMapper.save(this, warzone, false);
+				WarzoneMapper.save(warzone, false);
 			}
 		}
 	}
@@ -784,7 +784,7 @@ public class War extends JavaPlugin {
 				this.badMsg(player, "Usage: =<Classic mode>= /setzone <warzone-name> <'northwest'/'southeast'/'nw'/'se'> (NW defaults to top block, SE to bottom). " + "=<Wand Cuboid mode>= /setzone <warzone-name> wand (gives you a wooden sword to right and left click, drop to disable). " + "=<Wandless Cuboid mode>= /setzone <warzone-name> <'corner1'/'corner2'/'c1'/'c2'/'pos1'/'pos2'> (block where you're standing). " + "Set one corner, then the next. Defines the outline of the warzone, which will be reset at the start of every battle. " + "Saves the zone blocks if the outline is valid.");
 			}
 		} else {
-			ZoneSetter setter = new ZoneSetter(this, player, arguments[0]);
+			ZoneSetter setter = new ZoneSetter(player, arguments[0]);
 			if (arguments[1].equals("northwest") || arguments[1].equals("nw")) {
 				setter.placeNorthwest();
 			} else if (arguments[1].equals("southeast") || arguments[1].equals("se")) {
@@ -1155,7 +1155,7 @@ public class War extends JavaPlugin {
 			this.badMsg(player, "Can't set rally point. No such warzone.");
 		} else {
 			zone.setRallyPoint(player.getLocation());
-			WarzoneMapper.save(this, zone, false);
+			WarzoneMapper.save(zone, false);
 		}
 	}
 
