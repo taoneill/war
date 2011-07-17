@@ -44,6 +44,7 @@ public class War extends JavaPlugin {
 	private WarPlayerListener playerListener = new WarPlayerListener();
 	private WarEntityListener entityListener = new WarEntityListener();
 	private WarBlockListener blockListener = new WarBlockListener();
+	private WarCommandHandler commandHandler = new WarCommandHandler();
 	private Logger log;
 	private PluginDescriptionFile desc = null;
 	private boolean loaded = false;
@@ -173,6 +174,8 @@ public class War extends JavaPlugin {
 	 * Handles war commands
 	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+		return this.commandHandler.handle(sender, cmd, commandLabel, args);
+
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			String command = cmd.getName();
@@ -952,23 +955,6 @@ public class War extends JavaPlugin {
 				this.badMsg(player, "No such warzone.");
 			}
 		}
-	}
-
-	private void performZones(Player player) {
-		String warzonesMessage = "Warzones: ";
-		if (this.getWarzones().isEmpty()) {
-			warzonesMessage += "none.";
-		}
-		for (Warzone warzone : this.getWarzones()) {
-
-			warzonesMessage += warzone.getName() + " (" + warzone.getTeams().size() + " teams, ";
-			int playerTotal = 0;
-			for (Team team : warzone.getTeams()) {
-				playerTotal += team.getPlayers().size();
-			}
-			warzonesMessage += playerTotal + " players)  ";
-		}
-		this.msg(player, warzonesMessage + "  Use /zone <zone-name> to " + "teleport to a warzone. ");
 	}
 
 	private boolean updateZoneFromNamedParams(Warzone warzone, Player player, String[] arguments) {
