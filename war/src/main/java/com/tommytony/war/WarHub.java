@@ -28,18 +28,27 @@ public class WarHub {
 
 	public WarHub(War war, Location location, String hubOrientation) {
 		this.war = war;
-		this.location = location;
-		this.volume = new Volume("warhub", war, location.getWorld());
+		int yaw = 0;
 		if (hubOrientation.equals("south")) {
+			yaw = 270;
 			this.setOrientation(BlockFace.SOUTH);	
 		} else if (hubOrientation.equals("north")) {
-			this.setOrientation(BlockFace.SOUTH);
+			yaw = 90;
+			this.setOrientation(BlockFace.NORTH);
 		} else if (hubOrientation.equals("east")) {
+			yaw = 180;
 			this.setOrientation(BlockFace.EAST);
 		} else {
+			yaw = 0;
 			this.setOrientation(BlockFace.WEST);
 		}
-		
+
+		this.location = new Location(location.getWorld(), 
+								location.getX(),
+								location.getY(),
+								location.getZ(),
+								yaw, 0);
+		this.volume = new Volume("warhub", war, location.getWorld());
 	}
 
 	// Use when creating from player location (with yaw)
@@ -65,19 +74,14 @@ public class WarHub {
 			yaw = (int) (360 + (location.getYaw() % 360));
 		}
 		BlockFace facing = null;
-		BlockFace opposite = null;
 		if ((yaw >= 0 && yaw < 45) || (yaw >= 315 && yaw <= 360)) {
 			facing = BlockFace.WEST;
-			opposite = BlockFace.EAST;
 		} else if (yaw >= 45 && yaw < 135) {
 			facing = BlockFace.NORTH;
-			opposite = BlockFace.SOUTH;
 		} else if (yaw >= 135 && yaw < 225) {
 			facing = BlockFace.EAST;
-			opposite = BlockFace.WEST;
 		} else if (yaw >= 225 && yaw < 315) {
 			facing = BlockFace.SOUTH;
-			opposite = BlockFace.NORTH;
 		}
 		this.setOrientation(facing);
 	}
@@ -191,31 +195,24 @@ public class WarHub {
 	}
 
 	public void resetZoneSign(Warzone zone) {
-
 		BlockFace left;
-		BlockFace right;
-		BlockFace front = this.getOrientation();
 		BlockFace back;
 		byte data;
 		if (this.getOrientation() == BlockFace.SOUTH) {
 			data = (byte) 4;
 			left = BlockFace.EAST;
-			right = BlockFace.WEST;
 			back = BlockFace.NORTH;
 		} else if (this.getOrientation() == BlockFace.NORTH) {
 			data = (byte) 12;
 			left = BlockFace.WEST;
-			right = BlockFace.EAST;
 			back = BlockFace.SOUTH;
 		} else if (this.getOrientation() == BlockFace.EAST) {
 			data = (byte) 0;
 			left = BlockFace.NORTH;
-			right = BlockFace.SOUTH;
 			back = BlockFace.WEST;
 		} else {
 			data = (byte) 8;
 			left = BlockFace.SOUTH;
-			right = BlockFace.NORTH;
 			back = BlockFace.EAST;
 		}
 		

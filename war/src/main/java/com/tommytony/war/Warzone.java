@@ -664,7 +664,10 @@ public class Warzone {
 	}
 
 	public void setAutoAssignOnly(boolean autoAssignOnly) {
-		this.autoAssignOnly = autoAssignOnly;
+		this.autoAssignOnly = autoAssignOnly;		
+		if (this.getLobby() != null) {
+			this.getLobby().setLocation(this.getTeleport());
+		}
 	}
 
 	public boolean isAutoAssignOnly() {

@@ -146,7 +146,6 @@ public class ZoneLobby {
 		int z = this.lobbyMiddleWallBlock.getZ();
 
 		if (this.wall == BlockFace.NORTH) {
-			// lobbyMiddleWallBlock = new BlockInfo(warzone.getWorld().getBlockAt(x, y, wallCenterPos));
 			corner1 = this.warzone.getWorld().getBlockAt(x, y - 1, z + this.lobbyHalfSide);
 			corner2 = this.warzone.getWorld().getBlockAt(x - this.lobbyDepth, y + 1 + this.lobbyHeight, z - this.lobbyHalfSide);
 		} else if (this.wall == BlockFace.EAST) {
@@ -233,7 +232,10 @@ public class ZoneLobby {
 	}
 
 	private void calculateLobbyWidth() {
-		int lobbyWidth = this.warzone.getTeams().size() * 4 + 5;
+		int noOfTeams = this.warzone.getTeams().size();
+		if(this.warzone.isAutoAssignOnly())
+			noOfTeams = 1;
+		int lobbyWidth = noOfTeams * 4 + 5;
 		this.lobbyHalfSide = lobbyWidth / 2;
 		if (this.lobbyHalfSide < 7) {
 			this.lobbyHalfSide = 7;
@@ -311,8 +313,8 @@ public class ZoneLobby {
 			lines[0] = "Warzone";
 			lines[1] = this.warzone.getName();
 			if (this.autoAssignGate != null) {
-				lines[2] = "Walk in the";
-				lines[3] = "auto-assign gate.";
+				lines[2] = "Enter the auto-";
+				lines[3] = "assign gate.";
 			} else {
 				lines[2] = "";
 				lines[3] = "Pick your team.";
@@ -464,56 +466,19 @@ public class ZoneLobby {
 			Block autoAssignGateBlock = BlockInfo.getBlock(this.warzone.getWorld(), this.autoAssignGate);
 			this.setBlock(autoAssignGateBlock.getFace(BlockFace.DOWN), (Material.GLOWSTONE));
 			int size = teams.size();
-			int index = 0;
-			TeamKind kind = null;
-			if (index >= size) {
-				kind = TeamKinds.teamKindFromString("diamond");
-			} else {
-				kind = teams.get(index).getKind();
+			if(size > 0) {
+				TeamKind[] doorBlockKinds = new TeamKind[7];
+				for (int i = 0; i < 7; i++) {
+					doorBlockKinds[i] = teams.get(i % size).getKind();
+				}
+				this.setBlock(autoAssignGateBlock.getFace(leftSide), doorBlockKinds[0]);
+				this.setBlock(autoAssignGateBlock.getFace(leftSide).getFace(BlockFace.UP), doorBlockKinds[1]);
+				this.setBlock(autoAssignGateBlock.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP), doorBlockKinds[2]);
+				this.setBlock(autoAssignGateBlock.getFace(BlockFace.UP).getFace(BlockFace.UP), doorBlockKinds[3]);
+				this.setBlock(autoAssignGateBlock.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP), doorBlockKinds[4]);
+				this.setBlock(autoAssignGateBlock.getFace(rightSide).getFace(BlockFace.UP), doorBlockKinds[5]);
+				this.setBlock(autoAssignGateBlock.getFace(rightSide), doorBlockKinds[6]);
 			}
-			this.setBlock(autoAssignGateBlock.getFace(leftSide), kind);
-			index++;
-			if (index >= size) {
-				kind = TeamKinds.teamKindFromString("iron");
-			} else {
-				kind = teams.get(index).getKind();
-			}
-			this.setBlock(autoAssignGateBlock.getFace(leftSide).getFace(BlockFace.UP), kind);
-			index++;
-			if (index >= size) {
-				kind = TeamKinds.teamKindFromString("gold");
-			} else {
-				kind = teams.get(index).getKind();
-			}
-			this.setBlock(autoAssignGateBlock.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP), kind);
-			index++;
-			if (index >= size) {
-				kind = TeamKinds.teamKindFromString("diamond");
-			} else {
-				kind = teams.get(index).getKind();
-			}
-			this.setBlock(autoAssignGateBlock.getFace(BlockFace.UP).getFace(BlockFace.UP), kind);
-			index++;
-			if (index >= size) {
-				kind = TeamKinds.teamKindFromString("iron");
-			} else {
-				kind = teams.get(index).getKind();
-			}
-			this.setBlock(autoAssignGateBlock.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP), kind);
-			index++;
-			if (index >= size) {
-				kind = TeamKinds.teamKindFromString("gold");
-			} else {
-				kind = teams.get(index).getKind();
-			}
-			this.setBlock(autoAssignGateBlock.getFace(rightSide).getFace(BlockFace.UP), kind);
-			index++;
-			if (index >= size) {
-				kind = TeamKinds.teamKindFromString("diamond");
-			} else {
-				kind = teams.get(index).getKind();
-			}
-			this.setBlock(autoAssignGateBlock.getFace(rightSide), kind);
 		}
 	}
 
@@ -666,7 +631,6 @@ public class ZoneLobby {
 	}
 
 	public boolean isLeavingZone(Location location) {
-
 		BlockFace inside = null;
 		BlockFace left = null;
 		BlockFace right = null;
@@ -703,10 +667,6 @@ public class ZoneLobby {
 	}
 
 	private boolean leaving(Location location, Block gate, BlockFace inside, BlockFace left, BlockFace right) {
-		// int x = location.getBlockX();
-		// int y = location.getBlockY();
-		// int z = location.getBlockZ();
-		//
 		// 3x4x1 deep
 		Volume gateExitVolume = new Volume("tempGateExit", this.war, location.getWorld());
 		Block out = gate.getFace(inside);
@@ -717,35 +677,6 @@ public class ZoneLobby {
 			return true;
 		}
 
-		// 1 block thick arrow like detection grid:
-		// Block out = gate.getFace(inside);
-		// Block outL = out.getFace(left);
-		// Block outLL = out.getFace(left, 2);
-		// Block outR = out.getFace(right);
-		// Block outRR = out.getFace(right, 2);
-		// Block out2 = gate.getFace(inside, 2);
-		// Block out2L = out2.getFace(left);
-		// Block out2R = out2.getFace(right);
-		// Block out3 = gate.getFace(inside, 3);
-		// if (out.getX() == x && out.getY() == y && out.getZ() == z) {
-		// return true;
-		// } else if (outL.getX() == x && outL.getY() == y && outL.getZ() == z) {
-		// return true;
-		// } else if (outR.getX() == x && outR.getY() == y && outR.getZ() == z) {
-		// return true;
-		// } else if (outLL.getX() == x && outLL.getY() == y && outLL.getZ() == z) {
-		// return true;
-		// } else if (outRR.getX() == x && outRR.getY() == y && outRR.getZ() == z) {
-		// return true;
-		// } else if (out2.getX() == x && out2.getY() == y && out2.getZ() == z) {
-		// return true;
-		// } else if (out2L.getX() == x && out2L.getY() == y && out2L.getZ() == z) {
-		// return true;
-		// } else if (out2R.getX() == x && out2R.getY() == y && out2R.getZ() == z) {
-		// return true;
-		// } else if (out3.getX() == x && out3.getY() == y && out3.getZ() == z) {
-		// return true;
-		// }
 		return false;
 	}
 }
