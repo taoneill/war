@@ -816,15 +816,6 @@ public class War extends JavaPlugin {
 		}
 	}
 
-	public void performLeave(Player player) {
-		if (!this.inAnyWarzone(player.getLocation()) || this.getPlayerTeam(player.getName()) == null) {
-			this.badMsg(player, "Usage: /leave. " + "Must be in a team already.");
-		} else {
-			Warzone zone = this.getPlayerTeamWarzone(player.getName());
-			zone.handlePlayerLeave(player, zone.getTeleport(), true);
-		}
-	}
-
 	private boolean updateZoneFromNamedParams(Warzone warzone, Player player, String[] arguments) {
 		try {
 			Map<String, String> namedParams = new HashMap<String, String>();

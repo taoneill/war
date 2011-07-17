@@ -42,6 +42,9 @@ public class WarCommandHandler {
 		else if (command.equals("join")) {
 			commandObj = new JoinCommand(this, sender, arguments);
 		}
+		else if (command.equals("leave")) {
+			commandObj = new LeaveCommand(this, sender, arguments);
+		}
 		else {
 			// we are not responsible for this command
 			return true;
