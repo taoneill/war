@@ -83,11 +83,11 @@ public class War extends JavaPlugin {
 
 	public War() {
 		super();
-
 		War.war = this;
 	}
 
 	public void onEnable() {
+		War.war = this;
 		this.loadWar();
 	}
 
