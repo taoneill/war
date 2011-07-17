@@ -1,0 +1,170 @@
+name: War
+version: 1.6 (de Gaulle) PREVIEW 3
+description: Lets you create TDM and CTF (warzones) for a more structured PVP experience.
+author: tommytony
+website: war.tommytony.com
+main: bukkit.tommytony.war.War
+commands:
+# Player commands
+  warzones:
+    description: (War) Lists the warzones on the server. Each warzone is an independent TDM arena.
+    usage: /warzones
+  zones:
+    description: (War) Shortcut for /warzones.
+    usage: /zones
+  warzone:
+    description: (War) Teleports you to the specified warzone's lobby.
+    usage: /warzone ziggy
+  zone:
+    description: (War) Shortcut for /warzone.
+    usage: /zone ziggy
+  warhub:
+    description: (War) Teleports you to the warhub, if it exists. The warhub offers portals to reach each warzone on the server.
+    usage: /warhub
+  teams:
+    description: (War) Lists the teams in the warzone.
+    usage:
+       - Must be standing in warzone or lobby.
+       - /teams
+  join:
+    description: (War) Use to change teams. Also used instead of walking in the team gate in the lobby.
+    usage:
+       - Must be standing in warzone or lobby. 
+       - /join <team color>
+  leave:
+    description: (War) Use to leave a warzone. Teleports you back to the lobby.
+    usage:
+       - Must be in team already. 
+       - /leave
+  team:
+    description: (War) Team chat. 
+    usage: /team Leeeroooy!!!
+# Warzone maker commands (must have the 'war.*' permission or be added as a zone-maker in /plugins/War/war.txt
+# 1- Battle-related commands
+  nextbattle:
+    description: (War) Warzone blocks are restored (from memory). Teams are respawned.
+    usage:
+        - Must be standing in warzone or lobby 
+        - /nextbattle
+# 2- Warzone creation commands
+  setzone:
+    description: (War) Use to create a warzone. Lobby is created and blocks are saved when the second corner is set.
+    usage: 
+        - =<Classic/Northwest-Southeast mode>=
+        - /setzone <zonename> <northwest/southeast/nw/se>
+        - ex: first, /setzone ziggy se, then, /setzone ziggy nw
+        - In classic mode, corner1 defaults to the topmost block (127) in the northwest and corner2 to the bottommost block (0) in the southeast.     
+        - =<Wand Cuboid mode>=
+        - 1) /setzone <name> wand
+        - 2) Left-click to select or move corner1
+        - 3) Right-click to select or move corner2
+        - Turn off wand by dropping the wooden sword.
+        - =<Wandless Cuboid mode>=
+        - /setzone <name> <corner1/corner2/c1/c2/pos1/pos2>
+        - The three modes can be mixed and matched.
+        - Warzones must be at least 10 blocks wide in all directions.
+  savezone:
+    description: (War) Persists changes made to the warzone since the last save. Config can be set with named parameters. 
+    usage: 
+        - Must be standing in warzone or lobby 
+        - /savezone  =>  Basic save 
+        - /savezone lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on disabled:on
+        - /savezone loadout:default  =>  sets the respawn inventory to your current items
+        - /savezone reward:default  =>  sets the winner's reward to your current items
+  setzonelobby:
+    description: (War) Creates or changes the position of the warzone lobby.
+    usage:
+        - Must be standing in warzone or lobby. 
+        - /setzonelobby <north/east/south/west/n/e/s/w>
+  setteam:
+    description: (War) Creates or moves a team spawn. The lobby is updated. Teams are diamond, iron or gold.
+    usage:
+        - Must be standing in warzone.
+        - /setteam <diamond/iron/gold/white/orange/magenta/blue/green/pink/gray/purple/navy/brown/darkgreen/red/black>
+  setmonument:
+    description: (War) Creates or moves a monument.  
+    usage:
+        - Must be standing in warzone.
+        - /setmonument <monument-name>
+  setteamflag:
+    description: (War) Creates/moves a team flag post for CTF. 
+    usage:
+        - Must be standing in warzone.
+        - /setteamflag <team-color>
+  resetzone:
+    description: (War) Reloads zone blocks from memory. Everyone back to the lobby. 
+    usage:
+        - Must be standing in warzone or lobby. 
+        - /resetzone
+  deletezone:
+    description: (War) Deletes the zone, resets all blocks.  
+    usage:
+        - Must be standing in warzone or lobby, or provide name
+        - /deletezone, /deletezone <zone-name>
+  deleteteam:
+    description: (War) Deletes the team. Team must exist. 
+    usage:
+        - Must be standing in warzone or lobby.
+        - /deleteteam <team-color>
+  deletemonument:
+    description: (War) Deletes the monument. 
+    usage:
+        - Must be standing in warzone or lobby.
+        - /deletemonument <monument-name>
+  setzoneconfig:
+    description: (War) Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone.
+    usage:
+        - Must be standing in warzone or lobby.
+        - /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on disabled:on
+        - /setzoneconfig loadout:default  =>  sets the respawn inventory to your current items
+        - /setzoneconfig reward:default  =>  sets the winner's reward to your current items
+  zonecfg:
+    description: (War) Alias for /setzoneconfig
+    usage:
+  zonemaker:
+    description: (War) Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player. 
+    usage: 
+        - /zonemaker
+        - /zonemaker <new-or-kicked-zone-maker-name>
+  zm:
+    description: (War) Alias for /zonemaker
+    usage:
+# 3- War hub
+  setwarhub:
+    description: (War) Create or moves a West-facing wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
+    usage: /setwarhub
+  deletewarhub:
+    description: (War) Deletes the warhub if it exists. Resets all warzone lobbies.
+    usage: /deletewarhub
+# 4- Defaults and server configuration
+  unloadwar:
+    description: (War) Disables the War plugin.
+    usage: /unloadwar
+  loadwar:
+    description: (War) Enables the War plugin.
+    usage: /loadwar
+  setwarconfig:
+    description: (War) Change gobal settings and the default warzone configuration values.
+    usage: 
+        - /setwarconfig pvpinzonesonly:on buildinzonesonly:on  => Global settings 
+        - /setwarconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on  =>  Warzone defaults
+        - /setwarconfig loadout:default  =>  sets the respawn inventory to your current items
+        - /setwarconfig reward:default  =>  sets the winner's reward to your current items
+        - /setwarconfig rallypoint:<warzone-name>  =>  changes when players get teleported at the end of a match for that zone, useful for chaining warzones together in a sequence, or preventing players from rejoining immediately
+  warcfg:
+    description: (War) Alias for /setwarconfig
+    usage:
+# Fallback
+  war:
+    description: (War) Short War help. Can also be used as a prefix for all War commands as a fallback if they conflict with other plugins.
+    usage: 
+        - /war
+        - /war setzone ziggy northwest
+        - /war warhub
+        - /war zone ziggy
+        - etc.
+  War:
+    description: (War) Same as /war. Used as fallback.
+    usage: See /war. 
+#Note: When you /disable War with Essentials, or at shutdown, all warzone blocks will be reset and artifacts will disappear. 
+#      When you /enable War, all blocks will be loaded from disk and the War-related artifacts will reappear.  
