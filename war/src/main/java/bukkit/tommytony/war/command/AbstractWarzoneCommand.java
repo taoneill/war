@@ -11,7 +11,6 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 
 public abstract class AbstractWarzoneCommand extends AbstractWarCommand {
-	protected Warzone zone = null;
 	public AbstractWarzoneCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		super(handler, sender, args);
 	}
