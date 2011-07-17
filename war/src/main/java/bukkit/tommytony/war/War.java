@@ -177,32 +177,7 @@ public class War extends JavaPlugin {
 		return this.commandHandler.handle(sender, cmd, commandLabel, args);
 
 		if (sender instanceof Player) {
-			Player player = (Player) sender;
-			String command = cmd.getName();
-			String[] arguments = null;
-			// Handle both /war <command> and /<war command>. I.e. "/war zone temple" == "/zone temple"
-			String helpMessage = "War is on. Please pick your battle. " + "Try /warhub, /zones and /zone. Further instructions at war.tommytony.com/instructions.";
-			if ((command.equals("war") || command.equals("War")) && args.length > 0) {
-				command = args[0];
-				arguments = new String[args.length - 1];
-				for (int i = 1; i <= arguments.length; i++) {
-					arguments[i - 1] = args[i];
-				}
-				if (arguments.length == 1 && (arguments[0].equals("help") || arguments[0].equals("h"))) {
-					this.msg(player, helpMessage);
-				}
-			} else if (command.equals("war") || command.equals("War")) {
-				this.msg(player, helpMessage);
-			} else {
-				arguments = args;
-			}
-
-			// Player commands: /warzones, /warzone, /teams, /join, /leave
-			if (command.equals("zones") || command.equals("warzones")) {
-				this.performZones(player);
-			} else if (command.equals("zone") || command.equals("warzone")) {
-				this.performZone(player, arguments);
-			} else if (command.equals("teams")) {
+			if (command.equals("teams")) {
 				this.performTeams(player);
 			} else if (command.equals("join") && this.canPlayWar(player)) {
 				this.performJoin(player, arguments);
@@ -928,32 +903,6 @@ public class War extends JavaPlugin {
 			this.badMsg(player, "Usage: /teams. " + "Must be in a warzone or zone lobby (try /war, /zones and /zone).");
 		} else {
 			this.msg(player, "" + this.playerListener.getAllTeamsMsg(player));
-		}
-	}
-
-	public void performZone(Player player, String[] arguments) {
-		if (arguments.length < 1) {
-			this.badMsg(player, "Usage: /zone <warzone-name>.");
-		} else if (!this.canWarp(player)) {
-			this.badMsg(player, "Can't warp to zone. You need the 'war.warp' permission.");
-		} else {
-			boolean warped = false;
-			for (Warzone warzone : this.getWarzones()) {
-				if (warzone.getName().toLowerCase().startsWith(arguments[0].toLowerCase()) && warzone.getTeleport() != null) {
-					Team playerTeam = this.getPlayerTeam(player.getName());
-					if (playerTeam != null) {
-						Warzone playerWarzone = this.getPlayerTeamWarzone(player.getName());
-						playerWarzone.handlePlayerLeave(player, warzone.getTeleport(), true);
-					} else {
-						player.teleport(warzone.getTeleport());
-					}
-					warped = true;
-					break;
-				}
-			}
-			if (!warped) {
-				this.badMsg(player, "No such warzone.");
-			}
 		}
 	}
 
