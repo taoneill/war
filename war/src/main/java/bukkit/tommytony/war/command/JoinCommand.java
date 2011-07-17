@@ -22,12 +22,16 @@ public class JoinCommand extends AbstractWarzoneCommand {
 		if (!(this.sender instanceof Player)) return true;
 
 		Player player = (Player) this.sender;
+		if (!War.war.canPlayWar(player)) {
+			//War.war.badMsg(player, "Cannot play war.");
+			return true;
+		}
 		if (this.args.length < 1) {
 			return false;
 		}
 		Warzone zone = this.getWarzoneFromLocation(player);
 		if (zone == null) {
-			// throw error
+			War.war.badMsg(player, "No such warzone.");
 			return true;
 		}
 		// drop from old team if any

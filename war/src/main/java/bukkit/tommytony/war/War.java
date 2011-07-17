@@ -177,11 +177,7 @@ public class War extends JavaPlugin {
 		return this.commandHandler.handle(sender, cmd, commandLabel, args);
 
 		if (sender instanceof Player) {
-			if (command.equals("teams")) {
-				this.performTeams(player);
-			} else if (command.equals("join") && this.canPlayWar(player)) {
-				this.performJoin(player, arguments);
-			} else if (command.equals("leave")) {
+			if (command.equals("leave")) {
 				this.performLeave(player);
 			} else if (command.equals("team")) {
 				this.performTeam(player, arguments);
@@ -826,83 +822,6 @@ public class War extends JavaPlugin {
 		} else {
 			Warzone zone = this.getPlayerTeamWarzone(player.getName());
 			zone.handlePlayerLeave(player, zone.getTeleport(), true);
-		}
-	}
-
-	public void performJoin(Player player, String[] arguments) {
-		if (arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) || (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
-			this.badMsg(player, "Usage: /join <diamond/iron/gold/red/blue/green/etc.>." + " Teams are warzone specific." + " You must be inside a warzone or zone lobby to join a team." + " Use as an alternative to walking through the team gate.");
-		} else {
-			// drop from old team if any
-			Team previousTeam = this.getPlayerTeam(player.getName());
-			if (previousTeam != null) {
-				Warzone zone = this.getPlayerTeamWarzone(player.getName());
-				if (!previousTeam.removePlayer(player.getName())) {
-					this.logWarn("Could not remove player " + player.getName() + " from team " + previousTeam.getName());
-				}
-				if (zone.isFlagThief(player.getName())) {
-					Team victim = zone.getVictimTeamForThief(player.getName());
-					victim.getFlagVolume().resetBlocks();
-					victim.initializeTeamFlag();
-					zone.removeThief(player.getName());
-					for (Team t : zone.getTeams()) {
-						t.teamcast("Team " + victim.getName() + " flag was returned.");
-					}
-				}
-				previousTeam.resetSign();
-			}
-
-			// join new team
-			String name = arguments[0];
-			TeamKind kind = TeamKinds.teamKindFromString(arguments[0]);
-			Warzone warzone = this.warzone(player.getLocation());
-			ZoneLobby lobby = this.lobby(player.getLocation());
-			if (warzone == null && lobby != null) {
-				warzone = lobby.getZone();
-			} else {
-				lobby = warzone.getLobby();
-			}
-			if (warzone.isDisabled()) {
-				this.badMsg(player, "This warzone is disabled.");
-			} else {
-				List<Team> teams = warzone.getTeams();
-				boolean foundTeam = false;
-				for (Team team : teams) {
-					if (team.getName().startsWith(name) || team.getKind() == kind) {
-						if (!warzone.hasPlayerInventory(player.getName())) {
-							warzone.keepPlayerInventory(player);
-							this.msg(player, "Your inventory is in storage until you /leave.");
-						}
-						if (team.getPlayers().size() < warzone.getTeamCap()) {
-							team.addPlayer(player);
-							team.resetSign();
-							warzone.respawnPlayer(team, player);
-							if (this.warHub != null) {
-								this.warHub.resetZoneSign(warzone);
-							}
-							foundTeam = true;
-						} else {
-							this.badMsg(player, "Team " + team.getName() + " is full.");
-							foundTeam = true;
-						}
-					}
-				}
-				if (foundTeam) {
-					for (Team team : teams) {
-						team.teamcast("" + player.getName() + " joined " + team.getName());
-					}
-				} else {
-					this.badMsg(player, "No such team. Try /teams.");
-				}
-			}
-		}
-	}
-
-	public void performTeams(Player player) {
-		if (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-			this.badMsg(player, "Usage: /teams. " + "Must be in a warzone or zone lobby (try /war, /zones and /zone).");
-		} else {
-			this.msg(player, "" + this.playerListener.getAllTeamsMsg(player));
 		}
 	}
 
