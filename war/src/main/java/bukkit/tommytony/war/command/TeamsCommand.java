@@ -23,7 +23,7 @@ public class TeamsCommand extends AbstractWarzoneCommand {
 			zone = this.getWarzoneFromLocation((Player) this.sender);
 		}
 		if (zone == null) {
-			return false;
+			return true;
 		}
 //		zone.getTeams();
 		return true;
