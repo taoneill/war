@@ -132,7 +132,7 @@ public class War extends JavaPlugin {
 		this.getDefaultLoadout().put(2, new ItemStack(Material.ARROW, 7));
 		this.getDefaultLoadout().put(3, new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8));
 		this.getDefaultLoadout().put(4, new ItemStack(Material.STONE_SPADE, 1, (byte) 8));
-		this.getDefaultReward().put(0, new ItemStack(Material.CAKE, 1));
+		this.getDefaultReward().put( 0, new ItemStack(Material.CAKE, 1));
 
 		WarMapper.load();
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
@@ -142,7 +142,6 @@ public class War extends JavaPlugin {
 	 * Cleans up war
 	 */
 	public void unloadWar() {
-		this.setLoaded(false);
 		for (Warzone warzone : this.warzones) {
 			warzone.unload();
 		}
@@ -152,7 +151,8 @@ public class War extends JavaPlugin {
 			this.warHub.getVolume().resetBlocks();
 		}
 
-		this.log("Done. War v" + this.desc.getVersion() + " is off.", Level.INFO);
+		this.setLoaded(false);
+		this.log("War v" + this.desc.getVersion() + " is off.", Level.INFO);
 	}
 
 	/**
