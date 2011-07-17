@@ -159,8 +159,6 @@ public class WarHub {
 				if (!zone.isDisabled()) {
 					this.zoneGateBlocks.put(zone.getName(), currentGateBlock);
 					currentGateBlock.getFace(BlockFace.DOWN).setType(Material.GLOWSTONE);
-					currentGateBlock.setType(Material.PORTAL);
-					currentGateBlock.getFace(BlockFace.UP).setType(Material.PORTAL);
 					currentGateBlock.getFace(left).setType(Material.OBSIDIAN);
 					currentGateBlock.getFace(right).getFace(BlockFace.UP).setType(Material.OBSIDIAN);
 					currentGateBlock.getFace(left).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(Material.OBSIDIAN);
