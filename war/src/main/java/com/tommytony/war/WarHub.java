@@ -186,6 +186,11 @@ public class WarHub {
 		}
 	}
 
+	/**
+	 * Resets the sign of the given warzone
+	 *
+	 * @param Warzone	zone
+	 */
 	public void resetZoneSign(Warzone zone) {
 
 		BlockFace left;

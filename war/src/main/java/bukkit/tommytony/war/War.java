@@ -38,11 +38,9 @@ import com.tommytony.war.utils.*;
  */
 public class War extends JavaPlugin {
 	public static PermissionHandler permissionHandler;
+	public static War war;
 
-	public War() {
-		super();
-	}
-
+	// general
 	private WarPlayerListener playerListener = new WarPlayerListener(this);
 	private WarEntityListener entityListener = new WarEntityListener(this);
 	private WarBlockListener blockListener = new WarBlockListener(this);
@@ -50,7 +48,9 @@ public class War extends JavaPlugin {
 	private PluginDescriptionFile desc = null;
 	private boolean loaded = false;
 
+	// Zones and hub
 	private List<Warzone> warzones;
+	private WarHub warHub;
 	private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
 	private final List<String> zoneMakerNames = new ArrayList<String>();
 	private final List<String> commandWhitelist = new ArrayList<String>();
@@ -60,7 +60,7 @@ public class War extends JavaPlugin {
 
 	// Default warzone settings
 	private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
-	private int defaultLifepool = 21;
+	private int defaultLifepool = 7;
 	private boolean defaultFriendlyFire = false;
 	private boolean defaultAutoAssignOnly = false;
 	private int defaultTeamCap = 7;
@@ -81,31 +81,18 @@ public class War extends JavaPlugin {
 	private boolean disablePvpMessage = false;
 	private boolean buildInZonesOnly = false;
 
-	private WarHub warHub;
+	public War() {
+		super();
 
-	public void onDisable() {
-		this.unloadWar();
-	}
-
-	/**
-	 * Cleans up war
-	 */
-	public void unloadWar() {
-		this.setLoaded(false);
-		for (Warzone warzone : this.warzones) {
-			warzone.unload();
-		}
-		this.warzones.clear();
-
-		if (this.warHub != null) {
-			this.warHub.getVolume().resetBlocks();
-		}
-
-		this.logInfo("Done. War v" + this.desc.getVersion() + " is off.");
+		War.war = this;
 	}
 
 	public void onEnable() {
 		this.loadWar();
+	}
+
+	public void onDisable() {
+		this.unloadWar();
 	}
 
 	/**
@@ -140,17 +127,32 @@ public class War extends JavaPlugin {
 
 
 		// Load files from disk or create them (using these defaults)
-		this.defaultLoadout.put(0, new ItemStack(Material.STONE_SWORD, 1, (byte) 8));
-		this.defaultLoadout.put(1, new ItemStack(Material.BOW, 1, (byte) 8));
-		this.defaultLoadout.put(2, new ItemStack(Material.ARROW, 7));
-		this.defaultLoadout.put(3, new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8));
-		this.defaultLoadout.put(4, new ItemStack(Material.STONE_SPADE, 1, (byte) 8));
-		this.defaultLifepool = 7;
-		this.defaultFriendlyFire = false;
-		this.defaultAutoAssignOnly = false;
+		this.getDefaultLoadout().put(0, new ItemStack(Material.STONE_SWORD, 1, (byte) 8));
+		this.getDefaultLoadout().put(1, new ItemStack(Material.BOW, 1, (byte) 8));
+		this.getDefaultLoadout().put(2, new ItemStack(Material.ARROW, 7));
+		this.getDefaultLoadout().put(3, new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8));
+		this.getDefaultLoadout().put(4, new ItemStack(Material.STONE_SPADE, 1, (byte) 8));
 		this.getDefaultReward().put(0, new ItemStack(Material.CAKE, 1));
+
 		WarMapper.load(this);
-		this.logInfo("War v" + this.desc.getVersion() + " is on.");
+		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
+	}
+
+	/**
+	 * Cleans up war
+	 */
+	public void unloadWar() {
+		this.setLoaded(false);
+		for (Warzone warzone : this.warzones) {
+			warzone.unload();
+		}
+		this.warzones.clear();
+
+		if (this.warHub != null) {
+			this.warHub.getVolume().resetBlocks();
+		}
+
+		this.log("Done. War v" + this.desc.getVersion() + " is off.", Level.INFO);
 	}
 
 	/**
@@ -162,7 +164,7 @@ public class War extends JavaPlugin {
 			if (permissionsPlugin != null) {
 				War.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
 			} else {
-				this.logInfo("Permissions system not enabled. Defaulting to regular War config.");
+				this.log("Permissions system not enabled. Defaulting to regular War config.", Level.INFO);
 			}
 		}
 	}
@@ -1046,10 +1048,7 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("resetonunload");
 				warzone.setResetOnUnload(onOff.equals("on") || onOff.equals("true"));
 			}
-			// if (namedParams.containsKey("dropLootOnDeath")){
-			// String onOff = namedParams.get("dropLootOnDeath");
-			// warzone.setDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
-			// }
+
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -1143,10 +1142,7 @@ public class War extends JavaPlugin {
 				// String rewardType = namedParams.get("reward");
 				this.setZoneRallyPoint(namedParams.get("rallypoint"), player);
 			}
-			// if (namedParams.containsKey("dropLootOnDeath")){
-			// String onOff = namedParams.get("dropLootOnDeath");
-			// setDefaultDropLootOnDeath(onOff.equals("on") || onOff.equals("true"));
-			// }
+
 			return true;
 		} catch (Exception e) {
 			return false;
