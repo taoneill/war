@@ -59,11 +59,11 @@ public class PreDeGaulleZoneVolumeMapper {
 		return items;
 	}
 
-	public static int load(ZoneVolume volume, String zoneName, World world, boolean onlyLoadCorners) {
+	public static int load(ZoneVolume volume, String zoneName, War war, World world, boolean onlyLoadCorners) {
 		BufferedReader in = null;
 		int noOfResetBlocks = 0;
 		try {
-			in = new BufferedReader(new FileReader(new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
+			in = new BufferedReader(new FileReader(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
 			String firstLine = in.readLine();
 
 			if (firstLine != null && !firstLine.equals("")) {
@@ -240,7 +240,7 @@ public class PreDeGaulleZoneVolumeMapper {
 									}
 
 								} catch (Exception e) {
-									War.war.getLogger().warning("Failed to reset block in zone volume " + volume.getName() + ". " + "Blocks read: " + blockReads + ". Visited blocks so far:" + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
+									volume.getWar().getLogger().warning("Failed to reset block in zone volume " + volume.getName() + ". " + "Blocks read: " + blockReads + ". Visited blocks so far:" + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
 									e.printStackTrace();
 								} finally {
 									z++;
@@ -257,15 +257,15 @@ public class PreDeGaulleZoneVolumeMapper {
 						x++;
 					}
 					if (!deferred.isEmpty()) {
-						War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, deferred, 1);
+						war.getServer().getScheduler().scheduleSyncDelayedTask(war, deferred, 1);
 					}
 				}
 			}
 		} catch (IOException e) {
-			War.war.log("Failed to read volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
+			war.log("Failed to read volume file " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();
 		} catch (Exception e) {
-			War.war.log("Unexpected error caused failure to read volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
+			war.log("Unexpected error caused failure to read volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();
 		} finally {
 			if (in != null) {
@@ -276,7 +276,7 @@ public class PreDeGaulleZoneVolumeMapper {
 					// scanner.close();
 					// scanner = null;
 				} catch (IOException e) {
-					War.war.log("Failed to close file reader for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
+					war.log("Failed to close file reader for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
 					e.printStackTrace();
 				}
 			}

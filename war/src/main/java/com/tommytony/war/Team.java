@@ -30,12 +30,14 @@ public class Team {
 	private Volume flagVolume;
 	private final Warzone warzone;
 	private TeamKind kind;
+	private War war;
 
-	public Team(String name, TeamKind kind, Location teamSpawn, Warzone warzone) {
+	public Team(String name, TeamKind kind, Location teamSpawn, War war, Warzone warzone) {
 		this.warzone = warzone;
 		this.setName(name);
 		this.teamSpawn = teamSpawn;
-		this.setSpawnVolume(new Volume(name, warzone.getWorld()));
+		this.war = war;
+		this.setSpawnVolume(new Volume(name, war, warzone.getWorld()));
 		this.kind = kind;
 		this.setFlagVolume(null); // no flag at the start
 	}
@@ -296,7 +298,7 @@ public class Team {
 				lines[3] = this.remainingLives + "/" + this.warzone.getLifePool() + " lives left";
 			}
 
-			SignHelper.setToSign(War.war, signBlock, (byte) signData, lines);
+			SignHelper.setToSign(this.war, signBlock, (byte) signData, lines);
 		}
 	}
 
@@ -331,7 +333,7 @@ public class Team {
 
 	public void teamcast(String message) {
 		for (Player player : this.players) {
-			War.war.msg(player, message);
+			this.war.msg(player, message);
 		}
 	}
 
@@ -416,7 +418,7 @@ public class Team {
 
 	private void setFlagVolume() {
 		if (this.flagVolume == null) {
-			this.flagVolume = new Volume(this.getName() + "flag", this.warzone.getWorld());
+			this.flagVolume = new Volume(this.getName() + "flag", this.war, this.warzone.getWorld());
 		}
 		if (this.flagVolume.isSaved()) {
 			this.flagVolume.resetBlocks();

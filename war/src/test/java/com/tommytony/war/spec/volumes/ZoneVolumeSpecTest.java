@@ -9,6 +9,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import bukkit.tommytony.war.War;
+
 import com.tommytony.war.*;
 import com.tommytony.war.volumes.*;
 
@@ -19,12 +21,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenCreatingAndNoCornersAreSet_shouldSetCorner1AtTop() throws NotNorthwestException, TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(0);
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -47,12 +49,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenCreating_AndNoCorner1IsSet_ButCorner2Set_AndNewCornerBlockIsToEastOfCorner2_shouldThrowNotNorthwestException() throws TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64); // further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -81,12 +83,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenCreating_AndNoCorner1IsSet_ButCorner2Set_AndNewCornerBlockIsToSouthOfCorner2_shouldThrowNotNorthwestException() throws TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -115,12 +117,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenCreating_AndNoCorner1IsSet_ButCorner2Set_AndNewCornerBlockIsTooCloseToCorner2_shouldThrowTooSmallException() throws NotNorthwestException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-5); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -149,12 +151,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenCreating_AndNoCorner1IsSet_ButCorner2Set_AndNewCornerBlockIsTooFarFromCorner2_shouldThrowTooBigException() throws NotNorthwestException, TooSmallException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-1000); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -183,12 +185,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenCreatingAndCorner1AlreadySet_shouldSetCorner2AtTop() throws NotNorthwestException, TooSmallException, TooBigException{  // nw always goes to top
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64); // further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -219,12 +221,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenCreating_AndCorner1AlreadySet_ButNewCornerBlockIsEastOfCorner1_shouldThrowNotNorthwestException() throws TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64); // further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -253,12 +255,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenCreating_AndCorner1AlreadySet_ButNewCornerBlockIsSouthOfCorner1_shouldThrowNotNorthwestException() throws TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -287,12 +289,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenChangingVolumeWithCorner1NwCorner2Se_shouldMoveCorner1() throws NotNorthwestException, TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64);	// further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -326,12 +328,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenChangingVolumeWithCorner1SeCorner2Nw_shouldMoveCorner2() throws NotNorthwestException, TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64);	// further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -365,12 +367,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenChangingVolumeWithCorner1NeCorner2Sw_shouldMoveCorner1XAndCorner2Z() throws NotNorthwestException, TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64);	// further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -404,12 +406,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setNorthwest_whenChangingVolumeWithCorner1SwCorner2Ne_shouldMoveCorner1ZAndCorner2X() throws NotNorthwestException, TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64);	// further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -449,12 +451,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setSoutheast_whenCreatingAndNoCornersAreSet_shouldSetCorner2AtBottom() throws NotSoutheastException, TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(0);
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -477,12 +479,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setSoutheast_whenCreatingAndNoCorner2IsSet_ButCorner1IsAlreadySet_AndNewCornerBlockIsToWestOfCorner1_shouldThrowNotSoutheastException() throws TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -511,12 +513,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setSoutheast_whenCreatingAndNoCorner2IsSet_ButCorner1IsAlreadySet_AndNewCornerBlockIsToNorthOfCorner1_shouldThrowNotSoutheastException() throws TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64); // further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -545,12 +547,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setSoutheast_whenCreatingAndCorner2AlreadySet_shouldSetCorner1AtBottom() throws NotSoutheastException, TooSmallException, TooBigException{	// se always goes to bottom
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64);  // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -581,12 +583,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setSoutheast_whenCreating_AndCorner2AlreadySet_ButNewCornerBlockIsToWestOfCorner2_shouldThrowNotSoutheastException() throws TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64); // further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -615,12 +617,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setSoutheast_whenCreating_AndCorner2AlreadySet_ButNewCornerBlockIsToNorthOfCorner2_shouldThrowNotSoutheastException() throws TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(-64); // further north
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -649,12 +651,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setSoutheast_whenChangingVolumeWithCorner1NwCorner2Se_shouldMoveCorner2() throws NotSoutheastException, TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64);	// further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -688,12 +690,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setSoutheast_whenChangingVolumeWithCorner1SeCorner2Nw_shouldMoveCorner1() throws NotSoutheastException, TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64);	// further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -727,12 +729,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setSoutheast_whenChangingVolumeWithCorner1NeCorner2Sw_shouldMoveCorner1ZAndCorner2X() throws NotSoutheastException, TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64);	// further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level
@@ -766,12 +768,12 @@ public class ZoneVolumeSpecTest {
 	@Test
 	public void setSoutheast_whenChangingVolumeWithCorner1SwCorner2Ne_shouldMoveCorner1XAndCorner2Z() throws NotSoutheastException, TooSmallException, TooBigException{
 		// Arrange
-
+		War warMock = mock(War.class);
 		World worldMock = mock(World.class);
 		Warzone zoneMock = mock(Warzone.class);
 		when(zoneMock.getTeams()).thenReturn(new ArrayList<Team>());
 		when(zoneMock.getMonuments()).thenReturn(new ArrayList<Monument>());
-		ZoneVolume volume = new ZoneVolume("test", worldMock, zoneMock);
+		ZoneVolume volume = new ZoneVolume("test", warMock, worldMock, zoneMock);
 		Block blockMock = mock(Block.class);
 		when(blockMock.getX()).thenReturn(64);	// further south
 		when(blockMock.getY()).thenReturn(64);	// at sea level

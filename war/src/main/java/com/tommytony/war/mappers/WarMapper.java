@@ -23,15 +23,15 @@ import com.tommytony.war.jobs.RestoreWarzonesJob;
  */
 public class WarMapper {
 
-	public static void load() {
+	public static void load(War war) {
 		// war.getLogger().info("Loading war config...");
-		(War.war.getDataFolder()).mkdir();
-		(new File(War.war.getDataFolder().getPath() + "/dat")).mkdir();
-		PropertiesFile warConfig = new PropertiesFile(War.war.getDataFolder().getPath() + "/war.txt");
+		(war.getDataFolder()).mkdir();
+		(new File(war.getDataFolder().getPath() + "/dat")).mkdir();
+		PropertiesFile warConfig = new PropertiesFile(war.getDataFolder().getPath() + "/war.txt");
 		try {
 			warConfig.load();
 		} catch (IOException e) {
-			War.war.log("Failed to load war.txt file.", Level.WARNING);
+			war.log("Failed to load war.txt file.", Level.WARNING);
 			e.printStackTrace();
 		}
 
@@ -39,93 +39,93 @@ public class WarMapper {
 		boolean newWar = false;
 		if (!warConfig.containsKey("warzones")) {
 			newWar = true;
-			WarMapper.save();
-			War.war.log("war.txt settings file created.", Level.INFO);
+			WarMapper.save(war);
+			war.log("war.txt settings file created.", Level.INFO);
 			try {
 				warConfig.load();
 			} catch (IOException e) {
-				War.war.log("Failed to reload war.txt file after creating it.", Level.WARNING);
+				war.log("Failed to reload war.txt file after creating it.", Level.WARNING);
 				e.printStackTrace();
 			}
 		}
 
 		// warzones
 		String warzonesStr = warConfig.getString("warzones");
-		RestoreWarzonesJob restoreWarzones = new RestoreWarzonesJob(warzonesStr, newWar);
-		if (War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, restoreWarzones) == -1) {
-			War.war.log("Failed to schedule warzone-restore job. No warzone was loaded.", Level.WARNING);
+		RestoreWarzonesJob restoreWarzones = new RestoreWarzonesJob(war, warzonesStr, newWar);
+		if (war.getServer().getScheduler().scheduleSyncDelayedTask(war, restoreWarzones) == -1) {
+			war.log("Failed to schedule warzone-restore job. No warzone was loaded.", Level.WARNING);
 		}
 
 		// zone makers
 		String[] makers = warConfig.getString("zoneMakers").split(",");
-		War.war.getZoneMakerNames().clear();
+		war.getZoneMakerNames().clear();
 		for (String makerName : makers) {
 			if (makerName != null && !makerName.equals("")) {
-				War.war.getZoneMakerNames().add(makerName);
+				war.getZoneMakerNames().add(makerName);
 			}
 		}
 
 		// command whitelist
 		String[] whitelist = warConfig.getString("commandWhitelist").split(",");
-		War.war.getCommandWhitelist().clear();
+		war.getCommandWhitelist().clear();
 		for (String command : whitelist) {
 			if (command != null && !command.equals("")) {
-				War.war.getCommandWhitelist().add(command);
+				war.getCommandWhitelist().add(command);
 			}
 		}
 
 		// defaultLoadout
 		String defaultLoadoutStr = warConfig.getString("defaultLoadout");
 		String[] defaultLoadoutSplit = defaultLoadoutStr.split(";");
-		War.war.getDefaultLoadout().clear();
+		war.getDefaultLoadout().clear();
 		for (String itemStr : defaultLoadoutSplit) {
 			if (itemStr != null && !itemStr.equals("")) {
 				String[] itemStrSplit = itemStr.split(",");
 				ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
-				War.war.getDefaultLoadout().put(Integer.parseInt(itemStrSplit[2]), item);
+				war.getDefaultLoadout().put(Integer.parseInt(itemStrSplit[2]), item);
 			}
 		}
 
 		// defaultLifePool
-		War.war.setDefaultLifepool(warConfig.getInt("defaultLifePool"));
+		war.setDefaultLifepool(warConfig.getInt("defaultLifePool"));
 
 		// defaultMonumentHeal
-		War.war.setDefaultMonumentHeal(warConfig.getInt("defaultMonumentHeal"));
+		war.setDefaultMonumentHeal(warConfig.getInt("defaultMonumentHeal"));
 
 		// defaultFriendlyFire
-		War.war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));
+		war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));
 
 		// defaultAutoAssignOnly
-		War.war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
+		war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
 
 		// defaultTeamCap
-		War.war.setDefaultTeamCap(warConfig.getInt("defaultTeamCap"));
+		war.setDefaultTeamCap(warConfig.getInt("defaultTeamCap"));
 
 		// defaultScoreCap
-		War.war.setDefaultScoreCap(warConfig.getInt("defaultScoreCap"));
+		war.setDefaultScoreCap(warConfig.getInt("defaultScoreCap"));
 
 		// pvpInZonesOnly
-		War.war.setPvpInZonesOnly(warConfig.getBoolean("pvpInZonesOnly"));
+		war.setPvpInZonesOnly(warConfig.getBoolean("pvpInZonesOnly"));
 
 		// defaultBlockHeads
-		War.war.setDefaultBlockHeads(warConfig.getBoolean("defaultBlockHeads"));
+		war.setDefaultBlockHeads(warConfig.getBoolean("defaultBlockHeads"));
 
 		// buildInZonesOnly
-		War.war.setBuildInZonesOnly(warConfig.getBoolean("buildInZonesOnly"));
+		war.setBuildInZonesOnly(warConfig.getBoolean("buildInZonesOnly"));
 
 		// disablePVPMessage
-		War.war.setDisablePvpMessage(warConfig.getBoolean("disablePvpMessage"));
+		war.setDisablePvpMessage(warConfig.getBoolean("disablePvpMessage"));
 
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
 		if (spawnStyle != null && !spawnStyle.equals("")) {
 			spawnStyle = spawnStyle.toLowerCase();
 			if (spawnStyle.equals(TeamSpawnStyles.SMALL)) {
-				War.war.setDefaultSpawnStyle(spawnStyle);
+				war.setDefaultSpawnStyle(spawnStyle);
 			} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)) {
-				War.war.setDefaultSpawnStyle(spawnStyle);
+				war.setDefaultSpawnStyle(spawnStyle);
 			} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)) {
-				War.war.setDefaultSpawnStyle(spawnStyle);
+				war.setDefaultSpawnStyle(spawnStyle);
 			}
 			// default is already initialized to BIG (see Warzone)
 		}
@@ -134,73 +134,73 @@ public class WarMapper {
 		String defaultRewardStr = warConfig.getString("defaultReward");
 		if (defaultRewardStr != null && !defaultRewardStr.equals("")) {
 			String[] defaultRewardStrSplit = defaultRewardStr.split(";");
-			War.war.getDefaultReward().clear();
+			war.getDefaultReward().clear();
 			for (String itemStr : defaultRewardStrSplit) {
 				if (itemStr != null && !itemStr.equals("")) {
 					String[] itemStrSplit = itemStr.split(",");
 					ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
-					War.war.getDefaultReward().put(Integer.parseInt(itemStrSplit[2]), item);
+					war.getDefaultReward().put(Integer.parseInt(itemStrSplit[2]), item);
 				}
 			}
 		}
 
 		// defaultUnbreakableZoneBlocks
-		War.war.setDefaultUnbreakableZoneBlocks(warConfig.getBoolean("defaultUnbreakableZoneBlocks"));
+		war.setDefaultUnbreakableZoneBlocks(warConfig.getBoolean("defaultUnbreakableZoneBlocks"));
 
 		// defaultNoCreatures
-		War.war.setDefaultNoCreatures(warConfig.getBoolean("defaultNoCreatures"));
+		war.setDefaultNoCreatures(warConfig.getBoolean("defaultNoCreatures"));
 
 		// defaultDropLootOnDeath
 		// war.setDefaultDropLootOnDeath(warConfig.getBoolean("defaultDropLootOnDeath"));
 
 		// defaultResetOnEmpty
-		War.war.setDefaultResetOnEmpty(warConfig.getBoolean("defaultResetOnEmpty"));
+		war.setDefaultResetOnEmpty(warConfig.getBoolean("defaultResetOnEmpty"));
 
 		// defaultResetOnLoad
-		War.war.setDefaultResetOnLoad(warConfig.getBoolean("defaultResetOnLoad"));
+		war.setDefaultResetOnLoad(warConfig.getBoolean("defaultResetOnLoad"));
 
 		// defaultResetOnUnload
-		War.war.setDefaultResetOnUnload(warConfig.getBoolean("defaultResetOnUnload"));
+		war.setDefaultResetOnUnload(warConfig.getBoolean("defaultResetOnUnload"));
 
 		// warhub
 		String hubStr = warConfig.getString("warhub");
 		if (hubStr != null && !hubStr.equals("")) {
-			RestoreWarhubJob restoreWarhub = new RestoreWarhubJob(hubStr);
-			if (War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, restoreWarhub) == -1) {
-				War.war.log("Failed to schedule warhub-restore job. War hub was not loaded.", Level.WARNING);
+			RestoreWarhubJob restoreWarhub = new RestoreWarhubJob(war, hubStr);
+			if (war.getServer().getScheduler().scheduleSyncDelayedTask(war, restoreWarhub) == -1) {
+				war.log("Failed to schedule warhub-restore job. War hub was not loaded.", Level.WARNING);
 			}
 		}
 
 		warConfig.close();
 	}
 
-	public static void save() {
-		PropertiesFile warConfig = new PropertiesFile(War.war.getDataFolder().getPath() + "/war.txt");
+	public static void save(War war) {
+		PropertiesFile warConfig = new PropertiesFile(war.getDataFolder().getPath() + "/war.txt");
 		String warzonesStr = "";
 
 		// warzones
-		for (Warzone zone : War.war.getWarzones()) {
+		for (Warzone zone : war.getWarzones()) {
 			warzonesStr += zone.getName() + ",";
 		}
 		warConfig.setString("warzones", warzonesStr);
 
 		// zone makers: default is none and it means everyone can use /setzone
 		String makersStr = ""; // everyone
-		for (String name : War.war.getZoneMakerNames()) {
+		for (String name : war.getZoneMakerNames()) {
 			makersStr += name + ",";
 		}
 		warConfig.setString("zoneMakers", makersStr);
 
 		// whitelisted commands during a game
 		String commandWhitelistStr = ""; // everyone
-		for (String command : War.war.getCommandWhitelist()) {
+		for (String command : war.getCommandWhitelist()) {
 			commandWhitelistStr += command + ",";
 		}
 		warConfig.setString("commandWhitelist", makersStr);
 
 		// defaultLoadout
 		String defaultLoadoutStr = "";
-		HashMap<Integer, ItemStack> items = War.war.getDefaultLoadout();
+		HashMap<Integer, ItemStack> items = war.getDefaultLoadout();
 		for (Integer slot : items.keySet()) {
 			ItemStack item = items.get(slot);
 			if (item != null) {
@@ -210,41 +210,41 @@ public class WarMapper {
 		warConfig.setString("defaultLoadout", defaultLoadoutStr);
 
 		// defaultLifepool
-		warConfig.setInt("defaultLifePool", War.war.getDefaultLifepool());
+		warConfig.setInt("defaultLifePool", war.getDefaultLifepool());
 
 		// defaultMonumentHeal
-		warConfig.setInt("defaultMonumentHeal", War.war.getDefaultMonumentHeal());
+		warConfig.setInt("defaultMonumentHeal", war.getDefaultMonumentHeal());
 
 		// defaultFriendlyFire
-		warConfig.setBoolean("defaultFriendlyFire", War.war.getDefaultFriendlyFire());
+		warConfig.setBoolean("defaultFriendlyFire", war.getDefaultFriendlyFire());
 
 		// defaultAutoAssignOnly
-		warConfig.setBoolean("defaultAutoAssignOnly", War.war.getDefaultAutoAssignOnly());
+		warConfig.setBoolean("defaultAutoAssignOnly", war.getDefaultAutoAssignOnly());
 
 		// defaultTeamCap
-		warConfig.setInt("defaultTeamCap", War.war.getDefaultTeamCap());
+		warConfig.setInt("defaultTeamCap", war.getDefaultTeamCap());
 
 		// defaultScoreCap
-		warConfig.setInt("defaultScoreCap", War.war.getDefaultScoreCap());
+		warConfig.setInt("defaultScoreCap", war.getDefaultScoreCap());
 
 		// pvpInZonesOnly
-		warConfig.setBoolean("pvpInZonesOnly", War.war.isPvpInZonesOnly());
+		warConfig.setBoolean("pvpInZonesOnly", war.isPvpInZonesOnly());
 
 		// defaultBlockHeads
-		warConfig.setBoolean("defaultBlockHeads", War.war.isDefaultBlockHeads());
+		warConfig.setBoolean("defaultBlockHeads", war.isDefaultBlockHeads());
 
 		// buildInZonesOnly
-		warConfig.setBoolean("buildInZonesOnly", War.war.isBuildInZonesOnly());
+		warConfig.setBoolean("buildInZonesOnly", war.isBuildInZonesOnly());
 
 		// disablePVPMessage
-		warConfig.setBoolean("disablePvpMessage", War.war.isDisablePvpMessage());
+		warConfig.setBoolean("disablePvpMessage", war.isDisablePvpMessage());
 
 		// spawnStyle
-		warConfig.setString("spawnStyle", War.war.getDefaultSpawnStyle());
+		warConfig.setString("spawnStyle", war.getDefaultSpawnStyle());
 
 		// defaultReward
 		String defaultRewardStr = "";
-		HashMap<Integer, ItemStack> rewardItems = War.war.getDefaultReward();
+		HashMap<Integer, ItemStack> rewardItems = war.getDefaultReward();
 		for (Integer slot : rewardItems.keySet()) {
 			ItemStack item = items.get(slot);
 			if (item != null) {
@@ -254,26 +254,26 @@ public class WarMapper {
 		warConfig.setString("defaultReward", defaultRewardStr);
 
 		// defaultUnbreakableZoneBlocks
-		warConfig.setBoolean("defaultUnbreakableZoneBlocks", War.war.isDefaultUnbreakableZoneBlocks());
+		warConfig.setBoolean("defaultUnbreakableZoneBlocks", war.isDefaultUnbreakableZoneBlocks());
 
 		// defaultNoCreatures
-		warConfig.setBoolean("defaultNoCreatures", War.war.isDefaultNoCreatures());
+		warConfig.setBoolean("defaultNoCreatures", war.isDefaultNoCreatures());
 
 		// defaultResetOnEmpty
-		warConfig.setBoolean("defaultResetOnEmpty", War.war.isDefaultResetOnEmpty());
+		warConfig.setBoolean("defaultResetOnEmpty", war.isDefaultResetOnEmpty());
 
 		// defaultResetOnLoad
-		warConfig.setBoolean("defaultResetOnLoad", War.war.isDefaultResetOnLoad());
+		warConfig.setBoolean("defaultResetOnLoad", war.isDefaultResetOnLoad());
 
 		// defaultResetOnUnload
-		warConfig.setBoolean("defaultResetOnUnload", War.war.isDefaultResetOnUnload());
+		warConfig.setBoolean("defaultResetOnUnload", war.isDefaultResetOnUnload());
 
 		// defaultDropLootOnDeath
 		// warConfig.setBoolean("defaultDropLootOnDeath", war.isDefaultDropLootOnDeath());
 
 		// warhub
 		String hubStr = "";
-		WarHub hub = War.war.getWarHub();
+		WarHub hub = war.getWarHub();
 		if (hub != null) {
 			String orientationStr = "";
 			if (BlockFace.SOUTH == hub.getOrientation()) {
@@ -287,7 +287,7 @@ public class WarMapper {
 			}
 			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + ","
 			+ hub.getLocation().getWorld().getName() + "," + orientationStr;
-			VolumeMapper.save(hub.getVolume(), "");
+			VolumeMapper.save(hub.getVolume(), "", war);
 		}
 		warConfig.setString("warhub", hubStr);
 

@@ -27,8 +27,8 @@ import com.tommytony.war.volumes.ZoneVolume;
 
 /**
  *
- * @author 	tommytony
- * @package 	com.tommytony.war
+ * @author tommytony
+ *
  */
 public class Warzone {
 	private String name;
@@ -51,6 +51,7 @@ public class Warzone {
 	private World world;
 	private final int minSafeDistanceFromWall = 6;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
+	private War war;
 	private ZoneLobby lobby;
 	private boolean autoAssignOnly;
 	private boolean blockHeads;
@@ -66,24 +67,25 @@ public class Warzone {
 	private HashMap<String, InventoryStash> deadMenInventories = new HashMap<String, InventoryStash>();
 	private Location rallyPoint;
 
-	public Warzone(World world, String name) {
+	public Warzone(War war, World world, String name) {
 		this.world = world;
+		this.war = war;
 		this.name = name;
-		this.friendlyFire = War.war.getDefaultFriendlyFire();
-		this.setLifePool(War.war.getDefaultLifepool());
-		this.setLoadout(War.war.getDefaultLoadout());
-		this.setAutoAssignOnly(War.war.getDefaultAutoAssignOnly());
-		this.teamCap = War.war.getDefaultTeamCap();
-		this.scoreCap = War.war.getDefaultScoreCap();
-		this.monumentHeal = War.war.getDefaultMonumentHeal();
-		this.setBlockHeads(War.war.isDefaultBlockHeads());
-		this.setDropLootOnDeath(War.war.isDefaultDropLootOnDeath());
-		this.setUnbreakableZoneBlocks(War.war.isDefaultUnbreakableZoneBlocks());
-		this.setNoCreatures(War.war.getDefaultNoCreatures());
-		this.setResetOnEmpty(War.war.isDefaultResetOnEmpty());
-		this.setResetOnLoad(War.war.isDefaultResetOnLoad());
-		this.setResetOnUnload(War.war.isDefaultResetOnUnload());
-		this.volume = new ZoneVolume(name, this.getWorld(), this);
+		this.friendlyFire = war.getDefaultFriendlyFire();
+		this.setLifePool(war.getDefaultLifepool());
+		this.setLoadout(war.getDefaultLoadout());
+		this.setAutoAssignOnly(war.getDefaultAutoAssignOnly());
+		this.teamCap = war.getDefaultTeamCap();
+		this.scoreCap = war.getDefaultScoreCap();
+		this.monumentHeal = war.getDefaultMonumentHeal();
+		this.setBlockHeads(war.isDefaultBlockHeads());
+		this.setDropLootOnDeath(war.isDefaultDropLootOnDeath());
+		this.setUnbreakableZoneBlocks(war.isDefaultUnbreakableZoneBlocks());
+		this.setNoCreatures(war.getDefaultNoCreatures());
+		this.setResetOnEmpty(war.isDefaultResetOnEmpty());
+		this.setResetOnLoad(war.isDefaultResetOnLoad());
+		this.setResetOnUnload(war.isDefaultResetOnUnload());
+		this.volume = new ZoneVolume(name, war, this.getWorld(), this);
 	}
 
 	public boolean ready() {
@@ -186,12 +188,12 @@ public class Warzone {
 
 	public void initializeZoneAsJob(Player respawnExempted) {
 		InitZoneJob job = new InitZoneJob(this, respawnExempted);
-		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, job);
 	}
 
 	public void initializeZoneAsJob() {
 		InitZoneJob job = new InitZoneJob(this);
-		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, job);
 	}
 
 	private void initZone() {
@@ -233,7 +235,7 @@ public class Warzone {
 		player.setHealth(20);
 
 		LoadoutResetJob job = new LoadoutResetJob(this, team, player);
-		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, job);
 	}
 
 	public void resetInventory(Team team, Player player) {
@@ -579,7 +581,7 @@ public class Warzone {
 				guard.updatePlayerPosition(player.getLocation());
 			} else {
 				// new guard
-				guard = new ZoneWallGuard(player, War.war, this, wall);
+				guard = new ZoneWallGuard(player, this.war, this, wall);
 				this.zoneWallGuards.add(guard);
 			}
 			protecting = true;
@@ -637,7 +639,7 @@ public class Warzone {
 			if (!this.hasPlayerInventory(player.getName())) {
 				this.keepPlayerInventory(player);
 			}
-			War.war.msg(player, "Your inventory is in storage until you /leave.");
+			this.war.msg(player, "Your inventory is in storage until you /leave.");
 			this.respawnPlayer(lowestNoOfPlayers, player);
 			for (Team team : this.teams) {
 				team.teamcast("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + ".");
@@ -674,11 +676,10 @@ public class Warzone {
 	}
 
 	public void handleDeath(Player player) {
-		Team playerTeam = War.war.getPlayerTeam(player.getName());
-		Warzone playerWarzone = War.war.getPlayerTeamWarzone(player.getName());
+		Team playerTeam = this.war.getPlayerTeam(player.getName());
+		Warzone playerWarzone = this.war.getPlayerTeamWarzone(player.getName());
 		if (playerTeam != null && playerWarzone != null) {
 			// teleport to team spawn upon death
-
 			playerWarzone.respawnPlayer(playerTeam, player);
 			int remaining = playerTeam.getRemainingLifes();
 			if (remaining == 0) { // your death caused your team to lose
@@ -750,7 +751,7 @@ public class Warzone {
 				}
 			}
 			playerTeam.resetSign();
-			Plugin heroicDeath = War.war.getServer().getPluginManager().getPlugin("HeroicDeath");
+			Plugin heroicDeath = this.war.getServer().getPluginManager().getPlugin("HeroicDeath");
 			if (heroicDeath != null) {
 
 			}
@@ -768,7 +769,7 @@ public class Warzone {
 	}
 
 	private void handlePlayerLeave(Player player, boolean removeFromTeam) {
-		Team playerTeam = War.war.getPlayerTeam(player.getName());
+		Team playerTeam = this.war.getPlayerTeam(player.getName());
 		if (playerTeam != null) {
 			if (removeFromTeam) {
 				playerTeam.removePlayer(player.getName());
@@ -796,9 +797,9 @@ public class Warzone {
 			player.setFireTicks(0);
 			player.setRemainingAir(300);
 
-			War.war.msg(player, "Left the zone. Your inventory has been restored.");
-			if (War.war.getWarHub() != null) {
-				War.war.getWarHub().resetZoneSign(this);
+			this.war.msg(player, "Left the zone. Your inventory has been restored.");
+			if (this.war.getWarHub() != null) {
+				this.war.getWarHub().resetZoneSign(this);
 			}
 
 			boolean zoneEmpty = true;
@@ -816,7 +817,7 @@ public class Warzone {
 				}
 				this.getVolume().resetBlocksAsJob();
 				this.initializeZoneAsJob();
-				War.war.log("Last player left warzone " + this.getName() + ". Warzone blocks resetting automatically...", Level.INFO);
+				this.war.log("Last player left warzone " + this.getName() + ". Warzone blocks resetting automatically...", Level.INFO);
 			}
 		}
 	}
@@ -876,15 +877,15 @@ public class Warzone {
 		winnersStr += ". Resetting warzone and your inventory...";
 		// Score cap reached. Reset everything.
 		ScoreCapReachedJob job = new ScoreCapReachedJob(this, winnersStr);
-		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+		this.war.getServer().getScheduler().scheduleSyncDelayedTask(this.war, job);
 		if (this.getLobby() != null) {
 			this.getLobby().getVolume().resetBlocksAsJob();
 		}
 		this.getVolume().resetBlocksAsJob();
 		this.initializeZoneAsJob(player);
-		if (War.war.getWarHub() != null) {
+		if (this.war.getWarHub() != null) {
 			// TODO: test if warhub sign give the correct info despite the jobs
-			War.war.getWarHub().resetZoneSign(this);
+			this.war.getWarHub().resetZoneSign(this);
 		}
 	}
 
@@ -971,7 +972,7 @@ public class Warzone {
 	}
 
 	public void unload() {
-		War.war.log("Unloading zone " + this.getName() + "...", Level.INFO);
+		this.war.log("Unloading zone " + this.getName() + "...", Level.INFO);
 		for (Team team : this.getTeams()) {
 			for (Player player : team.getPlayers()) {
 				this.handlePlayerLeave(player, this.getTeleport(), false);

@@ -29,13 +29,13 @@ import com.tommytony.war.volumes.ZoneVolume;
  */
 public class WarzoneMapper {
 
-	public static Warzone load(String name, boolean createNewVolume) {
+	public static Warzone load(War war, String name, boolean createNewVolume) {
 		// war.getLogger().info("Loading warzone " + name + " config and blocks...");
-		PropertiesFile warzoneConfig = new PropertiesFile(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
+		PropertiesFile warzoneConfig = new PropertiesFile(war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		try {
 			warzoneConfig.load();
 		} catch (IOException e) {
-			War.war.getLogger().info("Failed to load warzone-" + name + ".txt file.");
+			war.getLogger().info("Failed to load warzone-" + name + ".txt file.");
 			e.printStackTrace();
 		}
 
@@ -43,21 +43,21 @@ public class WarzoneMapper {
 		String worldStr = warzoneConfig.getProperty("world");
 		World world = null;
 		if (worldStr == null || worldStr.equals("")) {
-			world = War.war.getServer().getWorlds().get(0); // default to first world
+			world = war.getServer().getWorlds().get(0); // default to first world
 		} else {
-			world = War.war.getServer().getWorld(worldStr);
+			world = war.getServer().getWorld(worldStr);
 		}
 
 		if (world == null) {
-			War.war.log("Failed to restore warzone " + name + ". The specified world (name: " + worldStr + ") does not exist!", Level.WARNING);
+			war.log("Failed to restore warzone " + name + ". The specified world (name: " + worldStr + ") does not exist!", Level.WARNING);
 		} else {
 			// Create the zone
-			Warzone warzone = new Warzone(world, name);
+			Warzone warzone = new Warzone(war, world, name);
 
 			// Create file if needed
 			if (!warzoneConfig.containsKey("name")) {
-				WarzoneMapper.save(warzone, false);
-				War.war.getLogger().info("Warzone " + name + " config file created.");
+				WarzoneMapper.save(war, warzone, false);
+				war.getLogger().info("Warzone " + name + " config file created.");
 				try {
 					warzoneConfig.load();
 				} catch (IOException e) {
@@ -93,7 +93,7 @@ public class WarzoneMapper {
 							int yaw = Integer.parseInt(teamStrSplit[4]);
 							teamLocation.setYaw(yaw);
 						}
-						Team team = new Team(teamStrSplit[0], TeamKinds.teamKindFromString(teamStrSplit[0]), teamLocation, warzone);
+						Team team = new Team(teamStrSplit[0], TeamKinds.teamKindFromString(teamStrSplit[0]), teamLocation, war, warzone);
 						team.setRemainingLives(warzone.getLifePool());
 						warzone.getTeams().add(team);
 					}
@@ -230,7 +230,7 @@ public class WarzoneMapper {
 						int monumentX = Integer.parseInt(monumentStrSplit[1]);
 						int monumentY = Integer.parseInt(monumentStrSplit[2]);
 						int monumentZ = Integer.parseInt(monumentStrSplit[3]);
-						Monument monument = new Monument(monumentStrSplit[0], warzone, new Location(world, monumentX, monumentY, monumentZ));
+						Monument monument = new Monument(monumentStrSplit[0], war, warzone, new Location(world, monumentX, monumentY, monumentZ));
 						warzone.getMonuments().add(monument);
 					}
 				}
@@ -242,20 +242,20 @@ public class WarzoneMapper {
 			warzoneConfig.close();
 
 			if (createNewVolume) {
-				ZoneVolume zoneVolume = new ZoneVolume(warzone.getName(), world, warzone); // VolumeMapper.loadZoneVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld(), warzone);
+				ZoneVolume zoneVolume = new ZoneVolume(warzone.getName(), war, world, warzone); // VolumeMapper.loadZoneVolume(warzone.getName(), warzone.getName(), war, warzone.getWorld(), warzone);
 				warzone.setVolume(zoneVolume);
 			}
 
 			// monument blocks
 			for (Monument monument : warzone.getMonuments()) {
-				monument.setVolume(VolumeMapper.loadVolume(monument.getName(), warzone.getName(), world));
+				monument.setVolume(VolumeMapper.loadVolume(monument.getName(), warzone.getName(), war, world));
 			}
 
 			// team spawn blocks
 			for (Team team : warzone.getTeams()) {
-				team.setSpawnVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), world));
+				team.setSpawnVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), war, world));
 				if (team.getTeamFlag() != null) {
-					team.setFlagVolume(VolumeMapper.loadVolume(team.getName() + "flag", warzone.getName(), world));
+					team.setFlagVolume(VolumeMapper.loadVolume(team.getName() + "flag", warzone.getName(), war, world));
 				}
 			}
 
@@ -271,8 +271,8 @@ public class WarzoneMapper {
 				} else if (lobbyStr.equals("west")) {
 					lobbyFace = BlockFace.WEST;
 				}
-				Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), world);
-				ZoneLobby lobby = new ZoneLobby(warzone, lobbyFace, lobbyVolume);
+				Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), war, world);
+				ZoneLobby lobby = new ZoneLobby(war, warzone, lobbyFace, lobbyVolume);
 				warzone.setLobby(lobby);
 			}
 
@@ -281,9 +281,9 @@ public class WarzoneMapper {
 		return null;
 	}
 
-	public static void save(Warzone warzone, boolean saveAllBlocks) {
-		(new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + warzone.getName())).mkdir();
-		PropertiesFile warzoneConfig = new PropertiesFile(War.war.getDataFolder().getPath() + "/warzone-" + warzone.getName() + ".txt");
+	public static void save(War war, Warzone warzone, boolean saveAllBlocks) {
+		(new File(war.getDataFolder().getPath() + "/dat/warzone-" + warzone.getName())).mkdir();
+		PropertiesFile warzoneConfig = new PropertiesFile(war.getDataFolder().getPath() + "/warzone-" + warzone.getName() + ".txt");
 		// war.getLogger().info("Saving warzone " + warzone.getName() + "...");
 
 		// name
@@ -446,19 +446,19 @@ public class WarzoneMapper {
 
 		// monument blocks
 		for (Monument monument : monuments) {
-			VolumeMapper.save(monument.getVolume(), warzone.getName());
+			VolumeMapper.save(monument.getVolume(), warzone.getName(), war);
 		}
 
 		// team spawn & flag blocks
 		for (Team team : teams) {
-			VolumeMapper.save(team.getSpawnVolume(), warzone.getName());
+			VolumeMapper.save(team.getSpawnVolume(), warzone.getName(), war);
 			if (team.getFlagVolume() != null) {
-				VolumeMapper.save(team.getFlagVolume(), warzone.getName());
+				VolumeMapper.save(team.getFlagVolume(), warzone.getName(), war);
 			}
 		}
 
 		if (warzone.getLobby() != null) {
-			VolumeMapper.save(warzone.getLobby().getVolume(), warzone.getName());
+			VolumeMapper.save(warzone.getLobby().getVolume(), warzone.getName(), war);
 		}
 
 		// if (saveBlocks) {
@@ -468,23 +468,23 @@ public class WarzoneMapper {
 		// }
 	}
 
-	public static void delete(String name) {
-		File zoneFolder = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name);
+	public static void delete(War war, String name) {
+		File zoneFolder = new File(war.getDataFolder().getPath() + "/dat/warzone-" + name);
 		File[] files = zoneFolder.listFiles();
 		for (File file : files) {
 			boolean deletedData = file.delete();
 			if (!deletedData) {
-				War.war.log("Failed to delete file " + file.getName(), Level.WARNING);
+				war.log("Failed to delete file " + file.getName(), Level.WARNING);
 			}
 		}
 		boolean deletedData = zoneFolder.delete();
 		if (!deletedData) {
-			War.war.log("Failed to delete folder " + zoneFolder.getName(), Level.WARNING);
+			war.log("Failed to delete folder " + zoneFolder.getName(), Level.WARNING);
 		}
-		File zoneFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
+		File zoneFile = new File(war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		deletedData = zoneFile.delete();
 		if (!deletedData) {
-			War.war.log("Failed to delete file " + zoneFile.getName(), Level.WARNING);
+			war.log("Failed to delete file " + zoneFile.getName(), Level.WARNING);
 		}
 	}
 
