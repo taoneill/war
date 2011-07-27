@@ -18,7 +18,10 @@ public class DeletemonumentCommand extends AbstractZoneMakerCommand {
 	@Override
 	public boolean handle() {
 		Warzone zone;
-		if (this.args.length == 1) {
+		if (this.args.length == 0) {
+			return false;
+		}
+		else if (this.args.length == 2) {
 			zone = Warzone.getZoneByName(this.args[0]);
 			this.args[0] = this.args[1];
 		} else {

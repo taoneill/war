@@ -327,39 +327,6 @@ public class War extends JavaPlugin {
 		}
 	}
 
-	public void performDeleteTeam(Player player, String[] arguments) {
-		if (arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))) {
-			this.badMsg(player, "Usage: /deleteteam <team-name/color>." + " Deletes the team and its spawn. " + "Must be in a warzone or lobby (try /zones and /zone). ");
-		} else {
-			String name = arguments[0];
-			Warzone warzone = Warzone.getZoneByLocation(player);
-			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
-			if (warzone == null && lobby != null) {
-				warzone = lobby.getZone();
-			} else {
-				lobby = warzone.getLobby();
-			}
-			Team team = warzone.getTeamByKind(TeamKinds.teamKindFromString(name));
-			if (team != null) {
-				if (team.getFlagVolume() != null) {
-					team.getFlagVolume().resetBlocks();
-				}
-				team.getSpawnVolume().resetBlocks();
-				warzone.getTeams().remove(team);
-				if (warzone.getLobby() != null) {
-					warzone.getLobby().getVolume().resetBlocks();
-					// warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
-					// warzone.addZoneOutline(warzone.getLobby().getWall());
-					warzone.getLobby().initialize();
-				}
-				WarzoneMapper.save(warzone, false);
-				this.msg(player, "Team " + team.getName() + " removed.");
-			} else {
-				this.badMsg(player, "No such team.");
-			}
-		}
-	}
-
 	public void performSetTeamFlag(Player player, String[] arguments) {
 		if (arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) || (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
 			this.badMsg(player, "Usage: /setteamflag <team-name/color>, e.g. /setteamflag diamond. " + "Sets the team flag post to the current location. " + "Must be in a warzone (try /zones and /zone). ");
