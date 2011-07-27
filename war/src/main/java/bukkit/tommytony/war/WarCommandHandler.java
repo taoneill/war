@@ -33,26 +33,50 @@ public class WarCommandHandler {
 		}
 
 		AbstractWarCommand commandObj = null;
-		if (command.equals("zones") || command.equals("warzones")) {
-			commandObj = new WarzonesCommand(this, sender, arguments);
+		try {
+			if (command.equals("zones") || command.equals("warzones")) {
+				commandObj = new WarzonesCommand(this, sender, arguments);
+			}
+			else if (command.equals("zone") || command.equals("warzone")) {
+				commandObj = new WarzoneCommand(this, sender, arguments);
+			}
+			else if (command.equals("teams")) {
+				commandObj = new TeamsCommand(this, sender, arguments);
+			}
+			else if (command.equals("join")) {
+				commandObj = new JoinCommand(this, sender, arguments);
+			}
+			else if (command.equals("leave")) {
+				commandObj = new LeaveCommand(this, sender, arguments);
+			}
+			else if (command.equals("team")) {
+				commandObj = new TeamCommand(this, sender, arguments);
+			}
+			else if (command.equals("deletezone")) {
+				commandObj = new DeletezoneCommand(this, sender, arguments);
+			}
+			else if (command.equals("resetzone")) {
+				commandObj = new ResetzoneCommand(this, sender, arguments);
+			}
+			else if (command.equals("deletewarhub")) {
+				commandObj = new DeletewarhubCommand(this, sender, arguments);
+			}
+			else if (command.equals("loadwar")) {
+				commandObj = new LoadwarCommand(this, sender, arguments);
+			}
+			else if (command.equals("unloadwar")) {
+				commandObj = new UnloadwarCommand(this, sender, arguments);
+			}
+			else {
+				// we are not responsible for this command
+				return true;
+			}
 		}
-		else if (command.equals("zone") || command.equals("warzone")) {
-			commandObj = new WarzoneCommand(this, sender, arguments);
+		catch (AbstractZoneMakerCommand.NoZoneMakerException e) {
+			sender.sendMessage("You can't do this if you are not a warzone maker.");
+			return true;
 		}
-		else if (command.equals("teams")) {
-			commandObj = new TeamsCommand(this, sender, arguments);
-		}
-		else if (command.equals("join")) {
-			commandObj = new JoinCommand(this, sender, arguments);
-		}
-		else if (command.equals("leave")) {
-			commandObj = new LeaveCommand(this, sender, arguments);
-		}
-		else if (command.equals("team")) {
-			commandObj = new TeamCommand(this, sender, arguments);
-		}
-		else {
-			// we are not responsible for this command
+		catch (Exception e) {
 			return true;
 		}
 

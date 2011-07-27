@@ -34,13 +34,13 @@ public class WarEntityListener extends EntityListener {
 	/**
 	 * Handles PVP-Damage
 	 *
-	 * @param EntityDamageByEntityEvent	event	fired event
+	 * @param event	fired event
 	 */
 	private void handlerAttackDefend(EntityDamageByEntityEvent event) {
 		Entity attacker = event.getDamager();
 		Entity defender = event.getEntity();
 
-		if (attacker != null && defender != null && attacker instanceof Player && defender instanceof Player) {
+		if (attacker == null && defender != null && attacker instanceof Player && defender instanceof Player) {
 			// only let adversaries (same warzone, different team) attack each other
 			Player a = (Player) attacker;
 			Player d = (Player) defender;
@@ -48,16 +48,17 @@ public class WarEntityListener extends EntityListener {
 			Team attackerTeam = Team.getTeamByPlayerName(a.getName());
 			Warzone defenderWarzone = Warzone.getZoneByPlayerName(d.getName());
 			Team defenderTeam = Team.getTeamByPlayerName(d.getName());
+
 			if (attackerTeam != null && defenderTeam != null && attackerTeam != defenderTeam && attackerWarzone == defenderWarzone) {
 				// Make sure one of the players isn't in the spawn
 				if (defenderTeam.getSpawnVolume().contains(d.getLocation())) { // attacking person in spawn
-					if (!defenderWarzone.isFlagThief(d.getName())) { // thiefs can always be attacked
+					if (!defenderWarzone.isFlagThief(d.getName())) { // thieves can always be attacked
 						War.war.badMsg(a, "Can't attack a player that's inside his team's spawn.");
 						event.setCancelled(true);
 					}
 				} else if (attackerTeam.getSpawnVolume().contains(a.getLocation()) && !attackerTeam.getSpawnVolume().contains(d.getLocation())) {
 					// only let a player inside spawn attack an enemy player if that player enters the spawn
-					if (!attackerWarzone.isFlagThief(a.getName())) { // thiefs can always attack
+					if (!attackerWarzone.isFlagThief(a.getName())) { // thieves can always attack
 						War.war.badMsg(a, "Can't attack a player from inside your spawn.");
 						event.setCancelled(true);
 					}
@@ -66,8 +67,9 @@ public class WarEntityListener extends EntityListener {
 				// Detect death, prevent it and respawn the player
 				if (event.getDamage() >= d.getHealth()) {
 					String killMessage = "";
-					killMessage = attackerTeam.getKind().getColor() + a.getDisplayName() + ChatColor.WHITE +
-									" killed " + defenderTeam.getKind().getColor() + d.getDisplayName();
+					String attackerString = attackerTeam.getKind().getColor() + a.getDisplayName();
+					String defenderString = defenderTeam.getKind().getColor() + d.getDisplayName();
+					killMessage = attackerString + ChatColor.WHITE + " killed " + defenderString;
 					for (Team team : defenderWarzone.getTeams()) {
 						team.teamcast(killMessage);
 					}
@@ -92,7 +94,7 @@ public class WarEntityListener extends EntityListener {
 			} else {
 				War.war.badMsg(a, "Your attack missed!");
 				if (attackerTeam == null) {
-					War.war.badMsg(a, "You must join a team " + ", then you'll be able to damage people " + "in the other teams in that warzone.");
+					War.war.badMsg(a, "You must join a team, then you'll be able to damage people " + "in the other teams in that warzone.");
 				} else if (defenderTeam == null) {
 					War.war.badMsg(a, "Your target is not in a team.");
 				} else if (attacker != null && defender != null && attacker.getEntityId() == defender.getEntityId()) {
@@ -104,7 +106,6 @@ public class WarEntityListener extends EntityListener {
 				}
 				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 			}
-
 		} else if (defender instanceof Player) {
 			// attacked by dispenser arrow most probably
 			// Detect death, prevent it and respawn the player
@@ -112,12 +113,13 @@ public class WarEntityListener extends EntityListener {
 			Warzone defenderWarzone = Warzone.getZoneByPlayerName(d.getName());
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
 				String deathMessage = "";
+				String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName();
 				if (event instanceof EntityDamageByProjectileEvent)
-					deathMessage = "A dispenser killed " + Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName();
+					deathMessage = "A dispenser killed " + defenderString;
 				else if (event.getDamager() instanceof CraftTNTPrimed)
-					deathMessage = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName() + ChatColor.WHITE + " exploded";
+					deathMessage = defenderString + ChatColor.WHITE + " exploded";
 				else
-					deathMessage = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName() + ChatColor.WHITE + " died";
+					deathMessage = defenderString + ChatColor.WHITE + " died";
 				for (Team team : defenderWarzone.getTeams()) {
 					team.teamcast(deathMessage);
 				}
@@ -163,8 +165,11 @@ public class WarEntityListener extends EntityListener {
 	public void onEntityDamage(EntityDamageEvent event) {
 		if (War.war.isLoaded()) {
 			Entity entity = event.getEntity();
+			if (!(entity instanceof Player)) return;
+			Player player = (Player) entity;
+
 			// prevent godmode
-			if (entity instanceof Player && Warzone.getZoneByPlayerName(((Player) entity).getName()) != null) {
+			if (Warzone.getZoneByPlayerName(player.getName()) != null) {
 				event.setCancelled(false);
 			}
 
@@ -173,18 +178,15 @@ public class WarEntityListener extends EntityListener {
 				this.handlerAttackDefend((EntityDamageByEntityEvent) event);
 			} else {
 				// Detect death, prevent it and respawn the player
-				if (entity instanceof Player) {
-					Player player = (Player) entity;
-					Warzone zone = Warzone.getZoneByPlayerName(player.getName());
-					if (zone != null && event.getDamage() >= player.getHealth()) {
-						String deathMessage = "";
-						deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getDisplayName() + ChatColor.WHITE + " died";
-						for (Team team : zone.getTeams()) {
-							team.teamcast(deathMessage);
-						}
-						zone.handleDeath(player);
-						event.setCancelled(true);
+				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+				if (zone != null && event.getDamage() >= player.getHealth()) {
+					String deathMessage = "";
+					deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getDisplayName() + ChatColor.WHITE + " died";
+					for (Team team : zone.getTeams()) {
+						team.teamcast(deathMessage);
 					}
+					zone.handleDeath(player);
+					event.setCancelled(true);
 				}
 			}
 		}

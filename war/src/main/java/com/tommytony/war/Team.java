@@ -317,7 +317,6 @@ public class Team {
 	}
 
 	public void setTeamSpawn(Location teamSpawn) {
-
 		this.teamSpawn = teamSpawn;
 
 		// this resets the block to old state
@@ -501,7 +500,6 @@ public class Team {
 	}
 
 	public void setTeamFlag(Location teamFlag) {
-
 		this.teamFlag = teamFlag;
 
 		// this resets the block to old state
@@ -524,7 +522,6 @@ public class Team {
 	}
 
 	public Location getTeamFlag() {
-
 		return this.teamFlag;
 	}
 }

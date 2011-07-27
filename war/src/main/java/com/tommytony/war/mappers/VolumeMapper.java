@@ -285,11 +285,11 @@ public class VolumeMapper {
 		}
 	}
 
-	public static void delete(Volume volume, War war) {
+	public static void delete(Volume volume) {
 		File volFile = new File("War/dat/volume-" + volume.getName());
 		boolean deletedData = volFile.delete();
 		if (!deletedData) {
-			war.log("Failed to delete file " + volFile.getName(), Level.WARNING);
+			War.war.log("Failed to delete file " + volFile.getName(), Level.WARNING);
 		}
 	}
 
