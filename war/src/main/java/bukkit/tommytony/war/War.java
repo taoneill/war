@@ -177,12 +177,8 @@ public class War extends JavaPlugin {
 
 		/*if (sender instanceof Player) {
 			if (this.isZoneMaker(player)) {
-				// Mod commands : /nextbattle
-				if (command.equals("nextbattle")) {
-					this.performNextBattle(player);
-				}
 				// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
-				else if (command.equals("setzone")) {
+				if (command.equals("setzone")) {
 					this.performSetZone(player, arguments);
 				} else if (command.equals("setzonelobby")) {
 					this.performSetZoneLobby(player, arguments);
@@ -641,20 +637,6 @@ public class War extends JavaPlugin {
 			} else if (arguments[1].equals("wand")) {
 				this.addWandBearer(player, arguments[0]);
 			}
-		}
-	}
-
-	public void performNextBattle(Player player) {
-		if (!this.inAnyWarzone(player.getLocation())) {
-			this.badMsg(player, "Usage: /nextbattle. Resets the zone blocks and all teams' life pools. Must be in warzone.");
-		} else {
-			Warzone warzone = Warzone.getZoneByLocation(player);
-			warzone.clearFlagThieves();
-			for (Team team : warzone.getTeams()) {
-				team.teamcast("The battle was interrupted. " + warzone.getTeamInformation() + " Resetting warzone " + warzone.getName() + " and life pools...");
-			}
-			warzone.getVolume().resetBlocksAsJob();
-			warzone.initializeZoneAsJob();
 		}
 	}
 
