@@ -20,17 +20,13 @@ import com.tommytony.war.volumes.Volume;
  * @package	com.tommytony.war
  */
 public class WarHub {
-	private final War war;
 	private Location location;
 	private Volume volume;
 	private Map<String, Block> zoneGateBlocks = new HashMap<String, Block>();
 	private BlockFace orientation;
 
-	public WarHub(War war, Location location, String hubOrientation) {
-		this.war = war;
-		this.location = location;
+	public WarHub(Location location, String hubOrientation) {
 		int yaw = 0;
-		
 		if (hubOrientation.equals("south")) {
 			yaw = 270;
 			this.setOrientation(BlockFace.SOUTH);	
@@ -50,14 +46,13 @@ public class WarHub {
 								location.getY(),
 								location.getZ(),
 								yaw, 0);
-		this.volume = new Volume("warhub", war, location.getWorld());
+		this.volume = new Volume("warhub", location.getWorld());
 	}
 
 	// Use when creating from player location (with yaw)
-	public WarHub(War war, Location location) {
-		this.war = war;
+	public WarHub(Location location) {
 		this.location = location;
-		this.volume = new Volume("warhub", war, location.getWorld());
+		this.volume = new Volume("warhub", location.getWorld());
 
 		setLocation(location);
 	}
@@ -98,7 +93,7 @@ public class WarHub {
 		for (String zoneName : this.zoneGateBlocks.keySet()) {
 			Block gate = this.zoneGateBlocks.get(zoneName);
 			if (gate.getX() == playerLocation.getBlockX() && gate.getY() == playerLocation.getBlockY() && gate.getZ() == playerLocation.getBlockZ()) {
-				zone = this.war.findWarzone(zoneName);
+				zone = War.war.findWarzone(zoneName);
 			}
 		}
 		return zone;
@@ -108,12 +103,12 @@ public class WarHub {
 		// for now, draw the wall of gates to the west
 		this.zoneGateBlocks.clear();
 		int disabled = 0;
-		for (Warzone zone : this.war.getWarzones()) {
+		for (Warzone zone : War.war.getWarzones()) {
 			if (zone.isDisabled()) {
 				disabled++;
 			}
 		}
-		int noOfWarzones = this.war.getWarzones().size() - disabled;
+		int noOfWarzones = War.war.getWarzones().size() - disabled;
 		if (noOfWarzones > 0) {
 			int hubWidth = noOfWarzones * 4 + 2;
 			int halfHubWidth = hubWidth / 2;
@@ -160,7 +155,7 @@ public class WarHub {
 			// draw gates
 			Block currentGateBlock = BlockInfo.getBlock(this.location.getWorld(), this.volume.getCornerOne()).getFace(BlockFace.UP).getFace(front, hubDepth).getFace(right, 2);
 
-			for (Warzone zone : this.war.getWarzones()) { // gonna use the index to find it again
+			for (Warzone zone : War.war.getWarzones()) { // gonna use the index to find it again
 				if (!zone.isDisabled()) {
 					this.zoneGateBlocks.put(zone.getName(), currentGateBlock);
 					currentGateBlock.getFace(BlockFace.DOWN).setType(Material.GLOWSTONE);
@@ -184,10 +179,10 @@ public class WarHub {
 			lines[1] = "(/warhub)";
 			lines[2] = "Pick your";
 			lines[3] = "battle!";
-			SignHelper.setToSign(this.war, signBlock, data, lines);
+			SignHelper.setToSign(War.war, signBlock, data, lines);
 
 			// Warzone signs
-			for (Warzone zone : this.war.getWarzones()) {
+			for (Warzone zone : War.war.getWarzones()) {
 				if (!zone.isDisabled() && zone.ready()) {
 					this.resetZoneSign(zone);
 				}
@@ -240,7 +235,7 @@ public class WarHub {
 		lines[1] = zone.getName();
 		lines[2] = zonePlayers + "/" + zoneCap + " players";
 		lines[3] = zone.getTeams().size() + " teams";
-		SignHelper.setToSign(this.war, block, data, lines);
+		SignHelper.setToSign(War.war, block, data, lines);
 	}
 
 	public void setVolume(Volume vol) {

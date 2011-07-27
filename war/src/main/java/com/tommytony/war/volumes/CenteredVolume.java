@@ -4,14 +4,10 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import bukkit.tommytony.war.War;
-
 /**
- * 
- * @author tommytony
- * 
- *         Broken, don't use.
- * 
+ *
+ * @author 	tommytony
+ * @deprecated 	Broken, don't use.
  */
 @Deprecated
 public class CenteredVolume extends Volume {
@@ -20,8 +16,8 @@ public class CenteredVolume extends Volume {
 	private int sideSize = -1;
 	private final World world;
 
-	public CenteredVolume(String name, Block center, int sideSize, War war, World world) {
-		super(name, war, world);
+	public CenteredVolume(String name, Block center, int sideSize, World world) {
+		super(name, world);
 		this.world = world;
 		this.setCenter(center);
 		this.setSideSize(sideSize);

@@ -9,25 +9,23 @@ import com.tommytony.war.mappers.WarzoneMapper;
 
 public class RestoreWarzonesJob implements Runnable {
 
-	private final War war;
 	private final String warzonesStr;
 	private final boolean newWarInstall;
 
-	public RestoreWarzonesJob(War war, String warzonesStr, boolean newWarInstall) {
-		this.war = war;
+	public RestoreWarzonesJob(String warzonesStr, boolean newWarInstall) {
 		this.warzonesStr = warzonesStr;
 		this.newWarInstall = newWarInstall;
 	}
 
 	public void run() {
 		String[] warzoneSplit = this.warzonesStr.split(",");
-		this.war.getWarzones().clear();
+		War.war.getWarzones().clear();
 		for (String warzoneName : warzoneSplit) {
 			if (warzoneName != null && !warzoneName.equals("")) {
-				this.war.log("Loading zone " + warzoneName + "...", Level.INFO);
-				Warzone zone = WarzoneMapper.load(this.war, warzoneName, !this.newWarInstall);
+				War.war.log("Loading zone " + warzoneName + "...", Level.INFO);
+				Warzone zone = WarzoneMapper.load(warzoneName, !this.newWarInstall);
 				if (zone != null) { // could have failed, would've been logged already
-					this.war.getWarzones().add(zone);
+					War.war.getWarzones().add(zone);
 					// zone.getVolume().loadCorners();
 					zone.getVolume().loadCorners();
 					if (zone.getLobby() != null) {
@@ -40,8 +38,8 @@ public class RestoreWarzonesJob implements Runnable {
 				}
 			}
 		}
-		if (this.war.getWarzones().size() > 0) {
-			this.war.log("Warzones ready.", Level.INFO);
+		if (War.war.getWarzones().size() > 0) {
+			War.war.log("Warzones ready.", Level.INFO);
 		}
 	}
 

@@ -20,16 +20,16 @@ public class ZoneVolume extends Volume {
 	private Warzone zone;
 	private boolean isSaved = false;
 
-	public ZoneVolume(String name, War war, World world, Warzone zone) {
-		super(name, war, world);
+	public ZoneVolume(String name, World world, Warzone zone) {
+		super(name, world);
 		this.zone = zone;
 	}
 
 	@Override
 	public int saveBlocks() {
 		// Save blocks directly to disk (i.e. don't put everything in memory)
-		int saved = ZoneVolumeMapper.save(this, this.zone.getName(), this.getWar());
-		this.getWar().log("Saved " + saved + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
+		int saved = ZoneVolumeMapper.save(this, this.zone.getName());
+		War.war.log("Saved " + saved + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
 		this.isSaved = true;
 		return saved;
 	}
@@ -40,15 +40,15 @@ public class ZoneVolume extends Volume {
 	}
 
 	public void loadCorners() {
-		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWar(), this.getWorld(), true);
+		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), true);
 		this.isSaved = true;
 	}
 
 	@Override
 	public int resetBlocks() {
 		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
-		int reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWar(), this.getWorld(), false);
-		this.getWar().log("Reset " + reset + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
+		int reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false);
+		War.war.log("Reset " + reset + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
 		this.isSaved = true;
 		return reset;
 	}
