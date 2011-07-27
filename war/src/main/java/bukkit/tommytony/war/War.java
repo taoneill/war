@@ -194,8 +194,6 @@ public class War extends JavaPlugin {
 					this.performDeleteTeam(player, arguments);
 				} else if (command.equals("setmonument")) {
 					this.performSetMonument(player, arguments);
-				} else if (command.equals("deletemonument")) {
-					this.performDeleteMonument(player, arguments);
 				} else if (command.equals("setwarconfig") || command.equals("warcfg")) {
 					this.performSetWarConfig(player, arguments);
 				} else if (command.equals("zonemaker") || command.equals("zm")) {
@@ -303,30 +301,6 @@ public class War extends JavaPlugin {
 				this.msg(player, "War config saved.");
 			} else {
 				this.badMsg(player, "Failed to read named parameters.");
-			}
-		}
-	}
-
-	public void performDeleteMonument(Player player, String[] arguments) {
-		if (arguments.length < 1 || (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation()))) {
-			this.badMsg(player, "Usage: /deletemonument <name>." + " Deletes the monument. " + "Must be in a warzone or lobby (try /warzones and /warzone). ");
-		} else {
-			String name = arguments[0];
-			Warzone warzone = Warzone.getZoneByLocation(player);
-			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
-			if (warzone == null && lobby != null) {
-				warzone = lobby.getZone();
-			} else {
-				lobby = warzone.getLobby();
-			}
-			Monument monument = warzone.getMonument(name);
-			if (monument != null) {
-				monument.getVolume().resetBlocks();
-				warzone.getMonuments().remove(monument);
-				WarzoneMapper.save(warzone, false);
-				this.msg(player, "Monument " + monument.getName() + " removed.");
-			} else {
-				this.badMsg(player, "No such monument.");
 			}
 		}
 	}

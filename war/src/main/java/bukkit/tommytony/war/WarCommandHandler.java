@@ -61,6 +61,9 @@ public class WarCommandHandler {
 			else if (command.equals("nextbattle")) {
 				commandObj = new NextbattleCommand(this, sender, arguments);
 			}
+			else if (command.equals("deleteteam")) {
+				commandObj = new DeleteteamCommand(this, sender, arguments);
+			}
 			else if (command.equals("deletemonument")) {
 				commandObj = new DeletemonumentCommand(this, sender, arguments);
 			}
