@@ -12,6 +12,7 @@ import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
 import com.tommytony.war.TeamKinds;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.ZoneLobby;
 
 public class JoinCommand extends AbstractWarCommand {
 	public JoinCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
@@ -23,21 +24,36 @@ public class JoinCommand extends AbstractWarCommand {
 
 		Player player = (Player) this.sender;
 		if (!War.war.canPlayWar(player)) {
-			//War.war.badMsg(player, "Cannot play war.");
+			this.sender.sendMessage("Cannot play war");
 			return true;
 		}
-		if (this.args.length < 1) {
+
+		Warzone zone;
+		if (this.args.length == 0) {
 			return false;
 		}
-		Warzone zone = War.war.getWarzoneFromLocation(player);
-		if (zone == null) {
-			War.war.badMsg(player, "No such warzone.");
-			return true;
+		else if (this.args.length == 2) {
+			// zone by name
+			zone = Warzone.getZoneByName(this.args[0]);
+			// move the team-name to first place :)
+			this.args[0] = this.args[1];
 		}
+		else {
+			zone = Warzone.getZoneByLocation(player);
+			if (zone == null) {
+				ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
+				if (lobby == null) return false;
+				zone = lobby.getZone();
+			}
+		}
+		if (zone == null) {
+			return false;
+		}
+
 		// drop from old team if any
-		Team previousTeam = War.war.getPlayerTeam(player.getName());
+		Team previousTeam = Team.getTeamByPlayerName(player.getName());
 		if (previousTeam != null) {
-			Warzone oldZone = War.war.getPlayerTeamWarzone(player.getName());
+			Warzone oldZone = Warzone.getZoneByPlayerName(player.getName());
 			if (!previousTeam.removePlayer(player.getName())) {
 				War.war.log("Could not remove player " + player.getName() + " from team " + previousTeam.getName(), java.util.logging.Level.WARNING);
 			}
@@ -58,7 +74,7 @@ public class JoinCommand extends AbstractWarCommand {
 		TeamKind kind = TeamKinds.teamKindFromString(this.args[0]);
 
 		if (zone.isDisabled()) {
-			War.war.badMsg(player, "This warzone is disabled.");
+			this.sender.sendMessage("This warzone is disabled.");
 		} else {
 			List<Team> teams = zone.getTeams();
 			boolean foundTeam = false;
@@ -66,7 +82,7 @@ public class JoinCommand extends AbstractWarCommand {
 				if (team.getName().startsWith(name) || team.getKind() == kind) {
 					if (!zone.hasPlayerInventory(player.getName())) {
 						zone.keepPlayerInventory(player);
-						War.war.msg(player, "Your inventory is in storage until you /leave.");
+						this.sender.sendMessage("Your inventory is in storage until you /leave.");
 					}
 					if (team.getPlayers().size() < zone.getTeamCap()) {
 						team.addPlayer(player);
@@ -77,17 +93,18 @@ public class JoinCommand extends AbstractWarCommand {
 						}
 						foundTeam = true;
 					} else {
-						War.war.badMsg(player, "Team " + team.getName() + " is full.");
+						this.sender.sendMessage("Team " + team.getName() + " is full.");
 						foundTeam = true;
 					}
 				}
 			}
+
 			if (foundTeam) {
 				for (Team team : teams) {
 					team.teamcast("" + player.getName() + " joined " + team.getName());
 				}
 			} else {
-				War.war.badMsg(player, "No such team. Try /teams.");
+				this.sender.sendMessage("No such team. Try /teams.");
 			}
 		}
 		return true;

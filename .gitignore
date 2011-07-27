@@ -9,6 +9,6 @@
 *.class
 
 # Ignore bin
-*/bin/*
+bin
 */lib/*
 */target/*

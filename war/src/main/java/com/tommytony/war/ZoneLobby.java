@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import bukkit.tommytony.war.War;
 
@@ -97,6 +98,19 @@ public class ZoneLobby {
 		} else if (wall == BlockFace.WEST) {
 			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.NORTH, this.lobbyHalfSide));
 		}
+	}
+
+	public static ZoneLobby getLobbyByLocation(Location location) {
+		for (Warzone warzone : War.war.getWarzones()) {
+			if (warzone.getLobby() != null && warzone.getLobby().getVolume() != null && warzone.getLobby().getVolume().contains(location)) {
+				return warzone.getLobby();
+			}
+		}
+		return null;
+	}
+
+	public static ZoneLobby getLobbyByLocation(Player player) {
+		return ZoneLobby.getLobbyByLocation(player.getLocation());
 	}
 
 	/**

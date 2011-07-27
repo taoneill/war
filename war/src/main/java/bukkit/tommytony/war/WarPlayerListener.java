@@ -39,13 +39,11 @@ public class WarPlayerListener extends PlayerListener {
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
-			Team team = War.war.getPlayerTeam(player.getName());
-			if (team != null) {
-				Warzone zone = War.war.getPlayerTeamWarzone(player.getName());
-				if (zone != null) {
-					zone.handlePlayerLeave(player, zone.getTeleport(), true);
-				}
+			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+			if (zone != null) {
+				zone.handlePlayerLeave(player, zone.getTeleport(), true);
 			}
+
 			if (War.war.isWandBearer(player)) {
 				War.war.removeWandBearer(player);
 			}
@@ -56,9 +54,9 @@ public class WarPlayerListener extends PlayerListener {
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
-			Team team = War.war.getPlayerTeam(player.getName());
+			Team team = Team.getTeamByPlayerName(player.getName());
 			if (team != null) {
-				Warzone zone = War.war.getPlayerTeamWarzone(player.getName());
+				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 
 				if (zone.isFlagThief(player.getName())) {
 					// a flag thief can't drop his flag
@@ -99,9 +97,9 @@ public class WarPlayerListener extends PlayerListener {
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
-			Team team = War.war.getPlayerTeam(player.getName());
+			Team team = Team.getTeamByPlayerName(player.getName());
 			if (team != null) {
-				Warzone zone = War.war.getPlayerTeamWarzone(player.getName());
+				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 
 				if (zone.isFlagThief(player.getName())) {
 					// a flag thief can't pick up anything
@@ -130,7 +128,7 @@ public class WarPlayerListener extends PlayerListener {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
 			Inventory inventory = event.getInventory();
-			Team team = War.war.getPlayerTeam(player.getName());
+			Team team = Team.getTeamByPlayerName(player.getName());
 			if (team != null && inventory instanceof PlayerInventory) {
 				// make sure the player doesn't have too many precious blocks
 				// or illegal armor (i.e. armor not found in loadout)
@@ -149,7 +147,7 @@ public class WarPlayerListener extends PlayerListener {
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
-			Team talkingPlayerTeam = War.war.getPlayerTeam(player.getName());
+			Team talkingPlayerTeam = Team.getTeamByPlayerName(player.getName());
 			if (talkingPlayerTeam != null) {
 				String msg = event.getMessage();
 				String[] split = msg.split(" ");
@@ -216,14 +214,14 @@ public class WarPlayerListener extends PlayerListener {
 			Location playerLoc = event.getFrom(); // same as player.getLoc. Don't call again we need same result.
 			Warzone locZone = null;
 			ZoneLobby locLobby = null;
-			locZone = War.war.warzone(playerLoc);
-			locLobby = War.war.lobby(playerLoc);
+			locZone = Warzone.getZoneByLocation(playerLoc);
+			locLobby = ZoneLobby.getLobbyByLocation(playerLoc);
 			boolean canPlay = War.war.canPlayWar(player);
 			boolean isMaker = War.war.isZoneMaker(player);
 
 			// Zone walls
-			Team currentTeam = War.war.getPlayerTeam(player.getName());
-			Warzone playerWarzone = War.war.getPlayerTeamWarzone(player.getName()); // this uses the teams, so it asks: get the player's team's warzone
+			Team currentTeam = Team.getTeamByPlayerName(player.getName());
+			Warzone playerWarzone = Warzone.getZoneByPlayerName(player.getName()); // this uses the teams, so it asks: get the player's team's warzone
 			boolean protecting = false;
 			if (currentTeam != null) {
 				// Warzone nearbyZone = war.zoneOfZoneWallAtProximity(playerLoc);
@@ -246,7 +244,7 @@ public class WarPlayerListener extends PlayerListener {
 			// Warzone lobby gates
 			if (locLobby != null) {
 				Warzone zone = locLobby.getZone();
-				Team oldTeam = War.war.getPlayerTeam(player.getName());
+				Team oldTeam = Team.getTeamByPlayerName(player.getName());
 				boolean isAutoAssignGate = false;
 				if (oldTeam == null && canPlay) { // trying to counter spammy player move
 					isAutoAssignGate = zone.getLobby().isAutoAssignGate(playerLoc);
@@ -324,7 +322,7 @@ public class WarPlayerListener extends PlayerListener {
 			}
 
 			boolean isLeaving = playerWarzone != null && playerWarzone.getLobby().isLeavingZone(playerLoc);
-			Team playerTeam = War.war.getPlayerTeam(player.getName());
+			Team playerTeam = Team.getTeamByPlayerName(player.getName());
 			if (isLeaving) { // already in a team and in warzone, leaving
 				// same as leave
 				if (playerTeam != null) {
@@ -348,19 +346,16 @@ public class WarPlayerListener extends PlayerListener {
 				if (playerTeam != null && playerWarzone.nearAnyOwnedMonument(playerLoc, playerTeam) && player.getHealth() < 20 && player.getHealth() > 0 // don't heal the dead
 						&& this.random.nextInt(77) == 3) { // one chance out of many of getting healed
 					int currentHp = player.getHealth();
-					int newHp = currentHp + locZone.getMonumentHeal();
-					if (newHp > 20) {
-						newHp = 20;
-					}
+					int newHp = Math.max(20, currentHp + locZone.getMonumentHeal());
+
 					player.setHealth(newHp);
-					String isS = "s"; // no 's' in 'hearts' when it's just one heart
-					if (newHp - currentHp == 2) {
-						isS = "";
-					}
+					String isS = "s";
 					String heartNum = ""; // since (newHp-currentHp)/2 won't give the right amount
-					if (newHp - currentHp == 2) {
-						heartNum = "1 ";
-					} else if (newHp - currentHp % 2 == 0) {
+					if (newHp - currentHp == 2) { // no 's' in 'hearts' when it's just one heart
+						isS = "";
+						heartNum = "one ";
+					}
+					else if (newHp - currentHp % 2 == 0) {
 						heartNum = ((newHp - currentHp) / 2) + " ";
 					} else {
 						heartNum = ((newHp - currentHp - 1) / 2) + ".5 ";
@@ -404,7 +399,7 @@ public class WarPlayerListener extends PlayerListener {
 				}
 			} else if (locZone != null && locZone.getLobby() != null && !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker) {
 				// player is not in any team, but inside warzone boundaries, get him out
-				Warzone zone = War.war.warzone(playerLoc);
+				Warzone zone = Warzone.getZoneByLocation(playerLoc);
 				event.setTo(zone.getTeleport());
 				// player.teleport(zone.getTeleport());
 				War.war.badMsg(player, "You can't be inside a warzone without a team.");
@@ -422,33 +417,11 @@ public class WarPlayerListener extends PlayerListener {
 
 	private void dropFromOldTeamIfAny(Player player) {
 		// drop from old team if any
-		Team previousTeam = War.war.getPlayerTeam(player.getName());
+		Team previousTeam = Team.getTeamByPlayerName(player.getName());
 		if (previousTeam != null) {
 			if (!previousTeam.removePlayer(player.getName())) {
 				War.war.log("Could not remove player " + player.getName() + " from team " + previousTeam.getName(), java.util.logging.Level.WARNING);
 			}
 		}
-	}
-
-	public String getAllTeamsMsg(Player player) {
-		String teamsMessage = "Teams: ";
-		Warzone warzone = War.war.warzone(player.getLocation());
-		ZoneLobby lobby = War.war.lobby(player.getLocation());
-		if (warzone == null && lobby != null) {
-			warzone = lobby.getZone();
-		} else {
-			lobby = warzone.getLobby();
-		}
-		if (warzone.getTeams().isEmpty()) {
-			teamsMessage += "none.";
-		}
-		for (Team team : warzone.getTeams()) {
-			teamsMessage += team.getName() + " (" + team.getPoints() + " points, " + team.getRemainingLifes() + "/" + warzone.getLifePool() + " lives left. ";
-			for (Player member : team.getPlayers()) {
-				teamsMessage += member.getName() + " ";
-			}
-			teamsMessage += ")  ";
-		}
-		return teamsMessage;
 	}
 }

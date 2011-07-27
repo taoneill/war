@@ -44,10 +44,10 @@ public class WarEntityListener extends EntityListener {
 			// only let adversaries (same warzone, different team) attack each other
 			Player a = (Player) attacker;
 			Player d = (Player) defender;
-			Warzone attackerWarzone = War.war.getPlayerTeamWarzone(a.getName());
-			Team attackerTeam = War.war.getPlayerTeam(a.getName());
-			Warzone defenderWarzone = War.war.getPlayerTeamWarzone(d.getName());
-			Team defenderTeam = War.war.getPlayerTeam(d.getName());
+			Warzone attackerWarzone = Warzone.getZoneByPlayerName(a.getName());
+			Team attackerTeam = Team.getTeamByPlayerName(a.getName());
+			Warzone defenderWarzone = Warzone.getZoneByPlayerName(d.getName());
+			Team defenderTeam = Team.getTeamByPlayerName(d.getName());
 			if (attackerTeam != null && defenderTeam != null && attackerTeam != defenderTeam && attackerWarzone == defenderWarzone) {
 				// Make sure one of the players isn't in the spawn
 				if (defenderTeam.getSpawnVolume().contains(d.getLocation())) { // attacking person in spawn
@@ -109,15 +109,15 @@ public class WarEntityListener extends EntityListener {
 			// attacked by dispenser arrow most probably
 			// Detect death, prevent it and respawn the player
 			Player d = (Player) defender;
-			Warzone defenderWarzone = War.war.getPlayerTeamWarzone(d.getName());
+			Warzone defenderWarzone = Warzone.getZoneByPlayerName(d.getName());
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
 				String deathMessage = "";
 				if (event instanceof EntityDamageByProjectileEvent)
-					deathMessage = "A dispenser killed " + War.war.getPlayerTeam(d.getName()).getKind().getColor() + d.getDisplayName();
+					deathMessage = "A dispenser killed " + Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName();
 				else if (event.getDamager() instanceof CraftTNTPrimed)
-					deathMessage = War.war.getPlayerTeam(d.getName()).getKind().getColor() + d.getDisplayName() + ChatColor.WHITE + " exploded";
+					deathMessage = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName() + ChatColor.WHITE + " exploded";
 				else
-					deathMessage = War.war.getPlayerTeam(d.getName()).getKind().getColor() + d.getDisplayName() + ChatColor.WHITE + " died";
+					deathMessage = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName() + ChatColor.WHITE + " died";
 				for (Team team : defenderWarzone.getTeams()) {
 					team.teamcast(deathMessage);
 				}
@@ -164,7 +164,7 @@ public class WarEntityListener extends EntityListener {
 		if (War.war.isLoaded()) {
 			Entity entity = event.getEntity();
 			// prevent godmode
-			if (entity instanceof Player && War.war.getPlayerTeamWarzone(((Player) entity).getName()) != null) {
+			if (entity instanceof Player && Warzone.getZoneByPlayerName(((Player) entity).getName()) != null) {
 				event.setCancelled(false);
 			}
 
@@ -175,10 +175,10 @@ public class WarEntityListener extends EntityListener {
 				// Detect death, prevent it and respawn the player
 				if (entity instanceof Player) {
 					Player player = (Player) entity;
-					Warzone zone = War.war.getPlayerTeamWarzone(player.getName());
+					Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 					if (zone != null && event.getDamage() >= player.getHealth()) {
 						String deathMessage = "";
-						deathMessage = War.war.getPlayerTeam(player.getName()).getKind().getColor() + player.getDisplayName() + ChatColor.WHITE + " died";
+						deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getDisplayName() + ChatColor.WHITE + " died";
 						for (Team team : zone.getTeams()) {
 							team.teamcast(deathMessage);
 						}
@@ -196,7 +196,7 @@ public class WarEntityListener extends EntityListener {
 			Entity entity = event.getEntity();
 			if (entity instanceof Player) {
 				Player player = (Player) entity;
-				Team team = War.war.getPlayerTeam(player.getName());
+				Team team = Team.getTeamByPlayerName(player.getName());
 				if (team != null && team.getSpawnVolume().contains(player.getLocation())) {
 					// smother out the fire that didn't burn out when you respawned
 					// Stop fire (upcast, watch out!)
@@ -217,7 +217,7 @@ public class WarEntityListener extends EntityListener {
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
 		if (War.war.isLoaded()) {
 			Location location = event.getLocation();
-			Warzone zone = War.war.warzone(location);
+			Warzone zone = Warzone.getZoneByLocation(location);
 			if (zone != null && zone.isNoCreatures()) {
 				event.setCancelled(true);
 				// war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
@@ -234,8 +234,7 @@ public class WarEntityListener extends EntityListener {
 			Entity entity = event.getEntity();
 			if (entity instanceof Player) {
 				Player player = (Player) entity;
-				Location location = player.getLocation();
-				Warzone zone = War.war.warzone(location);
+				Warzone zone = Warzone.getZoneByLocation(player);
 				if (zone != null) {
 					event.setCancelled(true);
 				}

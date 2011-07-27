@@ -50,7 +50,7 @@ public class War extends JavaPlugin {
 	private boolean loaded = false;
 
 	// Zones and hub
-	private List<Warzone> warzones;
+	private List<Warzone> warzones = new ArrayList<Warzone>();
 	private WarHub warHub;
 	private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
 	private final List<String> zoneMakerNames = new ArrayList<String>();
@@ -101,7 +101,6 @@ public class War extends JavaPlugin {
 	 */
 	public void loadWar() {
 		this.setLoaded(true);
-		this.warzones = new ArrayList<Warzone>();
 		this.desc = this.getDescription();
 		this.log = this.getServer().getLogger();
 		this.setupPermissions();
@@ -226,29 +225,6 @@ public class War extends JavaPlugin {
 			}
 		}
 		return true;*/
-	}
-
-	public Warzone getWarzoneFromLocation(Player player) {
-		return this.getWarzoneFromLocation(player.getLocation());
-	}
-
-	public Warzone getWarzoneFromLocation(Location location) {
-		Warzone zone = War.war.warzone(location);
-		if (zone == null) {
-			ZoneLobby lobby = War.war.lobby(location);
-			if (lobby == null) return null;
-			zone = lobby.getZone();
-		}
-		return zone;
-	}
-
-	public Warzone getWarzoneFromName(String name) {
-		for (Warzone zone : War.war.getWarzones()) {
-			if (zone.getName().toLowerCase().equals(name.toLowerCase())) {
-				return zone;
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -400,8 +376,8 @@ public class War extends JavaPlugin {
 			this.badMsg(player, "Usage: /deletemonument <name>." + " Deletes the monument. " + "Must be in a warzone or lobby (try /warzones and /warzone). ");
 		} else {
 			String name = arguments[0];
-			Warzone warzone = this.warzone(player.getLocation());
-			ZoneLobby lobby = this.lobby(player.getLocation());
+			Warzone warzone = Warzone.getZoneByLocation(player);
+			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
 			if (warzone == null && lobby != null) {
 				warzone = lobby.getZone();
 			} else {
@@ -420,10 +396,10 @@ public class War extends JavaPlugin {
 	}
 
 	public void performSetMonument(Player player, String[] arguments) {
-		if (!this.inAnyWarzone(player.getLocation()) || arguments.length < 1 || arguments.length > 1 || (arguments.length == 1 && this.warzone(player.getLocation()) != null && arguments[0].equals(this.warzone(player.getLocation()).getName()))) {
+		if (!this.inAnyWarzone(player.getLocation()) || arguments.length < 1 || arguments.length > 1 || (arguments.length == 1 && Warzone.getZoneByLocation(player) != null && arguments[0].equals(Warzone.getZoneByLocation(player).getName()))) {
 			this.badMsg(player, "Usage: /setmonument <name>. Creates or moves a monument. Monument can't have same name as zone. Must be in warzone.");
 		} else {
-			Warzone warzone = this.warzone(player.getLocation());
+			Warzone warzone = Warzone.getZoneByLocation(player);
 			String monumentName = arguments[0];
 			if (warzone.hasMonument(monumentName)) {
 				// move the existing monument
@@ -446,8 +422,8 @@ public class War extends JavaPlugin {
 			this.badMsg(player, "Usage: /deleteteam <team-name/color>." + " Deletes the team and its spawn. " + "Must be in a warzone or lobby (try /zones and /zone). ");
 		} else {
 			String name = arguments[0];
-			Warzone warzone = this.warzone(player.getLocation());
-			ZoneLobby lobby = this.lobby(player.getLocation());
+			Warzone warzone = Warzone.getZoneByLocation(player);
+			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
 			if (warzone == null && lobby != null) {
 				warzone = lobby.getZone();
 			} else {
@@ -479,7 +455,7 @@ public class War extends JavaPlugin {
 			this.badMsg(player, "Usage: /setteamflag <team-name/color>, e.g. /setteamflag diamond. " + "Sets the team flag post to the current location. " + "Must be in a warzone (try /zones and /zone). ");
 		} else {
 			TeamKind kind = TeamKinds.teamKindFromString(arguments[0]);
-			Warzone warzone = this.warzone(player.getLocation());
+			Warzone warzone = Warzone.getZoneByLocation(player);
 			Team team = warzone.getTeamByKind(kind);
 			if (team == null) {
 				// no such team yet
@@ -508,7 +484,7 @@ public class War extends JavaPlugin {
 			this.badMsg(player, "Usage: /setteam <team-kind/color>, e.g. /setteam red." + "Sets the team spawn to the current location. " + "Must be in a warzone (try /zones and /zone). ");
 		} else {
 			TeamKind teamKind = TeamKinds.teamKindFromString(arguments[0]);
-			Warzone warzone = this.warzone(player.getLocation());
+			Warzone warzone = Warzone.getZoneByLocation(player);
 			Team existingTeam = warzone.getTeamByKind(teamKind);
 			if (existingTeam != null) {
 				// relocate
@@ -551,8 +527,8 @@ public class War extends JavaPlugin {
 					return;
 				}
 			} else { // get zone by position
-				warzone = this.warzone(player.getLocation());
-				lobby = this.lobby(player.getLocation());
+				warzone = Warzone.getZoneByLocation(player);
+				lobby = ZoneLobby.getLobbyByLocation(player);
 			}
 
 			if (warzone == null && lobby != null) {
@@ -594,8 +570,8 @@ public class War extends JavaPlugin {
 		if (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
 			this.badMsg(player, "Usage: /resetzone. Reloads the zone. Must be in warzone or lobby.");
 		} else {
-			Warzone warzone = this.warzone(player.getLocation());
-			ZoneLobby lobby = this.lobby(player.getLocation());
+			Warzone warzone = Warzone.getZoneByLocation(player);
+			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
 			if (warzone == null && lobby != null) {
 				warzone = lobby.getZone();
 			} else {
@@ -603,7 +579,7 @@ public class War extends JavaPlugin {
 			}
 			warzone.clearFlagThieves();
 			for (Team team : warzone.getTeams()) {
-				team.teamcast("The war has ended. " + this.playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and teams...");
+				team.teamcast("The war has ended. " + warzone.getTeamInformation() + " Resetting warzone " + warzone.getName() + " and teams...");
 				for (Player p : team.getPlayers()) {
 					warzone.restorePlayerInventory(p);
 					p.teleport(warzone.getTeleport());
@@ -626,8 +602,8 @@ public class War extends JavaPlugin {
 		if ((!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) || arguments.length == 0) {
 			this.badMsg(player, "Usage: /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " + "Please give at leaset one named parameter. Does not save the blocks of the warzone. Resets the zone with the new config. Must be in warzone.");
 		} else {
-			Warzone warzone = this.warzone(player.getLocation());
-			ZoneLobby lobby = this.lobby(player.getLocation());
+			Warzone warzone = Warzone.getZoneByLocation(player);
+			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
 			if (warzone == null && lobby != null) {
 				warzone = lobby.getZone();
 			} else {
@@ -657,8 +633,8 @@ public class War extends JavaPlugin {
 		if (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
 			this.badMsg(player, "Usage: /savezone lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on " + "All named params optional. Saves the blocks of the warzone (i.e. the current zone state will be reloaded at each battle start). Must be in warzone.");
 		} else {
-			Warzone warzone = this.warzone(player.getLocation());
-			ZoneLobby lobby = this.lobby(player.getLocation());
+			Warzone warzone = Warzone.getZoneByLocation(player);
+			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
 			if (warzone == null && lobby != null) {
 				warzone = lobby.getZone();
 			} else {
@@ -696,8 +672,8 @@ public class War extends JavaPlugin {
 				this.badMsg(player, usageStr);
 				return;
 			}
-			Warzone warzone = this.warzone(player.getLocation());
-			ZoneLobby lobby = this.lobby(player.getLocation());
+			Warzone warzone = Warzone.getZoneByLocation(player);
+			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
 			if (warzone == null && lobby != null) {
 				warzone = lobby.getZone();
 			} else {
@@ -738,7 +714,7 @@ public class War extends JavaPlugin {
 			WarzoneMapper.save(warzone, false);
 		} else {
 			// Not in a warzone: set the lobby position to where the player is standing
-			Warzone warzone = this.matchWarzone(arguments[0]);
+			Warzone warzone = Warzone.getZoneByName(arguments[0]);
 			if (warzone == null) {
 				this.badMsg(player, "No warzone matches " + arguments[0] + ".");
 			} else {
@@ -794,10 +770,10 @@ public class War extends JavaPlugin {
 		if (!this.inAnyWarzone(player.getLocation())) {
 			this.badMsg(player, "Usage: /nextbattle. Resets the zone blocks and all teams' life pools. Must be in warzone.");
 		} else {
-			Warzone warzone = this.warzone(player.getLocation());
+			Warzone warzone = Warzone.getZoneByLocation(player);
 			warzone.clearFlagThieves();
 			for (Team team : warzone.getTeams()) {
-				team.teamcast("The battle was interrupted. " + this.playerListener.getAllTeamsMsg(player) + " Resetting warzone " + warzone.getName() + " and life pools...");
+				team.teamcast("The battle was interrupted. " + warzone.getTeamInformation() + " Resetting warzone " + warzone.getName() + " and life pools...");
 			}
 			warzone.getVolume().resetBlocksAsJob();
 			warzone.initializeZoneAsJob();
@@ -992,42 +968,13 @@ public class War extends JavaPlugin {
 		}
 	}
 
-	public Team getPlayerTeam(String playerName) {
-		for (Warzone warzone : this.warzones) {
-			Team team = warzone.getPlayerTeam(playerName);
-			if (team != null) {
-				return team;
-			}
-		}
-		return null;
-	}
-
-	public Warzone getPlayerTeamWarzone(String playerName) {
-		for (Warzone warzone : this.warzones) {
-			Team team = warzone.getPlayerTeam(playerName);
-			if (team != null) {
-				return warzone;
-			}
-		}
-		return null;
-	}
-
 	public Logger getLogger() {
 		return this.log;
 	}
 
-	public Warzone warzone(Location location) {
-		for (Warzone warzone : this.warzones) {
-			if (location.getWorld().getName().equals(warzone.getWorld().getName()) && warzone.getVolume() != null && warzone.getVolume().contains(location)) {
-				return warzone;
-			}
-		}
-		return null;
-	}
-
 	public boolean inAnyWarzone(Location location) {
 		Block locBlock = location.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-		Warzone currentZone = this.warzone(location);
+		Warzone currentZone = Warzone.getZoneByLocation(location);
 		if (currentZone == null) {
 			return false;
 		} else if (currentZone.getVolume().isWallBlock(locBlock)) {
@@ -1037,7 +984,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean inWarzone(String warzoneName, Location location) {
-		Warzone currentZone = this.warzone(location);
+		Warzone currentZone = Warzone.getZoneByLocation(location);
 		if (currentZone == null) {
 			return false;
 		} else if (warzoneName.toLowerCase().equals(currentZone.getName().toLowerCase())) {
@@ -1119,15 +1066,6 @@ public class War extends JavaPlugin {
 		}
 		for (Warzone warzone : this.incompleteZones) {
 			if (warzone.getName().equals(warzoneName)) {
-				return warzone;
-			}
-		}
-		return null;
-	}
-
-	public Warzone matchWarzone(String warzoneSubString) {
-		for (Warzone warzone : this.warzones) {
-			if (warzone.getName().toLowerCase().startsWith(warzoneSubString.toLowerCase())) {
 				return warzone;
 			}
 		}
@@ -1314,24 +1252,15 @@ public class War extends JavaPlugin {
 		this.warHub = warHub;
 	}
 
-	public ZoneLobby lobby(Location location) {
-		for (Warzone warzone : this.warzones) {
-			if (warzone.getLobby() != null && warzone.getLobby().getVolume() != null && warzone.getLobby().getVolume().contains(location)) {
-				return warzone.getLobby();
-			}
-		}
-		return null;
-	}
-
 	public boolean inAnyWarzoneLobby(Location location) {
-		if (this.lobby(location) == null) {
+		if (ZoneLobby.getLobbyByLocation(location) == null) {
 			return false;
 		}
 		return true;
 	}
 
 	public boolean inWarzoneLobby(String warzoneName, Location location) {
-		ZoneLobby currentLobby = this.lobby(location);
+		ZoneLobby currentLobby = ZoneLobby.getLobbyByLocation(location);
 		if (currentLobby == null) {
 			return false;
 		} else if (warzoneName.toLowerCase().equals(currentLobby.getZone().getName().toLowerCase())) {

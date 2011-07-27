@@ -86,6 +86,38 @@ public class Warzone {
 		this.volume = new ZoneVolume(name, this.getWorld(), this);
 	}
 
+	public static Warzone getZoneByName(String name) {
+		for (Warzone warzone : War.war.getWarzones()) {
+			if (warzone.getName().toLowerCase().equals(name.toLowerCase())) {
+				return warzone;
+			}
+		}
+		return null;
+	}
+
+	public static Warzone getZoneByLocation(Location location) {
+		for (Warzone warzone : War.war.getWarzones()) {
+			if (location.getWorld().getName().equals(warzone.getWorld().getName()) && warzone.getVolume() != null && warzone.getVolume().contains(location)) {
+				return warzone;
+			}
+		}
+		return null;
+	}
+
+	public static Warzone getZoneByLocation(Player player) {
+		return Warzone.getZoneByLocation(player.getLocation());
+	}
+
+	public static Warzone getZoneByPlayerName(String playerName) {
+		for (Warzone warzone : War.war.getWarzones()) {
+			Team team = warzone.getPlayerTeam(playerName);
+			if (team != null) {
+				return warzone;
+			}
+		}
+		return null;
+	}
+
 	public boolean ready() {
 		if (this.volume.hasTwoCorners() && !this.volume.tooSmall() && !this.volume.tooBig()) {
 			return true;
@@ -106,6 +138,23 @@ public class Warzone {
 			}
 		}
 		return null;
+	}
+
+	public String getTeamInformation() {
+		String teamsMessage = "Teams: ";
+		if (this.getTeams().isEmpty()) {
+			teamsMessage += "none.";
+		}
+		else {
+			for (Team team : this.getTeams()) {
+				teamsMessage += team.getName() + " (" + team.getPoints() + " points, " + team.getRemainingLifes() + "/" + this.getLifePool() + " lives left. ";
+				for (Player member : team.getPlayers()) {
+					teamsMessage += member.getName() + " ";
+				}
+				teamsMessage += ")  ";
+			}
+		}
+		return teamsMessage;
 	}
 
 	public String getName() {
@@ -663,7 +712,7 @@ public class Warzone {
 	}
 
 	public void setAutoAssignOnly(boolean autoAssignOnly) {
-		this.autoAssignOnly = autoAssignOnly;		
+		this.autoAssignOnly = autoAssignOnly;
 		if (this.getLobby() != null) {
 			this.getLobby().setLocation(this.getTeleport());
 		}
@@ -674,8 +723,8 @@ public class Warzone {
 	}
 
 	public void handleDeath(Player player) {
-		Team playerTeam = War.war.getPlayerTeam(player.getName());
-		Warzone playerWarzone = War.war.getPlayerTeamWarzone(player.getName());
+		Team playerTeam = Team.getTeamByPlayerName(player.getName());
+		Warzone playerWarzone = Warzone.getZoneByPlayerName(player.getName());
 		if (playerTeam != null && playerWarzone != null) {
 			// teleport to team spawn upon death
 
@@ -768,7 +817,7 @@ public class Warzone {
 	}
 
 	private void handlePlayerLeave(Player player, boolean removeFromTeam) {
-		Team playerTeam = War.war.getPlayerTeam(player.getName());
+		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 		if (playerTeam != null) {
 			if (removeFromTeam) {
 				playerTeam.removePlayer(player.getName());

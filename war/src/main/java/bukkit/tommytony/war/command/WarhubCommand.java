@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
-import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 
 public class WarhubCommand extends AbstractWarCommand {
@@ -23,9 +22,8 @@ public class WarhubCommand extends AbstractWarCommand {
 		} else if (!War.war.canWarp(player)) {
 			War.war.badMsg(player, "Can't warp to warhub. You need the 'war.warp' permission.");
 		} else {
-			Team playerTeam = War.war.getPlayerTeam(player.getName());
-			Warzone playerWarzone = War.war.getPlayerTeamWarzone(player.getName());
-			if (playerTeam != null) { // was in zone
+			Warzone playerWarzone = Warzone.getZoneByPlayerName(player.getName());
+			if (playerWarzone != null) { // was in zone
 				playerWarzone.handlePlayerLeave(player, War.war.getWarHub().getLocation(), true);
 			}
 			player.teleport(War.war.getWarHub().getLocation());

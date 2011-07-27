@@ -40,6 +40,16 @@ public class Team {
 		this.setFlagVolume(null); // no flag at the start
 	}
 
+	public static Team getTeamByPlayerName(String playerName) {
+		for (Warzone warzone : War.war.getWarzones()) {
+			Team team = warzone.getPlayerTeam(playerName);
+			if (team != null) {
+				return team;
+			}
+		}
+		return null;
+	}
+
 	public TeamKind getKind() {
 		return this.kind;
 	}

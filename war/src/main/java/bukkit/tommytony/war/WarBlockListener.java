@@ -30,8 +30,8 @@ public class WarBlockListener extends BlockListener {
 			Player player = event.getPlayer();
 			Block block = event.getBlock();
 			if (player != null && block != null) {
-				Team team = War.war.getPlayerTeam(player.getName());
-				Warzone zone = War.war.warzone(player.getLocation());
+				Team team = Team.getTeamByPlayerName(player.getName());
+				Warzone zone = Warzone.getZoneByLocation(player);
 				if (team != null && block != null && zone != null && zone.isMonumentCenterBlock(block) && block.getType() == team.getKind().getMaterial() && block.getData() == team.getKind().getData()) {
 					Monument monument = zone.getMonumentFromCenterBlock(block);
 					if (monument != null && !monument.hasOwner()) {
@@ -113,8 +113,8 @@ public class WarBlockListener extends BlockListener {
 	}
 
 	private void handleBreakOrDamage(Player player, Block block, Cancellable event) {
-		Warzone warzone = War.war.warzone(player.getLocation());
-		Team team = War.war.getPlayerTeam(player.getName());
+		Warzone warzone = Warzone.getZoneByLocation(player);
+		Team team = Team.getTeamByPlayerName(player.getName());
 		boolean isZoneMaker = War.war.isZoneMaker(player);
 
 		if (warzone != null && team == null && !isZoneMaker) {
@@ -164,7 +164,7 @@ public class WarBlockListener extends BlockListener {
 						for (Team t : warzone.getTeams()) {
 							t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " stole team " + lostFlagTeam.getName() + "'s flag.");
 							if (t.getName().equals(lostFlagTeam.getName())) {
-								t.teamcast("Prevent " + team.getKind().getColor() + player.getName() + ChatColor.WHITE 
+								t.teamcast("Prevent " + team.getKind().getColor() + player.getName() + ChatColor.WHITE
 										+ " from reaching team " + team.getName() + "'s spawn or flag.");
 							}
 						}
@@ -201,7 +201,7 @@ public class WarBlockListener extends BlockListener {
 		}
 
 		// buildInZonesOnly
-		Warzone blockZone = War.war.warzone(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ()));
+		Warzone blockZone = Warzone.getZoneByLocation(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ()));
 		if (blockZone == null && War.war.isBuildInZonesOnly() && !War.war.canBuildOutsideZone(player)) {
 			War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
 			event.setCancelled(true);
