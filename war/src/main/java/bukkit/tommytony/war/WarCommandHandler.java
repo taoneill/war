@@ -88,6 +88,9 @@ public class WarCommandHandler {
 			else if (command.equals("unloadwar")) {
 				commandObj = new UnloadwarCommand(this, sender, arguments);
 			}
+			else if (command.equals("setwarconfig") || command.equals("warcfg")) {
+				commandObj = new SetwarconfigCommand(this, sender, arguments);
+			}
 			else {
 				// we are not responsible for this command
 				return true;

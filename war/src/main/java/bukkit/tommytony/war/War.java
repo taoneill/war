@@ -175,27 +175,25 @@ public class War extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		return this.commandHandler.handle(sender, cmd, commandLabel, args);
 
-		/*if (sender instanceof Player) {
-			if (this.isZoneMaker(player)) {
-				// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
-				if (command.equals("setzone")) {
-					this.performSetZone(player, arguments);
-				} else if (command.equals("setzonelobby")) {
-					this.performSetZoneLobby(player, arguments);
-				} else if (command.equals("savezone")) {
-					this.performSaveZone(player, arguments);
-				} else if (command.equals("setzoneconfig") || command.equals("zonecfg")) {
-					this.performSetZoneConfig(player, arguments);
-				} else if (command.equals("setwarconfig") || command.equals("warcfg")) {
-					this.performSetWarConfig(player, arguments);
-				} else if (command.equals("zonemaker") || command.equals("zm")) {
-					this.performZonemakerAsZonemaker(player, arguments);
-				}
+		/*
+		if (this.isZoneMaker(player)) {
+			// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
+			if (command.equals("setzone")) {
+				this.performSetZone(player, arguments);
+			} else if (command.equals("setzonelobby")) {
+				this.performSetZoneLobby(player, arguments);
+			} else if (command.equals("savezone")) {
+				this.performSaveZone(player, arguments);
+			} else if (command.equals("setzoneconfig") || command.equals("zonecfg")) {
+				this.performSetZoneConfig(player, arguments);
 			} else if (command.equals("zonemaker") || command.equals("zm")) {
-				this.performZonemakerAsPlayer(player);
+				this.performZonemakerAsZonemaker(player, arguments);
 			}
+		} else if (command.equals("zonemaker") || command.equals("zm")) {
+			this.performZonemakerAsPlayer(player);
 		}
-		return true;*/
+		return true;
+		*/
 	}
 
 	/**
@@ -281,19 +279,6 @@ public class War extends JavaPlugin {
 			}
 
 			WarMapper.save();
-		}
-	}
-
-	public void performSetWarConfig(Player player, String[] arguments) {
-		if (arguments.length == 0) {
-			this.badMsg(player, "Usage: /setwarconfig pvpinzonesonly:on lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " + "Changes the server defaults for new warzones. Please give at leaset one named parameter.");
-		} else {
-			if (this.updateFromNamedParams(player, arguments)) {
-				WarMapper.save();
-				this.msg(player, "War config saved.");
-			} else {
-				this.badMsg(player, "Failed to read named parameters.");
-			}
 		}
 	}
 
@@ -569,7 +554,7 @@ public class War extends JavaPlugin {
 		}
 	}
 
-	private boolean updateFromNamedParams(Player player, String[] arguments) {
+	public boolean updateFromNamedParams(Player player, String[] arguments) {
 		try {
 			Map<String, String> namedParams = new HashMap<String, String>();
 			for (String namedPair : arguments) {
