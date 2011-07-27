@@ -553,6 +553,5 @@ public class Volume {
 		this.signLines = null;
 		this.invBlockContents.clear();
 		this.invBlockContents = null;
-		War.war = null;
 	}
 }
