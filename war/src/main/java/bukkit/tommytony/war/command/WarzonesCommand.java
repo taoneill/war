@@ -19,6 +19,7 @@ public class WarzonesCommand extends AbstractWarCommand {
 		super(handler, sender, args);
 	}
 
+	@Override
 	public boolean handle() {
 		String warzonesMessage = "Warzones: ";
 		if (War.war.getWarzones().isEmpty()) {

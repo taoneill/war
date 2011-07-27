@@ -13,6 +13,7 @@ public class TeamsCommand extends AbstractWarCommand {
 		super(handler, sender, args);
 	}
 
+	@Override
 	public boolean handle() {
 		Warzone zone;
 		if (this.args.length == 1) {

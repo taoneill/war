@@ -18,6 +18,7 @@ public class TeamCommand extends AbstractWarCommand {
 		super(handler, sender, args);
 	}
 
+	@Override
 	public boolean handle() {
 		if (!(this.sender instanceof Player)) return true;
 

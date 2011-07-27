@@ -196,8 +196,6 @@ public class War extends JavaPlugin {
 					this.performSetMonument(player, arguments);
 				} else if (command.equals("deletemonument")) {
 					this.performDeleteMonument(player, arguments);
-				} else if (command.equals("setwarhub")) {
-					this.performSetWarhub(player);
 				} else if (command.equals("setwarconfig") || command.equals("warcfg")) {
 					this.performSetWarConfig(player, arguments);
 				} else if (command.equals("zonemaker") || command.equals("zm")) {
@@ -306,31 +304,6 @@ public class War extends JavaPlugin {
 			} else {
 				this.badMsg(player, "Failed to read named parameters.");
 			}
-		}
-	}
-
-	public void performSetWarhub(Player player) {
-		if (this.warzones.size() > 0) {
-			if (this.warHub != null) {
-				// reset existing hub
-				this.warHub.getVolume().resetBlocks();
-				this.warHub.setLocation(player.getLocation());
-				this.warHub.initialize();
-				this.msg(player, "War hub moved.");
-			} else {
-				this.warHub = new WarHub(player.getLocation());
-				this.warHub.initialize();
-				for (Warzone zone : this.warzones) {
-					if (zone.getLobby() != null) {
-						zone.getLobby().getVolume().resetBlocks();
-						zone.getLobby().initialize();
-					}
-				}
-				this.msg(player, "War hub created.");
-			}
-			WarMapper.save();
-		} else {
-			this.badMsg(player, "No warzones yet.");
 		}
 	}
 

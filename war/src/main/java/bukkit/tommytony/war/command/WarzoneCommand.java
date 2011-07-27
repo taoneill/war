@@ -13,6 +13,7 @@ public class WarzoneCommand extends AbstractWarCommand {
 		super(handler, sender, args);
 	}
 
+	@Override
 	public boolean handle() {
 		// ignore it when no player
 		if (!(this.sender instanceof Player)) return true;
