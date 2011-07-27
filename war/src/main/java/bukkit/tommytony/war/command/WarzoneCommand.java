@@ -15,14 +15,14 @@ public class WarzoneCommand extends AbstractWarCommand {
 
 	@Override
 	public boolean handle() {
-		// ignore it when no player
 		if (!(this.sender instanceof Player)) return true;
 
-		Player player = (Player) this.sender;
-		if (this.args.length < 1) {
-			// handle missing warzone-name
+		if (this.args.length != 1) {
 			return false;
-		} else if (!War.war.canWarp(player)) {
+		}
+		Player player = (Player) this.sender;
+
+		if (!War.war.canWarp(player)) {
 			this.msg("Can't warp to zone. You need the 'war.warp' permission.");
 		} else {
 			Warzone warzone = Warzone.getZoneByName(this.args[0]);

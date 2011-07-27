@@ -18,7 +18,7 @@ public class NextbattleCommand extends AbstractZoneMakerCommand {
 		Warzone zone;
 		if (this.args.length == 1) {
 			zone = Warzone.getZoneByName(this.args[0]);
-		} else {
+		} else if (this.args.length == 0) {
 			if (!(this.sender instanceof Player)) {
 				return false;
 			}
@@ -28,6 +28,8 @@ public class NextbattleCommand extends AbstractZoneMakerCommand {
 				if (lobby == null) return false;
 				zone = lobby.getZone();
 			}
+		} else {
+			return false;
 		}
 		if (zone == null) {
 			return false;

@@ -32,20 +32,23 @@ public class JoinCommand extends AbstractWarCommand {
 		Warzone zone;
 		if (this.args.length == 0) {
 			return false;
-		}
-		else if (this.args.length == 2) {
+		} else if (this.args.length == 2) {
 			// zone by name
 			zone = Warzone.getZoneByName(this.args[0]);
 			// move the team-name to first place :)
 			this.args[0] = this.args[1];
-		}
-		else {
-			zone = Warzone.getZoneByLocation(player);
+		} else if (this.args.length == 1) {
+			if (!(this.sender instanceof Player)) {
+				return false;
+			}
+			zone = Warzone.getZoneByLocation((Player) this.sender);
 			if (zone == null) {
-				ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
+				ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.sender);
 				if (lobby == null) return false;
 				zone = lobby.getZone();
 			}
+		} else {
+			return false;
 		}
 		if (zone == null) {
 			return false;

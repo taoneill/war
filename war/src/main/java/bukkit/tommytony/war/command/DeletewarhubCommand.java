@@ -18,6 +18,9 @@ public class DeletewarhubCommand extends AbstractZoneMakerCommand {
 
 	@Override
 	public boolean handle() {
+		if (this.args.length != 0) {
+			return false;
+		}
 		if (War.war.getWarHub() != null) {
 			// reset existing hub
 			War.war.getWarHub().getVolume().resetBlocks();

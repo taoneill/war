@@ -12,6 +12,9 @@ public class LoadwarCommand extends AbstractZoneMakerCommand {
 
 	@Override
 	public boolean handle() {
+		if (this.args.length != 0) {
+			return false;
+		}
 		War.war.loadWar();
 
 		return true;

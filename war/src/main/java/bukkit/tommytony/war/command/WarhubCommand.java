@@ -16,7 +16,9 @@ public class WarhubCommand extends AbstractWarCommand {
 	@Override
 	public boolean handle() {
 		if (!(this.sender instanceof Player)) return true;
-
+		if (this.args.length != 0) {
+			return false;
+		}
 		Player player = (Player) this.sender;
 		if (War.war.getWarHub() == null) {
 			this.msg("No warhub on this War server. Try /zones and /zone.");

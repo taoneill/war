@@ -19,6 +19,9 @@ public class SetwarhubCommand extends AbstractZoneMakerCommand {
 	public boolean handle() {
 		if (!(this.sender instanceof Player)) return true;
 
+		if (this.args.length != 0) {
+			return false;
+		}
 		Player player = (Player) this.sender;
 
 		if (War.war.getWarzones().size() > 0) {

@@ -186,14 +186,6 @@ public class War extends JavaPlugin {
 					this.performSaveZone(player, arguments);
 				} else if (command.equals("setzoneconfig") || command.equals("zonecfg")) {
 					this.performSetZoneConfig(player, arguments);
-				} else if (command.equals("setteam")) {
-					this.performSetTeam(player, arguments);
-				} else if (command.equals("setteamflag")) {
-					this.performSetTeamFlag(player, arguments);
-				} else if (command.equals("deleteteam")) {
-					this.performDeleteTeam(player, arguments);
-				} else if (command.equals("setmonument")) {
-					this.performSetMonument(player, arguments);
 				} else if (command.equals("setwarconfig") || command.equals("warcfg")) {
 					this.performSetWarConfig(player, arguments);
 				} else if (command.equals("zonemaker") || command.equals("zm")) {
@@ -323,65 +315,6 @@ public class War extends JavaPlugin {
 				warzone.getMonuments().add(monument);
 				this.msg(player, "Monument " + monument.getName() + " created.");
 			}
-			WarzoneMapper.save(warzone, false);
-		}
-	}
-
-	public void performSetTeamFlag(Player player, String[] arguments) {
-		if (arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) || (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
-			this.badMsg(player, "Usage: /setteamflag <team-name/color>, e.g. /setteamflag diamond. " + "Sets the team flag post to the current location. " + "Must be in a warzone (try /zones and /zone). ");
-		} else {
-			TeamKind kind = TeamKinds.teamKindFromString(arguments[0]);
-			Warzone warzone = Warzone.getZoneByLocation(player);
-			Team team = warzone.getTeamByKind(kind);
-			if (team == null) {
-				// no such team yet
-				this.badMsg(player, "Place the team spawn first.");
-			} else if (team.getFlagVolume() == null) {
-				// new team flag
-				team.setTeamFlag(player.getLocation());
-				Location playerLoc = player.getLocation();
-				player.teleport(new Location(playerLoc.getWorld(), playerLoc.getBlockX() + 1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
-				this.msg(player, "Team " + team.getName() + " flag added here.");
-				WarzoneMapper.save(warzone, false);
-			} else {
-				// relocate flag
-				team.getFlagVolume().resetBlocks();
-				team.setTeamFlag(player.getLocation());
-				Location playerLoc = player.getLocation();
-				player.teleport(new Location(playerLoc.getWorld(), playerLoc.getBlockX() + 1, playerLoc.getBlockY(), playerLoc.getBlockZ() + 1));
-				this.msg(player, "Team " + team.getName() + " flag moved.");
-				WarzoneMapper.save(warzone, false);
-			}
-		}
-	}
-
-	public void performSetTeam(Player player, String[] arguments) {
-		if (arguments.length < 1 || !this.inAnyWarzone(player.getLocation()) || (arguments.length > 0 && TeamKinds.teamKindFromString(arguments[0]) == null)) {
-			this.badMsg(player, "Usage: /setteam <team-kind/color>, e.g. /setteam red." + "Sets the team spawn to the current location. " + "Must be in a warzone (try /zones and /zone). ");
-		} else {
-			TeamKind teamKind = TeamKinds.teamKindFromString(arguments[0]);
-			Warzone warzone = Warzone.getZoneByLocation(player);
-			Team existingTeam = warzone.getTeamByKind(teamKind);
-			if (existingTeam != null) {
-				// relocate
-				existingTeam.setTeamSpawn(player.getLocation());
-				this.msg(player, "Team " + existingTeam.getName() + " spawn relocated.");
-			} else {
-				// new team (use default TeamKind name for now)
-				Team newTeam = new Team(teamKind.getDefaultName(), teamKind, player.getLocation(), warzone);
-				newTeam.setRemainingLives(warzone.getLifePool());
-				warzone.getTeams().add(newTeam);
-				if (warzone.getLobby() != null) {
-					warzone.getLobby().getVolume().resetBlocks();
-					// warzone.getVolume().resetWallBlocks(warzone.getLobby().getWall());
-					// warzone.addZoneOutline(warzone.getLobby().getWall());
-					warzone.getLobby().initialize();
-				}
-				newTeam.setTeamSpawn(player.getLocation());
-				this.msg(player, "Team " + newTeam.getName() + " created with spawn here.");
-			}
-
 			WarzoneMapper.save(warzone, false);
 		}
 	}
