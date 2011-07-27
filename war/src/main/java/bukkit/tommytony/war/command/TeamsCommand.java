@@ -32,7 +32,7 @@ public class TeamsCommand extends AbstractWarCommand {
 			return false;
 		}
 
-		this.sender.sendMessage(zone.getTeamInformation());
+		this.msg(zone.getTeamInformation());
 
 		return true;
 	}

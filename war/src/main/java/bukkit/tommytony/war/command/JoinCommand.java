@@ -24,7 +24,7 @@ public class JoinCommand extends AbstractWarCommand {
 
 		Player player = (Player) this.sender;
 		if (!War.war.canPlayWar(player)) {
-			this.sender.sendMessage("Cannot play war");
+			this.msg("Cannot play war");
 			return true;
 		}
 
@@ -74,7 +74,7 @@ public class JoinCommand extends AbstractWarCommand {
 		TeamKind kind = TeamKinds.teamKindFromString(this.args[0]);
 
 		if (zone.isDisabled()) {
-			this.sender.sendMessage("This warzone is disabled.");
+			this.msg("This warzone is disabled.");
 		} else {
 			List<Team> teams = zone.getTeams();
 			boolean foundTeam = false;
@@ -82,7 +82,7 @@ public class JoinCommand extends AbstractWarCommand {
 				if (team.getName().startsWith(name) || team.getKind() == kind) {
 					if (!zone.hasPlayerInventory(player.getName())) {
 						zone.keepPlayerInventory(player);
-						this.sender.sendMessage("Your inventory is in storage until you /leave.");
+						this.msg("Your inventory is in storage until you /leave.");
 					}
 					if (team.getPlayers().size() < zone.getTeamCap()) {
 						team.addPlayer(player);
@@ -93,7 +93,7 @@ public class JoinCommand extends AbstractWarCommand {
 						}
 						foundTeam = true;
 					} else {
-						this.sender.sendMessage("Team " + team.getName() + " is full.");
+						this.msg("Team " + team.getName() + " is full.");
 						foundTeam = true;
 					}
 				}
@@ -104,7 +104,7 @@ public class JoinCommand extends AbstractWarCommand {
 					team.teamcast("" + player.getName() + " joined " + team.getName());
 				}
 			} else {
-				this.sender.sendMessage("No such team. Try /teams.");
+				this.msg("No such team. Try /teams.");
 			}
 		}
 		return true;
