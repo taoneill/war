@@ -54,7 +54,6 @@ public class Warzone {
 	private ZoneLobby lobby;
 	private boolean autoAssignOnly;
 	private boolean blockHeads;
-	private boolean dropLootOnDeath;
 	private boolean unbreakableZoneBlocks;
 	private boolean disabled = false;
 	private boolean noCreatures;
@@ -77,7 +76,6 @@ public class Warzone {
 		this.scoreCap = War.war.getDefaultScoreCap();
 		this.monumentHeal = War.war.getDefaultMonumentHeal();
 		this.setBlockHeads(War.war.isDefaultBlockHeads());
-		this.setDropLootOnDeath(War.war.isDefaultDropLootOnDeath());
 		this.setUnbreakableZoneBlocks(War.war.isDefaultUnbreakableZoneBlocks());
 		this.setNoCreatures(War.war.isDefaultNoCreatures());
 		this.setResetOnEmpty(War.war.isDefaultResetOnEmpty());
@@ -943,14 +941,6 @@ public class Warzone {
 
 	public boolean isBlockHeads() {
 		return this.blockHeads;
-	}
-
-	public void setDropLootOnDeath(boolean dropLootOnDeath) {
-		this.dropLootOnDeath = dropLootOnDeath;
-	}
-
-	public boolean isDropLootOnDeath() {
-		return this.dropLootOnDeath;
 	}
 
 	public void setSpawnStyle(String spawnStyle) {

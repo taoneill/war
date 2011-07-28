@@ -70,7 +70,6 @@ public class War extends JavaPlugin {
 	private int defaultScoreCap = 10;
 	private int defaultMonumentHeal = 5;
 	private boolean defaultBlockHeads = true;
-	private boolean defaultDropLootOnDeath = false;
 	private boolean defaultFriendlyFire = false;
 	private boolean defaultAutoAssignOnly = false;
 	private boolean defaultUnbreakableZoneBlocks = false;
@@ -783,14 +782,6 @@ public class War extends JavaPlugin {
 
 	public void setDefaultBlockHeads(boolean defaultBlockHeads) {
 		this.defaultBlockHeads = defaultBlockHeads;
-	}
-
-	public boolean isDefaultDropLootOnDeath() {
-		return defaultDropLootOnDeath;
-	}
-
-	public void setDefaultDropLootOnDeath(boolean defaultDropLootOnDeath) {
-		this.defaultDropLootOnDeath = defaultDropLootOnDeath;
 	}
 
 	public boolean isDefaultFriendlyFire() {

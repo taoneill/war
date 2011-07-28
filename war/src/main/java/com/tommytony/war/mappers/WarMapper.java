@@ -150,9 +150,6 @@ public class WarMapper {
 		// defaultNoCreatures
 		War.war.setDefaultNoCreatures(warConfig.getBoolean("defaultNoCreatures"));
 
-		// defaultDropLootOnDeath
-		// war.setDefaultDropLootOnDeath(warConfig.getBoolean("defaultDropLootOnDeath"));
-
 		// defaultResetOnEmpty
 		War.war.setDefaultResetOnEmpty(warConfig.getBoolean("defaultResetOnEmpty"));
 
