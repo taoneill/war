@@ -14,23 +14,22 @@ commands:
     usage: /zones
   warzone:
     description: (War) Teleports you to the specified warzone's lobby.
-    usage: /warzone ziggy
+    usage: /warzone <zone-name>
   zone:
     description: (War) Shortcut for /warzone.
-    usage: /zone ziggy
+    usage: /zone <zone-name>
   warhub:
     description: (War) Teleports you to the warhub, if it exists. The warhub offers portals to reach each warzone on the server.
     usage: /warhub
   teams:
     description: (War) Lists the teams in the warzone.
     usage:
-       - Must be standing in warzone or lobby.
-       - /teams
+       - /teams [zone-name]
   join:
     description: (War) Use to change teams. Also used instead of walking in the team gate in the lobby.
     usage:
        - Must be standing in warzone or lobby.
-       - /join <team color>
+       - /join <team-color>
   leave:
     description: (War) Use to leave a warzone. Teleports you back to the lobby.
     usage:
@@ -38,29 +37,29 @@ commands:
        - /leave
   team:
     description: (War) Team chat.
-    usage: /team Leeeroooy!!!
+    usage: /team <Message>
 # Warzone maker commands (must have the 'war.*' permission or be added as a zone-maker in /plugins/War/war.txt
 # 1- Battle-related commands
   nextbattle:
     description: (War) Warzone blocks are restored (from memory). Teams are respawned.
     usage:
         - Must be standing in warzone or lobby
-        - /nextbattle
+        - /nextbattle [zone-name]
 # 2- Warzone creation commands
   setzone:
     description: (War) Use to create a warzone. Lobby is created and blocks are saved when the second corner is set.
     usage:
         - =<Classic/Northwest-Southeast mode>=
-        - /setzone <zonename> <northwest/southeast/nw/se>
+        - /setzone <zone-name> <northwest/southeast/nw/se>
         - ex: first, /setzone ziggy se, then, /setzone ziggy nw
         - In classic mode, corner1 defaults to the topmost block (127) in the northwest and corner2 to the bottommost block (0) in the southeast.
         - =<Wand Cuboid mode>=
-        - 1) /setzone <name> wand
+        - 1) /setzone <zone-name> wand
         - 2) Left-click to select or move corner1
         - 3) Right-click to select or move corner2
         - Turn off wand by dropping the wooden sword.
         - =<Wandless Cuboid mode>=
-        - /setzone <name> <corner1/corner2/c1/c2/pos1/pos2>
+        - /setzone <zone-name> <corner1/corner2/c1/c2/pos1/pos2>
         - The three modes can be mixed and matched.
         - Warzones must be at least 10 blocks wide in all directions.
   savezone:
@@ -74,8 +73,11 @@ commands:
   setzonelobby:
     description: (War) Creates or changes the position of the warzone lobby.
     usage:
+        - =<Attached lobby>
         - Must be standing in warzone or lobby.
         - /setzonelobby <north/east/south/west/n/e/s/w>
+        - =<External lobby>
+        - /setzonelobby <zone-name>
   setteam:
     description: (War) Creates or moves a team spawn. The lobby is updated. Teams are diamond, iron or gold etc.
     usage:
@@ -94,23 +96,23 @@ commands:
   resetzone:
     description: (War) Reloads zone blocks from disks. Everyone is ported back to the lobby.
     usage:
-        - Must be standing in warzone or lobby.
-        - /resetzone
+        - Must be standing in warzone or lobby, or provide name
+        - /resetzone [zone-name]
   deletezone:
     description: (War) Deletes the zone, resets all blocks.
     usage:
         - Must be standing in warzone or lobby, or provide name
-        - /deletezone, /deletezone <zone-name>
+        - /deletezone [zone-name]
   deleteteam:
     description: (War) Deletes the team. Team must exist.
     usage:
         - Must be standing in warzone or lobby, or provide warzone-name
-        - /deleteteam <team-color>
+        - /deleteteam [zone-name] <team-color>
   deletemonument:
     description: (War) Deletes the monument.
     usage:
         - Must be standing in warzone or lobby, or provide warzone-name
-        - /deletemonument <monument-name>
+        - /deletemonument [zone-name] <monument-name>
   setzoneconfig:
     description: (War) Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone.
     usage:
