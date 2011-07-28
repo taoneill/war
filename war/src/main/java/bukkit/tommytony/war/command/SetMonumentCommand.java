@@ -16,7 +16,9 @@ public class SetMonumentCommand extends AbstractZoneMakerCommand {
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) return true;
+		if (!(this.sender instanceof Player)) {
+			return true;
+		}
 
 		Player player = (Player) this.sender;
 

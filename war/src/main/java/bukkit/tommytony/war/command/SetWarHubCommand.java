@@ -17,7 +17,9 @@ public class SetWarHubCommand extends AbstractZoneMakerCommand {
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) return true;
+		if (!(this.sender instanceof Player)) {
+			return true;
+		}
 
 		if (this.args.length != 0) {
 			return false;

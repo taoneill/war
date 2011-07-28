@@ -29,7 +29,7 @@ public class WarHub {
 		int yaw = 0;
 		if (hubOrientation.equals("south")) {
 			yaw = 270;
-			this.setOrientation(BlockFace.SOUTH);	
+			this.setOrientation(BlockFace.SOUTH);
 		} else if (hubOrientation.equals("north")) {
 			yaw = 90;
 			this.setOrientation(BlockFace.NORTH);
@@ -41,7 +41,7 @@ public class WarHub {
 			this.setOrientation(BlockFace.WEST);
 		}
 
-		this.location = new Location(location.getWorld(), 
+		this.location = new Location(location.getWorld(),
 								location.getX(),
 								location.getY(),
 								location.getZ(),
@@ -54,7 +54,7 @@ public class WarHub {
 		this.location = location;
 		this.volume = new Volume("warhub", location.getWorld());
 
-		setLocation(location);
+		this.setLocation(location);
 	}
 
 	public Volume getVolume() {
@@ -65,10 +65,10 @@ public class WarHub {
 		this.location = loc;
 		// Lobby orientation
 		int yaw = 0;
-		if (location.getYaw() >= 0) {
-			yaw = (int) (location.getYaw() % 360);
+		if (this.location.getYaw() >= 0) {
+			yaw = (int) (this.location.getYaw() % 360);
 		} else {
-			yaw = (int) (360 + (location.getYaw() % 360));
+			yaw = (int) (360 + (this.location.getYaw() % 360));
 		}
 
 		BlockFace facing = null;
@@ -247,7 +247,7 @@ public class WarHub {
 	}
 
 	public BlockFace getOrientation() {
-		return orientation;
+		return this.orientation;
 	}
 
 }

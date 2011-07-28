@@ -7,9 +7,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class TeamKinds {
 	private static final List<TeamKind> teamKinds = new ArrayList<TeamKind>();

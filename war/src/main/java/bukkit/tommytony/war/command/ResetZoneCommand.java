@@ -26,7 +26,9 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 			zone = Warzone.getZoneByLocation((Player) this.sender);
 			if (zone == null) {
 				ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.sender);
-				if (lobby == null) return false;
+				if (lobby == null) {
+					return false;
+				}
 				zone = lobby.getZone();
 			}
 		} else {

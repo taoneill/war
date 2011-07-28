@@ -5,9 +5,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class BlockInfo {
 	private int x;

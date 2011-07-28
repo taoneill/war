@@ -21,7 +21,9 @@ public class JoinCommand extends AbstractWarCommand {
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) return true;
+		if (!(this.sender instanceof Player)) {
+			return true;
+		}
 
 		Player player = (Player) this.sender;
 		if (!War.war.canPlayWar(player)) {
@@ -44,7 +46,9 @@ public class JoinCommand extends AbstractWarCommand {
 			zone = Warzone.getZoneByLocation((Player) this.sender);
 			if (zone == null) {
 				ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.sender);
-				if (lobby == null) return false;
+				if (lobby == null) {
+					return false;
+				}
 				zone = lobby.getZone();
 			}
 		} else {

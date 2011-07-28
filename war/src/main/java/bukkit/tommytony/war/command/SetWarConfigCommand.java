@@ -19,9 +19,12 @@ public class SetWarConfigCommand extends AbstractZoneMakerCommand {
 		if (this.args.length == 0) {
 			return false;
 		}
-		if (!(this.sender instanceof Player)) return true;
-		// TODO: Maybe move rallypoint to warzone setting
-		// TODO: The rallypoint is the only thing that prevents this from being used from cli
+		if (!(this.sender instanceof Player))
+		 {
+			return true;
+			// TODO: Maybe move rallypoint to warzone setting
+			// TODO: The rallypoint is the only thing that prevents this from being used from cli
+		}
 
 		if (War.war.updateFromNamedParams((Player) this.sender, this.args)) {
 			WarMapper.save();

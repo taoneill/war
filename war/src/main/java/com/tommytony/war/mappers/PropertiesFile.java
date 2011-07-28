@@ -10,7 +10,7 @@ import java.util.Properties;
 
 /**
  * Used for accessing and creating .[properties] files, reads them as utf-8, saves as utf-8. Internationalization is key importance especially for character codes.
- * 
+ *
  * @author Nijikokun
  * @version 1.0.4, %G%
  */
@@ -27,7 +27,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Creates or opens a properties file using specified filename
-	 * 
+	 *
 	 * @param fileName
 	 */
 	public PropertiesFile(String fileName) {
@@ -48,7 +48,7 @@ public final class PropertiesFile {
 
 	/**
 	 * The loader for property files, it reads the file as UTF8 or converts the string into UTF8. Used for simple runthrough's, loading, or reloading of the file.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void load() throws IOException {
@@ -88,20 +88,20 @@ public final class PropertiesFile {
 	 * Returns a Map of all <code>key=value</code> properties in the file as <code>&lt;key (java.lang.String), value (java.lang.String)></code> <br />
 	 * <br />
 	 * Example: <blockquote>
-	 * 
+	 *
 	 * <pre>
 	 * PropertiesFile settings = new PropertiesFile(&quot;settings.properties&quot;);
 	 * Map&lt;String, String&gt; mappedSettings;
-	 * 
+	 *
 	 * try {
 	 * 	mappedSettings = settings.returnMap();
 	 * } catch (Exception ex) {
 	 * 	log.info(&quot;Failed mapping settings.properties&quot;);
 	 * }
 	 * </pre>
-	 * 
+	 *
 	 * </blockquote>
-	 * 
+	 *
 	 * @return <code>map</code> - Simple Map HashMap of the entire <code>key=value</code> as <code>&lt;key (java.lang.String), value (java.lang.String)></code>
 	 * @throws Exception
 	 *                 If the properties file doesn't exist.
@@ -113,7 +113,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Checks to see if the .[properties] file contains the given <code>key</code>.
-	 * 
+	 *
 	 * @param var
 	 *                The key we are going to be checking the existance of.
 	 * @return <code>Boolean</code> - True if the <code>key</code> exists, false if it cannot be found.
@@ -124,7 +124,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Checks to see if this <code>key</code> exists in the .[properties] file.
-	 * 
+	 *
 	 * @param var
 	 *                The key we are grabbing the value of.
 	 * @return <code>java.lang.String</code> - True if the <code>key</code> exists, false if it cannot be found.
@@ -135,7 +135,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Remove a key from the file if it exists. This will save() which will invoke a load() on the file.
-	 * 
+	 *
 	 * @see #save()
 	 * @param var
 	 *                The <code>key</code> that will be removed from the file
@@ -149,7 +149,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Checks the existance of a <code>key</code>.
-	 * 
+	 *
 	 * @see #containsKey(java.lang.String)
 	 * @param key
 	 *                The <code>key</code> in question of existance.
@@ -161,7 +161,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Returns the value of the <code>key</code> given as a <code>String</code>, however we do not set a string if no <code>key</code> is found.
-	 * 
+	 *
 	 * @see #getProperty(java.lang.String)
 	 * @param key
 	 *                The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to "" or empty.
@@ -176,7 +176,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Returns the value of the <code>key</code> given as a <code>String</code>. If it is not found, it will invoke saving the default <code>value</code> to the properties file.
-	 * 
+	 *
 	 * @see #setString(java.lang.String, java.lang.String)
 	 * @see #getProperty(java.lang.String)
 	 * @param key
@@ -196,7 +196,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Save the value given as a <code>String</code> on the specified key.
-	 * 
+	 *
 	 * @see #save()
 	 * @param key
 	 *                The <code>key</code> that we will be addressing the <code>value</code> to.
@@ -210,7 +210,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Returns the value of the <code>key</code> given in a Integer, however we do not set a string if no <code>key</code> is found.
-	 * 
+	 *
 	 * @see #getProperty(String var)
 	 * @param key
 	 *                The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to 0
@@ -225,7 +225,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Returns the int value of a key
-	 * 
+	 *
 	 * @see #setInt(String key, int value)
 	 * @param key
 	 *                The key that we will be grabbing the value from, if no value is found set and return <code>value</code>
@@ -245,7 +245,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Save the value given as a <code>int</code> on the specified key.
-	 * 
+	 *
 	 * @see #save()
 	 * @param key
 	 *                The <code>key</code> that we will be addressing the <code>value</code> to.
@@ -260,7 +260,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Returns the value of the <code>key</code> given in a Double, however we do not set a string if no <code>key</code> is found.
-	 * 
+	 *
 	 * @see #getProperty(String var)
 	 * @param key
 	 *                The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to 0.0
@@ -275,7 +275,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Returns the double value of a key
-	 * 
+	 *
 	 * @see #setDouble(String key, double value)
 	 * @param key
 	 *                The key that we will be grabbing the value from, if no value is found set and return <code>value</code>
@@ -294,7 +294,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Save the value given as a <code>double</code> on the specified key.
-	 * 
+	 *
 	 * @see #save()
 	 * @param key
 	 *                The <code>key</code> that we will be addressing the <code>value</code> to.
@@ -309,7 +309,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Returns the value of the <code>key</code> given in a Long, however we do not set a string if no <code>key</code> is found.
-	 * 
+	 *
 	 * @see #getProperty(String var)
 	 * @param key
 	 *                The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to 0L
@@ -324,7 +324,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Returns the long value of a key
-	 * 
+	 *
 	 * @see #setLong(String key, long value)
 	 * @param key
 	 *                The key that we will be grabbing the value from, if no value is found set and return <code>value</code>
@@ -343,7 +343,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Save the value given as a <code>long</code> on the specified key.
-	 * 
+	 *
 	 * @see #save()
 	 * @param key
 	 *                The <code>key</code> that we will be addressing the <code>value</code> to.
@@ -358,7 +358,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Returns the value of the <code>key</code> given in a Boolean, however we do not set a string if no <code>key</code> is found.
-	 * 
+	 *
 	 * @see #getProperty(String var)
 	 * @param key
 	 *                The <code>key</code> we will retrieve the property from, if no <code>key</code> is found default to false
@@ -373,7 +373,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Returns the boolean value of a key
-	 * 
+	 *
 	 * @see #setBoolean(String key, boolean value)
 	 * @param key
 	 *                The key that we will be grabbing the value from, if no value is found set and return <code>value</code>
@@ -392,7 +392,7 @@ public final class PropertiesFile {
 
 	/**
 	 * Save the value given as a <code>boolean</code> on the specified key.
-	 * 
+	 *
 	 * @see #save()
 	 * @param key
 	 *                The <code>key</code> that we will be addressing the <code>value</code> to.

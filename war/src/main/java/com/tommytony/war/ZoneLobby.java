@@ -243,8 +243,9 @@ public class ZoneLobby {
 
 	private void calculateLobbyWidth() {
 		int noOfTeams = this.warzone.getTeams().size();
-		if(this.warzone.isAutoAssignOnly())
+		if(this.warzone.isAutoAssignOnly()) {
 			noOfTeams = 1;
+		}
 		int lobbyWidth = noOfTeams * 4 + 5;
 		this.lobbyHalfSide = lobbyWidth / 2;
 		if (this.lobbyHalfSide < 7) {

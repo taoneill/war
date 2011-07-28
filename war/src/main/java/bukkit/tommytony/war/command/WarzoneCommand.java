@@ -15,7 +15,9 @@ public class WarzoneCommand extends AbstractWarCommand {
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) return true;
+		if (!(this.sender instanceof Player)) {
+			return true;
+		}
 
 		if (this.args.length != 1) {
 			return false;

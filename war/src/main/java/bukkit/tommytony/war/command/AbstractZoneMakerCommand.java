@@ -12,7 +12,9 @@ public abstract class AbstractZoneMakerCommand extends AbstractWarCommand {
 	public AbstractZoneMakerCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
 		super(handler, sender, args);
 		if (sender instanceof Player) {
-			if (War.war.isZoneMaker((Player) sender)) throw new NoZoneMakerException();
+			if (War.war.isZoneMaker((Player) sender)) {
+				throw new NoZoneMakerException();
+			}
 		}
 		else if (!(sender instanceof ConsoleCommandSender)) {
 			throw new NoZoneMakerException();

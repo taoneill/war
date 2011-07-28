@@ -114,12 +114,13 @@ public class WarEntityListener extends EntityListener {
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
 				String deathMessage = "";
 				String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName();
-				if (event instanceof EntityDamageByProjectileEvent)
+				if (event instanceof EntityDamageByProjectileEvent) {
 					deathMessage = "A dispenser killed " + defenderString;
-				else if (event.getDamager() instanceof CraftTNTPrimed)
+				} else if (event.getDamager() instanceof CraftTNTPrimed) {
 					deathMessage = defenderString + ChatColor.WHITE + " exploded";
-				else
+				} else {
 					deathMessage = defenderString + ChatColor.WHITE + " died";
+				}
 				for (Team team : defenderWarzone.getTeams()) {
 					team.teamcast(deathMessage);
 				}
@@ -165,7 +166,9 @@ public class WarEntityListener extends EntityListener {
 	public void onEntityDamage(EntityDamageEvent event) {
 		if (War.war.isLoaded()) {
 			Entity entity = event.getEntity();
-			if (!(entity instanceof Player)) return;
+			if (!(entity instanceof Player)) {
+				return;
+			}
 			Player player = (Player) entity;
 
 			// prevent godmode

@@ -6,15 +6,15 @@ import org.bukkit.entity.Player;
 
 /**
  * The purpose of this tool is twofold: 1: Avoid client crashes due to bad color formating. 2: Make color continue on word wrapping
- * 
+ *
  * In minecraft the degree sign is used as a prefix to another char to create a color. For example the code for white is "\u00A7f". The "\u00A7" is the unicode notation for the degree sign and the "f" means white.
- * 
+ *
  * When does minecraft wrap the text? After how many chars? Answer: Because the font isn't monospace this differs depending on what you write. However we can fit 53 "M" without wrapping and the 54th char would then wrap (be at the beginning of the next line instead) As there is no broader char than "M" we can know for sure the minimum line length is 53. Note that this means the number of DISPLAYED chars per row is 53. A degree sign and the char after will NOT count, as they will not be displayed as chars.
- * 
+ *
  * Good to know: Numbers have the same font width as an M.
- * 
+ *
  * When does the client crash? Answer: When a row ends with a degree char and optionally another sign after. Another way to say the same: When a line ends with either a broken or valid color notation. AND The client will ALWAYS crash if the sign after the last displayed char in a row is a degree char. A goofy way to explatin it: For a line with only "M" and numbers, the fiftyfourth "displayed char" musn't be a degree sign.
- * 
+ *
  * WARNING: Above is a hypothesis I have created based on what my experiments have shown. I am fairly sure it is correct but please help me test it further.
  */
 public class ChatFixUtil {
@@ -23,13 +23,13 @@ public class ChatFixUtil {
 
 	/**
 	 * This method wraps the msg for you at row lengths of 53, avoids client crash scenarios and makes the previous color continue on the next line.
-	 * 
+	 *
 	 * The upsides with filtering your messages through this method are: - No client crashes. - Line wrapping with preserved color.
-	 * 
+	 *
 	 * The downsides are: - The width of the chat window will not be used to it's fullest. For example you can fit more that 53 commas (,) in a chatwindow row but the line would break after 53 displayed chars.
-	 * 
+	 *
 	 * Suggested usage: NO NEED TO USE the fix method for static help pages in your plugin. As the text is static you can make sure there is no client crash yourself and be able to use the full line length.
-	 * 
+	 *
 	 * DO USE in cases like where you output colored messages with playernames in your plugin. As the player names have different length there is potential for client crash.
 	 */
 	public static ArrayList<String> fix(String msg) {

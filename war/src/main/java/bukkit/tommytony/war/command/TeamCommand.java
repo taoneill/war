@@ -20,7 +20,9 @@ public class TeamCommand extends AbstractWarCommand {
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) return true;
+		if (!(this.sender instanceof Player)) {
+			return true;
+		}
 
 		Player player = (Player) this.sender;
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
