@@ -196,7 +196,7 @@ public class WarMapper {
 		for (String command : war.getCommandWhitelist()) {
 			commandWhitelistStr += command + ",";
 		}
-		warConfig.setString("commandWhitelist", makersStr);
+		warConfig.setString("commandWhitelist", commandWhitelistStr);
 
 		// defaultLoadout
 		String defaultLoadoutStr = "";
