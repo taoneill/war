@@ -44,7 +44,7 @@ public class War extends JavaPlugin {
 	private WarEntityListener entityListener = new WarEntityListener();
 	private WarBlockListener blockListener = new WarBlockListener();
 	private WarCommandHandler commandHandler = new WarCommandHandler();
-	private Logger log;
+	private Logger logger;
 	private PluginDescriptionFile desc = null;
 	private boolean loaded = false;
 
@@ -58,28 +58,26 @@ public class War extends JavaPlugin {
 	private HashMap<String, InventoryStash> disconnected = new HashMap<String, InventoryStash>();
 	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
 
+	// Global settings
+	private boolean pvpInZonesOnly = false;
+	private boolean disablePvpMessage = false;
+	private boolean buildInZonesOnly = false;
+
 	// Default warzone settings
 	private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
 	private int defaultLifepool = 7;
-	private boolean defaultFriendlyFire = false;
-	private boolean defaultAutoAssignOnly = false;
 	private int defaultTeamCap = 7;
 	private int defaultScoreCap = 10;
 	private int defaultMonumentHeal = 5;
 	private boolean defaultBlockHeads = true;
 	private boolean defaultDropLootOnDeath = false;
-	private String defaultSpawnStyle = TeamSpawnStyles.BIG;
-	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
+	private boolean defaultFriendlyFire = false;
+	private boolean defaultAutoAssignOnly = false;
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
-	private boolean defaultResetOnEmpty = false;
-	private boolean defaultResetOnLoad = false;
-	private boolean defaultResetOnUnload = false;
-
-	// Global settings
-	private boolean pvpInZonesOnly = false;
-	private boolean disablePvpMessage = false;
-	private boolean buildInZonesOnly = false;
+	private boolean defaultResetOnEmpty = false, defaultResetOnLoad = false, defaultResetOnUnload = false;
+	private String defaultSpawnStyle = TeamSpawnStyles.BIG;
+	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
 
 	public War() {
 		super();
@@ -101,7 +99,7 @@ public class War extends JavaPlugin {
 	public void loadWar() {
 		this.setLoaded(true);
 		this.desc = this.getDescription();
-		this.log = this.getServer().getLogger();
+		this.logger = this.getServer().getLogger();
 		this.setupPermissions();
 
 		// Register hooks
@@ -668,31 +666,7 @@ public class War extends JavaPlugin {
 	}
 
 	public Logger getLogger() {
-		return this.log;
-	}
-
-	public void setDefaultLifepool(int defaultLifepool) {
-		this.defaultLifepool = defaultLifepool;
-	}
-
-	public int getDefaultLifepool() {
-		return this.defaultLifepool;
-	}
-
-	public void setDefaultMonumentHeal(int defaultMonumentHeal) {
-		this.defaultMonumentHeal = defaultMonumentHeal;
-	}
-
-	public int getDefaultMonumentHeal() {
-		return this.defaultMonumentHeal;
-	}
-
-	public void setDefaultFriendlyFire(boolean defaultFriendlyFire) {
-		this.defaultFriendlyFire = defaultFriendlyFire;
-	}
-
-	public boolean getDefaultFriendlyFire() {
-		return this.defaultFriendlyFire;
+		return this.logger;
 	}
 
 	public Warzone zoneOfZoneWallAtProximity(Location location) {
@@ -712,22 +686,6 @@ public class War extends JavaPlugin {
 		return this.commandWhitelist;
 	}
 
-	public boolean getDefaultAutoAssignOnly() {
-		return this.defaultAutoAssignOnly;
-	}
-
-	public void setDefaultAutoAssignOnly(boolean autoAssign) {
-		this.defaultAutoAssignOnly = autoAssign;
-	}
-
-	public WarHub getWarHub() {
-		return this.warHub;
-	}
-
-	public void setWarHub(WarHub warHub) {
-		this.warHub = warHub;
-	}
-
 	public boolean inAnyWarzoneLobby(Location location) {
 		if (ZoneLobby.getLobbyByLocation(location) == null) {
 			return false;
@@ -735,56 +693,8 @@ public class War extends JavaPlugin {
 		return true;
 	}
 
-	public void setDefaultTeamCap(int defaultTeamCap) {
-		this.defaultTeamCap = defaultTeamCap;
-	}
-
-	public int getDefaultTeamCap() {
-		return this.defaultTeamCap;
-	}
-
-	public void setPvpInZonesOnly(boolean pvpInZonesOnly) {
-		this.pvpInZonesOnly = pvpInZonesOnly;
-	}
-
-	public boolean isPvpInZonesOnly() {
-		return this.pvpInZonesOnly;
-	}
-
-	public void setDefaultScoreCap(int defaultScoreCap) {
-		this.defaultScoreCap = defaultScoreCap;
-	}
-
-	public int getDefaultScoreCap() {
-		return this.defaultScoreCap;
-	}
-
 	public List<String> getZoneMakersImpersonatingPlayers() {
 		return this.zoneMakersImpersonatingPlayers;
-	}
-
-	public void setDefaultBlockHeads(boolean defaultBlockHeads) {
-		this.defaultBlockHeads = defaultBlockHeads;
-	}
-
-	public boolean isDefaultBlockHeads() {
-		return this.defaultBlockHeads;
-	}
-
-	public void setDefaultDropLootOnDeath(boolean defaultDropLootOnDeath) {
-		this.defaultDropLootOnDeath = defaultDropLootOnDeath;
-	}
-
-	public boolean isDefaultDropLootOnDeath() {
-		return this.defaultDropLootOnDeath;
-	}
-
-	public void setDefaultSpawnStyle(String defaultSpawnStyle) {
-		this.defaultSpawnStyle = defaultSpawnStyle;
-	}
-
-	public String getDefaultSpawnStyle() {
-		return this.defaultSpawnStyle;
 	}
 
 	public HashMap<Integer, ItemStack> getDefaultReward() {
@@ -795,79 +705,163 @@ public class War extends JavaPlugin {
 		return this.incompleteZones;
 	}
 
-	public void setBuildInZonesOnly(boolean buildInZonesOnly) {
-		this.buildInZonesOnly = buildInZonesOnly;
+	public WarHub getWarHub() {
+		return this.warHub;
 	}
 
-	public boolean isBuildInZonesOnly() {
-		return this.buildInZonesOnly;
+	public void setWarHub(WarHub warHub) {
+		this.warHub = warHub;
 	}
 
-	public void setDisablePvpMessage(boolean disablePvpMessage) {
-		this.disablePvpMessage = disablePvpMessage;
-	}
-
-	public boolean isDisablePvpMessage() {
-		return this.disablePvpMessage;
-	}
-
-	public void setDefaultUnbreakableZoneBlocks(boolean defaultUnbreakableZoneBlocks) {
-		this.defaultUnbreakableZoneBlocks = defaultUnbreakableZoneBlocks;
-	}
-
-	public boolean isDefaultUnbreakableZoneBlocks() {
-		return this.defaultUnbreakableZoneBlocks;
-	}
-
-	public boolean getDefaultNoCreatures() {
-		return this.isDefaultNoCreatures();
-	}
-
-	public void setDefaultNoCreatures(boolean defaultNoCreatures) {
-		this.defaultNoCreatures = defaultNoCreatures;
-	}
-
-	public boolean isDefaultNoCreatures() {
-		return this.defaultNoCreatures;
-	}
-
-	public void setDisconnected(HashMap<String, InventoryStash> disconnected) {
-		this.disconnected = disconnected;
-	}
-
-	public HashMap<String, InventoryStash> getDisconnected() {
-		return this.disconnected;
+	public boolean isLoaded() {
+		return loaded;
 	}
 
 	public void setLoaded(boolean loaded) {
 		this.loaded = loaded;
 	}
 
-	public boolean isLoaded() {
-		return this.loaded;
+	public boolean isPvpInZonesOnly() {
+		return pvpInZonesOnly;
+	}
+
+	public void setPvpInZonesOnly(boolean pvpInZonesOnly) {
+		this.pvpInZonesOnly = pvpInZonesOnly;
+	}
+
+	public boolean isDisablePvpMessage() {
+		return disablePvpMessage;
+	}
+
+	public void setDisablePvpMessage(boolean disablePvpMessage) {
+		this.disablePvpMessage = disablePvpMessage;
+	}
+
+	public boolean isBuildInZonesOnly() {
+		return buildInZonesOnly;
+	}
+
+	public void setBuildInZonesOnly(boolean buildInZonesOnly) {
+		this.buildInZonesOnly = buildInZonesOnly;
+	}
+
+	public int getDefaultLifepool() {
+		return defaultLifepool;
+	}
+
+	public void setDefaultLifepool(int defaultLifepool) {
+		this.defaultLifepool = defaultLifepool;
+	}
+
+	public int getDefaultTeamCap() {
+		return defaultTeamCap;
+	}
+
+	public void setDefaultTeamCap(int defaultTeamCap) {
+		this.defaultTeamCap = defaultTeamCap;
+	}
+
+	public int getDefaultScoreCap() {
+		return defaultScoreCap;
+	}
+
+	public void setDefaultScoreCap(int defaultScoreCap) {
+		this.defaultScoreCap = defaultScoreCap;
+	}
+
+	public int getDefaultMonumentHeal() {
+		return defaultMonumentHeal;
+	}
+
+	public void setDefaultMonumentHeal(int defaultMonumentHeal) {
+		this.defaultMonumentHeal = defaultMonumentHeal;
+	}
+
+	public boolean isDefaultBlockHeads() {
+		return defaultBlockHeads;
+	}
+
+	public void setDefaultBlockHeads(boolean defaultBlockHeads) {
+		this.defaultBlockHeads = defaultBlockHeads;
+	}
+
+	public boolean isDefaultDropLootOnDeath() {
+		return defaultDropLootOnDeath;
+	}
+
+	public void setDefaultDropLootOnDeath(boolean defaultDropLootOnDeath) {
+		this.defaultDropLootOnDeath = defaultDropLootOnDeath;
+	}
+
+	public boolean isDefaultFriendlyFire() {
+		return defaultFriendlyFire;
+	}
+
+	public void setDefaultFriendlyFire(boolean defaultFriendlyFire) {
+		this.defaultFriendlyFire = defaultFriendlyFire;
+	}
+
+	public boolean isDefaultAutoAssignOnly() {
+		return defaultAutoAssignOnly;
+	}
+
+	public void setDefaultAutoAssignOnly(boolean defaultAutoAssignOnly) {
+		this.defaultAutoAssignOnly = defaultAutoAssignOnly;
+	}
+
+	public boolean isDefaultUnbreakableZoneBlocks() {
+		return defaultUnbreakableZoneBlocks;
+	}
+
+	public void setDefaultUnbreakableZoneBlocks(boolean defaultUnbreakableZoneBlocks) {
+		this.defaultUnbreakableZoneBlocks = defaultUnbreakableZoneBlocks;
+	}
+
+	public boolean isDefaultNoCreatures() {
+		return defaultNoCreatures;
+	}
+
+	public void setDefaultNoCreatures(boolean defaultNoCreatures) {
+		this.defaultNoCreatures = defaultNoCreatures;
+	}
+
+	public boolean isDefaultResetOnEmpty() {
+		return defaultResetOnEmpty;
 	}
 
 	public void setDefaultResetOnEmpty(boolean defaultResetOnEmpty) {
 		this.defaultResetOnEmpty = defaultResetOnEmpty;
 	}
 
-	public boolean isDefaultResetOnEmpty() {
-		return this.defaultResetOnEmpty;
+	public boolean isDefaultResetOnLoad() {
+		return defaultResetOnLoad;
 	}
 
 	public void setDefaultResetOnLoad(boolean defaultResetOnLoad) {
 		this.defaultResetOnLoad = defaultResetOnLoad;
 	}
 
-	public boolean isDefaultResetOnLoad() {
-		return this.defaultResetOnLoad;
+	public boolean isDefaultResetOnUnload() {
+		return defaultResetOnUnload;
 	}
 
 	public void setDefaultResetOnUnload(boolean defaultResetOnUnload) {
 		this.defaultResetOnUnload = defaultResetOnUnload;
 	}
 
-	public boolean isDefaultResetOnUnload() {
-		return this.defaultResetOnUnload;
+	public String getDefaultSpawnStyle() {
+		return defaultSpawnStyle;
+	}
+
+	public void setDefaultSpawnStyle(String defaultSpawnStyle) {
+		this.defaultSpawnStyle = defaultSpawnStyle;
+	}
+
+	public HashMap<String, InventoryStash> getDisconnected() {
+		return this.disconnected;
+	}
+
+	public void setDisconnected(HashMap<String, InventoryStash> disconnected) {
+		this.disconnected = disconnected;
 	}
 }

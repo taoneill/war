@@ -69,17 +69,17 @@ public class Warzone {
 	public Warzone(World world, String name) {
 		this.world = world;
 		this.name = name;
-		this.friendlyFire = War.war.getDefaultFriendlyFire();
+		this.friendlyFire = War.war.isDefaultFriendlyFire();
 		this.setLifePool(War.war.getDefaultLifepool());
 		this.setLoadout(War.war.getDefaultLoadout());
-		this.setAutoAssignOnly(War.war.getDefaultAutoAssignOnly());
+		this.setAutoAssignOnly(War.war.isDefaultAutoAssignOnly());
 		this.teamCap = War.war.getDefaultTeamCap();
 		this.scoreCap = War.war.getDefaultScoreCap();
 		this.monumentHeal = War.war.getDefaultMonumentHeal();
 		this.setBlockHeads(War.war.isDefaultBlockHeads());
 		this.setDropLootOnDeath(War.war.isDefaultDropLootOnDeath());
 		this.setUnbreakableZoneBlocks(War.war.isDefaultUnbreakableZoneBlocks());
-		this.setNoCreatures(War.war.getDefaultNoCreatures());
+		this.setNoCreatures(War.war.isDefaultNoCreatures());
 		this.setResetOnEmpty(War.war.isDefaultResetOnEmpty());
 		this.setResetOnLoad(War.war.isDefaultResetOnLoad());
 		this.setResetOnUnload(War.war.isDefaultResetOnUnload());

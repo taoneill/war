@@ -216,10 +216,10 @@ public class WarMapper {
 		warConfig.setInt("defaultMonumentHeal", War.war.getDefaultMonumentHeal());
 
 		// defaultFriendlyFire
-		warConfig.setBoolean("defaultFriendlyFire", War.war.getDefaultFriendlyFire());
+		warConfig.setBoolean("defaultFriendlyFire", War.war.isDefaultFriendlyFire());
 
 		// defaultAutoAssignOnly
-		warConfig.setBoolean("defaultAutoAssignOnly", War.war.getDefaultAutoAssignOnly());
+		warConfig.setBoolean("defaultAutoAssignOnly", War.war.isDefaultAutoAssignOnly());
 
 		// defaultTeamCap
 		warConfig.setInt("defaultTeamCap", War.war.getDefaultTeamCap());
