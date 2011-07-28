@@ -83,11 +83,19 @@ public class War extends JavaPlugin {
 		War.war = this;
 	}
 
+	/**
+	 * @see JavaPlugin.onEnable()
+	 * @see War.loadWar()
+	 */
 	public void onEnable() {
 		War.war = this;
 		this.loadWar();
 	}
 
+	/**
+	 * @see JavaPlugin.onDisable()
+	 * @see War.unloadWar()
+	 */
 	public void onDisable() {
 		this.unloadWar();
 	}
@@ -169,7 +177,7 @@ public class War extends JavaPlugin {
 	 * Handles war commands
 	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-		return this.commandHandler.handle(sender, cmd, commandLabel, args);
+		return this.commandHandler.handle(sender, cmd, args);
 
 		/*
 		if (this.isZoneMaker(player)) {

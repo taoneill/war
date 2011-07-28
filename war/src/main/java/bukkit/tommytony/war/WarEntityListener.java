@@ -34,7 +34,7 @@ public class WarEntityListener extends EntityListener {
 	/**
 	 * Handles PVP-Damage
 	 *
-	 * @param event	fired event
+	 * @param	event	fired event
 	 */
 	private void handlerAttackDefend(EntityDamageByEntityEvent event) {
 		Entity attacker = event.getDamager();
@@ -132,28 +132,30 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Protects important structures from explosions
+	 *
+	 * @see	EntityListener.onEntityExplode()
 	 */
 	@Override
 	public void onEntityExplode(EntityExplodeEvent event) {
-		if (War.war.isLoaded()) {
-			// protect zones elements, lobbies and warhub from creepers
-			List<Block> explodedBlocks = event.blockList();
-			for (Block block : explodedBlocks) {
-				if (War.war.getWarHub() != null && War.war.getWarHub().getVolume().contains(block)) {
+		if (!War.war.isLoaded()) return;
+		// protect zones elements, lobbies and warhub from creepers
+		List<Block> explodedBlocks = event.blockList();
+		for (Block block : explodedBlocks) {
+			if (War.war.getWarHub() != null && War.war.getWarHub().getVolume().contains(block)) {
+				event.setCancelled(true);
+				War.war.log("Explosion prevented at warhub.", Level.INFO);
+				return;
+			}
+
+			for (Warzone zone : War.war.getWarzones()) {
+				if (zone.isImportantBlock(block)) {
 					event.setCancelled(true);
-					War.war.log("Explosion prevented at warhub.", Level.INFO);
+					War.war.log("Explosion prevented in zone " + zone.getName() + ".", Level.INFO);
 					return;
-				}
-				for (Warzone zone : War.war.getWarzones()) {
-					if (zone.isImportantBlock(block)) {
-						event.setCancelled(true);
-						War.war.log("Explosion prevented in zone " + zone.getName() + ".", Level.INFO);
-						return;
-					} else if (zone.getLobby() != null && zone.getLobby().getVolume().contains(block)) {
-						event.setCancelled(true);
-						War.war.log("Explosion prevented at zone " + zone.getName() + " lobby.", Level.INFO);
-						return;
-					}
+				} else if (zone.getLobby() != null && zone.getLobby().getVolume().contains(block)) {
+					event.setCancelled(true);
+					War.war.log("Explosion prevented at zone " + zone.getName() + " lobby.", Level.INFO);
+					return;
 				}
 			}
 		}
@@ -161,89 +163,93 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Handles damage on Players
+	 *
+	 * @see	EntityListener.onEntityDamage()
 	 */
 	@Override
 	public void onEntityDamage(EntityDamageEvent event) {
-		if (War.war.isLoaded()) {
-			Entity entity = event.getEntity();
-			if (!(entity instanceof Player)) {
-				return;
-			}
-			Player player = (Player) entity;
+		if (!War.war.isLoaded()) return;
 
-			// prevent godmode
-			if (Warzone.getZoneByPlayerName(player.getName()) != null) {
-				event.setCancelled(false);
-			}
+		Entity entity = event.getEntity();
+		if (!(entity instanceof Player)) {
+			return;
+		}
+		Player player = (Player) entity;
 
-			// pass pvp-damage
-			if (event instanceof EntityDamageByEntityEvent || event instanceof EntityDamageByProjectileEvent) {
-				this.handlerAttackDefend((EntityDamageByEntityEvent) event);
-			} else {
-				// Detect death, prevent it and respawn the player
-				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
-				if (zone != null && event.getDamage() >= player.getHealth()) {
-					String deathMessage = "";
-					deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getDisplayName() + ChatColor.WHITE + " died";
-					for (Team team : zone.getTeams()) {
-						team.teamcast(deathMessage);
-					}
-					zone.handleDeath(player);
-					event.setCancelled(true);
+		// prevent godmode
+		if (Warzone.getZoneByPlayerName(player.getName()) != null) {
+			event.setCancelled(false);
+		}
+
+		// pass pvp-damage
+		if (event instanceof EntityDamageByEntityEvent || event instanceof EntityDamageByProjectileEvent) {
+			this.handlerAttackDefend((EntityDamageByEntityEvent) event);
+		} else {
+			// Detect death, prevent it and respawn the player
+			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+			if (zone != null && event.getDamage() >= player.getHealth()) {
+				String deathMessage = "";
+				deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getDisplayName() + ChatColor.WHITE + " died";
+				for (Team team : zone.getTeams()) {
+					team.teamcast(deathMessage);
 				}
+				zone.handleDeath(player);
+				event.setCancelled(true);
 			}
 		}
 	}
 
 	@Override
 	public void onEntityCombust(EntityCombustEvent event) {
-		if (War.war.isLoaded()) {
-			Entity entity = event.getEntity();
-			if (entity instanceof Player) {
-				Player player = (Player) entity;
-				Team team = Team.getTeamByPlayerName(player.getName());
-				if (team != null && team.getSpawnVolume().contains(player.getLocation())) {
-					// smother out the fire that didn't burn out when you respawned
-					// Stop fire (upcast, watch out!)
-					if (player instanceof CraftPlayer) {
-						net.minecraft.server.Entity playerEntity = ((CraftPlayer) player).getHandle();
-						playerEntity.fireTicks = 0;
-					}
-					event.setCancelled(true);
+		if (!War.war.isLoaded()) return;
+		Entity entity = event.getEntity();
+		if (entity instanceof Player) {
+			Player player = (Player) entity;
+			Team team = Team.getTeamByPlayerName(player.getName());
+			if (team != null && team.getSpawnVolume().contains(player.getLocation())) {
+				// smother out the fire that didn't burn out when you respawned
+				// Stop fire (upcast, watch out!)
+				if (player instanceof CraftPlayer) {
+					net.minecraft.server.Entity playerEntity = ((CraftPlayer) player).getHandle();
+					playerEntity.fireTicks = 0;
 				}
+				event.setCancelled(true);
 			}
 		}
 	}
 
 	/**
 	 * Prevents creatures from spawning in warzones if no creatures is active
+	 *
+	 * @see	EntityListener.onCreatureSpawn()
 	 */
 	@Override
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
-		if (War.war.isLoaded()) {
-			Location location = event.getLocation();
-			Warzone zone = Warzone.getZoneByLocation(location);
-			if (zone != null && zone.isNoCreatures()) {
-				event.setCancelled(true);
-				// war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
-			}
+		if (!War.war.isLoaded()) return;
+
+		Location location = event.getLocation();
+		Warzone zone = Warzone.getZoneByLocation(location);
+		if (zone != null && zone.isNoCreatures()) {
+			event.setCancelled(true);
+			// war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
 		}
 	}
 
 	/**
 	 * Prevents health regaining caused by peaceful mode
+	 *
+	 * @see	EntityListener.onEntityRegainHealth()
 	 */
 	@Override
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-		if (War.war.isLoaded() && event.getRegainReason() == RegainReason.REGEN) {
-			Entity entity = event.getEntity();
-			if (entity instanceof Player) {
-				Player player = (Player) entity;
-				Warzone zone = Warzone.getZoneByLocation(player);
-				if (zone != null) {
-					event.setCancelled(true);
-				}
-			}
+		if (!War.war.isLoaded() || event.getRegainReason() != RegainReason.REGEN) return;
+		Entity entity = event.getEntity();
+		if (!(entity instanceof Player)) return;
+
+		Player player = (Player) entity;
+		Warzone zone = Warzone.getZoneByLocation(player);
+		if (zone != null) {
+			event.setCancelled(true);
 		}
 	}
 }

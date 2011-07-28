@@ -6,12 +6,22 @@ import org.bukkit.command.CommandSender;
 import bukkit.tommytony.war.command.*;
 
 /**
+ * Handles commands received by War
+ *
  * @author 	Tim Düsterhus
  * @package 	bukkit.tommytony.war
  */
 public class WarCommandHandler {
 
-	public boolean handle(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+	/**
+	 * Handles a command
+	 *
+	 * @param 	sender	The sender of the command
+	 * @param 	cmd	The command
+	 * @param 	args	The arguments
+	 * @return		Success
+	 */
+	public boolean handle(CommandSender sender, Command cmd, String[] args) {
 		String command = cmd.getName();
 		String[] arguments = null;
 
