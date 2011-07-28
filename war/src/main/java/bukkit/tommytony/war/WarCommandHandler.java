@@ -52,6 +52,9 @@ public class WarCommandHandler {
 			else if (command.equals("team")) {
 				commandObj = new TeamCommand(this, sender, arguments);
 			}
+			else if (command.equals("setzone")) {
+				commandObj = new SetZoneCommand(this, sender, arguments);
+			}
 			else if (command.equals("deletezone")) {
 				commandObj = new DeleteZoneCommand(this, sender, arguments);
 			}

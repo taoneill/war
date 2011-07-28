@@ -178,9 +178,7 @@ public class War extends JavaPlugin {
 		/*
 		if (this.isZoneMaker(player)) {
 			// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
-			if (command.equals("setzone")) {
-				this.performSetZone(player, arguments);
-			} else if (command.equals("setzonelobby")) {
+			if (command.equals("setzonelobby")) {
 				this.performSetZoneLobby(player, arguments);
 			} else if (command.equals("savezone")) {
 				this.performSaveZone(player, arguments);
@@ -444,30 +442,6 @@ public class War extends JavaPlugin {
 					this.msg(player, "Warzone lobby moved to your location.");
 				}
 				WarzoneMapper.save(warzone, false);
-			}
-		}
-	}
-
-	public void performSetZone(Player player, String[] arguments) {
-		if (arguments.length < 2 || arguments.length > 2 || (arguments.length == 2 && (!arguments[1].equals("southeast") && !arguments[1].equals("northwest") && !arguments[1].equals("se") && !arguments[1].equals("nw") && !arguments[1].equals("corner1") && !arguments[1].equals("corner2") && !arguments[1].equals("c1") && !arguments[1].equals("c2") && !arguments[1].equals("pos1") && !arguments[1].equals("pos2") && !arguments[1].equals("wand")))) {
-			if (arguments.length == 1) {
-				// we only have a zone name, default to wand mode
-				this.addWandBearer(player, arguments[0]);
-			} else {
-				this.badMsg(player, "Usage: =<Classic mode>= /setzone <warzone-name> <'northwest'/'southeast'/'nw'/'se'> (NW defaults to top block, SE to bottom). " + "=<Wand Cuboid mode>= /setzone <warzone-name> wand (gives you a wooden sword to right and left click, drop to disable). " + "=<Wandless Cuboid mode>= /setzone <warzone-name> <'corner1'/'corner2'/'c1'/'c2'/'pos1'/'pos2'> (block where you're standing). " + "Set one corner, then the next. Defines the outline of the warzone, which will be reset at the start of every battle. " + "Saves the zone blocks if the outline is valid.");
-			}
-		} else {
-			ZoneSetter setter = new ZoneSetter(player, arguments[0]);
-			if (arguments[1].equals("northwest") || arguments[1].equals("nw")) {
-				setter.placeNorthwest();
-			} else if (arguments[1].equals("southeast") || arguments[1].equals("se")) {
-				setter.placeSoutheast();
-			} else if (arguments[1].equals("corner1") || arguments[1].equals("c1") || arguments[1].equals("pos1")) {
-				setter.placeCorner1();
-			} else if (arguments[1].equals("corner2") || arguments[1].equals("c2") || arguments[1].equals("pos2")) {
-				setter.placeCorner2();
-			} else if (arguments[1].equals("wand")) {
-				this.addWandBearer(player, arguments[0]);
 			}
 		}
 	}
