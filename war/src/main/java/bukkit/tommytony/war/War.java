@@ -11,7 +11,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -178,9 +177,7 @@ public class War extends JavaPlugin {
 		/*
 		if (this.isZoneMaker(player)) {
 			// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
-			if (command.equals("setzonelobby")) {
-				this.performSetZoneLobby(player, arguments);
-			} else if (command.equals("savezone")) {
+			if (command.equals("savezone")) {
 				this.performSaveZone(player, arguments);
 			} else if (command.equals("setzoneconfig") || command.equals("zonecfg")) {
 				this.performSetZoneConfig(player, arguments);
@@ -288,86 +285,6 @@ public class War extends JavaPlugin {
 			}
 
 			this.msg(player, "Warzone " + warzone.getName() + " initial state changed. Saved " + savedBlocks + " blocks.");
-		}
-	}
-
-	public void performSetZoneLobby(Player player, String[] arguments) {
-		String usageStr = "Usage: When inside a warzone - /setzonelobby <north/n/east/e/south/s/west/w>." + "Attaches the lobby to the specified zone wall. When outside a warzone - /setzonelobby <zonename>. " + "Moves the lobby to your current position.";
-		if (arguments.length < 1 || arguments.length > 1) {
-			this.badMsg(player, usageStr);
-		} else if (this.inAnyWarzone(player.getLocation()) || this.inAnyWarzoneLobby(player.getLocation())) {
-			// Inside a warzone: use the classic n/s/e/w mode
-			if (!arguments[0].equals("north") && !arguments[0].equals("n") && !arguments[0].equals("east") && !arguments[0].equals("e") && !arguments[0].equals("south") && !arguments[0].equals("s") && !arguments[0].equals("west") && !arguments[0].equals("w")) {
-				this.badMsg(player, usageStr);
-				return;
-			}
-			Warzone warzone = Warzone.getZoneByLocation(player);
-			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
-			if (warzone == null && lobby != null) {
-				warzone = lobby.getZone();
-			} else {
-				lobby = warzone.getLobby();
-			}
-			BlockFace wall = BlockFace.WEST;
-			String wallStr = "";
-			if (arguments[0].equals("north") || arguments[0].equals("n")) {
-				wall = BlockFace.NORTH;
-				wallStr = "north";
-			} else if (arguments[0].equals("east") || arguments[0].equals("e")) {
-				wall = BlockFace.EAST;
-				wallStr = "east";
-			} else if (arguments[0].equals("south") || arguments[0].equals("s")) {
-				wall = BlockFace.SOUTH;
-				wallStr = "south";
-			} else if (arguments[0].equals("west") || arguments[0].equals("w")) {
-				wall = BlockFace.WEST;
-				wallStr = "west";
-			}
-			if (lobby != null) {
-				// reset existing lobby
-				lobby.getVolume().resetBlocks();
-				lobby.setWall(wall);
-				lobby.initialize();
-				this.msg(player, "Warzone lobby moved to " + wallStr + " side of zone.");
-			} else {
-				// new lobby
-				lobby = new ZoneLobby(warzone, wall);
-				warzone.setLobby(lobby);
-				lobby.initialize();
-				if (this.warHub != null) { // warhub has to change
-					this.warHub.getVolume().resetBlocks();
-					this.warHub.initialize();
-				}
-				this.msg(player, "Warzone lobby created on " + wallStr + "side of zone.");
-			}
-			WarzoneMapper.save(warzone, false);
-		} else {
-			// Not in a warzone: set the lobby position to where the player is standing
-			Warzone warzone = Warzone.getZoneByName(arguments[0]);
-			if (warzone == null) {
-				this.badMsg(player, "No warzone matches " + arguments[0] + ".");
-			} else {
-				// Move the warzone lobby
-				ZoneLobby lobby = warzone.getLobby();
-				if (lobby != null) {
-					// reset existing lobby
-					lobby.getVolume().resetBlocks();
-					lobby.setLocation(player.getLocation());
-					lobby.initialize();
-					this.msg(player, "Warzone lobby moved to your location.");
-				} else {
-					// new lobby
-					lobby = new ZoneLobby(warzone, player.getLocation());
-					warzone.setLobby(lobby);
-					lobby.initialize();
-					if (this.warHub != null) { // warhub has to change
-						this.warHub.getVolume().resetBlocks();
-						this.warHub.initialize();
-					}
-					this.msg(player, "Warzone lobby moved to your location.");
-				}
-				WarzoneMapper.save(warzone, false);
-			}
 		}
 	}
 

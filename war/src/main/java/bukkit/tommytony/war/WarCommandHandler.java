@@ -36,68 +36,49 @@ public class WarCommandHandler {
 		try {
 			if (command.equals("zones") || command.equals("warzones")) {
 				commandObj = new WarzonesCommand(this, sender, arguments);
-			}
-			else if (command.equals("zone") || command.equals("warzone")) {
+			} else if (command.equals("zone") || command.equals("warzone")) {
 				commandObj = new WarzoneCommand(this, sender, arguments);
-			}
-			else if (command.equals("teams")) {
+			} else if (command.equals("teams")) {
 				commandObj = new TeamsCommand(this, sender, arguments);
-			}
-			else if (command.equals("join")) {
+			} else if (command.equals("join")) {
 				commandObj = new JoinCommand(this, sender, arguments);
-			}
-			else if (command.equals("leave")) {
+			} else if (command.equals("leave")) {
 				commandObj = new LeaveCommand(this, sender, arguments);
-			}
-			else if (command.equals("team")) {
+			} else if (command.equals("team")) {
 				commandObj = new TeamCommand(this, sender, arguments);
-			}
-			else if (command.equals("setzone")) {
+			} else if (command.equals("setzone")) {
 				commandObj = new SetZoneCommand(this, sender, arguments);
-			}
-			else if (command.equals("deletezone")) {
+			} else if (command.equals("deletezone")) {
 				commandObj = new DeleteZoneCommand(this, sender, arguments);
-			}
-			else if (command.equals("resetzone")) {
+			} else if (command.equals("setzonelobby")) {
+				commandObj = new SetZoneLobbyCommand(this, sender, arguments);
+			} else if (command.equals("resetzone")) {
 				commandObj = new ResetZoneCommand(this, sender, arguments);
-			}
-			else if (command.equals("nextbattle")) {
+			} else if (command.equals("nextbattle")) {
 				commandObj = new NextBattleCommand(this, sender, arguments);
-			}
-			else if (command.equals("setteam")) {
+			} else if (command.equals("setteam")) {
 				commandObj = new SetTeamCommand(this, sender, arguments);
-			}
-			else if (command.equals("deleteteam")) {
+			} else if (command.equals("deleteteam")) {
 				commandObj = new DeleteTeamCommand(this, sender, arguments);
-			}
-			else if (command.equals("teamflag")) {
+			} else if (command.equals("teamflag")) {
 				commandObj = new SetTeamFlagCommand(this, sender, arguments);
-			}
-			else if (command.equals("setmonument")) {
+			} else if (command.equals("setmonument")) {
 				commandObj = new SetMonumentCommand(this, sender, arguments);
-			}
-			else if (command.equals("deletemonument")) {
+			} else if (command.equals("deletemonument")) {
 				commandObj = new DeleteMonumentCommand(this, sender, arguments);
-			}
-			else if (command.equals("setwarhub")) {
+			} else if (command.equals("setwarhub")) {
 				commandObj = new SetWarHubCommand(this, sender, arguments);
-			}
-			else if (command.equals("deletewarhub")) {
+			} else if (command.equals("deletewarhub")) {
 				commandObj = new DeleteWarhubCommand(this, sender, arguments);
-			}
-			else if (command.equals("loadwar")) {
+			} else if (command.equals("loadwar")) {
 				commandObj = new LoadWarCommand(this, sender, arguments);
-			}
-			else if (command.equals("unloadwar")) {
+			} else if (command.equals("unloadwar")) {
 				commandObj = new UnloadWarCommand(this, sender, arguments);
-			}
-			else if (command.equals("setwarconfig") || command.equals("warcfg")) {
+			} else if (command.equals("setwarconfig") || command.equals("warcfg")) {
 				commandObj = new SetWarConfigCommand(this, sender, arguments);
-			}
-			else if (command.equals("zonemaker") || command.equals("zm")) {
+			} else if (command.equals("zonemaker") || command.equals("zm")) {
 				commandObj = new ZoneMakerCommand(this, sender, arguments);
-			}
-			else {
+			} else {
 				// we are not responsible for this command
 				return true;
 			}

@@ -73,5 +73,4 @@ public class ZoneMakerCommand extends AbstractWarCommand {
 
 		return true;
 	}
-
 }
