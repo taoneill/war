@@ -7,6 +7,7 @@ import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.WarMapper;
 
+import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 

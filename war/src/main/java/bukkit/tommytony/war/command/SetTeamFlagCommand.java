@@ -10,6 +10,7 @@ import com.tommytony.war.TeamKinds;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.WarzoneMapper;
 
+import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.WarCommandHandler;
 
 public class SetTeamFlagCommand extends AbstractZoneMakerCommand {

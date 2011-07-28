@@ -184,11 +184,7 @@ public class War extends JavaPlugin {
 				this.performSaveZone(player, arguments);
 			} else if (command.equals("setzoneconfig") || command.equals("zonecfg")) {
 				this.performSetZoneConfig(player, arguments);
-			} else if (command.equals("zonemaker") || command.equals("zm")) {
-				this.performZonemakerAsZonemaker(player, arguments);
 			}
-		} else if (command.equals("zonemaker") || command.equals("zm")) {
-			this.performZonemakerAsPlayer(player);
 		}
 		return true;
 		*/
@@ -229,77 +225,6 @@ public class War extends JavaPlugin {
 	 */
 	private void inventoryToLoadout(Player player, HashMap<Integer, ItemStack> loadout) {
 		this.inventoryToLoadout(player.getInventory(), loadout);
-	}
-
-	public void performZonemakerAsPlayer(Player player) {
-		boolean wasImpersonating = false;
-		for (String name : this.getZoneMakersImpersonatingPlayers()) {
-			if (player.getName().equals(name)) {
-				wasImpersonating = true;
-			}
-		}
-		if (wasImpersonating) {
-			this.getZoneMakersImpersonatingPlayers().remove(player.getName());
-			this.msg(player, "You are back as a zone maker.");
-		}
-		WarMapper.save();
-	}
-
-	public void performZonemakerAsZonemaker(Player player, String[] arguments) {
-		if (arguments.length > 2) {
-			this.badMsg(player, "Usage: /zonemaker <player-name>, /zonemaker" + "Elevates the player to zone maker or removes his rights. " + "If you are already a zonemaker, you can toggle between player and zone maker modes by using the command without arguments.");
-		} else {
-			if (arguments.length == 1) {
-				// make someone zonemaker or remove the right
-				if (this.zoneMakerNames.contains(arguments[0])) {
-					// kick
-					this.zoneMakerNames.remove(arguments[0]);
-					this.msg(player, arguments[0] + " is not a zone maker anymore.");
-					Player kickedMaker = this.getServer().getPlayer(arguments[0]);
-					if (kickedMaker != null) {
-						this.msg(kickedMaker, player.getName() + " took away your warzone maker priviledges.");
-					}
-				} else {
-					// add
-					this.zoneMakerNames.add(arguments[0]);
-					this.msg(player, arguments[0] + " is now a zone maker.");
-					Player newMaker = this.getServer().getPlayer(arguments[0]);
-					if (newMaker != null) {
-						this.msg(newMaker, player.getName() + " made you warzone maker.");
-					}
-				}
-			} else {
-				// toggle to player mode
-				if (this.isZoneMaker(player)) {
-					this.getZoneMakersImpersonatingPlayers().add(player.getName());
-				}
-				this.msg(player, "You are now impersonating a regular player. Type /zonemaker again to toggle back to war maker mode.");
-			}
-
-			WarMapper.save();
-		}
-	}
-
-	public void performSetMonument(Player player, String[] arguments) {
-		if (!this.inAnyWarzone(player.getLocation()) || arguments.length < 1 || arguments.length > 1 || (arguments.length == 1 && Warzone.getZoneByLocation(player) != null && arguments[0].equals(Warzone.getZoneByLocation(player).getName()))) {
-			this.badMsg(player, "Usage: /setmonument <name>. Creates or moves a monument. Monument can't have same name as zone. Must be in warzone.");
-		} else {
-			Warzone warzone = Warzone.getZoneByLocation(player);
-			String monumentName = arguments[0];
-			if (warzone.hasMonument(monumentName)) {
-				// move the existing monument
-				Monument monument = warzone.getMonument(monumentName);
-				monument.getVolume().resetBlocks();
-				monument.setLocation(player.getLocation());
-				this.msg(player, "Monument " + monument.getName() + " was moved.");
-			} else {
-				// create a new monument
-				Monument monument = new Monument(arguments[0], warzone, player.getLocation());
-				warzone.getMonuments().add(monument);
-				this.msg(player, "Monument " + monument.getName() + " created.");
-			}
-			WarzoneMapper.save(warzone, false);
-		}
 	}
 
 	public void performSetZoneConfig(Player player, String[] arguments) {
@@ -707,6 +632,71 @@ public class War extends JavaPlugin {
 		return null;
 	}
 
+	public boolean canPlayWar(Player player) {
+		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.player") || War.permissionHandler.has(player, "War.player"))) {
+			return true;
+		}
+		if (War.permissionHandler == null) {
+			// w/o Permissions, everyone can play
+			return true;
+		}
+		return false;
+	}
+
+	public boolean canWarp(Player player) {
+		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.warp") || War.permissionHandler.has(player, "War.warp"))) {
+			return true;
+		}
+		if (War.permissionHandler == null) {
+			// w/o Permissions, everyone can warp
+			return true;
+		}
+		return false;
+	}
+
+	public boolean canBuildOutsideZone(Player player) {
+		if (this.isBuildInZonesOnly()) {
+			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.build") || War.permissionHandler.has(player, "War.build"))) {
+				return true;
+			}
+			// w/o Permissions, if buildInZonesOnly, no one can build outside the zone except Zonemakers
+			return this.isZoneMaker(player);
+		} else {
+			return true;
+		}
+	}
+
+	public boolean canPvpOutsideZones(Player player) {
+		if (this.isPvpInZonesOnly()) {
+			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.pvp") || War.permissionHandler.has(player, "War.pvp"))) {
+				return true;
+			}
+			// w/o Permissions, if pvpInZoneOnly, no one can pvp outside the zone
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	public boolean isZoneMaker(Player player) {
+		for (String disguised : this.zoneMakersImpersonatingPlayers) {
+			if (disguised.equals(player.getName())) {
+				return false;
+			}
+		}
+
+		for (String zoneMaker : this.zoneMakerNames) {
+			if (zoneMaker.equals(player.getName())) {
+				return true;
+			}
+		}
+		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "War.*"))) {
+			return true;
+		} else {
+			return player.isOp();
+		}
+	}
+
 	public void addWandBearer(Player player, String zoneName) {
 		if (this.wandBearers.containsKey(player.getName())) {
 			String alreadyHaveWand = this.wandBearers.get(player.getName());
@@ -805,73 +795,7 @@ public class War extends JavaPlugin {
 		return this.commandWhitelist;
 	}
 
-	public boolean canPlayWar(Player player) {
-		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.player") || War.permissionHandler.has(player, "War.player"))) {
-			return true;
-		}
-		if (War.permissionHandler == null) {
-			// w/o Permissions, everyone can play
-			return true;
-		}
-		return false;
-	}
-
-	public boolean canWarp(Player player) {
-		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.warp") || War.permissionHandler.has(player, "War.warp"))) {
-			return true;
-		}
-		if (War.permissionHandler == null) {
-			// w/o Permissions, everyone can warp
-			return true;
-		}
-		return false;
-	}
-
-	public boolean canBuildOutsideZone(Player player) {
-		if (this.isBuildInZonesOnly()) {
-			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.build") || War.permissionHandler.has(player, "War.build"))) {
-				return true;
-			}
-			// w/o Permissions, if buildInZonesOnly, no one can build outside the zone except Zonemakers
-			return this.isZoneMaker(player);
-		} else {
-			return true;
-		}
-	}
-
-	public boolean canPvpOutsideZones(Player player) {
-		if (this.isPvpInZonesOnly()) {
-			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.pvp") || War.permissionHandler.has(player, "War.pvp"))) {
-				return true;
-			}
-			// w/o Permissions, if pvpInZoneOnly, no one can pvp outside the zone
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	public boolean isZoneMaker(Player player) {
-		for (String disguised : this.zoneMakersImpersonatingPlayers) {
-			if (disguised.equals(player.getName())) {
-				return false;
-			}
-		}
-
-		for (String zoneMaker : this.zoneMakerNames) {
-			if (zoneMaker.equals(player.getName())) {
-				return true;
-			}
-		}
-		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "War.*"))) {
-			return true;
-		} else {
-			return player.isOp();
-		}
-	}
-
 	public boolean getDefaultAutoAssignOnly() {
-
 		return this.defaultAutoAssignOnly;
 	}
 
@@ -892,16 +816,6 @@ public class War extends JavaPlugin {
 			return false;
 		}
 		return true;
-	}
-
-	public boolean inWarzoneLobby(String warzoneName, Location location) {
-		ZoneLobby currentLobby = ZoneLobby.getLobbyByLocation(location);
-		if (currentLobby == null) {
-			return false;
-		} else if (warzoneName.toLowerCase().equals(currentLobby.getZone().getName().toLowerCase())) {
-			return true;
-		}
-		return false;
 	}
 
 	public void setDefaultTeamCap(int defaultTeamCap) {

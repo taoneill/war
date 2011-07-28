@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
+
+import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 

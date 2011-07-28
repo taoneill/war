@@ -10,6 +10,7 @@ import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
 
+import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 

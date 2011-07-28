@@ -94,12 +94,15 @@ public class WarCommandHandler {
 			else if (command.equals("setwarconfig") || command.equals("warcfg")) {
 				commandObj = new SetWarConfigCommand(this, sender, arguments);
 			}
+			else if (command.equals("zonemaker") || command.equals("zm")) {
+				commandObj = new ZoneMakerCommand(this, sender, arguments);
+			}
 			else {
 				// we are not responsible for this command
 				return true;
 			}
 		}
-		catch (AbstractZoneMakerCommand.NoZoneMakerException e) {
+		catch (NoZoneMakerException e) {
 			sender.sendMessage("You can't do this if you are not a warzone maker.");
 			return true;
 		}

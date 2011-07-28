@@ -2,6 +2,7 @@ package bukkit.tommytony.war.command;
 
 import org.bukkit.command.CommandSender;
 
+import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
