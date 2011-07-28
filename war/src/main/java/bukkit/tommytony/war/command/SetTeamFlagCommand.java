@@ -12,8 +12,8 @@ import com.tommytony.war.mappers.WarzoneMapper;
 
 import bukkit.tommytony.war.WarCommandHandler;
 
-public class SetteamflagCommand extends AbstractZoneMakerCommand {
-	public SetteamflagCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+public class SetTeamFlagCommand extends AbstractZoneMakerCommand {
+	public SetTeamFlagCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
 		super(handler, sender, args);
 	}
 

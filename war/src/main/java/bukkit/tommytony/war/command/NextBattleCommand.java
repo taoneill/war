@@ -3,27 +3,22 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.tommytony.war.Monument;
+import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.mappers.WarzoneMapper;
-
 import bukkit.tommytony.war.WarCommandHandler;
 
-public class DeletemonumentCommand extends AbstractZoneMakerCommand {
-	public DeletemonumentCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+public class NextBattleCommand extends AbstractZoneMakerCommand {
+	public NextBattleCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
 		super(handler, sender, args);
 	}
 
 	@Override
 	public boolean handle() {
 		Warzone zone;
-		if (this.args.length == 0) {
-			return false;
-		} else if (this.args.length == 2) {
+		if (this.args.length == 1) {
 			zone = Warzone.getZoneByName(this.args[0]);
-			this.args[0] = this.args[1];
-		} else if (this.args.length == 1) {
+		} else if (this.args.length == 0) {
 			if (!(this.sender instanceof Player)) {
 				return false;
 			}
@@ -40,15 +35,12 @@ public class DeletemonumentCommand extends AbstractZoneMakerCommand {
 			return false;
 		}
 
-		Monument monument = zone.getMonument(this.args[0]);
-		if (monument != null) {
-			monument.getVolume().resetBlocks();
-			zone.getMonuments().remove(monument);
-			WarzoneMapper.save(zone, false);
-			this.msg("Monument " + monument.getName() + " removed.");
-		} else {
-			this.msg("No such monument.");
+		zone.clearFlagThieves();
+		for (Team team : zone.getTeams()) {
+			team.teamcast("The battle was interrupted. " + zone.getTeamInformation() + " Resetting warzone " + zone.getName() + " and life pools...");
 		}
+		zone.getVolume().resetBlocksAsJob();
+		zone.initializeZoneAsJob();
 
 		return true;
 	}

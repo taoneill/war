@@ -11,8 +11,8 @@ import com.tommytony.war.mappers.WarMapper;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
-public class DeletewarhubCommand extends AbstractZoneMakerCommand {
-	public DeletewarhubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+public class DeleteWarhubCommand extends AbstractZoneMakerCommand {
+	public DeleteWarhubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
 		super(handler, sender, args);
 	}
 

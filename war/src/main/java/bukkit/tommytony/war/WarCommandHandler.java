@@ -53,43 +53,43 @@ public class WarCommandHandler {
 				commandObj = new TeamCommand(this, sender, arguments);
 			}
 			else if (command.equals("deletezone")) {
-				commandObj = new DeletezoneCommand(this, sender, arguments);
+				commandObj = new DeleteZoneCommand(this, sender, arguments);
 			}
 			else if (command.equals("resetzone")) {
-				commandObj = new ResetzoneCommand(this, sender, arguments);
+				commandObj = new ResetZoneCommand(this, sender, arguments);
 			}
 			else if (command.equals("nextbattle")) {
-				commandObj = new NextbattleCommand(this, sender, arguments);
+				commandObj = new NextBattleCommand(this, sender, arguments);
 			}
 			else if (command.equals("setteam")) {
-				commandObj = new SetteamCommand(this, sender, arguments);
+				commandObj = new SetTeamCommand(this, sender, arguments);
 			}
 			else if (command.equals("deleteteam")) {
-				commandObj = new DeleteteamCommand(this, sender, arguments);
+				commandObj = new DeleteTeamCommand(this, sender, arguments);
 			}
 			else if (command.equals("teamflag")) {
-				commandObj = new SetteamflagCommand(this, sender, arguments);
+				commandObj = new SetTeamFlagCommand(this, sender, arguments);
 			}
 			else if (command.equals("setmonument")) {
-				commandObj = new SetmonumentCommand(this, sender, arguments);
+				commandObj = new SetMonumentCommand(this, sender, arguments);
 			}
 			else if (command.equals("deletemonument")) {
-				commandObj = new DeletemonumentCommand(this, sender, arguments);
+				commandObj = new DeleteMonumentCommand(this, sender, arguments);
 			}
 			else if (command.equals("setwarhub")) {
-				commandObj = new SetwarhubCommand(this, sender, arguments);
+				commandObj = new SetWarHubCommand(this, sender, arguments);
 			}
 			else if (command.equals("deletewarhub")) {
-				commandObj = new DeletewarhubCommand(this, sender, arguments);
+				commandObj = new DeleteWarhubCommand(this, sender, arguments);
 			}
 			else if (command.equals("loadwar")) {
-				commandObj = new LoadwarCommand(this, sender, arguments);
+				commandObj = new LoadWarCommand(this, sender, arguments);
 			}
 			else if (command.equals("unloadwar")) {
-				commandObj = new UnloadwarCommand(this, sender, arguments);
+				commandObj = new UnloadWarCommand(this, sender, arguments);
 			}
 			else if (command.equals("setwarconfig") || command.equals("warcfg")) {
-				commandObj = new SetwarconfigCommand(this, sender, arguments);
+				commandObj = new SetWarConfigCommand(this, sender, arguments);
 			}
 			else {
 				// we are not responsible for this command

@@ -5,8 +5,8 @@ import org.bukkit.command.CommandSender;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
-public class UnloadwarCommand extends AbstractZoneMakerCommand {
-	public UnloadwarCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+public class LoadWarCommand extends AbstractZoneMakerCommand {
+	public LoadWarCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
 		super(handler, sender, args);
 	}
 
@@ -15,8 +15,7 @@ public class UnloadwarCommand extends AbstractZoneMakerCommand {
 		if (this.args.length != 0) {
 			return false;
 		}
-
-		War.war.unloadWar();
+		War.war.loadWar();
 
 		return true;
 	}

@@ -10,8 +10,8 @@ import com.tommytony.war.mappers.WarMapper;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
-public class SetwarhubCommand extends AbstractZoneMakerCommand {
-	public SetwarhubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+public class SetWarHubCommand extends AbstractZoneMakerCommand {
+	public SetWarHubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
 		super(handler, sender, args);
 	}
 

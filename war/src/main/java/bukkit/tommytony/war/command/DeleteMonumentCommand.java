@@ -3,16 +3,15 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.tommytony.war.Team;
-import com.tommytony.war.TeamKinds;
+import com.tommytony.war.Monument;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.WarzoneMapper;
 
 import bukkit.tommytony.war.WarCommandHandler;
 
-public class DeleteteamCommand extends AbstractZoneMakerCommand {
-	public DeleteteamCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+public class DeleteMonumentCommand extends AbstractZoneMakerCommand {
+	public DeleteMonumentCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
 		super(handler, sender, args);
 	}
 
@@ -41,20 +40,14 @@ public class DeleteteamCommand extends AbstractZoneMakerCommand {
 			return false;
 		}
 
-		Team team = zone.getTeamByKind(TeamKinds.teamKindFromString(this.args[0]));
-		if (team != null) {
-			if (team.getFlagVolume() != null) {
-				team.getFlagVolume().resetBlocks();
-			}
-			team.getSpawnVolume().resetBlocks();
-			zone.getTeams().remove(team);
-			if (zone.getLobby() != null) {
-				zone.getLobby().initialize();
-			}
+		Monument monument = zone.getMonument(this.args[0]);
+		if (monument != null) {
+			monument.getVolume().resetBlocks();
+			zone.getMonuments().remove(monument);
 			WarzoneMapper.save(zone, false);
-			this.msg("Team " + team.getName() + " removed.");
+			this.msg("Monument " + monument.getName() + " removed.");
 		} else {
-			this.msg("No such team.");
+			this.msg("No such monument.");
 		}
 
 		return true;

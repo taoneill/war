@@ -9,8 +9,8 @@ import com.tommytony.war.ZoneLobby;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
-public class ResetzoneCommand extends AbstractZoneMakerCommand {
-	public ResetzoneCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+public class ResetZoneCommand extends AbstractZoneMakerCommand {
+	public ResetZoneCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
 		super(handler, sender, args);
 	}
 

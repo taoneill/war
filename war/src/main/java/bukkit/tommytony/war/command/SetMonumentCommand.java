@@ -9,8 +9,8 @@ import com.tommytony.war.mappers.WarzoneMapper;
 
 import bukkit.tommytony.war.WarCommandHandler;
 
-public class SetmonumentCommand extends AbstractZoneMakerCommand {
-	public SetmonumentCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+public class SetMonumentCommand extends AbstractZoneMakerCommand {
+	public SetMonumentCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
 		super(handler, sender, args);
 	}
 
