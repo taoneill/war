@@ -35,7 +35,7 @@ public class WarzonesCommand extends AbstractWarCommand {
 				for (Team team : warzone.getTeams()) {
 					playerTotal += team.getPlayers().size();
 				}
-				warzonesMessage += playerTotal + " players)";
+				warzonesMessage += playerTotal + " players) ";
 			}
 		}
 

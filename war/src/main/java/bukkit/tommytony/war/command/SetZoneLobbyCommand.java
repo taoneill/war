@@ -30,10 +30,9 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 		Warzone zone = Warzone.getZoneByLocation((Player) this.getSender());
 		if (zone == null) {
 			ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.getSender());
-			if (lobby == null) {
-				return false;
+			if (lobby != null) {
+				zone = lobby.getZone();
 			}
-			zone = lobby.getZone();
 		}
 
 		if (zone == null) {

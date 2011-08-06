@@ -48,7 +48,9 @@ public class WarCommandHandler {
 
 		AbstractWarCommand commandObj = null;
 		try {
-			if (command.equals("zones") || command.equals("warzones")) {
+			if (command.equals("warhub")) {
+				commandObj = new WarhubCommand(this, sender, arguments);
+			} else if (command.equals("zones") || command.equals("warzones")) {
 				commandObj = new WarzonesCommand(this, sender, arguments);
 			} else if (command.equals("zone") || command.equals("warzone")) {
 				commandObj = new WarzoneCommand(this, sender, arguments);
