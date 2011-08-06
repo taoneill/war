@@ -64,10 +64,10 @@ commands:
     description: War> Persists changes made to the warzone since the last save. Config can be set with named parameters.
     usage: Persists changes made to the warzone since the last save. Config can be set with named parameters. Provide a zone name if not standing in warzone or lobby.
         Ex - 
-        /savezone => Basic save, 
-        /savezone lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on disabled:on, 
-        /savezone loadout:default => sets the respawn inventory to your current items, 
-        /savezone reward:default => sets the winner's reward to your current items.
+        /savezone [zone-name] => Basic save - name optional if standing inside, 
+        /savezone [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on disabled:on, 
+        /savezone [zone-name] loadout:default => sets the respawn inventory to your current items, 
+        /savezone [zone-name] reward:default => sets the winner's reward to your current items.
   setzonelobby:
     description: War> Creates or changes the position of the warzone lobby.
     usage: Creates or changes the position of the warzone lobby.
@@ -117,16 +117,16 @@ commands:
     description: War> Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone.
     usage: Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone. Provide a zone name if not standing in warzone or lobby.
         Ex -
-        /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on,
-        /setzoneconfig loadout:default  =>  sets the respawn inventory to your current items,
-        /setzoneconfig reward:default  =>  sets the winner's reward to your current items
+        /setzoneconfig [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on,
+        /setzoneconfig [zone-name] loadout:default  =>  sets the respawn inventory to your current items,
+        /setzoneconfig [zone-name] reward:default  =>  sets the winner's reward to your current items
   zonecfg:
     description: War> Alias for /setzoneconfig
     usage: Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone. Provide a zone name if not standing in warzone or lobby.
         Ex -
-        /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on,
-        /setzoneconfig loadout:default  =>  sets the respawn inventory to your current items,
-        /setzoneconfig reward:default  =>  sets the winner's reward to your current items
+        /setzoneconfig [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on,
+        /setzoneconfig [zone-name] loadout:default  =>  sets the respawn inventory to your current items,
+        /setzoneconfig [zone-name] reward:default  =>  sets the winner's reward to your current items
   zonemaker:
     description: War> Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player.
     usage: Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player.

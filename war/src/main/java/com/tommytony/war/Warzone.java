@@ -85,12 +85,17 @@ public class Warzone {
 	}
 
 	public static Warzone getZoneByName(String name) {
+		Warzone bestGuess = null;
 		for (Warzone warzone : War.war.getWarzones()) {
-			if (warzone.getName().toLowerCase().startsWith(name.toLowerCase())) {
+			if (warzone.getName().toLowerCase().equals(name.toLowerCase())) {
+				// perfect match, return right away
 				return warzone;
+			} else if (warzone.getName().toLowerCase().startsWith(name.toLowerCase())) {
+				// prehaps there's a perfect match in the remaining zones, let's take this one aside 
+				bestGuess = warzone;
 			}
 		}
-		return null;
+		return bestGuess;
 	}
 
 	public static Warzone getZoneByLocation(Location location) {
@@ -933,6 +938,12 @@ public class Warzone {
 			// TODO: test if warhub sign give the correct info despite the jobs
 			War.war.getWarHub().resetZoneSign(this);
 		}
+	}
+
+	public String printConfig() {
+		String cfg = "Warzone " + this.getName() + " config: ";
+		
+		return null;
 	}
 
 	public void setBlockHeads(boolean blockHeads) {

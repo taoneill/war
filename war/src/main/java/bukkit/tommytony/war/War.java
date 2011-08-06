@@ -178,18 +178,6 @@ public class War extends JavaPlugin {
 	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		return this.commandHandler.handle(sender, cmd, args);
-
-		/*
-		if (this.isZoneMaker(player)) {
-			// Warzone maker commands: /setzone, /savezone, /setteam, /setmonument, /resetzone
-			if (command.equals("savezone")) {
-				this.performSaveZone(player, arguments);
-			} else if (command.equals("setzoneconfig") || command.equals("zonecfg")) {
-				this.performSetZoneConfig(player, arguments);
-			}
-		}
-		return true;
-		*/
 	}
 
 	/**
@@ -229,71 +217,7 @@ public class War extends JavaPlugin {
 		this.inventoryToLoadout(player.getInventory(), loadout);
 	}
 
-	public void performSetZoneConfig(Player player, String[] arguments) {
-		if ((!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) || arguments.length == 0) {
-			this.badMsg(player, "Usage: /setzoneconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on  " + "Please give at leaset one named parameter. Does not save the blocks of the warzone. Resets the zone with the new config. Must be in warzone.");
-		} else {
-			Warzone warzone = Warzone.getZoneByLocation(player);
-			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
-			if (warzone == null && lobby != null) {
-				warzone = lobby.getZone();
-			} else {
-				lobby = warzone.getLobby();
-			}
-			if (this.updateZoneFromNamedParams(warzone, player, arguments)) {
-				this.msg(player, "Saving config and resetting warzone " + warzone.getName() + ".");
-				WarzoneMapper.save(warzone, false);
-				warzone.getVolume().resetBlocks();
-				if (lobby != null) {
-					lobby.getVolume().resetBlocks();
-				}
-				warzone.initializeZone(); // bring back team spawns etc
-				this.msg(player, "Warzone config saved. Zone reset.");
-
-				if (this.warHub != null) { // maybe the zone was disabled/enabled
-					this.warHub.getVolume().resetBlocks();
-					this.warHub.initialize();
-				}
-			} else {
-				this.badMsg(player, "Failed to read named parameters.");
-			}
-		}
-	}
-
-	public void performSaveZone(Player player, String[] arguments) {
-		if (!this.inAnyWarzone(player.getLocation()) && !this.inAnyWarzoneLobby(player.getLocation())) {
-			this.badMsg(player, "Usage: /savezone lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on " + "All named params optional. Saves the blocks of the warzone (i.e. the current zone state will be reloaded at each battle start). Must be in warzone.");
-		} else {
-			Warzone warzone = Warzone.getZoneByLocation(player);
-			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
-			if (warzone == null && lobby != null) {
-				warzone = lobby.getZone();
-			} else {
-				lobby = warzone.getLobby();
-			}
-			this.msg(player, "Saving warzone " + warzone.getName() + ".");
-			int savedBlocks = warzone.saveState(true);
-			if (arguments.length > 0) {
-				// changed settings: must reinitialize with new settings
-				this.updateZoneFromNamedParams(warzone, player, arguments);
-				WarzoneMapper.save(warzone, true);
-				warzone.getVolume().resetBlocks();
-				if (lobby != null) {
-					lobby.getVolume().resetBlocks();
-				}
-				warzone.initializeZone(); // bring back team spawns etc
-
-				if (this.warHub != null) { // maybe the zone was disabled/enabled
-					this.warHub.getVolume().resetBlocks();
-					this.warHub.initialize();
-				}
-			}
-
-			this.msg(player, "Warzone " + warzone.getName() + " initial state changed. Saved " + savedBlocks + " blocks.");
-		}
-	}
-
-	private boolean updateZoneFromNamedParams(Warzone warzone, Player player, String[] arguments) {
+	public boolean updateZoneFromNamedParams(Warzone warzone, CommandSender commandSender, String[] arguments) {
 		try {
 			Map<String, String> namedParams = new HashMap<String, String>();
 			for (String namedPair : arguments) {
@@ -350,12 +274,7 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("nocreatures");
 				warzone.setNoCreatures(onOff.equals("on") || onOff.equals("true"));
 			}
-			if (namedParams.containsKey("loadout")) {
-				this.inventoryToLoadout(player, warzone.getLoadout());
-			}
-			if (namedParams.containsKey("reward")) {
-				this.inventoryToLoadout(player, warzone.getReward());
-			}
+			
 			if (namedParams.containsKey("resetonempty")) {
 				String onOff = namedParams.get("resetonempty");
 				warzone.setResetOnEmpty(onOff.equals("on") || onOff.equals("true"));
@@ -368,6 +287,15 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("resetonunload");
 				warzone.setResetOnUnload(onOff.equals("on") || onOff.equals("true"));
 			}
+			if (commandSender instanceof Player) {
+				Player player = (Player) commandSender;
+				if (namedParams.containsKey("loadout")) {
+					this.inventoryToLoadout(player, warzone.getLoadout());
+				}
+				if (namedParams.containsKey("reward")) {
+					this.inventoryToLoadout(player, warzone.getReward());
+				}
+			}
 
 			return true;
 		} catch (Exception e) {
@@ -375,7 +303,7 @@ public class War extends JavaPlugin {
 		}
 	}
 
-	public boolean updateFromNamedParams(Player player, String[] arguments) {
+	public boolean updateFromNamedParams(CommandSender commandSender, String[] arguments) {
 		try {
 			Map<String, String> namedParams = new HashMap<String, String>();
 			for (String namedPair : arguments) {
@@ -422,6 +350,8 @@ public class War extends JavaPlugin {
 					this.setDefaultSpawnStyle(spawnStyle);
 				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)) {
 					this.setDefaultSpawnStyle(spawnStyle);
+				} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)) {
+					this.setDefaultSpawnStyle(spawnStyle);
 				} else {
 					this.setDefaultSpawnStyle(TeamSpawnStyles.BIG);
 				}
@@ -438,12 +368,7 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("nocreatures");
 				this.setDefaultNoCreatures(onOff.equals("on") || onOff.equals("true"));
 			}
-			if (namedParams.containsKey("loadout")) {
-				this.inventoryToLoadout(player, this.getDefaultLoadout());
-			}
-			if (namedParams.containsKey("reward")) {
-				this.inventoryToLoadout(player, this.getDefaultReward());
-			}
+			
 			if (namedParams.containsKey("resetonempty")) {
 				String onOff = namedParams.get("resetonempty");
 				this.setDefaultResetOnEmpty(onOff.equals("on") || onOff.equals("true"));
@@ -456,8 +381,17 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("resetonunload");
 				this.setDefaultResetOnUnload(onOff.equals("on") || onOff.equals("true"));
 			}
-			if (namedParams.containsKey("rallypoint")) {
-				this.setZoneRallyPoint(namedParams.get("rallypoint"), player);
+			if (commandSender instanceof Player) {
+				Player player = (Player)commandSender;
+				if (namedParams.containsKey("loadout")) {
+					this.inventoryToLoadout(player, this.getDefaultLoadout());
+				}
+				if (namedParams.containsKey("reward")) {
+					this.inventoryToLoadout(player, this.getDefaultReward());
+				}
+				if (namedParams.containsKey("rallypoint")) {
+					this.setZoneRallyPoint(namedParams.get("rallypoint"), player);
+				}
 			}
 
 			return true;

@@ -68,6 +68,8 @@ public class WarCommandHandler {
 				commandObj = new DeleteZoneCommand(this, sender, arguments);
 			} else if (command.equals("setzonelobby")) {
 				commandObj = new SetZoneLobbyCommand(this, sender, arguments);
+			} else if (command.equals("savezone")) {
+				commandObj = new SaveZoneCommand(this, sender, arguments);
 			} else if (command.equals("resetzone")) {
 				commandObj = new ResetZoneCommand(this, sender, arguments);
 			} else if (command.equals("nextbattle")) {
@@ -82,6 +84,8 @@ public class WarCommandHandler {
 				commandObj = new SetMonumentCommand(this, sender, arguments);
 			} else if (command.equals("deletemonument")) {
 				commandObj = new DeleteMonumentCommand(this, sender, arguments);
+			} else if (command.equals("setzoneconfig") || command.equals("zonecfg")) {
+				commandObj = new SetZoneConfigCommand(this, sender, arguments);
 			} else if (command.equals("setwarhub")) {
 				commandObj = new SetWarHubCommand(this, sender, arguments);
 			} else if (command.equals("deletewarhub")) {
