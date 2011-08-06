@@ -8,12 +8,11 @@ import com.tommytony.war.WarHub;
 import com.tommytony.war.mappers.VolumeMapper;
 import com.tommytony.war.mappers.WarMapper;
 
-import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
 public class DeleteWarhubCommand extends AbstractZoneMakerCommand {
-	public DeleteWarhubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+	public DeleteWarhubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
 	}
 
@@ -36,7 +35,7 @@ public class DeleteWarhubCommand extends AbstractZoneMakerCommand {
 
 			this.msg("War hub removed.");
 		} else {
-			this.msg("No War hub to delete.");
+			this.badMsg("No War hub to delete.");
 		}
 		WarMapper.save();
 

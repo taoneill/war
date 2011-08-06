@@ -15,20 +15,21 @@ public class WarzoneCommand extends AbstractWarCommand {
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) {
+		if (!(this.getSender() instanceof Player)) {
+			this.badMsg("You can't do this if you are not in-game.");
 			return true;
 		}
 
 		if (this.args.length != 1) {
 			return false;
 		}
-		Player player = (Player) this.sender;
+		Player player = (Player) this.getSender();
 
 		if (!War.war.canWarp(player)) {
-			this.msg("Can't warp to zone. You need the 'war.warp' permission.");
+			this.badMsg("Can't warp to zone. You need the 'war.warp' permission.");
 		} else {
 			Warzone warzone = Warzone.getZoneByName(this.args[0]);
-			if (warzone.getTeleport() != null) {
+			if (warzone != null && warzone.getTeleport() != null) {
 				Warzone playerWarzone = Warzone.getZoneByPlayerName(player.getName());
 				if (playerWarzone != null) {
 					playerWarzone.handlePlayerLeave(player, warzone.getTeleport(), true);
@@ -38,7 +39,7 @@ public class WarzoneCommand extends AbstractWarCommand {
 				return true;
 			}
 
-			this.msg("No such warzone.");
+			this.badMsg("No such warzone.");
 		}
 		return true;
 	}

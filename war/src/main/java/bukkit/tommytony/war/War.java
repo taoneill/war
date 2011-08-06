@@ -505,27 +505,36 @@ public class War extends JavaPlugin {
 		return this.warzones;
 	}
 
-	public void msg(Player player, String str) {
-		String out = ChatColor.GRAY + "War> " + ChatColor.WHITE + this.colorTeams(str, ChatColor.WHITE) + " ";
-		ChatFixUtil.sendMessage(player, out);
+	public void msg(CommandSender sender, String str) {
+		if(sender instanceof Player) {
+			String out = ChatColor.GRAY + "War> " + ChatColor.WHITE + this.colorKnownTokens(str, ChatColor.WHITE) + " ";
+			ChatFixUtil.sendMessage(sender, out);
+		} else {
+			sender.sendMessage("War> " + str);
+		}
 	}
 
-	public void badMsg(Player player, String str) {
-		String out = ChatColor.GRAY + "War> " + ChatColor.RED + this.colorTeams(str, ChatColor.RED) + " ";
-		ChatFixUtil.sendMessage(player, out);
+	public void badMsg(CommandSender sender, String str) {
+		if(sender instanceof Player) {
+			String out = ChatColor.GRAY + "War> " + ChatColor.RED + this.colorKnownTokens(str, ChatColor.RED) + " ";
+			ChatFixUtil.sendMessage(sender, out);
+		} else {
+			sender.sendMessage("War> " + str);
+		}
 	}
 
 	/**
-	 * Colors the teams in messages
+	 * Colors the teams and examples in messages 
 	 *
 	 * @param 	String	str		message-string
 	 * @param 	String	msgColor	current message-color
 	 * @return	String			Message with colored teams
 	 */
-	private String colorTeams(String str, ChatColor msgColor) {
+	private String colorKnownTokens(String str, ChatColor msgColor) {
 		for (TeamKind kind : TeamKinds.getTeamkinds()) {
 			str = str.replaceAll(" " + kind.getDefaultName(), " " + kind.getColor() + kind.getDefaultName() + msgColor);
 		}
+		str = str.replaceAll("Ex -", ChatColor.GRAY + "Ex -");
 		return str;
 	}
 

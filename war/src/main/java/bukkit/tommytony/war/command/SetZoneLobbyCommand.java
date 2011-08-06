@@ -8,28 +8,28 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.WarzoneMapper;
 
-import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
 public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 
-	public SetZoneLobbyCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+	public SetZoneLobbyCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
 	}
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) {
+		if (!(this.getSender() instanceof Player)) {
+			this.badMsg("You can't do this if you are not in-game.");
 			return true;
 		}
 		if (this.args.length != 1) {
 			return false;
 		}
-		Player player = (Player) this.sender;
-		Warzone zone = Warzone.getZoneByLocation((Player) this.sender);
+		Player player = (Player) this.getSender();
+		Warzone zone = Warzone.getZoneByLocation((Player) this.getSender());
 		if (zone == null) {
-			ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.sender);
+			ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.getSender());
 			if (lobby == null) {
 				return false;
 			}

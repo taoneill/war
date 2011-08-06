@@ -7,21 +7,21 @@ import com.tommytony.war.Monument;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.WarzoneMapper;
 
-import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.WarCommandHandler;
 
 public class SetMonumentCommand extends AbstractZoneMakerCommand {
-	public SetMonumentCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+	public SetMonumentCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
 	}
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) {
+		if (!(this.getSender() instanceof Player)) {
+			this.badMsg("You can't do this if you are not in-game.");
 			return true;
 		}
 
-		Player player = (Player) this.sender;
+		Player player = (Player) this.getSender();
 
 		if (this.args.length != 1) {
 			return false;

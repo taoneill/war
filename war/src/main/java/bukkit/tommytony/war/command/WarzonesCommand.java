@@ -39,7 +39,7 @@ public class WarzonesCommand extends AbstractWarCommand {
 			}
 		}
 
-		this.msg(warzonesMessage + ((this.sender instanceof Player) ? " Use /zone <zone-name> to teleport to a warzone." : ""));
+		this.msg(warzonesMessage + ((this.getSender() instanceof Player) ? " Use /zone <zone-name> to teleport to a warzone." : ""));
 
 		return true;
 	}

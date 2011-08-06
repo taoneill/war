@@ -15,17 +15,18 @@ public class WarhubCommand extends AbstractWarCommand {
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) {
+		if (!(this.getSender() instanceof Player)) {
+			this.badMsg("You can't do this if you are not in-game.");
 			return true;
 		}
 		if (this.args.length != 0) {
 			return false;
 		}
-		Player player = (Player) this.sender;
+		Player player = (Player) this.getSender();
 		if (War.war.getWarHub() == null) {
-			this.msg("No warhub on this War server. Try /zones and /zone.");
+			this.badMsg("No warhub on this War server. Try /zones and /zone.");
 		} else if (!War.war.canWarp(player)) {
-			this.msg("Can't warp to warhub. You need the 'war.warp' permission.");
+			this.badMsg("Can't warp to warhub. You need the 'war.warp' permission.");
 		} else {
 			Warzone playerWarzone = Warzone.getZoneByPlayerName(player.getName());
 			if (playerWarzone != null) { // was in zone

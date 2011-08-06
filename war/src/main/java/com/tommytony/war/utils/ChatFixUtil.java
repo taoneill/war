@@ -2,7 +2,7 @@ package com.tommytony.war.utils;
 
 import java.util.*;
 
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 /**
  * The purpose of this tool is twofold: 1: Avoid client crashes due to bad color formating. 2: Make color continue on word wrapping
@@ -123,7 +123,7 @@ public class ChatFixUtil {
 	// ----------------------------------------------//
 	// One player
 	// ----------------------------------------------//
-	public static void sendMessage(Player player, String message, boolean fix) {
+	public static void sendMessage(CommandSender player, String message, boolean fix) {
 		if (fix) {
 			List<String> messages = ChatFixUtil.fix(message);
 			ChatFixUtil.sendMessage(player, messages, false);
@@ -134,7 +134,7 @@ public class ChatFixUtil {
 		}
 	}
 
-	public static void sendMessage(Player player, List<String> messages, boolean fix) {
+	public static void sendMessage(CommandSender player, List<String> messages, boolean fix) {
 		if (fix) {
 			messages = ChatFixUtil.fix(messages);
 		}
@@ -143,29 +143,29 @@ public class ChatFixUtil {
 		}
 	}
 
-	public static void sendMessage(Player player, String message) {
+	public static void sendMessage(CommandSender player, String message) {
 		ChatFixUtil.sendMessage(player, message, true);
 	}
 
-	public static void sendMessage(Player player, List<String> messages) {
+	public static void sendMessage(CommandSender player, List<String> messages) {
 		ChatFixUtil.sendMessage(player, messages, true);
 	}
 
 	// ----------------------------------------------//
-	// Many Players
+	// Many CommandSenders
 	// ----------------------------------------------//
-	public static void sendMessage(Collection<Player> players, String message, boolean fix) {
+	public static void sendMessage(Collection<CommandSender> players, String message, boolean fix) {
 		if (fix) {
 			List<String> messages = ChatFixUtil.fix(message);
 			ChatFixUtil.sendMessage(players, messages, false);
 		} else {
-			for (Player player : players) {
+			for (CommandSender player : players) {
 				ChatFixUtil.sendMessage(player, message, false);
 			}
 		}
 	}
 
-	public static void sendMessage(Collection<Player> players, List<String> messages, boolean fix) {
+	public static void sendMessage(Collection<CommandSender> players, List<String> messages, boolean fix) {
 		if (fix) {
 			messages = ChatFixUtil.fix(messages);
 		}
@@ -175,11 +175,11 @@ public class ChatFixUtil {
 		}
 	}
 
-	public static void sendMessage(Collection<Player> players, String message) {
+	public static void sendMessage(Collection<CommandSender> players, String message) {
 		ChatFixUtil.sendMessage(players, message, true);
 	}
 
-	public static void sendMessage(Collection<Player> players, List<String> messages) {
+	public static void sendMessage(Collection<CommandSender> players, List<String> messages) {
 		ChatFixUtil.sendMessage(players, messages, true);
 	}
 }

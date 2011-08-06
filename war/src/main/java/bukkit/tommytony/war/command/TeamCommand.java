@@ -20,11 +20,12 @@ public class TeamCommand extends AbstractWarCommand {
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) {
+		if (!(this.getSender() instanceof Player)) {
+			this.badMsg("You can't do this if you are not in-game.");
 			return true;
 		}
 
-		Player player = (Player) this.sender;
+		Player player = (Player) this.getSender();
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 		if (playerTeam == null) {
 			return false;

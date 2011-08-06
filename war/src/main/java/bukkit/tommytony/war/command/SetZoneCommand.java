@@ -5,23 +5,23 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.ZoneSetter;
 
-import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
 public class SetZoneCommand extends AbstractZoneMakerCommand {
 
-	public SetZoneCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+	public SetZoneCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
 	}
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) {
-			return false;
+		if (!(this.getSender() instanceof Player)) {
+			this.badMsg("You can't do this if you are not in-game.");
+			return true;
 		}
 
-		Player player = (Player) this.sender;
+		Player player = (Player) this.getSender();
 
 		if (this.args.length == 0) {
 			return false;

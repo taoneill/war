@@ -21,13 +21,14 @@ public class JoinCommand extends AbstractWarCommand {
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) {
+		if (!(this.getSender() instanceof Player)) {
+			this.badMsg("You can't do this if you are not in-game.");
 			return true;
 		}
 
-		Player player = (Player) this.sender;
+		Player player = (Player) this.getSender();
 		if (!War.war.canPlayWar(player)) {
-			this.msg("Cannot play war");
+			this.badMsg("Cannot play war. You need the war.player permission.");
 			return true;
 		}
 
@@ -40,12 +41,9 @@ public class JoinCommand extends AbstractWarCommand {
 			// move the team-name to first place :)
 			this.args[0] = this.args[1];
 		} else if (this.args.length == 1) {
-			if (!(this.sender instanceof Player)) {
-				return false;
-			}
-			zone = Warzone.getZoneByLocation((Player) this.sender);
+			zone = Warzone.getZoneByLocation((Player) this.getSender());
 			if (zone == null) {
-				ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.sender);
+				ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.getSender());
 				if (lobby == null) {
 					return false;
 				}

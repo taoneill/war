@@ -86,7 +86,7 @@ public class Warzone {
 
 	public static Warzone getZoneByName(String name) {
 		for (Warzone warzone : War.war.getWarzones()) {
-			if (warzone.getName().toLowerCase().equals(name.toLowerCase())) {
+			if (warzone.getName().toLowerCase().startsWith(name.toLowerCase())) {
 				return warzone;
 			}
 		}

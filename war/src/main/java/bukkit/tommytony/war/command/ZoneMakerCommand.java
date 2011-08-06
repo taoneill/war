@@ -5,17 +5,13 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.mappers.WarMapper;
 
-import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
 public class ZoneMakerCommand extends AbstractWarCommand {
 
-	public ZoneMakerCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+	public ZoneMakerCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
-		// ffffuuuu java, fffuuu!
-		// Just because you want the invoking of super-constructor as the very first statement
-		// I had to rewrite the complete NoZoneMakerException thingy :(
 		if (sender instanceof Player) {
 			if (!War.war.isZoneMaker((Player) sender)) {
 				for (String name : War.war.getZoneMakersImpersonatingPlayers()) {
@@ -23,17 +19,18 @@ public class ZoneMakerCommand extends AbstractWarCommand {
 						return;
 					}
 				}
-				throw new NoZoneMakerException();
+				throw new NotZoneMakerException();
 			}
 		}
 	}
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) {
+		if (!(this.getSender() instanceof Player)) {
+			this.badMsg("You can't do this if you are not in-game.");
 			return true;
 		}
-		Player player = (Player) this.sender;
+		Player player = (Player) this.getSender();
 
 		if (War.war.isZoneMaker(player)) {
 			if (this.args.length == 0) {

@@ -19,12 +19,12 @@ public class TeamsCommand extends AbstractWarCommand {
 		if (this.args.length == 1) {
 			zone = Warzone.getZoneByName(this.args[0]);
 		} else if (this.args.length == 0) {
-			if (!(this.sender instanceof Player)) {
+			if (!(this.getSender() instanceof Player)) {
 				return false;
 			}
-			zone = Warzone.getZoneByLocation((Player) this.sender);
+			zone = Warzone.getZoneByLocation((Player) this.getSender());
 			if (zone == null) {
-				ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.sender);
+				ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.getSender());
 				if (lobby == null) {
 					return false;
 				}

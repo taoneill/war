@@ -7,25 +7,25 @@ import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.WarMapper;
 
-import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
 public class SetWarHubCommand extends AbstractZoneMakerCommand {
-	public SetWarHubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+	public SetWarHubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
 	}
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) {
+		if (!(this.getSender() instanceof Player)) {
+			this.badMsg("You can't do this if you are not in-game.");
 			return true;
 		}
 
 		if (this.args.length != 0) {
 			return false;
 		}
-		Player player = (Player) this.sender;
+		Player player = (Player) this.getSender();
 
 		if (War.war.getWarzones().size() > 0) {
 			if (War.war.getWarHub() != null) {

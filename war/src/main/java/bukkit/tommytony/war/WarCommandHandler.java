@@ -1,5 +1,7 @@
 package bukkit.tommytony.war;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -32,12 +34,14 @@ public class WarCommandHandler {
 				arguments[i - 1] = args[i];
 			}
 			if (arguments.length == 1 && (arguments[0].equals("help") || arguments[0].equals("h"))) {
-				// show help
-				return false;
+				// show /war help
+				War.war.badMsg(sender, cmd.getUsage());	
+				return true;
 			}
 		} else if (command.equals("war") || command.equals("War")) {
-			// show help
-			return false;
+			// show /war help
+			War.war.msg(sender, cmd.getUsage());	
+			return true;
 		} else {
 			arguments = args;
 		}
@@ -88,19 +92,24 @@ public class WarCommandHandler {
 				commandObj = new SetWarConfigCommand(this, sender, arguments);
 			} else if (command.equals("zonemaker") || command.equals("zm")) {
 				commandObj = new ZoneMakerCommand(this, sender, arguments);
-			} else {
-				// we are not responsible for this command
-				return true;
-			}
+			} 
+			// we are not responsible for any other command
 		}
-		catch (NoZoneMakerException e) {
-			sender.sendMessage("You can't do this if you are not a warzone maker.");
-			return true;
+		catch (NotZoneMakerException e) {
+			War.war.badMsg(sender, "You can't do this if you are not a warzone maker.");
 		}
 		catch (Exception e) {
-			return true;
+			War.war.log("An error occured while handling command " + cmd.getName() + ". Exception:" + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
+			e.printStackTrace();
 		}
-
-		return commandObj.handle();
+		
+		if(commandObj != null) {
+			boolean handled = commandObj.handle();
+			if(!handled) {
+				War.war.badMsg(sender, cmd.getUsage());	
+			}
+		}
+		
+		return true;
 	}
 }

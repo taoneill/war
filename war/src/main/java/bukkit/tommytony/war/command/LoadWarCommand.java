@@ -2,12 +2,11 @@ package bukkit.tommytony.war.command;
 
 import org.bukkit.command.CommandSender;
 
-import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
 public class LoadWarCommand extends AbstractZoneMakerCommand {
-	public LoadWarCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+	public LoadWarCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
 	}
 

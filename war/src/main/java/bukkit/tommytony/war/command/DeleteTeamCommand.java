@@ -9,11 +9,10 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.WarzoneMapper;
 
-import bukkit.tommytony.war.NoZoneMakerException;
 import bukkit.tommytony.war.WarCommandHandler;
 
 public class DeleteTeamCommand extends AbstractZoneMakerCommand {
-	public DeleteTeamCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NoZoneMakerException {
+	public DeleteTeamCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
 	}
 
@@ -26,12 +25,12 @@ public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 			zone = Warzone.getZoneByName(this.args[0]);
 			this.args[0] = this.args[1];
 		} else if (this.args.length == 1) {
-			if (!(this.sender instanceof Player)) {
+			if (!(this.getSender() instanceof Player)) {
 				return false;
 			}
-			zone = Warzone.getZoneByLocation((Player) this.sender);
+			zone = Warzone.getZoneByLocation((Player) this.getSender());
 			if (zone == null) {
-				ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.sender);
+				ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.getSender());
 				if (lobby == null) {
 					return false;
 				}
@@ -57,7 +56,7 @@ public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 			WarzoneMapper.save(zone, false);
 			this.msg("Team " + team.getName() + " removed.");
 		} else {
-			this.msg("No such team.");
+			this.badMsg("No such team.");
 		}
 
 		return true;

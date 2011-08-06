@@ -14,7 +14,8 @@ public class LeaveCommand extends AbstractWarCommand {
 
 	@Override
 	public boolean handle() {
-		if (!(this.sender instanceof Player)) {
+		if (!(this.getSender() instanceof Player)) {
+			this.badMsg("You can't do this if you are not in-game.");
 			return true;
 		}
 
@@ -22,7 +23,7 @@ public class LeaveCommand extends AbstractWarCommand {
 			return false;
 		}
 
-		Player player = (Player) this.sender;
+		Player player = (Player) this.getSender();
 		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 		if (zone == null) {
 			return false;
