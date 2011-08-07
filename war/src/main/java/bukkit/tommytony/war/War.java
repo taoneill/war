@@ -399,6 +399,54 @@ public class War extends JavaPlugin {
 			return false;
 		}
 	}
+	
+	public String printConfig(Warzone zone) {
+		return "Warzone " + zone.getName() + " config - "
+		 + "lifepool:" + zone.getLifePool() + " " 
+		 + "teamsize:" + zone.getTeamCap() + " "
+		 + "maxscore:" + zone.getScoreCap() + " "
+		 + "ff:" + onOffStr(zone.getFriendlyFire())
+		 + "autoassign:" + onOffStr(zone.getAutoAssignOnly())
+		 + "blockheads:" + onOffStr(zone.isBlockHeads())
+		 + "spawnstyle:" + zone.getSpawnStyle() + " "
+		 + "monumentheal:" + zone.getMonumentHeal() + " "
+		 + "unbreakable:" + onOffStr(zone.isUnbreakableZoneBlocks())
+		 + "disabled:" + onOffStr(zone.isDisabled())
+		 + "nocreatures:" + onOffStr(zone.isNoCreatures())
+		 + "resetonempty:" + onOffStr(zone.isResetOnEmpty())
+		 + "resetonload:" + onOffStr(zone.isResetOnLoad())
+		 + "resetonunload:" + onOffStr(zone.isResetOnUnload());
+	}
+	
+	public String printConfig() {
+		return "War config - "
+		 + "pvpinzonesonly:" + onOffStr(War.war.isPvpInZonesOnly())
+		 + "disablepvpmessage:" + onOffStr(War.war.isDisablePvpMessage())
+		 + "buildinzonesonly:" + onOffStr(War.war.isBuildInZonesOnly())
+		 + "- Warzone defaults - "
+		 + "lifepool:" + War.war.getDefaultLifepool() + " " 
+		 + "teamsize:" + War.war.getDefaultTeamCap() + " "
+		 + "maxscore:" + War.war.getDefaultScoreCap() + " "
+		 + "ff:" + onOffStr(War.war.isDefaultFriendlyFire())
+		 + "autoassign:" + onOffStr(War.war.isDefaultAutoAssignOnly())
+		 + "blockheads:" + onOffStr(War.war.isDefaultBlockHeads())
+		 + "spawnstyle:" + War.war.getDefaultSpawnStyle() + " "
+		 + "monumentheal:" + War.war.getDefaultMonumentHeal() + " "
+		 + "unbreakable:" + onOffStr(War.war.isDefaultUnbreakableZoneBlocks())
+		 + "nocreatures:" + onOffStr(War.war.isDefaultNoCreatures())
+		 + "resetonempty:" + onOffStr(War.war.isDefaultResetOnEmpty())
+		 + "resetonload:" + onOffStr(War.war.isDefaultResetOnLoad())
+		 + "resetonunload:" + onOffStr(War.war.isDefaultResetOnUnload());
+	}
+	
+	private String onOffStr(boolean makeThisAString) {
+		if(makeThisAString) {
+			return "on ";
+		} else {
+			return "off ";
+		}
+			 
+	}
 
 	private void setZoneRallyPoint(String warzoneName, Player player) {
 		Warzone zone = this.findWarzone(warzoneName);
@@ -534,11 +582,13 @@ public class War extends JavaPlugin {
 	public boolean canPvpOutsideZones(Player player) {
 		if (this.isPvpInZonesOnly()) {
 			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.pvp") || War.permissionHandler.has(player, "War.pvp"))) {
+				War.war.log(player.getName() + " can pvp. Has war.pvp.", Level.INFO);
 				return true;
 			}
 			// w/o Permissions, if pvpInZoneOnly, no one can pvp outside the zone
 			return false;
 		} else {
+			War.war.log(player.getName() + " can pvp. Not pvpinzonesonly.", Level.INFO);
 			return true;
 		}
 	}

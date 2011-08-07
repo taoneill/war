@@ -3,13 +3,12 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.tommytony.war.Warzone;
-import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.mappers.WarMapper;
-import com.tommytony.war.mappers.WarzoneMapper;
-
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
+
+import com.tommytony.war.Warzone;
+import com.tommytony.war.ZoneLobby;
+import com.tommytony.war.mappers.WarzoneMapper;
 
 public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 
@@ -23,16 +22,19 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 		Player player = null;
 		CommandSender commandSender = this.getSender();
 		boolean isFirstParamWarzone = false;
+		boolean wantsToPrint = false;
 		
 		if (this.args.length == 0) {
 			return false;
 		} else {
-			if(!this.args[0].contains(":")) {
+			if (!this.args[0].contains(":")) {
 				// warzone name maybe in first place
 				Warzone zoneByName = Warzone.getZoneByName(this.args[0]);
 				if (zoneByName != null) {
 					zone = zoneByName;
 					isFirstParamWarzone = true;
+				} else if (this.args[0].equals("-p") || this.args[0].equals("print")){
+					wantsToPrint = true;
 				}
 			}
 			
@@ -67,6 +69,23 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 				this.args = newargs;
 			}
 			
+			// args have been shifted if needed
+			if(this.args.length > 0 && (this.args[0].equals("-p") || this.args[0].equals("print"))) {
+				// only printing
+				if(this.args.length == 1) {
+					this.msg(War.war.printConfig(zone));
+					return true;
+				} else {
+					// first param was to print, shift again
+					String[] newargs = new String[this.args.length - 1];
+					for (int i = 1; i < this.args.length; i++) {
+						newargs[i-1] = args[i];
+					}
+					this.args = newargs;
+				}
+				wantsToPrint = true;
+			} 
+			
 			// We have a warzone and indexed-from-0 arguments, let's update
 			if (War.war.updateZoneFromNamedParams(zone, player, this.args)) {
 				this.msg("Saving config and resetting warzone " + zone.getName() + ".");
@@ -76,7 +95,12 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 					zone.getLobby().getVolume().resetBlocks();
 				}
 				zone.initializeZone(); // bring back team spawns etc
-				this.msg("Warzone config saved. Zone reset.");
+				
+				if (wantsToPrint) {
+					this.msg("Warzone config saved. Zone reset. " + War.war.printConfig(zone));
+				} else {
+					this.msg("Warzone config saved. Zone reset.");
+				}
 
 				if (War.war.getWarHub() != null) { // maybe the zone was disabled/enabled
 					War.war.getWarHub().getVolume().resetBlocks();

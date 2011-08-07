@@ -940,12 +940,6 @@ public class Warzone {
 		}
 	}
 
-	public String printConfig() {
-		String cfg = "Warzone " + this.getName() + " config: ";
-		
-		return null;
-	}
-
 	public void setBlockHeads(boolean blockHeads) {
 		this.blockHeads = blockHeads;
 	}

@@ -1,8 +1,6 @@
 package bukkit.tommytony.war.command;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
 
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
