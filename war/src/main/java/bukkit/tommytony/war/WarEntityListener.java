@@ -40,7 +40,7 @@ public class WarEntityListener extends EntityListener {
 		Entity attacker = event.getDamager();
 		Entity defender = event.getEntity();
 
-		if (attacker == null && defender != null && attacker instanceof Player && defender instanceof Player) {
+		if (attacker != null && defender != null && attacker instanceof Player && defender instanceof Player) {
 			// only let adversaries (same warzone, different team) attack each other
 			Player a = (Player) attacker;
 			Player d = (Player) defender;
@@ -86,12 +86,10 @@ public class WarEntityListener extends EntityListener {
 				}
 			} else if (attackerTeam == null && defenderTeam == null && War.war.canPvpOutsideZones(a)) {
 				// let normal PVP through is its not turned off or if you have perms
-				War.war.log("Allowed " + a.getDisplayName() + " to hit " + d.getDisplayName() + " ouside zone.", Level.INFO);
 			} else if (attackerTeam == null && defenderTeam == null && !War.war.canPvpOutsideZones(a)) {
 				if (!War.war.isDisablePvpMessage()) {
 					War.war.badMsg(a, "You need the 'war.pvp' permission to attack players outside warzones.");
 				}
-				War.war.log("Prevented " + a.getDisplayName() + " from hitting " + d.getDisplayName() + " ouside zone.", Level.INFO);
 				event.setCancelled(true); // global pvp is off
 			} else {
 				War.war.badMsg(a, "Your attack missed!");
@@ -106,7 +104,6 @@ public class WarEntityListener extends EntityListener {
 				} else if (attackerWarzone != defenderWarzone) {
 					War.war.badMsg(a, "Your target is playing in another warzone.");
 				}
-				War.war.log("Prevented " + a.getDisplayName() + " from hitting " + d.getDisplayName() + " somehow.", Level.INFO);
 				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 			}
 		} else if (defender instanceof Player) {

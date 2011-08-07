@@ -290,7 +290,7 @@ public class WarPlayerListener extends PlayerListener {
 								War.war.getWarHub().resetZoneSign(zone);
 							}
 							zone.keepPlayerInventory(player);
-							War.war.msg(player, "Your inventory is in storage until you /leave.");
+							War.war.msg(player, "Your inventory is in storage until you use '/war leave'.");
 							zone.respawnPlayer(event, team, player);
 							for (Team t : zone.getTeams()) {
 								t.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
@@ -342,7 +342,7 @@ public class WarPlayerListener extends PlayerListener {
 		if (playerWarzone != null) {
 			// Player belongs to a warzone team but is outside: he snuck out or is at spawn and died
 			if (locZone == null && playerTeam != null && playerWarzone.getLobby() != null && !playerWarzone.getLobby().getVolume().contains(playerLoc) && !isLeaving) {
-				War.war.badMsg(player, "Use /leave to exit the zone.");
+				War.war.badMsg(player, "Use /leave (or /war leave) to exit the zone.");
 				event.setTo(playerTeam.getTeamSpawn());
 				return;
 			}
