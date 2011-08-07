@@ -17,7 +17,7 @@ public class UnloadWarCommand extends AbstractZoneMakerCommand {
 		}
 
 		War.war.unloadWar();
-
+		this.msg("War unloaded.");
 		return true;
 	}
 }
