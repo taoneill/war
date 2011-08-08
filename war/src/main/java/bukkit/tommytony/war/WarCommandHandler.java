@@ -78,7 +78,7 @@ public class WarCommandHandler {
 				commandObj = new SetTeamCommand(this, sender, arguments);
 			} else if (command.equals("deleteteam")) {
 				commandObj = new DeleteTeamCommand(this, sender, arguments);
-			} else if (command.equals("teamflag")) {
+			} else if (command.equals("setteamflag")) {
 				commandObj = new SetTeamFlagCommand(this, sender, arguments);
 			} else if (command.equals("setmonument")) {
 				commandObj = new SetMonumentCommand(this, sender, arguments);
