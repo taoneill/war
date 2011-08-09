@@ -588,13 +588,11 @@ public class War extends JavaPlugin {
 	public boolean canPvpOutsideZones(Player player) {
 		if (this.isPvpInZonesOnly()) {
 			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.pvp") || War.permissionHandler.has(player, "War.pvp"))) {
-				War.war.log(player.getName() + " can pvp. Has war.pvp.", Level.INFO);
 				return true;
 			}
 			// w/o Permissions, if pvpInZoneOnly, no one can pvp outside the zone
 			return false;
 		} else {
-			War.war.log(player.getName() + " can pvp. Not pvpinzonesonly.", Level.INFO);
 			return true;
 		}
 	}
