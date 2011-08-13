@@ -35,12 +35,12 @@ public class WarCommandHandler {
 			}
 			if (arguments.length == 1 && (arguments[0].equals("help") || arguments[0].equals("h"))) {
 				// show /war help
-				War.war.badMsg(sender, cmd.getUsage());	
+				War.war.badMsg(sender, cmd.getUsage());
 				return true;
 			}
 		} else if (command.equals("war") || command.equals("War")) {
 			// show /war help
-			War.war.msg(sender, cmd.getUsage());	
+			War.war.msg(sender, cmd.getUsage());
 			return true;
 		} else {
 			arguments = args;
@@ -74,6 +74,8 @@ public class WarCommandHandler {
 				commandObj = new ResetZoneCommand(this, sender, arguments);
 			} else if (command.equals("nextbattle")) {
 				commandObj = new NextBattleCommand(this, sender, arguments);
+			} else if (command.equals("renamezone")) {
+				commandObj = new RenameZoneCommand(this, sender, arguments);
 			} else if (command.equals("setteam")) {
 				commandObj = new SetTeamCommand(this, sender, arguments);
 			} else if (command.equals("deleteteam")) {
@@ -98,7 +100,7 @@ public class WarCommandHandler {
 				commandObj = new SetWarConfigCommand(this, sender, arguments);
 			} else if (command.equals("zonemaker") || command.equals("zm")) {
 				commandObj = new ZoneMakerCommand(this, sender, arguments);
-			} 
+			}
 			// we are not responsible for any other command
 		}
 		catch (NotZoneMakerException e) {
@@ -108,14 +110,14 @@ public class WarCommandHandler {
 			War.war.log("An error occured while handling command " + cmd.getName() + ". Exception:" + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();
 		}
-		
+
 		if(commandObj != null) {
 			boolean handled = commandObj.handle();
 			if(!handled) {
-				War.war.badMsg(sender, cmd.getUsage());	
+				War.war.badMsg(sender, cmd.getUsage());
 			}
 		}
-		
+
 		return true;
 	}
 }

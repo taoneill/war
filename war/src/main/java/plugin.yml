@@ -8,65 +8,65 @@ commands:
 # Player commands
   warzones:
     description: War> Lists the warzones on the server. Each warzone is an independent arena.
-    usage: Lists the warzones on the server. Each warzone is an independent arena. 
+    usage: Lists the warzones on the server. Each warzone is an independent arena.
         Ex - /warzones
   zones:
     description: War> Shortcut for /warzones.
-    usage: Lists the warzones on the server. Each warzone is an independent arena. 
+    usage: Lists the warzones on the server. Each warzone is an independent arena.
         Ex - /zones
   warzone:
     description: War> Teleports you to the specified warzone's lobby.
-    usage: Teleports you to the specified warzone's lobby. 
+    usage: Teleports you to the specified warzone's lobby.
         Ex - /warzone <zone-name>
   zone:
     description: War> Shortcut for /warzone.
-    usage: Teleports you to the specified warzone's lobby. 
+    usage: Teleports you to the specified warzone's lobby.
         Ex - /zone <zone-name>
   warhub:
     description: War> Teleports you to the warhub, if it exists. The warhub offers portals to reach each warzone on the server.
-    usage: Teleports you to the warhub, if it exists. 
+    usage: Teleports you to the warhub, if it exists.
         Ex - /warhub
   teams:
     description: War> Lists the teams in the warzone.
-    usage: Lists the teams in the warzone. Use zone name when outside warzone. 
+    usage: Lists the teams in the warzone. Use zone name when outside warzone.
         Ex - /teams [zone-name]
   join:
     description: War> Use to change teams. Also used instead of walking in the team gate in the lobby.
-    usage: Use to change teams. Also used instead of walking in the team gate in the lobby. Must be standing in warzone or lobby. 
+    usage: Use to change teams. Also used instead of walking in the team gate in the lobby. Must be standing in warzone or lobby.
         Ex - /join <team-color>
   leave:
     description: War> Use to leave a warzone. Teleports you back to the lobby.
-    usage: Use to leave a warzone. Teleports you back to the lobby. Must be in team already. 
+    usage: Use to leave a warzone. Teleports you back to the lobby. Must be in team already.
         Ex - /leave
   team:
     description: War> Team chat.
-    usage: Team chat. 
+    usage: Team chat.
         Ex - /team <message>
 # Warzone maker commands (must have the 'war.*' permission or be added as a zone-maker in /plugins/War/war.txt
 # 1- Battle-related commands
   nextbattle:
     description: War> Warzone blocks are restored, teams are respawned but score remains unaffected.
-    usage: Warzone blocks are restored, teams are respawned but score remains unaffected. Provide a zone name if not standing in warzone or lobby. 
+    usage: Warzone blocks are restored, teams are respawned but score remains unaffected. Provide a zone name if not standing in warzone or lobby.
         Ex - /nextbattle [zone-name]
 # 2- Warzone creation commands
   setzone:
     description: War> Use to create a warzone. Lobby is created and blocks are saved when the second corner is set.
     usage: Use to create a warzone. Lobby is created and blocks are saved when the second corner is set. Warzones must be at least 10 blocks wide in all directions.
-        Ex - 
+        Ex -
         ==Wand Cuboid mode==>
-        1) /setzone <zone-name> to get wooden sword, 
-        2) Left-click to select or move corner1, 
-        3) Right-click to select or move corner2. 
+        1) /setzone <zone-name> to get wooden sword,
+        2) Left-click to select or move corner1,
+        3) Right-click to select or move corner2.
         Turn off wand by dropping the wooden sword.
-        ==Wandless Cuboid mode==>  
-        /setzone <zone-name> <corner1/corner2/c1/c2/pos1/pos2> 
+        ==Wandless Cuboid mode==>
+        /setzone <zone-name> <corner1/corner2/c1/c2/pos1/pos2>
   savezone:
     description: War> Persists changes made to the warzone since the last save. Config can be set with named parameters.
     usage: Persists changes made to the warzone since the last save. Config can be set with named parameters. Provide a zone name if not standing in warzone or lobby.
-        Ex - 
-        /savezone [zone-name] => Basic save - name optional if standing inside, 
-        /savezone [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on disabled:on, 
-        /savezone [zone-name] loadout:default => sets the respawn inventory to your current items, 
+        Ex -
+        /savezone [zone-name] => Basic save - name optional if standing inside,
+        /savezone [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on disabled:on,
+        /savezone [zone-name] loadout:default => sets the respawn inventory to your current items,
         /savezone [zone-name] reward:default => sets the winner's reward to your current items.
   setzonelobby:
     description: War> Creates or changes the position of the warzone lobby.
@@ -85,8 +85,8 @@ commands:
         /setteam <diamond/iron/gold/white/orange/magenta/blue/green/pink/gray/purple/navy/brown/darkgreen/red/black>
   setmonument:
     description: War> Creates or moves a monument.
-    usage: Creates or moves a monument. Must be standing in warzone. 
-        Ex - 
+    usage: Creates or moves a monument. Must be standing in warzone.
+        Ex -
         /setmonument <monument-name>
   setteamflag:
     description: War> Creates/moves a team flag post for CTF.
@@ -96,13 +96,18 @@ commands:
   resetzone:
     description: War> Reloads zone blocks from disk. Everyone is teleported back to the lobby.
     usage: Reloads zone blocks from disk. Everyone is teleported back to the lobby. Provide a zone name if not standing in warzone or lobby.
-        Ex - 
+        Ex -
         /resetzone [zone-name]
   deletezone:
     description: War> Deletes the zone, resets all blocks.
     usage: Deletes the zone after resetting all blocks. Provide a zone name if not standing in warzone or lobby.
         Ex -
         /deletezone [zone-name]
+  renamezone:
+    description: War> Renames the zone
+    usage: Renames the zone. Provide a zone name if not standing in warzone or lobby.
+        Ex -
+        /renamezone [zone-name] <new-name>
   deleteteam:
     description: War> Deletes the team. Team must exist.
     usage: Deletes the team. Team must exist. Provide a zone name if not standing in warzone or lobby.
@@ -143,7 +148,7 @@ commands:
   setwarhub:
     description: War> Create or moves a wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
     usage: Create or moves a wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
-        Ex - 
+        Ex -
         /setwarhub
   deletewarhub:
     description: War> Deletes the warhub if it exists. Resets all warzone lobbies.
@@ -154,7 +159,7 @@ commands:
   unloadwar:
     description: War> Disables the War plugin.
     usage: Disables the War plugin.
-        Ex - 
+        Ex -
         /unloadwar
   loadwar:
     description: War> Enables the War plugin.
@@ -179,12 +184,12 @@ commands:
         /setwarconfig loadout:default  =>  sets the respawn inventory to your current items,
         /setwarconfig reward:default  =>  sets the winner's reward to your current items,
         /setwarconfig rallypoint:<warzone-name>  =>  changes when players get teleported at the end of a match for that zone, useful for chaining warzones together in a sequence, or preventing players from rejoining immediately
-    
+
 # Fallback
   war:
     description: War> Short War help. Can also be used as a prefix for all War commands as a fallback if they conflict with other plugins.
-    usage: War is on. Please pick your battle. Try /warhub, /zones and /zone. Further instructions at war.tommytony.com/instructions. 
-        The /war command can be used as a prefix to all other command as a fallback if they conflict with other plugins. Ex - 
+    usage: War is on. Please pick your battle. Try /warhub, /zones and /zone. Further instructions at war.tommytony.com/instructions.
+        The /war command can be used as a prefix to all other command as a fallback if they conflict with other plugins. Ex -
         /war,
         /war setzone <zone-name>,
         /war warhub,
