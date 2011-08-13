@@ -462,27 +462,6 @@ public class War extends JavaPlugin {
 		}
 	}
 
-	public boolean inAnyWarzone(Location location) {
-		Block locBlock = location.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-		Warzone currentZone = Warzone.getZoneByLocation(location);
-		if (currentZone == null) {
-			return false;
-		} else if (currentZone.getVolume().isWallBlock(locBlock)) {
-			return false; // wall block doesnt count. this lets people in at the lobby side wall because wall gates overlap with the zone.
-		}
-		return true;
-	}
-
-	public boolean inWarzone(String warzoneName, Location location) {
-		Warzone currentZone = Warzone.getZoneByLocation(location);
-		if (currentZone == null) {
-			return false;
-		} else if (warzoneName.toLowerCase().equals(currentZone.getName().toLowerCase())) {
-			return true;
-		}
-		return false;
-	}
-
 	public void addWarzone(Warzone zone) {
 		this.warzones.add(zone);
 	}

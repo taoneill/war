@@ -179,8 +179,8 @@ public class WarPlayerListener extends PlayerListener {
 			Player player = event.getPlayer();
 			String reason = event.getReason();
 			if (reason.contains("moved") || reason.contains("too quickly") || reason.contains("Hacking")) {
-				boolean inWarzone = War.war.inAnyWarzone(player.getLocation());
-				boolean inLobby = War.war.inAnyWarzone(player.getLocation());
+				boolean inWarzone = Warzone.getZoneByLocation(player) != null;
+				boolean inLobby = ZoneLobby.getLobbyByLocation(player) != null;
 				boolean inWarhub = false;
 				if (War.war.getWarHub() != null && War.war.getWarHub().getVolume().contains(player.getLocation())) {
 					inWarhub = true;
