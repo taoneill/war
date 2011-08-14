@@ -11,6 +11,11 @@ import com.tommytony.war.mappers.WarzoneMapper;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
+/**
+ * Places the zonelobby
+ *
+ * @author Tim Düsterhus
+ */
 public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 
 	public SetZoneLobbyCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {

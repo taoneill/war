@@ -8,6 +8,11 @@ import bukkit.tommytony.war.WarCommandHandler;
 
 import com.tommytony.war.Warzone;
 
+/**
+ * Warps the player to the given warzone.
+ *
+ * @author Tim Düsterhus
+ */
 public class WarzoneCommand extends AbstractWarCommand {
 	public WarzoneCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		super(handler, sender, args);

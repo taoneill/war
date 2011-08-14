@@ -14,6 +14,11 @@ import com.tommytony.war.TeamKinds;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 
+/**
+ * Joins a team.
+ *
+ * @author Tim Düsterhus
+ */
 public class JoinCommand extends AbstractWarCommand {
 	public JoinCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		super(handler, sender, args);

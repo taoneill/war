@@ -12,6 +12,11 @@ import com.tommytony.war.mappers.WarzoneMapper;
 
 import bukkit.tommytony.war.WarCommandHandler;
 
+/**
+ * Places a teamflag
+ *
+ * @author Tim Düsterhus
+ */
 public class SetTeamFlagCommand extends AbstractZoneMakerCommand {
 	public SetTeamFlagCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);

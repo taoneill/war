@@ -111,10 +111,10 @@ public class War extends JavaPlugin {
 
 		if(!loadedOnce) {
 			loadedOnce = true;	// This prevented multiple hookups of the same listener
-			
+
 			// Register hooks
 			PluginManager pm = this.getServer().getPluginManager();
-			
+
 			pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_KICK, this.playerListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Priority.Normal, this);
@@ -123,17 +123,17 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, this.playerListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, this.playerListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Priority.Normal, this);
-	
+
 			pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Priority.High, this);
 			pm.registerEvent(Event.Type.ENTITY_COMBUST, this.entityListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, this.entityListener, Priority.Normal, this);
-	
+
 			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
 		}
-	
+
 		// Load files from disk or create them (using these defaults)
 		this.getDefaultLoadout().put(0, new ItemStack(Material.STONE_SWORD, 1, (byte) 8));
 		this.getDefaultLoadout().put(1, new ItemStack(Material.BOW, 1, (byte) 8));
@@ -141,7 +141,7 @@ public class War extends JavaPlugin {
 		this.getDefaultLoadout().put(3, new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8));
 		this.getDefaultLoadout().put(4, new ItemStack(Material.STONE_SPADE, 1, (byte) 8));
 		this.getDefaultReward().put( 0, new ItemStack(Material.CAKE, 1));
-	
+
 		WarMapper.load();
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
 	}
@@ -154,7 +154,7 @@ public class War extends JavaPlugin {
 			warzone.unload();
 		}
 		this.warzones.clear();
-		
+
 		PluginManager pm = this.getServer().getPluginManager();
 
 		if (this.warHub != null) {
@@ -180,7 +180,7 @@ public class War extends JavaPlugin {
 	}
 
 	/**
-	 * Handles war commands
+	 * @see JavaPlugin.onCommand()
 	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		return this.commandHandler.handle(sender, cmd, args);
@@ -280,7 +280,7 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("nocreatures");
 				warzone.setNoCreatures(onOff.equals("on") || onOff.equals("true"));
 			}
-			
+
 			if (namedParams.containsKey("resetonempty")) {
 				String onOff = namedParams.get("resetonempty");
 				warzone.setResetOnEmpty(onOff.equals("on") || onOff.equals("true"));
@@ -374,7 +374,7 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("nocreatures");
 				this.setDefaultNoCreatures(onOff.equals("on") || onOff.equals("true"));
 			}
-			
+
 			if (namedParams.containsKey("resetonempty")) {
 				String onOff = namedParams.get("resetonempty");
 				this.setDefaultResetOnEmpty(onOff.equals("on") || onOff.equals("true"));
@@ -405,10 +405,10 @@ public class War extends JavaPlugin {
 			return false;
 		}
 	}
-	
+
 	public String printConfig(Warzone zone) {
 		return "Warzone " + zone.getName() + " config - "
-		 + "lifepool:" + zone.getLifePool() + " " 
+		 + "lifepool:" + zone.getLifePool() + " "
 		 + "teamsize:" + zone.getTeamCap() + " "
 		 + "maxscore:" + zone.getScoreCap() + " "
 		 + "ff:" + onOffStr(zone.getFriendlyFire())
@@ -423,14 +423,14 @@ public class War extends JavaPlugin {
 		 + "resetonload:" + onOffStr(zone.isResetOnLoad())
 		 + "resetonunload:" + onOffStr(zone.isResetOnUnload());
 	}
-	
+
 	public String printConfig() {
 		return "War config - "
 		 + "pvpinzonesonly:" + onOffStr(War.war.isPvpInZonesOnly())
 		 + "disablepvpmessage:" + onOffStr(War.war.isDisablePvpMessage())
 		 + "buildinzonesonly:" + onOffStr(War.war.isBuildInZonesOnly())
 		 + "- Warzone defaults - "
-		 + "lifepool:" + War.war.getDefaultLifepool() + " " 
+		 + "lifepool:" + War.war.getDefaultLifepool() + " "
 		 + "teamsize:" + War.war.getDefaultTeamCap() + " "
 		 + "maxscore:" + War.war.getDefaultScoreCap() + " "
 		 + "ff:" + onOffStr(War.war.isDefaultFriendlyFire())
@@ -444,14 +444,14 @@ public class War extends JavaPlugin {
 		 + "resetonload:" + onOffStr(War.war.isDefaultResetOnLoad())
 		 + "resetonunload:" + onOffStr(War.war.isDefaultResetOnUnload());
 	}
-	
+
 	private String onOffStr(boolean makeThisAString) {
 		if(makeThisAString) {
 			return "on ";
 		} else {
 			return "off ";
 		}
-			 
+
 	}
 
 	private void setZoneRallyPoint(String warzoneName, Player player) {
@@ -512,11 +512,11 @@ public class War extends JavaPlugin {
 	}
 
 	/**
-	 * Colors the teams and examples in messages 
+	 * Colors the teams and examples in messages
 	 *
-	 * @param 	String	str		message-string
-	 * @param 	String	msgColor	current message-color
-	 * @return	String			Message with colored teams
+	 * @param 	str		message-string
+	 * @param 	msgColor	current message-color
+	 * @return			Message with colored teams
 	 */
 	private String colorKnownTokens(String str, ChatColor msgColor) {
 		for (TeamKind kind : TeamKinds.getTeamkinds()) {
@@ -529,8 +529,8 @@ public class War extends JavaPlugin {
 	/**
 	 * Logs a specified message with a specified level
 	 *
-	 * @param 	String	str	message to log
-	 * @param 	Level	lvl	level to use
+	 * @param 	str	message to log
+	 * @param 	lvl	level to use
 	 */
 	public void log(String str, Level lvl) {
 		this.getLogger().log(lvl, "War> " + str);
@@ -551,6 +551,12 @@ public class War extends JavaPlugin {
 		return null;
 	}
 
+	/**
+	 * Checks whether the given player is allowed to play war.
+	 *
+	 * @param 	player	Player to check
+	 * @return		true if the player may play war
+	 */
 	public boolean canPlayWar(Player player) {
 		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.player") || War.permissionHandler.has(player, "War.player"))) {
 			return true;
@@ -562,6 +568,12 @@ public class War extends JavaPlugin {
 		return false;
 	}
 
+	/**
+	 * Checks whether the given player is allowed to warp.
+	 *
+	 * @param 	player	Player to check
+	 * @return		true if the player may warp
+	 */
 	public boolean canWarp(Player player) {
 		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.warp") || War.permissionHandler.has(player, "War.warp"))) {
 			return true;
@@ -573,6 +585,12 @@ public class War extends JavaPlugin {
 		return false;
 	}
 
+	/**
+	 * Checks whether the given player is allowed to build outside zones
+	 *
+	 * @param 	player	Player to check
+	 * @return		true if the player may build outside zones
+	 */
 	public boolean canBuildOutsideZone(Player player) {
 		if (this.isBuildInZonesOnly()) {
 			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.build") || War.permissionHandler.has(player, "War.build"))) {
@@ -585,6 +603,12 @@ public class War extends JavaPlugin {
 		}
 	}
 
+	/**
+	 * Checks whether the given player is allowed to pvp outside zones
+	 *
+	 * @param 	player	Player to check
+	 * @return		true if the player may pvp outside zones
+	 */
 	public boolean canPvpOutsideZones(Player player) {
 		if (this.isPvpInZonesOnly()) {
 			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.pvp") || War.permissionHandler.has(player, "War.pvp"))) {
@@ -597,7 +621,14 @@ public class War extends JavaPlugin {
 		}
 	}
 
+	/**
+	 * Checks whether the given player is a zone maker
+	 *
+	 * @param 	player	Player to check
+	 * @return		true if the player is a zone maker
+	 */
 	public boolean isZoneMaker(Player player) {
+		// sort out disguised first
 		for (String disguised : this.zoneMakersImpersonatingPlayers) {
 			if (disguised.equals(player.getName())) {
 				return false;
@@ -612,6 +643,7 @@ public class War extends JavaPlugin {
 		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "War.*"))) {
 			return true;
 		} else {
+			// default to op, if no permissions are found
 			return player.isOp();
 		}
 	}

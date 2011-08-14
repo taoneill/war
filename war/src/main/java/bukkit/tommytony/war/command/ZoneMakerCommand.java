@@ -8,11 +8,17 @@ import com.tommytony.war.mappers.WarMapper;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
+/**
+ * Makes a player zonemaker and other way round.
+ *
+ * @author Tim Düsterhus
+ */
 public class ZoneMakerCommand extends AbstractWarCommand {
 
 	public ZoneMakerCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
-		if (sender instanceof Player) {
+
+		if (sender instanceof Player) { // i hate java for this.
 			if (!War.war.isZoneMaker((Player) sender)) {
 				for (String name : War.war.getZoneMakersImpersonatingPlayers()) {
 					if (((Player) sender).getName().equals(name)) {

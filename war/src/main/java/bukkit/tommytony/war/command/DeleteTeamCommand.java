@@ -11,6 +11,11 @@ import com.tommytony.war.mappers.WarzoneMapper;
 
 import bukkit.tommytony.war.WarCommandHandler;
 
+/**
+ * Deletes a team.
+ *
+ * @author Tim Düsterhus
+ */
 public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 	public DeleteTeamCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
@@ -19,6 +24,7 @@ public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 	@Override
 	public boolean handle() {
 		Warzone zone;
+
 		if (this.args.length == 0) {
 			return false;
 		} else if (this.args.length == 2) {
@@ -39,6 +45,7 @@ public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 		} else {
 			return false;
 		}
+
 		if (zone == null) {
 			return false;
 		}

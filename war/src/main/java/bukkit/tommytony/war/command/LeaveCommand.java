@@ -7,6 +7,11 @@ import bukkit.tommytony.war.WarCommandHandler;
 
 import com.tommytony.war.Warzone;
 
+/**
+ * Leaves a game.
+ *
+ * @author Tim Düsterhus
+ */
 public class LeaveCommand extends AbstractWarCommand {
 	public LeaveCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		super(handler, sender, args);

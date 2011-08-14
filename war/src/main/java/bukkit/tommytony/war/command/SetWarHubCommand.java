@@ -10,6 +10,11 @@ import com.tommytony.war.mappers.WarMapper;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
+/**
+ * Places the warhub
+ *
+ * @author Tim Düsterhus
+ */
 public class SetWarHubCommand extends AbstractZoneMakerCommand {
 	public SetWarHubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
