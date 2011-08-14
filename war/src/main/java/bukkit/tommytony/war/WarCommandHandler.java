@@ -9,19 +9,22 @@ import bukkit.tommytony.war.command.*;
 
 /**
  * Handles commands received by War
- *
- * @author 	Tim Düsterhus
- * @package 	bukkit.tommytony.war
+ * 
+ * @author Tim Düsterhus
+ * @package bukkit.tommytony.war
  */
 public class WarCommandHandler {
 
 	/**
 	 * Handles a command
-	 *
-	 * @param 	sender	The sender of the command
-	 * @param 	cmd	The command
-	 * @param 	args	The arguments
-	 * @return		Success
+	 * 
+	 * @param sender
+	 *                The sender of the command
+	 * @param cmd
+	 *                The command
+	 * @param args
+	 *                The arguments
+	 * @return Success
 	 */
 	public boolean handle(CommandSender sender, Command cmd, String[] args) {
 		String command = cmd.getName();
@@ -35,12 +38,12 @@ public class WarCommandHandler {
 			}
 			if (arguments.length == 1 && (arguments[0].equals("help") || arguments[0].equals("h"))) {
 				// show /war help
-				War.war.badMsg(sender, cmd.getUsage());	
+				War.war.badMsg(sender, cmd.getUsage());
 				return true;
 			}
 		} else if (command.equals("war") || command.equals("War")) {
 			// show /war help
-			War.war.msg(sender, cmd.getUsage());	
+			War.war.msg(sender, cmd.getUsage());
 			return true;
 		} else {
 			arguments = args;
@@ -98,24 +101,22 @@ public class WarCommandHandler {
 				commandObj = new SetWarConfigCommand(this, sender, arguments);
 			} else if (command.equals("zonemaker") || command.equals("zm")) {
 				commandObj = new ZoneMakerCommand(this, sender, arguments);
-			} 
+			}
 			// we are not responsible for any other command
-		}
-		catch (NotZoneMakerException e) {
+		} catch (NotZoneMakerException e) {
 			War.war.badMsg(sender, "You can't do this if you are not a warzone maker.");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			War.war.log("An error occured while handling command " + cmd.getName() + ". Exception:" + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();
 		}
-		
-		if(commandObj != null) {
+
+		if (commandObj != null) {
 			boolean handled = commandObj.handle();
-			if(!handled) {
-				War.war.badMsg(sender, cmd.getUsage());	
+			if (!handled) {
+				War.war.badMsg(sender, cmd.getUsage());
 			}
 		}
-		
+
 		return true;
 	}
 }

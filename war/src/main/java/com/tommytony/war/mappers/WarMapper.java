@@ -16,9 +16,9 @@ import com.tommytony.war.jobs.RestoreWarhubJob;
 import com.tommytony.war.jobs.RestoreWarzonesJob;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class WarMapper {
 
@@ -275,20 +275,20 @@ public class WarMapper {
 			switch (hub.getOrientation()) {
 				case SOUTH:
 					orientationStr = "south";
-				break;
+					break;
 				case EAST:
 					orientationStr = "east";
-				break;
+					break;
 				case NORTH:
 					orientationStr = "north";
-				break;
+					break;
 				case WEST:
 				default:
 					orientationStr = "west";
-				break;
+					break;
 			}
 			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + ","
-			+ hub.getLocation().getWorld().getName() + "," + orientationStr;
+					+ hub.getLocation().getWorld().getName() + "," + orientationStr;
 			VolumeMapper.save(hub.getVolume(), "");
 		}
 		warConfig.setString("warhub", hubStr);

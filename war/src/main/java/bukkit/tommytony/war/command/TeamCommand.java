@@ -10,8 +10,9 @@ import com.tommytony.war.Team;
 
 /**
  * Sends a message to all team-members
+ * 
  * @author das-schaf
- *
+ * 
  */
 public class TeamCommand extends AbstractWarCommand {
 	public TeamCommand(WarCommandHandler handler, CommandSender sender, String[] args) {

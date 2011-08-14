@@ -26,9 +26,9 @@ import com.tommytony.war.utils.InventoryStash;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
- *
- * @author 	tommytony
- * @package 	com.tommytony.war
+ * 
+ * @author tommytony
+ * @package com.tommytony.war
  */
 public class Warzone {
 	private String name;
@@ -91,7 +91,7 @@ public class Warzone {
 				// perfect match, return right away
 				return warzone;
 			} else if (warzone.getName().toLowerCase().startsWith(name.toLowerCase())) {
-				// prehaps there's a perfect match in the remaining zones, let's take this one aside 
+				// prehaps there's a perfect match in the remaining zones, let's take this one aside
 				bestGuess = warzone;
 			}
 		}
@@ -147,8 +147,7 @@ public class Warzone {
 		String teamsMessage = "Teams: ";
 		if (this.getTeams().isEmpty()) {
 			teamsMessage += "none.";
-		}
-		else {
+		} else {
 			for (Team team : this.getTeams()) {
 				teamsMessage += team.getName() + " (" + team.getPoints() + " points, " + team.getRemainingLifes() + "/" + this.getLifePool() + " lives left. ";
 				for (Player member : team.getPlayers()) {
@@ -208,7 +207,7 @@ public class Warzone {
 
 	/**
 	 * Goes back to the saved state of the warzone (resets only block types, not physics). Also teleports all players back to their respective spawns.
-	 *
+	 * 
 	 * @return
 	 */
 	public void initializeZone() {
@@ -950,7 +949,7 @@ public class Warzone {
 
 	public void setSpawnStyle(String spawnStyle) {
 		this.spawnStyle = spawnStyle;
-		for(Team team : this.teams) {
+		for (Team team : this.teams) {
 			team.setTeamSpawn(team.getTeamSpawn());
 		}
 	}

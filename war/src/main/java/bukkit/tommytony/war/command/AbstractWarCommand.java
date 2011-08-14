@@ -10,6 +10,7 @@ public abstract class AbstractWarCommand {
 	private CommandSender sender;
 	protected String[] args;
 	protected WarCommandHandler handler;
+
 	public AbstractWarCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		this.handler = handler;
 		this.setSender(sender);
@@ -19,11 +20,11 @@ public abstract class AbstractWarCommand {
 	abstract public boolean handle();
 
 	public void msg(String message) {
-		War.war.msg(getSender(), message);
+		War.war.msg(this.getSender(), message);
 	}
-	
+
 	public void badMsg(String message) {
-		War.war.badMsg(getSender(), message);
+		War.war.badMsg(this.getSender(), message);
 	}
 
 	public void setSender(CommandSender sender) {
@@ -31,6 +32,6 @@ public abstract class AbstractWarCommand {
 	}
 
 	public CommandSender getSender() {
-		return sender;
+		return this.sender;
 	}
 }

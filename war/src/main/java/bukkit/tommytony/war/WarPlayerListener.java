@@ -28,15 +28,15 @@ import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.ZoneSetter;
 
 /**
- * @author 	tommytony, Tim Düsterhus
- * @package 	bukkit.tommytony.war
+ * @author tommytony, Tim Düsterhus
+ * @package bukkit.tommytony.war
  */
 public class WarPlayerListener extends PlayerListener {
 	private java.util.Random random = new java.util.Random();
 
 	/**
 	 * Correctly removes quitting players from warzones
-	 *
+	 * 
 	 * @see PlayerListener.onPlayerQuit()
 	 */
 	@Override
@@ -215,7 +215,9 @@ public class WarPlayerListener extends PlayerListener {
 
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
-		if (!War.war.isLoaded()) return;
+		if (!War.war.isLoaded()) {
+			return;
+		}
 		Player player = event.getPlayer();
 		Location playerLoc = event.getFrom(); // same as player.getLoc. Don't call again we need same result.
 		Warzone locZone = Warzone.getZoneByLocation(playerLoc);

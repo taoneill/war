@@ -1,9 +1,9 @@
 package com.tommytony.war;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class TeamSpawnStyles {
 	public static final String INVISIBLE = "invisible";

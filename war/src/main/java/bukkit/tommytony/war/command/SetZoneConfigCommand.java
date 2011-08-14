@@ -23,7 +23,7 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 		CommandSender commandSender = this.getSender();
 		boolean isFirstParamWarzone = false;
 		boolean wantsToPrint = false;
-		
+
 		if (this.args.length == 0) {
 			return false;
 		} else {
@@ -33,59 +33,59 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 				if (zoneByName != null) {
 					zone = zoneByName;
 					isFirstParamWarzone = true;
-				} else if (this.args[0].equals("-p") || this.args[0].equals("print")){
+				} else if (this.args[0].equals("-p") || this.args[0].equals("print")) {
 					wantsToPrint = true;
 				}
 			}
-			
+
 			if (this.getSender() instanceof Player) {
-				player = (Player)commandSender;
-				
+				player = (Player) commandSender;
+
 				Warzone zoneByLoc = Warzone.getZoneByLocation(player);
 				ZoneLobby lobbyByLoc = ZoneLobby.getLobbyByLocation(player);
-				if(zoneByLoc == null && lobbyByLoc != null) {
+				if (zoneByLoc == null && lobbyByLoc != null) {
 					zoneByLoc = lobbyByLoc.getZone();
 				}
-				if(zoneByLoc != null) {
+				if (zoneByLoc != null) {
 					zone = zoneByLoc;
-				}				
+				}
 			}
-			
+
 			if (zone == null) {
 				// No warzone found, whatever the mean, escape
 				return false;
 			}
-			
+
 			if (isFirstParamWarzone) {
-				if(this.args.length == 1) {
+				if (this.args.length == 1) {
 					// Only one param: the warzone name - default to usage
 					return false;
 				}
 				// More than one param: the arguments need to be shifted
 				String[] newargs = new String[this.args.length - 1];
 				for (int i = 1; i < this.args.length; i++) {
-					newargs[i-1] = args[i];
+					newargs[i - 1] = this.args[i];
 				}
 				this.args = newargs;
 			}
-			
+
 			// args have been shifted if needed
-			if(this.args.length > 0 && (this.args[0].equals("-p") || this.args[0].equals("print"))) {
+			if (this.args.length > 0 && (this.args[0].equals("-p") || this.args[0].equals("print"))) {
 				// only printing
-				if(this.args.length == 1) {
+				if (this.args.length == 1) {
 					this.msg(War.war.printConfig(zone));
 					return true;
 				} else {
 					// first param was to print, shift again
 					String[] newargs = new String[this.args.length - 1];
 					for (int i = 1; i < this.args.length; i++) {
-						newargs[i-1] = args[i];
+						newargs[i - 1] = this.args[i];
 					}
 					this.args = newargs;
 				}
 				wantsToPrint = true;
-			} 
-			
+			}
+
 			// We have a warzone and indexed-from-0 arguments, let's update
 			if (War.war.updateZoneFromNamedParams(zone, player, this.args)) {
 				this.msg("Saving config and resetting warzone " + zone.getName() + ".");
@@ -95,7 +95,7 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 					zone.getLobby().getVolume().resetBlocks();
 				}
 				zone.initializeZone(); // bring back team spawns etc
-				
+
 				if (wantsToPrint) {
 					this.msg("Warzone config saved. Zone reset. " + War.war.printConfig(zone));
 				} else {
@@ -109,7 +109,7 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 			} else {
 				this.badMsg("Failed to read named parameters.");
 			}
-			
+
 			return true;
 		}
 	}

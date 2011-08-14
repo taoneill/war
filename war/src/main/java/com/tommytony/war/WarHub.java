@@ -15,9 +15,9 @@ import com.tommytony.war.volumes.BlockInfo;
 import com.tommytony.war.volumes.Volume;
 
 /**
- *
- * @author 	tommytony, Tim Düsterhus
- * @package	com.tommytony.war
+ * 
+ * @author tommytony, Tim Düsterhus
+ * @package com.tommytony.war
  */
 public class WarHub {
 	private Location location;
@@ -192,8 +192,9 @@ public class WarHub {
 
 	/**
 	 * Resets the sign of the given warzone
-	 *
-	 * @param Warzone	zone
+	 * 
+	 * @param Warzone
+	 *                zone
 	 */
 	public void resetZoneSign(Warzone zone) {
 		BlockFace left;

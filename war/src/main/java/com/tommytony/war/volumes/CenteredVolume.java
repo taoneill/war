@@ -5,9 +5,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 /**
- *
- * @author 	tommytony
- * @deprecated 	Broken, don't use.
+ * 
+ * @author tommytony
+ * @deprecated Broken, don't use.
  */
 @Deprecated
 public class CenteredVolume extends Volume {

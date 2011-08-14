@@ -30,9 +30,9 @@ import com.tommytony.war.utils.*;
 
 /**
  * Main class of War
- *
- * @author 	tommytony, Tim Düsterhus
- * @package 	bukkit.tommytony.war
+ * 
+ * @author tommytony, Tim Düsterhus
+ * @package bukkit.tommytony.war
  */
 public class War extends JavaPlugin {
 	public static PermissionHandler permissionHandler;
@@ -74,7 +74,9 @@ public class War extends JavaPlugin {
 	private boolean defaultAutoAssignOnly = false;
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
-	private boolean defaultResetOnEmpty = false, defaultResetOnLoad = false, defaultResetOnUnload = false;
+	private boolean defaultResetOnEmpty = false,
+			defaultResetOnLoad = false,
+			defaultResetOnUnload = false;
 	private String defaultSpawnStyle = TeamSpawnStyles.BIG;
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
 
@@ -108,8 +110,8 @@ public class War extends JavaPlugin {
 		this.logger = this.getServer().getLogger();
 		this.setupPermissions();
 
-		if (!loadedOnce) {
-			loadedOnce = true;	// This prevented multiple hookups of the same listener
+		if (!War.loadedOnce) {
+			War.loadedOnce = true; // This prevented multiple hookups of the same listener
 
 			// Register hooks
 			PluginManager pm = this.getServer().getPluginManager();
@@ -139,7 +141,7 @@ public class War extends JavaPlugin {
 		this.getDefaultLoadout().put(2, new ItemStack(Material.ARROW, 7));
 		this.getDefaultLoadout().put(3, new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8));
 		this.getDefaultLoadout().put(4, new ItemStack(Material.STONE_SPADE, 1, (byte) 8));
-		this.getDefaultReward().put( 0, new ItemStack(Material.CAKE, 1));
+		this.getDefaultReward().put(0, new ItemStack(Material.CAKE, 1));
 
 		WarMapper.load();
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
@@ -185,9 +187,11 @@ public class War extends JavaPlugin {
 
 	/**
 	 * Converts the player-inventory to a loadout hashmap
-	 *
-	 * @param inv		inventory to get the items from
-	 * @param loadout	the hashmap to save to
+	 * 
+	 * @param inv
+	 *                inventory to get the items from
+	 * @param loadout
+	 *                the hashmap to save to
 	 */
 	private void inventoryToLoadout(PlayerInventory inv, HashMap<Integer, ItemStack> loadout) {
 		loadout.clear();
@@ -212,9 +216,11 @@ public class War extends JavaPlugin {
 
 	/**
 	 * Converts the player-inventory to a loadout hashmap
-	 *
-	 * @param player	player to get the inventory to get the items from
-	 * @param loadout	the hashmap to save to
+	 * 
+	 * @param player
+	 *                player to get the inventory to get the items from
+	 * @param loadout
+	 *                the hashmap to save to
 	 */
 	private void inventoryToLoadout(Player player, HashMap<Integer, ItemStack> loadout) {
 		this.inventoryToLoadout(player.getInventory(), loadout);
@@ -385,7 +391,7 @@ public class War extends JavaPlugin {
 				this.setDefaultResetOnUnload(onOff.equals("on") || onOff.equals("true"));
 			}
 			if (commandSender instanceof Player) {
-				Player player = (Player)commandSender;
+				Player player = (Player) commandSender;
 				if (namedParams.containsKey("loadout")) {
 					this.inventoryToLoadout(player, this.getDefaultLoadout());
 				}
@@ -405,45 +411,45 @@ public class War extends JavaPlugin {
 
 	public String printConfig(Warzone zone) {
 		return "Warzone " + zone.getName() + " config - "
-		 + "lifepool:" + zone.getLifePool() + " "
-		 + "teamsize:" + zone.getTeamCap() + " "
-		 + "maxscore:" + zone.getScoreCap() + " "
-		 + "ff:" + onOffStr(zone.getFriendlyFire())
-		 + "autoassign:" + onOffStr(zone.getAutoAssignOnly())
-		 + "blockheads:" + onOffStr(zone.isBlockHeads())
-		 + "spawnstyle:" + zone.getSpawnStyle() + " "
-		 + "monumentheal:" + zone.getMonumentHeal() + " "
-		 + "unbreakable:" + onOffStr(zone.isUnbreakableZoneBlocks())
-		 + "disabled:" + onOffStr(zone.isDisabled())
-		 + "nocreatures:" + onOffStr(zone.isNoCreatures())
-		 + "resetonempty:" + onOffStr(zone.isResetOnEmpty())
-		 + "resetonload:" + onOffStr(zone.isResetOnLoad())
-		 + "resetonunload:" + onOffStr(zone.isResetOnUnload());
+				+ "lifepool:" + zone.getLifePool() + " "
+				+ "teamsize:" + zone.getTeamCap() + " "
+				+ "maxscore:" + zone.getScoreCap() + " "
+				+ "ff:" + this.onOffStr(zone.getFriendlyFire())
+				+ "autoassign:" + this.onOffStr(zone.getAutoAssignOnly())
+				+ "blockheads:" + this.onOffStr(zone.isBlockHeads())
+				+ "spawnstyle:" + zone.getSpawnStyle() + " "
+				+ "monumentheal:" + zone.getMonumentHeal() + " "
+				+ "unbreakable:" + this.onOffStr(zone.isUnbreakableZoneBlocks())
+				+ "disabled:" + this.onOffStr(zone.isDisabled())
+				+ "nocreatures:" + this.onOffStr(zone.isNoCreatures())
+				+ "resetonempty:" + this.onOffStr(zone.isResetOnEmpty())
+				+ "resetonload:" + this.onOffStr(zone.isResetOnLoad())
+				+ "resetonunload:" + this.onOffStr(zone.isResetOnUnload());
 	}
 
 	public String printConfig() {
 		return "War config - "
-		 + "pvpinzonesonly:" + onOffStr(War.war.isPvpInZonesOnly())
-		 + "disablepvpmessage:" + onOffStr(War.war.isDisablePvpMessage())
-		 + "buildinzonesonly:" + onOffStr(War.war.isBuildInZonesOnly())
-		 + "- Warzone defaults - "
-		 + "lifepool:" + War.war.getDefaultLifepool() + " "
-		 + "teamsize:" + War.war.getDefaultTeamCap() + " "
-		 + "maxscore:" + War.war.getDefaultScoreCap() + " "
-		 + "ff:" + onOffStr(War.war.isDefaultFriendlyFire())
-		 + "autoassign:" + onOffStr(War.war.isDefaultAutoAssignOnly())
-		 + "blockheads:" + onOffStr(War.war.isDefaultBlockHeads())
-		 + "spawnstyle:" + War.war.getDefaultSpawnStyle() + " "
-		 + "monumentheal:" + War.war.getDefaultMonumentHeal() + " "
-		 + "unbreakable:" + onOffStr(War.war.isDefaultUnbreakableZoneBlocks())
-		 + "nocreatures:" + onOffStr(War.war.isDefaultNoCreatures())
-		 + "resetonempty:" + onOffStr(War.war.isDefaultResetOnEmpty())
-		 + "resetonload:" + onOffStr(War.war.isDefaultResetOnLoad())
-		 + "resetonunload:" + onOffStr(War.war.isDefaultResetOnUnload());
+				+ "pvpinzonesonly:" + this.onOffStr(War.war.isPvpInZonesOnly())
+				+ "disablepvpmessage:" + this.onOffStr(War.war.isDisablePvpMessage())
+				+ "buildinzonesonly:" + this.onOffStr(War.war.isBuildInZonesOnly())
+				+ "- Warzone defaults - "
+				+ "lifepool:" + War.war.getDefaultLifepool() + " "
+				+ "teamsize:" + War.war.getDefaultTeamCap() + " "
+				+ "maxscore:" + War.war.getDefaultScoreCap() + " "
+				+ "ff:" + this.onOffStr(War.war.isDefaultFriendlyFire())
+				+ "autoassign:" + this.onOffStr(War.war.isDefaultAutoAssignOnly())
+				+ "blockheads:" + this.onOffStr(War.war.isDefaultBlockHeads())
+				+ "spawnstyle:" + War.war.getDefaultSpawnStyle() + " "
+				+ "monumentheal:" + War.war.getDefaultMonumentHeal() + " "
+				+ "unbreakable:" + this.onOffStr(War.war.isDefaultUnbreakableZoneBlocks())
+				+ "nocreatures:" + this.onOffStr(War.war.isDefaultNoCreatures())
+				+ "resetonempty:" + this.onOffStr(War.war.isDefaultResetOnEmpty())
+				+ "resetonload:" + this.onOffStr(War.war.isDefaultResetOnLoad())
+				+ "resetonunload:" + this.onOffStr(War.war.isDefaultResetOnUnload());
 	}
 
 	private String onOffStr(boolean makeThisAString) {
-		if(makeThisAString) {
+		if (makeThisAString) {
 			return "on ";
 		} else {
 			return "off ";
@@ -470,7 +476,7 @@ public class War extends JavaPlugin {
 	}
 
 	public void msg(CommandSender sender, String str) {
-		if(sender instanceof Player) {
+		if (sender instanceof Player) {
 			String out = ChatColor.GRAY + "War> " + ChatColor.WHITE + this.colorKnownTokens(str, ChatColor.WHITE) + " ";
 			ChatFixUtil.sendMessage(sender, out);
 		} else {
@@ -479,7 +485,7 @@ public class War extends JavaPlugin {
 	}
 
 	public void badMsg(CommandSender sender, String str) {
-		if(sender instanceof Player) {
+		if (sender instanceof Player) {
 			String out = ChatColor.GRAY + "War> " + ChatColor.RED + this.colorKnownTokens(str, ChatColor.RED) + " ";
 			ChatFixUtil.sendMessage(sender, out);
 		} else {
@@ -489,10 +495,12 @@ public class War extends JavaPlugin {
 
 	/**
 	 * Colors the teams and examples in messages
-	 *
-	 * @param 	String	str		message-string
-	 * @param 	String	msgColor	current message-color
-	 * @return	String			Message with colored teams
+	 * 
+	 * @param String
+	 *                str message-string
+	 * @param String
+	 *                msgColor current message-color
+	 * @return String Message with colored teams
 	 */
 	private String colorKnownTokens(String str, ChatColor msgColor) {
 		for (TeamKind kind : TeamKinds.getTeamkinds()) {
@@ -504,9 +512,11 @@ public class War extends JavaPlugin {
 
 	/**
 	 * Logs a specified message with a specified level
-	 *
-	 * @param 	String	str	message to log
-	 * @param 	Level	lvl	level to use
+	 * 
+	 * @param String
+	 *                str message to log
+	 * @param Level
+	 *                lvl level to use
 	 */
 	public void log(String str, Level lvl) {
 		this.getLogger().log(lvl, "War> " + str);
@@ -694,7 +704,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isLoaded() {
-		return loaded;
+		return this.loaded;
 	}
 
 	public void setLoaded(boolean loaded) {
@@ -702,7 +712,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isPvpInZonesOnly() {
-		return pvpInZonesOnly;
+		return this.pvpInZonesOnly;
 	}
 
 	public void setPvpInZonesOnly(boolean pvpInZonesOnly) {
@@ -710,7 +720,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isDisablePvpMessage() {
-		return disablePvpMessage;
+		return this.disablePvpMessage;
 	}
 
 	public void setDisablePvpMessage(boolean disablePvpMessage) {
@@ -718,7 +728,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isBuildInZonesOnly() {
-		return buildInZonesOnly;
+		return this.buildInZonesOnly;
 	}
 
 	public void setBuildInZonesOnly(boolean buildInZonesOnly) {
@@ -726,7 +736,7 @@ public class War extends JavaPlugin {
 	}
 
 	public int getDefaultLifepool() {
-		return defaultLifepool;
+		return this.defaultLifepool;
 	}
 
 	public void setDefaultLifepool(int defaultLifepool) {
@@ -734,7 +744,7 @@ public class War extends JavaPlugin {
 	}
 
 	public int getDefaultTeamCap() {
-		return defaultTeamCap;
+		return this.defaultTeamCap;
 	}
 
 	public void setDefaultTeamCap(int defaultTeamCap) {
@@ -742,7 +752,7 @@ public class War extends JavaPlugin {
 	}
 
 	public int getDefaultScoreCap() {
-		return defaultScoreCap;
+		return this.defaultScoreCap;
 	}
 
 	public void setDefaultScoreCap(int defaultScoreCap) {
@@ -750,7 +760,7 @@ public class War extends JavaPlugin {
 	}
 
 	public int getDefaultMonumentHeal() {
-		return defaultMonumentHeal;
+		return this.defaultMonumentHeal;
 	}
 
 	public void setDefaultMonumentHeal(int defaultMonumentHeal) {
@@ -758,7 +768,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isDefaultBlockHeads() {
-		return defaultBlockHeads;
+		return this.defaultBlockHeads;
 	}
 
 	public void setDefaultBlockHeads(boolean defaultBlockHeads) {
@@ -766,7 +776,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isDefaultFriendlyFire() {
-		return defaultFriendlyFire;
+		return this.defaultFriendlyFire;
 	}
 
 	public void setDefaultFriendlyFire(boolean defaultFriendlyFire) {
@@ -774,7 +784,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isDefaultAutoAssignOnly() {
-		return defaultAutoAssignOnly;
+		return this.defaultAutoAssignOnly;
 	}
 
 	public void setDefaultAutoAssignOnly(boolean defaultAutoAssignOnly) {
@@ -782,7 +792,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isDefaultUnbreakableZoneBlocks() {
-		return defaultUnbreakableZoneBlocks;
+		return this.defaultUnbreakableZoneBlocks;
 	}
 
 	public void setDefaultUnbreakableZoneBlocks(boolean defaultUnbreakableZoneBlocks) {
@@ -790,7 +800,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isDefaultNoCreatures() {
-		return defaultNoCreatures;
+		return this.defaultNoCreatures;
 	}
 
 	public void setDefaultNoCreatures(boolean defaultNoCreatures) {
@@ -798,7 +808,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isDefaultResetOnEmpty() {
-		return defaultResetOnEmpty;
+		return this.defaultResetOnEmpty;
 	}
 
 	public void setDefaultResetOnEmpty(boolean defaultResetOnEmpty) {
@@ -806,7 +816,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isDefaultResetOnLoad() {
-		return defaultResetOnLoad;
+		return this.defaultResetOnLoad;
 	}
 
 	public void setDefaultResetOnLoad(boolean defaultResetOnLoad) {
@@ -814,7 +824,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean isDefaultResetOnUnload() {
-		return defaultResetOnUnload;
+		return this.defaultResetOnUnload;
 	}
 
 	public void setDefaultResetOnUnload(boolean defaultResetOnUnload) {
@@ -822,7 +832,7 @@ public class War extends JavaPlugin {
 	}
 
 	public String getDefaultSpawnStyle() {
-		return defaultSpawnStyle;
+		return this.defaultSpawnStyle;
 	}
 
 	public void setDefaultSpawnStyle(String defaultSpawnStyle) {

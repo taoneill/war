@@ -15,7 +15,7 @@ public class LoadWarCommand extends AbstractZoneMakerCommand {
 		if (this.args.length != 0) {
 			return false;
 		}
-		
+
 		War.war.loadWar();
 		this.msg("War loaded.");
 		return true;

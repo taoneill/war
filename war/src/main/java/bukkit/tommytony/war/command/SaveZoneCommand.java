@@ -21,8 +21,8 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 		Warzone zone = null;
 		CommandSender commandSender = this.getSender();
 		boolean isFirstParamWarzone = false;
-	
-		if(this.args.length > 0 && !this.args[0].contains(":")) {
+
+		if (this.args.length > 0 && !this.args[0].contains(":")) {
 			// warzone name maybe in first place
 			Warzone zoneByName = Warzone.getZoneByName(this.args[0]);
 			if (zoneByName != null) {
@@ -30,43 +30,43 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 				isFirstParamWarzone = true;
 			}
 		}
-		
+
 		if (this.getSender() instanceof Player) {
-			Player player = (Player)commandSender;
-			
+			Player player = (Player) commandSender;
+
 			Warzone zoneByLoc = Warzone.getZoneByLocation(player);
 			ZoneLobby lobbyByLoc = ZoneLobby.getLobbyByLocation(player);
-			if(zoneByLoc == null && lobbyByLoc != null) {
+			if (zoneByLoc == null && lobbyByLoc != null) {
 				zoneByLoc = lobbyByLoc.getZone();
 			}
-			if(zoneByLoc != null) {
+			if (zoneByLoc != null) {
 				zone = zoneByLoc;
-			}				
+			}
 		}
-		
+
 		if (zone == null) {
 			// No warzone found, whatever the mean, escape
 			return false;
 		}
-		
+
 		if (isFirstParamWarzone) {
-			if(this.args.length > 1) {
+			if (this.args.length > 1) {
 				// More than one param: the arguments need to be shifted
 				String[] newargs = new String[this.args.length - 1];
 				for (int i = 1; i < this.args.length; i++) {
-					newargs[i-1] = args[i];
+					newargs[i - 1] = this.args[i];
 				}
-				this.args = newargs;	
+				this.args = newargs;
 			}
 		}
-		
+
 		// We have a warzone and indexed-from-0 arguments, let's updatethis.msg(player, "Saving warzone " + warzone.getName() + ".");
 		int savedBlocks = zone.saveState(true);
-	
+
 		// changed settings: must reinitialize with new settings
-		War.war.updateZoneFromNamedParams(zone, commandSender, args);
+		War.war.updateZoneFromNamedParams(zone, commandSender, this.args);
 		WarzoneMapper.save(zone, true);
-		if(this.args.length > 0) {
+		if (this.args.length > 0) {
 			// the config may have changed, requiring a reset for spawn styles etc.
 			zone.getVolume().resetBlocks();
 		}
@@ -80,9 +80,8 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 			War.war.getWarHub().initialize();
 		}
 
-
 		this.msg("Warzone " + zone.getName() + " initial state changed. Saved " + savedBlocks + " blocks.");
-		
+
 		return true;
 	}
 }
