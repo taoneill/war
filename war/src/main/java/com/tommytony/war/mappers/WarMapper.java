@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
@@ -273,14 +272,20 @@ public class WarMapper {
 		WarHub hub = War.war.getWarHub();
 		if (hub != null) {
 			String orientationStr = "";
-			if (BlockFace.SOUTH == hub.getOrientation()) {
-				orientationStr = "south";
-			} else if (BlockFace.EAST == hub.getOrientation()) {
-				orientationStr = "east";
-			} else if (BlockFace.NORTH == hub.getOrientation()) {
-				orientationStr = "north";
-			} else {
-				orientationStr = "west";
+			switch (hub.getOrientation()) {
+				case SOUTH:
+					orientationStr = "south";
+				break;
+				case EAST:
+					orientationStr = "east";
+				break;
+				case NORTH:
+					orientationStr = "north";
+				break;
+				case WEST:
+				default:
+					orientationStr = "west";
+				break;
 			}
 			hubStr = hub.getLocation().getBlockX() + "," + hub.getLocation().getBlockY() + "," + hub.getLocation().getBlockZ() + ","
 			+ hub.getLocation().getWorld().getName() + "," + orientationStr;
