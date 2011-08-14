@@ -138,6 +138,7 @@ public class WarEntityListener extends EntityListener {
 	@Override
 	public void onEntityExplode(EntityExplodeEvent event) {
 		if (!War.war.isLoaded()) return;
+
 		// protect zones elements, lobbies and warhub from creepers
 		List<Block> explodedBlocks = event.blockList();
 		for (Block block : explodedBlocks) {
@@ -242,7 +243,10 @@ public class WarEntityListener extends EntityListener {
 	 */
 	@Override
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-		if (!War.war.isLoaded() || event.getRegainReason() != RegainReason.REGEN) return;
+		if (!War.war.isLoaded()) return;
+
+		// break if reason was not regen
+		if (event.getRegainReason() != RegainReason.REGEN) return;
 		Entity entity = event.getEntity();
 		if (!(entity instanceof Player)) return;
 

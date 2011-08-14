@@ -11,6 +11,11 @@ import com.tommytony.war.mappers.WarzoneMapper;
 
 import bukkit.tommytony.war.WarCommandHandler;
 
+/**
+ * Places a soawn
+ *
+ * @author Tim Düsterhus
+ */
 public class SetTeamCommand extends AbstractZoneMakerCommand {
 	public SetTeamCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);

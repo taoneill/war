@@ -21,26 +21,28 @@ public class WarCommandHandler {
 	 * @param 	sender	The sender of the command
 	 * @param 	cmd	The command
 	 * @param 	args	The arguments
-	 * @return		Success
+	 * @see War.onCommand()
 	 */
 	public boolean handle(CommandSender sender, Command cmd, String[] args) {
 		String command = cmd.getName();
 		String[] arguments = null;
 
+		// parse prefixed commands
 		if ((command.equals("war") || command.equals("War")) && args.length > 0) {
 			command = args[0];
 			arguments = new String[args.length - 1];
 			for (int i = 1; i <= arguments.length; i++) {
 				arguments[i - 1] = args[i];
 			}
+
 			if (arguments.length == 1 && (arguments[0].equals("help") || arguments[0].equals("h"))) {
 				// show /war help
-				War.war.badMsg(sender, cmd.getUsage());	
+				War.war.badMsg(sender, cmd.getUsage());
 				return true;
 			}
 		} else if (command.equals("war") || command.equals("War")) {
 			// show /war help
-			War.war.msg(sender, cmd.getUsage());	
+			War.war.msg(sender, cmd.getUsage());
 			return true;
 		} else {
 			arguments = args;
@@ -98,24 +100,26 @@ public class WarCommandHandler {
 				commandObj = new SetWarConfigCommand(this, sender, arguments);
 			} else if (command.equals("zonemaker") || command.equals("zm")) {
 				commandObj = new ZoneMakerCommand(this, sender, arguments);
-			} 
+			}
 			// we are not responsible for any other command
 		}
 		catch (NotZoneMakerException e) {
+			// user is no zonemaker -> flame him :D
 			War.war.badMsg(sender, "You can't do this if you are not a warzone maker.");
 		}
 		catch (Exception e) {
+			// generally catch exceptions and log them
 			War.war.log("An error occured while handling command " + cmd.getName() + ". Exception:" + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();
 		}
-		
+
 		if(commandObj != null) {
 			boolean handled = commandObj.handle();
 			if(!handled) {
-				War.war.badMsg(sender, cmd.getUsage());	
+				War.war.badMsg(sender, cmd.getUsage());
 			}
 		}
-		
+
 		return true;
 	}
 }

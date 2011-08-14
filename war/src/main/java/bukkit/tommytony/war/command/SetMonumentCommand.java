@@ -9,6 +9,11 @@ import com.tommytony.war.mappers.WarzoneMapper;
 
 import bukkit.tommytony.war.WarCommandHandler;
 
+/**
+ * Places a monument
+ *
+ * @author Tim Düsterhus
+ */
 public class SetMonumentCommand extends AbstractZoneMakerCommand {
 	public SetMonumentCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);

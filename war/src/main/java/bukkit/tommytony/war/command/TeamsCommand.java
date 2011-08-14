@@ -8,6 +8,11 @@ import bukkit.tommytony.war.WarCommandHandler;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 
+/**
+ * Shows team information
+ *
+ * @author Tim Düsterhus
+ */
 public class TeamsCommand extends AbstractWarCommand {
 	public TeamsCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
 		super(handler, sender, args);

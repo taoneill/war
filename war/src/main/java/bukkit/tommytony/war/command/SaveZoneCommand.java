@@ -21,7 +21,7 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 		Warzone zone = null;
 		CommandSender commandSender = this.getSender();
 		boolean isFirstParamWarzone = false;
-	
+
 		if(this.args.length > 0 && !this.args[0].contains(":")) {
 			// warzone name maybe in first place
 			Warzone zoneByName = Warzone.getZoneByName(this.args[0]);
@@ -30,10 +30,10 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 				isFirstParamWarzone = true;
 			}
 		}
-		
+
 		if (this.getSender() instanceof Player) {
 			Player player = (Player)commandSender;
-			
+
 			Warzone zoneByLoc = Warzone.getZoneByLocation(player);
 			ZoneLobby lobbyByLoc = ZoneLobby.getLobbyByLocation(player);
 			if(zoneByLoc == null && lobbyByLoc != null) {
@@ -41,14 +41,14 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 			}
 			if(zoneByLoc != null) {
 				zone = zoneByLoc;
-			}				
+			}
 		}
-		
+
 		if (zone == null) {
 			// No warzone found, whatever the mean, escape
 			return false;
 		}
-		
+
 		if (isFirstParamWarzone) {
 			if(this.args.length > 1) {
 				// More than one param: the arguments need to be shifted
@@ -56,13 +56,13 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 				for (int i = 1; i < this.args.length; i++) {
 					newargs[i-1] = args[i];
 				}
-				this.args = newargs;	
+				this.args = newargs;
 			}
 		}
-		
+
 		// We have a warzone and indexed-from-0 arguments, let's updatethis.msg(player, "Saving warzone " + warzone.getName() + ".");
 		int savedBlocks = zone.saveState(true);
-	
+
 		// changed settings: must reinitialize with new settings
 		War.war.updateZoneFromNamedParams(zone, commandSender, args);
 		WarzoneMapper.save(zone, true);
@@ -82,7 +82,7 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 
 
 		this.msg("Warzone " + zone.getName() + " initial state changed. Saved " + savedBlocks + " blocks.");
-		
+
 		return true;
 	}
 }
