@@ -130,6 +130,18 @@ public class WarMapper {
 			// default is already initialized to BIG (see Warzone)
 		}
 
+		// defaultFlagReturn
+		String flagReturn = warConfig.getString("defaultFlagReturn");
+		if (flagReturn != null && !flagReturn.equals("")) {
+			flagReturn = flagReturn.toLowerCase();
+			if (flagReturn.equals("flag")) {
+				War.war.setDefaultFlagReturn("flag");
+			} else if (flagReturn.equals("spawn")) {
+				War.war.setDefaultFlagReturn("spawn");
+			}
+			// default is already initialized to both (see Warzone)
+		}
+
 		// defaultReward
 		String defaultRewardStr = warConfig.getString("defaultReward");
 		if (defaultRewardStr != null && !defaultRewardStr.equals("")) {
