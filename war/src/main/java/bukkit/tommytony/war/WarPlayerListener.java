@@ -369,7 +369,28 @@ public class WarPlayerListener extends PlayerListener {
 			}
 
 			// Flag capture
-			if (playerWarzone.isFlagThief(player.getName()) && (playerTeam.getSpawnVolume().contains(player.getLocation()) || (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation())))) {
+			if (playerWarzone.isFlagThief(player.getName())) {
+				boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
+				boolean inFlag = (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation()));
+
+				if (playerWarzone.equals("both")) {
+					if (!inSpawn && !inFlag) return;
+				} else if (playerWarzone.equals("spawn")) {
+					if (inFlag) {
+						War.war.badMsg(player, "You have to unload the flag at your spawn.");
+						return;
+					} else if (!inSpawn) {
+						return;
+					}
+				} else if (playerWarzone.equals("flag")) {
+					if (inSpawn) {
+						War.war.badMsg(player, "You have to unload the flag at your flag.");
+						return;
+					} else if (!inFlag) {
+						return;
+					}
+				}
+
 				if (playerWarzone.isTeamFlagStolen(playerTeam)) {
 					War.war.badMsg(player, "You can't capture the enemy flag until your team's flag is returned.");
 				} else {

@@ -44,6 +44,7 @@ public class Warzone {
 	private int scoreCap = 5;
 	private int monumentHeal = 5;
 	private String spawnStyle = TeamSpawnStyles.BIG;
+	private String flagReturn = "both";
 	private HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
 
 	private HashMap<String, InventoryStash> inventories = new HashMap<String, InventoryStash>();
@@ -91,7 +92,7 @@ public class Warzone {
 				// perfect match, return right away
 				return warzone;
 			} else if (warzone.getName().toLowerCase().startsWith(name.toLowerCase())) {
-				// prehaps there's a perfect match in the remaining zones, let's take this one aside 
+				// prehaps there's a perfect match in the remaining zones, let's take this one aside
 				bestGuess = warzone;
 			}
 		}
@@ -957,6 +958,15 @@ public class Warzone {
 
 	public String getSpawnStyle() {
 		return this.spawnStyle;
+	}
+
+
+	public void setFlagReturn(String flagReturn) {
+		this.flagReturn = flagReturn;
+	}
+
+	public String getFlagReturn() {
+		return this.flagReturn;
 	}
 
 	public void setReward(HashMap<Integer, ItemStack> reward) {

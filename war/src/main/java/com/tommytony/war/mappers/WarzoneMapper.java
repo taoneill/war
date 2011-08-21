@@ -172,6 +172,18 @@ public class WarzoneMapper {
 				// default is already initialized to BIG (see Warzone)
 			}
 
+			// flagReturn
+			String flagReturn = warzoneConfig.getString("flagReturn");
+			if (flagReturn != null && !flagReturn.equals("")) {
+				flagReturn = flagReturn.toLowerCase();
+				if (flagReturn.equals("flag")) {
+					warzone.setFlagReturn("flag");
+				} else if (flagReturn.equals("spawn")) {
+					warzone.setFlagReturn("spawn");
+				}
+				// default is already initialized to both (see Warzone)
+			}
+
 			// reward
 			String rewardStr = warzoneConfig.getString("reward");
 			if (rewardStr != null && !rewardStr.equals("")) {
