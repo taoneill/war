@@ -10,7 +10,6 @@ import bukkit.tommytony.war.WarCommandHandler;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
-import com.tommytony.war.TeamKinds;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 
@@ -82,7 +81,7 @@ public class JoinCommand extends AbstractWarCommand {
 
 		// join new team
 		String name = this.args[0];
-		TeamKind kind = TeamKinds.teamKindFromString(this.args[0]);
+		TeamKind kind = TeamKind.teamKindFromString(this.args[0]);
 
 		if (zone.isDisabled()) {
 			this.msg("This warzone is disabled.");

@@ -4,9 +4,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamKinds;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
+import com.tommytony.war.TeamKind;
 import com.tommytony.war.mappers.WarzoneMapper;
 
 import bukkit.tommytony.war.WarCommandHandler;
@@ -50,7 +50,7 @@ public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 			return false;
 		}
 
-		Team team = zone.getTeamByKind(TeamKinds.teamKindFromString(this.args[0]));
+		Team team = zone.getTeamByKind(TeamKind.teamKindFromString(this.args[0]));
 		if (team != null) {
 			if (team.getFlagVolume() != null) {
 				team.getFlagVolume().resetBlocks();
