@@ -11,6 +11,9 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.entity.CraftItem;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -260,6 +263,16 @@ public class Warzone {
 		}
 
 		this.flagThieves.clear();
+
+		// nom drops
+		for(Entity entity : (this.getWorld().getEntities())) {
+			if (!(entity instanceof Item) && !(entity instanceof CraftItem)) continue;
+			// validate position
+			if (!this.getVolume().contains(entity.getLocation())) continue;
+
+			// omnomnomnom
+			entity.remove();
+		}
 	}
 
 	public void endRound() {
