@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
-import com.tommytony.war.TeamKinds;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.WarzoneMapper;
 
@@ -39,7 +38,7 @@ public class SetTeamCommand extends AbstractZoneMakerCommand {
 			return false;
 		}
 
-		TeamKind teamKind = TeamKinds.teamKindFromString(this.args[0]);
+		TeamKind teamKind = TeamKind.teamKindFromString(this.args[0]);
 		Team existingTeam = zone.getTeamByKind(teamKind);
 		if (existingTeam != null) {
 			// relocate
@@ -47,7 +46,7 @@ public class SetTeamCommand extends AbstractZoneMakerCommand {
 			this.msg("Team " + existingTeam.getName() + " spawn relocated.");
 		} else {
 			// new team (use default TeamKind name for now)
-			Team newTeam = new Team(teamKind.getDefaultName(), teamKind, player.getLocation(), zone);
+			Team newTeam = new Team(teamKind.toString(), teamKind, player.getLocation(), zone);
 			newTeam.setRemainingLives(zone.getLifePool());
 			zone.getTeams().add(newTeam);
 			if (zone.getLobby() != null) {
