@@ -77,6 +77,7 @@ public class War extends JavaPlugin {
 	private boolean defaultNoCreatures = false;
 	private boolean defaultResetOnEmpty = false, defaultResetOnLoad = false, defaultResetOnUnload = false;
 	private String defaultSpawnStyle = TeamSpawnStyles.BIG;
+	private String defaultFlagReturn = "both";
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
 
 	public War() {
@@ -268,6 +269,16 @@ public class War extends JavaPlugin {
 					warzone.setSpawnStyle(TeamSpawnStyles.BIG);
 				}
 			}
+			if (namedParams.containsKey("flagreturn")) {
+				String flagReturn = namedParams.get("flagreturn").toLowerCase();
+				if (flagReturn.equals("flag")) {
+					warzone.setFlagReturn("flag");
+				} else if (flagReturn.equals("spawn")) {
+					warzone.setFlagReturn("spawn");
+				} else {
+					warzone.setFlagReturn("both");
+				}
+			}
 			if (namedParams.containsKey("unbreakable")) {
 				String onOff = namedParams.get("unbreakable");
 				warzone.setUnbreakableZoneBlocks(onOff.equals("on") || onOff.equals("true"));
@@ -360,6 +371,16 @@ public class War extends JavaPlugin {
 					this.setDefaultSpawnStyle(spawnStyle);
 				} else {
 					this.setDefaultSpawnStyle(TeamSpawnStyles.BIG);
+				}
+			}
+			if (namedParams.containsKey("flagreturn")) {
+				String flagreturn = namedParams.get("flagreturn").toLowerCase();
+				if (flagreturn.equals("flag")) {
+					this.setDefaultFlagReturn("flag");
+				} else if (flagreturn.equals("spawn")) {
+					this.setDefaultFlagReturn("spawn");
+				} else {
+					this.setDefaultFlagReturn("both");
 				}
 			}
 			if (namedParams.containsKey("buildinzonesonly")) {
@@ -883,6 +904,14 @@ public class War extends JavaPlugin {
 
 	public void setDefaultSpawnStyle(String defaultSpawnStyle) {
 		this.defaultSpawnStyle = defaultSpawnStyle;
+	}
+
+	public void setDefaultFlagReturn(String defaultFlagReturn) {
+		this.defaultFlagReturn = defaultFlagReturn;
+	}
+
+	public String getDefaultFlagReturn() {
+		return defaultFlagReturn;
 	}
 
 	public HashMap<String, InventoryStash> getDisconnected() {
