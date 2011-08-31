@@ -26,6 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.tommytony.war.*;
+import com.tommytony.war.jobs.HelmetProtectionTask;
 import com.tommytony.war.mappers.*;
 import com.tommytony.war.utils.*;
 
@@ -144,6 +145,7 @@ public class War extends JavaPlugin {
 		this.getDefaultReward().put( 0, new ItemStack(Material.CAKE, 1));
 
 		WarMapper.load();
+		this.getServer().getScheduler().scheduleAsyncDelayedTask(this, new HelmetProtectionTask());
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
 	}
 
