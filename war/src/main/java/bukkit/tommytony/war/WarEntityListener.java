@@ -25,16 +25,17 @@ import com.tommytony.war.Warzone;
 
 /**
  * Handles Entity-Events
- *
- * @author 	tommytony, Tim Düsterhus
- * @package	bukkit.tommytony.war
+ * 
+ * @author tommytony, Tim Düsterhus
+ * @package bukkit.tommytony.war
  */
 public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Handles PVP-Damage
-	 *
-	 * @param	event	fired event
+	 * 
+	 * @param event
+	 *                fired event
 	 */
 	private void handlerAttackDefend(EntityDamageByEntityEvent event) {
 		Entity attacker = event.getDamager();
@@ -132,13 +133,14 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Protects important structures from explosions
-	 *
-	 * @see	EntityListener.onEntityExplode()
+	 * 
+	 * @see EntityListener.onEntityExplode()
 	 */
 	@Override
 	public void onEntityExplode(EntityExplodeEvent event) {
-		if (!War.war.isLoaded()) return;
-
+		if (!War.war.isLoaded()) {
+			return;
+		}
 		// protect zones elements, lobbies and warhub from creepers
 		List<Block> explodedBlocks = event.blockList();
 		for (Block block : explodedBlocks) {
@@ -164,12 +166,14 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Handles damage on Players
-	 *
-	 * @see	EntityListener.onEntityDamage()
+	 * 
+	 * @see EntityListener.onEntityDamage()
 	 */
 	@Override
 	public void onEntityDamage(EntityDamageEvent event) {
-		if (!War.war.isLoaded()) return;
+		if (!War.war.isLoaded()) {
+			return;
+		}
 
 		Entity entity = event.getEntity();
 		if (!(entity instanceof Player)) {
@@ -202,7 +206,9 @@ public class WarEntityListener extends EntityListener {
 
 	@Override
 	public void onEntityCombust(EntityCombustEvent event) {
-		if (!War.war.isLoaded()) return;
+		if (!War.war.isLoaded()) {
+			return;
+		}
 		Entity entity = event.getEntity();
 		if (entity instanceof Player) {
 			Player player = (Player) entity;
@@ -221,12 +227,14 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Prevents creatures from spawning in warzones if no creatures is active
-	 *
-	 * @see	EntityListener.onCreatureSpawn()
+	 * 
+	 * @see EntityListener.onCreatureSpawn()
 	 */
 	@Override
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
-		if (!War.war.isLoaded()) return;
+		if (!War.war.isLoaded()) {
+			return;
+		}
 
 		Location location = event.getLocation();
 		Warzone zone = Warzone.getZoneByLocation(location);
@@ -238,17 +246,19 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Prevents health regaining caused by peaceful mode
-	 *
-	 * @see	EntityListener.onEntityRegainHealth()
+	 * 
+	 * @see EntityListener.onEntityRegainHealth()
 	 */
 	@Override
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-		if (!War.war.isLoaded()) return;
-
-		// break if reason was not regen
-		if (event.getRegainReason() != RegainReason.REGEN) return;
+		if (!War.war.isLoaded() || event.getRegainReason() != RegainReason.REGEN) {
+			return;
+		}
+		
 		Entity entity = event.getEntity();
-		if (!(entity instanceof Player)) return;
+		if (!(entity instanceof Player)) {
+			return;
+		}
 
 		Player player = (Player) entity;
 		Warzone zone = Warzone.getZoneByLocation(player);

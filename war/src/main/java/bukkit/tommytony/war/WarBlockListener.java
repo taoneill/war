@@ -18,22 +18,26 @@ import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class WarBlockListener extends BlockListener {
 
 	/**
-	 * @see	BlockListener.onBlockPlace()
+	 * @see BlockListener.onBlockPlace()
 	 */
 	@Override
 	public void onBlockPlace(BlockPlaceEvent event) {
-		if (!War.war.isLoaded()) return;
+		if (!War.war.isLoaded()) {
+			return;
+		}
 
 		Player player = event.getPlayer();
 		Block block = event.getBlock();
-		if (player == null || block == null) return;
+		if (player == null || block == null) {
+			return;
+		}
 
 		Team team = Team.getTeamByPlayerName(player.getName());
 		Warzone zone = Warzone.getZoneByLocation(player);
@@ -110,11 +114,13 @@ public class WarBlockListener extends BlockListener {
 	}
 
 	/**
-	 * @see	BlockListener.onBlockBreak()
+	 * @see BlockListener.onBlockBreak()
 	 */
 	@Override
 	public void onBlockBreak(BlockBreakEvent event) {
-		if (!War.war.isLoaded()) return;
+		if (!War.war.isLoaded()) {
+			return;
+		}
 		Player player = event.getPlayer();
 		Block block = event.getBlock();
 		if (player != null && block != null) {

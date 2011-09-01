@@ -22,9 +22,7 @@ public abstract class AbstractZoneMakerCommand extends AbstractWarCommand {
 			if (!War.war.isZoneMaker((Player) sender)) {
 				throw new NotZoneMakerException();
 			}
-		}
-		else if (!(sender instanceof ConsoleCommandSender)) {
-			// otherwise only the console is a legimate sender
+		} else if (!(sender instanceof ConsoleCommandSender)) {
 			throw new NotZoneMakerException();
 		}
 	}

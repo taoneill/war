@@ -8,9 +8,9 @@ import org.bukkit.block.BlockFace;
 import com.tommytony.war.volumes.Volume;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class Monument {
 	private Location location;

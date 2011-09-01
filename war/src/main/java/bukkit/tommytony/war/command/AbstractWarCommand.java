@@ -52,7 +52,7 @@ public abstract class AbstractWarCommand {
 	 * @param 	message	message to send
 	 */
 	public void msg(String message) {
-		War.war.msg(getSender(), message);
+		War.war.msg(this.getSender(), message);
 	}
 
 	/**
@@ -61,7 +61,7 @@ public abstract class AbstractWarCommand {
 	 * @param 	message	message to send
 	 */
 	public void badMsg(String message) {
-		War.war.badMsg(getSender(), message);
+		War.war.badMsg(this.getSender(), message);
 	}
 
 	/**

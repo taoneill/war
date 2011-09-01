@@ -11,7 +11,7 @@ import com.tommytony.war.Warzone;
 
 /**
  * Lists all warzones
- *
+ * 
  * @author Tim Düsterhus
  */
 public class WarzonesCommand extends AbstractWarCommand {
@@ -27,8 +27,7 @@ public class WarzonesCommand extends AbstractWarCommand {
 		String warzonesMessage = "Warzones: ";
 		if (War.war.getWarzones().isEmpty()) {
 			warzonesMessage += "none.";
-		}
-		else {
+		} else {
 			for (Warzone warzone : War.war.getWarzones()) {
 				warzonesMessage += warzone.getName() + " (" + warzone.getTeams().size() + " teams, ";
 				int playerTotal = 0;

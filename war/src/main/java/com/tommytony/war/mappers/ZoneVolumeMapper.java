@@ -34,20 +34,23 @@ import com.tommytony.war.volumes.ZoneVolume;
 
 /**
  * The ZoneVolumeMapper take the blocks from disk and sets them in the worlds, since the ZoneVolume doesn't hold its blocks in memory like regular Volumes.
- *
- * @author 	tommytony, Tim Düsterhus
- * @package 	com.tommytony.war.mappers
+ * 
+ * @author tommytony, Tim Düsterhus
+ * @package com.tommytony.war.mappers
  */
 public class ZoneVolumeMapper {
 
 	/**
 	 * Loads the given volume
-	 *
-	 * @param 	ZoneVolume	volume		Volume to load
-	 * @param 	String		zoneName	Zone to load the volume from
-	 * @param 	World		world		The world the zone is located
-	 * @param 	boolean		onlyLoadCorners	Should only the corners be loaded
-	 * @return	integer				Changed blocks
+	 * 
+	 * @param ZoneVolume
+	 *                volume Volume to load
+	 * @param String
+	 *                zoneName Zone to load the volume from
+	 * @param World
+	 *                world The world the zone is located
+	 * @param boolean onlyLoadCorners Should only the corners be loaded
+	 * @return integer Changed blocks
 	 */
 	public static int load(ZoneVolume volume, String zoneName, World world, boolean onlyLoadCorners) {
 		File cornersFile = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".corners");
@@ -274,9 +277,10 @@ public class ZoneVolumeMapper {
 
 	/**
 	 * Parses an inventory string
-	 *
-	 * @param 	String		invString	string to parse
-	 * @return	List<ItemStack>			Parsed items
+	 * 
+	 * @param String
+	 *                invString string to parse
+	 * @return List<ItemStack> Parsed items
 	 */
 	private static List<ItemStack> readInventoryString(String invString) {
 		List<ItemStack> items = new ArrayList<ItemStack>();
@@ -305,10 +309,12 @@ public class ZoneVolumeMapper {
 
 	/**
 	 * Saves the given volume
-	 *
-	 * @param 	Volume	volume		Volume to save
-	 * @param 	String	zoneName	The warzone the volume is located
-	 * @return	integer			Number of written blocks
+	 * 
+	 * @param Volume
+	 *                volume Volume to save
+	 * @param String
+	 *                zoneName The warzone the volume is located
+	 * @return integer Number of written blocks
 	 */
 	public static int save(Volume volume, String zoneName) {
 		int noOfSavedBlocks = 0;
@@ -472,11 +478,14 @@ public class ZoneVolumeMapper {
 
 	/**
 	 * Saves the Volume as a background-job
-	 *
-	 * @param 	ZoneVolme	volume		volume to save
-	 * @param 	String		zoneName	The zone the volume is located
-	 * @param 	War		war		Instance of war
-	 * @param 	long		tickDelay	delay before beginning the task
+	 * 
+	 * @param ZoneVolme
+	 *                volume volume to save
+	 * @param String
+	 *                zoneName The zone the volume is located
+	 * @param War
+	 *                war Instance of war
+	 * @param long tickDelay delay before beginning the task
 	 */
 	private static void saveAsJob(ZoneVolume volume, String zoneName, long tickDelay) {
 		ZoneVolumeSaveJob job = new ZoneVolumeSaveJob(volume, zoneName);
@@ -485,9 +494,11 @@ public class ZoneVolumeMapper {
 
 	/**
 	 * Deletes the given volume
-	 *
-	 * @param 	Volume	volume	volume to delete
-	 * @param 	War	war	Instance of war
+	 * 
+	 * @param Volume
+	 *                volume volume to delete
+	 * @param War
+	 *                war Instance of war
 	 */
 	public static void delete(Volume volume) {
 		ZoneVolumeMapper.deleteFile("War/dat/volume-" + volume.getName() + ".dat");
@@ -499,9 +510,11 @@ public class ZoneVolumeMapper {
 
 	/**
 	 * Deletes a volume file
-	 *
-	 * @param	String	path	path of file
-	 * @param 	War	war	Instance of war
+	 * 
+	 * @param String
+	 *                path path of file
+	 * @param War
+	 *                war Instance of war
 	 */
 	private static void deleteFile(String path) {
 		File volFile = new File(path);

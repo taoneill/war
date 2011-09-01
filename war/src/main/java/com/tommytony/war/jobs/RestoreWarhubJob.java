@@ -32,7 +32,7 @@ public class RestoreWarhubJob implements Runnable {
 		if (hubStrSplit.length > 3) {
 			worldName = hubStrSplit[3];
 			world = War.war.getServer().getWorld(worldName);
-			if(hubStrSplit.length > 4) {
+			if (hubStrSplit.length > 4) {
 				hubOrientation = hubStrSplit[4];
 			}
 		} else {

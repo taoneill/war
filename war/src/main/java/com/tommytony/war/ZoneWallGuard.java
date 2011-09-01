@@ -14,9 +14,9 @@ import com.tommytony.war.volumes.BlockInfo;
 import bukkit.tommytony.war.War;
 
 /**
- *
+ * 
  * @author tommytony
- *
+ * 
  */
 public class ZoneWallGuard {
 	private Player player;

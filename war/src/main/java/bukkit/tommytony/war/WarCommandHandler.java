@@ -9,19 +9,22 @@ import bukkit.tommytony.war.command.*;
 
 /**
  * Handles commands received by War
- *
- * @author 	Tim Düsterhus
- * @package 	bukkit.tommytony.war
+ * 
+ * @author Tim Düsterhus
+ * @package bukkit.tommytony.war
  */
 public class WarCommandHandler {
 
 	/**
 	 * Handles a command
-	 *
-	 * @param 	sender	The sender of the command
-	 * @param 	cmd	The command
-	 * @param 	args	The arguments
-	 * @see War.onCommand()
+	 * 
+	 * @param sender
+	 *                The sender of the command
+	 * @param cmd
+	 *                The command
+	 * @param args
+	 *                The arguments
+	 * @return Success
 	 */
 	public boolean handle(CommandSender sender, Command cmd, String[] args) {
 		String command = cmd.getName();
@@ -102,20 +105,16 @@ public class WarCommandHandler {
 				commandObj = new ZoneMakerCommand(this, sender, arguments);
 			}
 			// we are not responsible for any other command
-		}
-		catch (NotZoneMakerException e) {
-			// user is no zonemaker -> flame him :D
+		} catch (NotZoneMakerException e) {
 			War.war.badMsg(sender, "You can't do this if you are not a warzone maker.");
-		}
-		catch (Exception e) {
-			// generally catch exceptions and log them
+		} catch (Exception e) {
 			War.war.log("An error occured while handling command " + cmd.getName() + ". Exception:" + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();
 		}
 
-		if(commandObj != null) {
+		if (commandObj != null) {
 			boolean handled = commandObj.handle();
-			if(!handled) {
+			if (!handled) {
 				War.war.badMsg(sender, cmd.getUsage());
 			}
 		}
