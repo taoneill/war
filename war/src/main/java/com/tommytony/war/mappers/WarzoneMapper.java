@@ -499,5 +499,4 @@ public class WarzoneMapper {
 			War.war.log("Failed to delete file " + zoneFile.getName(), Level.WARNING);
 		}
 	}
-
 }

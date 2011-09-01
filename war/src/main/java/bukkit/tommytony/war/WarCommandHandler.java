@@ -76,6 +76,8 @@ public class WarCommandHandler {
 				commandObj = new ResetZoneCommand(this, sender, arguments);
 			} else if (command.equals("nextbattle")) {
 				commandObj = new NextBattleCommand(this, sender, arguments);
+			} else if (command.equals("renamezone")) {
+				commandObj = new RenameZoneCommand(this, sender, arguments);
 			} else if (command.equals("setteam")) {
 				commandObj = new SetTeamCommand(this, sender, arguments);
 			} else if (command.equals("deleteteam")) {
