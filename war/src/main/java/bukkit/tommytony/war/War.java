@@ -433,51 +433,42 @@ public class War extends JavaPlugin {
 	}
 
 	public String printConfig(Warzone zone) {
-		return "Warzone " + zone.getName() + " config - "
-				+ "lifepool:" + zone.getLifePool() + " "
-				+ "teamsize:" + zone.getTeamCap() + " "
-				+ "maxscore:" + zone.getScoreCap() + " "
-				+ "ff:" + this.onOffStr(zone.getFriendlyFire())
-				+ "autoassign:" + this.onOffStr(zone.getAutoAssignOnly())
-				+ "blockheads:" + this.onOffStr(zone.isBlockHeads())
-				+ "spawnstyle:" + zone.getSpawnStyle() + " "
-				+ "monumentheal:" + zone.getMonumentHeal() + " "
-				+ "unbreakable:" + this.onOffStr(zone.isUnbreakableZoneBlocks())
-				+ "disabled:" + this.onOffStr(zone.isDisabled())
-				+ "nocreatures:" + this.onOffStr(zone.isNoCreatures())
-				+ "resetonempty:" + this.onOffStr(zone.isResetOnEmpty())
-				+ "resetonload:" + this.onOffStr(zone.isResetOnLoad())
-				+ "resetonunload:" + this.onOffStr(zone.isResetOnUnload());
+		return "Warzone " + zone.getName() + " config -"
+		 + " lifepool:" + zone.getLifePool()
+		 + " teamsize:" + zone.getTeamCap()
+		 + " maxscore:" + zone.getScoreCap()
+		 + " ff:" + String.valueOf(zone.getFriendlyFire())
+		 + " autoassign:" + String.valueOf(zone.getAutoAssignOnly())
+		 + " blockheads:" + String.valueOf(zone.isBlockHeads())
+		 + " spawnstyle:" + zone.getSpawnStyle()
+		 + " monumentheal:" + zone.getMonumentHeal()
+		 + " unbreakable:" + String.valueOf(zone.isUnbreakableZoneBlocks())
+		 + " disabled:" + String.valueOf(zone.isDisabled())
+		 + " nocreatures:" + String.valueOf(zone.isNoCreatures())
+		 + " resetonempty:" + String.valueOf(zone.isResetOnEmpty())
+		 + " resetonload:" + String.valueOf(zone.isResetOnLoad())
+		 + " resetonunload:" + String.valueOf(zone.isResetOnUnload());
 	}
 
 	public String printConfig() {
-		return "War config - "
-				+ "pvpinzonesonly:" + this.onOffStr(War.war.isPvpInZonesOnly())
-				+ "disablepvpmessage:" + this.onOffStr(War.war.isDisablePvpMessage())
-				+ "buildinzonesonly:" + this.onOffStr(War.war.isBuildInZonesOnly())
-				+ "- Warzone defaults - "
-				+ "lifepool:" + War.war.getDefaultLifepool() + " "
-				+ "teamsize:" + War.war.getDefaultTeamCap() + " "
-				+ "maxscore:" + War.war.getDefaultScoreCap() + " "
-				+ "ff:" + this.onOffStr(War.war.isDefaultFriendlyFire())
-				+ "autoassign:" + this.onOffStr(War.war.isDefaultAutoAssignOnly())
-				+ "blockheads:" + this.onOffStr(War.war.isDefaultBlockHeads())
-				+ "spawnstyle:" + War.war.getDefaultSpawnStyle() + " "
-				+ "monumentheal:" + War.war.getDefaultMonumentHeal() + " "
-				+ "unbreakable:" + this.onOffStr(War.war.isDefaultUnbreakableZoneBlocks())
-				+ "nocreatures:" + this.onOffStr(War.war.isDefaultNoCreatures())
-				+ "resetonempty:" + this.onOffStr(War.war.isDefaultResetOnEmpty())
-				+ "resetonload:" + this.onOffStr(War.war.isDefaultResetOnLoad())
-				+ "resetonunload:" + this.onOffStr(War.war.isDefaultResetOnUnload());
-	}
-
-	private String onOffStr(boolean makeThisAString) {
-		if (makeThisAString) {
-			return "on ";
-		} else {
-			return "off ";
-		}
-
+		return "War config -"
+		 + " pvpinzonesonly:" + String.valueOf(War.war.isPvpInZonesOnly())
+		 + " disablepvpmessage:" + String.valueOf(War.war.isDisablePvpMessage())
+		 + " buildinzonesonly:" + String.valueOf(War.war.isBuildInZonesOnly())
+		 + " - Warzone defaults -"
+		 + " lifepool:" + War.war.getDefaultLifepool()
+		 + " teamsize:" + War.war.getDefaultTeamCap()
+		 + " maxscore:" + War.war.getDefaultScoreCap()
+		 + " ff:" + String.valueOf(War.war.isDefaultFriendlyFire())
+		 + " autoassign:" + String.valueOf(War.war.isDefaultAutoAssignOnly())
+		 + " blockheads:" + String.valueOf(War.war.isDefaultBlockHeads())
+		 + " spawnstyle:" + War.war.getDefaultSpawnStyle()
+		 + " monumentheal:" + War.war.getDefaultMonumentHeal()
+		 + " unbreakable:" + String.valueOf(War.war.isDefaultUnbreakableZoneBlocks())
+		 + " nocreatures:" + String.valueOf(War.war.isDefaultNoCreatures())
+		 + " resetonempty:" + String.valueOf(War.war.isDefaultResetOnEmpty())
+		 + " resetonload:" + String.valueOf(War.war.isDefaultResetOnLoad())
+		 + " resetonunload:" + String.valueOf(War.war.isDefaultResetOnUnload());
 	}
 
 	private void setZoneRallyPoint(String warzoneName, Player player) {
@@ -519,6 +510,9 @@ public class War extends JavaPlugin {
 	/**
 	 * Colors the teams and examples in messages
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e1b895a966e461402a178315162fcb3ae12d3d9d
 	 *
 	 * @param 	str		message-string
 	 * @param 	msgColor	current message-color
