@@ -288,7 +288,7 @@ public class ZoneLobby {
 			this.placeAutoAssignGate();
 			for (String teamName : this.teamGateBlocks.keySet()) {
 				BlockInfo gateInfo = this.teamGateBlocks.get(teamName);
-				this.placeGate(BlockInfo.getBlock(this.warzone.getWorld(), gateInfo), TeamKinds.teamKindFromString(teamName));
+				this.placeGate(BlockInfo.getBlock(this.warzone.getWorld(), gateInfo), TeamKind.teamKindFromString(teamName));
 			}
 			for (Team t : this.warzone.getTeams()) {
 				this.resetTeamGateSign(t);

@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
-import com.tommytony.war.TeamKinds;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mappers.WarzoneMapper;
 
@@ -40,7 +39,7 @@ public class SetTeamFlagCommand extends AbstractZoneMakerCommand {
 			return false;
 		}
 
-		TeamKind kind = TeamKinds.teamKindFromString(this.args[0]);
+		TeamKind kind = TeamKind.teamKindFromString(this.args[0]);
 		Team team = zone.getTeamByKind(kind);
 		if (team == null) {
 			// no such team yet

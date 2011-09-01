@@ -46,7 +46,7 @@ public class HelmetProtectionTask implements Runnable {
 				}
 			}
 			try {
-				Thread.sleep((War.war.isLoaded()) ? 500 : 10000));
+				Thread.sleep((War.war.isLoaded()) ? 500 : 10000);
 			} catch (InterruptedException e) {
 			}
 		}

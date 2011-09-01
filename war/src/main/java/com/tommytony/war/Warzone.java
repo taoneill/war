@@ -46,8 +46,8 @@ public class Warzone {
 	private int teamCap = 5;
 	private int scoreCap = 5;
 	private int monumentHeal = 5;
-	private String spawnStyle = TeamSpawnStyles.BIG;
 	private String flagReturn = "both";
+	private TeamSpawnStyle spawnStyle = TeamSpawnStyle.BIG;
 	private HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
 
 	private HashMap<String, InventoryStash> inventories = new HashMap<String, InventoryStash>();
@@ -326,11 +326,11 @@ public class Warzone {
 		if (this.isBlockHeads()) {
 			playerInv.setHelmet(new ItemStack(team.getKind().getMaterial(), 1, (short) 1, new Byte(team.getKind().getData())));
 		} else {
-			if (team.getKind() == TeamKinds.teamKindFromString("gold")) {
+			if (team.getKind() == TeamKind.GOLD) {
 				playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
-			} else if (team.getKind() == TeamKinds.teamKindFromString("diamond")) {
+			} else if (team.getKind() == TeamKind.DIAMOND) {
 				playerInv.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-			} else if (team.getKind() == TeamKinds.teamKindFromString("iron")) {
+			} else if (team.getKind() == TeamKind.IRON) {
 				playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
 			} else {
 				playerInv.setHelmet(new ItemStack(Material.LEATHER_HELMET));
@@ -961,14 +961,14 @@ public class Warzone {
 		return this.blockHeads;
 	}
 
-	public void setSpawnStyle(String spawnStyle) {
+	public void setSpawnStyle(TeamSpawnStyle spawnStyle) {
 		this.spawnStyle = spawnStyle;
 		for (Team team : this.teams) {
 			team.setTeamSpawn(team.getTeamSpawn());
 		}
 	}
 
-	public String getSpawnStyle() {
+	public TeamSpawnStyle getSpawnStyle() {
 		return this.spawnStyle;
 	}
 

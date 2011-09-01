@@ -15,8 +15,8 @@ import bukkit.tommytony.war.War;
 
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamKinds;
-import com.tommytony.war.TeamSpawnStyles;
+import com.tommytony.war.TeamKind;
+import com.tommytony.war.TeamSpawnStyle;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.volumes.Volume;
@@ -93,7 +93,7 @@ public class WarzoneMapper {
 							int yaw = Integer.parseInt(teamStrSplit[4]);
 							teamLocation.setYaw(yaw);
 						}
-						Team team = new Team(teamStrSplit[0], TeamKinds.teamKindFromString(teamStrSplit[0]), teamLocation, warzone);
+						Team team = new Team(teamStrSplit[0], TeamKind.teamKindFromString(teamStrSplit[0]), teamLocation, warzone);
 						team.setRemainingLives(warzone.getLifePool());
 						warzone.getTeams().add(team);
 					}
@@ -107,7 +107,7 @@ public class WarzoneMapper {
 				for (String teamFlagStr : teamFlagsSplit) {
 					if (teamFlagStr != null && !teamFlagStr.equals("")) {
 						String[] teamFlagStrSplit = teamFlagStr.split(",");
-						Team team = warzone.getTeamByKind(TeamKinds.teamKindFromString(teamFlagStrSplit[0]));
+						Team team = warzone.getTeamByKind(TeamKind.teamKindFromString(teamFlagStrSplit[0]));
 						if (team != null) {
 							int teamFlagX = Integer.parseInt(teamFlagStrSplit[1]);
 							int teamFlagY = Integer.parseInt(teamFlagStrSplit[2]);
@@ -161,15 +161,7 @@ public class WarzoneMapper {
 			// spawnStyle
 			String spawnStyle = warzoneConfig.getString("spawnStyle");
 			if (spawnStyle != null && !spawnStyle.equals("")) {
-				spawnStyle = spawnStyle.toLowerCase();
-				if (spawnStyle.equals(TeamSpawnStyles.SMALL)) {
-					warzone.setSpawnStyle(spawnStyle);
-				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)) {
-					warzone.setSpawnStyle(spawnStyle);
-				} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)) {
-					warzone.setSpawnStyle(spawnStyle);
-				}
-				// default is already initialized to BIG (see Warzone)
+				warzone.setSpawnStyle(TeamSpawnStyle.getStyleByString(spawnStyle));
 			}
 
 			// flagReturn
@@ -382,7 +374,7 @@ public class WarzoneMapper {
 		warzoneConfig.setBoolean("blockHeads", warzone.isBlockHeads());
 
 		// spawnStyle
-		warzoneConfig.setString("spawnStyle", warzone.getSpawnStyle());
+		warzoneConfig.setString("spawnStyle", warzone.getSpawnStyle().toString());
 
 		// reward
 		String rewardStr = "";

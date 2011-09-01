@@ -75,11 +75,9 @@ public class War extends JavaPlugin {
 	private boolean defaultAutoAssignOnly = false;
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
-	private boolean defaultResetOnEmpty = false,
-			defaultResetOnLoad = false,
-			defaultResetOnUnload = false;
-	private String defaultSpawnStyle = TeamSpawnStyles.BIG;
 	private String defaultFlagReturn = "both";
+	private boolean defaultResetOnEmpty = false, defaultResetOnLoad = false, defaultResetOnUnload = false;
+	private TeamSpawnStyle defaultSpawnStyle = TeamSpawnStyle.BIG;
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
 
 	public War() {
@@ -263,16 +261,8 @@ public class War extends JavaPlugin {
 				warzone.setBlockHeads(onOff.equals("on") || onOff.equals("true"));
 			}
 			if (namedParams.containsKey("spawnstyle")) {
-				String spawnStyle = namedParams.get("spawnstyle").toLowerCase();
-				if (spawnStyle.equals(TeamSpawnStyles.SMALL)) {
-					warzone.setSpawnStyle(spawnStyle);
-				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)) {
-					warzone.setSpawnStyle(spawnStyle);
-				} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)) {
-					warzone.setSpawnStyle(spawnStyle);
-				} else {
-					warzone.setSpawnStyle(TeamSpawnStyles.BIG);
-				}
+				String spawnStyle = namedParams.get("spawnstyle");
+				warzone.setSpawnStyle(TeamSpawnStyle.getStyleByString(spawnStyle));
 			}
 			if (namedParams.containsKey("flagreturn")) {
 				String flagReturn = namedParams.get("flagreturn").toLowerCase();
@@ -367,16 +357,8 @@ public class War extends JavaPlugin {
 				this.setDefaultBlockHeads(onOff.equals("on") || onOff.equals("true"));
 			}
 			if (namedParams.containsKey("spawnstyle")) {
-				String spawnStyle = namedParams.get("spawnstyle").toLowerCase();
-				if (spawnStyle.equals(TeamSpawnStyles.SMALL)) {
-					this.setDefaultSpawnStyle(spawnStyle);
-				} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)) {
-					this.setDefaultSpawnStyle(spawnStyle);
-				} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)) {
-					this.setDefaultSpawnStyle(spawnStyle);
-				} else {
-					this.setDefaultSpawnStyle(TeamSpawnStyles.BIG);
-				}
+				String spawnStyle = namedParams.get("spawnstyle");
+				this.setDefaultSpawnStyle(TeamSpawnStyle.getStyleByString(spawnStyle));
 			}
 			if (namedParams.containsKey("flagreturn")) {
 				String flagreturn = namedParams.get("flagreturn").toLowerCase();
@@ -527,8 +509,8 @@ public class War extends JavaPlugin {
 >>>>>>> 174126209b48a201d04de613eaae26503605fa94
 	 */
 	private String colorKnownTokens(String str, ChatColor msgColor) {
-		for (TeamKind kind : TeamKinds.getTeamkinds()) {
-			str = str.replaceAll(" " + kind.getDefaultName(), " " + kind.getColor() + kind.getDefaultName() + msgColor);
+		for (TeamKind kind : TeamKind.values()) {
+			str = str.replaceAll(" " + kind.toString(), " " + kind.getColor() + kind.toString() + msgColor);
 		}
 		str = str.replaceAll("Ex -", ChatColor.GRAY + "Ex -");
 		return str;
@@ -893,11 +875,11 @@ public class War extends JavaPlugin {
 		this.defaultResetOnUnload = defaultResetOnUnload;
 	}
 
-	public String getDefaultSpawnStyle() {
-		return this.defaultSpawnStyle;
+	public TeamSpawnStyle getDefaultSpawnStyle() {
+		return defaultSpawnStyle;
 	}
 
-	public void setDefaultSpawnStyle(String defaultSpawnStyle) {
+	public void setDefaultSpawnStyle(TeamSpawnStyle defaultSpawnStyle) {
 		this.defaultSpawnStyle = defaultSpawnStyle;
 	}
 

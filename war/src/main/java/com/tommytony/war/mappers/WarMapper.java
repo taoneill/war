@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
 
-import com.tommytony.war.TeamSpawnStyles;
+import com.tommytony.war.TeamSpawnStyle;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.jobs.RestoreWarhubJob;
@@ -118,15 +118,7 @@ public class WarMapper {
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
 		if (spawnStyle != null && !spawnStyle.equals("")) {
-			spawnStyle = spawnStyle.toLowerCase();
-			if (spawnStyle.equals(TeamSpawnStyles.SMALL)) {
-				War.war.setDefaultSpawnStyle(spawnStyle);
-			} else if (spawnStyle.equals(TeamSpawnStyles.FLAT)) {
-				War.war.setDefaultSpawnStyle(spawnStyle);
-			} else if (spawnStyle.equals(TeamSpawnStyles.INVISIBLE)) {
-				War.war.setDefaultSpawnStyle(spawnStyle);
-			}
-			// default is already initialized to BIG (see Warzone)
+			War.war.setDefaultSpawnStyle(TeamSpawnStyle.getStyleByString(spawnStyle));
 		}
 
 		// defaultFlagReturn
@@ -248,7 +240,7 @@ public class WarMapper {
 		warConfig.setBoolean("disablePvpMessage", War.war.isDisablePvpMessage());
 
 		// spawnStyle
-		warConfig.setString("spawnStyle", War.war.getDefaultSpawnStyle());
+		warConfig.setString("spawnStyle", War.war.getDefaultSpawnStyle().toString());
 
 		// defaultReward
 		String defaultRewardStr = "";
