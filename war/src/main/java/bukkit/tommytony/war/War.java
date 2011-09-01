@@ -491,22 +491,12 @@ public class War extends JavaPlugin {
 
 	/**
 	 * Colors the teams and examples in messages
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e1b895a966e461402a178315162fcb3ae12d3d9d
-	 *
-	 * @param 	str		message-string
-	 * @param 	msgColor	current message-color
-	 * @return			Message with colored teams
-=======
 	 * 
 	 * @param String
 	 *                str message-string
 	 * @param String
 	 *                msgColor current message-color
 	 * @return String Message with colored teams
->>>>>>> 174126209b48a201d04de613eaae26503605fa94
 	 */
 	private String colorKnownTokens(String str, ChatColor msgColor) {
 		for (TeamKind kind : TeamKind.values()) {
@@ -518,17 +508,11 @@ public class War extends JavaPlugin {
 
 	/**
 	 * Logs a specified message with a specified level
-<<<<<<< HEAD
-	 *
-	 * @param 	str	message to log
-	 * @param 	lvl	level to use
-=======
 	 * 
 	 * @param String
 	 *                str message to log
 	 * @param Level
 	 *                lvl level to use
->>>>>>> 174126209b48a201d04de613eaae26503605fa94
 	 */
 	public void log(String str, Level lvl) {
 		this.getLogger().log(lvl, "War> " + str);
