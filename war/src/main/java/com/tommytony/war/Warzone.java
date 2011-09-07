@@ -46,7 +46,7 @@ public class Warzone {
 	private int teamCap = 5;
 	private int scoreCap = 5;
 	private int monumentHeal = 5;
-	private String flagReturn = "both";
+	private FlagReturn flagReturn = FlagReturn.BOTH;
 	private TeamSpawnStyle spawnStyle = TeamSpawnStyle.BIG;
 	private HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
 
@@ -79,6 +79,8 @@ public class Warzone {
 		this.teamCap = War.war.getDefaultTeamCap();
 		this.scoreCap = War.war.getDefaultScoreCap();
 		this.monumentHeal = War.war.getDefaultMonumentHeal();
+		this.spawnStyle = War.war.getDefaultSpawnStyle(); // don't use side-effect-full setters instead of this
+		this.flagReturn = War.war.getDefaultFlagReturn();
 		this.setBlockHeads(War.war.isDefaultBlockHeads());
 		this.setUnbreakableZoneBlocks(War.war.isDefaultUnbreakableZoneBlocks());
 		this.setNoCreatures(War.war.isDefaultNoCreatures());
@@ -973,11 +975,11 @@ public class Warzone {
 	}
 
 
-	public void setFlagReturn(String flagReturn) {
+	public void setFlagReturn(FlagReturn flagReturn) {
 		this.flagReturn = flagReturn;
 	}
 
-	public String getFlagReturn() {
+	public FlagReturn getFlagReturn() {
 		return this.flagReturn;
 	}
 

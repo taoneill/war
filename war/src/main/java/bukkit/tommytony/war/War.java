@@ -75,7 +75,7 @@ public class War extends JavaPlugin {
 	private boolean defaultAutoAssignOnly = false;
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
-	private String defaultFlagReturn = "both";
+	private FlagReturn defaultFlagReturn = FlagReturn.BOTH;
 	private boolean defaultResetOnEmpty = false, defaultResetOnLoad = false, defaultResetOnUnload = false;
 	private TeamSpawnStyle defaultSpawnStyle = TeamSpawnStyle.BIG;
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
@@ -262,16 +262,16 @@ public class War extends JavaPlugin {
 			}
 			if (namedParams.containsKey("spawnstyle")) {
 				String spawnStyle = namedParams.get("spawnstyle");
-				warzone.setSpawnStyle(TeamSpawnStyle.getStyleByString(spawnStyle));
+				warzone.setSpawnStyle(TeamSpawnStyle.getStyleFromString(spawnStyle));
 			}
 			if (namedParams.containsKey("flagreturn")) {
 				String flagReturn = namedParams.get("flagreturn").toLowerCase();
 				if (flagReturn.equals("flag")) {
-					warzone.setFlagReturn("flag");
+					warzone.setFlagReturn(FlagReturn.FLAG);
 				} else if (flagReturn.equals("spawn")) {
-					warzone.setFlagReturn("spawn");
+					warzone.setFlagReturn(FlagReturn.SPAWN);
 				} else {
-					warzone.setFlagReturn("both");
+					warzone.setFlagReturn(FlagReturn.BOTH);
 				}
 			}
 			if (namedParams.containsKey("unbreakable")) {
@@ -358,16 +358,16 @@ public class War extends JavaPlugin {
 			}
 			if (namedParams.containsKey("spawnstyle")) {
 				String spawnStyle = namedParams.get("spawnstyle");
-				this.setDefaultSpawnStyle(TeamSpawnStyle.getStyleByString(spawnStyle));
+				this.setDefaultSpawnStyle(TeamSpawnStyle.getStyleFromString(spawnStyle));
 			}
 			if (namedParams.containsKey("flagreturn")) {
 				String flagreturn = namedParams.get("flagreturn").toLowerCase();
 				if (flagreturn.equals("flag")) {
-					this.setDefaultFlagReturn("flag");
+					this.setDefaultFlagReturn(FlagReturn.FLAG);
 				} else if (flagreturn.equals("spawn")) {
-					this.setDefaultFlagReturn("spawn");
+					this.setDefaultFlagReturn(FlagReturn.SPAWN);
 				} else {
-					this.setDefaultFlagReturn("both");
+					this.setDefaultFlagReturn(FlagReturn.BOTH);
 				}
 			}
 			if (namedParams.containsKey("buildinzonesonly")) {
@@ -423,6 +423,7 @@ public class War extends JavaPlugin {
 		 + " autoassign:" + String.valueOf(zone.getAutoAssignOnly())
 		 + " blockheads:" + String.valueOf(zone.isBlockHeads())
 		 + " spawnstyle:" + zone.getSpawnStyle()
+		 + " flagreturn:" + zone.getFlagReturn()
 		 + " monumentheal:" + zone.getMonumentHeal()
 		 + " unbreakable:" + String.valueOf(zone.isUnbreakableZoneBlocks())
 		 + " disabled:" + String.valueOf(zone.isDisabled())
@@ -445,6 +446,7 @@ public class War extends JavaPlugin {
 		 + " autoassign:" + String.valueOf(War.war.isDefaultAutoAssignOnly())
 		 + " blockheads:" + String.valueOf(War.war.isDefaultBlockHeads())
 		 + " spawnstyle:" + War.war.getDefaultSpawnStyle()
+		 + " flagreturn:" + War.war.getDefaultFlagReturn()
 		 + " monumentheal:" + War.war.getDefaultMonumentHeal()
 		 + " unbreakable:" + String.valueOf(War.war.isDefaultUnbreakableZoneBlocks())
 		 + " nocreatures:" + String.valueOf(War.war.isDefaultNoCreatures())
@@ -867,11 +869,11 @@ public class War extends JavaPlugin {
 		this.defaultSpawnStyle = defaultSpawnStyle;
 	}
 
-	public void setDefaultFlagReturn(String defaultFlagReturn) {
+	public void setDefaultFlagReturn(FlagReturn defaultFlagReturn) {
 		this.defaultFlagReturn = defaultFlagReturn;
 	}
 
-	public String getDefaultFlagReturn() {
+	public FlagReturn getDefaultFlagReturn() {
 		return defaultFlagReturn;
 	}
 

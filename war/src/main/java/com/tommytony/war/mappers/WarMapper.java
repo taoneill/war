@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.FlagReturn;
 import com.tommytony.war.TeamSpawnStyle;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
@@ -118,19 +119,13 @@ public class WarMapper {
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
 		if (spawnStyle != null && !spawnStyle.equals("")) {
-			War.war.setDefaultSpawnStyle(TeamSpawnStyle.getStyleByString(spawnStyle));
+			War.war.setDefaultSpawnStyle(TeamSpawnStyle.getStyleFromString(spawnStyle));
 		}
 
 		// defaultFlagReturn
 		String flagReturn = warConfig.getString("defaultFlagReturn");
 		if (flagReturn != null && !flagReturn.equals("")) {
-			flagReturn = flagReturn.toLowerCase();
-			if (flagReturn.equals("flag")) {
-				War.war.setDefaultFlagReturn("flag");
-			} else if (flagReturn.equals("spawn")) {
-				War.war.setDefaultFlagReturn("spawn");
-			}
-			// default is already initialized to both (see Warzone)
+			War.war.setDefaultFlagReturn(FlagReturn.getFromString(flagReturn));
 		}
 
 		// defaultReward
@@ -242,6 +237,9 @@ public class WarMapper {
 		// spawnStyle
 		warConfig.setString("spawnStyle", War.war.getDefaultSpawnStyle().toString());
 
+		// spawnStyle
+		warConfig.setString("flagReturn", War.war.getDefaultFlagReturn().toString());
+		
 		// defaultReward
 		String defaultRewardStr = "";
 		HashMap<Integer, ItemStack> rewardItems = War.war.getDefaultReward();

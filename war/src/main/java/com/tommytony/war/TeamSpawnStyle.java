@@ -16,7 +16,7 @@ public enum TeamSpawnStyle {
 		return super.toString().toLowerCase();
 	}
 
-	public static TeamSpawnStyle getStyleByString(String string) {
+	public static TeamSpawnStyle getStyleFromString(String string) {
 		for (TeamSpawnStyle style : TeamSpawnStyle.values()) {
 			if (string.toLowerCase().equals(style.toString())) {
 				return style;

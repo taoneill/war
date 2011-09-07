@@ -21,6 +21,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.tommytony.war.FlagReturn;
 import com.tommytony.war.Team;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
@@ -375,18 +376,18 @@ public class WarPlayerListener extends PlayerListener {
 				boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
 				boolean inFlag = (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation()));
 
-				if (playerWarzone.equals("both")) {
+				if (playerWarzone.getFlagReturn() == FlagReturn.BOTH) {
 					if (!inSpawn && !inFlag) return;
-				} else if (playerWarzone.equals("spawn")) {
+				} else if (playerWarzone.getFlagReturn() == FlagReturn.SPAWN) {
 					if (inFlag) {
-						War.war.badMsg(player, "You have to unload the flag at your spawn.");
+						War.war.badMsg(player, "You have to capture the enemy flag at your team's spawn.");
 						return;
 					} else if (!inSpawn) {
 						return;
 					}
-				} else if (playerWarzone.equals("flag")) {
+				} else if (playerWarzone.getFlagReturn() == FlagReturn.FLAG) {
 					if (inSpawn) {
-						War.war.badMsg(player, "You have to unload the flag at your flag.");
+						War.war.badMsg(player, "You have to capture the enemy flag at your team's flag.");
 						return;
 					} else if (!inFlag) {
 						return;

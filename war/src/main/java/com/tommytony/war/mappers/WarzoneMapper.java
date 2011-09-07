@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.FlagReturn;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
@@ -161,19 +162,13 @@ public class WarzoneMapper {
 			// spawnStyle
 			String spawnStyle = warzoneConfig.getString("spawnStyle");
 			if (spawnStyle != null && !spawnStyle.equals("")) {
-				warzone.setSpawnStyle(TeamSpawnStyle.getStyleByString(spawnStyle));
+				warzone.setSpawnStyle(TeamSpawnStyle.getStyleFromString(spawnStyle));
 			}
 
 			// flagReturn
 			String flagReturn = warzoneConfig.getString("flagReturn");
 			if (flagReturn != null && !flagReturn.equals("")) {
-				flagReturn = flagReturn.toLowerCase();
-				if (flagReturn.equals("flag")) {
-					warzone.setFlagReturn("flag");
-				} else if (flagReturn.equals("spawn")) {
-					warzone.setFlagReturn("spawn");
-				}
-				// default is already initialized to both (see Warzone)
+				warzone.setFlagReturn(FlagReturn.getFromString(flagReturn));
 			}
 
 			// reward
@@ -375,6 +370,9 @@ public class WarzoneMapper {
 
 		// spawnStyle
 		warzoneConfig.setString("spawnStyle", warzone.getSpawnStyle().toString());
+		
+		// flagReturn
+		warzoneConfig.setString("flagReturn", warzone.getFlagReturn().toString());
 
 		// reward
 		String rewardStr = "";

@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.tommytony.war.FlagReturn;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
@@ -182,14 +183,21 @@ public class WarBlockListener extends BlockListener {
 						warzone.addFlagThief(lostFlagTeam, player.getName());
 						block.setType(Material.AIR);
 
+						String spawnOrFlag = "spawn or flag";
+						if (warzone.getFlagReturn() == FlagReturn.FLAG || warzone.getFlagReturn() == FlagReturn.SPAWN) {
+							spawnOrFlag = warzone.getFlagReturn().toString();
+						}
+												
 						for (Team t : warzone.getTeams()) {
 							t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " stole team " + lostFlagTeam.getName() + "'s flag.");
 							if (t.getName().equals(lostFlagTeam.getName())) {
 								t.teamcast("Prevent " + team.getKind().getColor() + player.getName() + ChatColor.WHITE
-										+ " from reaching team " + team.getName() + "'s spawn or flag.");
+										+ " from reaching team " + team.getName() + "'s " + spawnOrFlag + ".");
 							}
 						}
-						War.war.msg(player, "You have team " + lostFlagTeam.getName() + "'s flag. Reach your team spawn or flag to capture it!");
+						
+						
+						War.war.msg(player, "You have team " + lostFlagTeam.getName() + "'s flag. Reach your team " + spawnOrFlag + " to capture it!");
 					} else {
 						War.war.msg(player, "You can't steal team " + lostFlagTeam.getName() + "'s flag since no players are on that team.");
 					}
