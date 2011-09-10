@@ -98,6 +98,9 @@ public class WarMapper {
 		// defaultAutoAssignOnly
 		War.war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
 
+		// defaultFlagPointsOnly
+		War.war.setDefaultFlagPointsOnly(warConfig.getBoolean("defaultFlagPointsOnly"));
+
 		// defaultTeamCap
 		War.war.setDefaultTeamCap(warConfig.getInt("defaultTeamCap"));
 
@@ -215,6 +218,9 @@ public class WarMapper {
 
 		// defaultAutoAssignOnly
 		warConfig.setBoolean("defaultAutoAssignOnly", War.war.isDefaultAutoAssignOnly());
+
+		// defaultFlagPointsOnly
+		warConfig.setBoolean("defaultFlagPointsOnly", War.war.isDefaultFlagPointsOnly());
 
 		// defaultTeamCap
 		warConfig.setInt("defaultTeamCap", War.war.getDefaultTeamCap());

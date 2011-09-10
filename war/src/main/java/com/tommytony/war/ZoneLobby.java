@@ -362,7 +362,7 @@ public class ZoneLobby {
 			rightSide = BlockFace.SOUTH;
 		}
 		this.teamGateBlocks.clear();
-		if (this.warzone.getAutoAssignOnly()) {
+		if (this.warzone.isAutoAssignOnly()) {
 			this.autoAssignGate = new BlockInfo(lobbyMiddleWallBlock);
 		} else {
 			this.autoAssignGate = null;
