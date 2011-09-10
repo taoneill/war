@@ -18,8 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.plugin.Plugin;
-
 import bukkit.tommytony.war.War;
 
 import com.tommytony.war.jobs.InitZoneJob;
@@ -29,7 +27,7 @@ import com.tommytony.war.utils.InventoryStash;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
- * 
+ *
  * @author tommytony
  * @package com.tommytony.war
  */
@@ -213,7 +211,7 @@ public class Warzone {
 
 	/**
 	 * Goes back to the saved state of the warzone (resets only block types, not physics). Also teleports all players back to their respective spawns.
-	 * 
+	 *
 	 * @return
 	 */
 	public void initializeZone() {

@@ -1,8 +1,6 @@
 package com.tommytony.war.jobs;
 
 import java.util.HashMap;
-import java.util.logging.Level;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,8 +13,7 @@ import com.tommytony.war.Warzone;
 import bukkit.tommytony.war.War;
 
 /**
- * Sets the helmet again onto the players heads.
- * Also limits the number of blocks being held.
+ * Sets the helmet again onto the players heads. Also limits the number of blocks being held.
  *
  * @author Tim Düsterhus
  */
@@ -81,7 +78,7 @@ public class HelmetProtectionTask implements Runnable {
 			}
 		}
 	}
-	
+
 	private ItemStack createBlockHead(Team team) {
 		return new ItemStack(team.getKind().getMaterial(), 1, (short) 1, new Byte(team.getKind().getData()));
 	}
