@@ -290,12 +290,10 @@ public class Warzone {
 		this.handleRespawn(team, player);
 		// Teleport the player back to spawn
 		event.setTo(team.getTeamSpawn());
-		// player.teleport(team.getTeamSpawn());
 	}
 
 	private void handleRespawn(Team team, Player player) {
 		// Fill hp
-		player.setFireTicks(0);
 		player.setRemainingAir(300);
 		player.setHealth(20);
 
@@ -817,10 +815,6 @@ public class Warzone {
 				}
 			}
 			playerTeam.resetSign();
-			Plugin heroicDeath = War.war.getServer().getPluginManager().getPlugin("HeroicDeath");
-			if (heroicDeath != null) {
-
-			}
 		}
 	}
 
