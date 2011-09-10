@@ -20,7 +20,7 @@ public class LoadoutResetJob implements Runnable {
 	public void run() {
 		this.zone.resetInventory(this.team, this.player);
 		// Stop fire here, since doing it in the same tick as death doesn't extinguish it
-		player.setFireTicks(0);
+		this.player.setFireTicks(0);
 	}
 
 }

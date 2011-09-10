@@ -18,9 +18,9 @@ import com.tommytony.war.volumes.Volume;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class ZoneLobby {
 	private final Warzone warzone;
@@ -41,7 +41,7 @@ public class ZoneLobby {
 
 	/**
 	 * Use this constructor with /setzonelobby <n/s/e/w>
-	 * 
+	 *
 	 * @param war
 	 * @param warzone
 	 * @param wall
@@ -59,7 +59,7 @@ public class ZoneLobby {
 
 	/**
 	 * Use this constructor with /setzonelobby <zonename>. Makes sure the lobby is not sticking inside the zone.
-	 * 
+	 *
 	 * @param war
 	 * @param warzone
 	 * @param wall
@@ -115,7 +115,7 @@ public class ZoneLobby {
 
 	/**
 	 * Changes the lobby's position. Orientation is determined from the player location. Creates volume or resets. Saves new lobby blocks.
-	 * 
+	 *
 	 * @param playerLocation
 	 */
 	public void setLocation(Location playerLocation) {
@@ -174,7 +174,7 @@ public class ZoneLobby {
 
 	/**
 	 * Classic way of creating a lobby. Lobby position goes to middle of zone wall. Creates volume or resets. Saves new lobby blocks.
-	 * 
+	 *
 	 * @param newWall
 	 */
 	public void setWall(BlockFace newWall) {

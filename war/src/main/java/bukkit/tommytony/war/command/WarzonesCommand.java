@@ -11,7 +11,7 @@ import com.tommytony.war.Warzone;
 
 /**
  * Lists all warzones
- * 
+ *
  * @author Tim Düsterhus
  */
 public class WarzonesCommand extends AbstractWarCommand {

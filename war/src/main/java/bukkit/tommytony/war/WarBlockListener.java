@@ -19,9 +19,9 @@ import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class WarBlockListener extends BlockListener {
 
@@ -187,7 +187,7 @@ public class WarBlockListener extends BlockListener {
 						if (warzone.getFlagReturn() == FlagReturn.FLAG || warzone.getFlagReturn() == FlagReturn.SPAWN) {
 							spawnOrFlag = warzone.getFlagReturn().toString();
 						}
-												
+
 						for (Team t : warzone.getTeams()) {
 							t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " stole team " + lostFlagTeam.getName() + "'s flag.");
 							if (t.getName().equals(lostFlagTeam.getName())) {
@@ -195,8 +195,8 @@ public class WarBlockListener extends BlockListener {
 										+ " from reaching team " + team.getName() + "'s " + spawnOrFlag + ".");
 							}
 						}
-						
-						
+
+
 						War.war.msg(player, "You have team " + lostFlagTeam.getName() + "'s flag. Reach your team " + spawnOrFlag + " to capture it!");
 					} else {
 						War.war.msg(player, "You can't steal team " + lostFlagTeam.getName() + "'s flag since no players are on that team.");

@@ -10,9 +10,9 @@ import org.bukkit.block.BlockFace;
 import bukkit.tommytony.war.War;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 @Deprecated
 public class VerticalVolume extends Volume {

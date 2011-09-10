@@ -9,7 +9,7 @@ import bukkit.tommytony.war.command.*;
 
 /**
  * Handles commands received by War
- * 
+ *
  * @author Tim Düsterhus
  * @package bukkit.tommytony.war
  */
@@ -17,7 +17,7 @@ public class WarCommandHandler {
 
 	/**
 	 * Handles a command
-	 * 
+	 *
 	 * @param sender
 	 *                The sender of the command
 	 * @param cmd

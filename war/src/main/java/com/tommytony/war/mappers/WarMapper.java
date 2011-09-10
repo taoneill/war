@@ -17,9 +17,9 @@ import com.tommytony.war.jobs.RestoreWarhubJob;
 import com.tommytony.war.jobs.RestoreWarzonesJob;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class WarMapper {
 
@@ -239,7 +239,7 @@ public class WarMapper {
 
 		// spawnStyle
 		warConfig.setString("flagReturn", War.war.getDefaultFlagReturn().toString());
-		
+
 		// defaultReward
 		String defaultRewardStr = "";
 		HashMap<Integer, ItemStack> rewardItems = War.war.getDefaultReward();

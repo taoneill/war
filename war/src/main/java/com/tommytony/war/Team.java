@@ -15,9 +15,9 @@ import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.Volume;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class Team {
 	private List<Player> players = new ArrayList<Player>();

@@ -24,9 +24,9 @@ import com.tommytony.war.volumes.Volume;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class WarzoneMapper {
 
@@ -370,7 +370,7 @@ public class WarzoneMapper {
 
 		// spawnStyle
 		warzoneConfig.setString("spawnStyle", warzone.getSpawnStyle().toString());
-		
+
 		// flagReturn
 		warzoneConfig.setString("flagReturn", warzone.getFlagReturn().toString());
 

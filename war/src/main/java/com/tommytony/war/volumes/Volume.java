@@ -22,9 +22,9 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.jobs.BlockResetJob;
 
 /**
- * 
+ *
  * @author tommytony
- * 
+ *
  */
 public class Volume {
 	private final String name;

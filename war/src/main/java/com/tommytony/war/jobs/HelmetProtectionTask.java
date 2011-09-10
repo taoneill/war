@@ -23,7 +23,9 @@ public class HelmetProtectionTask implements Runnable {
 	 * @see Runnable.run()
 	 */
 	public void run() {
-		if (!War.war.isLoaded()) return;
+		if (!War.war.isLoaded()) {
+			return;
+		}
 		for (Warzone zone : War.war.getWarzones()) {
 			for (Team team : zone.getTeams()) {
 				for (Player player : team.getPlayers()) {
@@ -33,7 +35,7 @@ public class HelmetProtectionTask implements Runnable {
 						teamBlockMaterial = team.getKind().getMaterial();
 						// 1) Replace missing block head
 						if (playerInv.getHelmet().getType() != teamBlockMaterial) {
-							playerInv.setHelmet(createBlockHead(team));
+							playerInv.setHelmet(this.createBlockHead(team));
 						}
 						// 2) Get rid of extra blocks in inventory: only keep one
 						HashMap<Integer, ? extends ItemStack> blocks = playerInv.all(teamBlockMaterial);
@@ -48,7 +50,7 @@ public class HelmetProtectionTask implements Runnable {
 								}
 								i++;
 							}
-							playerInv.setItem(playerInv.firstEmpty(), createBlockHead(team));
+							playerInv.setItem(playerInv.firstEmpty(), this.createBlockHead(team));
 							if (removed > 1) {
 								War.war.badMsg(player, "All that " + team.getName() + " wool must have been heavy!");
 							}

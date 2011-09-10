@@ -52,6 +52,7 @@ public enum TeamKind {
 		return this.material;
 	}
 
+	@Override
 	public String toString() {
 		return super.toString().toLowerCase();
 	}

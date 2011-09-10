@@ -37,7 +37,7 @@ public class WarPlayerListener extends PlayerListener {
 
 	/**
 	 * Correctly removes quitting players from warzones
-	 * 
+	 *
 	 * @see PlayerListener.onPlayerQuit()
 	 */
 	@Override
@@ -376,7 +376,9 @@ public class WarPlayerListener extends PlayerListener {
 				boolean inFlag = (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation()));
 
 				if (playerWarzone.getFlagReturn() == FlagReturn.BOTH) {
-					if (!inSpawn && !inFlag) return;
+					if (!inSpawn && !inFlag) {
+						return;
+					}
 				} else if (playerWarzone.getFlagReturn() == FlagReturn.SPAWN) {
 					if (inFlag) {
 						War.war.badMsg(player, "You have to capture the enemy flag at your team's spawn.");

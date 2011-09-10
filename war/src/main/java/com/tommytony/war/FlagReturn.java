@@ -4,7 +4,7 @@ public enum FlagReturn {
 	BOTH,
 	FLAG,
 	SPAWN;
-	
+
 	@Override
 	public String toString() {
 		return super.toString().toLowerCase();

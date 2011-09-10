@@ -31,7 +31,7 @@ import com.tommytony.war.utils.*;
 
 /**
  * Main class of War
- * 
+ *
  * @author tommytony, Tim Düsterhus
  * @package bukkit.tommytony.war
  */
@@ -164,7 +164,7 @@ public class War extends JavaPlugin {
 		}
 
 		this.getServer().getScheduler().cancelTasks(this);
-		
+
 		this.log("War v" + this.desc.getVersion() + " is off.", Level.INFO);
 		this.setLoaded(false);
 	}
@@ -192,7 +192,7 @@ public class War extends JavaPlugin {
 
 	/**
 	 * Converts the player-inventory to a loadout hashmap
-	 * 
+	 *
 	 * @param inv
 	 *                inventory to get the items from
 	 * @param loadout
@@ -221,7 +221,7 @@ public class War extends JavaPlugin {
 
 	/**
 	 * Converts the player-inventory to a loadout hashmap
-	 * 
+	 *
 	 * @param player
 	 *                player to get the inventory to get the items from
 	 * @param loadout
@@ -497,7 +497,7 @@ public class War extends JavaPlugin {
 
 	/**
 	 * Colors the teams and examples in messages
-	 * 
+	 *
 	 * @param String
 	 *                str message-string
 	 * @param String
@@ -514,7 +514,7 @@ public class War extends JavaPlugin {
 
 	/**
 	 * Logs a specified message with a specified level
-	 * 
+	 *
 	 * @param String
 	 *                str message to log
 	 * @param Level
@@ -866,7 +866,7 @@ public class War extends JavaPlugin {
 	}
 
 	public TeamSpawnStyle getDefaultSpawnStyle() {
-		return defaultSpawnStyle;
+		return this.defaultSpawnStyle;
 	}
 
 	public void setDefaultSpawnStyle(TeamSpawnStyle defaultSpawnStyle) {
@@ -878,7 +878,7 @@ public class War extends JavaPlugin {
 	}
 
 	public FlagReturn getDefaultFlagReturn() {
-		return defaultFlagReturn;
+		return this.defaultFlagReturn;
 	}
 
 	public HashMap<String, InventoryStash> getDisconnected() {

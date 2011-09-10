@@ -25,7 +25,7 @@ import com.tommytony.war.Warzone;
 
 /**
  * Handles Entity-Events
- * 
+ *
  * @author tommytony, Tim Düsterhus
  * @package bukkit.tommytony.war
  */
@@ -33,7 +33,7 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Handles PVP-Damage
-	 * 
+	 *
 	 * @param event
 	 *                fired event
 	 */
@@ -133,7 +133,7 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Protects important structures from explosions
-	 * 
+	 *
 	 * @see EntityListener.onEntityExplode()
 	 */
 	@Override
@@ -166,7 +166,7 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Handles damage on Players
-	 * 
+	 *
 	 * @see EntityListener.onEntityDamage()
 	 */
 	@Override
@@ -227,7 +227,7 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Prevents creatures from spawning in warzones if no creatures is active
-	 * 
+	 *
 	 * @see EntityListener.onCreatureSpawn()
 	 */
 	@Override
@@ -246,7 +246,7 @@ public class WarEntityListener extends EntityListener {
 
 	/**
 	 * Prevents health regaining caused by peaceful mode
-	 * 
+	 *
 	 * @see EntityListener.onEntityRegainHealth()
 	 */
 	@Override
@@ -254,7 +254,7 @@ public class WarEntityListener extends EntityListener {
 		if (!War.war.isLoaded() || event.getRegainReason() != RegainReason.REGEN) {
 			return;
 		}
-		
+
 		Entity entity = event.getEntity();
 		if (!(entity instanceof Player)) {
 			return;

@@ -265,9 +265,13 @@ public class Warzone {
 
 		// nom drops
 		for(Entity entity : (this.getWorld().getEntities())) {
-			if (!(entity instanceof Item) && !(entity instanceof CraftItem)) continue;
+			if (!(entity instanceof Item) && !(entity instanceof CraftItem)) {
+				continue;
+			}
 			// validate position
-			if (!this.getVolume().contains(entity.getLocation())) continue;
+			if (!this.getVolume().contains(entity.getLocation())) {
+				continue;
+			}
 
 			// omnomnomnom
 			entity.remove();
