@@ -79,6 +79,7 @@ public class War extends JavaPlugin {
 	private boolean defaultResetOnEmpty = false, defaultResetOnLoad = false, defaultResetOnUnload = false;
 	private TeamSpawnStyle defaultSpawnStyle = TeamSpawnStyle.BIG;
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
+	private int helmetProtectionTask;
 
 	public War() {
 		super();
@@ -144,7 +145,8 @@ public class War extends JavaPlugin {
 		this.getDefaultReward().put(0, new ItemStack(Material.CAKE, 1));
 
 		WarMapper.load();
-		this.getServer().getScheduler().scheduleAsyncDelayedTask(this, new HelmetProtectionTask());
+		HelmetProtectionTask helmetProtectionTask = new HelmetProtectionTask();
+		this.helmetProtectionTask = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, helmetProtectionTask, 250, 100);
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
 	}
 
@@ -161,6 +163,8 @@ public class War extends JavaPlugin {
 			this.warHub.getVolume().resetBlocks();
 		}
 
+		this.getServer().getScheduler().cancelTasks(this);
+		
 		this.log("War v" + this.desc.getVersion() + " is off.", Level.INFO);
 		this.setLoaded(false);
 	}

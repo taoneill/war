@@ -67,14 +67,13 @@ public class WarPlayerListener extends PlayerListener {
 					// a flag thief can't drop his flag
 					War.war.badMsg(player, "Can't drop items while stealing flag. What are you doing?! Run!");
 					event.setCancelled(true);
-
 				} else {
 					Item item = event.getItemDrop();
 					if (item != null) {
 						ItemStack itemStack = item.getItemStack();
 						if (itemStack != null && itemStack.getType() == team.getKind().getMaterial() && itemStack.getData().getData() == team.getKind().getData()) {
 							// Can't drop your team's kind block
-							War.war.badMsg(player, "Can't drop " + team.getName() + " block blocks.");
+							War.war.badMsg(player, "Can't drop " + team.getName() + " blocks.");
 							event.setCancelled(true);
 							return;
 						}
