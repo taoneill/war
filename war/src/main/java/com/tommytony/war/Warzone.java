@@ -55,6 +55,7 @@ public class Warzone {
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private ZoneLobby lobby;
 	private boolean autoAssignOnly;
+	private boolean flagPointsOnly;
 	private boolean blockHeads;
 	private boolean unbreakableZoneBlocks;
 	private boolean disabled = false;
@@ -74,6 +75,7 @@ public class Warzone {
 		this.setLifePool(War.war.getDefaultLifepool());
 		this.setLoadout(War.war.getDefaultLoadout());
 		this.setAutoAssignOnly(War.war.isDefaultAutoAssignOnly());
+		this.setFlagPointsOnly(War.war.isDefaultFlagPointsOnly());
 		this.teamCap = War.war.getDefaultTeamCap();
 		this.scoreCap = War.war.getDefaultScoreCap();
 		this.monumentHeal = War.war.getDefaultMonumentHeal();
@@ -165,6 +167,11 @@ public class Warzone {
 
 	public String getName() {
 		return this.name;
+	}
+
+	@Override
+	public String toString() {
+		return this.getName();
 	}
 
 	public void setTeleport(Location location) {
@@ -381,6 +388,11 @@ public class Warzone {
 		return this.friendlyFire;
 	}
 
+	public void setFriendlyFire(boolean ffOn) {
+		this.friendlyFire = ffOn;
+	}
+
+
 	public void setLoadout(HashMap<Integer, ItemStack> newLoadout) {
 		this.loadout.clear();
 		for (Integer slot : newLoadout.keySet()) {
@@ -412,10 +424,6 @@ public class Warzone {
 
 	public int getMonumentHeal() {
 		return this.monumentHeal;
-	}
-
-	public void setFriendlyFire(boolean ffOn) {
-		this.friendlyFire = ffOn;
 	}
 
 	public boolean hasPlayerInventory(String playerName) {
@@ -679,10 +687,6 @@ public class Warzone {
 		playerGuards.clear();
 	}
 
-	public boolean getAutoAssignOnly() {
-		return this.isAutoAssignOnly();
-	}
-
 	public void setLobby(ZoneLobby lobby) {
 		this.lobby = lobby;
 	}
@@ -754,7 +758,7 @@ public class Warzone {
 				for (Team t : teams) {
 					t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " + player.getName() + " died and there were no lives left in their life pool.");
 
-					if (t.getPlayers().size() != 0) {
+					if (t.getPlayers().size() != 0 && !this.flagPointsOnly) {
 						if (!t.getName().equals(playerTeam.getName())) {
 							// all other teams get a point
 							t.addPoint();
@@ -1074,5 +1078,13 @@ public class Warzone {
 
 	public boolean isResetOnEmpty() {
 		return this.resetOnEmpty;
+	}
+
+	public boolean isFlagPointsOnly() {
+		return flagPointsOnly;
+	}
+
+	public void setFlagPointsOnly(boolean flagPointsOnly) {
+		this.flagPointsOnly = flagPointsOnly;
 	}
 }

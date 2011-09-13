@@ -150,6 +150,9 @@ public class WarzoneMapper {
 			// autoAssignOnly
 			warzone.setAutoAssignOnly(warzoneConfig.getBoolean("autoAssignOnly"));
 
+			// flagPointsOnly
+			warzone.setAutoAssignOnly(warzoneConfig.getBoolean("flagPointsOnly"));
+
 			// team cap
 			warzone.setTeamCap(warzoneConfig.getInt("teamCap"));
 
@@ -358,6 +361,9 @@ public class WarzoneMapper {
 
 		// autoAssignOnly
 		warzoneConfig.setBoolean("autoAssignOnly", warzone.isAutoAssignOnly());
+
+		// flagPointsOnly
+		warzoneConfig.setBoolean("flagPointsOnly", warzone.isFlagPointsOnly());
 
 		// team cap
 		warzoneConfig.setInt("teamCap", warzone.getTeamCap());
