@@ -58,7 +58,8 @@ public class Warzone {
 	private boolean blockHeads;
 	private boolean unbreakableZoneBlocks;
 	private boolean disabled = false;
-	private boolean noCreatures;
+	private boolean noCreatures = false;
+	private boolean glassWalls = true;
 
 	private boolean resetOnEmpty = false;
 	private boolean resetOnLoad = false;
@@ -82,6 +83,7 @@ public class Warzone {
 		this.setBlockHeads(War.war.isDefaultBlockHeads());
 		this.setUnbreakableZoneBlocks(War.war.isDefaultUnbreakableZoneBlocks());
 		this.setNoCreatures(War.war.isDefaultNoCreatures());
+		this.setGlassWalls(War.war.isDefaultGlassWalls());
 		this.setResetOnEmpty(War.war.isDefaultResetOnEmpty());
 		this.setResetOnLoad(War.war.isDefaultResetOnLoad());
 		this.setResetOnUnload(War.war.isDefaultResetOnUnload());
@@ -1074,5 +1076,13 @@ public class Warzone {
 
 	public boolean isResetOnEmpty() {
 		return this.resetOnEmpty;
+	}
+
+	public void setGlassWalls(boolean glassWalls) {
+		this.glassWalls = glassWalls;
+	}
+
+	public boolean isGlassWalls() {
+		return glassWalls;
 	}
 }

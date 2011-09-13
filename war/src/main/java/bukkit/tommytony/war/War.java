@@ -75,11 +75,11 @@ public class War extends JavaPlugin {
 	private boolean defaultAutoAssignOnly = false;
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
+	private boolean defaultGlassWalls = true;
 	private FlagReturn defaultFlagReturn = FlagReturn.BOTH;
 	private boolean defaultResetOnEmpty = false, defaultResetOnLoad = false, defaultResetOnUnload = false;
 	private TeamSpawnStyle defaultSpawnStyle = TeamSpawnStyle.BIG;
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
-	private int helmetProtectionTask;
 
 	public War() {
 		super();
@@ -146,7 +146,7 @@ public class War extends JavaPlugin {
 
 		WarMapper.load();
 		HelmetProtectionTask helmetProtectionTask = new HelmetProtectionTask();
-		this.helmetProtectionTask = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, helmetProtectionTask, 250, 100);
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, helmetProtectionTask, 250, 100);
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
 	}
 
@@ -289,6 +289,10 @@ public class War extends JavaPlugin {
 			if (namedParams.containsKey("nocreatures")) {
 				String onOff = namedParams.get("nocreatures");
 				warzone.setNoCreatures(onOff.equals("on") || onOff.equals("true"));
+			}
+			if (namedParams.containsKey("glasswalls")) {
+				String onOff = namedParams.get("glasswalls");
+				warzone.setGlassWalls(onOff.equals("on") || onOff.equals("true"));
 			}
 
 			if (namedParams.containsKey("resetonempty")) {
@@ -887,5 +891,13 @@ public class War extends JavaPlugin {
 
 	public void setDisconnected(HashMap<String, InventoryStash> disconnected) {
 		this.disconnected = disconnected;
+	}
+
+	public void setDefaultGlassWalls(boolean defaultGlassWalls) {
+		this.defaultGlassWalls = defaultGlassWalls;
+	}
+
+	public boolean isDefaultGlassWalls() {
+		return defaultGlassWalls;
 	}
 }

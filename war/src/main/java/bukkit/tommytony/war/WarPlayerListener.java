@@ -1,5 +1,7 @@
 package bukkit.tommytony.war;
 
+import java.util.HashMap;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -34,6 +36,7 @@ import com.tommytony.war.ZoneSetter;
  */
 public class WarPlayerListener extends PlayerListener {
 	private java.util.Random random = new java.util.Random();
+	private HashMap<String, Location> latestLocations = new HashMap<String, Location>(); 
 
 	/**
 	 * Correctly removes quitting players from warzones
@@ -220,6 +223,17 @@ public class WarPlayerListener extends PlayerListener {
 		}
 		Player player = event.getPlayer();
 		Location playerLoc = event.getFrom(); // same as player.getLoc. Don't call again we need same result.
+		
+		Location previousLocation = latestLocations.get(player.getName());
+		if (previousLocation != null &&
+				playerLoc.getBlockX() == previousLocation.getBlockX() &&
+				playerLoc.getBlockY() == previousLocation.getBlockY() &&
+				playerLoc.getBlockZ() == previousLocation.getBlockZ()) {
+			// we only care when people change location
+			return;
+		}
+		latestLocations.put(player.getName(), playerLoc);
+		
 		Warzone locZone = Warzone.getZoneByLocation(playerLoc);
 		ZoneLobby locLobby = ZoneLobby.getLobbyByLocation(playerLoc);
 
@@ -231,11 +245,12 @@ public class WarPlayerListener extends PlayerListener {
 		Warzone playerWarzone = Warzone.getZoneByPlayerName(player.getName()); // this uses the teams, so it asks: get the player's team's warzone
 		boolean protecting = false;
 		if (currentTeam != null) {
-			// Warzone nearbyZone = war.zoneOfZoneWallAtProximity(playerLoc);
-			protecting = playerWarzone.protectZoneWallAgainstPlayer(player);
+			if (playerWarzone.isGlassWalls()) {
+				protecting = playerWarzone.protectZoneWallAgainstPlayer(player);
+			}
 		} else {
 			Warzone nearbyZone = War.war.zoneOfZoneWallAtProximity(playerLoc);
-			if (nearbyZone != null && !isMaker) {
+			if (nearbyZone != null && nearbyZone.isGlassWalls() && !isMaker) {
 				protecting = nearbyZone.protectZoneWallAgainstPlayer(player);
 			}
 		}
