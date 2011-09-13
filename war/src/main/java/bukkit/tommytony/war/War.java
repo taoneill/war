@@ -73,6 +73,7 @@ public class War extends JavaPlugin {
 	private boolean defaultBlockHeads = true;
 	private boolean defaultFriendlyFire = false;
 	private boolean defaultAutoAssignOnly = false;
+	private boolean defaultFlagPointsOnly = false;
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
 	private FlagReturn defaultFlagReturn = FlagReturn.BOTH;
@@ -260,6 +261,10 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("autoassign");
 				warzone.setAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
 			}
+			if (namedParams.containsKey("flagpointsonly")) {
+				String onOff = namedParams.get("flagpointsonly");
+				warzone.setFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
+			}
 			if (namedParams.containsKey("blockheads")) {
 				String onOff = namedParams.get("blockheads");
 				warzone.setBlockHeads(onOff.equals("on") || onOff.equals("true"));
@@ -348,6 +353,10 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("autoassign");
 				this.setDefaultAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
 			}
+			if (namedParams.containsKey("flagpointsonly")) {
+				String onOff = namedParams.get("flagpointsonly");
+				this.setDefaultFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
+			}
 			if (namedParams.containsKey("pvpinzonesonly")) {
 				String onOff = namedParams.get("pvpinzonesonly");
 				this.setPvpInZonesOnly(onOff.equals("on") || onOff.equals("true"));
@@ -424,7 +433,8 @@ public class War extends JavaPlugin {
 		 + " teamsize:" + zone.getTeamCap()
 		 + " maxscore:" + zone.getScoreCap()
 		 + " ff:" + String.valueOf(zone.getFriendlyFire())
-		 + " autoassign:" + String.valueOf(zone.getAutoAssignOnly())
+		 + " autoassign:" + String.valueOf(zone.isAutoAssignOnly())
+		 + " flagpointsonly:" + String.valueOf(zone.isFlagPointsOnly())
 		 + " blockheads:" + String.valueOf(zone.isBlockHeads())
 		 + " spawnstyle:" + zone.getSpawnStyle()
 		 + " flagreturn:" + zone.getFlagReturn()
@@ -439,24 +449,25 @@ public class War extends JavaPlugin {
 
 	public String printConfig() {
 		return "War config -"
-		 + " pvpinzonesonly:" + String.valueOf(War.war.isPvpInZonesOnly())
-		 + " disablepvpmessage:" + String.valueOf(War.war.isDisablePvpMessage())
-		 + " buildinzonesonly:" + String.valueOf(War.war.isBuildInZonesOnly())
+		 + " pvpinzonesonly:" + String.valueOf(this.isPvpInZonesOnly())
+		 + " disablepvpmessage:" + String.valueOf(this.isDisablePvpMessage())
+		 + " buildinzonesonly:" + String.valueOf(this.isBuildInZonesOnly())
 		 + " - Warzone defaults -"
-		 + " lifepool:" + War.war.getDefaultLifepool()
-		 + " teamsize:" + War.war.getDefaultTeamCap()
-		 + " maxscore:" + War.war.getDefaultScoreCap()
-		 + " ff:" + String.valueOf(War.war.isDefaultFriendlyFire())
-		 + " autoassign:" + String.valueOf(War.war.isDefaultAutoAssignOnly())
-		 + " blockheads:" + String.valueOf(War.war.isDefaultBlockHeads())
-		 + " spawnstyle:" + War.war.getDefaultSpawnStyle()
-		 + " flagreturn:" + War.war.getDefaultFlagReturn()
-		 + " monumentheal:" + War.war.getDefaultMonumentHeal()
-		 + " unbreakable:" + String.valueOf(War.war.isDefaultUnbreakableZoneBlocks())
-		 + " nocreatures:" + String.valueOf(War.war.isDefaultNoCreatures())
-		 + " resetonempty:" + String.valueOf(War.war.isDefaultResetOnEmpty())
-		 + " resetonload:" + String.valueOf(War.war.isDefaultResetOnLoad())
-		 + " resetonunload:" + String.valueOf(War.war.isDefaultResetOnUnload());
+		 + " lifepool:" + this.getDefaultLifepool()
+		 + " teamsize:" + this.getDefaultTeamCap()
+		 + " maxscore:" + this.getDefaultScoreCap()
+		 + " ff:" + String.valueOf(this.isDefaultFriendlyFire())
+		 + " autoassign:" + String.valueOf(this.isDefaultAutoAssignOnly())
+		 + " flagpointsonly:" + String.valueOf(this.isDefaultFlagPointsOnly())
+		 + " blockheads:" + String.valueOf(this.isDefaultBlockHeads())
+		 + " spawnstyle:" + this.getDefaultSpawnStyle()
+		 + " flagreturn:" + this.getDefaultFlagReturn()
+		 + " monumentheal:" + this.getDefaultMonumentHeal()
+		 + " unbreakable:" + String.valueOf(this.isDefaultUnbreakableZoneBlocks())
+		 + " nocreatures:" + String.valueOf(this.isDefaultNoCreatures())
+		 + " resetonempty:" + String.valueOf(this.isDefaultResetOnEmpty())
+		 + " resetonload:" + String.valueOf(this.isDefaultResetOnLoad())
+		 + " resetonunload:" + String.valueOf(this.isDefaultResetOnUnload());
 	}
 
 	private void setZoneRallyPoint(String warzoneName, Player player) {
@@ -887,5 +898,13 @@ public class War extends JavaPlugin {
 
 	public void setDisconnected(HashMap<String, InventoryStash> disconnected) {
 		this.disconnected = disconnected;
+	}
+
+	public void setDefaultFlagPointsOnly(boolean defaultFlagPointsOnly) {
+		this.defaultFlagPointsOnly = defaultFlagPointsOnly;
+	}
+
+	public boolean isDefaultFlagPointsOnly() {
+		return defaultFlagPointsOnly;
 	}
 }
