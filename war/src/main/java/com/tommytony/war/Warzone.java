@@ -75,6 +75,7 @@ public class Warzone {
 		this.setLifePool(War.war.getDefaultLifepool());
 		this.setLoadout(War.war.getDefaultLoadout());
 		this.setAutoAssignOnly(War.war.isDefaultAutoAssignOnly());
+		this.setFlagPointsOnly(War.war.isDefaultFlagPointsOnly());
 		this.teamCap = War.war.getDefaultTeamCap();
 		this.scoreCap = War.war.getDefaultScoreCap();
 		this.monumentHeal = War.war.getDefaultMonumentHeal();

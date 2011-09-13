@@ -261,6 +261,10 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("autoassign");
 				warzone.setAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
 			}
+			if (namedParams.containsKey("flagpointsonly")) {
+				String onOff = namedParams.get("flagpointsonly");
+				warzone.setFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
+			}
 			if (namedParams.containsKey("blockheads")) {
 				String onOff = namedParams.get("blockheads");
 				warzone.setBlockHeads(onOff.equals("on") || onOff.equals("true"));
@@ -349,6 +353,10 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("autoassign");
 				this.setDefaultAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
 			}
+			if (namedParams.containsKey("flagpointsonly")) {
+				String onOff = namedParams.get("flagpointsonly");
+				this.setDefaultFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
+			}
 			if (namedParams.containsKey("pvpinzonesonly")) {
 				String onOff = namedParams.get("pvpinzonesonly");
 				this.setPvpInZonesOnly(onOff.equals("on") || onOff.equals("true"));
@@ -426,7 +434,7 @@ public class War extends JavaPlugin {
 		 + " maxscore:" + zone.getScoreCap()
 		 + " ff:" + String.valueOf(zone.getFriendlyFire())
 		 + " autoassign:" + String.valueOf(zone.isAutoAssignOnly())
-		 + " flagpoints:" + String.valueOf(zone.isFlagPointsOnly())
+		 + " flagpointsonly:" + String.valueOf(zone.isFlagPointsOnly())
 		 + " blockheads:" + String.valueOf(zone.isBlockHeads())
 		 + " spawnstyle:" + zone.getSpawnStyle()
 		 + " flagreturn:" + zone.getFlagReturn()
@@ -450,7 +458,7 @@ public class War extends JavaPlugin {
 		 + " maxscore:" + this.getDefaultScoreCap()
 		 + " ff:" + String.valueOf(this.isDefaultFriendlyFire())
 		 + " autoassign:" + String.valueOf(this.isDefaultAutoAssignOnly())
-		 + " flagpoints:" + String.valueOf(this.isDefaultFlagPointsOnly())
+		 + " flagpointsonly:" + String.valueOf(this.isDefaultFlagPointsOnly())
 		 + " blockheads:" + String.valueOf(this.isDefaultBlockHeads())
 		 + " spawnstyle:" + this.getDefaultSpawnStyle()
 		 + " flagreturn:" + this.getDefaultFlagReturn()
