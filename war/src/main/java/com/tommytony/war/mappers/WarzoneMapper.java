@@ -150,6 +150,9 @@ public class WarzoneMapper {
 			// autoAssignOnly
 			warzone.setAutoAssignOnly(warzoneConfig.getBoolean("autoAssignOnly"));
 
+			// flagPointsOnly
+			warzone.setAutoAssignOnly(warzoneConfig.getBoolean("flagPointsOnly"));
+
 			// team cap
 			warzone.setTeamCap(warzoneConfig.getInt("teamCap"));
 
@@ -191,8 +194,12 @@ public class WarzoneMapper {
 			// disabled
 			warzone.setDisabled(warzoneConfig.getBoolean("disabled"));
 
-			// defaultNoCreatures
+			// noCreatures
 			warzone.setNoCreatures(warzoneConfig.getBoolean("noCreatures"));
+			
+			// glassWalls
+			warzone.setGlassWalls(warzoneConfig.getBoolean("glassWalls"));
+
 
 			// resetOnEmpty
 			warzone.setResetOnEmpty(warzoneConfig.getBoolean("resetOnEmpty"));
@@ -359,6 +366,9 @@ public class WarzoneMapper {
 		// autoAssignOnly
 		warzoneConfig.setBoolean("autoAssignOnly", warzone.isAutoAssignOnly());
 
+		// flagPointsOnly
+		warzoneConfig.setBoolean("flagPointsOnly", warzone.isFlagPointsOnly());
+
 		// team cap
 		warzoneConfig.setInt("teamCap", warzone.getTeamCap());
 
@@ -393,6 +403,9 @@ public class WarzoneMapper {
 
 		// noCreatures
 		warzoneConfig.setBoolean("noCreatures", warzone.isNoCreatures());
+		
+		// glassWalls
+		warzoneConfig.setBoolean("glassWalls", warzone.isGlassWalls());
 
 		// resetOnEmpty
 		warzoneConfig.setBoolean("resetOnEmpty", warzone.isResetOnEmpty());
@@ -462,12 +475,6 @@ public class WarzoneMapper {
 		if (warzone.getLobby() != null) {
 			VolumeMapper.save(warzone.getLobby().getVolume(), warzone.getName());
 		}
-
-		// if (saveBlocks) {
-		// war.getLogger().info("Saved warzone " + warzone.getName() + " config and blocks.");
-		// } else {
-		// war.getLogger().info("Saved warzone " + warzone.getName() + " config.");
-		// }
 	}
 
 	public static void delete(String name) {

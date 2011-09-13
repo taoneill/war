@@ -98,6 +98,9 @@ public class WarMapper {
 		// defaultAutoAssignOnly
 		War.war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
 
+		// defaultFlagPointsOnly
+		War.war.setDefaultFlagPointsOnly(warConfig.getBoolean("defaultFlagPointsOnly"));
+
 		// defaultTeamCap
 		War.war.setDefaultTeamCap(warConfig.getInt("defaultTeamCap"));
 
@@ -147,6 +150,9 @@ public class WarMapper {
 
 		// defaultNoCreatures
 		War.war.setDefaultNoCreatures(warConfig.getBoolean("defaultNoCreatures"));
+		
+		// defaultGlassWalls
+		War.war.setDefaultGlassWalls(warConfig.getBoolean("defaultGlassWalls"));
 
 		// defaultResetOnEmpty
 		War.war.setDefaultResetOnEmpty(warConfig.getBoolean("defaultResetOnEmpty"));
@@ -216,6 +222,9 @@ public class WarMapper {
 		// defaultAutoAssignOnly
 		warConfig.setBoolean("defaultAutoAssignOnly", War.war.isDefaultAutoAssignOnly());
 
+		// defaultFlagPointsOnly
+		warConfig.setBoolean("defaultFlagPointsOnly", War.war.isDefaultFlagPointsOnly());
+
 		// defaultTeamCap
 		warConfig.setInt("defaultTeamCap", War.war.getDefaultTeamCap());
 
@@ -257,6 +266,9 @@ public class WarMapper {
 		// defaultNoCreatures
 		warConfig.setBoolean("defaultNoCreatures", War.war.isDefaultNoCreatures());
 
+		// defaultGlassWalls
+		warConfig.setBoolean("defaultGlassWalls", War.war.isDefaultGlassWalls());
+
 		// defaultResetOnEmpty
 		warConfig.setBoolean("defaultResetOnEmpty", War.war.isDefaultResetOnEmpty());
 
@@ -265,9 +277,6 @@ public class WarMapper {
 
 		// defaultResetOnUnload
 		warConfig.setBoolean("defaultResetOnUnload", War.war.isDefaultResetOnUnload());
-
-		// defaultDropLootOnDeath
-		// warConfig.setBoolean("defaultDropLootOnDeath", war.isDefaultDropLootOnDeath());
 
 		// warhub
 		String hubStr = "";

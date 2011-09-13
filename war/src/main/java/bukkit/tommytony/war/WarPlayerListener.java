@@ -228,7 +228,8 @@ public class WarPlayerListener extends PlayerListener {
 		if (previousLocation != null &&
 				playerLoc.getBlockX() == previousLocation.getBlockX() &&
 				playerLoc.getBlockY() == previousLocation.getBlockY() &&
-				playerLoc.getBlockZ() == previousLocation.getBlockZ()) {
+				playerLoc.getBlockZ() == previousLocation.getBlockZ() &&
+				playerLoc.getWorld() == previousLocation.getWorld()) {
 			// we only care when people change location
 			return;
 		}
@@ -450,6 +451,10 @@ public class WarPlayerListener extends PlayerListener {
 			return;
 		}
 	}
+	
+	public void purgeLatestPositions() {
+		this.latestLocations.clear();	
+	}
 
 	private void handleDisabledZone(PlayerMoveEvent event, Player player, Warzone zone) {
 		if (zone.getLobby() != null) {
@@ -467,4 +472,6 @@ public class WarPlayerListener extends PlayerListener {
 			}
 		}
 	}
+	
+	
 }
