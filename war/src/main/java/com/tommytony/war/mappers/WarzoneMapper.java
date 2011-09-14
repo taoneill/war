@@ -199,7 +199,12 @@ public class WarzoneMapper {
 			
 			// glassWalls
 			warzone.setGlassWalls(warzoneConfig.getBoolean("glassWalls"));
-
+			
+			// minPlayers
+			warzone.setMinPlayers(warzoneConfig.getInt("minPlayers"));
+			
+			// minTeams
+			warzone.setMinTeams(warzoneConfig.getInt("minTeams"));
 
 			// resetOnEmpty
 			warzone.setResetOnEmpty(warzoneConfig.getBoolean("resetOnEmpty"));
@@ -221,9 +226,6 @@ public class WarzoneMapper {
 				Location rallyPoint = new Location(world, rpX, rpY, rpZ);
 				warzone.setRallyPoint(rallyPoint);
 			}
-
-			// dropLootOnDeath
-			// warzone.setDropLootOnDeath(warzoneConfig.getBoolean("dropLootOnDeath"));
 
 			// monuments
 			String monumentsStr = warzoneConfig.getString("monuments");
@@ -406,6 +408,12 @@ public class WarzoneMapper {
 		
 		// glassWalls
 		warzoneConfig.setBoolean("glassWalls", warzone.isGlassWalls());
+		
+		// minPlayers
+		warzoneConfig.setInt("minPlayers", warzone.getMinPlayers());
+		
+		// minTeams
+		warzoneConfig.setInt("minTeams", warzone.getMinTeams());
 
 		// resetOnEmpty
 		warzoneConfig.setBoolean("resetOnEmpty", warzone.isResetOnEmpty());

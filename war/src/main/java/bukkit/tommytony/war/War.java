@@ -77,6 +77,8 @@ public class War extends JavaPlugin {
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
 	private boolean defaultGlassWalls = true;
+	private int defaultMinPlayers = 1;	// By default, 1 player on 1 team is enough for unlocking the cant-exit-spawn guard
+	private int defaultMinTeams = 1;
 	private FlagReturn defaultFlagReturn = FlagReturn.BOTH;
 	private boolean defaultResetOnEmpty = false, defaultResetOnLoad = false, defaultResetOnUnload = false;
 	private TeamSpawnStyle defaultSpawnStyle = TeamSpawnStyle.BIG;
@@ -233,7 +235,7 @@ public class War extends JavaPlugin {
 		this.inventoryToLoadout(player.getInventory(), loadout);
 	}
 
-	public boolean updateZoneFromNamedParams(Warzone warzone, CommandSender commandSender, String[] arguments) {
+	public String updateZoneFromNamedParams(Warzone warzone, CommandSender commandSender, String[] arguments) {
 		try {
 			Map<String, String> namedParams = new HashMap<String, String>();
 			for (String namedPair : arguments) {
@@ -242,37 +244,48 @@ public class War extends JavaPlugin {
 					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
 				}
 			}
+			
+			StringBuilder returnMessage = new StringBuilder();
 			if (namedParams.containsKey("lifepool")) {
 				warzone.setLifePool(Integer.parseInt(namedParams.get("lifepool")));
+				returnMessage.append(" lifepool set to " + warzone.getLifePool() + ".");
 			}
 			if (namedParams.containsKey("monumentheal")) {
 				warzone.setMonumentHeal(Integer.parseInt(namedParams.get("monumentheal")));
+				returnMessage.append(" monumentheal set to " + warzone.getMonumentHeal() + ".");
 			}
 			if (namedParams.containsKey("teamsize")) {
 				warzone.setTeamCap(Integer.parseInt(namedParams.get("teamsize")));
+				returnMessage.append(" teamsize set to " + warzone.getTeamCap() + ".");
 			}
 			if (namedParams.containsKey("maxscore")) {
 				warzone.setScoreCap(Integer.parseInt(namedParams.get("maxscore")));
+				returnMessage.append(" maxscore set to " + warzone.getScoreCap() + ".");
 			}
 			if (namedParams.containsKey("ff")) {
 				String onOff = namedParams.get("ff");
 				warzone.setFriendlyFire(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" ff set to " + String.valueOf(warzone.getFriendlyFire()) + ".");
 			}
 			if (namedParams.containsKey("autoassign")) {
 				String onOff = namedParams.get("autoassign");
 				warzone.setAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" autoassign set to " + String.valueOf(warzone.isAutoAssignOnly()) + ".");
 			}
 			if (namedParams.containsKey("flagpointsonly")) {
 				String onOff = namedParams.get("flagpointsonly");
 				warzone.setFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" flagpointsonly set to " + String.valueOf(warzone.isFlagPointsOnly()) + ".");
 			}
 			if (namedParams.containsKey("blockheads")) {
 				String onOff = namedParams.get("blockheads");
 				warzone.setBlockHeads(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" blockheads set to " + String.valueOf(warzone.isBlockHeads()) + ".");
 			}
 			if (namedParams.containsKey("spawnstyle")) {
 				String spawnStyle = namedParams.get("spawnstyle");
 				warzone.setSpawnStyle(TeamSpawnStyle.getStyleFromString(spawnStyle));
+				returnMessage.append(" spawnstyle set to " + warzone.getSpawnStyle().toString() + ".");
 			}
 			if (namedParams.containsKey("flagreturn")) {
 				String flagReturn = namedParams.get("flagreturn").toLowerCase();
@@ -283,49 +296,77 @@ public class War extends JavaPlugin {
 				} else {
 					warzone.setFlagReturn(FlagReturn.BOTH);
 				}
+				returnMessage.append(" flagreturn set to " + warzone.getFlagReturn().toString() + ".");
 			}
 			if (namedParams.containsKey("unbreakable")) {
 				String onOff = namedParams.get("unbreakable");
 				warzone.setUnbreakableZoneBlocks(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" unbreakable set to " + String.valueOf(warzone.isUnbreakableZoneBlocks()) + ".");
 			}
 			if (namedParams.containsKey("disabled")) {
 				String onOff = namedParams.get("disabled");
 				warzone.setDisabled(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" disabled set to " + String.valueOf(warzone.isDisabled()) + ".");
 			}
 			if (namedParams.containsKey("nocreatures")) {
 				String onOff = namedParams.get("nocreatures");
 				warzone.setNoCreatures(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" nocreatures set to " + String.valueOf(warzone.isNoCreatures()) + ".");
 			}
 			if (namedParams.containsKey("glasswalls")) {
 				String onOff = namedParams.get("glasswalls");
 				warzone.setGlassWalls(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" glasswalls set to " + String.valueOf(warzone.isGlassWalls()) + ".");
 			}
+			if (namedParams.containsKey("minplayers")) {
+				int val = Integer.parseInt(namedParams.get("minplayers"));
+				if (val > warzone.getTeamCap()) {
+					returnMessage.append(" minplayers can't be greater than teamsize.");
+				} else {
+					warzone.setMinPlayers(val);
+					returnMessage.append(" minplayers set to " + warzone.getMinPlayers() + ".");	
+				}				
+			}
+			if (namedParams.containsKey("minteams")) {
+				int val = Integer.parseInt(namedParams.get("minteams"));
+				if (val > warzone.getTeams().size()) {
+					returnMessage.append(" minteams can't be higher than number of teams.");
+				} else {
+					warzone.setMinTeams(val);
+					returnMessage.append(" minteams set to " + warzone.getMinTeams() + ".");
+				}
+			}			
 
 			if (namedParams.containsKey("resetonempty")) {
 				String onOff = namedParams.get("resetonempty");
 				warzone.setResetOnEmpty(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" resetonempty set to " + String.valueOf(warzone.isResetOnEmpty()) + ".");
 			}
 			if (namedParams.containsKey("resetonload")) {
 				String onOff = namedParams.get("resetonload");
 				warzone.setResetOnLoad(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" resetonload set to " + String.valueOf(warzone.isResetOnLoad()) + ".");
 			}
 			if (namedParams.containsKey("resetonunload")) {
 				String onOff = namedParams.get("resetonunload");
 				warzone.setResetOnUnload(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" resetonunload set to " + String.valueOf(warzone.isResetOnUnload()) + ".");
 			}
 			if (commandSender instanceof Player) {
 				Player player = (Player) commandSender;
 				if (namedParams.containsKey("loadout")) {
 					this.inventoryToLoadout(player, warzone.getLoadout());
+					returnMessage.append(" respawn loadout updated.");
 				}
 				if (namedParams.containsKey("reward")) {
 					this.inventoryToLoadout(player, warzone.getReward());
+					returnMessage.append(" game end reward updated.");
 				}
 			}
 
-			return true;
+			return returnMessage.toString();
 		} catch (Exception e) {
-			return false;
+			return "PARSE-ERROR";
 		}
 	}
 
@@ -338,45 +379,64 @@ public class War extends JavaPlugin {
 					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
 				}
 			}
-			if (namedParams.containsKey("lifepool")) {
-				this.setDefaultLifepool(Integer.parseInt(namedParams.get("lifepool")));
-			}
-			if (namedParams.containsKey("monumentheal")) {
-				this.setDefaultMonumentHeal(Integer.parseInt(namedParams.get("monumentheal")));
-			}
-			if (namedParams.containsKey("teamsize")) {
-				this.setDefaultTeamCap(Integer.parseInt(namedParams.get("teamsize")));
-			}
-			if (namedParams.containsKey("maxscore")) {
-				this.setDefaultScoreCap(Integer.parseInt(namedParams.get("maxscore")));
-			}
-			if (namedParams.containsKey("ff")) {
-				String onOff = namedParams.get("ff");
-				this.setDefaultFriendlyFire(onOff.equals("on") || onOff.equals("true"));
-			}
-			if (namedParams.containsKey("autoassign")) {
-				String onOff = namedParams.get("autoassign");
-				this.setDefaultAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
-			}
-			if (namedParams.containsKey("flagpointsonly")) {
-				String onOff = namedParams.get("flagpointsonly");
-				this.setDefaultFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
-			}
+			
+			StringBuilder returnMessage = new StringBuilder();
 			if (namedParams.containsKey("pvpinzonesonly")) {
 				String onOff = namedParams.get("pvpinzonesonly");
 				this.setPvpInZonesOnly(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" flagpointsonly set to " + String.valueOf(war.isDefaultFlagPointsOnly()) + ".");
 			}
 			if (namedParams.containsKey("disablepvpmessage")) {
 				String onOff = namedParams.get("disablepvpmessage");
 				this.setDisablePvpMessage(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" disablepvpmessage set to " + String.valueOf(war.isDisablePvpMessage()) + ".");
 			}
+			if (namedParams.containsKey("buildinzonesonly")) {
+				String onOff = namedParams.get("buildinzonesonly");
+				this.setBuildInZonesOnly(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" buildinzonesonly set to " + String.valueOf(war.isBuildInZonesOnly()) + ".");
+			}
+			
+			if (namedParams.containsKey("lifepool")) {
+				this.setDefaultLifepool(Integer.parseInt(namedParams.get("lifepool")));
+				returnMessage.append(" lifepool set to " + war.getDefaultLifepool() + ".");
+			}
+			if (namedParams.containsKey("monumentheal")) {
+				this.setDefaultMonumentHeal(Integer.parseInt(namedParams.get("monumentheal")));
+				returnMessage.append(" monumentheal set to " + war.getDefaultMonumentHeal() + ".");
+			}
+			if (namedParams.containsKey("teamsize")) {
+				this.setDefaultTeamCap(Integer.parseInt(namedParams.get("teamsize")));
+				returnMessage.append(" teamsize set to " + war.getDefaultTeamCap() + ".");
+			}
+			if (namedParams.containsKey("maxscore")) {
+				this.setDefaultScoreCap(Integer.parseInt(namedParams.get("maxscore")));
+				returnMessage.append(" maxscore set to " + war.getDefaultScoreCap() + ".");
+			}
+			if (namedParams.containsKey("ff")) {
+				String onOff = namedParams.get("ff");
+				this.setDefaultFriendlyFire(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" ff set to " + String.valueOf(war.isDefaultFriendlyFire()) + ".");
+			}
+			if (namedParams.containsKey("autoassign")) {
+				String onOff = namedParams.get("autoassign");
+				this.setDefaultAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" autoassign set to " + String.valueOf(war.isDefaultAutoAssignOnly()) + ".");
+			}
+			if (namedParams.containsKey("flagpointsonly")) {
+				String onOff = namedParams.get("flagpointsonly");
+				this.setDefaultFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" flagpointsonly set to " + String.valueOf(war.isDefaultFlagPointsOnly()) + ".");
+			}			
 			if (namedParams.containsKey("blockheads")) {
 				String onOff = namedParams.get("blockheads");
 				this.setDefaultBlockHeads(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" blockheads set to " + String.valueOf(war.isDefaultBlockHeads()) + ".");
 			}
 			if (namedParams.containsKey("spawnstyle")) {
 				String spawnStyle = namedParams.get("spawnstyle");
 				this.setDefaultSpawnStyle(TeamSpawnStyle.getStyleFromString(spawnStyle));
+				returnMessage.append(" spawnstyle set to " + war.getDefaultSpawnStyle().toString() + ".");
 			}
 			if (namedParams.containsKey("flagreturn")) {
 				String flagreturn = namedParams.get("flagreturn").toLowerCase();
@@ -387,46 +447,67 @@ public class War extends JavaPlugin {
 				} else {
 					this.setDefaultFlagReturn(FlagReturn.BOTH);
 				}
+				returnMessage.append(" flagreturn set to " + war.getDefaultFlagReturn().toString() + ".");
 			}
-			if (namedParams.containsKey("buildinzonesonly")) {
-				String onOff = namedParams.get("buildinzonesonly");
-				this.setBuildInZonesOnly(onOff.equals("on") || onOff.equals("true"));
-			}
+			
 			if (namedParams.containsKey("unbreakable")) {
 				String onOff = namedParams.get("unbreakable");
 				this.setDefaultUnbreakableZoneBlocks(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" unbreakable set to " + String.valueOf(war.isDefaultUnbreakableZoneBlocks()) + ".");
 			}
 			if (namedParams.containsKey("nocreatures")) {
 				String onOff = namedParams.get("nocreatures");
 				this.setDefaultNoCreatures(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" nocreatures set to " + String.valueOf(war.isDefaultNoCreatures()) + ".");
 			}
 			if (namedParams.containsKey("glasswalls")) {
 				String onOff = namedParams.get("glasswalls");
 				this.setDefaultGlassWalls(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" glasswalls set to " + String.valueOf(war.isDefaultGlassWalls()) + ".");
 			}
+			if (namedParams.containsKey("minplayers")) {
+				int val = Integer.parseInt(namedParams.get("minplayers"));
+				if (val > this.getDefaultTeamCap()) {
+					returnMessage.append(" minplayers can't be greater than teamsize.");
+				} else {
+					this.setDefaultMinPlayers(val);
+					returnMessage.append(" minplayers set to " + this.getDefaultMinPlayers() + ".");	
+				}				
+			}
+			if (namedParams.containsKey("minteams")) {
+				this.setDefaultMinTeams(Integer.parseInt(namedParams.get("minteams")));
+				returnMessage.append(" minteams set to " + this.getDefaultMinTeams() + ".");
+			}	
 
 			if (namedParams.containsKey("resetonempty")) {
 				String onOff = namedParams.get("resetonempty");
 				this.setDefaultResetOnEmpty(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" resetonempty set to " + String.valueOf(war.isDefaultResetOnEmpty()) + ".");
 			}
 			if (namedParams.containsKey("resetonload")) {
 				String onOff = namedParams.get("resetonload");
 				this.setDefaultResetOnLoad(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" resetonload set to " + String.valueOf(war.isDefaultResetOnLoad()) + ".");
 			}
 			if (namedParams.containsKey("resetonunload")) {
 				String onOff = namedParams.get("resetonunload");
 				this.setDefaultResetOnUnload(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" resetonunload set to " + String.valueOf(war.isDefaultResetOnUnload()) + ".");
 			}
 			if (commandSender instanceof Player) {
 				Player player = (Player) commandSender;
 				if (namedParams.containsKey("loadout")) {
 					this.inventoryToLoadout(player, this.getDefaultLoadout());
+					returnMessage.append(" respawn loadout updated.");
 				}
 				if (namedParams.containsKey("reward")) {
 					this.inventoryToLoadout(player, this.getDefaultReward());
+					returnMessage.append(" game end reward updated.");
 				}
 				if (namedParams.containsKey("rallypoint")) {
-					this.setZoneRallyPoint(namedParams.get("rallypoint"), player);
+					String zoneName = namedParams.get("rallypoint");
+					this.setZoneRallyPoint(zoneName, player);
+					returnMessage.append(" rallypoint set for zone " + zoneName + ".");
 				}
 			}
 
@@ -452,6 +533,8 @@ public class War extends JavaPlugin {
 		 + " disabled:" + String.valueOf(zone.isDisabled())
 		 + " nocreatures:" + String.valueOf(zone.isNoCreatures())
 		 + " glasswalls:" + String.valueOf(zone.isGlassWalls())
+		 + " minplayers:" + zone.getMinPlayers()
+		 + " minteams:" + zone.getMinTeams()
 		 + " resetonempty:" + String.valueOf(zone.isResetOnEmpty())
 		 + " resetonload:" + String.valueOf(zone.isResetOnLoad())
 		 + " resetonunload:" + String.valueOf(zone.isResetOnUnload());
@@ -476,6 +559,8 @@ public class War extends JavaPlugin {
 		 + " unbreakable:" + String.valueOf(this.isDefaultUnbreakableZoneBlocks())
 		 + " nocreatures:" + String.valueOf(this.isDefaultNoCreatures())
 		 + " glasswalls:" + String.valueOf(this.isDefaultGlassWalls())
+		 + " minplayers:" + this.getDefaultMinPlayers()
+		 + " minteams:" + this.getDefaultMinTeams()
 		 + " resetonempty:" + String.valueOf(this.isDefaultResetOnEmpty())
 		 + " resetonload:" + String.valueOf(this.isDefaultResetOnLoad())
 		 + " resetonunload:" + String.valueOf(this.isDefaultResetOnUnload());
@@ -925,5 +1010,21 @@ public class War extends JavaPlugin {
 
 	public boolean isDefaultFlagPointsOnly() {
 		return this.defaultFlagPointsOnly;
+	}
+
+	public void setDefaultMinPlayers(int defaultMinPlayers) {
+		this.defaultMinPlayers = defaultMinPlayers;
+	}
+
+	public int getDefaultMinPlayers() {
+		return defaultMinPlayers;
+	}
+
+	public void setDefaultMinTeams(int defaultMinTeams) {
+		this.defaultMinTeams = defaultMinTeams;
+	}
+
+	public int getDefaultMinTeams() {
+		return defaultMinTeams;
 	}
 }

@@ -91,6 +91,9 @@ public class WarMapper {
 
 		// defaultMonumentHeal
 		War.war.setDefaultMonumentHeal(warConfig.getInt("defaultMonumentHeal"));
+		
+		// defaultMonumentHeal
+		War.war.setDefaultMonumentHeal(warConfig.getInt("defaultMonumentHeal"));
 
 		// defaultFriendlyFire
 		War.war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));
@@ -153,6 +156,12 @@ public class WarMapper {
 		
 		// defaultGlassWalls
 		War.war.setDefaultGlassWalls(warConfig.getBoolean("defaultGlassWalls"));
+		
+		// defaultMinPlayers
+		War.war.setDefaultMinPlayers(warConfig.getInt("defaultMinPlayers"));
+		
+		// defaultMinTeams
+		War.war.setDefaultMinTeams(warConfig.getInt("defaultMinTeams"));
 
 		// defaultResetOnEmpty
 		War.war.setDefaultResetOnEmpty(warConfig.getBoolean("defaultResetOnEmpty"));
@@ -268,6 +277,12 @@ public class WarMapper {
 
 		// defaultGlassWalls
 		warConfig.setBoolean("defaultGlassWalls", War.war.isDefaultGlassWalls());
+		
+		// defaultMinPlayers
+		warConfig.setInt("defaultMinPlayers", War.war.getDefaultMinPlayers());
+		
+		// defaultMinTeams
+		warConfig.setInt("defaultMinTeams", War.war.getDefaultMinTeams());
 
 		// defaultResetOnEmpty
 		warConfig.setBoolean("defaultResetOnEmpty", War.war.isDefaultResetOnEmpty());

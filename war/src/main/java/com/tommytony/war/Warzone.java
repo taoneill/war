@@ -61,7 +61,9 @@ public class Warzone {
 	private boolean disabled = false;
 	private boolean noCreatures = false;
 	private boolean glassWalls = true;
-
+	private int minPlayers = 1;
+	private int minTeams = 1;
+	
 	private boolean resetOnEmpty = false;
 	private boolean resetOnLoad = false;
 	private boolean resetOnUnload = false;
@@ -86,6 +88,8 @@ public class Warzone {
 		this.setUnbreakableZoneBlocks(War.war.isDefaultUnbreakableZoneBlocks());
 		this.setNoCreatures(War.war.isDefaultNoCreatures());
 		this.setGlassWalls(War.war.isDefaultGlassWalls());
+		this.setMinPlayers(War.war.getDefaultMinPlayers());
+		this.setMinTeams(War.war.getDefaultMinTeams());
 		this.setResetOnEmpty(War.war.isDefaultResetOnEmpty());
 		this.setResetOnLoad(War.war.isDefaultResetOnLoad());
 		this.setResetOnUnload(War.war.isDefaultResetOnUnload());
@@ -1058,6 +1062,19 @@ public class Warzone {
 		this.getVolume().finalize();
 	}
 
+	public boolean isEnoughPlayers() {
+		int teamsWithEnough = 0;
+		for (Team team : teams) {
+			if (team.getPlayers().size() >= this.getMinPlayers()) {
+				teamsWithEnough++;
+			}
+		}
+		if (teamsWithEnough >= this.getMinTeams()) {
+			return true;
+		}
+		return false;
+	}
+
 	public void setResetOnLoad(boolean resetOnLoad) {
 		this.resetOnLoad = resetOnLoad;
 	}
@@ -1096,5 +1113,21 @@ public class Warzone {
 	
 	public boolean isFlagPointsOnly() {
 		return this.flagPointsOnly;
+	}
+
+	public void setMinPlayers(int minPlayers) {
+		this.minPlayers = minPlayers;
+	}
+
+	public int getMinPlayers() {
+		return minPlayers;
+	}
+
+	public void setMinTeams(int minTeams) {
+		this.minTeams = minTeams;
+	}
+
+	public int getMinTeams() {
+		return minTeams;
 	}
 }

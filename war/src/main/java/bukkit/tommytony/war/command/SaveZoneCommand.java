@@ -64,7 +64,7 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 		int savedBlocks = zone.saveState(true);
 
 		// changed settings: must reinitialize with new settings
-		War.war.updateZoneFromNamedParams(zone, commandSender, this.args);
+		String namedParamResult = War.war.updateZoneFromNamedParams(zone, commandSender, this.args);
 		WarzoneMapper.save(zone, true);
 		if (this.args.length > 0) {
 			// the config may have changed, requiring a reset for spawn styles etc.
@@ -80,7 +80,7 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 			War.war.getWarHub().initialize();
 		}
 
-		this.msg("Warzone " + zone.getName() + " initial state changed. Saved " + savedBlocks + " blocks.");
+		this.msg("Warzone " + zone.getName() + " initial state changed. Saved " + savedBlocks + " blocks." + namedParamResult);
 
 		return true;
 	}

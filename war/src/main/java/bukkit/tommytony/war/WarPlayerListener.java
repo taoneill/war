@@ -221,6 +221,7 @@ public class WarPlayerListener extends PlayerListener {
 		if (!War.war.isLoaded()) {
 			return;
 		}
+		
 		Player player = event.getPlayer();
 		Location playerLoc = event.getFrom(); // same as player.getLoc. Don't call again we need same result.
 		
@@ -308,7 +309,7 @@ public class WarPlayerListener extends PlayerListener {
 								War.war.getWarHub().resetZoneSign(zone);
 							}
 							zone.keepPlayerInventory(player);
-							War.war.msg(player, "Your inventory is in storage until you use '/war leave'.");
+							War.war.msg(player, "Your inventory is in storage until exit with '/war leave'.");
 							zone.respawnPlayer(event, team, player);
 							for (Team t : zone.getTeams()) {
 								t.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
@@ -361,6 +362,12 @@ public class WarPlayerListener extends PlayerListener {
 			// Player belongs to a warzone team but is outside: he snuck out or is at spawn and died
 			if (locZone == null && playerTeam != null && playerWarzone.getLobby() != null && !playerWarzone.getLobby().getVolume().contains(playerLoc) && !isLeaving) {
 				War.war.badMsg(player, "Use /leave (or /war leave) to exit the zone.");
+				event.setTo(playerTeam.getTeamSpawn());
+				return;
+			}
+			
+			if (!playerWarzone.isEnoughPlayers() && !playerTeam.getSpawnVolume().contains(playerLoc)) {
+				War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getMinPlayers() +" player(s) on at least " + playerWarzone.getMinTeams() + " team(s).");
 				event.setTo(playerTeam.getTeamSpawn());
 				return;
 			}
@@ -423,7 +430,6 @@ public class WarPlayerListener extends PlayerListener {
 							}
 							playerWarzone.handleScoreCapReached(player, playerTeam.getName());
 							event.setTo(playerWarzone.getTeleport());
-							// player.teleport(playerWarzone.getTeleport());
 						} else {
 							// added a point
 							Team victim = playerWarzone.getVictimTeamForThief(player.getName());
@@ -446,7 +452,6 @@ public class WarPlayerListener extends PlayerListener {
 			// player is not in any team, but inside warzone boundaries, get him out
 			Warzone zone = Warzone.getZoneByLocation(playerLoc);
 			event.setTo(zone.getTeleport());
-			// player.teleport(zone.getTeleport());
 			War.war.badMsg(player, "You can't be inside a warzone without a team.");
 			return;
 		}

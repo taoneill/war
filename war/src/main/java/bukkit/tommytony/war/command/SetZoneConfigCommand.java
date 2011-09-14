@@ -87,7 +87,8 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 			}
 
 			// We have a warzone and indexed-from-0 arguments, let's update
-			if (War.war.updateZoneFromNamedParams(zone, player, this.args)) {
+			String namedParamReturn = War.war.updateZoneFromNamedParams(zone, player, this.args);
+			if (!namedParamReturn.equals("") && !namedParamReturn.equals("PARSE-ERROR")) {
 				this.msg("Saving config and resetting warzone " + zone.getName() + ".");
 				WarzoneMapper.save(zone, false);
 				zone.getVolume().resetBlocks();
@@ -97,17 +98,20 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 				zone.initializeZone(); // bring back team spawns etc
 
 				if (wantsToPrint) {
-					this.msg("Warzone config saved. Zone reset. " + War.war.printConfig(zone));
+					this.msg("Warzone config saved. Zone reset." + namedParamReturn + " " + War.war.printConfig(zone));
 				} else {
-					this.msg("Warzone config saved. Zone reset.");
+					this.msg("Warzone config saved. Zone reset." + namedParamReturn);
 				}
 
 				if (War.war.getWarHub() != null) { // maybe the zone was disabled/enabled
 					War.war.getWarHub().getVolume().resetBlocks();
 					War.war.getWarHub().initialize();
 				}
+			} else if (namedParamReturn.equals("PARSE-ERROR")) {
+				this.badMsg("Failed to read named parameter(s).");
 			} else {
-				this.badMsg("Failed to read named parameters.");
+				// empty return means no param was parsed - print command usage
+				return false;
 			}
 
 			return true;
