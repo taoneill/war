@@ -370,7 +370,7 @@ public class War extends JavaPlugin {
 		}
 	}
 
-	public boolean updateFromNamedParams(CommandSender commandSender, String[] arguments) {
+	public String updateFromNamedParams(CommandSender commandSender, String[] arguments) {
 		try {
 			Map<String, String> namedParams = new HashMap<String, String>();
 			for (String namedPair : arguments) {
@@ -511,9 +511,9 @@ public class War extends JavaPlugin {
 				}
 			}
 
-			return true;
+			return returnMessage.toString();
 		} catch (Exception e) {
-			return false;
+			return "PARSE-ERROR";
 		}
 	}
 
@@ -653,14 +653,16 @@ public class War extends JavaPlugin {
 	 * @return		true if the player may play war
 	 */
 	public boolean canPlayWar(Player player) {
-		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.player") || War.permissionHandler.has(player, "War.player"))) {
-			return true;
-		}
-		if (War.permissionHandler == null) {
+		if (War.permissionHandler != null) {
+			if (War.permissionHandler.has(player, "war.player") || War.permissionHandler.has(player, "War.player")) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
 			// w/o Permissions, everyone can play
-			return true;
+			return player.hasPermission("war.player");
 		}
-		return false;
 	}
 
 	/**
@@ -670,14 +672,17 @@ public class War extends JavaPlugin {
 	 * @return		true if the player may warp
 	 */
 	public boolean canWarp(Player player) {
-		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.warp") || War.permissionHandler.has(player, "War.warp"))) {
-			return true;
-		}
-		if (War.permissionHandler == null) {
+		if (War.permissionHandler != null) {
+			if (War.permissionHandler.has(player, "war.warp") || War.permissionHandler.has(player, "War.warp")) {
+				return true; 
+			} else {
+				return false;
+			}
+			
+		} else {
 			// w/o Permissions, everyone can warp
-			return true;
+			return player.hasPermission("war.warp");
 		}
-		return false;
 	}
 
 	/**
@@ -688,11 +693,16 @@ public class War extends JavaPlugin {
 	 */
 	public boolean canBuildOutsideZone(Player player) {
 		if (this.isBuildInZonesOnly()) {
-			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.build") || War.permissionHandler.has(player, "War.build"))) {
-				return true;
+			if (War.permissionHandler != null) {
+				if (War.permissionHandler.has(player, "war.build") || War.permissionHandler.has(player, "War.build")) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				// w/o Permissions, if buildInZonesOnly, no one can build outside the zone except Zonemakers
+				return player.hasPermission("war.build");
 			}
-			// w/o Permissions, if buildInZonesOnly, no one can build outside the zone except Zonemakers
-			return this.isZoneMaker(player);
 		} else {
 			return true;
 		}
@@ -706,11 +716,16 @@ public class War extends JavaPlugin {
 	 */
 	public boolean canPvpOutsideZones(Player player) {
 		if (this.isPvpInZonesOnly()) {
-			if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.pvp") || War.permissionHandler.has(player, "War.pvp"))) {
-				return true;
+			if (War.permissionHandler != null) {
+				if (War.permissionHandler.has(player, "war.pvp") || War.permissionHandler.has(player, "War.pvp")) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				// w/o Permissions, if pvpInZoneOnly, no one can pvp outside the zone
+				return player.hasPermission("war.pvp");
 			}
-			// w/o Permissions, if pvpInZoneOnly, no one can pvp outside the zone
-			return false;
 		} else {
 			return true;
 		}
@@ -735,11 +750,15 @@ public class War extends JavaPlugin {
 				return true;
 			}
 		}
-		if (War.permissionHandler != null && (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "War.*"))) {
-			return true;
+		if (War.permissionHandler != null) {
+			if (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "War.*")) {
+				return true;
+			} else {
+				return false;
+			}
 		} else {
 			// default to op, if no permissions are found
-			return player.isOp();
+			return player.hasPermission("war.*");
 		}
 	}
 

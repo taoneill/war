@@ -4,6 +4,32 @@ description: Lets you create TDM and CTF (warzones) for a more structured PVP ex
 author: tommytony
 website: war.tommytony.com
 main: bukkit.tommytony.war.War
+permissions:
+  war.*:
+    description: Create and destroy warzones. Change War configuration.
+    default: op
+    children:
+      war.player: true
+      war.warp: true
+      war.build: true
+      war.pvp: false
+  war.player:
+    description: Lets you participate in War matches.
+    default: true
+  war.warp:
+    description: Gives you access the /zone and /warhub commands that let you teleport to all warzones.
+    default: true
+  war.build:
+    description: 
+      Useful only after using /warcfg buildinzonesonly:true. This node circumvents the build restriction and lets you build outside warzones. 
+      Give war.build to people that you consider worthy of having build rights. 
+    default: false
+  war.pvp:
+    description: 
+      Useful only after using /warcfg pvpinzonesonly:true. This node circumvents the pvp restriction and lets you pvp outside warzones. 
+      To setup a pvp world, give war.pvp to players, but only as a permission specific to the pvp world. Other worlds will remain protected
+      by the pvpinzonesonly setting. No matter what, pvp must be turned on in your server.properties file, otherwise War won't work.
+    default: false
 commands:
 # Player commands
   warzones:

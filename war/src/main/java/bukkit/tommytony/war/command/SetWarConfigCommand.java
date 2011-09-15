@@ -26,16 +26,19 @@ public class SetWarConfigCommand extends AbstractZoneMakerCommand {
 			wantsToPrint = true;
 		}
 
-		if (War.war.updateFromNamedParams(this.getSender(), this.args)) {
+		String namedParamReturn = War.war.updateFromNamedParams(this.getSender(), this.args); 
+		if (!namedParamReturn.equals("") && !namedParamReturn.equals("PARSE-ERROR")) {
 			WarMapper.save();
 			if (wantsToPrint) {
 				String config = War.war.printConfig();
-				this.msg("War config saved. " + config);
+				this.msg("War config saved." + namedParamReturn + " " + config);
 			} else {
-				this.msg("War config saved.");
+				this.msg("War config saved." + namedParamReturn);
 			}
-		} else {
+		} else if (namedParamReturn.equals("PARSE-ERROR")) {
 			this.msg("Failed to read named parameters.");
+		} else {
+			return false;
 		}
 
 		return true;
