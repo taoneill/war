@@ -468,7 +468,7 @@ public class WarPlayerListener extends PlayerListener {
 	
 	@Override
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
-		if (War.war.isLoaded()) {
+		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());
 			if (playerWarzone != null && playerWarzone.getNewlyRespawned().keySet().contains(event.getPlayer().getName())) {
 				Integer currentIndex = playerWarzone.getNewlyRespawned().get(event.getPlayer().getName());

@@ -361,10 +361,10 @@ public class War extends JavaPlugin {
 					if (loadoutName.equals("default")) {
 						this.inventoryToLoadout(player, warzone.getLoadout());
 					} else {
-						HashMap<Integer, ItemStack> extraLoadout = this.getDefaultExtraLoadouts().get(loadoutName);
+						HashMap<Integer, ItemStack> extraLoadout = warzone.getExtraLoadouts().get(loadoutName);
 						if (extraLoadout == null) {
 							HashMap<Integer, ItemStack> newLoadout = new HashMap<Integer, ItemStack>();
-							this.getDefaultExtraLoadouts().put(loadoutName, newLoadout);
+							warzone.getExtraLoadouts().put(loadoutName, newLoadout);
 						}
 						this.inventoryToLoadout(player, extraLoadout);
 					}
@@ -509,8 +509,18 @@ public class War extends JavaPlugin {
 			if (commandSender instanceof Player) {
 				Player player = (Player) commandSender;
 				if (namedParams.containsKey("loadout")) {
-					this.inventoryToLoadout(player, this.getDefaultLoadout());
-					returnMessage.append(" respawn loadout updated.");
+					String loadoutName = namedParams.get("loadout");
+					if (loadoutName.equals("default")) {
+						this.inventoryToLoadout(player, this.getDefaultLoadout());
+					} else {
+						HashMap<Integer, ItemStack> extraLoadout = this.getDefaultExtraLoadouts().get(loadoutName);
+						if (extraLoadout == null) {
+							HashMap<Integer, ItemStack> newLoadout = new HashMap<Integer, ItemStack>();
+							this.getDefaultExtraLoadouts().put(loadoutName, newLoadout);
+						}
+						this.inventoryToLoadout(player, extraLoadout);
+					}
+					returnMessage.append(loadoutName + " respawn loadout updated.");
 				}
 				if (namedParams.containsKey("reward")) {
 					this.inventoryToLoadout(player, this.getDefaultReward());
