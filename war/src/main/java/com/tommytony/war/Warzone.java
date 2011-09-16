@@ -41,6 +41,7 @@ public class Warzone {
 	private boolean friendlyFire;
 	private int lifePool;
 	private HashMap<Integer, ItemStack> loadout = new HashMap<Integer, ItemStack>();
+	private HashMap<String, HashMap<Integer, ItemStack>> extraLoadouts = new HashMap<String, HashMap<Integer, ItemStack>>();
 	private int teamCap = 5;
 	private int scoreCap = 5;
 	private int monumentHeal = 5;
@@ -50,6 +51,7 @@ public class Warzone {
 
 	private HashMap<String, InventoryStash> inventories = new HashMap<String, InventoryStash>();
 	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
+	private HashMap<String, Integer> newlyRespawned = new HashMap<String, Integer>();
 	private World world;
 	private final int minSafeDistanceFromWall = 6;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
@@ -71,12 +73,15 @@ public class Warzone {
 	private HashMap<String, InventoryStash> deadMenInventories = new HashMap<String, InventoryStash>();
 	private Location rallyPoint;
 
+	@SuppressWarnings("unchecked")
 	public Warzone(World world, String name) {
 		this.world = world;
 		this.name = name;
 		this.friendlyFire = War.war.isDefaultFriendlyFire();
 		this.setLifePool(War.war.getDefaultLifepool());
-		this.setLoadout(War.war.getDefaultLoadout());
+		this.setLoadout((HashMap<Integer, ItemStack>)War.war.getDefaultLoadout().clone());
+		this.extraLoadouts = (HashMap<String, HashMap<Integer, ItemStack>>)War.war.getDefaultExtraLoadouts().clone();
+		this.reward = (HashMap<Integer, ItemStack>)War.war.getDefaultReward().clone();
 		this.setAutoAssignOnly(War.war.isDefaultAutoAssignOnly());
 		this.setFlagPointsOnly(War.war.isDefaultFlagPointsOnly());
 		this.teamCap = War.war.getDefaultTeamCap();
@@ -311,12 +316,19 @@ public class Warzone {
 		// Fill hp
 		player.setRemainingAir(300);
 		player.setHealth(20);
+		if (!this.getNewlyRespawned().keySet().contains(player.getName())) {
+			this.getNewlyRespawned().put(player.getName(), 0);
+		}
 
 		LoadoutResetJob job = new LoadoutResetJob(this, team, player);
 		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
 	}
-
+	
 	public void resetInventory(Team team, Player player) {
+		this.resetInventory(team, player, this.loadout);
+	}
+
+	public void resetInventory(Team team, Player player, HashMap<Integer, ItemStack> loadout) {
 		// Reset inventory to loadout
 		PlayerInventory playerInv = player.getInventory();
 		playerInv.clear();
@@ -324,15 +336,15 @@ public class Warzone {
 		playerInv.clear(playerInv.getSize() + 1);
 		playerInv.clear(playerInv.getSize() + 2);
 		playerInv.clear(playerInv.getSize() + 3); // helmet/blockHead
-		for (Integer slot : this.loadout.keySet()) {
+		for (Integer slot : loadout.keySet()) {
 			if (slot == 100) {
-				playerInv.setBoots(this.loadout.get(slot));
+				playerInv.setBoots(loadout.get(slot));
 			} else if (slot == 101) {
-				playerInv.setLeggings(this.loadout.get(slot));
+				playerInv.setLeggings(loadout.get(slot));
 			} else if (slot == 102) {
-				playerInv.setChestplate(this.loadout.get(slot));
+				playerInv.setChestplate(loadout.get(slot));
 			} else {
-				ItemStack item = this.loadout.get(slot);
+				ItemStack item = loadout.get(slot);
 				if (item != null) {
 					playerInv.addItem(item);
 				}
@@ -1129,5 +1141,17 @@ public class Warzone {
 
 	public int getMinTeams() {
 		return minTeams;
+	}
+
+	public HashMap<String, HashMap<Integer, ItemStack>> getExtraLoadouts() {
+		return extraLoadouts;
+	}
+
+	public void setNewlyRespawned(HashMap<String, Integer> newlyRespawned) {
+		this.newlyRespawned = newlyRespawned;
+	}
+
+	public HashMap<String, Integer> getNewlyRespawned() {
+		return newlyRespawned;
 	}
 }

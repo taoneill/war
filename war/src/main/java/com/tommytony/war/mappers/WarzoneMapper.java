@@ -140,6 +140,31 @@ public class WarzoneMapper {
 					}
 				}
 			}
+			
+			// extraLoadouts
+			String extraLoadoutStr = warzoneConfig.getString("extraLoadouts");
+			String[] extraLoadoutsSplit = extraLoadoutStr.split(",");
+			War.war.getDefaultExtraLoadouts().clear();
+			for (String nameStr : extraLoadoutsSplit) {
+				if (nameStr != null && !nameStr.equals("")) {
+					warzone.getExtraLoadouts().put(nameStr, new HashMap<Integer, ItemStack>());
+				}
+			}
+			
+			for (String extraName : warzone.getExtraLoadouts().keySet()) {
+				String loadoutString = warzoneConfig.getString(extraName + "Loadout");
+				String[] loadoutSplit = loadoutString.split(";");
+				HashMap<Integer, ItemStack> loadout = War.war.getDefaultExtraLoadouts().get(extraName);
+				loadout.clear();
+				for (String str : loadoutSplit) {
+					if (str != null && !str.equals("")) {
+						String[] strSplit = str.split(",");
+						ItemStack item = new ItemStack(Integer.parseInt(strSplit[0]), Integer.parseInt(strSplit[1]));
+						loadout.put(Integer.parseInt(strSplit[2]), item);
+					}
+				}
+			}
+
 
 			// life pool (always set after teams, so the teams' remaining lives get initialized properly by this setter)
 			warzone.setLifePool(warzoneConfig.getInt("lifePool"));
@@ -358,6 +383,23 @@ public class WarzoneMapper {
 			}
 		}
 		warzoneConfig.setString("loadout", loadoutStr);
+		
+		// defaultExtraLoadouts
+		String extraLoadoutsStr = "";
+		for (String name : warzone.getExtraLoadouts().keySet()) {
+			extraLoadoutsStr += name + ",";
+			
+			String str = "";
+			HashMap<Integer, ItemStack> loadout = warzone.getExtraLoadouts().get(name);
+			for (Integer slot : loadout.keySet()) {
+				ItemStack item = loadout.get(slot);
+				if (item != null) {
+					str += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+				}
+			}
+			warzoneConfig.setString(name + "Loadout", str);
+		}
+		warzoneConfig.setString("extraLoadouts", extraLoadoutsStr);
 
 		// life pool
 		warzoneConfig.setInt("lifePool", warzone.getLifePool());

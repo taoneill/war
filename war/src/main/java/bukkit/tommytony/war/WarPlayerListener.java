@@ -1,6 +1,7 @@
 package bukkit.tommytony.war;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -19,6 +20,7 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -448,6 +450,13 @@ public class WarPlayerListener extends PlayerListener {
 				}
 				return;
 			}
+			
+			// Class selection lock
+			if (!playerTeam.getSpawnVolume().contains(player.getLocation()) && 
+					playerWarzone.getNewlyRespawned().keySet().contains(player.getName())) {
+				playerWarzone.getNewlyRespawned().remove(player.getName());
+			}
+			
 		} else if (locZone != null && locZone.getLobby() != null && !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker) {
 			// player is not in any team, but inside warzone boundaries, get him out
 			Warzone zone = Warzone.getZoneByLocation(playerLoc);
@@ -456,6 +465,29 @@ public class WarPlayerListener extends PlayerListener {
 			return;
 		}
 	}
+	
+	@Override
+	public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
+		if (War.war.isLoaded()) {
+			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());
+			if (playerWarzone != null && playerWarzone.getNewlyRespawned().keySet().contains(event.getPlayer().getName())) {
+				Integer currentIndex = playerWarzone.getNewlyRespawned().get(event.getPlayer().getName());
+				currentIndex = (currentIndex + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);
+				playerWarzone.getNewlyRespawned().put(event.getPlayer().getName(), currentIndex);
+				
+				Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
+				
+				if (currentIndex == 0) {
+					playerWarzone.resetInventory(playerTeam, event.getPlayer(), playerWarzone.getLoadout());
+				} else {
+					String[] array = (String[]) playerWarzone.getExtraLoadouts().keySet().toArray();
+					playerWarzone.resetInventory(playerTeam, event.getPlayer(), playerWarzone.getExtraLoadouts().get(array[currentIndex-1]));
+				}
+			}
+		}
+	}
+	
+	
 	
 	public void purgeLatestPositions() {
 		this.latestLocations.clear();	

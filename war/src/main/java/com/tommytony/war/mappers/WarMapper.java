@@ -85,6 +85,30 @@ public class WarMapper {
 				War.war.getDefaultLoadout().put(Integer.parseInt(itemStrSplit[2]), item);
 			}
 		}
+		
+		// defaultExtraLoadouts
+		String extraLoadoutStr = warConfig.getString("defaultExtraLoadouts");
+		String[] extraLoadoutsSplit = extraLoadoutStr.split(",");
+		War.war.getDefaultExtraLoadouts().clear();
+		for (String nameStr : extraLoadoutsSplit) {
+			if (nameStr != null && !nameStr.equals("")) {
+				War.war.getDefaultExtraLoadouts().put(nameStr, new HashMap<Integer, ItemStack>());
+			}
+		}
+		
+		for (String name : War.war.getDefaultExtraLoadouts().keySet()) {
+			String loadoutStr = warConfig.getString(name + "Loadout");
+			String[] loadoutSplit = loadoutStr.split(";");
+			HashMap<Integer, ItemStack> loadout = War.war.getDefaultExtraLoadouts().get(name);
+			loadout.clear();
+			for (String str : loadoutSplit) {
+				if (str != null && !str.equals("")) {
+					String[] strSplit = str.split(",");
+					ItemStack item = new ItemStack(Integer.parseInt(strSplit[0]), Integer.parseInt(strSplit[1]));
+					loadout.put(Integer.parseInt(strSplit[2]), item);
+				}
+			}
+		}
 
 		// defaultLifePool
 		War.war.setDefaultLifepool(warConfig.getInt("defaultLifePool"));
@@ -219,6 +243,23 @@ public class WarMapper {
 		}
 		warConfig.setString("defaultLoadout", defaultLoadoutStr);
 
+		// defaultExtraLoadouts
+		String defaultExtraLoadoutsStr = "";
+		for (String name : War.war.getDefaultExtraLoadouts().keySet()) {
+			defaultExtraLoadoutsStr += name + ",";
+			
+			String loadoutStr = "";
+			HashMap<Integer, ItemStack> loadout = War.war.getDefaultExtraLoadouts().get(name);
+			for (Integer slot : loadout.keySet()) {
+				ItemStack item = loadout.get(slot);
+				if (item != null) {
+					loadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
+				}
+			}
+			warConfig.setString(name + "Loadout", loadoutStr);
+		}
+		warConfig.setString("defaultExtraLoadouts", defaultExtraLoadoutsStr);
+		
 		// defaultLifepool
 		warConfig.setInt("defaultLifePool", War.war.getDefaultLifepool());
 

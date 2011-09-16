@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.entity.CraftTNTPrimed;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -115,8 +116,8 @@ public class WarEntityListener extends EntityListener {
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
 				String deathMessage = "";
 				String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName();
-				if (event instanceof EntityDamageByProjectileEvent) {
-					deathMessage = "A dispenser killed " + defenderString;
+				if (event.getDamager() instanceof Projectile && ((Projectile)event.getDamager()).getShooter() instanceof Player){
+					deathMessage = ((Player)((Projectile)event.getDamager()).getShooter()).getDisplayName() + "'s deadly aim killed " + defenderString;
 				} else if (event.getDamager() instanceof CraftTNTPrimed) {
 					deathMessage = defenderString + ChatColor.WHITE + " exploded";
 				} else {
@@ -240,7 +241,6 @@ public class WarEntityListener extends EntityListener {
 		Warzone zone = Warzone.getZoneByLocation(location);
 		if (zone != null && zone.isNoCreatures()) {
 			event.setCancelled(true);
-			// war.logInfo("Prevented " + event.getMobType().getName() + " from spawning in zone " + zone.getName());
 		}
 	}
 

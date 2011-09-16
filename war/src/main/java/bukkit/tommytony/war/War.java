@@ -66,6 +66,7 @@ public class War extends JavaPlugin {
 
 	// Default warzone settings
 	private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
+	private final HashMap<String, HashMap<Integer, ItemStack>> defaultExtraLoadouts = new HashMap<String, HashMap<Integer, ItemStack>>();
 	private int defaultLifepool = 7;
 	private int defaultTeamCap = 7;
 	private int defaultScoreCap = 10;
@@ -128,6 +129,7 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, this.playerListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, this.playerListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Priority.Normal, this);
+			pm.registerEvent(Event.Type.PLAYER_TOGGLE_SNEAK, this.playerListener, Priority.Normal, this);
 
 			pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Priority.High, this);
@@ -355,8 +357,18 @@ public class War extends JavaPlugin {
 			if (commandSender instanceof Player) {
 				Player player = (Player) commandSender;
 				if (namedParams.containsKey("loadout")) {
-					this.inventoryToLoadout(player, warzone.getLoadout());
-					returnMessage.append(" respawn loadout updated.");
+					String loadoutName = namedParams.get("loadout");
+					if (loadoutName.equals("default")) {
+						this.inventoryToLoadout(player, warzone.getLoadout());
+					} else {
+						HashMap<Integer, ItemStack> extraLoadout = this.getDefaultExtraLoadouts().get(loadoutName);
+						if (extraLoadout == null) {
+							HashMap<Integer, ItemStack> newLoadout = new HashMap<Integer, ItemStack>();
+							this.getDefaultExtraLoadouts().put(loadoutName, newLoadout);
+						}
+						this.inventoryToLoadout(player, extraLoadout);
+					}
+					returnMessage.append(loadoutName + " respawn loadout updated.");
 				}
 				if (namedParams.containsKey("reward")) {
 					this.inventoryToLoadout(player, warzone.getReward());
@@ -1045,5 +1057,9 @@ public class War extends JavaPlugin {
 
 	public int getDefaultMinTeams() {
 		return defaultMinTeams;
+	}
+
+	public HashMap<String, HashMap<Integer, ItemStack>> getDefaultExtraLoadouts() {
+		return defaultExtraLoadouts;
 	}
 }
