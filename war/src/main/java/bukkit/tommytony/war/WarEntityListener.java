@@ -1,5 +1,6 @@
 package bukkit.tommytony.war;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -117,7 +118,9 @@ public class WarEntityListener extends EntityListener {
 				String deathMessage = "";
 				String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName();
 				if (event.getDamager() instanceof Projectile && ((Projectile)event.getDamager()).getShooter() instanceof Player){
-					deathMessage = ((Player)((Projectile)event.getDamager()).getShooter()).getDisplayName() + "'s deadly aim killed " + defenderString;
+					Player shooter = ((Player)((Projectile)event.getDamager()).getShooter());
+					Team shooterTeam = Team.getTeamByPlayerName(shooter.getName()); 
+					deathMessage = shooterTeam.getKind().getColor() + shooter.getDisplayName() + ChatColor.WHITE + "'s deadly aim killed " + defenderString;
 				} else if (event.getDamager() instanceof CraftTNTPrimed) {
 					deathMessage = defenderString + ChatColor.WHITE + " exploded";
 				} else {
