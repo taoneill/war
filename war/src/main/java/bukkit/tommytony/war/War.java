@@ -368,7 +368,7 @@ public class War extends JavaPlugin {
 						}
 						this.inventoryToLoadout(player, extraLoadout);
 					}
-					returnMessage.append(loadoutName + " respawn loadout updated.");
+					returnMessage.append(" " + loadoutName + " respawn loadout updated.");
 				}
 				if (namedParams.containsKey("reward")) {
 					this.inventoryToLoadout(player, warzone.getReward());

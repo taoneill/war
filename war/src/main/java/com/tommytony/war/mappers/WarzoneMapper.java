@@ -154,7 +154,7 @@ public class WarzoneMapper {
 			for (String extraName : warzone.getExtraLoadouts().keySet()) {
 				String loadoutString = warzoneConfig.getString(extraName + "Loadout");
 				String[] loadoutSplit = loadoutString.split(";");
-				HashMap<Integer, ItemStack> loadout = War.war.getDefaultExtraLoadouts().get(extraName);
+				HashMap<Integer, ItemStack> loadout = warzone.getExtraLoadouts().get(extraName);
 				loadout.clear();
 				for (String str : loadoutSplit) {
 					if (str != null && !str.equals("")) {

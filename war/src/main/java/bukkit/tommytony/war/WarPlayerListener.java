@@ -2,6 +2,7 @@ package bukkit.tommytony.war;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -470,19 +471,32 @@ public class WarPlayerListener extends PlayerListener {
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
 		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());
-			if (playerWarzone != null && playerWarzone.getNewlyRespawned().keySet().contains(event.getPlayer().getName())) {
-				Integer currentIndex = playerWarzone.getNewlyRespawned().get(event.getPlayer().getName());
-				currentIndex = (currentIndex + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);
-				playerWarzone.getNewlyRespawned().put(event.getPlayer().getName(), currentIndex);
-				
-				Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
-				
-				if (currentIndex == 0) {
-					playerWarzone.resetInventory(playerTeam, event.getPlayer(), playerWarzone.getLoadout());
+			Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
+			if (playerWarzone != null && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
+				if (playerWarzone.getNewlyRespawned().keySet().contains(event.getPlayer().getName())) {
+					Integer currentIndex = playerWarzone.getNewlyRespawned().get(event.getPlayer().getName());
+					currentIndex = (currentIndex + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);
+					playerWarzone.getNewlyRespawned().put(event.getPlayer().getName(), currentIndex);
+					
+					if (currentIndex == 0) {
+						playerWarzone.resetInventory(playerTeam, event.getPlayer(), playerWarzone.getLoadout());
+						War.war.msg(event.getPlayer(), "Equiped default loadout.");
+					} else {
+						int i = 0;
+						Iterator it = playerWarzone.getExtraLoadouts().entrySet().iterator();
+					    while (it.hasNext()) {
+					        Map.Entry pairs = (Map.Entry)it.next();
+					        if (i == currentIndex - 1) {
+								playerWarzone.resetInventory(playerTeam, event.getPlayer(), (HashMap<Integer, ItemStack>)pairs.getValue());
+								War.war.msg(event.getPlayer(), "Equiped " + pairs.getKey() + " loadout.");
+					        }
+					        i++;
+					    }
+					}
 				} else {
-					String[] array = (String[]) playerWarzone.getExtraLoadouts().keySet().toArray();
-					playerWarzone.resetInventory(playerTeam, event.getPlayer(), playerWarzone.getExtraLoadouts().get(array[currentIndex-1]));
+					War.war.badMsg(event.getPlayer(), "Can't change loadout after exiting the spawn.");
 				}
+				
 			}
 		}
 	}
