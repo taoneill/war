@@ -222,6 +222,12 @@ public class WarPlayerListener extends PlayerListener {
 					setter.placeCorner2(event.getClickedBlock());
 					event.setUseItemInHand(Result.ALLOW);
 				}
+			} 
+
+			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+			if (zone != null && zone.getNewlyRespawned().containsKey(player.getName()) && player.getItemInHand().getType() == Material.BOW) {
+				event.setUseItemInHand(Result.DENY);
+				War.war.badMsg(player, "Can't shoot from inside the spawn.");
 			}
 		}
 	}
@@ -479,7 +485,7 @@ public class WarPlayerListener extends PlayerListener {
 		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());
 			Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
-			if (playerWarzone != null && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
+			if (playerWarzone != null && playerWarzone.getExtraLoadouts().keySet().size() > 0 && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
 				if (playerWarzone.getNewlyRespawned().keySet().contains(event.getPlayer().getName())) {
 					Integer currentIndex = playerWarzone.getNewlyRespawned().get(event.getPlayer().getName());
 					currentIndex = (currentIndex + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);

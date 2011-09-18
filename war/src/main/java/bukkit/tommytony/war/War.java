@@ -370,6 +370,20 @@ public class War extends JavaPlugin {
 					}
 					returnMessage.append(" " + loadoutName + " respawn loadout updated.");
 				}
+				if (namedParams.containsKey("deleteloadout")) {
+					String loadoutName = namedParams.get("deleteloadout");
+					if (loadoutName.equals("default")) {
+						returnMessage.append(" Can't remove default loadout.");
+					} else {
+						HashMap<Integer, ItemStack> extraLoadout = warzone.getExtraLoadouts().get(loadoutName);
+						if (warzone.getExtraLoadouts().keySet().contains(loadoutName)) {
+							warzone.getExtraLoadouts().remove(loadoutName);
+							returnMessage.append(" " + loadoutName + " loadout removed.");
+						} else {
+							returnMessage.append(" " + loadoutName + " loadout not found.");
+						}
+					}
+				}
 				if (namedParams.containsKey("reward")) {
 					this.inventoryToLoadout(player, warzone.getReward());
 					returnMessage.append(" game end reward updated.");
@@ -521,6 +535,20 @@ public class War extends JavaPlugin {
 						this.inventoryToLoadout(player, extraLoadout);
 					}
 					returnMessage.append(loadoutName + " respawn loadout updated.");
+				} 
+				if (namedParams.containsKey("deleteloadout")) {
+					String loadoutName = namedParams.get("deleteloadout");
+					if (loadoutName.equals("default")) {
+						returnMessage.append(" Can't remove default loadout.");
+					} else {
+						HashMap<Integer, ItemStack> extraLoadout = this.getDefaultExtraLoadouts().get(loadoutName);
+						if (this.getDefaultExtraLoadouts().keySet().contains(loadoutName)) {
+							this.getDefaultExtraLoadouts().remove(loadoutName);
+							returnMessage.append(" " + loadoutName + " loadout removed.");
+						} else {
+							returnMessage.append(" " + loadoutName + " loadout not found.");
+						}
+					}
 				}
 				if (namedParams.containsKey("reward")) {
 					this.inventoryToLoadout(player, this.getDefaultReward());
