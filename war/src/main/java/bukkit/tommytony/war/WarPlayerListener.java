@@ -89,6 +89,13 @@ public class WarPlayerListener extends PlayerListener {
 							event.setCancelled(true);
 							return;
 						}
+						
+						if (zone.getNewlyRespawned().keySet().contains(player.getName())) {
+							// still at spawn
+							War.war.badMsg(player, "Can't drop items while still in spawn.");
+							event.setCancelled(true);
+							return;
+						}
 					}
 				}
 			}
@@ -215,6 +222,12 @@ public class WarPlayerListener extends PlayerListener {
 					setter.placeCorner2(event.getClickedBlock());
 					event.setUseItemInHand(Result.ALLOW);
 				}
+			} 
+
+			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+			if (zone != null && zone.getNewlyRespawned().containsKey(player.getName()) && player.getItemInHand().getType() == Material.BOW) {
+				event.setUseItemInHand(Result.DENY);
+				War.war.badMsg(player, "Can't shoot from inside the spawn.");
 			}
 		}
 	}
@@ -472,7 +485,7 @@ public class WarPlayerListener extends PlayerListener {
 		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());
 			Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
-			if (playerWarzone != null && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
+			if (playerWarzone != null && playerWarzone.getExtraLoadouts().keySet().size() > 0 && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
 				if (playerWarzone.getNewlyRespawned().keySet().contains(event.getPlayer().getName())) {
 					Integer currentIndex = playerWarzone.getNewlyRespawned().get(event.getPlayer().getName());
 					currentIndex = (currentIndex + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);
@@ -480,7 +493,7 @@ public class WarPlayerListener extends PlayerListener {
 					
 					if (currentIndex == 0) {
 						playerWarzone.resetInventory(playerTeam, event.getPlayer(), playerWarzone.getLoadout());
-						War.war.msg(event.getPlayer(), "Equiped default loadout.");
+						War.war.msg(event.getPlayer(), "Equipped default loadout.");
 					} else {
 						int i = 0;
 						Iterator it = playerWarzone.getExtraLoadouts().entrySet().iterator();
@@ -488,7 +501,7 @@ public class WarPlayerListener extends PlayerListener {
 					        Map.Entry pairs = (Map.Entry)it.next();
 					        if (i == currentIndex - 1) {
 								playerWarzone.resetInventory(playerTeam, event.getPlayer(), (HashMap<Integer, ItemStack>)pairs.getValue());
-								War.war.msg(event.getPlayer(), "Equiped " + pairs.getKey() + " loadout.");
+								War.war.msg(event.getPlayer(), "Equipped " + pairs.getKey() + " loadout.");
 					        }
 					        i++;
 					    }

@@ -191,7 +191,7 @@ public class WarEntityListener extends EntityListener {
 		}
 
 		// pass pvp-damage
-		if (event instanceof EntityDamageByEntityEvent || event instanceof EntityDamageByProjectileEvent) {
+		if (event instanceof EntityDamageByEntityEvent) {
 			this.handlerAttackDefend((EntityDamageByEntityEvent) event);
 		} else {
 			// Detect death, prevent it and respawn the player
