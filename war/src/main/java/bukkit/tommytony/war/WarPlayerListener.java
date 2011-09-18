@@ -89,6 +89,13 @@ public class WarPlayerListener extends PlayerListener {
 							event.setCancelled(true);
 							return;
 						}
+						
+						if (zone.getNewlyRespawned().keySet().contains(player.getName())) {
+							// still at spawn
+							War.war.badMsg(player, "Can't drop items while still in spawn.");
+							event.setCancelled(true);
+							return;
+						}
 					}
 				}
 			}
@@ -480,7 +487,7 @@ public class WarPlayerListener extends PlayerListener {
 					
 					if (currentIndex == 0) {
 						playerWarzone.resetInventory(playerTeam, event.getPlayer(), playerWarzone.getLoadout());
-						War.war.msg(event.getPlayer(), "Equiped default loadout.");
+						War.war.msg(event.getPlayer(), "Equipped default loadout.");
 					} else {
 						int i = 0;
 						Iterator it = playerWarzone.getExtraLoadouts().entrySet().iterator();
@@ -488,7 +495,7 @@ public class WarPlayerListener extends PlayerListener {
 					        Map.Entry pairs = (Map.Entry)it.next();
 					        if (i == currentIndex - 1) {
 								playerWarzone.resetInventory(playerTeam, event.getPlayer(), (HashMap<Integer, ItemStack>)pairs.getValue());
-								War.war.msg(event.getPlayer(), "Equiped " + pairs.getKey() + " loadout.");
+								War.war.msg(event.getPlayer(), "Equipped " + pairs.getKey() + " loadout.");
 					        }
 					        i++;
 					    }

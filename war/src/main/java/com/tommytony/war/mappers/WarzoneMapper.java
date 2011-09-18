@@ -173,10 +173,10 @@ public class WarzoneMapper {
 			warzone.setMonumentHeal(warzoneConfig.getInt("monumentHeal"));
 
 			// autoAssignOnly
-			warzone.setAutoAssignOnly(warzoneConfig.getBoolean("autoAssignOnly"));
+			warzone.setAutoAssignOnlyWithoutResettingLobby(warzoneConfig.getBoolean("autoAssignOnly"));
 
 			// flagPointsOnly
-			warzone.setAutoAssignOnly(warzoneConfig.getBoolean("flagPointsOnly"));
+			warzone.setFlagPointsOnly(warzoneConfig.getBoolean("flagPointsOnly"));
 
 			// team cap
 			warzone.setTeamCap(warzoneConfig.getInt("teamCap"));

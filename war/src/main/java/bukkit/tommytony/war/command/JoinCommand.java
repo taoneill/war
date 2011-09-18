@@ -59,10 +59,19 @@ public class JoinCommand extends AbstractWarCommand {
 		if (zone == null) {
 			return false;
 		}
+		
+		String name = this.args[0];
+		TeamKind kind = TeamKind.teamKindFromString(this.args[0]);
 
 		// drop from old team if any
 		Team previousTeam = Team.getTeamByPlayerName(player.getName());
 		if (previousTeam != null) {
+			if (previousTeam.getName().startsWith(name) || previousTeam.getKind() == kind) {
+				// trying to join own team
+				War.war.badMsg(player, "Can't join your own team.");
+				return true;
+			}
+			
 			Warzone oldZone = Warzone.getZoneByPlayerName(player.getName());
 			if (!previousTeam.removePlayer(player.getName())) {
 				War.war.log("Could not remove player " + player.getName() + " from team " + previousTeam.getName(), java.util.logging.Level.WARNING);
@@ -80,8 +89,7 @@ public class JoinCommand extends AbstractWarCommand {
 		}
 
 		// join new team
-		String name = this.args[0];
-		TeamKind kind = TeamKind.teamKindFromString(this.args[0]);
+		
 
 		if (zone.isDisabled()) {
 			this.msg("This warzone is disabled.");

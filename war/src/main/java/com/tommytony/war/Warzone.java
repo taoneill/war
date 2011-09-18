@@ -82,7 +82,7 @@ public class Warzone {
 		this.setLoadout((HashMap<Integer, ItemStack>)War.war.getDefaultLoadout().clone());
 		this.extraLoadouts = (HashMap<String, HashMap<Integer, ItemStack>>)War.war.getDefaultExtraLoadouts().clone();
 		this.reward = (HashMap<Integer, ItemStack>)War.war.getDefaultReward().clone();
-		this.setAutoAssignOnly(War.war.isDefaultAutoAssignOnly());
+		this.autoAssignOnly = War.war.isDefaultAutoAssignOnly();
 		this.setFlagPointsOnly(War.war.isDefaultFlagPointsOnly());
 		this.teamCap = War.war.getDefaultTeamCap();
 		this.scoreCap = War.war.getDefaultScoreCap();
@@ -751,11 +751,15 @@ public class Warzone {
 		return this.scoreCap;
 	}
 
-	public void setAutoAssignOnly(boolean autoAssignOnly) {
+	public void setAutoAssignOnlyAndResetLobby(boolean autoAssignOnly) {
 		this.autoAssignOnly = autoAssignOnly;
 		if (this.getLobby() != null) {
 			this.getLobby().setLocation(this.getTeleport());
 		}
+	}
+	
+	public void setAutoAssignOnlyWithoutResettingLobby(boolean autoAssignOnly) {
+		this.autoAssignOnly = autoAssignOnly;
 	}
 
 	public boolean isAutoAssignOnly() {

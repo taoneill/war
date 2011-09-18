@@ -271,7 +271,7 @@ public class War extends JavaPlugin {
 			}
 			if (namedParams.containsKey("autoassign")) {
 				String onOff = namedParams.get("autoassign");
-				warzone.setAutoAssignOnly(onOff.equals("on") || onOff.equals("true"));
+				warzone.setAutoAssignOnlyAndResetLobby(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" autoassign set to " + String.valueOf(warzone.isAutoAssignOnly()) + ".");
 			}
 			if (namedParams.containsKey("flagpointsonly")) {
