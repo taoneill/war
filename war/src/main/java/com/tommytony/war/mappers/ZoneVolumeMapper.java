@@ -501,11 +501,11 @@ public class ZoneVolumeMapper {
 	 *                war Instance of war
 	 */
 	public static void delete(Volume volume) {
-		ZoneVolumeMapper.deleteFile("War/dat/volume-" + volume.getName() + ".dat");
-		ZoneVolumeMapper.deleteFile("War/dat/volume-" + volume.getName() + ".corners");
-		ZoneVolumeMapper.deleteFile("War/dat/volume-" + volume.getName() + ".blocks");
-		ZoneVolumeMapper.deleteFile("War/dat/volume-" + volume.getName() + ".signs");
-		ZoneVolumeMapper.deleteFile("War/dat/volume-" + volume.getName() + ".invs");
+		ZoneVolumeMapper.deleteFile(War.war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat");
+		ZoneVolumeMapper.deleteFile(War.war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".corners");
+		ZoneVolumeMapper.deleteFile(War.war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".blocks");
+		ZoneVolumeMapper.deleteFile(War.war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".signs");
+		ZoneVolumeMapper.deleteFile(War.war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".invs");
 	}
 
 	/**

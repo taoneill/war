@@ -79,6 +79,8 @@ public class WarCommandHandler {
 				commandObj = new ResetZoneCommand(this, sender, arguments);
 			} else if (command.equals("nextbattle")) {
 				commandObj = new NextBattleCommand(this, sender, arguments);
+			} else if (command.equals("renamezone")) {
+				commandObj = new RenameZoneCommand(this, sender, arguments);
 			} else if (command.equals("setteam")) {
 				commandObj = new SetTeamCommand(this, sender, arguments);
 			} else if (command.equals("deleteteam")) {
@@ -112,9 +114,9 @@ public class WarCommandHandler {
 			e.printStackTrace();
 		}
 
-		if (commandObj != null) {
+		if(commandObj != null) {
 			boolean handled = commandObj.handle();
-			if (!handled) {
+			if(!handled) {
 				War.war.badMsg(sender, cmd.getUsage());
 			}
 		}
