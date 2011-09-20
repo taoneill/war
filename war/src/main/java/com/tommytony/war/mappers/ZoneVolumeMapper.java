@@ -200,7 +200,7 @@ public class ZoneVolumeMapper {
 											}
 										} else if (diskBlockType == Material.WOODEN_DOOR.getId() || diskBlockType == Material.IRON_DOOR_BLOCK.getId()) {
 											// Door blocks
-
+											
 											if (j - 1 > 0) {
 												Block blockBelow = world.getBlockAt(x, y - 1, z);
 												boolean belowIsGlass = blockBelow.getTypeId() == Material.GLASS.getId();
@@ -209,9 +209,9 @@ public class ZoneVolumeMapper {
 												if (belowIsGlass) {
 													// Top door block. Set both it and the block below as door.
 													blockBelow.setType(Material.getMaterial(diskBlockType));
-													blockBelow.setData(diskBlockData);
+													blockBelow.setData((byte)(diskBlockData & ~((byte)8))); // turn off 8 bit for bottom door
 													worldBlock.setType(Material.getMaterial(diskBlockType));
-													worldBlock.setData(diskBlockData);
+													worldBlock.setData(diskBlockData);	
 												} else {
 													worldBlock.setType(Material.GLASS);
 												}
@@ -243,7 +243,7 @@ public class ZoneVolumeMapper {
 						x++;
 					}
 					if (!deferred.isEmpty()) {
-						War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, deferred, 1);
+						War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, deferred, 2);
 					}
 				}
 			} catch (FileNotFoundException e) {

@@ -241,11 +241,13 @@ public class Volume {
 										// Check if is bottom door block
 										if (j + 1 < this.getSizeY() && this.getBlockTypes()[i][j + 1][k] == oldBlockType) {
 											// set both door blocks right away
-											currentBlock.setType(Material.getMaterial(oldBlockType));
-											currentBlock.setData(oldBlockData);
+											
 											Block blockAbove = this.getWorld().getBlockAt(x, y + 1, z);
 											blockAbove.setType(Material.getMaterial(oldBlockType));
 											blockAbove.setData(this.getBlockDatas()[i][j + 1][k]);
+											
+											currentBlock.setType(Material.getMaterial(oldBlockType));
+											currentBlock.setData(oldBlockData);
 										}
 									} else if (((oldBlockType == Material.TORCH.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.REDSTONE_TORCH_OFF.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.REDSTONE_TORCH_ON.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.LEVER.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.STONE_BUTTON.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.LADDER.getId() && ((oldBlockData & 0x04) == 0x04)) || (oldBlockType == Material.RAILS.getId() && ((oldBlockData & 0x02) == 0x02))) && i + 1 != this.getSizeX()) {
 										// Blocks that hang on a block south of themselves need to make sure that block is there before placing themselves... lol
