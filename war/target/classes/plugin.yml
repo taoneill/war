@@ -139,6 +139,11 @@ commands:
     usage: Deletes the team. Team must exist. Provide a zone name if not standing in warzone or lobby.
         Ex -
         /deleteteam [zone-name] <team-color>
+  deleteteamflag:
+    description: War> Deletes the specified team's flag. Team and flag must exist.
+    usage: Deletes the specified team's flag. Team and flag must exist. Provide a zone name if not standing in warzone or lobby.
+        Ex -
+        /deleteteamflag [zone-name] <team-color>
   deletemonument:
     description: War> Deletes the monument.
     usage: Deletes the monument. Provide a zone name if not standing in warzone or lobby.

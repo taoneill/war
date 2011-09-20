@@ -1,7 +1,9 @@
 package com.tommytony.war;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -508,7 +510,7 @@ public class Team {
 
 		this.initializeTeamFlag();
 	}
-
+	
 	public boolean isTeamFlagBlock(Block block) {
 		if (this.teamFlag != null) {
 			int flagX = this.teamFlag.getBlockX();
@@ -523,5 +525,17 @@ public class Team {
 
 	public Location getTeamFlag() {
 		return this.teamFlag;
+	}
+	
+	public void deleteTeamFlag() {
+		this.getFlagVolume().resetBlocks();
+		this.setFlagVolume(null);
+		this.teamFlag = null;
+		
+		// remove volume file
+		String filePath = War.war.getDataFolder().getPath() + "/dat/warzone-" + this.warzone.getName() + "/volume-" + this.getName() + "flag.dat";
+		if (!new File(filePath).delete()) {			
+			War.war.log("Failed to delete file " + filePath, Level.WARNING);
+		}
 	}
 }
