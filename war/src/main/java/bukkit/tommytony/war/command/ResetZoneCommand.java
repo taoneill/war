@@ -43,7 +43,7 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 		for (Team team : zone.getTeams()) {
 			team.teamcast("The war has ended. " + zone.getTeamInformation() + " Resetting warzone " + zone.getName() + " and teams...");
 			for (Player p : team.getPlayers()) {
-				zone.restorePlayerInventory(p);
+				zone.restorePlayerState(p);
 				p.teleport(zone.getTeleport());
 				War.war.msg(p, "You have left the warzone. Your inventory has been restored.");
 			}

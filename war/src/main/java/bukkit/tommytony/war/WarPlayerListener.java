@@ -324,7 +324,7 @@ public class WarPlayerListener extends PlayerListener {
 							if (War.war.getWarHub() != null) {
 								War.war.getWarHub().resetZoneSign(zone);
 							}
-							zone.keepPlayerInventory(player);
+							zone.keepPlayerState(player);
 							War.war.msg(player, "Your inventory is in storage until exit with '/war leave'.");
 							zone.respawnPlayer(event, team, player);
 							for (Team t : zone.getTeams()) {
@@ -441,8 +441,8 @@ public class WarPlayerListener extends PlayerListener {
 						// flags can be captured at own spawn or own flag pole
 						playerTeam.addPoint();
 						if (playerTeam.getPoints() >= playerWarzone.getScoreCap()) {
-							if (playerWarzone.hasPlayerInventory(player.getName())) {
-								playerWarzone.restorePlayerInventory(player);
+							if (playerWarzone.hasPlayerState(player.getName())) {
+								playerWarzone.restorePlayerState(player);
 							}
 							playerWarzone.handleScoreCapReached(player, playerTeam.getName());
 							event.setTo(playerWarzone.getTeleport());

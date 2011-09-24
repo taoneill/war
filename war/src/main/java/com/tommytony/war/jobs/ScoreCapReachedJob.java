@@ -28,8 +28,8 @@ public class ScoreCapReachedJob implements Runnable {
 				}
 				tp.setFireTicks(0);
 				tp.setRemainingAir(300);
-				if (this.zone.hasPlayerInventory(tp.getName())) {
-					this.zone.restorePlayerInventory(tp);
+				if (this.zone.hasPlayerState(tp.getName())) {
+					this.zone.restorePlayerState(tp);
 				}
 				if (this.winnersStr.contains(t.getName())) {
 					// give reward

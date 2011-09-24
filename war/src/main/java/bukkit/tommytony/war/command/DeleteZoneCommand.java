@@ -57,7 +57,7 @@ public class DeleteZoneCommand extends AbstractZoneMakerCommand {
 
 			// reset inventory
 			for (Player p : t.getPlayers()) {
-				zone.restorePlayerInventory(p);
+				zone.restorePlayerState(p);
 			}
 		}
 		for (Monument m : zone.getMonuments()) {

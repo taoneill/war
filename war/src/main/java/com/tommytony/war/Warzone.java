@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -23,7 +24,7 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.jobs.InitZoneJob;
 import com.tommytony.war.jobs.LoadoutResetJob;
 import com.tommytony.war.jobs.ScoreCapReachedJob;
-import com.tommytony.war.utils.InventoryStash;
+import com.tommytony.war.utils.PlayerState;
 import com.tommytony.war.volumes.ZoneVolume;
 
 /**
@@ -49,7 +50,7 @@ public class Warzone {
 	private TeamSpawnStyle spawnStyle = TeamSpawnStyle.BIG;
 	private HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
 
-	private HashMap<String, InventoryStash> inventories = new HashMap<String, InventoryStash>();
+	private HashMap<String, PlayerState> playerStates = new HashMap<String, PlayerState>();
 	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
 	private HashMap<String, Integer> newlyRespawned = new HashMap<String, Integer>();
 	private World world;
@@ -70,7 +71,7 @@ public class Warzone {
 	private boolean resetOnLoad = false;
 	private boolean resetOnUnload = false;
 
-	private HashMap<String, InventoryStash> deadMenInventories = new HashMap<String, InventoryStash>();
+	private HashMap<String, PlayerState> deadMenInventories = new HashMap<String, PlayerState>();
 	private Location rallyPoint;
 
 	@SuppressWarnings("unchecked")
@@ -316,6 +317,12 @@ public class Warzone {
 		// Fill hp
 		player.setRemainingAir(300);
 		player.setHealth(20);
+		player.setFoodLevel(20);
+		player.setSaturation(20);
+		player.setExhaustion(0);
+		if (player.getGameMode() == GameMode.CREATIVE) {
+			player.setGameMode(GameMode.SURVIVAL);
+		}
 		if (!this.getNewlyRespawned().keySet().contains(player.getName())) {
 			this.getNewlyRespawned().put(player.getName(), 0);
 		}
@@ -444,25 +451,32 @@ public class Warzone {
 		return this.monumentHeal;
 	}
 
-	public boolean hasPlayerInventory(String playerName) {
-		return this.inventories.containsKey(playerName);
+	public boolean hasPlayerState(String playerName) {
+		return this.playerStates.containsKey(playerName);
 	}
 
-	public void keepPlayerInventory(Player player) {
+	public void keepPlayerState(Player player) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack[] contents = inventory.getContents();
-		this.inventories.put(player.getName(), new InventoryStash(contents, inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots()));
+		this.playerStates.put(player.getName(), new PlayerState(player.getGameMode(), 
+																contents, inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), 
+																player.getHealth(), player.getExhaustion(), player.getSaturation(), player.getFoodLevel()));
 	}
 
-	public void restorePlayerInventory(Player player) {
-		InventoryStash originalContents = this.inventories.remove(player.getName());
+	public void restorePlayerState(Player player) {
+		PlayerState originalContents = this.playerStates.remove(player.getName());
 		PlayerInventory playerInv = player.getInventory();
 		if (originalContents != null) {
 			this.playerInvFromInventoryStash(playerInv, originalContents);
+			player.setGameMode(originalContents.getGamemode());
+			player.setHealth(originalContents.getHealth());
+			player.setExhaustion(originalContents.getExhaustion());
+			player.setSaturation(originalContents.getSaturation());
+			player.setFoodLevel(originalContents.getFoodLevel());
 		}
 	}
 
-	private void playerInvFromInventoryStash(PlayerInventory playerInv, InventoryStash originalContents) {
+	private void playerInvFromInventoryStash(PlayerInventory playerInv, PlayerState originalContents) {
 		playerInv.clear();
 		playerInv.clear(playerInv.getSize() + 0);
 		playerInv.clear(playerInv.getSize() + 1);
@@ -487,9 +501,9 @@ public class Warzone {
 		}
 	}
 
-	public InventoryStash getPlayerInventory(String playerName) {
-		if (this.inventories.containsKey(playerName)) {
-			return this.inventories.get(playerName);
+	public PlayerState getPlayerState(String playerName) {
+		if (this.playerStates.containsKey(playerName)) {
+			return this.playerStates.get(playerName);
 		}
 		return null;
 	}
@@ -723,8 +737,8 @@ public class Warzone {
 		if (lowestNoOfPlayers != null) {
 			lowestNoOfPlayers.addPlayer(player);
 			lowestNoOfPlayers.resetSign();
-			if (!this.hasPlayerInventory(player.getName())) {
-				this.keepPlayerInventory(player);
+			if (!this.hasPlayerState(player.getName())) {
+				this.keepPlayerState(player);
 			}
 			War.war.msg(player, "Your inventory is in storage until you use '/war leave'.");
 			this.respawnPlayer(lowestNoOfPlayers, player);
@@ -878,10 +892,9 @@ public class Warzone {
 			if (this.getLobby() != null) {
 				this.getLobby().resetTeamGateSign(playerTeam);
 			}
-			if (this.hasPlayerInventory(player.getName())) {
-				this.restorePlayerInventory(player);
+			if (this.hasPlayerState(player.getName())) {
+				this.restorePlayerState(player);
 			}
-			player.setHealth(20);
 			player.setFireTicks(0);
 			player.setRemainingAir(300);
 

@@ -98,8 +98,8 @@ public class JoinCommand extends AbstractWarCommand {
 			boolean foundTeam = false;
 			for (Team team : teams) {
 				if (team.getName().startsWith(name) || team.getKind() == kind) {
-					if (!zone.hasPlayerInventory(player.getName())) {
-						zone.keepPlayerInventory(player);
+					if (!zone.hasPlayerState(player.getName())) {
+						zone.keepPlayerState(player);
 						this.msg("Your inventory is in storage until you use '/war leave'.");
 					}
 					if (team.getPlayers().size() < zone.getTeamCap()) {

@@ -56,7 +56,7 @@ public class War extends JavaPlugin {
 	private final List<String> zoneMakerNames = new ArrayList<String>();
 	private final List<String> commandWhitelist = new ArrayList<String>();
 	private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
-	private HashMap<String, InventoryStash> disconnected = new HashMap<String, InventoryStash>();
+	private HashMap<String, PlayerState> disconnected = new HashMap<String, PlayerState>();
 	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
 
 	// Global settings
@@ -1057,11 +1057,11 @@ public class War extends JavaPlugin {
 		return this.defaultFlagReturn;
 	}
 
-	public HashMap<String, InventoryStash> getDisconnected() {
+	public HashMap<String, PlayerState> getDisconnected() {
 		return this.disconnected;
 	}
 
-	public void setDisconnected(HashMap<String, InventoryStash> disconnected) {
+	public void setDisconnected(HashMap<String, PlayerState> disconnected) {
 		this.disconnected = disconnected;
 	}
 
