@@ -39,8 +39,8 @@ public class Warzone {
 	private final List<Monument> monuments = new ArrayList<Monument>();
 
 	private Location teleport;
-	private boolean friendlyFire;
-	private int lifePool;
+	private boolean friendlyFire = false;
+	private int lifePool = 7;
 	private HashMap<Integer, ItemStack> loadout = new HashMap<Integer, ItemStack>();
 	private HashMap<String, HashMap<Integer, ItemStack>> extraLoadouts = new HashMap<String, HashMap<Integer, ItemStack>>();
 	private int teamCap = 5;
@@ -57,13 +57,15 @@ public class Warzone {
 	private final int minSafeDistanceFromWall = 6;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private ZoneLobby lobby;
-	private boolean autoAssignOnly;
-	private boolean flagPointsOnly;
-	private boolean blockHeads;
-	private boolean unbreakableZoneBlocks;
+	private boolean autoAssignOnly = false;
+	private boolean flagPointsOnly = false;
+	private boolean blockHeads = true;
+	private boolean unbreakableZoneBlocks = false;
 	private boolean disabled = false;
 	private boolean noCreatures = false;
 	private boolean glassWalls = true;
+	private boolean pvpInZone = true;
+	private boolean instaBreak = false;
 	private int minPlayers = 1;
 	private int minTeams = 1;
 	
@@ -73,6 +75,7 @@ public class Warzone {
 
 	private HashMap<String, PlayerState> deadMenInventories = new HashMap<String, PlayerState>();
 	private Location rallyPoint;
+
 
 	@SuppressWarnings("unchecked")
 	public Warzone(World world, String name) {
@@ -94,6 +97,8 @@ public class Warzone {
 		this.setUnbreakableZoneBlocks(War.war.isDefaultUnbreakableZoneBlocks());
 		this.setNoCreatures(War.war.isDefaultNoCreatures());
 		this.setGlassWalls(War.war.isDefaultGlassWalls());
+		this.setPvpInZone(War.war.isDefaultPvpInZone());
+		this.setInstaBreak(War.war.isDefaultInstaBreak());
 		this.setMinPlayers(War.war.getDefaultMinPlayers());
 		this.setMinTeams(War.war.getDefaultMinTeams());
 		this.setResetOnEmpty(War.war.isDefaultResetOnEmpty());
@@ -1170,5 +1175,21 @@ public class Warzone {
 
 	public HashMap<String, Integer> getNewlyRespawned() {
 		return newlyRespawned;
+	}
+
+	public boolean isPvpInZone() {
+		return pvpInZone;
+	}
+
+	public void setPvpInZone(boolean stopPvp) {
+		this.pvpInZone = stopPvp;
+	}
+
+	public boolean isInstaBreak() {
+		return instaBreak;
+	}
+
+	public void setInstaBreak(boolean instaBreak) {
+		this.instaBreak = instaBreak;
 	}
 }

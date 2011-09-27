@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
@@ -126,6 +127,21 @@ public class WarBlockListener extends BlockListener {
 		Block block = event.getBlock();
 		if (player != null && block != null) {
 			this.handleBreakOrDamage(player, block, event);
+		}
+	}
+	
+	public void onBlockDamage(BlockDamageEvent event) {
+		if (!War.war.isLoaded()) {
+			return;
+		}
+		Player player = event.getPlayer();
+		Block block = event.getBlock();
+		Warzone playerZone = Warzone.getZoneByLocation(player);
+		if (player != null && block != null && playerZone != null && playerZone.isInstaBreak()) {
+			Warzone blockZone = Warzone.getZoneByLocation(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ()));
+			if (blockZone != null && blockZone == playerZone) {
+				event.setInstaBreak(true);
+			}
 		}
 	}
 

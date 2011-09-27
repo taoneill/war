@@ -125,7 +125,9 @@ public class WarzoneMapper {
 			}
 
 			// ff
-			warzone.setFriendlyFire(warzoneConfig.getBoolean("friendlyFire"));
+			if (warzoneConfig.containsKey("friendlyFire")) {
+				warzone.setFriendlyFire(warzoneConfig.getBoolean("friendlyFire"));
+			}
 
 			// loadout
 			String loadoutStr = warzoneConfig.getString("loadout");
@@ -167,25 +169,39 @@ public class WarzoneMapper {
 
 
 			// life pool (always set after teams, so the teams' remaining lives get initialized properly by this setter)
-			warzone.setLifePool(warzoneConfig.getInt("lifePool"));
+			if (warzoneConfig.containsKey("lifePool")) {
+				warzone.setLifePool(warzoneConfig.getInt("lifePool"));
+			}
 
 			// monument heal
-			warzone.setMonumentHeal(warzoneConfig.getInt("monumentHeal"));
+			if (warzoneConfig.containsKey("monumentHeal")) {
+				warzone.setMonumentHeal(warzoneConfig.getInt("monumentHeal"));
+			}
 
 			// autoAssignOnly
-			warzone.setAutoAssignOnlyWithoutResettingLobby(warzoneConfig.getBoolean("autoAssignOnly"));
+			if (warzoneConfig.containsKey("autoAssignOnly")) {
+				warzone.setAutoAssignOnlyWithoutResettingLobby(warzoneConfig.getBoolean("autoAssignOnly"));
+			}
 
 			// flagPointsOnly
-			warzone.setFlagPointsOnly(warzoneConfig.getBoolean("flagPointsOnly"));
+			if (warzoneConfig.containsKey("flagPointsOnly")) {
+				warzone.setFlagPointsOnly(warzoneConfig.getBoolean("flagPointsOnly"));
+			}
 
 			// team cap
-			warzone.setTeamCap(warzoneConfig.getInt("teamCap"));
-
+			if (warzoneConfig.containsKey("teamCap")) {
+				warzone.setTeamCap(warzoneConfig.getInt("teamCap"));
+			}
+			
 			// score cap
-			warzone.setScoreCap(warzoneConfig.getInt("scoreCap"));
+			if (warzoneConfig.containsKey("scoreCap")) {
+				warzone.setScoreCap(warzoneConfig.getInt("scoreCap"));
+			}
 
 			// blockHeads
-			warzone.setBlockHeads(warzoneConfig.getBoolean("blockHeads"));
+			if (warzoneConfig.containsKey("blockHeads")) {
+				warzone.setBlockHeads(warzoneConfig.getBoolean("blockHeads"));
+			}
 
 			// spawnStyle
 			String spawnStyle = warzoneConfig.getString("spawnStyle");
@@ -214,31 +230,59 @@ public class WarzoneMapper {
 			}
 
 			// unbreakableZoneBlocks
-			warzone.setUnbreakableZoneBlocks(warzoneConfig.getBoolean("unbreakableZoneBlocks"));
+			if (warzoneConfig.containsKey("unbreakableZoneBlocks")) {
+				warzone.setUnbreakableZoneBlocks(warzoneConfig.getBoolean("unbreakableZoneBlocks"));
+			}
 
 			// disabled
-			warzone.setDisabled(warzoneConfig.getBoolean("disabled"));
+			if (warzoneConfig.containsKey("disabled")) {
+				warzone.setDisabled(warzoneConfig.getBoolean("disabled"));
+			}
 
 			// noCreatures
-			warzone.setNoCreatures(warzoneConfig.getBoolean("noCreatures"));
+			if (warzoneConfig.containsKey("noCreatures")) {
+				warzone.setNoCreatures(warzoneConfig.getBoolean("noCreatures"));
+			}
 			
 			// glassWalls
-			warzone.setGlassWalls(warzoneConfig.getBoolean("glassWalls"));
+			if (warzoneConfig.containsKey("glassWalls")) {
+				warzone.setGlassWalls(warzoneConfig.getBoolean("glassWalls"));
+			}
+			
+			// pvpInZone
+			if (warzoneConfig.containsKey("pvpInZone")) {
+				warzone.setPvpInZone(warzoneConfig.getBoolean("pvpInZone"));
+			}
+			
+			// instaBreak
+			if (warzoneConfig.containsKey("instaBreak")) {
+				warzone.setInstaBreak(warzoneConfig.getBoolean("instaBreak"));
+			}
 			
 			// minPlayers
-			warzone.setMinPlayers(warzoneConfig.getInt("minPlayers"));
+			if (warzoneConfig.containsKey("minPlayers")) {
+				warzone.setMinPlayers(warzoneConfig.getInt("minPlayers"));
+			}
 			
 			// minTeams
-			warzone.setMinTeams(warzoneConfig.getInt("minTeams"));
+			if (warzoneConfig.containsKey("minTeams")) {
+				warzone.setMinTeams(warzoneConfig.getInt("minTeams"));
+			}
 
 			// resetOnEmpty
-			warzone.setResetOnEmpty(warzoneConfig.getBoolean("resetOnEmpty"));
+			if (warzoneConfig.containsKey("resetOnEmpty")) {
+				warzone.setResetOnEmpty(warzoneConfig.getBoolean("resetOnEmpty"));
+			}
 
 			// resetOnLoad
-			warzone.setResetOnLoad(warzoneConfig.getBoolean("resetOnLoad"));
+			if (warzoneConfig.containsKey("resetOnLoad")) {
+				warzone.setResetOnLoad(warzoneConfig.getBoolean("resetOnLoad"));
+			}
 
 			// resetOnUnload
-			warzone.setResetOnUnload(warzoneConfig.getBoolean("resetOnUnload"));
+			if (warzoneConfig.containsKey("resetOnUnload")) {
+				warzone.setResetOnUnload(warzoneConfig.getBoolean("resetOnUnload"));
+			}
 
 			// rallyPoint
 			String rallyPointStr = warzoneConfig.getString("rallyPoint");
@@ -450,6 +494,12 @@ public class WarzoneMapper {
 		
 		// glassWalls
 		warzoneConfig.setBoolean("glassWalls", warzone.isGlassWalls());
+		
+		// pvpInZone
+		warzoneConfig.setBoolean("pvpInZone", warzone.isPvpInZone());
+		
+		// instaBreak
+		warzoneConfig.setBoolean("instaBreak", warzone.isInstaBreak());
 		
 		// minPlayers
 		warzoneConfig.setInt("minPlayers", warzone.getMinPlayers());

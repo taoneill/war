@@ -63,6 +63,8 @@ public class War extends JavaPlugin {
 	private boolean pvpInZonesOnly = false;
 	private boolean disablePvpMessage = false;
 	private boolean buildInZonesOnly = false;
+	private final List<String> deadlyAdjectives = new ArrayList<String>();
+	private final List<String> killerVerbs = new ArrayList<String>();
 
 	// Default warzone settings
 	private final HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
@@ -78,6 +80,8 @@ public class War extends JavaPlugin {
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
 	private boolean defaultGlassWalls = true;
+	private boolean defaultPvpInZone = true;
+	private boolean defaultInstaBreak = false;	
 	private int defaultMinPlayers = 1;	// By default, 1 player on 1 team is enough for unlocking the cant-exit-spawn guard
 	private int defaultMinTeams = 1;
 	private FlagReturn defaultFlagReturn = FlagReturn.BOTH;
@@ -138,17 +142,39 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, this.entityListener, Priority.Normal, this);
 
 			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Priority.Normal, this);
+			pm.registerEvent(Event.Type.BLOCK_DAMAGE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
 		}
 
 		// Load files from disk or create them (using these defaults)
+		this.getDefaultLoadout().clear();
 		this.getDefaultLoadout().put(0, new ItemStack(Material.STONE_SWORD, 1, (byte) 8));
 		this.getDefaultLoadout().put(1, new ItemStack(Material.BOW, 1, (byte) 8));
 		this.getDefaultLoadout().put(2, new ItemStack(Material.ARROW, 7));
 		this.getDefaultLoadout().put(3, new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8));
 		this.getDefaultLoadout().put(4, new ItemStack(Material.STONE_SPADE, 1, (byte) 8));
+		this.getDefaultReward().clear();
 		this.getDefaultReward().put(0, new ItemStack(Material.CAKE, 1));
-
+		
+		this.getDeadlyAdjectives().clear();
+		this.getDeadlyAdjectives().add("");
+		this.getDeadlyAdjectives().add("");
+		this.getDeadlyAdjectives().add("mighty ");
+		this.getDeadlyAdjectives().add("deadly ");
+		this.getDeadlyAdjectives().add("fine ");
+		this.getDeadlyAdjectives().add("precise ");
+		this.getDeadlyAdjectives().add("brutal ");
+		
+		this.getKillerVerbs().clear();
+		this.getKillerVerbs().add("killed");
+		this.getKillerVerbs().add("killed");
+		this.getKillerVerbs().add("killed");
+		this.getKillerVerbs().add("finished");
+		this.getKillerVerbs().add("annihilated");
+		this.getKillerVerbs().add("murdered");
+		this.getKillerVerbs().add("obliterated");
+		this.getKillerVerbs().add("exterminated");
+		
 		WarMapper.load();
 		HelmetProtectionTask helmetProtectionTask = new HelmetProtectionTask();
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, helmetProtectionTask, 250, 100);
@@ -319,6 +345,16 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("glasswalls");
 				warzone.setGlassWalls(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" glasswalls set to " + String.valueOf(warzone.isGlassWalls()) + ".");
+			}
+			if (namedParams.containsKey("pvpinzone")) {
+				String onOff = namedParams.get("pvpinzone");
+				warzone.setPvpInZone(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" pvpinzone set to " + String.valueOf(warzone.isPvpInZone()) + ".");
+			}
+			if (namedParams.containsKey("instabreak")) {
+				String onOff = namedParams.get("instabreak");
+				warzone.setInstaBreak(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" instabreak set to " + String.valueOf(warzone.isInstaBreak()) + ".");
 			}
 			if (namedParams.containsKey("minplayers")) {
 				int val = Integer.parseInt(namedParams.get("minplayers"));
@@ -491,6 +527,16 @@ public class War extends JavaPlugin {
 				this.setDefaultGlassWalls(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" glasswalls set to " + String.valueOf(war.isDefaultGlassWalls()) + ".");
 			}
+			if (namedParams.containsKey("pvpinzone")) {
+				String onOff = namedParams.get("pvpinzone");
+				this.setDefaultPvpInZone(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" pvpinzone set to " + String.valueOf(war.isDefaultPvpInZone()) + ".");
+			}
+			if (namedParams.containsKey("instabreak")) {
+				String onOff = namedParams.get("instabreak");
+				this.setDefaultInstaBreak(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" instabreak set to " + String.valueOf(war.isDefaultInstaBreak()) + ".");
+			}
 			if (namedParams.containsKey("minplayers")) {
 				int val = Integer.parseInt(namedParams.get("minplayers"));
 				if (val > this.getDefaultTeamCap()) {
@@ -583,6 +629,8 @@ public class War extends JavaPlugin {
 		 + " disabled:" + String.valueOf(zone.isDisabled())
 		 + " nocreatures:" + String.valueOf(zone.isNoCreatures())
 		 + " glasswalls:" + String.valueOf(zone.isGlassWalls())
+		 + " pvpinzone:" + String.valueOf(zone.isPvpInZone())
+		 + " instabreak:" + String.valueOf(zone.isInstaBreak())
 		 + " minplayers:" + zone.getMinPlayers()
 		 + " minteams:" + zone.getMinTeams()
 		 + " resetonempty:" + String.valueOf(zone.isResetOnEmpty())
@@ -609,6 +657,8 @@ public class War extends JavaPlugin {
 		 + " unbreakable:" + String.valueOf(this.isDefaultUnbreakableZoneBlocks())
 		 + " nocreatures:" + String.valueOf(this.isDefaultNoCreatures())
 		 + " glasswalls:" + String.valueOf(this.isDefaultGlassWalls())
+		 + " pvpinzone:" + String.valueOf(this.isDefaultPvpInZone())
+		 + " instabreak:" + String.valueOf(this.isDefaultInstaBreak())
 		 + " minplayers:" + this.getDefaultMinPlayers()
 		 + " minteams:" + this.getDefaultMinTeams()
 		 + " resetonempty:" + String.valueOf(this.isDefaultResetOnEmpty())
@@ -1099,5 +1149,29 @@ public class War extends JavaPlugin {
 
 	public HashMap<String, HashMap<Integer, ItemStack>> getDefaultExtraLoadouts() {
 		return defaultExtraLoadouts;
+	}
+
+	public void setDefaultPvpInZone(boolean defaultPvpInZone) {
+		this.defaultPvpInZone = defaultPvpInZone;
+	}
+
+	public boolean isDefaultPvpInZone() {
+		return defaultPvpInZone;
+	}
+
+	public void setDefaultInstaBreak(boolean defaultInstaBreak) {
+		this.defaultInstaBreak = defaultInstaBreak;
+	}
+
+	public boolean isDefaultInstaBreak() {
+		return defaultInstaBreak;
+	}
+
+	public List<String> getDeadlyAdjectives() {
+		return deadlyAdjectives;
+	}
+
+	public List<String> getKillerVerbs() {
+		return killerVerbs;
 	}
 }

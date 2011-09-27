@@ -1,21 +1,22 @@
 package bukkit.tommytony.war;
 
-import java.awt.Color;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.entity.CraftTNTPrimed;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
@@ -33,6 +34,8 @@ import com.tommytony.war.Warzone;
  */
 public class WarEntityListener extends EntityListener {
 
+	private Random killSeed = new Random();
+			
 	/**
 	 * Handles PVP-Damage
 	 *
@@ -42,6 +45,11 @@ public class WarEntityListener extends EntityListener {
 	private void handlerAttackDefend(EntityDamageByEntityEvent event) {
 		Entity attacker = event.getDamager();
 		Entity defender = event.getEntity();
+		
+		// Maybe an arrow was thrown
+		if (attacker != null && event.getDamager() instanceof Projectile && ((Projectile)event.getDamager()).getShooter() instanceof Player){
+			attacker = ((Player)((Projectile)event.getDamager()).getShooter());
+		}
 
 		if (attacker != null && defender != null && attacker instanceof Player && defender instanceof Player) {
 			// only let adversaries (same warzone, different team) attack each other
@@ -58,13 +66,21 @@ public class WarEntityListener extends EntityListener {
 					if (!defenderWarzone.isFlagThief(d.getName())) { // thieves can always be attacked
 						War.war.badMsg(a, "Can't attack a player that's inside his team's spawn.");
 						event.setCancelled(true);
+						return;
 					}
 				} else if (attackerTeam.getSpawnVolume().contains(a.getLocation()) && !attackerTeam.getSpawnVolume().contains(d.getLocation())) {
 					// only let a player inside spawn attack an enemy player if that player enters the spawn
 					if (!attackerWarzone.isFlagThief(a.getName())) { // thieves can always attack
 						War.war.badMsg(a, "Can't attack a player from inside your spawn.");
 						event.setCancelled(true);
+						return;
 					}
+				}
+				
+				if (!attackerWarzone.isPvpInZone()) {
+					// spleef-like, non-pvp, zone
+					event.setCancelled(true);
+					return;
 				}
 
 				// Detect death, prevent it and respawn the player
@@ -72,7 +88,31 @@ public class WarEntityListener extends EntityListener {
 					String killMessage = "";
 					String attackerString = attackerTeam.getKind().getColor() + a.getDisplayName();
 					String defenderString = defenderTeam.getKind().getColor() + d.getDisplayName();
-					killMessage = attackerString + ChatColor.WHITE + " killed " + defenderString;
+					
+					Material killerWeapon = a.getItemInHand().getType();
+					String weaponString = killerWeapon.toString();
+					if (killerWeapon == Material.AIR) {
+						weaponString = "fist";
+					} else if (killerWeapon == Material.BOW || event.getDamager() instanceof Arrow) {
+						int rand = killSeed.nextInt(3);
+						if (rand == 0) {
+							weaponString = "arrow";
+						} else if (rand == 1) {
+							weaponString = "bow";
+						} else {
+							weaponString = "aim";
+						}
+						
+					} else if (event.getDamager() instanceof Projectile) {
+						weaponString = "aim";
+					}
+					
+					String adjectiveString = War.war.getDeadlyAdjectives().get(this.killSeed.nextInt(War.war.getDeadlyAdjectives().size()));
+					String verbString = War.war.getKillerVerbs().get(this.killSeed.nextInt(War.war.getKillerVerbs().size()));
+					
+					killMessage = attackerString + ChatColor.WHITE + "'s " + adjectiveString + weaponString.toLowerCase().replace('_', ' ') 
+											+ " " + verbString + " " + defenderString;
+					
 					for (Team team : defenderWarzone.getTeams()) {
 						team.teamcast(killMessage);
 					}
@@ -117,11 +157,11 @@ public class WarEntityListener extends EntityListener {
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
 				String deathMessage = "";
 				String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName();
-				if (event.getDamager() instanceof Projectile && ((Projectile)event.getDamager()).getShooter() instanceof Player){
+				/* if (event.getDamager() instanceof Projectile && ((Projectile)event.getDamager()).getShooter() instanceof Player){
 					Player shooter = ((Player)((Projectile)event.getDamager()).getShooter());
 					Team shooterTeam = Team.getTeamByPlayerName(shooter.getName()); 
 					deathMessage = shooterTeam.getKind().getColor() + shooter.getDisplayName() + ChatColor.WHITE + "'s deadly aim killed " + defenderString;
-				} else if (event.getDamager() instanceof CraftTNTPrimed) {
+				} else */ if (event.getDamager() instanceof CraftTNTPrimed) {
 					deathMessage = defenderString + ChatColor.WHITE + " exploded";
 				} else {
 					deathMessage = defenderString + ChatColor.WHITE + " died";

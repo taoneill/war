@@ -111,40 +111,59 @@ public class WarMapper {
 		}
 
 		// defaultLifePool
-		War.war.setDefaultLifepool(warConfig.getInt("defaultLifePool"));
+		if (warConfig.keyExists("defaultLifePool")) {
+			War.war.setDefaultLifepool(warConfig.getInt("defaultLifePool"));
+		}
 
 		// defaultMonumentHeal
-		War.war.setDefaultMonumentHeal(warConfig.getInt("defaultMonumentHeal"));
-		
-		// defaultMonumentHeal
-		War.war.setDefaultMonumentHeal(warConfig.getInt("defaultMonumentHeal"));
+		if (warConfig.keyExists("defaultMonumentHeal")) {
+			War.war.setDefaultMonumentHeal(warConfig.getInt("defaultMonumentHeal"));
+		}
 
 		// defaultFriendlyFire
-		War.war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));
+		if (warConfig.keyExists("defaultFriendlyFire")) {
+			War.war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));
+		}
 
 		// defaultAutoAssignOnly
-		War.war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
+		if (warConfig.keyExists("defaultAutoAssignOnly")) {
+			War.war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
+		}
 
 		// defaultFlagPointsOnly
-		War.war.setDefaultFlagPointsOnly(warConfig.getBoolean("defaultFlagPointsOnly"));
+		if (warConfig.keyExists("defaultFlagPointsOnly")) {
+			War.war.setDefaultFlagPointsOnly(warConfig.getBoolean("defaultFlagPointsOnly"));
+		}
 
 		// defaultTeamCap
-		War.war.setDefaultTeamCap(warConfig.getInt("defaultTeamCap"));
+		if (warConfig.keyExists("defaultTeamCap")) {
+			War.war.setDefaultTeamCap(warConfig.getInt("defaultTeamCap"));
+		}
 
 		// defaultScoreCap
-		War.war.setDefaultScoreCap(warConfig.getInt("defaultScoreCap"));
+		if (warConfig.keyExists("defaultScoreCap")) {
+			War.war.setDefaultScoreCap(warConfig.getInt("defaultScoreCap"));
+		}
 
 		// pvpInZonesOnly
-		War.war.setPvpInZonesOnly(warConfig.getBoolean("pvpInZonesOnly"));
+		if (warConfig.keyExists("pvpInZonesOnly")) {
+			War.war.setPvpInZonesOnly(warConfig.getBoolean("pvpInZonesOnly"));
+		}
 
 		// defaultBlockHeads
-		War.war.setDefaultBlockHeads(warConfig.getBoolean("defaultBlockHeads"));
+		if (warConfig.keyExists("defaultBlockHeads")) {
+			War.war.setDefaultBlockHeads(warConfig.getBoolean("defaultBlockHeads"));
+		}
 
 		// buildInZonesOnly
-		War.war.setBuildInZonesOnly(warConfig.getBoolean("buildInZonesOnly"));
+		if (warConfig.keyExists("buildInZonesOnly")) {
+			War.war.setBuildInZonesOnly(warConfig.getBoolean("buildInZonesOnly"));
+		}
 
 		// disablePVPMessage
-		War.war.setDisablePvpMessage(warConfig.getBoolean("disablePvpMessage"));
+		if (warConfig.keyExists("disablePvpMessage")) {
+			War.war.setDisablePvpMessage(warConfig.getBoolean("disablePvpMessage"));
+		}
 
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
@@ -173,28 +192,54 @@ public class WarMapper {
 		}
 
 		// defaultUnbreakableZoneBlocks
-		War.war.setDefaultUnbreakableZoneBlocks(warConfig.getBoolean("defaultUnbreakableZoneBlocks"));
+		if (warConfig.keyExists("defaultUnbreakableZoneBlocks")) {
+			War.war.setDefaultUnbreakableZoneBlocks(warConfig.getBoolean("defaultUnbreakableZoneBlocks"));
+		}
 
 		// defaultNoCreatures
-		War.war.setDefaultNoCreatures(warConfig.getBoolean("defaultNoCreatures"));
+		if (warConfig.keyExists("defaultNoCreatures")) {
+			War.war.setDefaultNoCreatures(warConfig.getBoolean("defaultNoCreatures"));
+		}
 		
 		// defaultGlassWalls
-		War.war.setDefaultGlassWalls(warConfig.getBoolean("defaultGlassWalls"));
+		if (warConfig.keyExists("defaultGlassWalls")) {
+			War.war.setDefaultGlassWalls(warConfig.getBoolean("defaultGlassWalls"));
+		}
+		
+		// defaultPvpInZone
+		if (warConfig.keyExists("defaultPvpInZone")) {
+			War.war.setDefaultPvpInZone(warConfig.getBoolean("defaultPvpInZone"));
+		}
+		
+		// defaultInstaBreak
+		if (warConfig.keyExists("defaultInstaBreak")) {
+			War.war.setDefaultInstaBreak(warConfig.getBoolean("defaultInstaBreak"));
+		}
 		
 		// defaultMinPlayers
-		War.war.setDefaultMinPlayers(warConfig.getInt("defaultMinPlayers"));
+		if (warConfig.keyExists("defaultMinPlayers")) {
+			War.war.setDefaultMinPlayers(warConfig.getInt("defaultMinPlayers"));
+		}
 		
 		// defaultMinTeams
-		War.war.setDefaultMinTeams(warConfig.getInt("defaultMinTeams"));
+		if (warConfig.keyExists("defaultMinTeams")) {
+			War.war.setDefaultMinTeams(warConfig.getInt("defaultMinTeams"));
+		}
 
 		// defaultResetOnEmpty
-		War.war.setDefaultResetOnEmpty(warConfig.getBoolean("defaultResetOnEmpty"));
+		if (warConfig.keyExists("defaultResetOnEmpty")) {
+			War.war.setDefaultResetOnEmpty(warConfig.getBoolean("defaultResetOnEmpty"));
+		}
 
 		// defaultResetOnLoad
-		War.war.setDefaultResetOnLoad(warConfig.getBoolean("defaultResetOnLoad"));
+		if (warConfig.keyExists("defaultResetOnLoad")) {
+			War.war.setDefaultResetOnLoad(warConfig.getBoolean("defaultResetOnLoad"));
+		}
 
 		// defaultResetOnUnload
-		War.war.setDefaultResetOnUnload(warConfig.getBoolean("defaultResetOnUnload"));
+		if (warConfig.keyExists("defaultResetOnUnload")) {
+			War.war.setDefaultResetOnUnload(warConfig.getBoolean("defaultResetOnUnload"));
+		}
 
 		// warhub
 		String hubStr = warConfig.getString("warhub");
@@ -319,6 +364,12 @@ public class WarMapper {
 		// defaultGlassWalls
 		warConfig.setBoolean("defaultGlassWalls", War.war.isDefaultGlassWalls());
 		
+		// defaultPvpInZone
+		warConfig.setBoolean("defaultPvpInZone", War.war.isDefaultPvpInZone());
+		
+		// defaultInstaBreak
+		warConfig.setBoolean("defaultInstaBreak", War.war.isDefaultInstaBreak());
+				
 		// defaultMinPlayers
 		warConfig.setInt("defaultMinPlayers", War.war.getDefaultMinPlayers());
 		
