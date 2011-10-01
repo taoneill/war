@@ -91,8 +91,11 @@ commands:
     usage: Persists changes made to the warzone since the last save. Config can be set with named parameters. Provide a zone name if not standing in warzone or lobby.
         Ex -
         /savezone [zone-name] => Basic save - name optional if standing inside,
-        /savezone [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small> unbreakable:on nocreatures:on disabled:on,
+        /savezone [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on ff:on blockheads:on spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on monumentheal:<0-20>
+                              flagreturn:<both/spawn/flag> flagpointsonly:false glasswalls:on pvpinzone:true instabreak:false nodrops:false nohunger:false saturation:<0-20> minplayers:1 minteams:1 
         /savezone [zone-name] loadout:default => sets the respawn inventory to your current items,
+        /savezone [zone-name] loadout:<extra-loadout-name> => adds an extra loadout (i.e. another player class) that the players can toggle to by sneaking while inside the spawn
+        /savezone [zone-name] deleteloadout:<extra-loadout-name> => removed teh specified loadout from the choices. You cannot remove the default loadout.
         /savezone [zone-name] reward:default => sets the winner's reward to your current items.
   setzonelobby:
     description: War> Creates or changes the position of the warzone lobby.
@@ -153,16 +156,22 @@ commands:
     description: War> Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone.
     usage: Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone. Provide a zone name if not standing in warzone or lobby.
         Ex -
-        /setzoneconfig [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on,
-        /setzoneconfig [zone-name] loadout:default  =>  sets the respawn inventory to your current items,
-        /setzoneconfig [zone-name] reward:default  =>  sets the winner's reward to your current items
+        /setzoneconfig [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on ff:on blockheads:on spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on monumentheal:<0-20>
+                                   flagreturn:<both/spawn/flag> flagpointsonly:false glasswalls:on pvpinzone:true instabreak:false nodrops:false nohunger:false saturation:<0-20> minplayers:1 minteams:1
+        /setzoneconfig [zone-name] loadout:default => sets the respawn inventory to your current items,
+        /setzoneconfig [zone-name] loadout:<extra-loadout-name> => adds an extra loadout (i.e. another player class) that the players can toggle to by sneaking while inside the spawn
+        /setzoneconfig [zone-name] deleteloadout:<extra-loadout-name> => removed teh specified loadout from the choices. You cannot remove the default loadout.
+        /setzoneconfig [zone-name] reward:default => sets the winner's reward to your current items.
   zonecfg:
     description: War> Alias for /setzoneconfig
     usage: Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone. Provide a zone name if not standing in warzone or lobby.
         Ex -
-        /setzoneconfig [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on,
-        /setzoneconfig [zone-name] loadout:default  =>  sets the respawn inventory to your current items,
-        /setzoneconfig [zone-name] reward:default  =>  sets the winner's reward to your current items
+        /zonecfg [zone-name] lifepool:8 teamsize:5 maxscore:7 autoassign:on ff:on blockheads:on spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on monumentheal:<0-20>
+                             flagreturn:<both/spawn/flag> flagpointsonly:false glasswalls:on pvpinzone:true instabreak:false nodrops:false nohunger:false saturation:<0-20> minplayers:1 minteams:1
+        /zonecfg [zone-name] loadout:default => sets the respawn inventory to your current items,
+        /zonecfg [zone-name] loadout:<extra-loadout-name> => adds an extra loadout (i.e. another player class) that the players can toggle to by sneaking while inside the spawn
+        /zonecfg [zone-name] deleteloadout:<extra-loadout-name> => removed teh specified loadout from the choices. You cannot remove the default loadout.
+        /zonecfg [zone-name] reward:default => sets the winner's reward to your current items.
   zonemaker:
     description: War> Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player.
     usage: Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player.
@@ -201,20 +210,28 @@ commands:
     description: War> Change gobal settings and the default warzone configuration values.
     usage: Change gobal settings and the default warzone configuration values.
         Ex -
-        /setwarconfig pvpinzonesonly:on buildinzonesonly:on  => Global settings,
-        /setwarconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on  =>  Warzone defaults,
-        /setwarconfig loadout:default  =>  sets the respawn inventory to your current items,
-        /setwarconfig reward:default  =>  sets the winner's reward to your current items,
+        /setwarconfig pvpinzonesonly:on buildinzonesonly:on disablepvpmessage:off tntinzonesonly:off => Global settings,
+        /setwarconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on ff:on blockheads:on spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on monumentheal:<0-20>
+                      flagreturn:<both/spawn/flag> flagpointsonly:false glasswalls:on pvpinzone:true instabreak:false nodrops:false nohunger:false saturation:<0-20> minplayers:1 minteams:1
+                      =>  Warzone defaults,
+        /setwarconfig loadout:default => sets the respawn inventory to your current items,
+        /setwarconfig loadout:<extra-loadout-name> => adds an extra loadout (i.e. another player class) that the players can toggle to by sneaking while inside the spawn
+        /setwarconfig deleteloadout:<extra-loadout-name> => removed teh specified loadout from the choices. You cannot remove the default loadout.
+        /setwarconfig reward:default => sets the winner's reward to your current items.
         /setwarconfig rallypoint:<warzone-name>  =>  changes when players get teleported at the end of a match for that zone, useful for chaining warzones together in a sequence, or preventing players from rejoining immediately
   warcfg:
     description: War> Alias for /setwarconfig
     usage: Change gobal settings and the default warzone configuration values.
         Ex -
-        /setwarconfig pvpinzonesonly:on buildinzonesonly:on  => Global settings,
-        /setwarconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on outline:off ff:on blockheads:off spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on  =>  Warzone defaults,
-        /setwarconfig loadout:default  =>  sets the respawn inventory to your current items,
-        /setwarconfig reward:default  =>  sets the winner's reward to your current items,
-        /setwarconfig rallypoint:<warzone-name>  =>  changes when players get teleported at the end of a match for that zone, useful for chaining warzones together in a sequence, or preventing players from rejoining immediately
+        /warcfg pvpinzonesonly:on buildinzonesonly:on disablepvpmessage:off tntinzonesonly:off  => Global settings,
+        /warcfg lifepool:8 teamsize:5 maxscore:7 autoassign:on ff:on blockheads:on spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on monumentheal:<0-20>
+                flagreturn:<both/spawn/flag> flagpointsonly:false glasswalls:on pvpinzone:true instabreak:false nodrops:false nohunger:false saturation:<0-20> minplayers:1 minteams:1
+                =>  Warzone defaults,
+        /warcfg loadout:default => sets the respawn inventory to your current items,
+        /warcfg loadout:<extra-loadout-name> => adds an extra loadout (i.e. another player class) that the players can toggle to by sneaking while inside the spawn
+        /warcfg deleteloadout:<extra-loadout-name> => removed teh specified loadout from the choices. You cannot remove the default loadout.
+        /warcfg reward:default => sets the winner's reward to your current items.
+        /warcfg rallypoint:<warzone-name>  =>  changes when players get teleported at the end of a match for that zone, useful for chaining warzones together in a sequence, or preventing players from rejoining immediately
 
 # Fallback
   war:
