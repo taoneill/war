@@ -387,8 +387,10 @@ public class WarEntityListener extends EntityListener {
 	 */
 	@Override
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-		if (!War.war.isLoaded() || (event.getRegainReason() != RegainReason.REGEN && event.getRegainReason() != RegainReason.EATING)) {
-			War.war.log("Refused " + event.getRegainReason().toString(), Level.INFO);
+		if (!War.war.isLoaded() || 
+				(event.getRegainReason() != RegainReason.REGEN 
+						&& event.getRegainReason() != RegainReason.EATING 
+						&& event.getRegainReason().toString() != "SATIATED")) {
 			return;
 		}
 
@@ -400,7 +402,9 @@ public class WarEntityListener extends EntityListener {
 		Player player = (Player) entity;
 		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 		if (zone != null) {
-			if (event.getRegainReason() == RegainReason.EATING && zone.isNoHunger()) {
+			if ((event.getRegainReason() == RegainReason.EATING 
+					|| event.getRegainReason().toString() != "SATIATED" ) 
+				&& zone.isNoHunger()) {
 				// noHunger setting means you can't auto-heal with full hunger bar (use saturation instead to control how fast you get hungry)
 				event.setCancelled(true);
 			} else if (event.getRegainReason() == RegainReason.REGEN) {
