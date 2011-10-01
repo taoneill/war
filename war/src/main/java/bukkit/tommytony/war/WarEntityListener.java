@@ -1,5 +1,6 @@
 package bukkit.tommytony.war;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -8,12 +9,17 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.ContainerBlock;
+import org.bukkit.block.NoteBlock;
+import org.bukkit.block.Sign;
+import org.bukkit.craftbukkit.entity.CraftCreeper;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.entity.CraftTNTPrimed;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -22,9 +28,12 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
+import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.jobs.DeferredBlockResetsJob;
+import com.tommytony.war.utils.DeferredBlockReset;
 
 /**
  * Handles Entity-Events
@@ -34,7 +43,7 @@ import com.tommytony.war.Warzone;
  */
 public class WarEntityListener extends EntityListener {
 
-	private Random killSeed = new Random();
+	private final Random killSeed = new Random();
 			
 	/**
 	 * Handles PVP-Damage
@@ -157,11 +166,8 @@ public class WarEntityListener extends EntityListener {
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
 				String deathMessage = "";
 				String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName();
-				/* if (event.getDamager() instanceof Projectile && ((Projectile)event.getDamager()).getShooter() instanceof Player){
-					Player shooter = ((Player)((Projectile)event.getDamager()).getShooter());
-					Team shooterTeam = Team.getTeamByPlayerName(shooter.getName()); 
-					deathMessage = shooterTeam.getKind().getColor() + shooter.getDisplayName() + ChatColor.WHITE + "'s deadly aim killed " + defenderString;
-				} else */ if (event.getDamager() instanceof CraftTNTPrimed) {
+				
+				if (event.getDamager() instanceof CraftTNTPrimed) {
 					deathMessage = defenderString + ChatColor.WHITE + " exploded";
 				} else {
 					deathMessage = defenderString + ChatColor.WHITE + " died";
@@ -187,25 +193,101 @@ public class WarEntityListener extends EntityListener {
 		}
 		// protect zones elements, lobbies and warhub from creepers
 		List<Block> explodedBlocks = event.blockList();
+		List<Block> dontExplode = new ArrayList<Block>();
+		
+		boolean explosionInAWarzone = Warzone.getZoneByLocation(event.getEntity().getLocation()) != null;
+		
+		if (!explosionInAWarzone && War.war.isTntInZonesOnly() && event.getEntity() instanceof TNTPrimed) {
+			// if tntinzonesonly:true, no tnt blows up outside zones
+			event.setCancelled(true);
+			return;
+		}
+		
 		for (Block block : explodedBlocks) {
 			if (War.war.getWarHub() != null && War.war.getWarHub().getVolume().contains(block)) {
-				event.setCancelled(true);
-				War.war.log("Explosion prevented at warhub.", Level.INFO);
-				return;
-			}
-
-			for (Warzone zone : War.war.getWarzones()) {
-				if (zone.isImportantBlock(block)) {
-					event.setCancelled(true);
-					War.war.log("Explosion prevented in zone " + zone.getName() + ".", Level.INFO);
-					return;
-				} else if (zone.getLobby() != null && zone.getLobby().getVolume().contains(block)) {
-					event.setCancelled(true);
-					War.war.log("Explosion prevented at zone " + zone.getName() + " lobby.", Level.INFO);
-					return;
+				dontExplode.add(block);
+			} else {
+				boolean inOneZone = false;
+				for (Warzone zone : War.war.getWarzones()) {
+					if (zone.isImportantBlock(block)) {
+						dontExplode.add(block);
+						inOneZone = true;
+						break;
+					} else if (zone.getLobby() != null && zone.getLobby().getVolume().contains(block)) {
+						dontExplode.add(block);
+						inOneZone = true;
+						break;
+					} else if (zone.getVolume().contains(block)) {
+						inOneZone = true;
+					}
+				}
+				
+				if (!inOneZone && explosionInAWarzone) {
+					// if the explosion originated in warzone, always rollback
+					dontExplode.add(block);
 				}
 			}
 		}
+		
+		int dontExplodeSize = dontExplode.size();
+		if (dontExplode.size() > 0) {
+			// Reset the exploded blocks that shouldn't have exploded (some of these are zone artifacts, if rollbackexplosion some may be outside-of-zone blocks 
+			DeferredBlockResetsJob job = new DeferredBlockResetsJob(dontExplode.get(0).getWorld());
+			List<Block> doors = new ArrayList<Block>(); 
+			for (Block dont : dontExplode) {
+				DeferredBlockReset deferred = null;
+				if (dont.getState() instanceof Sign) {
+					String[] lines = ((Sign)dont.getState()).getLines();
+					deferred = new DeferredBlockReset(dont.getX(), dont.getY(), dont.getZ(), dont.getTypeId(), dont.getData(), lines);
+				} else if (dont.getState() instanceof ContainerBlock) {
+					ItemStack[] contents = ((ContainerBlock)dont.getState()).getInventory().getContents();
+					Block worldBlock = dont.getWorld().getBlockAt(dont.getLocation());
+					if (worldBlock.getState() instanceof ContainerBlock) {
+						((ContainerBlock)worldBlock.getState()).getInventory().clear();
+					}
+					deferred = new DeferredBlockReset(dont.getX(), dont.getY(), dont.getZ(), dont.getTypeId(), dont.getData(), copyItems(contents));
+				} else if (dont.getTypeId() == Material.NOTE_BLOCK.getId()) {
+					Block worldBlock = dont.getWorld().getBlockAt(dont.getLocation());
+					if (worldBlock.getState() instanceof NoteBlock) {
+						NoteBlock noteBlock = ((NoteBlock)worldBlock.getState());
+						if (noteBlock != null) {
+							deferred = new DeferredBlockReset(dont.getX(), dont.getY(), dont.getZ(), dont.getTypeId(), dont.getData(), noteBlock.getRawNote());
+						}
+					}
+				} else if (dont.getTypeId() != Material.TNT.getId()) {				
+					deferred = new DeferredBlockReset(dont.getX(), dont.getY(), dont.getZ(), dont.getTypeId(), dont.getData());
+					if (dont.getTypeId() == Material.WOODEN_DOOR.getId() || dont.getTypeId() == Material.IRON_DOOR_BLOCK.getId()) {
+						doors.add(dont);
+					}
+				}
+				if (deferred != null) {
+					job.add(deferred);
+				}
+			}
+			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+			
+			// Changed explosion yeild following proportion of explosion prevention (makes drops less buggy too) 
+			int explodedSize = explodedBlocks.size();
+			float middleYeild = (float)(explodedSize - dontExplodeSize) / (float)explodedSize;
+			float newYeild = middleYeild * event.getYield();
+			
+			float old = event.getYield();
+			event.setYield(newYeild);
+		}
+	}
+
+	private List<ItemStack> copyItems(ItemStack[] contents) {
+		List<ItemStack> list = new ArrayList<ItemStack>();
+		for (ItemStack stack : contents) {
+			if (stack != null) {
+				if (stack.getData() != null) {
+					list.add(new ItemStack(stack.getType(), stack.getAmount(), stack.getDurability(), stack.getData().getData()));
+				} else {
+					list.add(new ItemStack(stack.getType(), stack.getAmount(), stack.getDurability()));
+				}
+			}
+		}
+		return list;
 	}
 
 	/**

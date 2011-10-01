@@ -903,7 +903,7 @@ public class Warzone {
 			player.setFireTicks(0);
 			player.setRemainingAir(300);
 
-			War.war.msg(player, "Left the zone. Your inventory has been restored.");
+			War.war.msg(player, "Left the zone. Your inventory is being restored.");
 			if (War.war.getWarHub() != null) {
 				War.war.getWarHub().resetZoneSign(this);
 			}

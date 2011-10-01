@@ -128,7 +128,7 @@ public class ZoneVolumeMapper {
 											String[] lines = linesStr.split(";;");
 
 											// Signs set
-											if (diskBlockType == Material.SIGN_POST.getId() && ((diskBlockData & 0x04) == 0x04) && i + 1 != volume.getSizeX()) {
+											if (diskBlockType == Material.WALL_SIGN.getId() && ((diskBlockData & 0x04) == 0x04) && i + 1 != volume.getSizeX()) {
 												// A sign post hanging on a wall south of here needs that block to be set first
 												deferred.add(new DeferredBlockReset(x, y, z, diskBlockType, diskBlockData, lines));
 											} else {

@@ -164,6 +164,11 @@ public class WarMapper {
 		if (warConfig.keyExists("disablePvpMessage")) {
 			War.war.setDisablePvpMessage(warConfig.getBoolean("disablePvpMessage"));
 		}
+		
+		// tntInZonesOnly
+		if (warConfig.keyExists("tntInZonesOnly")) {
+			War.war.setTntInZonesOnly(warConfig.getBoolean("tntInZonesOnly"));
+		}
 
 		// defaultSpawnStyle
 		String spawnStyle = warConfig.getString("defaultspawnStyle");
@@ -338,6 +343,9 @@ public class WarMapper {
 		// disablePVPMessage
 		warConfig.setBoolean("disablePvpMessage", War.war.isDisablePvpMessage());
 
+		// tntInZonesOnly
+		warConfig.setBoolean("tntInZonesOnly", War.war.isTntInZonesOnly());
+		
 		// spawnStyle
 		warConfig.setString("spawnStyle", War.war.getDefaultSpawnStyle().toString());
 

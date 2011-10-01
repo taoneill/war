@@ -1,5 +1,9 @@
 package com.tommytony.war.utils;
 
+import java.util.List;
+
+import org.bukkit.inventory.ItemStack;
+
 public class DeferredBlockReset {
 
 	private final int x;
@@ -8,6 +12,8 @@ public class DeferredBlockReset {
 	private final int blockType;
 	private final byte blockData;
 	private String[] lines;
+	private List<ItemStack> items;
+	private Byte rawNote;
 
 	public DeferredBlockReset(int x, int y, int z, int blockType, byte blockData) {
 		this.x = x;
@@ -25,6 +31,26 @@ public class DeferredBlockReset {
 		this.blockType = blockType;
 		this.blockData = blockData;
 		this.lines = signLines;
+	}
+	
+	// Container block
+	public DeferredBlockReset(int x, int y, int z, int blockType, byte blockData, List<ItemStack> contents) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.blockType = blockType;
+		this.blockData = blockData;
+		this.items = contents;
+	}
+	
+	// Noteblock
+	public DeferredBlockReset(int x, int y, int z, int blockType, byte blockData, byte rawNote) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.blockType = blockType;
+		this.blockData = blockData;
+		this.rawNote = rawNote;
 	}
 
 	public int getX() {
@@ -49,5 +75,13 @@ public class DeferredBlockReset {
 
 	public String[] getLines() {
 		return this.lines;
+	}
+
+	public List<ItemStack> getItems() {
+		return items;
+	}
+
+	public Byte getRawNote() {
+		return rawNote;
 	}
 }

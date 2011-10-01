@@ -63,6 +63,7 @@ public class War extends JavaPlugin {
 	private boolean pvpInZonesOnly = false;
 	private boolean disablePvpMessage = false;
 	private boolean buildInZonesOnly = false;
+	private boolean tntInZonesOnly = false;
 	private final List<String> deadlyAdjectives = new ArrayList<String>();
 	private final List<String> killerVerbs = new ArrayList<String>();
 
@@ -458,6 +459,11 @@ public class War extends JavaPlugin {
 				this.setBuildInZonesOnly(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" buildinzonesonly set to " + String.valueOf(war.isBuildInZonesOnly()) + ".");
 			}
+			if (namedParams.containsKey("tntinzonesonly")) {
+				String onOff = namedParams.get("tntinzonesonly");
+				this.setTntInZonesOnly(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" tntinzonesonly set to " + String.valueOf(war.isTntInZonesOnly()) + ".");
+			}
 			
 			if (namedParams.containsKey("lifepool")) {
 				this.setDefaultLifepool(Integer.parseInt(namedParams.get("lifepool")));
@@ -643,6 +649,7 @@ public class War extends JavaPlugin {
 		 + " pvpinzonesonly:" + String.valueOf(this.isPvpInZonesOnly())
 		 + " disablepvpmessage:" + String.valueOf(this.isDisablePvpMessage())
 		 + " buildinzonesonly:" + String.valueOf(this.isBuildInZonesOnly())
+		 + " tntinzonesonly:" + String.valueOf(this.isTntInZonesOnly())
 		 + " - Warzone defaults -"
 		 + " lifepool:" + this.getDefaultLifepool()
 		 + " teamsize:" + this.getDefaultTeamCap()
@@ -1173,5 +1180,13 @@ public class War extends JavaPlugin {
 
 	public List<String> getKillerVerbs() {
 		return killerVerbs;
+	}
+
+	public boolean isTntInZonesOnly() {
+		return tntInZonesOnly;
+	}
+
+	public void setTntInZonesOnly(boolean tntInZonesOnly) {
+		this.tntInZonesOnly = tntInZonesOnly;
 	}
 }
