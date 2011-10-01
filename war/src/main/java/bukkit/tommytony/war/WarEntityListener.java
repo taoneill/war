@@ -24,6 +24,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -271,7 +273,6 @@ public class WarEntityListener extends EntityListener {
 			float middleYeild = (float)(explodedSize - dontExplodeSize) / (float)explodedSize;
 			float newYeild = middleYeild * event.getYield();
 			
-			float old = event.getYield();
 			event.setYield(newYeild);
 		}
 	}
@@ -315,12 +316,22 @@ public class WarEntityListener extends EntityListener {
 		// pass pvp-damage
 		if (event instanceof EntityDamageByEntityEvent) {
 			this.handlerAttackDefend((EntityDamageByEntityEvent) event);
-		} else {
-			// Detect death, prevent it and respawn the player
+		} else  {
 			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+			
 			if (zone != null && event.getDamage() >= player.getHealth()) {
+				// Detect death, prevent it and respawn the player
 				String deathMessage = "";
-				deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getDisplayName() + ChatColor.WHITE + " died";
+				String cause = " died";
+				if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK 
+						|| event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LIGHTNING) {
+					cause = " burned to a crisp";
+				} else if (event.getCause() == DamageCause.DROWNING) {
+					cause = " drowned";
+				} else if (event.getCause() == DamageCause.FALL) {
+					cause = " fell to an untimely death";
+				}
+				deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getDisplayName() + ChatColor.WHITE + cause;
 				for (Team team : zone.getTeams()) {
 					team.teamcast(deathMessage);
 				}
@@ -376,7 +387,8 @@ public class WarEntityListener extends EntityListener {
 	 */
 	@Override
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-		if (!War.war.isLoaded() || event.getRegainReason() != RegainReason.REGEN) {
+		if (!War.war.isLoaded() || (event.getRegainReason() != RegainReason.REGEN && event.getRegainReason() != RegainReason.EATING)) {
+			War.war.log("Refused " + event.getRegainReason().toString(), Level.INFO);
 			return;
 		}
 
@@ -386,9 +398,27 @@ public class WarEntityListener extends EntityListener {
 		}
 
 		Player player = (Player) entity;
-		Warzone zone = Warzone.getZoneByLocation(player);
+		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 		if (zone != null) {
-			event.setCancelled(true);
+			if (event.getRegainReason() == RegainReason.EATING && zone.isNoHunger()) {
+				// noHunger setting means you can't auto-heal with full hunger bar (use saturation instead to control how fast you get hungry)
+				event.setCancelled(true);
+			} else if (event.getRegainReason() == RegainReason.REGEN) {
+				// disable peaceful mode regen
+				event.setCancelled(true);
+			}
 		}
 	}
+	
+	 public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		if (!War.war.isLoaded() || !(event.getEntity() instanceof Player)) {
+			return;
+		}
+		
+		Player player = (Player) event.getEntity();
+		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+		if (zone != null && zone.isNoHunger()){
+			event.setCancelled(true);
+		}
+	 }
 }

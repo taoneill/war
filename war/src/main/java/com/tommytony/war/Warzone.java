@@ -66,6 +66,9 @@ public class Warzone {
 	private boolean glassWalls = true;
 	private boolean pvpInZone = true;
 	private boolean instaBreak = false;
+	private boolean noDrops = false;
+	private boolean noHunger = false;
+	private int saturation = 10;
 	private int minPlayers = 1;
 	private int minTeams = 1;
 	
@@ -75,7 +78,6 @@ public class Warzone {
 
 	private HashMap<String, PlayerState> deadMenInventories = new HashMap<String, PlayerState>();
 	private Location rallyPoint;
-
 
 	@SuppressWarnings("unchecked")
 	public Warzone(World world, String name) {
@@ -99,6 +101,9 @@ public class Warzone {
 		this.setGlassWalls(War.war.isDefaultGlassWalls());
 		this.setPvpInZone(War.war.isDefaultPvpInZone());
 		this.setInstaBreak(War.war.isDefaultInstaBreak());
+		this.setNoDrops(War.war.isDefaultNoDrops());
+		this.setNoHunger(War.war.isDefaultNoHunger());
+		this.setSaturation(War.war.getDefaultSaturation());
 		this.setMinPlayers(War.war.getDefaultMinPlayers());
 		this.setMinTeams(War.war.getDefaultMinTeams());
 		this.setResetOnEmpty(War.war.isDefaultResetOnEmpty());
@@ -323,7 +328,7 @@ public class Warzone {
 		player.setRemainingAir(300);
 		player.setHealth(20);
 		player.setFoodLevel(20);
-		player.setSaturation(20);
+		player.setSaturation(this.getSaturation());
 		player.setExhaustion(0);
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			player.setGameMode(GameMode.SURVIVAL);
@@ -335,7 +340,7 @@ public class Warzone {
 		LoadoutResetJob job = new LoadoutResetJob(this, team, player);
 		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
 	}
-	
+
 	public void resetInventory(Team team, Player player) {
 		this.resetInventory(team, player, this.loadout);
 	}
@@ -1191,5 +1196,29 @@ public class Warzone {
 
 	public void setInstaBreak(boolean instaBreak) {
 		this.instaBreak = instaBreak;
+	}
+
+	public boolean isNoDrops() {
+		return noDrops;
+	}
+
+	public void setNoDrops(boolean noDrops) {
+		this.noDrops = noDrops;
+	}
+
+	public boolean isNoHunger() {
+		return noHunger;
+	}
+	
+	public void setNoHunger(boolean noHunger) {
+		this.noHunger = noHunger;
+	}
+
+	public int getSaturation() {
+		return this.saturation;
+	}
+	
+	public void setSaturation(int saturation) {
+		this.saturation = saturation;
 	}
 }

@@ -259,6 +259,21 @@ public class WarzoneMapper {
 				warzone.setInstaBreak(warzoneConfig.getBoolean("instaBreak"));
 			}
 			
+			// noDrops
+			if (warzoneConfig.containsKey("noDrops")) {
+				warzone.setNoDrops(warzoneConfig.getBoolean("noDrops"));
+			}
+			
+			// noHunger
+			if (warzoneConfig.containsKey("noHunger")) {
+				warzone.setNoHunger(warzoneConfig.getBoolean("noHunger"));
+			}
+			
+			// saturation
+			if (warzoneConfig.containsKey("saturation")) {
+				warzone.setSaturation(warzoneConfig.getInt("saturation"));
+			}
+			
 			// minPlayers
 			if (warzoneConfig.containsKey("minPlayers")) {
 				warzone.setMinPlayers(warzoneConfig.getInt("minPlayers"));
@@ -500,6 +515,15 @@ public class WarzoneMapper {
 		
 		// instaBreak
 		warzoneConfig.setBoolean("instaBreak", warzone.isInstaBreak());
+		
+		// noDrops
+		warzoneConfig.setBoolean("noDrops", warzone.isNoDrops());
+		
+		// noHunger
+		warzoneConfig.setBoolean("noHunger", warzone.isNoHunger());
+		
+		// saturation
+		warzoneConfig.setInt("saturation", warzone.getSaturation());
 		
 		// minPlayers
 		warzoneConfig.setInt("minPlayers", warzone.getMinPlayers());

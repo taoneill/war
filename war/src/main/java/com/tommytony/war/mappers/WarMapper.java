@@ -221,6 +221,21 @@ public class WarMapper {
 			War.war.setDefaultInstaBreak(warConfig.getBoolean("defaultInstaBreak"));
 		}
 		
+		// defaultNoDrops
+		if (warConfig.keyExists("defaultNoDrops")) {
+			War.war.setDefaultNoDrops(warConfig.getBoolean("defaultNoDrops"));
+		}
+		
+		// defaultNoHunger
+		if (warConfig.keyExists("defaultNoHunger")) {
+			War.war.setDefaultNoHunger(warConfig.getBoolean("defaultNoHunger"));
+		}
+		
+		// defaultSaturation
+		if (warConfig.keyExists("defaultSaturation")) {
+			War.war.setDefaultSaturation(warConfig.getInt("defaultSaturation"));
+		}
+		
 		// defaultMinPlayers
 		if (warConfig.keyExists("defaultMinPlayers")) {
 			War.war.setDefaultMinPlayers(warConfig.getInt("defaultMinPlayers"));
@@ -374,9 +389,18 @@ public class WarMapper {
 		
 		// defaultPvpInZone
 		warConfig.setBoolean("defaultPvpInZone", War.war.isDefaultPvpInZone());
-		
+
 		// defaultInstaBreak
 		warConfig.setBoolean("defaultInstaBreak", War.war.isDefaultInstaBreak());
+		
+		// defaultNoDrops
+		warConfig.setBoolean("defaultNoDrops", War.war.isDefaultNoDrops());
+		
+		// defaultNoHunger
+		warConfig.setBoolean("defaultNoHunger", War.war.isDefaultNoHunger());
+				
+		// defaultSaturation
+		warConfig.setInt("defaultSaturation", War.war.getDefaultSaturation());
 				
 		// defaultMinPlayers
 		warConfig.setInt("defaultMinPlayers", War.war.getDefaultMinPlayers());

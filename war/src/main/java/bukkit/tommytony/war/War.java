@@ -82,7 +82,10 @@ public class War extends JavaPlugin {
 	private boolean defaultNoCreatures = false;
 	private boolean defaultGlassWalls = true;
 	private boolean defaultPvpInZone = true;
-	private boolean defaultInstaBreak = false;	
+	private boolean defaultInstaBreak = false;
+	private boolean defaultNoDrops = false;
+	private boolean defaultNoHunger = false;
+	private int defaultSaturation = 10;
 	private int defaultMinPlayers = 1;	// By default, 1 player on 1 team is enough for unlocking the cant-exit-spawn guard
 	private int defaultMinTeams = 1;
 	private FlagReturn defaultFlagReturn = FlagReturn.BOTH;
@@ -141,6 +144,7 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.ENTITY_COMBUST, this.entityListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, this.entityListener, Priority.Normal, this);
+			pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, this.entityListener, Priority.Normal, this);
 
 			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_DAMAGE, this.blockListener, Priority.Normal, this);
@@ -165,6 +169,7 @@ public class War extends JavaPlugin {
 		this.getDeadlyAdjectives().add("fine ");
 		this.getDeadlyAdjectives().add("precise ");
 		this.getDeadlyAdjectives().add("brutal ");
+		this.getDeadlyAdjectives().add("powerful ");
 		
 		this.getKillerVerbs().clear();
 		this.getKillerVerbs().add("killed");
@@ -357,6 +362,26 @@ public class War extends JavaPlugin {
 				warzone.setInstaBreak(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" instabreak set to " + String.valueOf(warzone.isInstaBreak()) + ".");
 			}
+			if (namedParams.containsKey("nodrops")) {
+				String onOff = namedParams.get("nodrops");
+				warzone.setNoDrops(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" nodrops set to " + String.valueOf(warzone.isNoDrops()) + ".");
+			}
+			if (namedParams.containsKey("nohunger")) {
+				String onOff = namedParams.get("nohunger");
+				warzone.setNoHunger(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" nohunger set to " + String.valueOf(warzone.isNoHunger()) + ".");
+			}
+			if (namedParams.containsKey("saturation")) {
+				int sat = Integer.parseInt(namedParams.get("saturation"));
+				if (sat > 20) {
+					sat = 20;
+				} else if (sat < 0) {
+					sat = 0;
+				}
+				warzone.setSaturation(sat);
+				returnMessage.append(" saturation set to " + warzone.getSaturation() + ".");
+			}
 			if (namedParams.containsKey("minplayers")) {
 				int val = Integer.parseInt(namedParams.get("minplayers"));
 				if (val > warzone.getTeamCap()) {
@@ -543,6 +568,26 @@ public class War extends JavaPlugin {
 				this.setDefaultInstaBreak(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" instabreak set to " + String.valueOf(war.isDefaultInstaBreak()) + ".");
 			}
+			if (namedParams.containsKey("nodrops")) {
+				String onOff = namedParams.get("nodrops");
+				war.setDefaultNoDrops(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" nodrops set to " + String.valueOf(war.isDefaultNoDrops()) + ".");
+			}
+			if (namedParams.containsKey("nohunger")) {
+				String onOff = namedParams.get("nohunger");
+				this.setDefaultNoHunger(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" nohunger set to " + String.valueOf(this.isDefaultNoHunger()) + ".");
+			}
+			if (namedParams.containsKey("saturation")) {
+				int sat = Integer.parseInt(namedParams.get("saturation"));
+				if (sat > 20) {
+					sat = 20;
+				} else if (sat < 0) {
+					sat = 0;
+				}
+				this.setDefaultSaturation(sat);
+				returnMessage.append(" saturation set to " + this.getDefaultSaturation() + ".");
+			}
 			if (namedParams.containsKey("minplayers")) {
 				int val = Integer.parseInt(namedParams.get("minplayers"));
 				if (val > this.getDefaultTeamCap()) {
@@ -637,6 +682,9 @@ public class War extends JavaPlugin {
 		 + " glasswalls:" + String.valueOf(zone.isGlassWalls())
 		 + " pvpinzone:" + String.valueOf(zone.isPvpInZone())
 		 + " instabreak:" + String.valueOf(zone.isInstaBreak())
+		 + " nodrops:" + String.valueOf(zone.isNoDrops())
+		 + " nohunger:" + String.valueOf(zone.isNoHunger())
+		 + " saturation:" + zone.getSaturation()
 		 + " minplayers:" + zone.getMinPlayers()
 		 + " minteams:" + zone.getMinTeams()
 		 + " resetonempty:" + String.valueOf(zone.isResetOnEmpty())
@@ -666,6 +714,9 @@ public class War extends JavaPlugin {
 		 + " glasswalls:" + String.valueOf(this.isDefaultGlassWalls())
 		 + " pvpinzone:" + String.valueOf(this.isDefaultPvpInZone())
 		 + " instabreak:" + String.valueOf(this.isDefaultInstaBreak())
+		 + " nodrops:" + String.valueOf(this.isDefaultNoDrops())
+		 + " nohunger:" + String.valueOf(this.isDefaultNoHunger())
+		 + " saturation:" + this.getDefaultSaturation()
 		 + " minplayers:" + this.getDefaultMinPlayers()
 		 + " minteams:" + this.getDefaultMinTeams()
 		 + " resetonempty:" + String.valueOf(this.isDefaultResetOnEmpty())
@@ -1189,4 +1240,29 @@ public class War extends JavaPlugin {
 	public void setTntInZonesOnly(boolean tntInZonesOnly) {
 		this.tntInZonesOnly = tntInZonesOnly;
 	}
+
+	public boolean isDefaultNoDrops() {
+		return defaultNoDrops;
+	}
+
+	public void setDefaultNoDrops(boolean defaultNoDrops) {
+		this.defaultNoDrops = defaultNoDrops;
+	}
+
+	public boolean isDefaultNoHunger() {
+		return defaultNoHunger;
+	}
+
+	public void setDefaultNoHunger(boolean defaultNoHunger) {
+		this.defaultNoHunger = defaultNoHunger;
+	}
+	
+	public int getDefaultSaturation() {
+		return defaultSaturation;
+	}
+
+	public void setDefaultSaturation(int defaultSaturation) {
+		this.defaultSaturation = defaultSaturation;
+	}
+
 }

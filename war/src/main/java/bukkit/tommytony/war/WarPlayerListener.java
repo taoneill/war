@@ -2,11 +2,13 @@ package bukkit.tommytony.war;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -72,6 +74,9 @@ public class WarPlayerListener extends PlayerListener {
 				if (zone.isFlagThief(player.getName())) {
 					// a flag thief can't drop his flag
 					War.war.badMsg(player, "Can't drop items while stealing flag. What are you doing?! Run!");
+					event.setCancelled(true);
+				} else if (zone.isNoDrops()) {
+					War.war.badMsg(player, "Can't drop items in this warzone.");
 					event.setCancelled(true);
 				} else {
 					Item item = event.getItemDrop();
@@ -325,7 +330,7 @@ public class WarPlayerListener extends PlayerListener {
 								War.war.getWarHub().resetZoneSign(zone);
 							}
 							zone.keepPlayerState(player);
-							War.war.msg(player, "Your inventory is in storage until exit with '/war leave'.");
+							War.war.msg(player, "Your inventory is in storage until you exit with '/war leave'.");
 							zone.respawnPlayer(event, team, player);
 							for (Team t : zone.getTeams()) {
 								t.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
@@ -377,9 +382,51 @@ public class WarPlayerListener extends PlayerListener {
 		if (playerWarzone != null) {
 			// Player belongs to a warzone team but is outside: he snuck out or is at spawn and died
 			if (locZone == null && playerTeam != null && playerWarzone.getLobby() != null && !playerWarzone.getLobby().getVolume().contains(playerLoc) && !isLeaving) {
+				List<BlockFace> nearestWalls = playerWarzone.getNearestWalls(playerLoc);
 				War.war.badMsg(player, "Use /leave (or /war leave) to exit the zone.");
-				event.setTo(playerTeam.getTeamSpawn());
-				return;
+				if(nearestWalls != null && nearestWalls.size() > 0) {
+					// First, try to bump the player back in
+					int northSouthMove = 0;
+					int eastWestMove = 0;
+					int upDownMove = 0;
+					int moveDistance = 1;
+					
+					if (nearestWalls.contains(BlockFace.NORTH)) {
+						// move south
+						northSouthMove += moveDistance;
+					} else if (nearestWalls.contains(BlockFace.SOUTH)) {
+						// move north
+						northSouthMove -= moveDistance;
+					} 
+					
+					if (nearestWalls.contains(BlockFace.EAST)) {
+						// move west
+						eastWestMove += moveDistance;
+					} else if (nearestWalls.contains(BlockFace.WEST)) {
+						// move east
+						eastWestMove -= moveDistance;
+					} 
+					
+					if (nearestWalls.contains(BlockFace.UP)) {
+						upDownMove -= moveDistance;
+					} else if (nearestWalls.contains(BlockFace.DOWN)) {
+						// fell off the map, back to spawn
+						event.setTo(playerTeam.getTeamSpawn());
+						return;
+					}  
+					
+					event.setTo(new Location(playerLoc.getWorld(), 
+											playerLoc.getX() + northSouthMove, 
+											playerLoc.getY() + upDownMove, 
+											playerLoc.getZ() + eastWestMove, 
+											playerLoc.getYaw(),
+											playerLoc.getPitch()));
+					return;
+				} else {				
+					// Otherwise, send him to spawn
+					event.setTo(playerTeam.getTeamSpawn());
+					return;
+				}
 			}
 			
 			if (!playerWarzone.isEnoughPlayers() && !playerTeam.getSpawnVolume().contains(playerLoc)) {
@@ -390,7 +437,7 @@ public class WarPlayerListener extends PlayerListener {
 
 			// Monuments
 			if (playerTeam != null && playerWarzone.nearAnyOwnedMonument(playerLoc, playerTeam) && player.getHealth() < 20 && player.getHealth() > 0 // don't heal the dead
-					&& this.random.nextInt(77) == 3) { // one chance out of many of getting healed
+					&& this.random.nextInt(7) == 3) { // one chance out of many of getting healed
 				int currentHp = player.getHealth();
 				int newHp = Math.max(20, currentHp + locZone.getMonumentHeal());
 
@@ -485,7 +532,7 @@ public class WarPlayerListener extends PlayerListener {
 		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());
 			Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
-			if (playerWarzone != null && playerTeam != null &&playerWarzone.getExtraLoadouts().keySet().size() > 0 && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
+			if (playerWarzone != null && playerTeam != null && playerWarzone.getExtraLoadouts().keySet().size() > 0 && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
 				if (playerWarzone.getNewlyRespawned().keySet().contains(event.getPlayer().getName())) {
 					Integer currentIndex = playerWarzone.getNewlyRespawned().get(event.getPlayer().getName());
 					currentIndex = (currentIndex + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);
