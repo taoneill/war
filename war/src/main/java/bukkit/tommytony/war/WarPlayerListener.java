@@ -485,7 +485,7 @@ public class WarPlayerListener extends PlayerListener {
 		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());
 			Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
-			if (playerWarzone != null && playerWarzone.getExtraLoadouts().keySet().size() > 0 && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
+			if (playerWarzone != null && playerTeam != null &&playerWarzone.getExtraLoadouts().keySet().size() > 0 && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
 				if (playerWarzone.getNewlyRespawned().keySet().contains(event.getPlayer().getName())) {
 					Integer currentIndex = playerWarzone.getNewlyRespawned().get(event.getPlayer().getName());
 					currentIndex = (currentIndex + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);
