@@ -425,8 +425,8 @@ public class War extends JavaPlugin {
 					} else {
 						HashMap<Integer, ItemStack> extraLoadout = warzone.getExtraLoadouts().get(loadoutName);
 						if (extraLoadout == null) {
-							HashMap<Integer, ItemStack> newLoadout = new HashMap<Integer, ItemStack>();
-							warzone.getExtraLoadouts().put(loadoutName, newLoadout);
+							extraLoadout = new HashMap<Integer, ItemStack>();
+							warzone.getExtraLoadouts().put(loadoutName, extraLoadout);
 						}
 						this.inventoryToLoadout(player, extraLoadout);
 					}
