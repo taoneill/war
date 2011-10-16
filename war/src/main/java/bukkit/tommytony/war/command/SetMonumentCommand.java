@@ -36,7 +36,10 @@ public class SetMonumentCommand extends AbstractZoneMakerCommand {
 
 		if (zone == null) {
 			return false;
+		} else if (!this.isSenderAuthorOfZone(zone)) {
+			return true;
 		}
+		
 		if (this.args[0].equals(zone.getName())) {
 			return false;
 		}

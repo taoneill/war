@@ -54,6 +54,8 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 			if (zone == null) {
 				// No warzone found, whatever the mean, escape
 				return false;
+			} else if (!this.isSenderAuthorOfZone(zone)) {
+				return true;
 			}
 
 			if (isFirstParamWarzone) {

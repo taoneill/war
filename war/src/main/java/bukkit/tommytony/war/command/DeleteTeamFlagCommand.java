@@ -47,6 +47,8 @@ public class DeleteTeamFlagCommand extends AbstractZoneMakerCommand {
 		}
 
 		if (zone == null) {
+			return false;
+		} else if (!this.isSenderAuthorOfZone(zone)) {
 			return true;
 		}
 

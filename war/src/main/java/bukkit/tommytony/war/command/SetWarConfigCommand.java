@@ -7,9 +7,9 @@ import bukkit.tommytony.war.WarCommandHandler;
 
 import com.tommytony.war.mappers.WarMapper;
 
-public class SetWarConfigCommand extends AbstractZoneMakerCommand {
+public class SetWarConfigCommand extends AbstractWarAdminCommand {
 
-	public SetWarConfigCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
+	public SetWarConfigCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotWarAdminException {
 		super(handler, sender, args);
 	}
 

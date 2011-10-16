@@ -34,6 +34,7 @@ public class NextBattleCommand extends AbstractZoneMakerCommand {
 		} else {
 			return false;
 		}
+		
 		if (zone == null) {
 			return false;
 		}

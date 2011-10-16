@@ -5,7 +5,7 @@ package bukkit.tommytony.war.command;
  *
  * @author Tim Düsterhus
  */
-public class NotZoneMakerException extends Exception {
+public class NotWarAdminException extends Exception {
 
 	private static final long serialVersionUID = -5412011034665080340L;
 }

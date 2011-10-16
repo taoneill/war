@@ -167,6 +167,14 @@ public class WarzoneMapper {
 				}
 			}
 
+			// authors
+			if (warzoneConfig.containsKey("author") && !warzoneConfig.getString("author").equals("")) {
+				for(String authorStr : warzoneConfig.getString("author").split(",")) {
+					if (!authorStr.equals("")) {
+						warzone.addAuthor(authorStr);
+					}
+				}
+			}
 
 			// life pool (always set after teams, so the teams' remaining lives get initialized properly by this setter)
 			if (warzoneConfig.containsKey("lifePool")) {
@@ -460,6 +468,9 @@ public class WarzoneMapper {
 		}
 		warzoneConfig.setString("extraLoadouts", extraLoadoutsStr);
 
+		// authors
+		warzoneConfig.setString("author", warzone.getAuthorsString());
+		
 		// life pool
 		warzoneConfig.setInt("lifePool", warzone.getLifePool());
 
@@ -469,7 +480,7 @@ public class WarzoneMapper {
 		// autoAssignOnly
 		warzoneConfig.setBoolean("autoAssignOnly", warzone.isAutoAssignOnly());
 
-		// flagPointsOnly
+		// flagPointsOnly-+
 		warzoneConfig.setBoolean("flagPointsOnly", warzone.isFlagPointsOnly());
 
 		// team cap

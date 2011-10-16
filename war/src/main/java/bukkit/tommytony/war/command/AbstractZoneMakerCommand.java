@@ -4,6 +4,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import com.tommytony.war.Warzone;
+
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
@@ -24,6 +26,25 @@ public abstract class AbstractZoneMakerCommand extends AbstractWarCommand {
 			}
 		} else if (!(sender instanceof ConsoleCommandSender)) {
 			throw new NotZoneMakerException();
+		}
+	}
+	
+	public boolean isSenderAuthorOfZone(Warzone zone) {
+		if (this.getSender() instanceof Player) {
+			if (War.war.isWarAdmin((Player) this.getSender())) {
+				// War admin has rights over all warzones
+				return true;
+			}
+			
+			// Not War admin, is he author?
+			boolean isAuthor = zone.isAuthor((Player) this.getSender());
+			if (!isAuthor) {
+				War.war.badMsg(this.getSender(), "You can't do this because you are not an author of the " + zone.getName() + " warzone." );
+			}
+			return isAuthor;
+		} else {
+			// From console, you can do anything
+			return true;
 		}
 	}
 }

@@ -12,6 +12,7 @@ import com.tommytony.war.volumes.TooBigException;
 import com.tommytony.war.volumes.TooSmallException;
 
 import bukkit.tommytony.war.War;
+import bukkit.tommytony.war.command.SetZoneCommand;
 
 public class ZoneSetter {
 
@@ -31,9 +32,12 @@ public class ZoneSetter {
 			if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(this.player.getLocation().getWorld(), this.zoneName);
+				warzone.addAuthor(player.getName());
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setNorthwest(northwestBlock);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Northwesternmost point set to x:" + warzone.getVolume().getNorthwestX() + " z:" + warzone.getVolume().getNorthwestZ() + ". ");
+			} else if (!this.isPlayerAuthorOfZone(warzone)) {
+				return;
 			} else {
 				// change existing warzone
 				this.resetWarzone(warzone, msgString);
@@ -59,6 +63,8 @@ public class ZoneSetter {
 		}
 	}
 
+	
+
 	public void placeSoutheast() {
 		Warzone warzone = War.war.findWarzone(this.zoneName);
 		Block southeastBlock = this.player.getLocation().getWorld().getBlockAt(this.player.getLocation());
@@ -67,9 +73,12 @@ public class ZoneSetter {
 			if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(this.player.getLocation().getWorld(), this.zoneName);
+				warzone.addAuthor(player.getName());
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setSoutheast(southeastBlock);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Southeasternmost point set to x:" + warzone.getVolume().getSoutheastX() + " z:" + warzone.getVolume().getSoutheastZ() + ". ");
+			} else if (!this.isPlayerAuthorOfZone(warzone)) {
+				return;
 			} else {
 				// change existing warzone
 				this.resetWarzone(warzone, msgString);
@@ -107,9 +116,12 @@ public class ZoneSetter {
 			if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(this.player.getLocation().getWorld(), this.zoneName);
+				warzone.addAuthor(player.getName());
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setZoneCornerOne(corner1Block);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Corner 1 set to x:" + corner1Block.getX() + " y:" + corner1Block.getY() + " z:" + corner1Block.getZ() + ". ");
+			} else if (!this.isPlayerAuthorOfZone(warzone)) {
+				return;
 			} else {
 				// change existing warzone
 				this.resetWarzone(warzone, msgString);
@@ -142,9 +154,12 @@ public class ZoneSetter {
 			if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(this.player.getLocation().getWorld(), this.zoneName);
+				warzone.addAuthor(player.getName());
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setZoneCornerTwo(corner2Block);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Corner 2 set to x:" + corner2Block.getX() + " y:" + corner2Block.getY() + " z:" + corner2Block.getZ() + ". ");
+			} else if (!this.isPlayerAuthorOfZone(warzone)) {
+				return;
 			} else {
 				// change existing warzone
 				this.resetWarzone(warzone, msgString);
@@ -165,6 +180,14 @@ public class ZoneSetter {
 		}
 	}
 
+	private boolean isPlayerAuthorOfZone(Warzone warzone) {
+		boolean isAuthor = warzone.isAuthor(player);
+		if (!isAuthor) {
+			War.war.badMsg(player, "You can't do this because you are not an author of the " + warzone.getName() + " warzone." );
+		}
+		return isAuthor;
+	}
+	
 	private void resetWarzone(Warzone warzone, StringBuilder msgString) {
 		if (warzone.getVolume().isSaved()) {
 			War.war.msg(this.player, "Resetting " + warzone.getName() + " blocks.");
@@ -196,6 +219,7 @@ public class ZoneSetter {
 			msgString.append("Saving new warzone blocks...");
 			War.war.msg(this.player, msgString.toString());
 			warzone.saveState(false); // we just changed the volume, cant reset walls
+			
 			if (warzone.getLobby() == null) {
 				// Set default lobby on south side
 				ZoneLobby lobby = new ZoneLobby(warzone, BlockFace.SOUTH);
@@ -205,10 +229,8 @@ public class ZoneSetter {
 					War.war.getWarHub().initialize();
 				}
 				War.war.msg(this.player, "Default lobby created on south side of zone. Use /setzonelobby <n/s/e/w> to change its position.");
-			} // else {
-				// gotta move the lobby (or dont because zone.initzon does it for you)
-				// warzone.getLobby().changeWall(warzone.getLobby().getWall());
-			// }
+			}
+			
 			warzone.initializeZone();
 			WarzoneMapper.save(warzone, true);
 			War.war.msg(this.player, "Warzone saved.");

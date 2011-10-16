@@ -48,6 +48,8 @@ public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 
 		if (zone == null) {
 			return false;
+		} else if (!this.isSenderAuthorOfZone(zone)) {
+			return true;
 		}
 
 		Team team = zone.getTeamByKind(TeamKind.teamKindFromString(this.args[0]));

@@ -37,6 +37,8 @@ public class Warzone {
 	private ZoneVolume volume;
 	private final List<Team> teams = new ArrayList<Team>();
 	private final List<Monument> monuments = new ArrayList<Monument>();
+	
+	private final List<String> authors = new ArrayList<String>();
 
 	private Location teleport;
 	private boolean friendlyFire = false;
@@ -1220,5 +1222,26 @@ public class Warzone {
 	
 	public void setSaturation(int saturation) {
 		this.saturation = saturation;
+	}
+
+	public boolean isAuthor(Player player) {
+		// if no authors, all zonemakers can edit the zone
+		return authors.size() == 0 || authors.contains(player.getName());
+	}
+		
+	public void addAuthor(String playerName) {
+		authors.add(playerName);
+	}
+	
+	public List<String> getAuthors() {
+		return this.authors;
+	}
+
+	public String getAuthorsString() {
+		String authors = "";
+		for (String author : this.getAuthors()) {
+			authors += author + ",";
+		}
+		return authors;
 	}
 }

@@ -9,6 +9,15 @@ permissions:
     description: Create and destroy warzones. Change War configuration.
     default: op
     children:
+      war.zonemaker: true
+      war.player: true
+      war.warp: true
+      war.build: true
+      war.pvp: true
+  war.zonemaker:
+    description: Create and edit warzones, but you can't edit warzones that you are not the author of.
+    default: false
+    children:
       war.player: true
       war.warp: true
       war.build: true
@@ -68,16 +77,16 @@ commands:
     description: War> Team chat.
     usage: Team chat.
         Ex - /team <message>
-# Warzone maker commands (must have the 'war.*' permission or be added as a zone-maker in /plugins/War/war.txt
-# 1- Battle-related commands
+# Warzone maker commands (must have the 'war.zonemaker' permission or be added as a zone-maker in /plugins/War/war.txt)
+# Battle-related commands
   nextbattle:
-    description: War> Warzone blocks are restored, teams are respawned but score remains unaffected.
-    usage: Warzone blocks are restored, teams are respawned but score remains unaffected. Provide a zone name if not standing in warzone or lobby.
+    description: War> Warzone blocks are restored, teams are respawned but score remains unaffected. All zone-makers can do this, even if they are not an author of the zone.
+    usage: Warzone blocks are restored, teams are respawned but score remains unaffected. All zone-makers can do this, even if they are not an author of the zone. Provide a zone name if not standing in warzone or lobby.
         Ex - /nextbattle [zone-name]
-# 2- Warzone creation commands
+# Warzone creation commands
   setzone:
-    description: War> Use to create a warzone. Lobby is created and blocks are saved when the second corner is set.
-    usage: Use to create a warzone. Lobby is created and blocks are saved when the second corner is set. Warzones must be at least 10 blocks wide in all directions.
+    description: War> Use to create a warzone. Lobby is created and blocks are saved when the second corner is set. You can only edit zones you create or those listing you as author (add authors with /zonecfg author:yourname).
+    usage: Use to create a warzone. Lobby is created and blocks are saved when the second corner is set. You can only edit zones you create or those listing you as author (add authors with /zonecfg author:yourname). Warzones must be at least 10 blocks wide in all directions.
         Ex -
         ==Wand Cuboid mode==>
         1) /setzone <zone-name> to get wooden sword,
@@ -95,8 +104,10 @@ commands:
                               flagreturn:<both/spawn/flag> flagpointsonly:false glasswalls:on pvpinzone:true instabreak:false nodrops:false nohunger:false saturation:<0-20> minplayers:1 minteams:1 
         /savezone [zone-name] loadout:default => sets the respawn inventory to your current items,
         /savezone [zone-name] loadout:<extra-loadout-name> => adds an extra loadout (i.e. another player class) that the players can toggle to by sneaking while inside the spawn
-        /savezone [zone-name] deleteloadout:<extra-loadout-name> => removed teh specified loadout from the choices. You cannot remove the default loadout.
+        /savezone [zone-name] deleteloadout:<extra-loadout-name> => removed the specified loadout from the choices. You cannot remove the default loadout.
         /savezone [zone-name] reward:default => sets the winner's reward to your current items.
+        /savezone [zone-name] author:tommytony,someguy => adds these players as authors of the warzone, allowing them to edit it.
+        /savezone [zone-name] deleteauthor:tommytony,someguy => removes these players from the warzone authors.
   setzonelobby:
     description: War> Creates or changes the position of the warzone lobby.
     usage: Creates or changes the position of the warzone lobby.
@@ -162,6 +173,8 @@ commands:
         /setzoneconfig [zone-name] loadout:<extra-loadout-name> => adds an extra loadout (i.e. another player class) that the players can toggle to by sneaking while inside the spawn
         /setzoneconfig [zone-name] deleteloadout:<extra-loadout-name> => removed teh specified loadout from the choices. You cannot remove the default loadout.
         /setzoneconfig [zone-name] reward:default => sets the winner's reward to your current items.
+        /setzoneconfig [zone-name] author:tommytony,someguy => adds these players as authors of the warzone, allowing them to edit it.
+        /setzoneconfig [zone-name] deleteauthor:tommytony,someguy => removes these players from the warzone authors.
   zonecfg:
     description: War> Alias for /setzoneconfig
     usage: Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone. Provide a zone name if not standing in warzone or lobby.
@@ -172,6 +185,8 @@ commands:
         /zonecfg [zone-name] loadout:<extra-loadout-name> => adds an extra loadout (i.e. another player class) that the players can toggle to by sneaking while inside the spawn
         /zonecfg [zone-name] deleteloadout:<extra-loadout-name> => removed teh specified loadout from the choices. You cannot remove the default loadout.
         /zonecfg [zone-name] reward:default => sets the winner's reward to your current items.
+        /zonecfg [zone-name] author:tommytony,someguy => adds these players as authors of the warzone, allowing them to edit it.
+        /zonecfg [zone-name] deleteauthor:tommytony,someguy => removes these players from the warzone authors.
   zonemaker:
     description: War> Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player.
     usage: Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player.
@@ -184,7 +199,8 @@ commands:
         Ex -
         /zonemaker
         /zonemaker <new-or-kicked-zone-maker-name>
-# 3- War hub
+# War admin commands (must have the 'war.*' permission or be op)
+# War hub
   setwarhub:
     description: War> Create or moves a wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
     usage: Create or moves a wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
@@ -195,7 +211,7 @@ commands:
     usage: Deletes the warhub if it exists. Resets all warzone lobbies.
         Ex -
         /deletewarhub
-# 4- Defaults and server configuration
+# Defaults and server configuration
   unloadwar:
     description: War> Disables the War plugin.
     usage: Disables the War plugin.
@@ -232,7 +248,6 @@ commands:
         /warcfg deleteloadout:<extra-loadout-name> => removed teh specified loadout from the choices. You cannot remove the default loadout.
         /warcfg reward:default => sets the winner's reward to your current items.
         /warcfg rallypoint:<warzone-name>  =>  changes when players get teleported at the end of a match for that zone, useful for chaining warzones together in a sequence, or preventing players from rejoining immediately
-
 # Fallback
   war:
     description: War> Short War help. Can also be used as a prefix for all War commands as a fallback if they conflict with other plugins.

@@ -15,8 +15,8 @@ import bukkit.tommytony.war.WarCommandHandler;
  *
  * @author Tim Düsterhus
  */
-public class SetWarHubCommand extends AbstractZoneMakerCommand {
-	public SetWarHubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
+public class SetWarHubCommand extends AbstractWarAdminCommand {
+	public SetWarHubCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotWarAdminException {
 		super(handler, sender, args);
 	}
 

@@ -37,6 +37,8 @@ public class SetTeamFlagCommand extends AbstractZoneMakerCommand {
 
 		if (zone == null) {
 			return false;
+		} else if (!this.isSenderAuthorOfZone(zone)) {
+			return true;
 		}
 
 		TeamKind kind = TeamKind.teamKindFromString(this.args[0]);

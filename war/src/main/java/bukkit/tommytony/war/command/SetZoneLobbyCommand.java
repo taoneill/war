@@ -41,9 +41,12 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 		}
 
 		if (zone == null) {
+			// Zone not where player is standing, maybe player is detaching/relocating the lobby
 			Warzone givenWarzone = Warzone.getZoneByName(this.args[0]);
 			if (givenWarzone == null) {
 				return false;
+			} else if (!this.isSenderAuthorOfZone(zone)) {
+				return true;
 			} else {
 				// Move the warzone lobby
 				ZoneLobby lobby = givenWarzone.getLobby();
@@ -66,6 +69,8 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 				}
 				WarzoneMapper.save(givenWarzone, false);
 			}
+		} else if (!this.isSenderAuthorOfZone(zone)) {
+			return true;
 		} else {
 			// Inside a warzone: use the classic n/s/e/w mode
 			if (!this.args[0].equals("north") && !this.args[0].equals("n") && !this.args[0].equals("east") && !this.args[0].equals("e") && !this.args[0].equals("south") && !this.args[0].equals("s") && !this.args[0].equals("west") && !this.args[0].equals("w")) {

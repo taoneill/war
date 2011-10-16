@@ -280,6 +280,22 @@ public class War extends JavaPlugin {
 			}
 			
 			StringBuilder returnMessage = new StringBuilder();
+			if (namedParams.containsKey("author")) {
+				for(String author : namedParams.get("author").split(",")) {
+					if (!author.equals("") && !warzone.getAuthors().contains(author)) {
+						warzone.addAuthor(author);
+						returnMessage.append(" author " + author + " added.");
+					}
+				}
+			}
+			if (namedParams.containsKey("deleteauthor")) {
+				for(String author : namedParams.get("deleteauthor").split(",")) {
+					if (warzone.getAuthors().contains(author)) {
+						warzone.getAuthors().remove(author);
+						returnMessage.append(" " + author + " removed from zone authors.");
+					}
+				}
+			}
 			if (namedParams.containsKey("lifepool")) {
 				warzone.setLifePool(Integer.parseInt(namedParams.get("lifepool")));
 				returnMessage.append(" lifepool set to " + warzone.getLifePool() + ".");
@@ -665,63 +681,77 @@ public class War extends JavaPlugin {
 	}
 
 	public String printConfig(Warzone zone) {
+		ChatColor color = ChatColor.RED;
+		ChatColor alt = ChatColor.GREEN;
+		ChatColor normal = ChatColor.WHITE;
 		return "Warzone " + zone.getName() + " config -"
-		 + " lifepool:" + zone.getLifePool()
-		 + " teamsize:" + zone.getTeamCap()
-		 + " maxscore:" + zone.getScoreCap()
-		 + " ff:" + String.valueOf(zone.getFriendlyFire())
-		 + " autoassign:" + String.valueOf(zone.isAutoAssignOnly())
-		 + " flagpointsonly:" + String.valueOf(zone.isFlagPointsOnly())
-		 + " blockheads:" + String.valueOf(zone.isBlockHeads())
-		 + " spawnstyle:" + zone.getSpawnStyle()
-		 + " flagreturn:" + zone.getFlagReturn()
-		 + " monumentheal:" + zone.getMonumentHeal()
-		 + " unbreakable:" + String.valueOf(zone.isUnbreakableZoneBlocks())
-		 + " disabled:" + String.valueOf(zone.isDisabled())
-		 + " nocreatures:" + String.valueOf(zone.isNoCreatures())
-		 + " glasswalls:" + String.valueOf(zone.isGlassWalls())
-		 + " pvpinzone:" + String.valueOf(zone.isPvpInZone())
-		 + " instabreak:" + String.valueOf(zone.isInstaBreak())
-		 + " nodrops:" + String.valueOf(zone.isNoDrops())
-		 + " nohunger:" + String.valueOf(zone.isNoHunger())
-		 + " saturation:" + zone.getSaturation()
-		 + " minplayers:" + zone.getMinPlayers()
-		 + " minteams:" + zone.getMinTeams()
-		 + " resetonempty:" + String.valueOf(zone.isResetOnEmpty())
-		 + " resetonload:" + String.valueOf(zone.isResetOnLoad())
-		 + " resetonunload:" + String.valueOf(zone.isResetOnUnload());
+		 + " author:" + alt + ifEmptyEveryone(zone.getAuthorsString()) + normal
+		 + " lifepool:" + color + zone.getLifePool() + normal
+		 + " teamsize:" + color + zone.getTeamCap() + normal
+		 + " maxscore:" + color + zone.getScoreCap() + normal
+		 + " ff:" + color + String.valueOf(zone.getFriendlyFire()) + normal
+		 + " autoassign:" + color + String.valueOf(zone.isAutoAssignOnly()) + normal
+		 + " flagpointsonly:" + color + String.valueOf(zone.isFlagPointsOnly()) + normal
+		 + " blockheads:" + color + String.valueOf(zone.isBlockHeads()) + normal
+		 + " spawnstyle:" + color + zone.getSpawnStyle() + normal
+		 + " flagreturn:" + color + zone.getFlagReturn() + normal
+		 + " monumentheal:" + color + zone.getMonumentHeal() + normal
+		 + " unbreakable:" + color + String.valueOf(zone.isUnbreakableZoneBlocks()) + normal
+		 + " disabled:" + color + String.valueOf(zone.isDisabled()) + normal
+		 + " nocreatures:" + color + String.valueOf(zone.isNoCreatures()) + normal
+		 + " glasswalls:" + color + String.valueOf(zone.isGlassWalls()) + normal
+		 + " pvpinzone:" + color + String.valueOf(zone.isPvpInZone()) + normal
+		 + " instabreak:" + color + String.valueOf(zone.isInstaBreak()) + normal
+		 + " nodrops:" + color + String.valueOf(zone.isNoDrops()) + normal
+		 + " nohunger:" + color + String.valueOf(zone.isNoHunger()) + normal
+		 + " saturation:" + color + zone.getSaturation() + normal
+		 + " minplayers:" + color + zone.getMinPlayers() + normal
+		 + " minteams:" + color + zone.getMinTeams() + normal
+		 + " resetonempty:" + color + String.valueOf(zone.isResetOnEmpty()) + normal
+		 + " resetonload:" + color + String.valueOf(zone.isResetOnLoad()) + normal
+		 + " resetonunload:" + color + String.valueOf(zone.isResetOnUnload());
+	}
+	
+	private String ifEmptyEveryone(String maybeEmpty) {
+		if (maybeEmpty.equals("")) {
+			maybeEmpty = "*";
+		}
+		return maybeEmpty;
 	}
 
 	public String printConfig() {
+		ChatColor color = ChatColor.RED;
+		ChatColor global = ChatColor.GREEN;
+		ChatColor normal = ChatColor.WHITE;
 		return "War config -"
-		 + " pvpinzonesonly:" + String.valueOf(this.isPvpInZonesOnly())
-		 + " disablepvpmessage:" + String.valueOf(this.isDisablePvpMessage())
-		 + " buildinzonesonly:" + String.valueOf(this.isBuildInZonesOnly())
-		 + " tntinzonesonly:" + String.valueOf(this.isTntInZonesOnly())
+		 + " pvpinzonesonly:" + global + String.valueOf(this.isPvpInZonesOnly()) + normal
+		 + " disablepvpmessage:" + global + String.valueOf(this.isDisablePvpMessage()) + normal
+		 + " buildinzonesonly:" + global + String.valueOf(this.isBuildInZonesOnly()) + normal
+		 + " tntinzonesonly:" + global + String.valueOf(this.isTntInZonesOnly()) + normal
 		 + " - Warzone defaults -"
-		 + " lifepool:" + this.getDefaultLifepool()
-		 + " teamsize:" + this.getDefaultTeamCap()
-		 + " maxscore:" + this.getDefaultScoreCap()
-		 + " ff:" + String.valueOf(this.isDefaultFriendlyFire())
-		 + " autoassign:" + String.valueOf(this.isDefaultAutoAssignOnly())
-		 + " flagpointsonly:" + String.valueOf(this.isDefaultFlagPointsOnly())
-		 + " blockheads:" + String.valueOf(this.isDefaultBlockHeads())
-		 + " spawnstyle:" + this.getDefaultSpawnStyle()
-		 + " flagreturn:" + this.getDefaultFlagReturn()
-		 + " monumentheal:" + this.getDefaultMonumentHeal()
-		 + " unbreakable:" + String.valueOf(this.isDefaultUnbreakableZoneBlocks())
-		 + " nocreatures:" + String.valueOf(this.isDefaultNoCreatures())
-		 + " glasswalls:" + String.valueOf(this.isDefaultGlassWalls())
-		 + " pvpinzone:" + String.valueOf(this.isDefaultPvpInZone())
-		 + " instabreak:" + String.valueOf(this.isDefaultInstaBreak())
-		 + " nodrops:" + String.valueOf(this.isDefaultNoDrops())
-		 + " nohunger:" + String.valueOf(this.isDefaultNoHunger())
-		 + " saturation:" + this.getDefaultSaturation()
-		 + " minplayers:" + this.getDefaultMinPlayers()
-		 + " minteams:" + this.getDefaultMinTeams()
-		 + " resetonempty:" + String.valueOf(this.isDefaultResetOnEmpty())
-		 + " resetonload:" + String.valueOf(this.isDefaultResetOnLoad())
-		 + " resetonunload:" + String.valueOf(this.isDefaultResetOnUnload());
+		 + " lifepool:" + color + this.getDefaultLifepool() + normal
+		 + " teamsize:" + color + this.getDefaultTeamCap() + normal
+		 + " maxscore:" + color + this.getDefaultScoreCap() + normal
+		 + " ff:" + color + String.valueOf(this.isDefaultFriendlyFire()) + normal
+		 + " autoassign:" + color + String.valueOf(this.isDefaultAutoAssignOnly()) + normal
+		 + " flagpointsonly:" + color + String.valueOf(this.isDefaultFlagPointsOnly()) + normal
+		 + " blockheads:" + color + String.valueOf(this.isDefaultBlockHeads()) + normal
+		 + " spawnstyle:" + color + this.getDefaultSpawnStyle() + normal
+		 + " flagreturn:" + color + this.getDefaultFlagReturn() + normal
+		 + " monumentheal:" + color + this.getDefaultMonumentHeal() + normal
+		 + " unbreakable:" + color + String.valueOf(this.isDefaultUnbreakableZoneBlocks()) + normal
+		 + " nocreatures:" + color + String.valueOf(this.isDefaultNoCreatures()) + normal
+		 + " glasswalls:" + color + String.valueOf(this.isDefaultGlassWalls()) + normal
+		 + " pvpinzone:" + color + String.valueOf(this.isDefaultPvpInZone()) + normal
+		 + " instabreak:" + color + String.valueOf(this.isDefaultInstaBreak()) + normal
+		 + " nodrops:" + color + String.valueOf(this.isDefaultNoDrops()) + normal
+		 + " nohunger:" + color + String.valueOf(this.isDefaultNoHunger()) + normal
+		 + " saturation:" + color + this.getDefaultSaturation() + normal
+		 + " minplayers:" + color + this.getDefaultMinPlayers() + normal
+		 + " minteams:" + color + this.getDefaultMinTeams() + normal
+		 + " resetonempty:" + color + String.valueOf(this.isDefaultResetOnEmpty()) + normal
+		 + " resetonload:" + color + String.valueOf(this.isDefaultResetOnLoad()) + normal
+		 + " resetonunload:" + color + String.valueOf(this.isDefaultResetOnUnload());
 	}
 
 	private void setZoneRallyPoint(String warzoneName, Player player) {
@@ -908,6 +938,27 @@ public class War extends JavaPlugin {
 				return true;
 			}
 		}
+		if (War.permissionHandler != null) {
+			if (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "War.*")
+					|| War.permissionHandler.has(player, "war.zonemaker") || War.permissionHandler.has(player, "War.zonemaker")) {
+				// War admins are zonemakers
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			// default to op, if no permissions are found
+			return player.hasPermission("war.zonemaker");
+		}
+	}
+	
+	/**
+	 * Checks whether the given player is a War admin
+	 *
+	 * @param 	player	Player to check
+	 * @return		true if the player is a War admin
+	 */
+	public boolean isWarAdmin(Player player) {
 		if (War.permissionHandler != null) {
 			if (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "War.*")) {
 				return true;

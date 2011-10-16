@@ -35,8 +35,11 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 		} else {
 			return false;
 		}
+		
 		if (zone == null) {
 			return false;
+		} else if (!this.isSenderAuthorOfZone(zone)) {
+			return true;
 		}
 
 		zone.clearFlagThieves();

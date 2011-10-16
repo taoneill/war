@@ -10,8 +10,8 @@ import bukkit.tommytony.war.WarCommandHandler;
  *
  * @author Tim Düsterhus
  */
-public class UnloadWarCommand extends AbstractZoneMakerCommand {
-	public UnloadWarCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
+public class UnloadWarCommand extends AbstractWarAdminCommand {
+	public UnloadWarCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotWarAdminException {
 		super(handler, sender, args);
 	}
 
