@@ -29,7 +29,11 @@ public class ZoneSetter {
 		Block northwestBlock = this.player.getLocation().getWorld().getBlockAt(this.player.getLocation());
 		StringBuilder msgString = new StringBuilder();
 		try {
-			if (warzone == null) {
+			if (warzone == null && War.war.getWarzones().size() >= War.war.getMaxZones()) {
+				// max warzones reached
+				War.war.badMsg(player, "Too many warzones already! To change the maximum, use /warcfg maxzone:20.");
+				return;
+			} else if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(this.player.getLocation().getWorld(), this.zoneName);
 				warzone.addAuthor(player.getName());
@@ -70,7 +74,11 @@ public class ZoneSetter {
 		Block southeastBlock = this.player.getLocation().getWorld().getBlockAt(this.player.getLocation());
 		StringBuilder msgString = new StringBuilder();
 		try {
-			if (warzone == null) {
+			if (warzone == null && War.war.getWarzones().size() >= War.war.getMaxZones()) {
+				// max warzones reached
+				War.war.badMsg(player, "Too many warzones already! To change the maximum, use /warcfg maxzone:20.");
+				return;
+			} else if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(this.player.getLocation().getWorld(), this.zoneName);
 				warzone.addAuthor(player.getName());
@@ -113,7 +121,11 @@ public class ZoneSetter {
 		Warzone warzone = War.war.findWarzone(this.zoneName);
 		StringBuilder msgString = new StringBuilder();
 		try {
-			if (warzone == null) {
+			if (warzone == null && War.war.getWarzones().size() >= War.war.getMaxZones()) {
+				// max warzones reached
+				War.war.badMsg(player, "Too many warzones already! To change the maximum, use /warcfg maxzone:20.");
+				return;
+			} else if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(this.player.getLocation().getWorld(), this.zoneName);
 				warzone.addAuthor(player.getName());
@@ -151,7 +163,11 @@ public class ZoneSetter {
 		Warzone warzone = War.war.findWarzone(this.zoneName);
 		StringBuilder msgString = new StringBuilder();
 		try {
-			if (warzone == null) {
+			if (warzone == null && War.war.getWarzones().size() >= War.war.getMaxZones()) {
+				// max warzones reached
+				War.war.badMsg(player, "Too many warzones already! To change the maximum, use /warcfg maxzone:20.");
+				return;
+			} else if (warzone == null) {
 				// create the warzone
 				warzone = new Warzone(this.player.getLocation().getWorld(), this.zoneName);
 				warzone.addAuthor(player.getName());

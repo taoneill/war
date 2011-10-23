@@ -64,6 +64,7 @@ public class War extends JavaPlugin {
 	private boolean disablePvpMessage = false;
 	private boolean buildInZonesOnly = false;
 	private boolean tntInZonesOnly = false;
+	private int maxZones = 12;
 	private final List<String> deadlyAdjectives = new ArrayList<String>();
 	private final List<String> killerVerbs = new ArrayList<String>();
 
@@ -505,6 +506,10 @@ public class War extends JavaPlugin {
 				this.setTntInZonesOnly(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" tntinzonesonly set to " + String.valueOf(war.isTntInZonesOnly()) + ".");
 			}
+			if (namedParams.containsKey("maxzones")) {
+				this.setMaxZones(Integer.parseInt(namedParams.get("maxzones")));
+				returnMessage.append(" maxzones set to " + war.getMaxZones() + ".");
+			}
 			
 			if (namedParams.containsKey("lifepool")) {
 				this.setDefaultLifepool(Integer.parseInt(namedParams.get("lifepool")));
@@ -728,6 +733,7 @@ public class War extends JavaPlugin {
 		 + " disablepvpmessage:" + global + String.valueOf(this.isDisablePvpMessage()) + normal
 		 + " buildinzonesonly:" + global + String.valueOf(this.isBuildInZonesOnly()) + normal
 		 + " tntinzonesonly:" + global + String.valueOf(this.isTntInZonesOnly()) + normal
+		 + " maxzones:" + global + this.getMaxZones() + normal
 		 + " - Warzone defaults -"
 		 + " lifepool:" + color + this.getDefaultLifepool() + normal
 		 + " teamsize:" + color + this.getDefaultTeamCap() + normal
@@ -1314,6 +1320,14 @@ public class War extends JavaPlugin {
 
 	public void setDefaultSaturation(int defaultSaturation) {
 		this.defaultSaturation = defaultSaturation;
+	}
+
+	public void setMaxZones(int maxZones) {
+		this.maxZones = maxZones;
+	}
+
+	public int getMaxZones() {
+		return maxZones;
 	}
 
 }

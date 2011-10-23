@@ -15,7 +15,7 @@ permissions:
       war.build: true
       war.pvp: true
   war.zonemaker:
-    description: Create and edit warzones, but you can't edit warzones that you are not the author of.
+    description: Create and edit warzones, but you only edit a warzone if you are its author.
     default: false
     children:
       war.player: true
@@ -199,7 +199,7 @@ commands:
         Ex -
         /zonemaker
         /zonemaker <new-or-kicked-zone-maker-name>
-# War admin commands (must have the 'war.*' permission or be op)
+# War admin commands (must have the 'war.*' permission or be an op)
 # War hub
   setwarhub:
     description: War> Create or moves a wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
@@ -226,7 +226,7 @@ commands:
     description: War> Change gobal settings and the default warzone configuration values.
     usage: Change gobal settings and the default warzone configuration values.
         Ex -
-        /setwarconfig pvpinzonesonly:on buildinzonesonly:on disablepvpmessage:off tntinzonesonly:off => Global settings,
+        /setwarconfig pvpinzonesonly:on buildinzonesonly:on disablepvpmessage:off tntinzonesonly:off maxzones:12 => Global settings,
         /setwarconfig lifepool:8 teamsize:5 maxscore:7 autoassign:on ff:on blockheads:on spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on monumentheal:<0-20>
                       flagreturn:<both/spawn/flag> flagpointsonly:false glasswalls:on pvpinzone:true instabreak:false nodrops:false nohunger:false saturation:<0-20> minplayers:1 minteams:1
                       =>  Warzone defaults,
@@ -239,7 +239,7 @@ commands:
     description: War> Alias for /setwarconfig
     usage: Change gobal settings and the default warzone configuration values.
         Ex -
-        /warcfg pvpinzonesonly:on buildinzonesonly:on disablepvpmessage:off tntinzonesonly:off  => Global settings,
+        /warcfg pvpinzonesonly:on buildinzonesonly:on disablepvpmessage:off tntinzonesonly:off maxzones:12 => Global settings,
         /warcfg lifepool:8 teamsize:5 maxscore:7 autoassign:on ff:on blockheads:on spawnstyle:<big/flat/small/invisible> unbreakable:on nocreatures:on disabled:on monumentheal:<0-20>
                 flagreturn:<both/spawn/flag> flagpointsonly:false glasswalls:on pvpinzone:true instabreak:false nodrops:false nohunger:false saturation:<0-20> minplayers:1 minteams:1
                 =>  Warzone defaults,

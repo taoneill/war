@@ -24,7 +24,6 @@ import com.tommytony.war.jobs.RestoreWarzonesJob;
 public class WarMapper {
 
 	public static void load() {
-		// war.getLogger().info("Loading war config...");
 		(War.war.getDataFolder()).mkdir();
 		(new File(War.war.getDataFolder().getPath() + "/dat")).mkdir();
 		PropertiesFile warConfig = new PropertiesFile(War.war.getDataFolder().getPath() + "/war.txt");
@@ -108,6 +107,11 @@ public class WarMapper {
 					loadout.put(Integer.parseInt(strSplit[2]), item);
 				}
 			}
+		}
+		
+		// maxZones
+		if (warConfig.keyExists("maxZones")) {
+			War.war.setMaxZones(warConfig.getInt("maxZones"));
 		}
 
 		// defaultLifePool
@@ -324,6 +328,9 @@ public class WarMapper {
 			warConfig.setString(name + "Loadout", loadoutStr);
 		}
 		warConfig.setString("defaultExtraLoadouts", defaultExtraLoadoutsStr);
+		
+		// maxZones
+		warConfig.setInt("maxZones", War.war.getMaxZones());
 		
 		// defaultLifepool
 		warConfig.setInt("defaultLifePool", War.war.getDefaultLifepool());
