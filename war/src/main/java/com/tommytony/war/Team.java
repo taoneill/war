@@ -32,6 +32,8 @@ public class Team {
 	private Volume flagVolume;
 	private final Warzone warzone;
 	private TeamKind kind;
+	private boolean flagdown = false;
+	private int playerFlagDropX, playerFlagDropY, playerFlagDropZ;
 
 	public Team(String name, TeamKind kind, Location teamSpawn, Warzone warzone) {
 		this.warzone = warzone;
@@ -438,6 +440,70 @@ public class Team {
 		this.flagVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1));
 		this.flagVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x + 1, y + 3, z + 1));
 	}
+	
+	public void initializeDroppedTeamFlag(Player player) {
+		Team victim = ((Warzone) player).getVictimTeamForThief(player.getName());
+		String name = victim.getName();
+	    TeamKind poop = TeamKind.teamKindFromString(name);
+	    byte data = poop.getData();
+		
+		//get the location of player
+		Location loc = player.getLocation();
+		int x = loc.getBlockX();
+		int y = loc.getBlockY();
+		int z = loc.getBlockZ();
+		//check reasonably close blocks for solid ground
+		Material a = this.warzone.getWorld().getBlockAt(x, y - 1, z).getType();
+		Material b = this.warzone.getWorld().getBlockAt(x, y - 2, z).getType();
+		Material c = this.warzone.getWorld().getBlockAt(x, y - 3, z).getType();
+		Material d = this.warzone.getWorld().getBlockAt(x, y - 4, z).getType();
+		Material e = this.warzone.getWorld().getBlockAt(x, y - 5, z).getType();
+		Material f = this.warzone.getWorld().getBlockAt(x, y - 6, z).getType();
+		Material ab = this.warzone.getWorld().getBlockAt(x, y, z).getType();
+		//Check for solid ground up to 6 blocks under player once it finds once sets the dropped teams flag to block
+		if (a != Material.AIR && ab == Material.AIR) {
+			this.warzone.getWorld().getBlockAt(x, y, z).setType(Material.WOOL);
+			this.warzone.getWorld().getBlockAt(x, y, z).setData(data);
+			int playerFlagDropY = y;
+		} else {
+		if (f != Material.AIR && e == Material.AIR) {
+			this.warzone.getWorld().getBlockAt(x, y - 5, z).setType(Material.WOOL);
+			this.warzone.getWorld().getBlockAt(x, y - 5, z).setData(data);
+			int playerFlagDropY = y - 5;
+		} else {
+			if (e != Material.AIR && d == Material.AIR) {
+				this.warzone.getWorld().getBlockAt(x, y - 4, z).setType(Material.WOOL);
+				this.warzone.getWorld().getBlockAt(x, y - 4, z).setData(data);
+				int playerFlagDropY = y - 4;
+			} else {
+				if (d != Material.AIR && c == Material.AIR) {
+					this.warzone.getWorld().getBlockAt(x, y - 3, z).setType(Material.WOOL);
+					this.warzone.getWorld().getBlockAt(x, y - 3, z).setData(data);
+					int playerFlagDropY = y - 3;
+				} else {
+					if (c != Material.AIR && b == Material.AIR) {
+						this.warzone.getWorld().getBlockAt(x, y - 2, z).setType(Material.WOOL);
+						this.warzone.getWorld().getBlockAt(x, y - 2, z).setData(data);
+						int playerFlagDropY = y - 2;
+					} else {
+						if (b != Material.AIR && a == Material.AIR) {
+							this.warzone.getWorld().getBlockAt(x, y - 1, z).setType(Material.WOOL);
+							this.warzone.getWorld().getBlockAt(x, y - 1, z).setData(data);
+							int playerFlagDropY = y - 1;
+						} 
+								
+							}
+						}
+					}
+				}
+			}
+		
+		flagdown = true;
+		int playerFlagDropX = x;
+		int playerFlagDropZ = z;
+	}
+	
+
 
 	@SuppressWarnings("unused")
 	public void initializeTeamFlag() {
@@ -522,9 +588,38 @@ public class Team {
 		}
 		return false;
 	}
+	public boolean isTeamFlagDroppedBlock(Block block) {
+		if (this.teamFlag != null && flagdown == true) {
+			int playerFlagDropX = this.teamFlag.getBlockX();
+			int playerFlagDropY = this.teamFlag.getBlockY();
+			int playerFlagDropZ = this.teamFlag.getBlockZ();
+			if (block.getX() == playerFlagDropX && block.getY() == playerFlagDropY && block.getZ() == playerFlagDropZ) {
+				return true;
+			}
+			
+		}
+		return false;
+	}
 
 	public Location getTeamFlag() {
 		return this.teamFlag;
+	}
+	
+	public boolean getFlagDown() {
+		if (flagdown == true) {
+			return true;
+		} else{
+			return false;
+		}
+	}
+	
+	public void toggleFlagDown() {
+		if (flagdown == true) {
+			flagdown = false;
+		}
+		if (flagdown == false) {
+			flagdown = true;
+		}
 	}
 	
 	public void deleteTeamFlag() {

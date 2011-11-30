@@ -128,6 +128,11 @@ commands:
     usage: Creates or moves a monument. Must be standing in warzone.
         Ex -
         /setmonument <monument-name>
+  setclasssetter:
+    description: War> Creates or moves a Class Changer.
+    usage: Creates or moves a Class Changer. Must be standing in a warzone.
+        Ex -
+        /setclasssetter <ClassSetter-name>
   setteamflag:
     description: War> Creates/moves a team flag post for CTF.
     usage: Creates/moves a team flag post for CTF. Must be standing in warzone.
@@ -163,6 +168,9 @@ commands:
     usage: Deletes the monument. Provide a zone name if not standing in warzone or lobby.
         Ex -
         /deletemonument [zone-name] <monument-name>
+  deleteclasssetter
+    description: War> Deletes the Class Changer.
+    usage: Deletes the Class Changer. Provide a zone name if not standing in warzone or lobby.
   setzoneconfig:
     description: War> Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone.
     usage: Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone. Provide a zone name if not standing in warzone or lobby.
