@@ -84,7 +84,6 @@ public class Warzone {
 
 	@SuppressWarnings("unchecked")
 	public Warzone(World world, String name) {
-		War.war.log("DERP",Level.INFO);
 		this.world = world;
 		this.name = name;
 		this.friendlyFire = War.war.isDefaultFriendlyFire();
