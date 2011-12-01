@@ -63,6 +63,7 @@ public class War extends JavaPlugin {
 	private boolean pvpInZonesOnly = false;
 	private boolean disablePvpMessage = false;
 	private boolean buildInZonesOnly = false;
+	private boolean disableBuildMessage = false;
 	private boolean tntInZonesOnly = false;
 	private int maxZones = 12;
 	private final List<String> deadlyAdjectives = new ArrayList<String>();
@@ -79,6 +80,7 @@ public class War extends JavaPlugin {
 	private boolean defaultFriendlyFire = false;
 	private boolean defaultAutoAssignOnly = false;
 	private boolean defaultFlagPointsOnly = false;
+	private boolean defaultFlagMustBeHome = true;
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
 	private boolean defaultGlassWalls = true;
@@ -328,6 +330,11 @@ public class War extends JavaPlugin {
 				warzone.setFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" flagpointsonly set to " + String.valueOf(warzone.isFlagPointsOnly()) + ".");
 			}
+			if (namedParams.containsKey("flagmustbehome")) {
+				String onOff = namedParams.get("flagmustbehome");
+				warzone.setFlagMustBeHome(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" flagmustbehome set to " + String.valueOf(warzone.isFlagMustBeHome()) + ".");
+			}
 			if (namedParams.containsKey("blockheads")) {
 				String onOff = namedParams.get("blockheads");
 				warzone.setBlockHeads(onOff.equals("on") || onOff.equals("true"));
@@ -489,12 +496,17 @@ public class War extends JavaPlugin {
 			if (namedParams.containsKey("pvpinzonesonly")) {
 				String onOff = namedParams.get("pvpinzonesonly");
 				this.setPvpInZonesOnly(onOff.equals("on") || onOff.equals("true"));
-				returnMessage.append(" flagpointsonly set to " + String.valueOf(war.isDefaultFlagPointsOnly()) + ".");
+				returnMessage.append(" pvpinzonesonly set to " + String.valueOf(war.isPvpInZonesOnly()) + ".");
 			}
 			if (namedParams.containsKey("disablepvpmessage")) {
 				String onOff = namedParams.get("disablepvpmessage");
 				this.setDisablePvpMessage(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" disablepvpmessage set to " + String.valueOf(war.isDisablePvpMessage()) + ".");
+			}
+			if (namedParams.containsKey("disablebuildmessage")) {
+				String onOff = namedParams.get("disablebuildmessage");
+				this.setDisableBuildMessage(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" disablebuildmessage set to " + String.valueOf(war.isDisableBuildMessage()) + ".");
 			}
 			if (namedParams.containsKey("buildinzonesonly")) {
 				String onOff = namedParams.get("buildinzonesonly");
@@ -541,7 +553,12 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("flagpointsonly");
 				this.setDefaultFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" flagpointsonly set to " + String.valueOf(war.isDefaultFlagPointsOnly()) + ".");
-			}			
+			}	
+			if (namedParams.containsKey("flagmustbehome")) {
+				String onOff = namedParams.get("flagmustbehome");
+				this.setDefaultFlagMustBeHome(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" flagmustbehome set to " + String.valueOf(war.isDefaultFlagMustBeHome()) + ".");
+			}		
 			if (namedParams.containsKey("blockheads")) {
 				String onOff = namedParams.get("blockheads");
 				this.setDefaultBlockHeads(onOff.equals("on") || onOff.equals("true"));
@@ -697,6 +714,7 @@ public class War extends JavaPlugin {
 		 + " ff:" + color + String.valueOf(zone.getFriendlyFire()) + normal
 		 + " autoassign:" + color + String.valueOf(zone.isAutoAssignOnly()) + normal
 		 + " flagpointsonly:" + color + String.valueOf(zone.isFlagPointsOnly()) + normal
+		 + " flagmustbehome:" + color + String.valueOf(zone.isFlagMustBeHome()) + normal
 		 + " blockheads:" + color + String.valueOf(zone.isBlockHeads()) + normal
 		 + " spawnstyle:" + color + zone.getSpawnStyle() + normal
 		 + " flagreturn:" + color + zone.getFlagReturn() + normal
@@ -731,6 +749,7 @@ public class War extends JavaPlugin {
 		return "War config -"
 		 + " pvpinzonesonly:" + global + String.valueOf(this.isPvpInZonesOnly()) + normal
 		 + " disablepvpmessage:" + global + String.valueOf(this.isDisablePvpMessage()) + normal
+		 + " disablebuildmessage:" + global + String.valueOf(this.isDisableBuildMessage()) + normal
 		 + " buildinzonesonly:" + global + String.valueOf(this.isBuildInZonesOnly()) + normal
 		 + " tntinzonesonly:" + global + String.valueOf(this.isTntInZonesOnly()) + normal
 		 + " maxzones:" + global + this.getMaxZones() + normal
@@ -741,6 +760,7 @@ public class War extends JavaPlugin {
 		 + " ff:" + color + String.valueOf(this.isDefaultFriendlyFire()) + normal
 		 + " autoassign:" + color + String.valueOf(this.isDefaultAutoAssignOnly()) + normal
 		 + " flagpointsonly:" + color + String.valueOf(this.isDefaultFlagPointsOnly()) + normal
+		 + " flagmustbehome:" + color + String.valueOf(this.isDefaultFlagMustBeHome()) + normal
 		 + " blockheads:" + color + String.valueOf(this.isDefaultBlockHeads()) + normal
 		 + " spawnstyle:" + color + this.getDefaultSpawnStyle() + normal
 		 + " flagreturn:" + color + this.getDefaultFlagReturn() + normal
@@ -1101,6 +1121,14 @@ public class War extends JavaPlugin {
 	public void setDisablePvpMessage(boolean disablePvpMessage) {
 		this.disablePvpMessage = disablePvpMessage;
 	}
+	
+	public boolean isDisableBuildMessage() {
+		return this.disableBuildMessage;
+	}
+
+	public void setDisableBuildMessage(boolean disableBuildMessage) {
+		this.disableBuildMessage = disableBuildMessage;
+	}
 
 	public boolean isBuildInZonesOnly() {
 		return this.buildInZonesOnly;
@@ -1244,6 +1272,14 @@ public class War extends JavaPlugin {
 
 	public boolean isDefaultFlagPointsOnly() {
 		return this.defaultFlagPointsOnly;
+	}
+	
+	public void setDefaultFlagMustBeHome(boolean defaultFlagMustBeHome) {
+		this.defaultFlagMustBeHome = defaultFlagMustBeHome;
+	}
+
+	public boolean isDefaultFlagMustBeHome() {
+		return this.defaultFlagMustBeHome;
 	}
 
 	public void setDefaultMinPlayers(int defaultMinPlayers) {

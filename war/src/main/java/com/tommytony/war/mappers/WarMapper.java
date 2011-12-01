@@ -138,6 +138,11 @@ public class WarMapper {
 		if (warConfig.keyExists("defaultFlagPointsOnly")) {
 			War.war.setDefaultFlagPointsOnly(warConfig.getBoolean("defaultFlagPointsOnly"));
 		}
+		
+		// defaultFlagMustBeHome
+		if (warConfig.keyExists("defaultFlagMustBeHome")) {
+			War.war.setDefaultFlagMustBeHome(warConfig.getBoolean("defaultFlagMustBeHome"));
+		}
 
 		// defaultTeamCap
 		if (warConfig.keyExists("defaultTeamCap")) {
@@ -346,6 +351,9 @@ public class WarMapper {
 
 		// defaultFlagPointsOnly
 		warConfig.setBoolean("defaultFlagPointsOnly", War.war.isDefaultFlagPointsOnly());
+		
+		// defaultFlagMustBeHome
+		warConfig.setBoolean("defaultFlagMustBeHome", War.war.isDefaultFlagMustBeHome());
 
 		// defaultTeamCap
 		warConfig.setInt("defaultTeamCap", War.war.getDefaultTeamCap());
@@ -364,6 +372,9 @@ public class WarMapper {
 
 		// disablePVPMessage
 		warConfig.setBoolean("disablePvpMessage", War.war.isDisablePvpMessage());
+		
+		// disableBuildMessage
+		warConfig.setBoolean("disableBuildMessage", War.war.isDisableBuildMessage());
 
 		// tntInZonesOnly
 		warConfig.setBoolean("tntInZonesOnly", War.war.isTntInZonesOnly());
@@ -371,7 +382,7 @@ public class WarMapper {
 		// spawnStyle
 		warConfig.setString("spawnStyle", War.war.getDefaultSpawnStyle().toString());
 
-		// spawnStyle
+		// flagReturn
 		warConfig.setString("flagReturn", War.war.getDefaultFlagReturn().toString());
 
 		// defaultReward

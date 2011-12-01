@@ -195,6 +195,11 @@ public class WarzoneMapper {
 			if (warzoneConfig.containsKey("flagPointsOnly")) {
 				warzone.setFlagPointsOnly(warzoneConfig.getBoolean("flagPointsOnly"));
 			}
+			
+			// flagPointsOnly
+			if (warzoneConfig.containsKey("flagMustBeHome")) {
+				warzone.setFlagMustBeHome(warzoneConfig.getBoolean("flagMustBeHome"));
+			}
 
 			// team cap
 			if (warzoneConfig.containsKey("teamCap")) {
@@ -480,8 +485,11 @@ public class WarzoneMapper {
 		// autoAssignOnly
 		warzoneConfig.setBoolean("autoAssignOnly", warzone.isAutoAssignOnly());
 
-		// flagPointsOnly-+
+		// flagPointsOnly
 		warzoneConfig.setBoolean("flagPointsOnly", warzone.isFlagPointsOnly());
+		
+		// flagMustBeHome
+		warzoneConfig.setBoolean("flagMustBeHome", warzone.isFlagMustBeHome());
 
 		// team cap
 		warzoneConfig.setInt("teamCap", warzone.getTeamCap());

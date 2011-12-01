@@ -481,7 +481,7 @@ public class WarPlayerListener extends PlayerListener {
 					}
 				}
 
-				if (playerWarzone.isTeamFlagStolen(playerTeam)) {
+				if (playerWarzone.isTeamFlagStolen(playerTeam) && playerWarzone.isFlagMustBeHome()) {
 					War.war.badMsg(player, "You can't capture the enemy flag until your team's flag is returned.");
 				} else {
 					synchronized (playerWarzone) {

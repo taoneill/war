@@ -86,7 +86,7 @@ public class WarBlockListener extends BlockListener {
 		}
 
 		// buildInZonesOnly
-		if (zone == null && War.war.isBuildInZonesOnly() && !War.war.canBuildOutsideZone(player)) {
+		if (zone == null && War.war.isBuildInZonesOnly() && !War.war.canBuildOutsideZone(player) && !War.war.isDisableBuildMessage()) {
 			War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
 			event.setCancelled(true);
 			return;

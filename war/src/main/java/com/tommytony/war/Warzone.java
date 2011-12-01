@@ -61,6 +61,7 @@ public class Warzone {
 	private ZoneLobby lobby;
 	private boolean autoAssignOnly = false;
 	private boolean flagPointsOnly = false;
+	private boolean flagMustBeHome = true;
 	private boolean blockHeads = true;
 	private boolean unbreakableZoneBlocks = false;
 	private boolean disabled = false;
@@ -83,6 +84,7 @@ public class Warzone {
 
 	@SuppressWarnings("unchecked")
 	public Warzone(World world, String name) {
+		War.war.log("DERP",Level.INFO);
 		this.world = world;
 		this.name = name;
 		this.friendlyFire = War.war.isDefaultFriendlyFire();
@@ -92,6 +94,7 @@ public class Warzone {
 		this.reward = (HashMap<Integer, ItemStack>)War.war.getDefaultReward().clone();
 		this.autoAssignOnly = War.war.isDefaultAutoAssignOnly();
 		this.setFlagPointsOnly(War.war.isDefaultFlagPointsOnly());
+		this.setFlagMustBeHome(War.war.isDefaultFlagMustBeHome());
 		this.teamCap = War.war.getDefaultTeamCap();
 		this.scoreCap = War.war.getDefaultScoreCap();
 		this.monumentHeal = War.war.getDefaultMonumentHeal();
@@ -121,7 +124,7 @@ public class Warzone {
 				// perfect match, return right away
 				return warzone;
 			} else if (warzone.getName().toLowerCase().startsWith(name.toLowerCase())) {
-				// prehaps there's a perfect match in the remaining zones, let's take this one aside
+				// perhaps there's a perfect match in the remaining zones, let's take this one aside
 				bestGuess = warzone;
 			}
 		}
@@ -1154,6 +1157,14 @@ public class Warzone {
 	
 	public boolean isFlagPointsOnly() {
 		return this.flagPointsOnly;
+	}
+	
+	public void setFlagMustBeHome(boolean flagMustBeHome) {
+		this.flagMustBeHome = flagMustBeHome;
+	}
+	
+	public boolean isFlagMustBeHome() {
+		return this.flagMustBeHome;
 	}
 
 	public void setMinPlayers(int minPlayers) {
