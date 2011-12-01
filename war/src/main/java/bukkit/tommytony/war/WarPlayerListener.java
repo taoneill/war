@@ -335,6 +335,7 @@ public class WarPlayerListener extends PlayerListener {
 							for (Team t : zone.getTeams()) {
 								t.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
 							}
+							zone.resetInventory(team, player);
 						} else {
 							event.setTo(zone.getTeleport());
 							War.war.badMsg(player, "Team " + team.getName() + " is full.");
@@ -429,10 +430,17 @@ public class WarPlayerListener extends PlayerListener {
 				}
 			}
 			
-			if (!playerWarzone.isEnoughPlayers() && !playerTeam.getSpawnVolume().contains(playerLoc)) {
-				War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getMinPlayers() +" player(s) on at least " + playerWarzone.getMinTeams() + " team(s).");
-				event.setTo(playerTeam.getTeamSpawn());
-				return;
+			if (!playerTeam.getSpawnVolume().contains(playerLoc)) {
+				if (!playerWarzone.isEnoughPlayers()) {
+					War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getMinPlayers() +" player(s) on at least " + playerWarzone.getMinTeams() + " team(s).");
+					event.setTo(playerTeam.getTeamSpawn());
+					return;
+				}
+				if (playerWarzone.isRespawning(player)) {
+					War.war.badMsg(player, "Can't leave spawn for 10 seconds after spawning!");
+					event.setTo(playerTeam.getTeamSpawn());
+					return;
+				}
 			}
 
 			// Monuments
@@ -539,7 +547,7 @@ public class WarPlayerListener extends PlayerListener {
 					playerWarzone.getNewlyRespawned().put(event.getPlayer().getName(), currentIndex);
 					
 					if (currentIndex == 0) {
-						playerWarzone.resetInventory(playerTeam, event.getPlayer(), playerWarzone.getLoadout());
+						if (!playerWarzone.isRespawning(event.getPlayer())) playerWarzone.resetInventory(playerTeam, event.getPlayer(), playerWarzone.getLoadout());
 						War.war.msg(event.getPlayer(), "Equipped default loadout.");
 					} else {
 						int i = 0;
@@ -547,7 +555,7 @@ public class WarPlayerListener extends PlayerListener {
 					    while (it.hasNext()) {
 					        Map.Entry pairs = (Map.Entry)it.next();
 					        if (i == currentIndex - 1) {
-								playerWarzone.resetInventory(playerTeam, event.getPlayer(), (HashMap<Integer, ItemStack>)pairs.getValue());
+					        	if (!playerWarzone.isRespawning(event.getPlayer())) playerWarzone.resetInventory(playerTeam, event.getPlayer(), (HashMap<Integer, ItemStack>)pairs.getValue());
 								War.war.msg(event.getPlayer(), "Equipped " + pairs.getKey() + " loadout.");
 					        }
 					        i++;
@@ -556,7 +564,6 @@ public class WarPlayerListener extends PlayerListener {
 				} else {
 					War.war.badMsg(event.getPlayer(), "Can't change loadout after exiting the spawn.");
 				}
-				
 			}
 		}
 	}

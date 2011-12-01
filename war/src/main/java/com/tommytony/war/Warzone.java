@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.jobs.HelmetProtectionTask;
 import com.tommytony.war.jobs.InitZoneJob;
 import com.tommytony.war.jobs.LoadoutResetJob;
 import com.tommytony.war.jobs.ScoreCapReachedJob;
@@ -39,6 +40,7 @@ public class Warzone {
 	private final List<Monument> monuments = new ArrayList<Monument>();
 	
 	private final List<String> authors = new ArrayList<String>();
+	private final List<Player> respawn = new ArrayList<Player>();
 
 	private Location teleport;
 	private boolean friendlyFire = false;
@@ -326,23 +328,41 @@ public class Warzone {
 		// Teleport the player back to spawn
 		event.setTo(team.getTeamSpawn());
 	}
+	
+	public boolean isRespawning(Player p) {
+		return respawn.contains(p);
+	}
 
-	private void handleRespawn(Team team, Player player) {
+	private void handleRespawn(final Team team, final Player player) {
 		// Fill hp
 		player.setRemainingAir(300);
 		player.setHealth(20);
 		player.setFoodLevel(20);
 		player.setSaturation(this.getSaturation());
 		player.setExhaustion(0);
+		player.setFireTicks(0);
+		
+		player.getInventory().clear();
+		
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			player.setGameMode(GameMode.SURVIVAL);
 		}
 		if (!this.getNewlyRespawned().keySet().contains(player.getName())) {
 			this.getNewlyRespawned().put(player.getName(), 0);
 		}
-
-		LoadoutResetJob job = new LoadoutResetJob(this, team, player);
-		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+		
+		// "Respawn" Timer - player will not be able to leave spawn for 10 seconds
+		// TODO: Customizable "respawn" time
+		respawn.add(player);
+		final Warzone w = this;
+		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, new Runnable() {
+			public void run() {
+			    respawn.remove(player);
+			    // Getting the Loadout as visual cue
+			    LoadoutResetJob job = new LoadoutResetJob(w, team, player, newlyRespawned.get(player.getName()));
+				War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+			}
+		}, 10 * 20L); // 20 ticks = 1 second. So 10*20 ticks = 10 seconds.
 	}
 
 	public void resetInventory(Team team, Player player) {
@@ -759,6 +779,7 @@ public class Warzone {
 			for (Team team : this.teams) {
 				team.teamcast("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + ".");
 			}
+			resetInventory(lowestNoOfPlayers, player);
 		}
 		return lowestNoOfPlayers;
 	}
