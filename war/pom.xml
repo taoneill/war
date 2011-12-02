@@ -64,5 +64,10 @@
 	<version>1.8.5</version>
 	<scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>org.spoutcraft</groupId>
+    	<artifactId>spoutcraftapi</artifactId>
+    	<version>dev-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>

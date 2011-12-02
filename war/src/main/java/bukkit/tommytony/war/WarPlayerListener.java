@@ -43,7 +43,7 @@ public class WarPlayerListener extends PlayerListener {
 	private java.util.Random random = new java.util.Random();
 	private HashMap<String, Location> latestLocations = new HashMap<String, Location>(); 
 
-	/**
+	/**=
 	 * Correctly removes quitting players from warzones
 	 *
 	 * @see PlayerListener.onPlayerQuit()

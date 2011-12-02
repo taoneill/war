@@ -184,6 +184,43 @@ public class WarBlockListener extends BlockListener {
 					return;
 				}
 			}
+			//dropped flag mess
+			if (team.getFlagDown() == true && team != null && team.isTeamFlagBlock(block) == true && warzone.isEnemyTeamFlagBlock(team, block) == false) {
+				
+				Team lostFlagTeam2 = warzone.getTeamForFlagBlock(block);
+				
+				
+				lostFlagTeam2.getFlagVolume().resetBlocks();
+				lostFlagTeam2.initializeTeamFlag();
+				
+				for (Team t : warzone.getTeams()) {
+					t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " returned team " + lostFlagTeam2.getName() + "'s flag.");
+					
+			}
+			
+			if (team.getFlagDown() == true && team != null && team.isTeamFlagDroppedBlock(block) == true && warzone.isEnemyTeamFlagBlock(team, block) == true) {
+				if (warzone.isFlagThief(player.getName())) {
+					War.war.badMsg(player, "You can only steal on flag at a time!");
+					//can't have more than 1 dropped flag
+				} else {
+					Team lostFlagTeam = warzone.getTeamForFlagBlock(block);
+					if (lostFlagTeam.getPlayers().size() != 0) {
+						ItemStack teamKindBlock = new ItemStack(lostFlagTeam.getKind().getMaterial(), 1, (short) 1, new Byte(lostFlagTeam.getKind().getData()));
+						player.getInventory().clear();
+						player.getInventory().addItem(teamKindBlock);
+						warzone.addFlagThief(lostFlagTeam, player.getName());
+						block.setType(Material.AIR);
+						
+
+						String spawnOrFlag = "spawn or flag";
+						if (warzone.getFlagReturn() == FlagReturn.FLAG || warzone.getFlagReturn() == FlagReturn.SPAWN) {
+							spawnOrFlag = warzone.getFlagReturn().toString();
+							team.toggleFlagDown();
+						}
+						
+					}
+				}
+			}
 			// stealing of flag
 			if (team != null && warzone.isEnemyTeamFlagBlock(team, block)) {
 				if (warzone.isFlagThief(player.getName())) {
@@ -213,7 +250,7 @@ public class WarBlockListener extends BlockListener {
 						}
 
 
-						War.war.msg(player, "You have team " + lostFlagTeam.getName() + "'s flag. Reach your team " + spawnOrFlag + " to capture it!");
+						War.war.msg(player, "You have team " + lostFlagTeam.getName() + "'s flag. Reach your team's " + spawnOrFlag + " to capture it!");
 					} else {
 						War.war.msg(player, "You can't steal team " + lostFlagTeam.getName() + "'s flag since no players are on that team.");
 					}
@@ -260,5 +297,6 @@ public class WarBlockListener extends BlockListener {
 			event.setCancelled(true);
 			return;
 		}
+	}
 	}
 }

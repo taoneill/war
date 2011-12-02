@@ -107,7 +107,12 @@ public class WarCommandHandler {
 				commandObj = new SetWarConfigCommand(this, sender, arguments);
 			} else if (command.equals("zonemaker") || command.equals("zm")) {
 				commandObj = new ZoneMakerCommand(this, sender, arguments);
+			} else if (command.equals("setclasschanger")) {
+				commandObj = new ZoneMakerCommand(this, sender, arguments);
+			} else if (command.equals("deleteclasschanger")) {
+				commandObj = new ZoneMakerCommand(this, sender, arguments);
 			}
+			
 			// we are not responsible for any other command
 		} catch (NotWarAdminException e) {
 			War.war.badMsg(sender, "You can't do this if you are not a War admin (permission war.*).");

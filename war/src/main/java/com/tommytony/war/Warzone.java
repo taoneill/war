@@ -37,6 +37,7 @@ public class Warzone {
 	private ZoneVolume volume;
 	private final List<Team> teams = new ArrayList<Team>();
 	private final List<Monument> monuments = new ArrayList<Monument>();
+	private final List<ClassSetter> classsetters = new ArrayList<ClassSetter>();
 	
 	private final List<String> authors = new ArrayList<String>();
 
@@ -80,6 +81,9 @@ public class Warzone {
 
 	private HashMap<String, PlayerState> deadMenInventories = new HashMap<String, PlayerState>();
 	private Location rallyPoint;
+	
+	private boolean playerFlagDropEvent = false;
+	private String playerName = "tommytony";
 
 	@SuppressWarnings("unchecked")
 	public Warzone(World world, String name) {
@@ -225,6 +229,9 @@ public class Warzone {
 				for (Monument monument : this.monuments) {
 					monument.getVolume().resetBlocks();
 				}
+				for (ClassSetter classsetter : this.classsetters) {
+					classsetter.getVolume().resetBlocks();
+				}
 
 				if (this.lobby != null) {
 					this.lobby.getVolume().resetBlocks();
@@ -285,6 +292,11 @@ public class Warzone {
 		for (Monument monument : this.monuments) {
 			monument.getVolume().resetBlocks();
 			monument.addMonumentBlocks();
+		}
+		//reset ClassSetters
+		for (ClassSetter classsetter : this.classsetters) {
+			classsetter.getVolume().resetBlocks();
+			classsetter.addClassSetterBlocks();
 		}
 
 		// reset lobby (here be demons)
@@ -542,6 +554,13 @@ public class Warzone {
 		if (this.ready()) {
 			for (Monument m : this.monuments) {
 				if (m.getVolume().contains(block)) {
+					return true;
+				}
+			}
+			for (ClassSetter c : this.classsetters) {    //some good old inversion :P
+				if (c.getVolume().contains(block)) {
+					return false;
+				} else{
 					return true;
 				}
 			}
@@ -853,12 +872,25 @@ public class Warzone {
 				// player died without causing his team's demise
 				if (playerWarzone.isFlagThief(player.getName())) {
 					// died while carrying flag.. dropped it
+					playerFlagDropEvent = true;
+					playerName += player.getName() + "";
 					Team victim = playerWarzone.getVictimTeamForThief(player.getName());
-					victim.getFlagVolume().resetBlocks();
-					victim.initializeTeamFlag();
+					victim.initializeDroppedTeamFlag(player); //we pass it into all purpose initializer
 					playerWarzone.removeThief(player.getName());
 					for (Team t : playerWarzone.getTeams()) {
-						t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
+						t.teamcast(player.getName() + "died and dropped team " + victim.getName() + "'s flag.");
+					}
+					
+					/*
+					 * below this is old way... replaced by grin
+					 */
+					
+					//Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+					//victim.getFlagVolume().resetBlocks();
+					//victim.initializeTeamFlag();
+					//playerWarzone.removeThief(player.getName());
+					//for (Team t : playerWarzone.getTeams()) {
+						//t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
 					}
 				}
 				playerTeam.setRemainingLives(remaining - 1);
@@ -870,7 +902,7 @@ public class Warzone {
 			}
 			playerTeam.resetSign();
 		}
-	}
+	
 
 	public void handlePlayerLeave(Player player, Location destination, PlayerMoveEvent event, boolean removeFromTeam) {
 		this.handlePlayerLeave(player, removeFromTeam);
@@ -997,7 +1029,8 @@ public class Warzone {
 		this.getVolume().resetBlocksAsJob();
 		this.initializeZoneAsJob(player);
 		if (War.war.getWarHub() != null) {
-			// TODO: test if warhub sign give the correct info despite the jobs
+			// 
+
 			War.war.getWarHub().resetZoneSign(this);
 		}
 	}
@@ -1244,4 +1277,63 @@ public class Warzone {
 		}
 		return authors;
 	}
+	public boolean isClassSetterCenterBlock(Block block) {
+		for (ClassSetter classsetter : this.classsetters) {
+			int x = classsetter.getLocation().getBlockX();
+			int y = classsetter.getLocation().getBlockY() + 1;
+			int z = classsetter.getLocation().getBlockZ();
+			if (x == block.getX() && y == block.getY() && z == block.getZ()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public ClassSetter getClassSetterFromCenterBlock(Block block) {
+		for (ClassSetter classsetter : this.classsetters) {
+			int x = classsetter.getLocation().getBlockX();
+			int y = classsetter.getLocation().getBlockY() + 1;
+			int z = classsetter.getLocation().getBlockZ();
+			if (x == block.getX() && y == block.getY() && z == block.getZ()) {
+				return classsetter;
+			}
+		}
+		return null;
+	}
+	
+	public boolean inAnyClassetter(Location to) {
+		for (ClassSetter classetter : this.classsetters) {
+			if (classetter.isIn(to)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public List<ClassSetter> getClasSetters() {
+		return this.classsetters;
+	}
+
+	public boolean hasClassSetter(String classsetterName) {
+		for (ClassSetter classsetter : this.classsetters) {
+			if (classsetter.getName().equals(classsetterName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public ClassSetter getClassSetters(String classsetterName) {
+		for (ClassSetter classsetter : this.classsetters) {
+			if (classsetter.getName().startsWith(classsetterName)) {
+				return classsetter;
+			}
+		}
+		return null;
+	}
+	public List<ClassSetter> getClassSetters() {
+		return this.classsetters;
+	}
 }
+
+
+
