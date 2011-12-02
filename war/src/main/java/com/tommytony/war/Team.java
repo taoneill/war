@@ -606,20 +606,11 @@ public class Team {
 	}
 	
 	public boolean getFlagDown() {
-		if (flagdown == true) {
-			return true;
-		} else{
-			return false;
-		}
+		return this.flagdown;
 	}
 	
 	public void toggleFlagDown() {
-		if (flagdown == true) {
-			flagdown = false;
-		}
-		if (flagdown == false) {
-			flagdown = true;
-		}
+	    flagdown = !flagdown;
 	}
 	
 	public void deleteTeamFlag() {
