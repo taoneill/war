@@ -150,6 +150,8 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_DAMAGE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
+			
+			pm.registerEvent(Event.Type.CUSTOM_EVENT, new WarInputListener(), Priority.Normal, this);
 		}
 
 		// Load files from disk or create them (using these defaults)
