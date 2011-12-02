@@ -1,6 +1,7 @@
 package bukkit.tommytony.war;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -11,7 +12,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockListener;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.FlagReturn;
@@ -113,8 +116,44 @@ public class WarBlockListener extends BlockListener {
 			event.setCancelled(true);
 			return;
 		}
+		
+		/*// disallow placing of sticky pistons near flags. If the flag is pulled from the right position, you can't pick it up
+		if (block.getType() == Material.PISTON_STICKY_BASE && Team.getTeamByPlayerName(player.getName()).getTeamFlag().distance(block.getLocation()) < 4) {
+			War.war.badMsg(player, "You can't place sticky pistons this close to the flag.");
+			event.setCancelled(true);
+			return;
+		}*/
 	}
-
+	
+	/*public void onPistonExtend(BlockPistonExtendEvent event) {
+		Warzone zone = Warzone.getZoneByLocation(event.getBlock().getLocation());
+		if (zone!=null) {
+			for (Block b : event.getBlocks()) {
+				if (zone.isMonumentCenterBlock(b) || zone.isFlagBlock(b)) {
+					event.setCancelled(true);
+					return;
+				}
+			}
+		}
+	}
+	
+	public void onPistonRetract(BlockPistonRetractEvent event) {
+		Warzone zone = Warzone.getZoneByLocation(event.getBlock().getLocation());
+		if (zone!=null) {
+			Block b = event.getBlock();
+			if (zone.isImportantBlock(b)) {
+				event.setCancelled(true);
+				return;
+			}
+		}
+	}*/
+	public void onPistonExtend(BlockPistonExtendEvent event) {
+		War.war.log("EXTENDING",Level.INFO);
+	}
+	public void onPistonRetract(BlockPistonRetractEvent event) {
+		War.war.log("RETRACTING",Level.INFO);
+	}
+	
 	/**
 	 * @see BlockListener.onBlockBreak()
 	 */

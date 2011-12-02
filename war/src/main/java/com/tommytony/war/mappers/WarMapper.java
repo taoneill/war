@@ -153,6 +153,11 @@ public class WarMapper {
 		if (warConfig.keyExists("defaultScoreCap")) {
 			War.war.setDefaultScoreCap(warConfig.getInt("defaultScoreCap"));
 		}
+		
+		// defaultRespawnTimer
+		if (warConfig.keyExists("defaultRespawnTimer")) {
+			War.war.setDefaultRespawnTimer(warConfig.getInt("defaultRespawnTimer"));
+		}
 
 		// pvpInZonesOnly
 		if (warConfig.keyExists("pvpInZonesOnly")) {
@@ -360,6 +365,9 @@ public class WarMapper {
 
 		// defaultScoreCap
 		warConfig.setInt("defaultScoreCap", War.war.getDefaultScoreCap());
+		
+		// defaultRespawnTimer
+		warConfig.setInt("defaultRespawnTimer", War.war.getDefaultRespawnTimer());
 
 		// pvpInZonesOnly
 		warConfig.setBoolean("pvpInZonesOnly", War.war.isPvpInZonesOnly());

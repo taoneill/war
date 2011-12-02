@@ -682,7 +682,7 @@ public class ZoneLobby {
 		Volume gateExitVolume = new Volume("tempGateExit", location.getWorld());
 		Block out = gate.getFace(inside);
 		gateExitVolume.setCornerOne(out.getFace(left).getFace(BlockFace.DOWN));
-		gateExitVolume.setCornerTwo(gate.getFace(right, 1).getFace(BlockFace.UP, 3));
+		gateExitVolume.setCornerTwo(gate.getFace(right, 1).getFace(BlockFace.UP, 2));
 
 		if (gateExitVolume.contains(location)) {
 			return true;

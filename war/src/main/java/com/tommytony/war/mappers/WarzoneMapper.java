@@ -196,7 +196,7 @@ public class WarzoneMapper {
 				warzone.setFlagPointsOnly(warzoneConfig.getBoolean("flagPointsOnly"));
 			}
 			
-			// flagPointsOnly
+			// flagMustBeHome
 			if (warzoneConfig.containsKey("flagMustBeHome")) {
 				warzone.setFlagMustBeHome(warzoneConfig.getBoolean("flagMustBeHome"));
 			}
@@ -209,6 +209,11 @@ public class WarzoneMapper {
 			// score cap
 			if (warzoneConfig.containsKey("scoreCap")) {
 				warzone.setScoreCap(warzoneConfig.getInt("scoreCap"));
+			}
+			
+			// respawn timer
+			if (warzoneConfig.containsKey("respawnTimer")) {
+				warzone.setRespawnTimer(warzoneConfig.getInt("respawnTimer"));
 			}
 
 			// blockHeads
@@ -496,6 +501,9 @@ public class WarzoneMapper {
 
 		// score cap
 		warzoneConfig.setInt("scoreCap", warzone.getScoreCap());
+		
+		// respawn timer
+		warzoneConfig.setInt("respawnTimer", warzone.getRespawnTimer());
 
 		// blockHeads
 		warzoneConfig.setBoolean("blockHeads", warzone.isBlockHeads());

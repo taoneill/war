@@ -331,11 +331,11 @@ public class WarPlayerListener extends PlayerListener {
 							}
 							zone.keepPlayerState(player);
 							War.war.msg(player, "Your inventory is in storage until you exit with '/war leave'.");
+							zone.resetInventory(team, player);
 							zone.respawnPlayer(event, team, player);
 							for (Team t : zone.getTeams()) {
 								t.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
 							}
-							zone.resetInventory(team, player);
 						} else {
 							event.setTo(zone.getTeleport());
 							War.war.badMsg(player, "Team " + team.getName() + " is full.");
@@ -437,7 +437,10 @@ public class WarPlayerListener extends PlayerListener {
 					return;
 				}
 				if (playerWarzone.isRespawning(player)) {
-					War.war.badMsg(player, "Can't leave spawn for 10 seconds after spawning!");
+					int rt = playerWarzone.getRespawnTimer();
+					String isS = "s";
+					if (rt==1) isS = "";
+					War.war.badMsg(player, "Can't leave spawn for "+rt+" second"+isS+" after spawning!");
 					event.setTo(playerTeam.getTeamSpawn());
 					return;
 				}

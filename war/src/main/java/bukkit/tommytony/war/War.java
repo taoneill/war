@@ -88,6 +88,7 @@ public class War extends JavaPlugin {
 	private boolean defaultInstaBreak = false;
 	private boolean defaultNoDrops = false;
 	private boolean defaultNoHunger = false;
+	private int defaultRespawnTimer = 10;
 	private int defaultSaturation = 10;
 	private int defaultMinPlayers = 1;	// By default, 1 player on 1 team is enough for unlocking the cant-exit-spawn guard
 	private int defaultMinTeams = 1;
@@ -152,6 +153,8 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_DAMAGE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
+			pm.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, this.blockListener, Priority.Normal, this);
+			pm.registerEvent(Event.Type.BLOCK_PISTON_RETRACT, this.blockListener, Priority.Normal, this);
 		}
 
 		// Load files from disk or create them (using these defaults)
@@ -314,6 +317,10 @@ public class War extends JavaPlugin {
 			if (namedParams.containsKey("maxscore")) {
 				warzone.setScoreCap(Integer.parseInt(namedParams.get("maxscore")));
 				returnMessage.append(" maxscore set to " + warzone.getScoreCap() + ".");
+			}
+			if (namedParams.containsKey("respawntimer")) {
+				warzone.setRespawnTimer(Integer.parseInt(namedParams.get("respawntimer")));
+				returnMessage.append(" respawntimer set to " + warzone.getRespawnTimer() + ".");
 			}
 			if (namedParams.containsKey("ff")) {
 				String onOff = namedParams.get("ff");
@@ -538,6 +545,10 @@ public class War extends JavaPlugin {
 			if (namedParams.containsKey("maxscore")) {
 				this.setDefaultScoreCap(Integer.parseInt(namedParams.get("maxscore")));
 				returnMessage.append(" maxscore set to " + war.getDefaultScoreCap() + ".");
+			}
+			if (namedParams.containsKey("respawntimer")) {
+				this.setDefaultRespawnTimer(Integer.parseInt(namedParams.get("respawntimer")));
+				returnMessage.append(" respawntimer set to " + war.getDefaultRespawnTimer() + ".");
 			}
 			if (namedParams.containsKey("ff")) {
 				String onOff = namedParams.get("ff");
@@ -1364,6 +1375,14 @@ public class War extends JavaPlugin {
 
 	public int getMaxZones() {
 		return maxZones;
+	}
+	
+	public void setDefaultRespawnTimer(int defaultRespawnTimer) {
+		this.defaultRespawnTimer = defaultRespawnTimer;
+	}
+
+	public int getDefaultRespawnTimer() {
+		return defaultRespawnTimer;
 	}
 
 }

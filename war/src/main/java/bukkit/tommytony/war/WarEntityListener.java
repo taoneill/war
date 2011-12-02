@@ -86,6 +86,15 @@ public class WarEntityListener extends EntityListener {
 						event.setCancelled(true);
 						return;
 					}
+				// Make sure none of them are respawning
+				} else if (defenderWarzone.isRespawning(d)) {
+					War.war.badMsg(a, "The target is currently respawning!");
+					event.setCancelled(true);
+					return;
+				} else if (attackerWarzone.isRespawning(a)) {
+					War.war.badMsg(a, "You can't attack while respawning!");
+					event.setCancelled(true);
+					return;
 				}
 				
 				if (!attackerWarzone.isPvpInZone()) {

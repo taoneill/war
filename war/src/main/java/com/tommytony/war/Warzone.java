@@ -73,6 +73,7 @@ public class Warzone {
 	private boolean instaBreak = false;
 	private boolean noDrops = false;
 	private boolean noHunger = false;
+	private int respawnTimer = 10;
 	private int saturation = 10;
 	private int minPlayers = 1;
 	private int minTeams = 1;
@@ -109,6 +110,7 @@ public class Warzone {
 		this.setInstaBreak(War.war.isDefaultInstaBreak());
 		this.setNoDrops(War.war.isDefaultNoDrops());
 		this.setNoHunger(War.war.isDefaultNoHunger());
+		this.setRespawnTimer(War.war.getDefaultRespawnTimer());
 		this.setSaturation(War.war.getDefaultSaturation());
 		this.setMinPlayers(War.war.getDefaultMinPlayers());
 		this.setMinTeams(War.war.getDefaultMinTeams());
@@ -340,7 +342,7 @@ public class Warzone {
 		player.setFoodLevel(20);
 		player.setSaturation(this.getSaturation());
 		player.setExhaustion(0);
-		player.setFireTicks(0);
+		player.setFireTicks(0);		//this works fine here, why put it in LoudoutResetJob...? I'll keep it over there though
 		
 		player.getInventory().clear();
 		
@@ -351,18 +353,22 @@ public class Warzone {
 			this.getNewlyRespawned().put(player.getName(), 0);
 		}
 		
-		// "Respawn" Timer - player will not be able to leave spawn for 10 seconds
-		// TODO: Customizable "respawn" time
-		respawn.add(player);
+		// "Respawn" Timer - player will not be able to leave spawn for a few seconds
 		final Warzone w = this;
-		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, new Runnable() {
-			public void run() {
-			    respawn.remove(player);
-			    // Getting the Loadout as visual cue
-			    LoadoutResetJob job = new LoadoutResetJob(w, team, player, newlyRespawned.get(player.getName()));
-				War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
-			}
-		}, 10 * 20L); // 20 ticks = 1 second. So 10*20 ticks = 10 seconds.
+		if (respawnTimer==0) {
+			LoadoutResetJob job = new LoadoutResetJob(w, team, player);
+			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+		} else {
+			respawn.add(player);
+			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, new Runnable() {
+				public void run() {
+				    respawn.remove(player);
+				    // Getting the Loadout as visual cue
+				    LoadoutResetJob job = new LoadoutResetJob(w, team, player, newlyRespawned.get(player.getName()));
+					War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+				}
+			}, respawnTimer * 20L); // 20 ticks = 1 second
+		}
 	}
 
 	public void resetInventory(Team team, Player player) {
@@ -775,11 +781,11 @@ public class Warzone {
 				this.keepPlayerState(player);
 			}
 			War.war.msg(player, "Your inventory is in storage until you use '/war leave'.");
+			this.resetInventory(lowestNoOfPlayers, player);
 			this.respawnPlayer(lowestNoOfPlayers, player);
 			for (Team team : this.teams) {
 				team.teamcast("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + ".");
 			}
-			resetInventory(lowestNoOfPlayers, player);
 		}
 		return lowestNoOfPlayers;
 	}
@@ -961,6 +967,15 @@ public class Warzone {
 	public boolean isEnemyTeamFlagBlock(Team playerTeam, Block block) {
 		for (Team team : this.teams) {
 			if (!team.getName().equals(playerTeam.getName()) && team.isTeamFlagBlock(block)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isFlagBlock(Block block) {
+		for (Team team : this.teams) {
+			if (team.isTeamFlagBlock(block)) {
 				return true;
 			}
 		}
@@ -1274,5 +1289,13 @@ public class Warzone {
 			authors += author + ",";
 		}
 		return authors;
+	}
+	
+	public void setRespawnTimer(int respawnTimer) {
+		this.respawnTimer = respawnTimer;
+	}
+
+	public int getRespawnTimer() {
+		return this.respawnTimer;
 	}
 }
