@@ -129,16 +129,16 @@ public class Team {
 			// SMALL style
 			if (yaw >= 0 && yaw < 90) {
 				signData = 10;
-				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH).getFace(BlockFace.WEST);
+				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(BlockFace.NORTH).getRelative(BlockFace.WEST);
 			} else if (yaw >= 90 && yaw <= 180) {
 				signData = 14;
-				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH).getFace(BlockFace.EAST);
+				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(BlockFace.NORTH).getRelative(BlockFace.EAST);
 			} else if (yaw >= 180 && yaw < 270) {
 				signData = 2;
-				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH).getFace(BlockFace.EAST);
+				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST);
 			} else if (yaw >= 270 && yaw <= 360) {
 				signData = 6;
-				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH).getFace(BlockFace.WEST);
+				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(BlockFace.SOUTH).getRelative(BlockFace.WEST);
 			}
 		} else {
 			// outer ring (FLAT or BIG)
@@ -169,7 +169,7 @@ public class Team {
 				facing = BlockFace.NORTH_WEST;
 				opposite = BlockFace.SOUTH_EAST;
 				signData = 10;
-				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH, 2).getFace(BlockFace.WEST, 2);
+				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(BlockFace.NORTH, 2).getRelative(BlockFace.WEST, 2);
 
 				if (this.warzone.getSpawnStyle().equals(TeamSpawnStyle.BIG)) {
 					// rim
@@ -202,7 +202,7 @@ public class Team {
 				facing = BlockFace.NORTH_EAST;
 				opposite = BlockFace.SOUTH_WEST;
 				signData = 14;
-				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.NORTH, 2).getFace(BlockFace.EAST, 2);
+				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(BlockFace.NORTH, 2).getRelative(BlockFace.EAST, 2);
 				if (this.warzone.getSpawnStyle().equals(TeamSpawnStyle.BIG)) {
 					// rim
 					this.setBlock(x + 1, y, z - 2, this.kind);
@@ -234,7 +234,7 @@ public class Team {
 				facing = BlockFace.SOUTH_EAST;
 				opposite = BlockFace.NORTH_WEST;
 				signData = 2;
-				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.EAST, 2);
+				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(BlockFace.SOUTH, 2).getRelative(BlockFace.EAST, 2);
 				if (this.warzone.getSpawnStyle().equals(TeamSpawnStyle.BIG)) {
 					// rim
 					this.setBlock(x + 2, y, z + 1, this.kind);
@@ -266,7 +266,7 @@ public class Team {
 				facing = BlockFace.SOUTH_WEST;
 				opposite = BlockFace.NORTH_EAST;
 				signData = 6;
-				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getFace(BlockFace.SOUTH, 2).getFace(BlockFace.WEST, 2);
+				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(BlockFace.SOUTH, 2).getRelative(BlockFace.WEST, 2);
 				if (this.warzone.getSpawnStyle().equals(TeamSpawnStyle.BIG)) {
 					// rim
 					this.setBlock(x - 1, y, z + 2, this.kind);

@@ -140,8 +140,8 @@ public class Monument {
 
 	public void setLocation(Location location) {
 		Block locationBlock = this.warzone.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-		this.volume.setCornerOne(locationBlock.getFace(BlockFace.DOWN).getFace(BlockFace.EAST, 2).getFace(BlockFace.SOUTH, 2));
-		this.volume.setCornerTwo(locationBlock.getFace(BlockFace.UP, 2).getFace(BlockFace.WEST, 2).getFace(BlockFace.NORTH, 2));
+		this.volume.setCornerOne(locationBlock.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST, 2).getRelative(BlockFace.SOUTH, 2));
+		this.volume.setCornerTwo(locationBlock.getRelative(BlockFace.UP, 2).getRelative(BlockFace.WEST, 2).getRelative(BlockFace.NORTH, 2));
 		this.volume.saveBlocks();
 		this.location = location;
 		this.addMonumentBlocks();

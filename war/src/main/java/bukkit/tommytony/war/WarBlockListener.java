@@ -116,42 +116,33 @@ public class WarBlockListener extends BlockListener {
 			event.setCancelled(true);
 			return;
 		}
-		
-		/*// disallow placing of sticky pistons near flags. If the flag is pulled from the right position, you can't pick it up
-		if (block.getType() == Material.PISTON_STICKY_BASE && Team.getTeamByPlayerName(player.getName()).getTeamFlag().distance(block.getLocation()) < 4) {
-			War.war.badMsg(player, "You can't place sticky pistons this close to the flag.");
-			event.setCancelled(true);
-			return;
-		}*/
 	}
 	
-	/*public void onPistonExtend(BlockPistonExtendEvent event) {
+	// Do not allow moving of block into or from important zones
+	public void onBlockPistonExtend(BlockPistonExtendEvent event) {
 		Warzone zone = Warzone.getZoneByLocation(event.getBlock().getLocation());
 		if (zone!=null) {
 			for (Block b : event.getBlocks()) {
-				if (zone.isMonumentCenterBlock(b) || zone.isFlagBlock(b)) {
+				if (zone.isImportantBlock(b)) {
 					event.setCancelled(true);
 					return;
 				}
 			}
+			if (zone.isImportantBlock(event.getBlock().getRelative(event.getDirection(), event.getLength()+1))) {
+				event.setCancelled(true);
+				return;
+			}
 		}
 	}
-	
-	public void onPistonRetract(BlockPistonRetractEvent event) {
+	public void onBlockPistonRetract(BlockPistonRetractEvent event) {
 		Warzone zone = Warzone.getZoneByLocation(event.getBlock().getLocation());
 		if (zone!=null) {
-			Block b = event.getBlock();
+			Block b = event.getBlock().getRelative(event.getDirection(), 2);
 			if (zone.isImportantBlock(b)) {
 				event.setCancelled(true);
 				return;
 			}
 		}
-	}*/
-	public void onPistonExtend(BlockPistonExtendEvent event) {
-		War.war.log("EXTENDING",Level.INFO);
-	}
-	public void onPistonRetract(BlockPistonRetractEvent event) {
-		War.war.log("RETRACTING",Level.INFO);
 	}
 	
 	/**

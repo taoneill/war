@@ -21,17 +21,17 @@ public class ResetCursorJob implements Runnable {
 		if (this.isSoutheast) {
 			this.cornerBlock.setType(this.originalCursorBlocks[0].getType());
 			this.cornerBlock.setData(this.originalCursorBlocks[0].getData());
-			this.cornerBlock.getFace(BlockFace.WEST).setType(this.originalCursorBlocks[1].getType());
-			this.cornerBlock.getFace(BlockFace.WEST).setData(this.originalCursorBlocks[1].getData());
-			this.cornerBlock.getFace(BlockFace.NORTH).setType(this.originalCursorBlocks[2].getType());
-			this.cornerBlock.getFace(BlockFace.NORTH).setData(this.originalCursorBlocks[2].getData());
+			this.cornerBlock.getRelative(BlockFace.WEST).setType(this.originalCursorBlocks[1].getType());
+			this.cornerBlock.getRelative(BlockFace.WEST).setData(this.originalCursorBlocks[1].getData());
+			this.cornerBlock.getRelative(BlockFace.NORTH).setType(this.originalCursorBlocks[2].getType());
+			this.cornerBlock.getRelative(BlockFace.NORTH).setData(this.originalCursorBlocks[2].getData());
 		} else {
 			this.cornerBlock.setType(this.originalCursorBlocks[0].getType());
 			this.cornerBlock.setData(this.originalCursorBlocks[0].getData());
-			this.cornerBlock.getFace(BlockFace.EAST).setType(this.originalCursorBlocks[1].getType());
-			this.cornerBlock.getFace(BlockFace.EAST).setData(this.originalCursorBlocks[1].getData());
-			this.cornerBlock.getFace(BlockFace.SOUTH).setType(this.originalCursorBlocks[2].getType());
-			this.cornerBlock.getFace(BlockFace.SOUTH).setData(this.originalCursorBlocks[2].getData());
+			this.cornerBlock.getRelative(BlockFace.EAST).setType(this.originalCursorBlocks[1].getType());
+			this.cornerBlock.getRelative(BlockFace.EAST).setData(this.originalCursorBlocks[1].getData());
+			this.cornerBlock.getRelative(BlockFace.SOUTH).setType(this.originalCursorBlocks[2].getType());
+			this.cornerBlock.getRelative(BlockFace.SOUTH).setData(this.originalCursorBlocks[2].getData());
 		}
 	}
 }

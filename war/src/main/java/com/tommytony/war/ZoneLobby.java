@@ -90,13 +90,13 @@ public class ZoneLobby {
 
 		// we're setting the zoneVolume directly, so we need to figure out the lobbyMiddleWallBlock on our own
 		if (wall == BlockFace.NORTH) {
-			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.EAST, this.lobbyHalfSide));
+			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(BlockFace.EAST, this.lobbyHalfSide));
 		} else if (wall == BlockFace.EAST) {
-			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.SOUTH, this.lobbyHalfSide));
+			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(BlockFace.SOUTH, this.lobbyHalfSide));
 		} else if (wall == BlockFace.SOUTH) {
-			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.WEST, this.lobbyHalfSide));
+			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(BlockFace.WEST, this.lobbyHalfSide));
 		} else if (wall == BlockFace.WEST) {
-			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getFace(BlockFace.UP).getFace(BlockFace.NORTH, this.lobbyHalfSide));
+			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(BlockFace.NORTH, this.lobbyHalfSide));
 		}
 	}
 
@@ -147,7 +147,7 @@ public class ZoneLobby {
 		this.wall = opposite; // a player facing south places a lobby that looks just like a lobby stuck to the north wall
 
 		this.calculateLobbyWidth();
-		this.lobbyMiddleWallBlock = new BlockInfo(this.warzone.getWorld().getBlockAt(playerLocation.getBlockX(), playerLocation.getBlockY(), playerLocation.getBlockZ()).getFace(facing, 6));
+		this.lobbyMiddleWallBlock = new BlockInfo(this.warzone.getWorld().getBlockAt(playerLocation.getBlockX(), playerLocation.getBlockY(), playerLocation.getBlockZ()).getRelative(facing, 6));
 
 		Block corner1 = null;
 		Block corner2 = null;
@@ -295,7 +295,7 @@ public class ZoneLobby {
 			}
 
 			// set zone tp
-			this.zoneTeleportBlock = new BlockInfo(BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getFace(this.wall, 6));
+			this.zoneTeleportBlock = new BlockInfo(BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getRelative(this.wall, 6));
 			int yaw = 0;
 			if (this.wall == BlockFace.WEST) {
 				yaw = 180;
@@ -309,7 +309,7 @@ public class ZoneLobby {
 			this.warzone.setTeleport(new Location(this.warzone.getWorld(), this.zoneTeleportBlock.getX(), this.zoneTeleportBlock.getY(), this.zoneTeleportBlock.getZ(), yaw, 0));
 
 			// set zone sign
-			Block zoneSignBlock = BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getFace(this.wall, 4);
+			Block zoneSignBlock = BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getRelative(this.wall, 4);
 			byte data = 0;
 			if (this.wall == BlockFace.NORTH) {
 				data = (byte) 4;
@@ -334,11 +334,11 @@ public class ZoneLobby {
 
 			// lets get some light in here
 			if (this.wall == BlockFace.NORTH || this.wall == BlockFace.SOUTH) {
-				BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getFace(BlockFace.DOWN).getFace(BlockFace.WEST, this.lobbyHalfSide - 1).getFace(this.wall, 9).setType(Material.GLOWSTONE);
-				BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getFace(BlockFace.DOWN).getFace(BlockFace.EAST, this.lobbyHalfSide - 1).getFace(this.wall, 9).setType(Material.GLOWSTONE);
+				BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.WEST, this.lobbyHalfSide - 1).getRelative(this.wall, 9).setType(Material.GLOWSTONE);
+				BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST, this.lobbyHalfSide - 1).getRelative(this.wall, 9).setType(Material.GLOWSTONE);
 			} else {
-				BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getFace(BlockFace.DOWN).getFace(BlockFace.NORTH, this.lobbyHalfSide - 1).getFace(this.wall, 9).setType(Material.GLOWSTONE);
-				BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getFace(BlockFace.DOWN).getFace(BlockFace.SOUTH, this.lobbyHalfSide - 1).getFace(this.wall, 9).setType(Material.GLOWSTONE);
+				BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH, this.lobbyHalfSide - 1).getRelative(this.wall, 9).setType(Material.GLOWSTONE);
+				BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.SOUTH, this.lobbyHalfSide - 1).getRelative(this.wall, 9).setType(Material.GLOWSTONE);
 			}
 		} else {
 			War.war.log("Failed to initalize zone lobby for zone " + this.warzone.getName(), java.util.logging.Level.WARNING);
@@ -372,23 +372,23 @@ public class ZoneLobby {
 				if (this.warzone.getTeams().size() % 2 == 0) {
 					// even number of teams
 					if (doorIndex % 2 == 0) {
-						this.teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getFace(rightSide, doorIndex * 2 + 2)));
+						this.teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getRelative(rightSide, doorIndex * 2 + 2)));
 					} else {
-						this.teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getFace(leftSide, doorIndex * 2)));
+						this.teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getRelative(leftSide, doorIndex * 2)));
 					}
 
 				} else {
 					if (doorIndex == 0) {
 						this.teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock));
 					} else if (doorIndex % 2 == 0) {
-						this.teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getFace(rightSide, doorIndex * 2)));
+						this.teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getRelative(rightSide, doorIndex * 2)));
 					} else {
-						this.teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getFace(leftSide, doorIndex * 2 + 2)));
+						this.teamGateBlocks.put(team.getName(), new BlockInfo(lobbyMiddleWallBlock.getRelative(leftSide, doorIndex * 2 + 2)));
 					}
 				}
 			}
 		}
-		this.warHubLinkGate = new BlockInfo(lobbyMiddleWallBlock.getFace(this.wall, 9));
+		this.warHubLinkGate = new BlockInfo(lobbyMiddleWallBlock.getRelative(this.wall, 9));
 	}
 
 	private void placeGate(Block block, TeamKind teamKind) {
@@ -408,14 +408,14 @@ public class ZoneLobby {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}
-			block.getFace(BlockFace.DOWN).setType(Material.GLOWSTONE);
-			this.setBlock(block.getFace(leftSide), teamKind);
-			this.setBlock(block.getFace(rightSide).getFace(BlockFace.UP), teamKind);
-			this.setBlock(block.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP), teamKind);
-			this.setBlock(block.getFace(rightSide), teamKind);
-			this.setBlock(block.getFace(leftSide).getFace(BlockFace.UP), teamKind);
-			this.setBlock(block.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP), teamKind);
-			this.setBlock(block.getFace(BlockFace.UP).getFace(BlockFace.UP), teamKind);
+			block.getRelative(BlockFace.DOWN).setType(Material.GLOWSTONE);
+			this.setBlock(block.getRelative(leftSide), teamKind);
+			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP), teamKind);
+			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), teamKind);
+			this.setBlock(block.getRelative(rightSide), teamKind);
+			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP), teamKind);
+			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), teamKind);
+			this.setBlock(block.getRelative(BlockFace.UP).getRelative(BlockFace.UP), teamKind);
 		}
 	}
 
@@ -436,14 +436,14 @@ public class ZoneLobby {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}
-			block.getFace(BlockFace.DOWN).setType(Material.GLOWSTONE);
-			this.setBlock(block.getFace(leftSide), material);
-			this.setBlock(block.getFace(rightSide).getFace(BlockFace.UP), material);
-			this.setBlock(block.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP), material);
-			this.setBlock(block.getFace(rightSide), material);
-			this.setBlock(block.getFace(leftSide).getFace(BlockFace.UP), material);
-			this.setBlock(block.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP), material);
-			this.setBlock(block.getFace(BlockFace.UP).getFace(BlockFace.UP), material);
+			block.getRelative(BlockFace.DOWN).setType(Material.GLOWSTONE);
+			this.setBlock(block.getRelative(leftSide), material);
+			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP), material);
+			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), material);
+			this.setBlock(block.getRelative(rightSide), material);
+			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP), material);
+			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), material);
+			this.setBlock(block.getRelative(BlockFace.UP).getRelative(BlockFace.UP), material);
 		}
 	}
 
@@ -475,20 +475,20 @@ public class ZoneLobby {
 			}
 			List<Team> teams = this.warzone.getTeams();
 			Block autoAssignGateBlock = BlockInfo.getBlock(this.warzone.getWorld(), this.autoAssignGate);
-			this.setBlock(autoAssignGateBlock.getFace(BlockFace.DOWN), (Material.GLOWSTONE));
+			this.setBlock(autoAssignGateBlock.getRelative(BlockFace.DOWN), (Material.GLOWSTONE));
 			int size = teams.size();
 			if (size > 0) {
 				TeamKind[] doorBlockKinds = new TeamKind[7];
 				for (int i = 0; i < 7; i++) {
 					doorBlockKinds[i] = teams.get(i % size).getKind();
 				}
-				this.setBlock(autoAssignGateBlock.getFace(leftSide), doorBlockKinds[0]);
-				this.setBlock(autoAssignGateBlock.getFace(leftSide).getFace(BlockFace.UP), doorBlockKinds[1]);
-				this.setBlock(autoAssignGateBlock.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP), doorBlockKinds[2]);
-				this.setBlock(autoAssignGateBlock.getFace(BlockFace.UP).getFace(BlockFace.UP), doorBlockKinds[3]);
-				this.setBlock(autoAssignGateBlock.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP), doorBlockKinds[4]);
-				this.setBlock(autoAssignGateBlock.getFace(rightSide).getFace(BlockFace.UP), doorBlockKinds[5]);
-				this.setBlock(autoAssignGateBlock.getFace(rightSide), doorBlockKinds[6]);
+				this.setBlock(autoAssignGateBlock.getRelative(leftSide), doorBlockKinds[0]);
+				this.setBlock(autoAssignGateBlock.getRelative(leftSide).getRelative(BlockFace.UP), doorBlockKinds[1]);
+				this.setBlock(autoAssignGateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), doorBlockKinds[2]);
+				this.setBlock(autoAssignGateBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP), doorBlockKinds[3]);
+				this.setBlock(autoAssignGateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), doorBlockKinds[4]);
+				this.setBlock(autoAssignGateBlock.getRelative(rightSide).getRelative(BlockFace.UP), doorBlockKinds[5]);
+				this.setBlock(autoAssignGateBlock.getRelative(rightSide), doorBlockKinds[6]);
 			}
 		}
 	}
@@ -562,7 +562,7 @@ public class ZoneLobby {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}
-			return (block.getX() == gateBlock.getX() && block.getY() == gateBlock.getY() && block.getZ() == gateBlock.getZ()) || (block.getX() == gateBlock.getFace(BlockFace.UP).getX() && block.getY() == gateBlock.getFace(BlockFace.UP).getY() && block.getZ() == gateBlock.getFace(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getFace(leftSide).getX() && block.getY() == gateBlock.getFace(leftSide).getY() && block.getZ() == gateBlock.getFace(leftSide).getZ()) || (block.getX() == gateBlock.getFace(leftSide).getFace(BlockFace.UP).getX() && block.getY() == gateBlock.getFace(leftSide).getFace(BlockFace.UP).getY() && block.getZ() == gateBlock.getFace(leftSide).getFace(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP).getX() && block.getY() == gateBlock.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP).getY() && block.getZ() == gateBlock.getFace(leftSide).getFace(BlockFace.UP).getFace(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getFace(BlockFace.UP).getFace(BlockFace.UP).getX() && block.getY() == gateBlock.getFace(BlockFace.UP).getFace(BlockFace.UP).getY() && block.getZ() == gateBlock.getFace(BlockFace.UP).getFace(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getFace(rightSide).getFace(BlockFace.UP).getX() && block.getY() == gateBlock.getFace(rightSide).getFace(BlockFace.UP).getY() && block.getZ() == gateBlock.getFace(rightSide).getFace(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP).getX() && block.getY() == gateBlock.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP).getY() && block.getZ() == gateBlock.getFace(rightSide).getFace(BlockFace.UP).getFace(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getFace(rightSide).getX() && block.getY() == gateBlock.getFace(rightSide).getY() && block.getZ() == gateBlock.getFace(rightSide).getZ()) || (block.getX() == gateBlock.getX() && block.getY() == gateBlock.getY() - 1 && block.getZ() == gateBlock.getZ());
+			return (block.getX() == gateBlock.getX() && block.getY() == gateBlock.getY() && block.getZ() == gateBlock.getZ()) || (block.getX() == gateBlock.getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(leftSide).getX() && block.getY() == gateBlock.getRelative(leftSide).getY() && block.getZ() == gateBlock.getRelative(leftSide).getZ()) || (block.getX() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(rightSide).getX() && block.getY() == gateBlock.getRelative(rightSide).getY() && block.getZ() == gateBlock.getRelative(rightSide).getZ()) || (block.getX() == gateBlock.getX() && block.getY() == gateBlock.getY() - 1 && block.getZ() == gateBlock.getZ());
 		}
 		return false;
 	}
@@ -609,28 +609,28 @@ public class ZoneLobby {
 		}
 		byte data = 0;
 		if (this.wall == BlockFace.NORTH) {
-			block = gate.getFace(direction).getFace(BlockFace.EAST);
+			block = gate.getRelative(direction).getRelative(BlockFace.EAST);
 			if (awayFromWall) {
 				data = (byte) 4;
 			} else {
 				data = (byte) 12;
 			}
 		} else if (this.wall == BlockFace.EAST) {
-			block = gate.getFace(direction).getFace(BlockFace.SOUTH);
+			block = gate.getRelative(direction).getRelative(BlockFace.SOUTH);
 			if (awayFromWall) {
 				data = (byte) 8;
 			} else {
 				data = (byte) 0;
 			}
 		} else if (this.wall == BlockFace.SOUTH) {
-			block = gate.getFace(direction).getFace(BlockFace.WEST);
+			block = gate.getRelative(direction).getRelative(BlockFace.WEST);
 			if (awayFromWall) {
 				data = (byte) 12;
 			} else {
 				data = (byte) 4;
 			}
 		} else if (this.wall == BlockFace.WEST) {
-			block = gate.getFace(direction).getFace(BlockFace.NORTH);
+			block = gate.getRelative(direction).getRelative(BlockFace.NORTH);
 			if (awayFromWall) {
 				data = (byte) 0;
 			} else {
@@ -680,9 +680,9 @@ public class ZoneLobby {
 	private boolean leaving(Location location, Block gate, BlockFace inside, BlockFace left, BlockFace right) {
 		// 3x4x1 deep
 		Volume gateExitVolume = new Volume("tempGateExit", location.getWorld());
-		Block out = gate.getFace(inside);
-		gateExitVolume.setCornerOne(out.getFace(left).getFace(BlockFace.DOWN));
-		gateExitVolume.setCornerTwo(gate.getFace(right, 1).getFace(BlockFace.UP, 2));
+		Block out = gate.getRelative(inside);
+		gateExitVolume.setCornerOne(out.getRelative(left).getRelative(BlockFace.DOWN));
+		gateExitVolume.setCornerTwo(gate.getRelative(right, 1).getRelative(BlockFace.UP, 2));
 
 		if (gateExitVolume.contains(location)) {
 			return true;
