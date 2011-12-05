@@ -44,6 +44,9 @@ public class War extends JavaPlugin {
 	private WarPlayerListener playerListener = new WarPlayerListener();
 	private WarEntityListener entityListener = new WarEntityListener();
 	private WarBlockListener blockListener = new WarBlockListener();
+	private WarInputListener inputListener = new WarInputListener();
+	private WarScreenListener screenListener = new WarScreenListener();
+	private WarSpoutListener spoutListener = new WarSpoutListener();
 	private WarCommandHandler commandHandler = new WarCommandHandler();
 	private Logger logger;
 	private PluginDescriptionFile desc = null;
@@ -151,7 +154,7 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.BLOCK_DAMAGE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
 			
-			pm.registerEvent(Event.Type.CUSTOM_EVENT, new WarInputListener(), Priority.Normal, this);
+			pm.registerEvent(Event.Type.CUSTOM_EVENT, this.inputListener, Priority.Normal, this);
 		}
 
 		// Load files from disk or create them (using these defaults)

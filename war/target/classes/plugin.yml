@@ -128,6 +128,7 @@ commands:
     usage: Creates or moves a monument. Must be standing in warzone.
         Ex -
         /setmonument <monument-name>
+  setclasssetter:
   setteamflag:
     description: War> Creates/moves a team flag post for CTF.
     usage: Creates/moves a team flag post for CTF. Must be standing in warzone.
