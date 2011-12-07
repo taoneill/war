@@ -41,22 +41,27 @@ public class SetTeamCommand extends AbstractZoneMakerCommand {
 		}
 
 		TeamKind teamKind = TeamKind.teamKindFromString(this.args[0]);
-		Team existingTeam = zone.getTeamByKind(teamKind);
-		if (existingTeam != null) {
-			// relocate
-			existingTeam.setTeamSpawn(player.getLocation());
-			this.msg("Team " + existingTeam.getName() + " spawn relocated.");
+		
+		if (teamKind == null) {
+			return false;
 		} else {
-			// new team (use default TeamKind name for now)
-			Team newTeam = new Team(teamKind.toString(), teamKind, player.getLocation(), zone);
-			newTeam.setRemainingLives(zone.getLifePool());
-			zone.getTeams().add(newTeam);
-			if (zone.getLobby() != null) {
-				zone.getLobby().getVolume().resetBlocks();
-				zone.getLobby().initialize();
+			Team existingTeam = zone.getTeamByKind(teamKind);
+			if (existingTeam != null) {
+				// relocate
+				existingTeam.setTeamSpawn(player.getLocation());
+				this.msg("Team " + existingTeam.getName() + " spawn relocated.");
+			} else {
+				// new team (use default TeamKind name for now)
+				Team newTeam = new Team(teamKind.toString(), teamKind, player.getLocation(), zone);
+				newTeam.setRemainingLives(zone.getLifePool());
+				zone.getTeams().add(newTeam);
+				if (zone.getLobby() != null) {
+					zone.getLobby().getVolume().resetBlocks();
+					zone.getLobby().initialize();
+				}
+				newTeam.setTeamSpawn(player.getLocation());
+				this.msg("Team " + newTeam.getName() + " created with spawn here.");
 			}
-			newTeam.setTeamSpawn(player.getLocation());
-			this.msg("Team " + newTeam.getName() + " created with spawn here.");
 		}
 
 		WarzoneMapper.save(zone, false);

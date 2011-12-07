@@ -193,11 +193,11 @@ public class WarEntityListener extends EntityListener {
 		if (!War.war.isLoaded()) {
 			return;
 		}
-		// protect zones elements, lobbies and warhub from creepers
+		// protect zones elements, lobbies and warhub from creepers and tnt
 		List<Block> explodedBlocks = event.blockList();
 		List<Block> dontExplode = new ArrayList<Block>();
 		
-		boolean explosionInAWarzone = Warzone.getZoneByLocation(event.getEntity().getLocation()) != null;
+		boolean explosionInAWarzone = event.getEntity() != null && Warzone.getZoneByLocation(event.getEntity().getLocation()) != null;
 		
 		if (!explosionInAWarzone && War.war.isTntInZonesOnly() && event.getEntity() instanceof TNTPrimed) {
 			// if tntinzonesonly:true, no tnt blows up outside zones

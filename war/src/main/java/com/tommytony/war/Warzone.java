@@ -991,13 +991,10 @@ public class Warzone {
 		// Score cap reached. Reset everything.
 		ScoreCapReachedJob job = new ScoreCapReachedJob(this, winnersStr);
 		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
-		if (this.getLobby() != null) {
-			this.getLobby().getVolume().resetBlocksAsJob();
-		}
 		this.getVolume().resetBlocksAsJob();
 		this.initializeZoneAsJob(player);
 		if (War.war.getWarHub() != null) {
-			// TODO: test if warhub sign give the correct info despite the jobs
+			// TODO: test if warhub sign gives the correct info despite the jobs
 			War.war.getWarHub().resetZoneSign(this);
 		}
 	}

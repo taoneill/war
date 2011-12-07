@@ -45,7 +45,7 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 			Warzone givenWarzone = Warzone.getZoneByName(this.args[0]);
 			if (givenWarzone == null) {
 				return false;
-			} else if (!this.isSenderAuthorOfZone(zone)) {
+			} else if (!this.isSenderAuthorOfZone(givenWarzone)) {
 				return true;
 			} else {
 				// Move the warzone lobby

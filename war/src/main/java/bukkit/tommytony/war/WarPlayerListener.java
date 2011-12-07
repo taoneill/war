@@ -439,7 +439,7 @@ public class WarPlayerListener extends PlayerListener {
 			if (playerTeam != null && playerWarzone.nearAnyOwnedMonument(playerLoc, playerTeam) && player.getHealth() < 20 && player.getHealth() > 0 // don't heal the dead
 					&& this.random.nextInt(7) == 3) { // one chance out of many of getting healed
 				int currentHp = player.getHealth();
-				int newHp = Math.max(20, currentHp + locZone.getMonumentHeal());
+				int newHp = Math.min(20, currentHp + locZone.getMonumentHeal());
 
 				player.setHealth(newHp);
 				String isS = "s";
