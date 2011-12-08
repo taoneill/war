@@ -143,6 +143,7 @@ public class WarHub {
 			}
 
 			Block locationBlock = this.location.getWorld().getBlockAt(this.location.getBlockX(), this.location.getBlockY(), this.location.getBlockZ());
+			this.volume.setWorld(this.location.getWorld());
 			this.volume.setCornerOne(locationBlock.getFace(back).getFace(left, halfHubWidth).getFace(BlockFace.DOWN));
 			this.volume.setCornerTwo(locationBlock.getFace(right, halfHubWidth).getFace(front, hubDepth).getFace(BlockFace.UP, hubHeigth));
 			this.volume.saveBlocks();

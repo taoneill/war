@@ -15,7 +15,7 @@ permissions:
       war.build: true
       war.pvp: true
   war.zonemaker:
-    description: Create and edit warzones, but you only edit a warzone if you are its author.
+    description: Create and edit warzones, but you can only edit a warzone if you are its author.
     default: false
     children:
       war.player: true
