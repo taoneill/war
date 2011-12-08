@@ -362,18 +362,33 @@ public class WarzoneMapper {
 			// lobby
 			BlockFace lobbyFace = null;
 			if (lobbyStr != null && !lobbyStr.equals("")) {
-				if (lobbyStr.equals("south")) {
-					lobbyFace = BlockFace.SOUTH;
-				} else if (lobbyStr.equals("east")) {
-					lobbyFace = BlockFace.EAST;
-				} else if (lobbyStr.equals("north")) {
-					lobbyFace = BlockFace.NORTH;
-				} else if (lobbyStr.equals("west")) {
-					lobbyFace = BlockFace.WEST;
+				String[] lobbyStrSplit = lobbyStr.split(",");
+				if (lobbyStrSplit.length > 0) {
+					// lobby orientation
+					if (lobbyStrSplit[0].equals("south")) {
+						lobbyFace = BlockFace.SOUTH;
+					} else if (lobbyStrSplit[0].equals("east")) {
+						lobbyFace = BlockFace.EAST;
+					} else if (lobbyStrSplit[0].equals("north")) {
+						lobbyFace = BlockFace.NORTH;
+					} else if (lobbyStrSplit[0].equals("west")) {
+						lobbyFace = BlockFace.WEST;
+					}
+					
+					// lobby world
+					World lobbyWorld = world;	// by default, warzone world
+					if (lobbyStrSplit.length > 1) {
+						World strWorld = War.war.getServer().getWorld(lobbyStrSplit[1]);
+						if (strWorld != null) {
+							lobbyWorld = strWorld;
+						}
+					}
+					
+					// create the lobby
+					Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), lobbyWorld);
+					ZoneLobby lobby = new ZoneLobby(warzone, lobbyFace, lobbyVolume);
+					warzone.setLobby(lobby);
 				}
-				Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), world);
-				ZoneLobby lobby = new ZoneLobby(warzone, lobbyFace, lobbyVolume);
-				warzone.setLobby(lobby);
 			}
 
 			return warzone;
@@ -584,7 +599,7 @@ public class WarzoneMapper {
 				lobbyStr = "west";
 			}
 		}
-		warzoneConfig.setString("lobby", lobbyStr);
+		warzoneConfig.setString("lobby", lobbyStr + "," + warzone.getLobby().getVolume().getWorld().getName());
 
 		warzoneConfig.save();
 		warzoneConfig.close();

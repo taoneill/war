@@ -51,8 +51,7 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 				// Move the warzone lobby
 				ZoneLobby lobby = givenWarzone.getLobby();
 				if (lobby != null) {
-					// reset existing lobby
-					lobby.getVolume().resetBlocks();
+					// reset existing lobby and save new volume at new location
 					lobby.setLocation(player.getLocation());
 					lobby.initialize();
 					this.msg("Warzone lobby moved to your location.");

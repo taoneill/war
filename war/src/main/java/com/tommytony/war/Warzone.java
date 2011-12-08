@@ -262,7 +262,6 @@ public class Warzone {
 				team.initializeTeamSpawn();
 				if (team.getTeamFlag() != null) {
 					team.setTeamFlag(team.getTeamFlag());
-					// team.resetSign();
 				}
 			}
 
