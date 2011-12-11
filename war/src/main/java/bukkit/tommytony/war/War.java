@@ -29,6 +29,12 @@ import com.tommytony.war.jobs.HelmetProtectionTask;
 import com.tommytony.war.mappers.*;
 import com.tommytony.war.utils.*;
 
+import org.getspout.spoutapi.event.spout.SpoutCraftEnableEvent;
+import org.getspout.spoutapi.event.spout.SpoutListener;
+import org.getspout.spoutapi.gui.GenericLabel;
+import org.getspout.spoutapi.gui.WidgetAnchor;
+import org.getspout.spoutapi.player.SpoutPlayer;
+
 /**
  * Main class of War
  *
@@ -155,6 +161,8 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PISTON_RETRACT, this.blockListener, Priority.Normal, this);
+			
+			pm.registerEvent(Event.Type.CUSTOM_EVENT, new WarSpoutListener(this), Priority.Low, this);
 		}
 
 		// Load files from disk or create them (using these defaults)
@@ -197,6 +205,12 @@ public class War extends JavaPlugin {
 	 * Cleans up war
 	 */
 	public void unloadWar() {
+		for (Player player : getServer().getOnlinePlayers()) {
+            SpoutPlayer sp = (SpoutPlayer) player;
+            if (sp.isSpoutCraftEnabled())
+                sp.getMainScreen().removeWidgets(this);
+        }
+		
 		for (Warzone warzone : this.warzones) {
 			warzone.unload();
 		}

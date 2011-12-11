@@ -10,8 +10,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-
 import bukkit.tommytony.war.War;
+import bukkit.tommytony.war.WarSpoutListener;
 
 import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.Volume;
@@ -310,6 +310,8 @@ public class Team {
 
 			SignHelper.setToSign(War.war, signBlock, (byte) signData, lines);
 		}
+		
+		WarSpoutListener.updateStats(warzone);
 	}
 
 	private void setBlock(int x, int y, int z, TeamKind kind) {

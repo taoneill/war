@@ -4,6 +4,7 @@ description: Lets you create TDM and CTF (warzones) for a more structured PVP ex
 author: tommytony
 website: war.tommytony.com
 main: bukkit.tommytony.war.War
+softdepend: [Spout]
 permissions:
   war.*:
     description: Create and destroy warzones. Change War configuration.

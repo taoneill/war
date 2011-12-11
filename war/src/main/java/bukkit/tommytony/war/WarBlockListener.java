@@ -16,6 +16,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.inventory.ItemStack;
+import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.tommytony.war.FlagReturn;
 import com.tommytony.war.Monument;
@@ -237,6 +238,13 @@ public class WarBlockListener extends BlockListener {
 						for (Team t : warzone.getTeams()) {
 							t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " stole team " + lostFlagTeam.getName() + "'s flag.");
 							if (t.getName().equals(lostFlagTeam.getName())) {
+								for (Player p : t.getPlayers()) {
+									SpoutPlayer sp = (SpoutPlayer) p;
+									if (sp.isSpoutCraftEnabled()) {
+										String tn = team.getName();
+						                sp.sendNotification(tn.substring(0,1).toUpperCase()+tn.substring(1).toLowerCase()+" stole your Flag!","Stolen by "+player.getName(),lostFlagTeam.getKind().getMaterial(),lostFlagTeam.getKind().getData(),3000);
+									}
+								}
 								t.teamcast("Prevent " + team.getKind().getColor() + player.getName() + ChatColor.WHITE
 										+ " from reaching team " + team.getName() + "'s " + spawnOrFlag + ".");
 							}

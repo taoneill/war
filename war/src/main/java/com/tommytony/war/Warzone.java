@@ -19,7 +19,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.getspout.spoutapi.player.SpoutPlayer;
+
 import bukkit.tommytony.war.War;
+import bukkit.tommytony.war.WarSpoutListener;
 
 import com.tommytony.war.jobs.HelmetProtectionTask;
 import com.tommytony.war.jobs.InitZoneJob;
@@ -352,6 +355,8 @@ public class Warzone {
 		if (!this.getNewlyRespawned().keySet().contains(player.getName())) {
 			this.getNewlyRespawned().put(player.getName(), 0);
 		}
+		
+		((SpoutPlayer) player).setTitle(team.getKind().getColor()+player.getName());
 		
 		// "Respawn" Timer - player will not be able to leave spawn for a few seconds
 		final Warzone w = this;
@@ -939,6 +944,11 @@ public class Warzone {
 			player.setFireTicks(0);
 			player.setRemainingAir(300);
 
+			SpoutPlayer sp = (SpoutPlayer) player;
+			if (sp.isSpoutCraftEnabled()) WarSpoutListener.removeStats(sp);
+			sp.resetTitle();
+			
+			
 			War.war.msg(player, "Left the zone. Your inventory is being restored.");
 			if (War.war.getWarHub() != null) {
 				War.war.getWarHub().resetZoneSign(this);

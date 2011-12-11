@@ -27,7 +27,9 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.getspout.spoutapi.player.SpoutPlayer;
 
+import com.mysql.jdbc.StringUtils;
 import com.tommytony.war.FlagReturn;
 import com.tommytony.war.Team;
 import com.tommytony.war.WarHub;
@@ -510,6 +512,13 @@ public class WarPlayerListener extends PlayerListener {
 							victim.getFlagVolume().resetBlocks(); // bring back flag to team that lost it
 							victim.initializeTeamFlag();
 							for (Team t : playerWarzone.getTeams()) {
+								for (Player p : t.getPlayers()) {
+									SpoutPlayer sp = (SpoutPlayer) p;
+									if (sp.isSpoutCraftEnabled()) {
+										String tn = playerTeam.getName();
+						                sp.sendNotification(tn.substring(0,1).toUpperCase()+tn.substring(1).toLowerCase()+" captures Flag!","Capped by "+player.getName(),victim.getKind().getMaterial(),victim.getKind().getData(),3000);
+									}
+								}
 								t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE
 										+ " captured team " + victim.getName() + "'s flag. Team " + playerTeam.getName() + " scores one point.");
 							}

@@ -2,6 +2,9 @@ package com.tommytony.war.jobs;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.getspout.spoutapi.player.SpoutPlayer;
+
+import bukkit.tommytony.war.WarSpoutListener;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
@@ -20,6 +23,8 @@ public class ScoreCapReachedJob implements Runnable {
 		for (Team t : this.zone.getTeams()) {
 			t.teamcast(this.winnersStr);
 			for (Player tp : t.getPlayers()) {
+				SpoutPlayer sp = (SpoutPlayer) tp;
+				if (sp.isSpoutCraftEnabled()) WarSpoutListener.removeStats(sp);
 				// Send everyone to rally point (or zone lobby if not rally point)
 				if (this.zone.getRallyPoint() != null) {
 					tp.teleport(this.zone.getRallyPoint());
