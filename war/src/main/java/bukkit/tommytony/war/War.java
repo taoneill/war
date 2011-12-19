@@ -242,20 +242,26 @@ public class War extends JavaPlugin {
 		int i = 0;
 		for (ItemStack stack : inv.getContents()) {
 			if (stack != null && stack.getType() != Material.AIR) {
-				loadout.put(i, stack);
+				loadout.put(i, this.copyStack(stack));
 				i++;
 			}
 
 		}
 		if (inv.getBoots() != null && inv.getBoots().getType() != Material.AIR) {
-			loadout.put(100, inv.getBoots());
+			loadout.put(100, this.copyStack(inv.getBoots()));
 		}
 		if (inv.getLeggings() != null && inv.getLeggings().getType() != Material.AIR) {
-			loadout.put(101, inv.getLeggings());
+			loadout.put(101, this.copyStack(inv.getLeggings()));
 		}
 		if (inv.getChestplate() != null && inv.getChestplate().getType() != Material.AIR) {
-			loadout.put(102, inv.getChestplate());
+			loadout.put(102, this.copyStack(inv.getChestplate()));
 		}
+	}
+	
+	private ItemStack copyStack(ItemStack originalStack) {
+		ItemStack copiedStack = new ItemStack(originalStack.getType(), originalStack.getAmount(), originalStack.getDurability(), new Byte(originalStack.getData().getData()));
+		copiedStack.setDurability(originalStack.getDurability());
+		return copiedStack;
 	}
 
 	/**

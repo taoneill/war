@@ -20,6 +20,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -57,6 +58,8 @@ public class WarEntityListener extends EntityListener {
 		Entity attacker = event.getDamager();
 		Entity defender = event.getEntity();
 		
+		//DamageCause cause = event.getCause();
+		//War.war.log(cause.toString(), Level.INFO);
 		// Maybe an arrow was thrown
 		if (attacker != null && event.getDamager() instanceof Projectile && ((Projectile)event.getDamager()).getShooter() instanceof Player){
 			attacker = ((Player)((Projectile)event.getDamager()).getShooter());
@@ -70,8 +73,9 @@ public class WarEntityListener extends EntityListener {
 			Team attackerTeam = Team.getTeamByPlayerName(a.getName());
 			Warzone defenderWarzone = Warzone.getZoneByPlayerName(d.getName());
 			Team defenderTeam = Team.getTeamByPlayerName(d.getName());
-
-			if (attackerTeam != null && defenderTeam != null && attackerTeam != defenderTeam && attackerWarzone == defenderWarzone) {
+			
+			if ((attackerTeam != null && defenderTeam != null && attackerTeam != defenderTeam && attackerWarzone == defenderWarzone)
+					|| (attackerTeam != null && defenderTeam != null && attacker.getEntityId() == defender.getEntityId())) {
 				// Make sure one of the players isn't in the spawn
 				if (defenderTeam.getSpawnVolume().contains(d.getLocation())) { // attacking person in spawn
 					if (!defenderWarzone.isFlagThief(d.getName())) { // thieves can always be attacked
@@ -93,6 +97,10 @@ public class WarEntityListener extends EntityListener {
 					event.setCancelled(true);
 					return;
 				}
+				
+				if (attackerTeam != null && defenderTeam != null && attacker.getEntityId() == defender.getEntityId()) {
+					War.war.badMsg(a, "You hit yourself!");
+				}
 
 				// Detect death, prevent it and respawn the player
 				if (event.getDamage() >= d.getHealth()) {
@@ -100,29 +108,33 @@ public class WarEntityListener extends EntityListener {
 					String attackerString = attackerTeam.getKind().getColor() + a.getDisplayName();
 					String defenderString = defenderTeam.getKind().getColor() + d.getDisplayName();
 					
-					Material killerWeapon = a.getItemInHand().getType();
-					String weaponString = killerWeapon.toString();
-					if (killerWeapon == Material.AIR) {
-						weaponString = "fist";
-					} else if (killerWeapon == Material.BOW || event.getDamager() instanceof Arrow) {
-						int rand = killSeed.nextInt(3);
-						if (rand == 0) {
-							weaponString = "arrow";
-						} else if (rand == 1) {
-							weaponString = "bow";
-						} else {
+					if (attacker.getEntityId() != defender.getEntityId()) {
+						Material killerWeapon = a.getItemInHand().getType();
+						String weaponString = killerWeapon.toString();
+						if (killerWeapon == Material.AIR) {
+							weaponString = "hand";
+						} else if (killerWeapon == Material.BOW || event.getDamager() instanceof Arrow) {
+							int rand = killSeed.nextInt(3);
+							if (rand == 0) {
+								weaponString = "arrow";
+							} else if (rand == 1) {
+								weaponString = "bow";
+							} else {
+								weaponString = "aim";
+							}
+							
+						} else if (event.getDamager() instanceof Projectile) {
 							weaponString = "aim";
 						}
 						
-					} else if (event.getDamager() instanceof Projectile) {
-						weaponString = "aim";
+						String adjectiveString = War.war.getDeadlyAdjectives().get(this.killSeed.nextInt(War.war.getDeadlyAdjectives().size()));
+						String verbString = War.war.getKillerVerbs().get(this.killSeed.nextInt(War.war.getKillerVerbs().size()));
+						
+						killMessage = attackerString + ChatColor.WHITE + "'s " + adjectiveString + weaponString.toLowerCase().replace('_', ' ') 
+												+ " " + verbString + " " + defenderString;
+					} else {
+						killMessage = defenderString + ChatColor.WHITE + " committed accidental suicide";
 					}
-					
-					String adjectiveString = War.war.getDeadlyAdjectives().get(this.killSeed.nextInt(War.war.getDeadlyAdjectives().size()));
-					String verbString = War.war.getKillerVerbs().get(this.killSeed.nextInt(War.war.getKillerVerbs().size()));
-					
-					killMessage = attackerString + ChatColor.WHITE + "'s " + adjectiveString + weaponString.toLowerCase().replace('_', ' ') 
-											+ " " + verbString + " " + defenderString;
 					
 					for (Team team : defenderWarzone.getTeams()) {
 						team.teamcast(killMessage);

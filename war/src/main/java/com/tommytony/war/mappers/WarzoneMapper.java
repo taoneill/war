@@ -132,15 +132,7 @@ public class WarzoneMapper {
 			// loadout
 			String loadoutStr = warzoneConfig.getString("loadout");
 			if (loadoutStr != null && !loadoutStr.equals("")) {
-				String[] loadoutStrSplit = loadoutStr.split(";");
-				warzone.getLoadout().clear();
-				for (String itemStr : loadoutStrSplit) {
-					if (itemStr != null && !itemStr.equals("")) {
-						String[] itemStrSplit = itemStr.split(",");
-						ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
-						warzone.getLoadout().put(Integer.parseInt(itemStrSplit[2]), item);
-					}
-				}
+				fromStringToLoadout(loadoutStr, warzone.getLoadout());
 			}
 			
 			// extraLoadouts
@@ -155,16 +147,8 @@ public class WarzoneMapper {
 			
 			for (String extraName : warzone.getExtraLoadouts().keySet()) {
 				String loadoutString = warzoneConfig.getString(extraName + "Loadout");
-				String[] loadoutSplit = loadoutString.split(";");
 				HashMap<Integer, ItemStack> loadout = warzone.getExtraLoadouts().get(extraName);
-				loadout.clear();
-				for (String str : loadoutSplit) {
-					if (str != null && !str.equals("")) {
-						String[] strSplit = str.split(",");
-						ItemStack item = new ItemStack(Integer.parseInt(strSplit[0]), Integer.parseInt(strSplit[1]));
-						loadout.put(Integer.parseInt(strSplit[2]), item);
-					}
-				}
+				fromStringToLoadout(loadoutString, loadout);
 			}
 
 			// authors
@@ -226,15 +210,7 @@ public class WarzoneMapper {
 			// reward
 			String rewardStr = warzoneConfig.getString("reward");
 			if (rewardStr != null && !rewardStr.equals("")) {
-				String[] rewardStrSplit = rewardStr.split(";");
-				warzone.getReward().clear();
-				for (String itemStr : rewardStrSplit) {
-					if (itemStr != null && !itemStr.equals("")) {
-						String[] itemStrSplit = itemStr.split(",");
-						ItemStack item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
-						warzone.getReward().put(Integer.parseInt(itemStrSplit[2]), item);
-					}
-				}
+				fromStringToLoadout(rewardStr, warzone.getReward());
 			}
 
 			// unbreakableZoneBlocks
@@ -458,28 +434,15 @@ public class WarzoneMapper {
 		// loadout
 		String loadoutStr = "";
 		HashMap<Integer, ItemStack> items = warzone.getLoadout();
-		for (Integer slot : items.keySet()) {
-			ItemStack item = items.get(slot);
-			if (item != null) {
-				loadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
-			}
-		}
-		warzoneConfig.setString("loadout", loadoutStr);
+		warzoneConfig.setString("loadout", fromLoadoutToString(items));
 		
 		// defaultExtraLoadouts
 		String extraLoadoutsStr = "";
 		for (String name : warzone.getExtraLoadouts().keySet()) {
 			extraLoadoutsStr += name + ",";
 			
-			String str = "";
 			HashMap<Integer, ItemStack> loadout = warzone.getExtraLoadouts().get(name);
-			for (Integer slot : loadout.keySet()) {
-				ItemStack item = loadout.get(slot);
-				if (item != null) {
-					str += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
-				}
-			}
-			warzoneConfig.setString(name + "Loadout", str);
+			warzoneConfig.setString(name + "Loadout", fromLoadoutToString(loadout));
 		}
 		warzoneConfig.setString("extraLoadouts", extraLoadoutsStr);
 
@@ -516,13 +479,7 @@ public class WarzoneMapper {
 		// reward
 		String rewardStr = "";
 		HashMap<Integer, ItemStack> rewardItems = warzone.getReward();
-		for (Integer slot : rewardItems.keySet()) {
-			ItemStack item = rewardItems.get(slot);
-			if (item != null) {
-				rewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
-			}
-		}
-		warzoneConfig.setString("reward", rewardStr);
+		warzoneConfig.setString("reward", fromLoadoutToString(rewardItems));
 
 		// unbreakableZoneBlocks
 		warzoneConfig.setBoolean("unbreakableZoneBlocks", warzone.isUnbreakableZoneBlocks());
@@ -604,11 +561,6 @@ public class WarzoneMapper {
 		warzoneConfig.save();
 		warzoneConfig.close();
 
-		if (saveAllBlocks) {
-			// zone blocks
-			// VolumeMapper.save(warzone.getVolume(), warzone.getName(), war);
-		}
-
 		// monument blocks
 		for (Monument monument : monuments) {
 			VolumeMapper.save(monument.getVolume(), warzone.getName());
@@ -646,4 +598,34 @@ public class WarzoneMapper {
 			War.war.log("Failed to delete file " + zoneFile.getName(), Level.WARNING);
 		}
 	}
+	
+	private static String fromLoadoutToString(HashMap<Integer, ItemStack> loadout) {
+		String loadoutString = "";
+		for (Integer slot : loadout.keySet()) {
+			ItemStack item = loadout.get(slot);
+			if (item != null) {
+				loadoutString += item.getTypeId() + "," + item.getAmount() + "," + slot + "," + item.getDurability() + "," + item.getData().getData() + ";";
+			}
+		}
+		return loadoutString;
+	}
+	
+	private static void fromStringToLoadout(String loadoutString, HashMap<Integer, ItemStack> destinationLoadout) {
+		String[] rewardStrSplit = loadoutString.split(";");
+		destinationLoadout.clear();
+		for (String itemStr : rewardStrSplit) {
+			if (itemStr != null && !itemStr.equals("")) {
+				String[] itemStrSplit = itemStr.split(",");
+				ItemStack item = null;
+				if (itemStrSplit.length == 3) {
+					item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
+				} else if (itemStrSplit.length == 5) {
+					short durability = Short.parseShort(itemStrSplit[3]);
+					item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]), durability, Byte.parseByte(itemStrSplit[4]));
+					item.setDurability(durability);
+				}
+				destinationLoadout.put(Integer.parseInt(itemStrSplit[2]), item);
+			}
+		}
+	}	
 }

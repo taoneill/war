@@ -13,21 +13,22 @@ public class SignHelper {
 		if (block.getType() != Material.SIGN_POST) {
 			block.setType(Material.SIGN_POST);
 		}
-		BlockState state = block.getState();
-		state.setData(new org.bukkit.material.Sign(Material.SIGN_POST, data));
-		if (state instanceof Sign) {
-			Sign sign = (Sign) state;
-			try {
-				if (sign.getLines() != null) {
-					sign.setLine(0, lines[0]);
-					sign.setLine(1, lines[1]);
-					sign.setLine(2, lines[2]);
-					sign.setLine(3, lines[3]);
-					sign.update(true);
-				}
-			} catch (Exception e) {
-				// just can't stand this anymore
+		try {
+			BlockState state = block.getState();
+			state.setData(new org.bukkit.material.Sign(Material.SIGN_POST, data));
+			if (state instanceof Sign) {
+				Sign sign = (Sign) state;
+				
+					if (sign.getLines() != null) {
+						sign.setLine(0, lines[0]);
+						sign.setLine(1, lines[1]);
+						sign.setLine(2, lines[2]);
+						sign.setLine(3, lines[3]);
+						sign.update(true);
+					}
 			}
+		} catch (Exception e) {
+			// just can't stand this anymore
 		}
 	}
 

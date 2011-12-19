@@ -2,6 +2,7 @@ package com.tommytony.war;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -220,24 +221,28 @@ public class WarHub {
 		}
 
 		Block zoneGate = this.zoneGateBlocks.get(zone.getName());
-		Block block = zoneGate.getFace(left).getFace(back, 1);
-		if (block.getType() != Material.SIGN_POST) {
-			block.setType(Material.SIGN_POST);
+		if (zoneGate != null) {
+			Block block = zoneGate.getFace(left).getFace(back, 1);
+			if (block.getType() != Material.SIGN_POST) {
+				block.setType(Material.SIGN_POST);
+			}
+			block.setData(data);
+	
+			int zoneCap = 0;
+			int zonePlayers = 0;
+			for (Team t : zone.getTeams()) {
+				zonePlayers += t.getPlayers().size();
+				zoneCap += zone.getTeamCap();
+			}
+			String[] lines = new String[4];
+			lines[0] = "Warzone";
+			lines[1] = zone.getName();
+			lines[2] = zonePlayers + "/" + zoneCap + " players";
+			lines[3] = zone.getTeams().size() + " teams";
+			SignHelper.setToSign(War.war, block, data, lines);
+		} else {
+			War.war.log("Failed to find warhub gate for " + zone.getName() + " warzone.", Level.WARNING);
 		}
-		block.setData(data);
-
-		int zoneCap = 0;
-		int zonePlayers = 0;
-		for (Team t : zone.getTeams()) {
-			zonePlayers += t.getPlayers().size();
-			zoneCap += zone.getTeamCap();
-		}
-		String[] lines = new String[4];
-		lines[0] = "Warzone";
-		lines[1] = zone.getName();
-		lines[2] = zonePlayers + "/" + zoneCap + " players";
-		lines[3] = zone.getTeams().size() + " teams";
-		SignHelper.setToSign(War.war, block, data, lines);
 	}
 
 	public void setVolume(Volume vol) {

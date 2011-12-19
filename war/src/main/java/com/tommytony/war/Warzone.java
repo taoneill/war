@@ -356,15 +356,15 @@ public class Warzone {
 		playerInv.clear(playerInv.getSize() + 3); // helmet/blockHead
 		for (Integer slot : loadout.keySet()) {
 			if (slot == 100) {
-				playerInv.setBoots(loadout.get(slot));
+				playerInv.setBoots(this.copyStack(loadout.get(slot)));
 			} else if (slot == 101) {
-				playerInv.setLeggings(loadout.get(slot));
+				playerInv.setLeggings(this.copyStack(loadout.get(slot)));
 			} else if (slot == 102) {
-				playerInv.setChestplate(loadout.get(slot));
+				playerInv.setChestplate(this.copyStack(loadout.get(slot)));
 			} else {
 				ItemStack item = loadout.get(slot);
 				if (item != null) {
-					playerInv.addItem(item);
+					playerInv.addItem(this.copyStack(item));
 				}
 			}
 		}
@@ -381,6 +381,12 @@ public class Warzone {
 				playerInv.setHelmet(new ItemStack(Material.LEATHER_HELMET));
 			}
 		}
+	}
+	
+	private ItemStack copyStack(ItemStack originalStack) {
+		ItemStack copiedStack = new ItemStack(originalStack.getType(), originalStack.getAmount(), originalStack.getDurability(), new Byte(originalStack.getData().getData()));
+		copiedStack.setDurability(originalStack.getDurability());
+		return copiedStack;
 	}
 
 	public boolean isMonumentCenterBlock(Block block) {
