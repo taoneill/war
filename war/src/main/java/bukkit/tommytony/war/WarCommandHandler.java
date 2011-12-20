@@ -110,7 +110,7 @@ public class WarCommandHandler {
 			}
 			// we are not responsible for any other command
 		} catch (NotWarAdminException e) {
-			War.war.badMsg(sender, "You can't do this if you are not a War admin (permission war.*).");
+			War.war.badMsg(sender, "You can't do this if you are not a War admin (permission war.admin).");
 		} catch (NotZoneMakerException e) {
 			War.war.badMsg(sender, "You can't do this if you are not a warzone maker (permission war.zonemaker).");
 		} catch (Exception e) {

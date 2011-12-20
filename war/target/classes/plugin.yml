@@ -1,27 +1,33 @@
 name: War
 version: 1.6.1 (de Gaulle)
-description: Lets you create TDM and CTF (warzones) for a more structured PVP experience.
+description: Lets you create TDM and CTF arenas (warzones) for a fast-paced and structured PVP experience.
 author: tommytony
 website: war.tommytony.com
 main: bukkit.tommytony.war.War
 permissions:
   war.*:
-    description: Create and destroy warzones. Change War configuration.
+    description: Full War permissions. Create and destroy warzones. Change War configuration.
     default: op
     children:
+      war.admin: true
       war.zonemaker: true
       war.player: true
       war.warp: true
       war.build: true
       war.pvp: true
+  war.admin:
+    description: War admin rights. Create and destroy warzones. Change War configuration.
+    default: false
+    children:
+      war.zonemaker: true
+      war.player: true
+      war.build: true
   war.zonemaker:
-    description: Create and edit warzones, but you can only edit a warzone if you are its author.
+    description: Warzone maker rights. Create and edit warzones, but you can only edit a warzone if you are its author.
     default: false
     children:
       war.player: true
-      war.warp: true
       war.build: true
-      war.pvp: false
   war.player:
     description: Lets you participate in War matches.
     default: true
@@ -37,7 +43,7 @@ permissions:
     description: 
       Useful only after using /warcfg pvpinzonesonly:true. This node circumvents the pvp restriction and lets you pvp outside warzones. 
       To setup a pvp world, give war.pvp to players, but only as a permission specific to the pvp world. Other worlds will remain protected
-      by the pvpinzonesonly setting. No matter what, pvp must be turned on in your server.properties file, otherwise War won't work.
+      by the pvpinzonesonly setting. NOTE - No matter what, pvp must be turned on in your server.properties file, otherwise War won't work.
     default: false
 commands:
 # Player commands

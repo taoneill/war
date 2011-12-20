@@ -866,7 +866,7 @@ public class War extends JavaPlugin {
 	 */
 	public boolean canPlayWar(Player player) {
 		if (War.permissionHandler != null) {
-			if (War.permissionHandler.has(player, "war.player") || War.permissionHandler.has(player, "War.player")) {
+			if (War.permissionHandler.has(player, "war.player")) {
 				return true;
 			} else {
 				return false;
@@ -885,7 +885,7 @@ public class War extends JavaPlugin {
 	 */
 	public boolean canWarp(Player player) {
 		if (War.permissionHandler != null) {
-			if (War.permissionHandler.has(player, "war.warp") || War.permissionHandler.has(player, "War.warp")) {
+			if (War.permissionHandler.has(player, "war.warp")) {
 				return true; 
 			} else {
 				return false;
@@ -906,7 +906,7 @@ public class War extends JavaPlugin {
 	public boolean canBuildOutsideZone(Player player) {
 		if (this.isBuildInZonesOnly()) {
 			if (War.permissionHandler != null) {
-				if (War.permissionHandler.has(player, "war.build") || War.permissionHandler.has(player, "War.build")) {
+				if (War.permissionHandler.has(player, "war.build")) {
 					return true;
 				} else {
 					return false;
@@ -929,7 +929,7 @@ public class War extends JavaPlugin {
 	public boolean canPvpOutsideZones(Player player) {
 		if (this.isPvpInZonesOnly()) {
 			if (War.permissionHandler != null) {
-				if (War.permissionHandler.has(player, "war.pvp") || War.permissionHandler.has(player, "War.pvp")) {
+				if (War.permissionHandler.has(player, "war.pvp")) {
 					return true;
 				} else {
 					return false;
@@ -962,9 +962,9 @@ public class War extends JavaPlugin {
 				return true;
 			}
 		}
+		
 		if (War.permissionHandler != null) {
-			if (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "War.*")
-					|| War.permissionHandler.has(player, "war.zonemaker") || War.permissionHandler.has(player, "War.zonemaker")) {
+			if (War.permissionHandler.has(player, "war.zonemaker")) {
 				// War admins are zonemakers
 				return true;
 			} else {
@@ -984,14 +984,14 @@ public class War extends JavaPlugin {
 	 */
 	public boolean isWarAdmin(Player player) {
 		if (War.permissionHandler != null) {
-			if (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "War.*")) {
+			if (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "war.admin")) {
 				return true;
 			} else {
 				return false;
 			}
 		} else {
 			// default to op, if no permissions are found
-			return player.hasPermission("war.*");
+			return player.hasPermission("war.admin");
 		}
 	}
 
