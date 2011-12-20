@@ -12,6 +12,8 @@ import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
@@ -100,50 +102,14 @@ public class VolumeMapper {
 											// Chests
 											List<ItemStack> items = new ArrayList<ItemStack>();
 											if (blockSplit.length > 2) {
-												String itemsStr = blockSplit[2];
-												String[] itemsStrSplit = itemsStr.split(";;");
-												for (String itemStr : itemsStrSplit) {
-													String[] itemStrSplit = itemStr.split(";");
-													if (itemStrSplit.length == 4) {
-														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
-														stack.setData(new MaterialData(stack.getTypeId(), Byte.parseByte(itemStrSplit[3])));
-														short durability = (short) Integer.parseInt(itemStrSplit[2]);
-														stack.setDurability(durability);
-														items.add(stack);
-													} else if (itemStrSplit.length == 3) {
-														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
-														short durability = (short) Integer.parseInt(itemStrSplit[2]);
-														stack.setDurability(durability);
-														items.add(stack);
-													} else {
-														items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1])));
-													}
-												}
+												items = readInventoryString(blockSplit[2]);
 											}
 											volume.getInvBlockContents().put("chest-" + i + "-" + j + "-" + k, items);
 										} else if (typeID == Material.DISPENSER.getId()) {
 											// Dispensers
 											List<ItemStack> items = new ArrayList<ItemStack>();
 											if (blockSplit.length > 2) {
-												String itemsStr = blockSplit[2];
-												String[] itemsStrSplit = itemsStr.split(";;");
-												for (String itemStr : itemsStrSplit) {
-													String[] itemStrSplit = itemStr.split(";");
-													if (itemStrSplit.length == 4) {
-														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
-														stack.setData(new MaterialData(stack.getTypeId(), Byte.parseByte(itemStrSplit[3])));
-														short durability = (short) Integer.parseInt(itemStrSplit[2]);
-														stack.setDurability(durability);
-														items.add(stack);
-													} else if (itemStrSplit.length == 3) {
-														ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
-														short durability = (short) Integer.parseInt(itemStrSplit[2]);
-														stack.setDurability(durability);
-														items.add(stack);
-													} else {
-														items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1])));
-													}
-												}
+												items = readInventoryString(blockSplit[2]);
 											}
 											volume.getInvBlockContents().put("dispenser-" + i + "-" + j + "-" + k, items);
 										}
@@ -230,15 +196,7 @@ public class VolumeMapper {
 									String extra = "";
 									List<ItemStack> contents = volume.getInvBlockContents().get("chest-" + i + "-" + j + "-" + k);
 									if (contents != null) {
-										for (ItemStack item : contents) {
-											if (item != null) {
-												extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
-												if (item.getData() != null) {
-													extra += ";" + item.getData().getData();
-												}
-												extra += ";;";
-											}
-										}
+										out.write(buildInventoryStringFromItemList(contents));
 										out.write(extra);
 									}
 								} else if (typeId == Material.DISPENSER.getId()) {
@@ -246,16 +204,7 @@ public class VolumeMapper {
 									String extra = "";
 									List<ItemStack> contents = volume.getInvBlockContents().get("dispenser-" + i + "-" + j + "-" + k);
 									if (contents != null) {
-										for (ItemStack item : contents) {
-											if (item != null) {
-												extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
-												if (item.getData() != null) {
-													extra += ";" + item.getData().getData();
-												}
-												extra += ";;";
-											}
-										}
-										out.write(extra);
+										out.write(buildInventoryStringFromItemList(contents));
 									}
 								}
 								out.newLine();
@@ -283,6 +232,102 @@ public class VolumeMapper {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Parses an inventory string
+	 *
+	 * @param String
+	 *                invString string to parse
+	 * @return List<ItemStack> Parsed items
+	 */
+	public static List<ItemStack> readInventoryString(String invString) {
+		List<ItemStack> items = new ArrayList<ItemStack>();
+		if (invString != null && !invString.equals("")) {
+			String[] itemsStrSplit = invString.split(";;");
+			for (String itemStr : itemsStrSplit) {
+				String[] itemStrSplit = itemStr.split(";");
+				if (itemStrSplit.length == 5) {
+					ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
+					stack.setData(new MaterialData(stack.getTypeId(), Byte.parseByte(itemStrSplit[3])));
+					short durability = (short) Integer.parseInt(itemStrSplit[2]);
+					stack.setDurability(durability);
+
+					// enchantments
+					String[] enchantmentsSplit = itemStrSplit[4].split("::");
+					for (String enchantmentStr : enchantmentsSplit) {
+						if (!enchantmentStr.equals("")) {
+							String[] enchantmentSplit = enchantmentStr.split(":");
+							int enchantId = Integer.parseInt(enchantmentSplit[0]);
+							int level = Integer.parseInt(enchantmentSplit[1]);
+							stack.addEnchantment(Enchantment.getById(enchantId), level);
+						}
+					}
+					
+					items.add(stack);
+				} else if (itemStrSplit.length == 4) {
+					ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
+					stack.setData(new MaterialData(stack.getTypeId(), Byte.parseByte(itemStrSplit[3])));
+					short durability = (short) Integer.parseInt(itemStrSplit[2]);
+					stack.setDurability(durability);
+					items.add(stack);
+				} else if (itemStrSplit.length == 3) {
+					ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
+					short durability = (short) Integer.parseInt(itemStrSplit[2]);
+					stack.setDurability(durability);
+					items.add(stack);
+				} else {
+					items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1])));
+				}
+			}
+		}
+		return items;
+	}
+
+	/**
+	 * Create a string out of a list of items
+	 * 
+	 * @param items	The list of items
+	 * @return		The list as a string
+	 */
+	public static String buildInventoryStringFromItemList(List<ItemStack> items) {
+		String extra = "";
+		for (ItemStack item : items) {
+			if (item != null) {
+				extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
+				if (item.getData() != null) {
+					extra += ";" + item.getData().getData();
+				}
+				if (item.getEnchantments().keySet().size() > 0) {
+					String enchantmentsStr = "";
+					for (Enchantment enchantment : item.getEnchantments().keySet()) {
+						enchantmentsStr += enchantment.getId() + ":" + item.getEnchantments().get(enchantment) + "::";
+					}
+					extra += ";" + enchantmentsStr;
+				}
+				extra += ";;";
+			}
+		}
+		
+		return extra;
+	}
+	
+	/**
+	 * Extracts a list of items from and inventory
+	 * 
+	 * @param inv	The inventory
+	 * @return		The inventory as a list
+	 */
+	public static List<ItemStack> getItemListFromInv(Inventory inv) {
+		int size = inv.getSize();
+		List<ItemStack> items = new ArrayList<ItemStack>();
+		for (int invIndex = 0; invIndex < size; invIndex++) {
+			ItemStack item = inv.getItem(invIndex);
+			if (item != null && item.getType().getId() != Material.AIR.getId()) {
+				items.add(item);
+			}
+		}
+		return items;
 	}
 
 	public static void delete(Volume volume) {

@@ -156,7 +156,7 @@ public class ZoneVolumeMapper {
 											}
 										} else if (diskBlockType == Material.CHEST.getId()) {
 											// Chests read
-											List<ItemStack> items = ZoneVolumeMapper.readInventoryString(invsReader.readLine());
+											List<ItemStack> items = VolumeMapper.readInventoryString(invsReader.readLine());
 
 											// Chests set
 											worldBlock.setType(Material.getMaterial(diskBlockType));
@@ -178,7 +178,7 @@ public class ZoneVolumeMapper {
 											}
 										} else if (diskBlockType == Material.DISPENSER.getId()) {
 											// Dispensers read
-											List<ItemStack> items = ZoneVolumeMapper.readInventoryString(invsReader.readLine());
+											List<ItemStack> items = VolumeMapper.readInventoryString(invsReader.readLine());
 
 											// Dispensers set
 											worldBlock.setType(Material.getMaterial(diskBlockType));
@@ -276,38 +276,6 @@ public class ZoneVolumeMapper {
 	}
 
 	/**
-	 * Parses an inventory string
-	 *
-	 * @param String
-	 *                invString string to parse
-	 * @return List<ItemStack> Parsed items
-	 */
-	private static List<ItemStack> readInventoryString(String invString) {
-		List<ItemStack> items = new ArrayList<ItemStack>();
-		if (invString != null && !invString.equals("")) {
-			String[] itemsStrSplit = invString.split(";;");
-			for (String itemStr : itemsStrSplit) {
-				String[] itemStrSplit = itemStr.split(";");
-				if (itemStrSplit.length == 4) {
-					ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
-					stack.setData(new MaterialData(stack.getTypeId(), Byte.parseByte(itemStrSplit[3])));
-					short durability = (short) Integer.parseInt(itemStrSplit[2]);
-					stack.setDurability(durability);
-					items.add(stack);
-				} else if (itemStrSplit.length == 3) {
-					ItemStack stack = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
-					short durability = (short) Integer.parseInt(itemStrSplit[2]);
-					stack.setDurability(durability);
-					items.add(stack);
-				} else {
-					items.add(new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1])));
-				}
-			}
-		}
-		return items;
-	}
-
-	/**
 	 * Saves the given volume
 	 *
 	 * @param Volume
@@ -386,54 +354,16 @@ public class ZoneVolumeMapper {
 									// Chests
 									Chest chest = (Chest) state;
 									Inventory inv = chest.getInventory();
-									int size = inv.getSize();
-									List<ItemStack> items = new ArrayList<ItemStack>();
-									for (int invIndex = 0; invIndex < size; invIndex++) {
-										ItemStack item = inv.getItem(invIndex);
-										if (item != null && item.getType().getId() != Material.AIR.getId()) {
-											items.add(item);
-										}
-									}
-									String extra = "";
-									if (items != null) {
-										for (ItemStack item : items) {
-											if (item != null) {
-												extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
-												if (item.getData() != null) {
-													extra += ";" + item.getData().getData();
-												}
-												extra += ";;";
-											}
-										}
-										invsWriter.write(extra);
-										invsWriter.newLine();
-									}
+									List<ItemStack> items = VolumeMapper.getItemListFromInv(inv);
+									invsWriter.write(VolumeMapper.buildInventoryStringFromItemList(items));
+									invsWriter.newLine();
 								} else if (state instanceof Dispenser) {
 									// Dispensers
 									Dispenser dispenser = (Dispenser) state;
 									Inventory inv = dispenser.getInventory();
-									int size = inv.getSize();
-									List<ItemStack> items = new ArrayList<ItemStack>();
-									for (int invIndex = 0; invIndex < size; invIndex++) {
-										ItemStack item = inv.getItem(invIndex);
-										if (item != null && item.getType().getId() != Material.AIR.getId()) {
-											items.add(item);
-										}
-									}
-									String extra = "";
-									if (items != null) {
-										for (ItemStack item : items) {
-											if (item != null) {
-												extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
-												if (item.getData() != null) {
-													extra += ";" + item.getData().getData();
-												}
-												extra += ";;";
-											}
-										}
-										invsWriter.write(extra);
-										invsWriter.newLine();
-									}
+									List<ItemStack> items = VolumeMapper.getItemListFromInv(inv);
+									invsWriter.write(VolumeMapper.buildInventoryStringFromItemList(items));
+									invsWriter.newLine();
 								}
 								noOfSavedBlocks++;
 							} catch (Exception e) {
@@ -475,6 +405,8 @@ public class ZoneVolumeMapper {
 		}
 		return noOfSavedBlocks;
 	}
+	
+
 
 	/**
 	 * Saves the Volume as a background-job

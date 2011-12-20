@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -258,9 +259,12 @@ public class War extends JavaPlugin {
 		}
 	}
 	
-	private ItemStack copyStack(ItemStack originalStack) {
+	public ItemStack copyStack(ItemStack originalStack) {
 		ItemStack copiedStack = new ItemStack(originalStack.getType(), originalStack.getAmount(), originalStack.getDurability(), new Byte(originalStack.getData().getData()));
 		copiedStack.setDurability(originalStack.getDurability());
+		for (Enchantment enchantment : originalStack.getEnchantments().keySet()) {
+			copiedStack.addEnchantment(Enchantment.getById(enchantment.getId()), originalStack.getEnchantments().get(enchantment));
+		}
 		return copiedStack;
 	}
 
