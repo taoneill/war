@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.tommytony.war.FlagReturn;
+import com.tommytony.war.LoadoutSelection;
 import com.tommytony.war.Team;
 import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
@@ -95,7 +96,8 @@ public class WarPlayerListener extends PlayerListener {
 							return;
 						}
 						
-						if (zone.getNewlyRespawned().keySet().contains(player.getName())) {
+						if (zone.getLoadoutSelections().keySet().contains(player.getName())
+								&& zone.getLoadoutSelections().get(player.getName()).isStillInSpawn()) {
 							// still at spawn
 							War.war.badMsg(player, "Can't drop items while still in spawn.");
 							event.setCancelled(true);
@@ -230,7 +232,8 @@ public class WarPlayerListener extends PlayerListener {
 			} 
 
 			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
-			if (zone != null && zone.getNewlyRespawned().containsKey(player.getName()) && player.getItemInHand().getType() == Material.BOW) {
+			if (zone != null && zone.getLoadoutSelections().containsKey(player.getName()) 
+					&& zone.getLoadoutSelections().get(player.getName()).isStillInSpawn() && player.getItemInHand().getType() == Material.BOW) {
 				event.setUseItemInHand(Result.DENY);
 				War.war.badMsg(player, "Can't shoot from inside the spawn.");
 			}
@@ -514,8 +517,9 @@ public class WarPlayerListener extends PlayerListener {
 			
 			// Class selection lock
 			if (!playerTeam.getSpawnVolume().contains(player.getLocation()) && 
-					playerWarzone.getNewlyRespawned().keySet().contains(player.getName())) {
-				playerWarzone.getNewlyRespawned().remove(player.getName());
+					playerWarzone.getLoadoutSelections().keySet().contains(player.getName())
+					&& playerWarzone.getLoadoutSelections().get(player.getName()).isStillInSpawn()) {
+				playerWarzone.getLoadoutSelections().get(player.getName()).setStillInSpawn(false);
 			}
 			
 		} else if (locZone != null && locZone.getLobby() != null && !locZone.getLobby().isLeavingZone(playerLoc) && !isMaker) {
@@ -533,26 +537,13 @@ public class WarPlayerListener extends PlayerListener {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());
 			Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
 			if (playerWarzone != null && playerTeam != null && playerWarzone.getExtraLoadouts().keySet().size() > 0 && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
-				if (playerWarzone.getNewlyRespawned().keySet().contains(event.getPlayer().getName())) {
-					Integer currentIndex = playerWarzone.getNewlyRespawned().get(event.getPlayer().getName());
-					currentIndex = (currentIndex + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);
-					playerWarzone.getNewlyRespawned().put(event.getPlayer().getName(), currentIndex);
+				if (playerWarzone.getLoadoutSelections().keySet().contains(event.getPlayer().getName())
+						&& playerWarzone.getLoadoutSelections().get(event.getPlayer().getName()).isStillInSpawn()) {
+					LoadoutSelection selection = playerWarzone.getLoadoutSelections().get(event.getPlayer().getName());
+					int currentIndex = (selection.getSelectedIndex() + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);
+					selection.setSelectedIndex(currentIndex);
 					
-					if (currentIndex == 0) {
-						playerWarzone.resetInventory(playerTeam, event.getPlayer(), playerWarzone.getLoadout());
-						War.war.msg(event.getPlayer(), "Equipped default loadout.");
-					} else {
-						int i = 0;
-						Iterator it = playerWarzone.getExtraLoadouts().entrySet().iterator();
-					    while (it.hasNext()) {
-					        Map.Entry pairs = (Map.Entry)it.next();
-					        if (i == currentIndex - 1) {
-								playerWarzone.resetInventory(playerTeam, event.getPlayer(), (HashMap<Integer, ItemStack>)pairs.getValue());
-								War.war.msg(event.getPlayer(), "Equipped " + pairs.getKey() + " loadout.");
-					        }
-					        i++;
-					    }
-					}
+					playerWarzone.equipPlayerLoadoutSelection(event.getPlayer(), playerTeam);
 				} else {
 					War.war.badMsg(event.getPlayer(), "Can't change loadout after exiting the spawn.");
 				}

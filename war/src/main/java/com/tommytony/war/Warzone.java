@@ -2,7 +2,9 @@ package com.tommytony.war;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -54,7 +56,7 @@ public class Warzone {
 
 	private HashMap<String, PlayerState> playerStates = new HashMap<String, PlayerState>();
 	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
-	private HashMap<String, Integer> newlyRespawned = new HashMap<String, Integer>();
+	private HashMap<String, LoadoutSelection> loadoutSelections = new HashMap<String, LoadoutSelection>();
 	private World world;
 	private final int minSafeDistanceFromWall = 6;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
@@ -334,16 +336,14 @@ public class Warzone {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			player.setGameMode(GameMode.SURVIVAL);
 		}
-		if (!this.getNewlyRespawned().keySet().contains(player.getName())) {
-			this.getNewlyRespawned().put(player.getName(), 0);
+		if (!this.getLoadoutSelections().keySet().contains(player.getName())) {
+			this.getLoadoutSelections().put(player.getName(), new LoadoutSelection(true, 0));
+		} else {
+			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
 		}
 
 		LoadoutResetJob job = new LoadoutResetJob(this, team, player);
 		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
-	}
-
-	public void resetInventory(Team team, Player player) {
-		this.resetInventory(team, player, this.loadout);
 	}
 
 	public void resetInventory(Team team, Player player, HashMap<Integer, ItemStack> loadout) {
@@ -1172,12 +1172,8 @@ public class Warzone {
 		return extraLoadouts;
 	}
 
-	public void setNewlyRespawned(HashMap<String, Integer> newlyRespawned) {
-		this.newlyRespawned = newlyRespawned;
-	}
-
-	public HashMap<String, Integer> getNewlyRespawned() {
-		return newlyRespawned;
+	public HashMap<String, LoadoutSelection> getLoadoutSelections() {
+		return loadoutSelections;
 	}
 
 	public boolean isPvpInZone() {
@@ -1239,5 +1235,27 @@ public class Warzone {
 			authors += author + ",";
 		}
 		return authors;
+	}
+
+	public void equipPlayerLoadoutSelection(Player player, Team playerTeam) {
+		LoadoutSelection selection = this.getLoadoutSelections().get(player.getName());
+		if (selection != null) {
+			int currentIndex = selection.getSelectedIndex();
+			if (currentIndex == 0) {
+				this.resetInventory(playerTeam, player, this.getLoadout());
+				War.war.msg(player, "Equipped default loadout.");
+			} else {
+				int i = 0;
+				Iterator it = this.getExtraLoadouts().entrySet().iterator();
+			    while (it.hasNext()) {
+			        Map.Entry pairs = (Map.Entry)it.next();
+			        if (i == currentIndex - 1) {
+						this.resetInventory(playerTeam, player, (HashMap<Integer, ItemStack>)pairs.getValue());
+						War.war.msg(player, "Equipped " + pairs.getKey() + " loadout.");
+			        }
+			        i++;
+			    }
+			}
+		}
 	}
 }
