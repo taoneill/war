@@ -1,7 +1,11 @@
 package com.tommytony.war.utils;
 
+import java.util.List;
+
 import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
+
+import com.tommytony.war.PotionEffect;
 
 public class PlayerState {
 	private ItemStack[] contents;
@@ -14,14 +18,15 @@ public class PlayerState {
 	private final int foodLevel;
 	private final int health;
 	private final GameMode gamemode;
+	private final List<PotionEffect> potionEffects;
 
-
-	public PlayerState(GameMode gamemode, ItemStack[] contents, ItemStack helmet, ItemStack chest, ItemStack legs, ItemStack feet, int health, float exhaustion, float saturation, int foodLevel) {
+	public PlayerState(GameMode gamemode, ItemStack[] contents, ItemStack helmet, ItemStack chest, ItemStack legs, ItemStack feet, int health, float exhaustion, float saturation, int foodLevel, List<PotionEffect> potionEffects) {
 		this.gamemode = gamemode;
 		this.health = health;
 		this.exhaustion = exhaustion;
 		this.saturation = saturation;
 		this.foodLevel = foodLevel;
+		this.potionEffects = potionEffects;
 		this.setContents(contents);
 		this.setHelmet(helmet);
 		this.setChest(chest);
@@ -87,6 +92,10 @@ public class PlayerState {
 
 	public GameMode getGamemode() {
 		return gamemode;
+	}
+
+	public List<PotionEffect> getPotionEffects() {
+		return potionEffects;
 	}
 
 }

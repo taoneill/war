@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import net.minecraft.server.MobEffect;
+import net.minecraft.server.MobEffectList;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -15,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.entity.CraftItem;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -336,6 +340,9 @@ public class Warzone {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			player.setGameMode(GameMode.SURVIVAL);
 		}
+		// clear potion effects
+		PotionEffect.clearPotionEffects(player);
+		
 		if (!this.getLoadoutSelections().keySet().contains(player.getName())) {
 			this.getLoadoutSelections().put(player.getName(), new LoadoutSelection(true, 0));
 		} else {
@@ -469,9 +476,11 @@ public class Warzone {
 	public void keepPlayerState(Player player) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack[] contents = inventory.getContents();
+		List<PotionEffect> potionEffects = PotionEffect.getCurrentPotionEffects(player);
 		this.playerStates.put(player.getName(), new PlayerState(player.getGameMode(), 
 																contents, inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), 
-																player.getHealth(), player.getExhaustion(), player.getSaturation(), player.getFoodLevel()));
+																player.getHealth(), player.getExhaustion(), player.getSaturation(), 
+																player.getFoodLevel(), potionEffects));
 	}
 
 	public void restorePlayerState(Player player) {
@@ -484,6 +493,7 @@ public class Warzone {
 			player.setExhaustion(originalContents.getExhaustion());
 			player.setSaturation(originalContents.getSaturation());
 			player.setFoodLevel(originalContents.getFoodLevel());
+			PotionEffect.restorePotionEffects(player, originalContents.getPotionEffects());
 		}
 	}
 
