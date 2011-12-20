@@ -440,16 +440,18 @@ public class WarEntityListener extends EntityListener {
 	
 	@Override
 	public void onEntityDeath(EntityDeathEvent event) {
-		if (event.getEntity() instanceof Player) {
-			Player player = (Player) event.getEntity();
-			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
-			if (zone != null) {
-				event.getDrops().clear();
-				zone.handleDeath(player);
-				
-				for (Team team : zone.getTeams()) {
-					team.teamcast(player.getName() + " died");
-				}
+		if (!War.war.isLoaded() || !(event.getEntity() instanceof Player)) {
+			return;
+		}
+		
+		Player player = (Player) event.getEntity();
+		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+		if (zone != null) {
+			event.getDrops().clear();
+			zone.handleDeath(player);
+			
+			for (Team team : zone.getTeams()) {
+				team.teamcast(player.getName() + " died");
 			}
 		}
 	}
