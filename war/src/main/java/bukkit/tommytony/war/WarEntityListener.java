@@ -22,12 +22,14 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.Team;
@@ -423,7 +425,8 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 	
-	 public void onFoodLevelChange(FoodLevelChangeEvent event) {
+	@Override
+	public void onFoodLevelChange(FoodLevelChangeEvent event) {
 		if (!War.war.isLoaded() || !(event.getEntity() instanceof Player)) {
 			return;
 		}
@@ -433,5 +436,22 @@ public class WarEntityListener extends EntityListener {
 		if (zone != null && zone.isNoHunger()){
 			event.setCancelled(true);
 		}
-	 }
+	}
+	
+	@Override
+	public void onEntityDeath(EntityDeathEvent event) {
+		if (event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+			if (zone != null) {
+				event.getDrops().clear();
+				zone.handleDeath(player);
+				
+				for (Team team : zone.getTeams()) {
+					team.teamcast(player.getName() + " died");
+				}
+			}
+		}
+	}
+
 }
