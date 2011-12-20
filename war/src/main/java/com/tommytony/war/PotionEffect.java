@@ -57,7 +57,6 @@ public class PotionEffect {
 			{
 				MobEffect mobEffect = ((CraftPlayer)player).getHandle().getEffect(enchantIdToList(i));
 				effects.add(new PotionEffect(mobEffect.getEffectId(), mobEffect.getAmplifier(), mobEffect.getDuration()));
-				War.war.log("Stored " + mobEffect.getEffectId(), Level.INFO);
 			}
 		}
 		
@@ -68,7 +67,6 @@ public class PotionEffect {
 		clearPotionEffects(player);
 		for (PotionEffect effect : potionEffects) {
 			((CraftPlayer)player).getHandle().addEffect(new MobEffect(effect.getId(), effect.getTime(), effect.getAmplifier()));
-			War.war.log("Restored " + effect.getId(), Level.INFO);
 		}
 	}
 
@@ -78,8 +76,6 @@ public class PotionEffect {
 			{
 				int amplifier = ((CraftPlayer)player).getHandle().getEffect(enchantIdToList(i)).getAmplifier();
 				((CraftPlayer)player).getHandle().addEffect(new MobEffect(i, -1, amplifier + 1));
-				
-				War.war.log("Cleared " + i, Level.INFO);
 			}
 		}
 	}
