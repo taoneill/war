@@ -25,10 +25,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
-import com.tommytony.war.*;
+import com.tommytony.war.FlagReturn;
+import com.tommytony.war.TeamKind;
+import com.tommytony.war.TeamSpawnStyle;
+import com.tommytony.war.WarHub;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.jobs.HelmetProtectionTask;
-import com.tommytony.war.mappers.*;
-import com.tommytony.war.utils.*;
+import com.tommytony.war.mappers.WarMapper;
+import com.tommytony.war.mappers.WarzoneMapper;
+import com.tommytony.war.utils.ChatFixUtil;
+import com.tommytony.war.utils.PlayerState;
 
 /**
  * Main class of War

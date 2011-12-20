@@ -906,6 +906,10 @@ public class Warzone {
 			if (this.hasPlayerState(player.getName())) {
 				this.restorePlayerState(player);
 			}
+			if (this.getLoadoutSelections().containsKey(player.getName())) {
+				// clear inventory selection
+				this.getLoadoutSelections().remove(player.getName());
+			}
 			player.setFireTicks(0);
 			player.setRemainingAir(300);
 

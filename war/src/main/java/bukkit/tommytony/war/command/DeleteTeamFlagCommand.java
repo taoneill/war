@@ -3,13 +3,12 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.tommytony.war.Monument;
+import bukkit.tommytony.war.WarCommandHandler;
+
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.WarzoneMapper;
-
-import bukkit.tommytony.war.WarCommandHandler;
 
 /**
  * Deletes a monument.

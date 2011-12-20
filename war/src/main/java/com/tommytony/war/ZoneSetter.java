@@ -4,15 +4,14 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import bukkit.tommytony.war.War;
+
 import com.tommytony.war.mappers.WarMapper;
 import com.tommytony.war.mappers.WarzoneMapper;
 import com.tommytony.war.volumes.NotNorthwestException;
 import com.tommytony.war.volumes.NotSoutheastException;
 import com.tommytony.war.volumes.TooBigException;
 import com.tommytony.war.volumes.TooSmallException;
-
-import bukkit.tommytony.war.War;
-import bukkit.tommytony.war.command.SetZoneCommand;
 
 public class ZoneSetter {
 
@@ -40,7 +39,7 @@ public class ZoneSetter {
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setNorthwest(northwestBlock);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Northwesternmost point set to x:" + warzone.getVolume().getNorthwestX() + " z:" + warzone.getVolume().getNorthwestZ() + ". ");
-			} else if (!this.isPlayerAuthorOfZone(warzone)) {
+			} else if (!this.isPlayerAuthorOfZoneOrAdmin(warzone)) {
 				return;
 			} else {
 				// change existing warzone
@@ -67,8 +66,6 @@ public class ZoneSetter {
 		}
 	}
 
-	
-
 	public void placeSoutheast() {
 		Warzone warzone = War.war.findWarzone(this.zoneName);
 		Block southeastBlock = this.player.getLocation().getWorld().getBlockAt(this.player.getLocation());
@@ -85,7 +82,7 @@ public class ZoneSetter {
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setSoutheast(southeastBlock);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Southeasternmost point set to x:" + warzone.getVolume().getSoutheastX() + " z:" + warzone.getVolume().getSoutheastZ() + ". ");
-			} else if (!this.isPlayerAuthorOfZone(warzone)) {
+			} else if (!this.isPlayerAuthorOfZoneOrAdmin(warzone)) {
 				return;
 			} else {
 				// change existing warzone
@@ -132,7 +129,7 @@ public class ZoneSetter {
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setZoneCornerOne(corner1Block);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Corner 1 set to x:" + corner1Block.getX() + " y:" + corner1Block.getY() + " z:" + corner1Block.getZ() + ". ");
-			} else if (!this.isPlayerAuthorOfZone(warzone)) {
+			} else if (!this.isPlayerAuthorOfZoneOrAdmin(warzone)) {
 				return;
 			} else {
 				// change existing warzone
@@ -174,7 +171,7 @@ public class ZoneSetter {
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setZoneCornerTwo(corner2Block);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Corner 2 set to x:" + corner2Block.getX() + " y:" + corner2Block.getY() + " z:" + corner2Block.getZ() + ". ");
-			} else if (!this.isPlayerAuthorOfZone(warzone)) {
+			} else if (!this.isPlayerAuthorOfZoneOrAdmin(warzone)) {
 				return;
 			} else {
 				// change existing warzone
@@ -196,12 +193,13 @@ public class ZoneSetter {
 		}
 	}
 
-	private boolean isPlayerAuthorOfZone(Warzone warzone) {
+	private boolean isPlayerAuthorOfZoneOrAdmin(Warzone warzone) {
 		boolean isAuthor = warzone.isAuthor(player);
-		if (!isAuthor) {
+		boolean isAdmin = !War.war.isWarAdmin(player);
+		if (!isAuthor && !isAdmin) {
 			War.war.badMsg(player, "You can't do this because you are not an author of the " + warzone.getName() + " warzone." );
 		}
-		return isAuthor;
+		return isAuthor || isAdmin;
 	}
 	
 	private void resetWarzone(Warzone warzone, StringBuilder msgString) {

@@ -34,13 +34,6 @@ public class VolumeMapper {
 		return volume;
 	}
 
-	// public static ZoneVolume loadZoneVolume(String volumeName, String zoneName,
-	// War war, World world, Warzone zone) {
-	// ZoneVolume volume = new ZoneVolume(volumeName, war, world, zone);
-	// load(volume, zoneName, war, world);
-	// return volume;
-	// }
-
 	public static void load(Volume volume, String zoneName, World world) {
 		BufferedReader in = null;
 		try {
