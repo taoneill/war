@@ -198,22 +198,7 @@ public class ZoneVolumeMapper {
 											}
 										} else if (diskBlockType == Material.WOODEN_DOOR.getId() || diskBlockType == Material.IRON_DOOR_BLOCK.getId()) {
 											// Door blocks
-											
-											if (j - 1 > 0) {
-												Block blockBelow = world.getBlockAt(x, y - 1, z);
-												boolean belowIsGlass = blockBelow.getTypeId() == Material.GLASS.getId();
-												// Set current block to glass if block below isn't glass.
-												// Having a glass block below means the current block is a door top.
-												if (belowIsGlass) {
-													// Top door block. Set both it and the block below as door.
-													blockBelow.setType(Material.getMaterial(diskBlockType));
-													blockBelow.setData((byte)(diskBlockData & ~((byte)8))); // turn off 8 bit for bottom door
-													worldBlock.setType(Material.getMaterial(diskBlockType));
-													worldBlock.setData(diskBlockData);	
-												} else {
-													worldBlock.setType(Material.GLASS);
-												}
-											}
+											deferred.add(new DeferredBlockReset(x, y, z, diskBlockType, diskBlockData));
 										} else if (((diskBlockType == Material.TORCH.getId() && ((diskBlockData & 0x02) == 0x02)) || (diskBlockType == Material.REDSTONE_TORCH_OFF.getId() && ((diskBlockData & 0x02) == 0x02)) || (diskBlockType == Material.REDSTONE_TORCH_ON.getId() && ((diskBlockData & 0x02) == 0x02)) || (diskBlockType == Material.LEVER.getId() && ((diskBlockData & 0x02) == 0x02)) || (diskBlockType == Material.STONE_BUTTON.getId() && ((diskBlockData & 0x02) == 0x02)) || (diskBlockType == Material.LADDER.getId() && ((diskBlockData & 0x04) == 0x04)) || (diskBlockType == Material.RAILS.getId() && ((diskBlockData & 0x02) == 0x02))) && i + 1 != volume.getSizeX()) {
 											// Blocks that hang on a block south of themselves need to make sure that block is there before placing themselves... lol
 											// Change the block itself later on:
