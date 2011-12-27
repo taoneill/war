@@ -77,7 +77,7 @@ public class Warzone {
 	private boolean instaBreak = false;
 	private boolean noDrops = false;
 	private boolean noHunger = false;
-	private int respawnTimer = 10;
+	private int respawnTimer = 0;
 	private int saturation = 10;
 	private int minPlayers = 1;
 	private int minTeams = 1;
@@ -366,18 +366,17 @@ public class Warzone {
 			((SpoutPlayer) player).setTitle(team.getKind().getColor() + player.getName());
 		}
 		
-		// "Respawn" Timer - player will not be able to leave spawn for a few seconds
-		final Warzone w = this;
+		final LoadoutResetJob job = new LoadoutResetJob(this, team, player);
 		if (respawnTimer == 0) {
-			LoadoutResetJob job = new LoadoutResetJob(w, team, player);
 			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
-		} else {
+		}			
+		else {
+			// "Respawn" Timer - player will not be able to leave spawn for a few seconds
 			respawn.add(player);
+			
 			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, new Runnable() {
 				public void run() {
 				    respawn.remove(player);
-				    // Getting the Loadout as visual cue
-				    LoadoutResetJob job = new LoadoutResetJob(w, team, player);
 					War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
 				}
 			}, respawnTimer * 20L); // 20 ticks = 1 second
@@ -1310,7 +1309,7 @@ public class Warzone {
 
 	public void equipPlayerLoadoutSelection(Player player, Team playerTeam) {
 		LoadoutSelection selection = this.getLoadoutSelections().get(player.getName());
-		if (selection != null && this.isRespawning(player)) {
+		if (selection != null && !this.isRespawning(player)) {
 			int currentIndex = selection.getSelectedIndex();
 			if (currentIndex == 0) {
 				this.resetInventory(playerTeam, player, this.getLoadout());

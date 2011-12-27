@@ -97,7 +97,7 @@ public class War extends JavaPlugin {
 	private boolean defaultInstaBreak = false;
 	private boolean defaultNoDrops = false;
 	private boolean defaultNoHunger = false;
-	private int defaultRespawnTimer = 10;
+	private int defaultRespawnTimer = 0;
 	private int defaultSaturation = 10;
 	private int defaultMinPlayers = 1;	// By default, 1 player on 1 team is enough for unlocking the cant-exit-spawn guard
 	private int defaultMinTeams = 1;
@@ -451,7 +451,7 @@ public class War extends JavaPlugin {
 				} else {
 					warzone.setMinPlayers(val);
 					returnMessage.append(" minplayers set to " + warzone.getMinPlayers() + ".");	
-				}				
+				}
 			}
 			if (namedParams.containsKey("minteams")) {
 				int val = Integer.parseInt(namedParams.get("minteams"));
@@ -461,7 +461,11 @@ public class War extends JavaPlugin {
 					warzone.setMinTeams(val);
 					returnMessage.append(" minteams set to " + warzone.getMinTeams() + ".");
 				}
-			}			
+			}		
+			if (namedParams.containsKey("respawntimer")) {
+				warzone.setRespawnTimer(Integer.parseInt(namedParams.get("respawntimer")));
+				returnMessage.append(" respawntimer set to " + warzone.getRespawnTimer() + ".");
+			}	
 
 			if (namedParams.containsKey("resetonempty")) {
 				String onOff = namedParams.get("resetonempty");
@@ -679,6 +683,10 @@ public class War extends JavaPlugin {
 			if (namedParams.containsKey("minteams")) {
 				this.setDefaultMinTeams(Integer.parseInt(namedParams.get("minteams")));
 				returnMessage.append(" minteams set to " + this.getDefaultMinTeams() + ".");
+			}
+			if (namedParams.containsKey("respawntimer")) {
+				this.setDefaultRespawnTimer(Integer.parseInt(namedParams.get("respawntimer")));
+				returnMessage.append(" respawntimer set to " + this.getDefaultRespawnTimer() + ".");
 			}	
 
 			if (namedParams.containsKey("resetonempty")) {
@@ -770,6 +778,7 @@ public class War extends JavaPlugin {
 		 + " saturation:" + color + zone.getSaturation() + normal
 		 + " minplayers:" + color + zone.getMinPlayers() + normal
 		 + " minteams:" + color + zone.getMinTeams() + normal
+		 + " respawntimer:" + color + zone.getRespawnTimer() + normal
 		 + " resetonempty:" + color + String.valueOf(zone.isResetOnEmpty()) + normal
 		 + " resetonload:" + color + String.valueOf(zone.isResetOnLoad()) + normal
 		 + " resetonunload:" + color + String.valueOf(zone.isResetOnUnload());
@@ -815,6 +824,7 @@ public class War extends JavaPlugin {
 		 + " saturation:" + color + this.getDefaultSaturation() + normal
 		 + " minplayers:" + color + this.getDefaultMinPlayers() + normal
 		 + " minteams:" + color + this.getDefaultMinTeams() + normal
+		 + " respawntimer:" + color + this.getDefaultRespawnTimer() + normal
 		 + " resetonempty:" + color + String.valueOf(this.isDefaultResetOnEmpty()) + normal
 		 + " resetonload:" + color + String.valueOf(this.isDefaultResetOnLoad()) + normal
 		 + " resetonunload:" + color + String.valueOf(this.isDefaultResetOnUnload());
