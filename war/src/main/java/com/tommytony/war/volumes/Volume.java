@@ -169,7 +169,7 @@ public class Volume {
 									if (oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId()) {
 										// Signs
 										if (oldBlockType == Material.SIGN_POST.getId() && ((oldBlockData & 0x04) == 0x04) && i + 1 != this.getSizeX()) {
-											Block southBlock = currentBlock.getFace(BlockFace.SOUTH);
+											Block southBlock = currentBlock.getRelative(BlockFace.SOUTH);
 											int oldSouthBlockType = this.getBlockTypes()[i + 1][j][k];
 											byte oldSouthBlockData = this.getBlockDatas()[i + 1][j][k];
 											if (southBlock.getTypeId() != oldSouthBlockType) {
@@ -255,7 +255,7 @@ public class Volume {
 										}
 									} else if (((oldBlockType == Material.TORCH.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.REDSTONE_TORCH_OFF.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.REDSTONE_TORCH_ON.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.LEVER.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.STONE_BUTTON.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.LADDER.getId() && ((oldBlockData & 0x04) == 0x04)) || (oldBlockType == Material.RAILS.getId() && ((oldBlockData & 0x02) == 0x02))) && i + 1 != this.getSizeX()) {
 										// Blocks that hang on a block south of themselves need to make sure that block is there before placing themselves... lol
-										Block southBlock = currentBlock.getFace(BlockFace.SOUTH);
+										Block southBlock = currentBlock.getRelative(BlockFace.SOUTH);
 										int oldSouthBlockType = this.getBlockTypes()[i + 1][j][k];
 										byte oldSouthBlockData = this.getBlockDatas()[i + 1][j][k];
 										if (southBlock.getTypeId() != oldSouthBlockType) {

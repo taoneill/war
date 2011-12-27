@@ -22,6 +22,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -71,6 +72,7 @@ public class War extends JavaPlugin {
 	private boolean pvpInZonesOnly = false;
 	private boolean disablePvpMessage = false;
 	private boolean buildInZonesOnly = false;
+	private boolean disableBuildMessage = false;
 	private boolean tntInZonesOnly = false;
 	private int maxZones = 12;
 	private final List<String> deadlyAdjectives = new ArrayList<String>();
@@ -87,6 +89,7 @@ public class War extends JavaPlugin {
 	private boolean defaultFriendlyFire = false;
 	private boolean defaultAutoAssignOnly = false;
 	private boolean defaultFlagPointsOnly = false;
+	private boolean defaultFlagMustBeHome = true;
 	private boolean defaultUnbreakableZoneBlocks = false;
 	private boolean defaultNoCreatures = false;
 	private boolean defaultGlassWalls = true;
@@ -94,6 +97,7 @@ public class War extends JavaPlugin {
 	private boolean defaultInstaBreak = false;
 	private boolean defaultNoDrops = false;
 	private boolean defaultNoHunger = false;
+	private int defaultRespawnTimer = 10;
 	private int defaultSaturation = 10;
 	private int defaultMinPlayers = 1;	// By default, 1 player on 1 team is enough for unlocking the cant-exit-spawn guard
 	private int defaultMinTeams = 1;
@@ -159,6 +163,12 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_DAMAGE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
+			pm.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, this.blockListener, Priority.Normal, this);
+			pm.registerEvent(Event.Type.BLOCK_PISTON_RETRACT, this.blockListener, Priority.Normal, this);
+			
+			if (this.isSpoutServer()) {
+				pm.registerEvent(Event.Type.CUSTOM_EVENT, new WarSpoutListener(this), Priority.Low, this);
+			}
 		}
 
 		// Load files from disk or create them (using these defaults)
@@ -201,6 +211,14 @@ public class War extends JavaPlugin {
 	 * Cleans up war
 	 */
 	public void unloadWar() {
+		if (this.isSpoutServer()) {
+			for (Player player : getServer().getOnlinePlayers()) {
+	            SpoutPlayer sp = (SpoutPlayer) player;
+	            if (sp.isSpoutCraftEnabled())
+	                sp.getMainScreen().removeWidgets(this);
+	        }
+		}
+		
 		for (Warzone warzone : this.warzones) {
 			warzone.unload();
 		}
@@ -331,6 +349,10 @@ public class War extends JavaPlugin {
 				warzone.setScoreCap(Integer.parseInt(namedParams.get("maxscore")));
 				returnMessage.append(" maxscore set to " + warzone.getScoreCap() + ".");
 			}
+			if (namedParams.containsKey("respawntimer")) {
+				warzone.setRespawnTimer(Integer.parseInt(namedParams.get("respawntimer")));
+				returnMessage.append(" respawntimer set to " + warzone.getRespawnTimer() + ".");
+			}
 			if (namedParams.containsKey("ff")) {
 				String onOff = namedParams.get("ff");
 				warzone.setFriendlyFire(onOff.equals("on") || onOff.equals("true"));
@@ -345,6 +367,11 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("flagpointsonly");
 				warzone.setFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" flagpointsonly set to " + String.valueOf(warzone.isFlagPointsOnly()) + ".");
+			}
+			if (namedParams.containsKey("flagmustbehome")) {
+				String onOff = namedParams.get("flagmustbehome");
+				warzone.setFlagMustBeHome(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" flagmustbehome set to " + String.valueOf(warzone.isFlagMustBeHome()) + ".");
 			}
 			if (namedParams.containsKey("blockheads")) {
 				String onOff = namedParams.get("blockheads");
@@ -472,7 +499,6 @@ public class War extends JavaPlugin {
 					if (loadoutName.equals("default")) {
 						returnMessage.append(" Can't remove default loadout.");
 					} else {
-						HashMap<Integer, ItemStack> extraLoadout = warzone.getExtraLoadouts().get(loadoutName);
 						if (warzone.getExtraLoadouts().keySet().contains(loadoutName)) {
 							warzone.getExtraLoadouts().remove(loadoutName);
 							returnMessage.append(" " + loadoutName + " loadout removed.");
@@ -507,12 +533,17 @@ public class War extends JavaPlugin {
 			if (namedParams.containsKey("pvpinzonesonly")) {
 				String onOff = namedParams.get("pvpinzonesonly");
 				this.setPvpInZonesOnly(onOff.equals("on") || onOff.equals("true"));
-				returnMessage.append(" flagpointsonly set to " + String.valueOf(war.isDefaultFlagPointsOnly()) + ".");
+				returnMessage.append(" pvpinzonesonly set to " + String.valueOf(war.isPvpInZonesOnly()) + ".");
 			}
 			if (namedParams.containsKey("disablepvpmessage")) {
 				String onOff = namedParams.get("disablepvpmessage");
 				this.setDisablePvpMessage(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" disablepvpmessage set to " + String.valueOf(war.isDisablePvpMessage()) + ".");
+			}
+			if (namedParams.containsKey("disablebuildmessage")) {
+				String onOff = namedParams.get("disablebuildmessage");
+				this.setDisableBuildMessage(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" disablebuildmessage set to " + String.valueOf(war.isDisableBuildMessage()) + ".");
 			}
 			if (namedParams.containsKey("buildinzonesonly")) {
 				String onOff = namedParams.get("buildinzonesonly");
@@ -545,6 +576,10 @@ public class War extends JavaPlugin {
 				this.setDefaultScoreCap(Integer.parseInt(namedParams.get("maxscore")));
 				returnMessage.append(" maxscore set to " + war.getDefaultScoreCap() + ".");
 			}
+			if (namedParams.containsKey("respawntimer")) {
+				this.setDefaultRespawnTimer(Integer.parseInt(namedParams.get("respawntimer")));
+				returnMessage.append(" respawntimer set to " + war.getDefaultRespawnTimer() + ".");
+			}
 			if (namedParams.containsKey("ff")) {
 				String onOff = namedParams.get("ff");
 				this.setDefaultFriendlyFire(onOff.equals("on") || onOff.equals("true"));
@@ -559,7 +594,12 @@ public class War extends JavaPlugin {
 				String onOff = namedParams.get("flagpointsonly");
 				this.setDefaultFlagPointsOnly(onOff.equals("on") || onOff.equals("true"));
 				returnMessage.append(" flagpointsonly set to " + String.valueOf(war.isDefaultFlagPointsOnly()) + ".");
-			}			
+			}	
+			if (namedParams.containsKey("flagmustbehome")) {
+				String onOff = namedParams.get("flagmustbehome");
+				this.setDefaultFlagMustBeHome(onOff.equals("on") || onOff.equals("true"));
+				returnMessage.append(" flagmustbehome set to " + String.valueOf(war.isDefaultFlagMustBeHome()) + ".");
+			}		
 			if (namedParams.containsKey("blockheads")) {
 				String onOff = namedParams.get("blockheads");
 				this.setDefaultBlockHeads(onOff.equals("on") || onOff.equals("true"));
@@ -677,7 +717,6 @@ public class War extends JavaPlugin {
 					if (loadoutName.equals("default")) {
 						returnMessage.append(" Can't remove default loadout.");
 					} else {
-						HashMap<Integer, ItemStack> extraLoadout = this.getDefaultExtraLoadouts().get(loadoutName);
 						if (this.getDefaultExtraLoadouts().keySet().contains(loadoutName)) {
 							this.getDefaultExtraLoadouts().remove(loadoutName);
 							returnMessage.append(" " + loadoutName + " loadout removed.");
@@ -715,6 +754,7 @@ public class War extends JavaPlugin {
 		 + " ff:" + color + String.valueOf(zone.getFriendlyFire()) + normal
 		 + " autoassign:" + color + String.valueOf(zone.isAutoAssignOnly()) + normal
 		 + " flagpointsonly:" + color + String.valueOf(zone.isFlagPointsOnly()) + normal
+		 + " flagmustbehome:" + color + String.valueOf(zone.isFlagMustBeHome()) + normal
 		 + " blockheads:" + color + String.valueOf(zone.isBlockHeads()) + normal
 		 + " spawnstyle:" + color + zone.getSpawnStyle() + normal
 		 + " flagreturn:" + color + zone.getFlagReturn() + normal
@@ -749,6 +789,7 @@ public class War extends JavaPlugin {
 		return "War config -"
 		 + " pvpinzonesonly:" + global + String.valueOf(this.isPvpInZonesOnly()) + normal
 		 + " disablepvpmessage:" + global + String.valueOf(this.isDisablePvpMessage()) + normal
+		 + " disablebuildmessage:" + global + String.valueOf(this.isDisableBuildMessage()) + normal
 		 + " buildinzonesonly:" + global + String.valueOf(this.isBuildInZonesOnly()) + normal
 		 + " tntinzonesonly:" + global + String.valueOf(this.isTntInZonesOnly()) + normal
 		 + " maxzones:" + global + this.getMaxZones() + normal
@@ -759,6 +800,7 @@ public class War extends JavaPlugin {
 		 + " ff:" + color + String.valueOf(this.isDefaultFriendlyFire()) + normal
 		 + " autoassign:" + color + String.valueOf(this.isDefaultAutoAssignOnly()) + normal
 		 + " flagpointsonly:" + color + String.valueOf(this.isDefaultFlagPointsOnly()) + normal
+		 + " flagmustbehome:" + color + String.valueOf(this.isDefaultFlagMustBeHome()) + normal
 		 + " blockheads:" + color + String.valueOf(this.isDefaultBlockHeads()) + normal
 		 + " spawnstyle:" + color + this.getDefaultSpawnStyle() + normal
 		 + " flagreturn:" + color + this.getDefaultFlagReturn() + normal
@@ -1051,6 +1093,15 @@ public class War extends JavaPlugin {
 	public Logger getLogger() {
 		return this.logger;
 	}
+	
+	public boolean isSpoutServer() {
+		try {
+			Class.forName("org.getspout.spoutapi.player.SpoutPlayer");
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+	}
 
 	public Warzone zoneOfZoneWallAtProximity(Location location) {
 		for (Warzone zone : this.warzones) {
@@ -1118,6 +1169,14 @@ public class War extends JavaPlugin {
 
 	public void setDisablePvpMessage(boolean disablePvpMessage) {
 		this.disablePvpMessage = disablePvpMessage;
+	}
+	
+	public boolean isDisableBuildMessage() {
+		return this.disableBuildMessage;
+	}
+
+	public void setDisableBuildMessage(boolean disableBuildMessage) {
+		this.disableBuildMessage = disableBuildMessage;
 	}
 
 	public boolean isBuildInZonesOnly() {
@@ -1263,6 +1322,14 @@ public class War extends JavaPlugin {
 	public boolean isDefaultFlagPointsOnly() {
 		return this.defaultFlagPointsOnly;
 	}
+	
+	public void setDefaultFlagMustBeHome(boolean defaultFlagMustBeHome) {
+		this.defaultFlagMustBeHome = defaultFlagMustBeHome;
+	}
+
+	public boolean isDefaultFlagMustBeHome() {
+		return this.defaultFlagMustBeHome;
+	}
 
 	public void setDefaultMinPlayers(int defaultMinPlayers) {
 		this.defaultMinPlayers = defaultMinPlayers;
@@ -1346,6 +1413,14 @@ public class War extends JavaPlugin {
 
 	public int getMaxZones() {
 		return maxZones;
+	}
+	
+	public void setDefaultRespawnTimer(int defaultRespawnTimer) {
+		this.defaultRespawnTimer = defaultRespawnTimer;
+	}
+
+	public int getDefaultRespawnTimer() {
+		return defaultRespawnTimer;
 	}
 
 }

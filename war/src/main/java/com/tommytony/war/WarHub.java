@@ -144,9 +144,10 @@ public class WarHub {
 			}
 
 			Block locationBlock = this.location.getWorld().getBlockAt(this.location.getBlockX(), this.location.getBlockY(), this.location.getBlockZ());
+
 			this.volume.setWorld(this.location.getWorld());
-			this.volume.setCornerOne(locationBlock.getFace(back).getFace(left, halfHubWidth).getFace(BlockFace.DOWN));
-			this.volume.setCornerTwo(locationBlock.getFace(right, halfHubWidth).getFace(front, hubDepth).getFace(BlockFace.UP, hubHeigth));
+			this.volume.setCornerOne(locationBlock.getRelative(back).getRelative(left, halfHubWidth).getRelative(BlockFace.DOWN));
+			this.volume.setCornerTwo(locationBlock.getRelative(right, halfHubWidth).getRelative(front, hubDepth).getRelative(BlockFace.UP, hubHeigth));
 			this.volume.saveBlocks();
 
 			// glass floor
@@ -155,26 +156,26 @@ public class WarHub {
 			this.volume.setFaceMaterial(BlockFace.DOWN, Material.GLASS);
 
 			// draw gates
-			Block currentGateBlock = BlockInfo.getBlock(this.location.getWorld(), this.volume.getCornerOne()).getFace(BlockFace.UP).getFace(front, hubDepth).getFace(right, 2);
+			Block currentGateBlock = BlockInfo.getBlock(this.location.getWorld(), this.volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(front, hubDepth).getRelative(right, 2);
 
 			for (Warzone zone : War.war.getWarzones()) { // gonna use the index to find it again
 				if (!zone.isDisabled()) {
 					this.zoneGateBlocks.put(zone.getName(), currentGateBlock);
-					currentGateBlock.getFace(BlockFace.DOWN).setType(Material.GLOWSTONE);
-					currentGateBlock.getFace(left).setType(Material.OBSIDIAN);
-					currentGateBlock.getFace(right).getFace(BlockFace.UP).setType(Material.OBSIDIAN);
-					currentGateBlock.getFace(left).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(Material.OBSIDIAN);
-					currentGateBlock.getFace(right).setType(Material.OBSIDIAN);
-					currentGateBlock.getFace(left).getFace(BlockFace.UP).setType(Material.OBSIDIAN);
-					currentGateBlock.getFace(right).getFace(BlockFace.UP).getFace(BlockFace.UP).setType(Material.OBSIDIAN);
-					currentGateBlock.getFace(BlockFace.UP).getFace(BlockFace.UP).setType(Material.OBSIDIAN);
-					currentGateBlock = currentGateBlock.getFace(right, 4);
+					currentGateBlock.getRelative(BlockFace.DOWN).setType(Material.GLOWSTONE);
+					currentGateBlock.getRelative(left).setType(Material.OBSIDIAN);
+					currentGateBlock.getRelative(right).getRelative(BlockFace.UP).setType(Material.OBSIDIAN);
+					currentGateBlock.getRelative(left).getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.OBSIDIAN);
+					currentGateBlock.getRelative(right).setType(Material.OBSIDIAN);
+					currentGateBlock.getRelative(left).getRelative(BlockFace.UP).setType(Material.OBSIDIAN);
+					currentGateBlock.getRelative(right).getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.OBSIDIAN);
+					currentGateBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).setType(Material.OBSIDIAN);
+					currentGateBlock = currentGateBlock.getRelative(right, 4);
 
 				}
 			}
 
 			// War hub sign
-			Block signBlock = locationBlock.getFace(front);
+			Block signBlock = locationBlock.getRelative(front);
 
 			String[] lines = new String[4];
 			lines[0] = "War hub";
@@ -222,7 +223,7 @@ public class WarHub {
 
 		Block zoneGate = this.zoneGateBlocks.get(zone.getName());
 		if (zoneGate != null) {
-			Block block = zoneGate.getFace(left).getFace(back, 1);
+			Block block = zoneGate.getRelative(left).getRelative(back, 1);
 			if (block.getType() != Material.SIGN_POST) {
 				block.setType(Material.SIGN_POST);
 			}

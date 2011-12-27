@@ -25,6 +25,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.tommytony.war.FlagReturn;
 import com.tommytony.war.LoadoutSelection;
@@ -430,10 +431,20 @@ public class WarPlayerListener extends PlayerListener {
 				}
 			}
 			
-			if (!playerWarzone.isEnoughPlayers() && !playerTeam.getSpawnVolume().contains(playerLoc)) {
-				War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getMinPlayers() +" player(s) on at least " + playerWarzone.getMinTeams() + " team(s).");
-				event.setTo(playerTeam.getTeamSpawn());
-				return;
+			if (!playerTeam.getSpawnVolume().contains(playerLoc)) {
+				if (!playerWarzone.isEnoughPlayers()) {
+					War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getMinPlayers() +" player(s) on at least " + playerWarzone.getMinTeams() + " team(s).");
+					event.setTo(playerTeam.getTeamSpawn());
+					return;
+				}
+				if (playerWarzone.isRespawning(player)) {
+					int rt = playerWarzone.getRespawnTimer();
+					String isS = "s";
+					if (rt==1) isS = "";
+					War.war.badMsg(player, "Can't leave spawn for "+rt+" second"+isS+" after spawning!");
+					event.setTo(playerTeam.getTeamSpawn());
+					return;
+				}
 			}
 
 			// Monuments
@@ -482,7 +493,7 @@ public class WarPlayerListener extends PlayerListener {
 					}
 				}
 
-				if (playerWarzone.isTeamFlagStolen(playerTeam)) {
+				if (playerWarzone.isTeamFlagStolen(playerTeam) && playerWarzone.isFlagMustBeHome()) {
 					War.war.badMsg(player, "You can't capture the enemy flag until your team's flag is returned.");
 				} else {
 					synchronized (playerWarzone) {
@@ -500,6 +511,15 @@ public class WarPlayerListener extends PlayerListener {
 							victim.getFlagVolume().resetBlocks(); // bring back flag to team that lost it
 							victim.initializeTeamFlag();
 							for (Team t : playerWarzone.getTeams()) {
+								if (War.war.isSpoutServer()) {
+									for (Player p : t.getPlayers()) {
+										SpoutPlayer sp = (SpoutPlayer) p;
+										if (sp.isSpoutCraftEnabled()) {
+											String tn = playerTeam.getName();
+							                sp.sendNotification(tn.substring(0,1).toUpperCase()+tn.substring(1).toLowerCase()+" captures Flag!","Capped by "+player.getName(),victim.getKind().getMaterial(),victim.getKind().getData(),3000);
+										}
+									}
+								}
 								t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE
 										+ " captured team " + victim.getName() + "'s flag. Team " + playerTeam.getName() + " scores one point.");
 							}
@@ -545,7 +565,6 @@ public class WarPlayerListener extends PlayerListener {
 				} else {
 					War.war.badMsg(event.getPlayer(), "Can't change loadout after exiting the spawn.");
 				}
-				
 			}
 		}
 	}

@@ -22,14 +22,13 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.Team;
@@ -89,6 +88,15 @@ public class WarEntityListener extends EntityListener {
 						event.setCancelled(true);
 						return;
 					}
+				// Make sure none of them are respawning
+				} else if (defenderWarzone.isRespawning(d)) {
+					War.war.badMsg(a, "The target is currently respawning!");
+					event.setCancelled(true);
+					return;
+				} else if (attackerWarzone.isRespawning(a)) {
+					War.war.badMsg(a, "You can't attack while respawning!");
+					event.setCancelled(true);
+					return;
 				}
 				
 				if (!attackerWarzone.isPvpInZone()) {

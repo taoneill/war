@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import net.minecraft.server.MobEffect;
-import net.minecraft.server.MobEffectList;
-
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,14 +15,16 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.entity.CraftItem;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.getspout.spoutapi.player.SpoutPlayer;
+
 import bukkit.tommytony.war.War;
+import bukkit.tommytony.war.WarSpoutListener;
 
 import com.tommytony.war.jobs.InitZoneJob;
 import com.tommytony.war.jobs.LoadoutResetJob;
@@ -45,6 +44,7 @@ public class Warzone {
 	private final List<Monument> monuments = new ArrayList<Monument>();
 	
 	private final List<String> authors = new ArrayList<String>();
+	private final List<Player> respawn = new ArrayList<Player>();
 
 	private Location teleport;
 	private boolean friendlyFire = false;
@@ -67,6 +67,7 @@ public class Warzone {
 	private ZoneLobby lobby;
 	private boolean autoAssignOnly = false;
 	private boolean flagPointsOnly = false;
+	private boolean flagMustBeHome = true;
 	private boolean blockHeads = true;
 	private boolean unbreakableZoneBlocks = false;
 	private boolean disabled = false;
@@ -76,6 +77,7 @@ public class Warzone {
 	private boolean instaBreak = false;
 	private boolean noDrops = false;
 	private boolean noHunger = false;
+	private int respawnTimer = 10;
 	private int saturation = 10;
 	private int minPlayers = 1;
 	private int minTeams = 1;
@@ -98,6 +100,7 @@ public class Warzone {
 		this.reward = (HashMap<Integer, ItemStack>)War.war.getDefaultReward().clone();
 		this.autoAssignOnly = War.war.isDefaultAutoAssignOnly();
 		this.setFlagPointsOnly(War.war.isDefaultFlagPointsOnly());
+		this.setFlagMustBeHome(War.war.isDefaultFlagMustBeHome());
 		this.teamCap = War.war.getDefaultTeamCap();
 		this.scoreCap = War.war.getDefaultScoreCap();
 		this.monumentHeal = War.war.getDefaultMonumentHeal();
@@ -111,6 +114,7 @@ public class Warzone {
 		this.setInstaBreak(War.war.isDefaultInstaBreak());
 		this.setNoDrops(War.war.isDefaultNoDrops());
 		this.setNoHunger(War.war.isDefaultNoHunger());
+		this.setRespawnTimer(War.war.getDefaultRespawnTimer());
 		this.setSaturation(War.war.getDefaultSaturation());
 		this.setMinPlayers(War.war.getDefaultMinPlayers());
 		this.setMinTeams(War.war.getDefaultMinTeams());
@@ -127,7 +131,7 @@ public class Warzone {
 				// perfect match, return right away
 				return warzone;
 			} else if (warzone.getName().toLowerCase().startsWith(name.toLowerCase())) {
-				// prehaps there's a perfect match in the remaining zones, let's take this one aside
+				// perhaps there's a perfect match in the remaining zones, let's take this one aside
 				bestGuess = warzone;
 			}
 		}
@@ -329,14 +333,22 @@ public class Warzone {
 		// Teleport the player back to spawn
 		event.setTo(team.getTeamSpawn());
 	}
+	
+	public boolean isRespawning(Player p) {
+		return respawn.contains(p);
+	}
 
-	private void handleRespawn(Team team, Player player) {
+	private void handleRespawn(final Team team, final Player player) {
 		// Fill hp
 		player.setRemainingAir(300);
 		player.setHealth(20);
 		player.setFoodLevel(20);
 		player.setSaturation(this.getSaturation());
 		player.setExhaustion(0);
+		player.setFireTicks(0);		//this works fine here, why put it in LoudoutResetJob...? I'll keep it over there though
+		
+		player.getInventory().clear();
+		
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			player.setGameMode(GameMode.SURVIVAL);
 		}
@@ -348,9 +360,28 @@ public class Warzone {
 		} else {
 			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
 		}
-
-		LoadoutResetJob job = new LoadoutResetJob(this, team, player);
-		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+		
+		// Spout
+		if (War.war.isSpoutServer()) {
+			((SpoutPlayer) player).setTitle(team.getKind().getColor() + player.getName());
+		}
+		
+		// "Respawn" Timer - player will not be able to leave spawn for a few seconds
+		final Warzone w = this;
+		if (respawnTimer == 0) {
+			LoadoutResetJob job = new LoadoutResetJob(w, team, player);
+			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+		} else {
+			respawn.add(player);
+			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, new Runnable() {
+				public void run() {
+				    respawn.remove(player);
+				    // Getting the Loadout as visual cue
+				    LoadoutResetJob job = new LoadoutResetJob(w, team, player);
+					War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+				}
+			}, respawnTimer * 20L); // 20 ticks = 1 second
+		}
 	}
 
 	public void resetInventory(Team team, Player player, HashMap<Integer, ItemStack> loadout) {
@@ -923,6 +954,15 @@ public class Warzone {
 			player.setFireTicks(0);
 			player.setRemainingAir(300);
 
+			if (War.war.isSpoutServer()) {
+				SpoutPlayer sp = (SpoutPlayer) player;
+				if (sp.isSpoutCraftEnabled()) {
+					WarSpoutListener.removeStats(sp);
+				}
+				sp.resetTitle();
+			}
+			
+			
 			War.war.msg(player, "Left the zone. Your inventory is being restored.");
 			if (War.war.getWarHub() != null) {
 				War.war.getWarHub().resetZoneSign(this);
@@ -951,6 +991,15 @@ public class Warzone {
 	public boolean isEnemyTeamFlagBlock(Team playerTeam, Block block) {
 		for (Team team : this.teams) {
 			if (!team.getName().equals(playerTeam.getName()) && team.isTeamFlagBlock(block)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isFlagBlock(Block block) {
+		for (Team team : this.teams) {
+			if (team.isTeamFlagBlock(block)) {
 				return true;
 			}
 		}
@@ -1165,6 +1214,14 @@ public class Warzone {
 	public boolean isFlagPointsOnly() {
 		return this.flagPointsOnly;
 	}
+	
+	public void setFlagMustBeHome(boolean flagMustBeHome) {
+		this.flagMustBeHome = flagMustBeHome;
+	}
+	
+	public boolean isFlagMustBeHome() {
+		return this.flagMustBeHome;
+	}
 
 	public void setMinPlayers(int minPlayers) {
 		this.minPlayers = minPlayers;
@@ -1253,7 +1310,7 @@ public class Warzone {
 
 	public void equipPlayerLoadoutSelection(Player player, Team playerTeam) {
 		LoadoutSelection selection = this.getLoadoutSelections().get(player.getName());
-		if (selection != null) {
+		if (selection != null && this.isRespawning(player)) {
 			int currentIndex = selection.getSelectedIndex();
 			if (currentIndex == 0) {
 				this.resetInventory(playerTeam, player, this.getLoadout());
@@ -1271,5 +1328,13 @@ public class Warzone {
 			    }
 			}
 		}
+	}
+
+	public void setRespawnTimer(int respawnTimer) {
+		this.respawnTimer = respawnTimer;
+	}
+
+	public int getRespawnTimer() {
+		return this.respawnTimer;
 	}
 }

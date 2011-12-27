@@ -2,15 +2,12 @@ package com.tommytony.war;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 import net.minecraft.server.MobEffect;
 import net.minecraft.server.MobEffectList;
 
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-
-import bukkit.tommytony.war.War;
 
 public class PotionEffect {
 

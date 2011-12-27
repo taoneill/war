@@ -4,6 +4,7 @@ description: Lets you create TDM and CTF arenas (warzones) for a fast-paced and 
 author: tommytony
 website: war.tommytony.com
 main: bukkit.tommytony.war.War
+softdepend: [Spout]
 permissions:
   war.*:
     description: Full War permissions. Create and destroy warzones. Change War configuration.

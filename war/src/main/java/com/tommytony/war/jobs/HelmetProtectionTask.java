@@ -80,7 +80,7 @@ public class HelmetProtectionTask implements Runnable {
 		}
 	}
 
-	private ItemStack createBlockHead(Team team) {
+	public ItemStack createBlockHead(Team team) {
 		return new ItemStack(team.getKind().getMaterial(), 1, (short) 1, new Byte(team.getKind().getData()));
 	}
 }
