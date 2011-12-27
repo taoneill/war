@@ -355,7 +355,9 @@ public class Warzone {
 		// clear potion effects
 		PotionEffect.clearPotionEffects(player);
 		
+		boolean isFirstRespawn = false;
 		if (!this.getLoadoutSelections().keySet().contains(player.getName())) {
+			isFirstRespawn = true;
 			this.getLoadoutSelections().put(player.getName(), new LoadoutSelection(true, 0));
 		} else {
 			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
@@ -366,8 +368,8 @@ public class Warzone {
 			((SpoutPlayer) player).setTitle(team.getKind().getColor() + player.getName());
 		}
 		
-		final LoadoutResetJob job = new LoadoutResetJob(this, team, player);
-		if (respawnTimer == 0) {
+		final LoadoutResetJob job = new LoadoutResetJob(this, team, player, isFirstRespawn, false);
+		if (respawnTimer == 0 || isFirstRespawn) {
 			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
 		}			
 		else {
@@ -962,7 +964,7 @@ public class Warzone {
 			}
 			
 			
-			War.war.msg(player, "Left the zone. Your inventory is being restored.");
+			War.war.msg(player, "Your inventory is being restored.");
 			if (War.war.getWarHub() != null) {
 				War.war.getWarHub().resetZoneSign(this);
 			}
@@ -1307,13 +1309,17 @@ public class Warzone {
 		return authors;
 	}
 
-	public void equipPlayerLoadoutSelection(Player player, Team playerTeam) {
+	public void equipPlayerLoadoutSelection(Player player, Team playerTeam, boolean isFirstRespawn, boolean isToggle) {
 		LoadoutSelection selection = this.getLoadoutSelections().get(player.getName());
 		if (selection != null && !this.isRespawning(player)) {
 			int currentIndex = selection.getSelectedIndex();
 			if (currentIndex == 0) {
 				this.resetInventory(playerTeam, player, this.getLoadout());
-				War.war.msg(player, "Equipped default loadout.");
+				if (isFirstRespawn && this.extraLoadouts.keySet().size() > 0) {
+					War.war.msg(player, "Equipped default loadout (sneak to switch).");
+				} else if (isToggle){
+					War.war.msg(player, "Equipped default loadout.");
+				}
 			} else {
 				int i = 0;
 				Iterator it = this.getExtraLoadouts().entrySet().iterator();
@@ -1321,7 +1327,9 @@ public class Warzone {
 			        Map.Entry pairs = (Map.Entry)it.next();
 			        if (i == currentIndex - 1) {
 						this.resetInventory(playerTeam, player, (HashMap<Integer, ItemStack>)pairs.getValue());
-						War.war.msg(player, "Equipped " + pairs.getKey() + " loadout.");
+						if (isToggle) {
+							War.war.msg(player, "Equipped " + pairs.getKey() + " loadout.");
+						}
 			        }
 			        i++;
 			    }

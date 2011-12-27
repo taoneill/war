@@ -561,7 +561,7 @@ public class WarPlayerListener extends PlayerListener {
 					int currentIndex = (selection.getSelectedIndex() + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);
 					selection.setSelectedIndex(currentIndex);
 					
-					playerWarzone.equipPlayerLoadoutSelection(event.getPlayer(), playerTeam);
+					playerWarzone.equipPlayerLoadoutSelection(event.getPlayer(), playerTeam, false, true);
 				} else {
 					War.war.badMsg(event.getPlayer(), "Can't change loadout after exiting the spawn.");
 				}

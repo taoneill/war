@@ -105,6 +105,7 @@ public class War extends JavaPlugin {
 	private boolean defaultResetOnEmpty = false, defaultResetOnLoad = false, defaultResetOnUnload = false;
 	private TeamSpawnStyle defaultSpawnStyle = TeamSpawnStyle.BIG;
 	private final HashMap<Integer, ItemStack> defaultReward = new HashMap<Integer, ItemStack>();
+	private boolean isSpoutServer = false;
 
 	public War() {
 		super();
@@ -135,6 +136,14 @@ public class War extends JavaPlugin {
 		this.desc = this.getDescription();
 		this.logger = this.getServer().getLogger();
 		this.setupPermissions();
+		
+		// Spout server detection
+		try {
+			Class.forName("org.getspout.spoutapi.player.SpoutPlayer");
+			isSpoutServer = true;
+		} catch (ClassNotFoundException e) {
+			isSpoutServer = false;
+		}
 
 		if (!War.loadedOnce) {
 			War.loadedOnce = true; // This prevented multiple hookups of the same listener
@@ -1105,12 +1114,7 @@ public class War extends JavaPlugin {
 	}
 	
 	public boolean isSpoutServer() {
-		try {
-			Class.forName("org.getspout.spoutapi.player.SpoutPlayer");
-			return true;
-		} catch (ClassNotFoundException e) {
-			return false;
-		}
+		return this.isSpoutServer;
 	}
 
 	public Warzone zoneOfZoneWallAtProximity(Location location) {
