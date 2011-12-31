@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
@@ -26,24 +27,39 @@ public class WarMapper {
 	public static void load() {
 		(War.war.getDataFolder()).mkdir();
 		(new File(War.war.getDataFolder().getPath() + "/dat")).mkdir();
-		PropertiesFile warConfig = new PropertiesFile(War.war.getDataFolder().getPath() + "/war.txt");
+		YamlConfiguration warConfig = new YamlConfiguration();
+		File config = new File(War.war.getDataFolder().getPath() + "/war.yml");
+		File oldconfig = new File(War.war.getDataFolder().getPath() + "/war.txt");
+		if (oldconfig.exists()) {
+			War.war.log("Old config file found. Converting to YAML...", Level.INFO);
+			    try {
+					new PropertiesConverter(oldconfig, config).ConvertWarCfg();
+				    oldconfig.delete();
+				    War.war.log("Converted successfully!", Level.INFO);
+				} catch (Exception e) {
+					e.printStackTrace();
+				    oldconfig.renameTo(new File(War.war.getDataFolder().getPath() + "/war.txt.bad"));
+					War.war.log("Error in conversion, old war.txt has been renamed to war.txt.bad. Default config will be generated.", Level.INFO);
+				}
+		}
+		oldconfig = null;
 		try {
-			warConfig.load();
-		} catch (IOException e) {
-			War.war.log("Failed to load war.txt file.", Level.WARNING);
-			e.printStackTrace();
+			warConfig.load(config);
+		} catch (Exception e) {
+			War.war.log("Failed to load war.yml file.", Level.WARNING);
+			e.getMessage();
 		}
 
 		// Create file if need be
 		boolean newWar = false;
-		if (!warConfig.containsKey("warzones")) {
+		if (!warConfig.contains("warzones")) {
 			newWar = true;
 			WarMapper.save();
-			War.war.log("war.txt settings file created.", Level.INFO);
+			War.war.log("war.yml settings file created.", Level.INFO);
 			try {
-				warConfig.load();
-			} catch (IOException e) {
-				War.war.log("Failed to reload war.txt file after creating it.", Level.WARNING);
+				warConfig.load(config);
+			} catch (Exception e) {
+				War.war.log("Failed to reload war.yml file after creating it.", Level.WARNING);
 				e.printStackTrace();
 			}
 		}
@@ -56,7 +72,13 @@ public class WarMapper {
 		}
 
 		// zone makers
-		String[] makers = warConfig.getString("zoneMakers").split(",");
+		String[] makers = null;
+		try {
+		    makers = warConfig.getString("zoneMakers").split(",");
+		} catch (NullPointerException e) {
+			warConfig.set("zoneMakers", "");
+			makers = warConfig.getString("zoneMakers").split(",");
+		}
 		War.war.getZoneMakerNames().clear();
 		for (String makerName : makers) {
 			if (makerName != null && !makerName.equals("")) {
@@ -110,67 +132,67 @@ public class WarMapper {
 		}
 		
 		// maxZones
-		if (warConfig.keyExists("maxZones")) {
+		if (warConfig.contains("maxZones")) {
 			War.war.setMaxZones(warConfig.getInt("maxZones"));
 		}
 
 		// defaultLifePool
-		if (warConfig.keyExists("defaultLifePool")) {
+		if (warConfig.contains("defaultLifePool")) {
 			War.war.setDefaultLifepool(warConfig.getInt("defaultLifePool"));
 		}
 
 		// defaultMonumentHeal
-		if (warConfig.keyExists("defaultMonumentHeal")) {
+		if (warConfig.contains("defaultMonumentHeal")) {
 			War.war.setDefaultMonumentHeal(warConfig.getInt("defaultMonumentHeal"));
 		}
 
 		// defaultFriendlyFire
-		if (warConfig.keyExists("defaultFriendlyFire")) {
+		if (warConfig.contains("defaultFriendlyFire")) {
 			War.war.setDefaultFriendlyFire(warConfig.getBoolean("defaultFriendlyFire"));
 		}
 
 		// defaultAutoAssignOnly
-		if (warConfig.keyExists("defaultAutoAssignOnly")) {
+		if (warConfig.contains("defaultAutoAssignOnly")) {
 			War.war.setDefaultAutoAssignOnly(warConfig.getBoolean("defaultAutoAssignOnly"));
 		}
 
 		// defaultFlagPointsOnly
-		if (warConfig.keyExists("defaultFlagPointsOnly")) {
+		if (warConfig.contains("defaultFlagPointsOnly")) {
 			War.war.setDefaultFlagPointsOnly(warConfig.getBoolean("defaultFlagPointsOnly"));
 		}
 
 		// defaultTeamCap
-		if (warConfig.keyExists("defaultTeamCap")) {
+		if (warConfig.contains("defaultTeamCap")) {
 			War.war.setDefaultTeamCap(warConfig.getInt("defaultTeamCap"));
 		}
 
 		// defaultScoreCap
-		if (warConfig.keyExists("defaultScoreCap")) {
+		if (warConfig.contains("defaultScoreCap")) {
 			War.war.setDefaultScoreCap(warConfig.getInt("defaultScoreCap"));
 		}
 
 		// pvpInZonesOnly
-		if (warConfig.keyExists("pvpInZonesOnly")) {
+		if (warConfig.contains("pvpInZonesOnly")) {
 			War.war.setPvpInZonesOnly(warConfig.getBoolean("pvpInZonesOnly"));
 		}
 
 		// defaultBlockHeads
-		if (warConfig.keyExists("defaultBlockHeads")) {
+		if (warConfig.contains("defaultBlockHeads")) {
 			War.war.setDefaultBlockHeads(warConfig.getBoolean("defaultBlockHeads"));
 		}
 
 		// buildInZonesOnly
-		if (warConfig.keyExists("buildInZonesOnly")) {
+		if (warConfig.contains("buildInZonesOnly")) {
 			War.war.setBuildInZonesOnly(warConfig.getBoolean("buildInZonesOnly"));
 		}
 
 		// disablePVPMessage
-		if (warConfig.keyExists("disablePvpMessage")) {
+		if (warConfig.contains("disablePvpMessage")) {
 			War.war.setDisablePvpMessage(warConfig.getBoolean("disablePvpMessage"));
 		}
 		
 		// tntInZonesOnly
-		if (warConfig.keyExists("tntInZonesOnly")) {
+		if (warConfig.contains("tntInZonesOnly")) {
 			War.war.setTntInZonesOnly(warConfig.getBoolean("tntInZonesOnly"));
 		}
 
@@ -201,67 +223,67 @@ public class WarMapper {
 		}
 
 		// defaultUnbreakableZoneBlocks
-		if (warConfig.keyExists("defaultUnbreakableZoneBlocks")) {
+		if (warConfig.contains("defaultUnbreakableZoneBlocks")) {
 			War.war.setDefaultUnbreakableZoneBlocks(warConfig.getBoolean("defaultUnbreakableZoneBlocks"));
 		}
 
 		// defaultNoCreatures
-		if (warConfig.keyExists("defaultNoCreatures")) {
+		if (warConfig.contains("defaultNoCreatures")) {
 			War.war.setDefaultNoCreatures(warConfig.getBoolean("defaultNoCreatures"));
 		}
 		
 		// defaultGlassWalls
-		if (warConfig.keyExists("defaultGlassWalls")) {
+		if (warConfig.contains("defaultGlassWalls")) {
 			War.war.setDefaultGlassWalls(warConfig.getBoolean("defaultGlassWalls"));
 		}
 		
 		// defaultPvpInZone
-		if (warConfig.keyExists("defaultPvpInZone")) {
+		if (warConfig.contains("defaultPvpInZone")) {
 			War.war.setDefaultPvpInZone(warConfig.getBoolean("defaultPvpInZone"));
 		}
 		
 		// defaultInstaBreak
-		if (warConfig.keyExists("defaultInstaBreak")) {
+		if (warConfig.contains("defaultInstaBreak")) {
 			War.war.setDefaultInstaBreak(warConfig.getBoolean("defaultInstaBreak"));
 		}
 		
 		// defaultNoDrops
-		if (warConfig.keyExists("defaultNoDrops")) {
+		if (warConfig.contains("defaultNoDrops")) {
 			War.war.setDefaultNoDrops(warConfig.getBoolean("defaultNoDrops"));
 		}
 		
 		// defaultNoHunger
-		if (warConfig.keyExists("defaultNoHunger")) {
+		if (warConfig.contains("defaultNoHunger")) {
 			War.war.setDefaultNoHunger(warConfig.getBoolean("defaultNoHunger"));
 		}
 		
 		// defaultSaturation
-		if (warConfig.keyExists("defaultSaturation")) {
+		if (warConfig.contains("defaultSaturation")) {
 			War.war.setDefaultSaturation(warConfig.getInt("defaultSaturation"));
 		}
 		
 		// defaultMinPlayers
-		if (warConfig.keyExists("defaultMinPlayers")) {
+		if (warConfig.contains("defaultMinPlayers")) {
 			War.war.setDefaultMinPlayers(warConfig.getInt("defaultMinPlayers"));
 		}
 		
 		// defaultMinTeams
-		if (warConfig.keyExists("defaultMinTeams")) {
+		if (warConfig.contains("defaultMinTeams")) {
 			War.war.setDefaultMinTeams(warConfig.getInt("defaultMinTeams"));
 		}
 
 		// defaultResetOnEmpty
-		if (warConfig.keyExists("defaultResetOnEmpty")) {
+		if (warConfig.contains("defaultResetOnEmpty")) {
 			War.war.setDefaultResetOnEmpty(warConfig.getBoolean("defaultResetOnEmpty"));
 		}
 
 		// defaultResetOnLoad
-		if (warConfig.keyExists("defaultResetOnLoad")) {
+		if (warConfig.contains("defaultResetOnLoad")) {
 			War.war.setDefaultResetOnLoad(warConfig.getBoolean("defaultResetOnLoad"));
 		}
 
 		// defaultResetOnUnload
-		if (warConfig.keyExists("defaultResetOnUnload")) {
+		if (warConfig.contains("defaultResetOnUnload")) {
 			War.war.setDefaultResetOnUnload(warConfig.getBoolean("defaultResetOnUnload"));
 		}
 
@@ -274,32 +296,32 @@ public class WarMapper {
 			}
 		}
 
-		warConfig.close();
 	}
 
 	public static void save() {
-		PropertiesFile warConfig = new PropertiesFile(War.war.getDataFolder().getPath() + "/war.txt");
+		YamlConfiguration warConfig = new YamlConfiguration();
+		File config = new File(War.war.getDataFolder().getPath() + "/war.yml");
 		String warzonesStr = "";
 
 		// warzones
 		for (Warzone zone : War.war.getWarzones()) {
 			warzonesStr += zone.getName() + ",";
 		}
-		warConfig.setString("warzones", warzonesStr);
+		warConfig.set("warzones", warzonesStr);
 
 		// zone makers: default is none and it means everyone can use /setzone
 		String makersStr = ""; // everyone
 		for (String name : War.war.getZoneMakerNames()) {
 			makersStr += name + ",";
 		}
-		warConfig.setString("zoneMakers", makersStr);
+		warConfig.set("zoneMakers", makersStr);
 
 		// whitelisted commands during a game
 		String commandWhitelistStr = ""; // everyone
 		for (String command : War.war.getCommandWhitelist()) {
 			commandWhitelistStr += command + ",";
 		}
-		warConfig.setString("commandWhitelist", commandWhitelistStr);
+		warConfig.set("commandWhitelist", commandWhitelistStr);
 
 		// defaultLoadout
 		String defaultLoadoutStr = "";
@@ -310,7 +332,7 @@ public class WarMapper {
 				defaultLoadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 			}
 		}
-		warConfig.setString("defaultLoadout", defaultLoadoutStr);
+		warConfig.set("defaultLoadout", defaultLoadoutStr);
 
 		// defaultExtraLoadouts
 		String defaultExtraLoadoutsStr = "";
@@ -325,54 +347,54 @@ public class WarMapper {
 					loadoutStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 				}
 			}
-			warConfig.setString(name + "Loadout", loadoutStr);
+			warConfig.set(name + "Loadout", loadoutStr);
 		}
-		warConfig.setString("defaultExtraLoadouts", defaultExtraLoadoutsStr);
+		warConfig.set("defaultExtraLoadouts", defaultExtraLoadoutsStr);
 		
 		// maxZones
-		warConfig.setInt("maxZones", War.war.getMaxZones());
+		warConfig.set("maxZones", War.war.getMaxZones());
 		
 		// defaultLifepool
-		warConfig.setInt("defaultLifePool", War.war.getDefaultLifepool());
+		warConfig.set("defaultLifePool", War.war.getDefaultLifepool());
 
 		// defaultMonumentHeal
-		warConfig.setInt("defaultMonumentHeal", War.war.getDefaultMonumentHeal());
+		warConfig.set("defaultMonumentHeal", War.war.getDefaultMonumentHeal());
 
 		// defaultFriendlyFire
-		warConfig.setBoolean("defaultFriendlyFire", War.war.isDefaultFriendlyFire());
+		warConfig.set("defaultFriendlyFire", War.war.isDefaultFriendlyFire());
 
 		// defaultAutoAssignOnly
-		warConfig.setBoolean("defaultAutoAssignOnly", War.war.isDefaultAutoAssignOnly());
+		warConfig.set("defaultAutoAssignOnly", War.war.isDefaultAutoAssignOnly());
 
 		// defaultFlagPointsOnly
-		warConfig.setBoolean("defaultFlagPointsOnly", War.war.isDefaultFlagPointsOnly());
+		warConfig.set("defaultFlagPointsOnly", War.war.isDefaultFlagPointsOnly());
 
 		// defaultTeamCap
-		warConfig.setInt("defaultTeamCap", War.war.getDefaultTeamCap());
+		warConfig.set("defaultTeamCap", War.war.getDefaultTeamCap());
 
 		// defaultScoreCap
-		warConfig.setInt("defaultScoreCap", War.war.getDefaultScoreCap());
+		warConfig.set("defaultScoreCap", War.war.getDefaultScoreCap());
 
 		// pvpInZonesOnly
-		warConfig.setBoolean("pvpInZonesOnly", War.war.isPvpInZonesOnly());
+		warConfig.set("pvpInZonesOnly", War.war.isPvpInZonesOnly());
 
 		// defaultBlockHeads
-		warConfig.setBoolean("defaultBlockHeads", War.war.isDefaultBlockHeads());
+		warConfig.set("defaultBlockHeads", War.war.isDefaultBlockHeads());
 
 		// buildInZonesOnly
-		warConfig.setBoolean("buildInZonesOnly", War.war.isBuildInZonesOnly());
+		warConfig.set("buildInZonesOnly", War.war.isBuildInZonesOnly());
 
 		// disablePVPMessage
-		warConfig.setBoolean("disablePvpMessage", War.war.isDisablePvpMessage());
+		warConfig.set("disablePvpMessage", War.war.isDisablePvpMessage());
 
 		// tntInZonesOnly
-		warConfig.setBoolean("tntInZonesOnly", War.war.isTntInZonesOnly());
+		warConfig.set("tntInZonesOnly", War.war.isTntInZonesOnly());
 		
 		// spawnStyle
-		warConfig.setString("spawnStyle", War.war.getDefaultSpawnStyle().toString());
+		warConfig.set("spawnStyle", War.war.getDefaultSpawnStyle().toString());
 
 		// spawnStyle
-		warConfig.setString("flagReturn", War.war.getDefaultFlagReturn().toString());
+		warConfig.set("flagReturn", War.war.getDefaultFlagReturn().toString());
 
 		// defaultReward
 		String defaultRewardStr = "";
@@ -383,46 +405,46 @@ public class WarMapper {
 				defaultRewardStr += item.getTypeId() + "," + item.getAmount() + "," + slot + ";";
 			}
 		}
-		warConfig.setString("defaultReward", defaultRewardStr);
+		warConfig.set("defaultReward", defaultRewardStr);
 
 		// defaultUnbreakableZoneBlocks
-		warConfig.setBoolean("defaultUnbreakableZoneBlocks", War.war.isDefaultUnbreakableZoneBlocks());
+		warConfig.set("defaultUnbreakableZoneBlocks", War.war.isDefaultUnbreakableZoneBlocks());
 
 		// defaultNoCreatures
-		warConfig.setBoolean("defaultNoCreatures", War.war.isDefaultNoCreatures());
+		warConfig.set("defaultNoCreatures", War.war.isDefaultNoCreatures());
 
 		// defaultGlassWalls
-		warConfig.setBoolean("defaultGlassWalls", War.war.isDefaultGlassWalls());
+		warConfig.set("defaultGlassWalls", War.war.isDefaultGlassWalls());
 		
 		// defaultPvpInZone
-		warConfig.setBoolean("defaultPvpInZone", War.war.isDefaultPvpInZone());
+		warConfig.set("defaultPvpInZone", War.war.isDefaultPvpInZone());
 
 		// defaultInstaBreak
-		warConfig.setBoolean("defaultInstaBreak", War.war.isDefaultInstaBreak());
+		warConfig.set("defaultInstaBreak", War.war.isDefaultInstaBreak());
 		
 		// defaultNoDrops
-		warConfig.setBoolean("defaultNoDrops", War.war.isDefaultNoDrops());
+		warConfig.set("defaultNoDrops", War.war.isDefaultNoDrops());
 		
 		// defaultNoHunger
-		warConfig.setBoolean("defaultNoHunger", War.war.isDefaultNoHunger());
+		warConfig.set("defaultNoHunger", War.war.isDefaultNoHunger());
 				
 		// defaultSaturation
-		warConfig.setInt("defaultSaturation", War.war.getDefaultSaturation());
+		warConfig.set("defaultSaturation", War.war.getDefaultSaturation());
 				
 		// defaultMinPlayers
-		warConfig.setInt("defaultMinPlayers", War.war.getDefaultMinPlayers());
+		warConfig.set("defaultMinPlayers", War.war.getDefaultMinPlayers());
 		
 		// defaultMinTeams
-		warConfig.setInt("defaultMinTeams", War.war.getDefaultMinTeams());
+		warConfig.set("defaultMinTeams", War.war.getDefaultMinTeams());
 
 		// defaultResetOnEmpty
-		warConfig.setBoolean("defaultResetOnEmpty", War.war.isDefaultResetOnEmpty());
+		warConfig.set("defaultResetOnEmpty", War.war.isDefaultResetOnEmpty());
 
 		// defaultResetOnLoad
-		warConfig.setBoolean("defaultResetOnLoad", War.war.isDefaultResetOnLoad());
+		warConfig.set("defaultResetOnLoad", War.war.isDefaultResetOnLoad());
 
 		// defaultResetOnUnload
-		warConfig.setBoolean("defaultResetOnUnload", War.war.isDefaultResetOnUnload());
+		warConfig.set("defaultResetOnUnload", War.war.isDefaultResetOnUnload());
 
 		// warhub
 		String hubStr = "";
@@ -448,9 +470,12 @@ public class WarMapper {
 					+ hub.getLocation().getWorld().getName() + "," + orientationStr;
 			VolumeMapper.save(hub.getVolume(), "");
 		}
-		warConfig.setString("warhub", hubStr);
+		warConfig.set("warhub", hubStr);
 
-		warConfig.save();
-		warConfig.close();
+		try {
+			warConfig.save(config);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
