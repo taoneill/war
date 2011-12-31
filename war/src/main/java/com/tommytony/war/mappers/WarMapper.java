@@ -29,11 +29,25 @@ public class WarMapper {
 		(new File(War.war.getDataFolder().getPath() + "/dat")).mkdir();
 		YamlConfiguration warConfig = new YamlConfiguration();
 		File config = new File(War.war.getDataFolder().getPath() + "/war.yml");
+		File oldconfig = new File(War.war.getDataFolder().getPath() + "/war.txt");
+		if (oldconfig.exists()) {
+			War.war.log("Old config file found. Converting to YAML...", Level.INFO);
+			    try {
+					new PropertiesConverter(oldconfig, config).ConvertWarCfg();
+				    oldconfig.delete();
+				    War.war.log("Converted successfully!", Level.INFO);
+				} catch (Exception e) {
+					e.printStackTrace();
+				    oldconfig.renameTo(new File(War.war.getDataFolder().getPath() + "/war.txt.bad"));
+					War.war.log("Error in conversion, old war.txt has been renamed to war.txt.bad. Default config will be generated.", Level.INFO);
+				}
+		}
+		oldconfig = null;
 		try {
 			warConfig.load(config);
 		} catch (Exception e) {
-			War.war.log("Failed to load war.txt file.", Level.WARNING);
-			e.printStackTrace();
+			War.war.log("Failed to load war.yml file.", Level.WARNING);
+			e.getMessage();
 		}
 
 		// Create file if need be
@@ -58,7 +72,13 @@ public class WarMapper {
 		}
 
 		// zone makers
-		String[] makers = warConfig.getString("zoneMakers").split(",");
+		String[] makers = null;
+		try {
+		    makers = warConfig.getString("zoneMakers").split(",");
+		} catch (NullPointerException e) {
+			warConfig.set("zoneMakers", "");
+			makers = warConfig.getString("zoneMakers").split(",");
+		}
 		War.war.getZoneMakerNames().clear();
 		for (String makerName : makers) {
 			if (makerName != null && !makerName.equals("")) {

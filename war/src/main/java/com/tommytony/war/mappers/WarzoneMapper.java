@@ -34,10 +34,29 @@ public class WarzoneMapper {
 	public static Warzone load(String name, boolean createNewVolume) {
 		// war.getLogger().info("Loading warzone " + name + " config and blocks...");
 		YamlConfiguration warzoneConfig = new YamlConfiguration();
-		File config = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".yml");try {
+		File config = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".yml");
+		File oldconfig = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
+		File dataFolder = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name);
+		if (oldconfig.exists()) {
+			War.war.log("Old zone file found. Converting to YAML...", Level.INFO);
+			    try {
+			    	new PropertiesConverter(oldconfig, config).ConvertZoneCfg();
+				    oldconfig.delete();
+				    War.war.log("Converted successfully!", Level.INFO);
+				} catch (Exception e) {
+					e.printStackTrace();
+					oldconfig.renameTo(new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt.bad"));
+					dataFolder.renameTo(new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "-bad"));
+					War.war.getWarzones().remove(Warzone.getZoneByName(name));
+					WarMapper.save();
+					War.war.log("Error in conversion, old warzone-" + name + ".txt has been renamed to warzone-" + name + ".txt.bad and old data folder /dat/warzone-" + name + " has been renamed to /dat/warzone-" + name + "-bad. Zone has been removed.", Level.INFO);
+				}
+		}
+		oldconfig = null;
+		try {
 			warzoneConfig.load(config);
 		} catch (Exception e) {
-			War.war.getLogger().info("Failed to load warzone-" + name + ".txt file.");
+			War.war.getLogger().info("Failed to load warzone-" + name + ".yml file.");
 			e.printStackTrace();
 		}
 
@@ -591,7 +610,7 @@ public class WarzoneMapper {
 		if (!deletedData) {
 			War.war.log("Failed to delete folder " + zoneFolder.getName(), Level.WARNING);
 		}
-		File zoneFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
+		File zoneFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".yml");
 		deletedData = zoneFile.delete();
 		if (!deletedData) {
 			War.war.log("Failed to delete file " + zoneFile.getName(), Level.WARNING);
