@@ -89,8 +89,10 @@ public class WarBlockListener extends BlockListener {
 		}
 
 		// buildInZonesOnly
-		if (zone == null && War.war.isBuildInZonesOnly() && !War.war.canBuildOutsideZone(player) && !War.war.isDisableBuildMessage()) {
-			War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
+		if (zone == null && War.war.isBuildInZonesOnly() && !War.war.canBuildOutsideZone(player)) {
+			if (!War.war.isDisableBuildMessage()) {
+				War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
+			}
 			event.setCancelled(true);
 			return;
 		}
@@ -287,7 +289,9 @@ public class WarBlockListener extends BlockListener {
 		// buildInZonesOnly
 		Warzone blockZone = Warzone.getZoneByLocation(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ()));
 		if (blockZone == null && War.war.isBuildInZonesOnly() && !War.war.canBuildOutsideZone(player)) {
-			War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
+			if (!War.war.isDisableBuildMessage()) {
+				War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
+			}
 			event.setCancelled(true);
 			return;
 		}
