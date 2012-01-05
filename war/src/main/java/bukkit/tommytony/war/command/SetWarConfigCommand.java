@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
-import com.tommytony.war.mappers.WarMapper;
+import com.tommytony.war.mappers.WarYmlMapper;
 
 public class SetWarConfigCommand extends AbstractWarAdminCommand {
 
@@ -28,7 +28,7 @@ public class SetWarConfigCommand extends AbstractWarAdminCommand {
 
 		String namedParamReturn = War.war.updateFromNamedParams(this.getSender(), this.args); 
 		if (!namedParamReturn.equals("") && !namedParamReturn.equals("PARSE-ERROR")) {
-			WarMapper.save();
+			WarYmlMapper.save();
 			if (wantsToPrint) {
 				String config = War.war.printConfig();
 				this.msg("War config saved." + namedParamReturn + " " + config);

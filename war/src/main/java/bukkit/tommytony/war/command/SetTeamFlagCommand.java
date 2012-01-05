@@ -4,12 +4,12 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import bukkit.tommytony.war.WarCommandHandler;
+
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.mappers.WarzoneMapper;
-
-import bukkit.tommytony.war.WarCommandHandler;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 
 /**
  * Places a teamflag
@@ -52,7 +52,7 @@ public class SetTeamFlagCommand extends AbstractZoneMakerCommand {
 			Location playerLoc = player.getLocation();
 			player.teleport(new Location(playerLoc.getWorld(), playerLoc.getBlockX() + 1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
 			this.msg("Team " + team.getName() + " flag added here.");
-			WarzoneMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone, false);
 		} else {
 			// relocate flag
 			team.getFlagVolume().resetBlocks();
@@ -60,7 +60,7 @@ public class SetTeamFlagCommand extends AbstractZoneMakerCommand {
 			Location playerLoc = player.getLocation();
 			player.teleport(new Location(playerLoc.getWorld(), playerLoc.getBlockX() + 1, playerLoc.getBlockY(), playerLoc.getBlockZ() + 1));
 			this.msg("Team " + team.getName() + " flag moved.");
-			WarzoneMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone, false);
 		}
 
 		return true;

@@ -14,6 +14,7 @@ import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.TeamConfig;
 
 public class WarSpoutListener extends SpoutListener {
     static Plugin plugin;
@@ -72,34 +73,31 @@ public class WarSpoutListener extends SpoutListener {
 		}
 		
 		// is there even a score cap (or is it just 1 point)?
-		if (zone.getScoreCap()>1) {
-			linecounter = 0;
-			for (Team t : zone.getTeams()) {
-				// scores
-				line = new GenericLabel(t.getPoints()+"/"+zone.getScoreCap()+" points");
-				if (t.getPlayers().size()==0) line.setTextColor(new Color(100,100,100));
-				line.setTooltip("Warzone: "+zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
-		        line.setAlign(WidgetAnchor.TOP_LEFT).setX(3+teammax+15+playmax+15).setY(3+linecounter*(GenericLabel.getStringHeight("O")+3)).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
-		        scorelines.add(line);
-		        linecounter++;
-			}
-			// I bet you know what is done here!
-			for (GenericLabel l : scorelines) {
-				if (GenericLabel.getStringWidth(l.getText()) > scoremax) scoremax=GenericLabel.getStringWidth(l.getText());
-			}
+		
+		linecounter = 0;
+		for (Team t : zone.getTeams()) {
+			// scores
+			line = new GenericLabel(t.getPoints()+"/"+t.getTeamConfig().getInt(TeamConfig.MAXSCORE)+" points");
+			if (t.getPlayers().size()==0) line.setTextColor(new Color(100,100,100));
+			line.setTooltip("Warzone: "+zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
+	        line.setAlign(WidgetAnchor.TOP_LEFT).setX(3+teammax+15+playmax+15).setY(3+linecounter*(GenericLabel.getStringHeight("O")+3)).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
+	        scorelines.add(line);
+	        linecounter++;
+		}
+		// I bet you know what is done here!
+		for (GenericLabel l : scorelines) {
+			if (GenericLabel.getStringWidth(l.getText()) > scoremax) scoremax=GenericLabel.getStringWidth(l.getText());
 		}
 		
 		// and finally, lives.
-		if (zone.getLifePool()>1) {
-			linecounter = 0;
-			for (Team t : zone.getTeams()) {
-				line = new GenericLabel(t.getRemainingLifes()+"/"+zone.getLifePool()+" lives");
-				if (t.getPlayers().size()==0) line.setTextColor(new Color(100,100,100));
-				line.setTooltip("Warzone: "+zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
-		        line.setAlign(WidgetAnchor.TOP_LEFT).setX(3+teammax+15+playmax+15+scoremax+15).setY(3+linecounter*(GenericLabel.getStringHeight("O")+3)).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
-		        scorelines.add(line);
-		        linecounter++;
-			}
+		linecounter = 0;
+		for (Team t : zone.getTeams()) {
+			line = new GenericLabel(t.getRemainingLifes()+"/"+t.getTeamConfig().getInt(TeamConfig.LIFEPOOL)+" lives");
+			if (t.getPlayers().size()==0) line.setTextColor(new Color(100,100,100));
+			line.setTooltip("Warzone: "+zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
+	        line.setAlign(WidgetAnchor.TOP_LEFT).setX(3+teammax+15+playmax+15+scoremax+15).setY(3+linecounter*(GenericLabel.getStringHeight("O")+3)).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
+	        scorelines.add(line);
+	        linecounter++;
 		}
 		
 		// Now to print it to the Spout players!

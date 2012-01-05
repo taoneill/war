@@ -3,12 +3,12 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.tommytony.war.WarHub;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.mappers.WarMapper;
-
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
+
+import com.tommytony.war.WarHub;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.mappers.WarYmlMapper;
 
 /**
  * Places the warhub
@@ -50,7 +50,7 @@ public class SetWarHubCommand extends AbstractWarAdminCommand {
 				}
 				this.msg("War hub created.");
 			}
-			WarMapper.save();
+			WarYmlMapper.save();
 		} else {
 			this.msg("No warzones yet.");
 		}

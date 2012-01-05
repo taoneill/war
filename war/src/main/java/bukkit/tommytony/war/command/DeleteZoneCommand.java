@@ -3,15 +3,15 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import bukkit.tommytony.war.War;
+import bukkit.tommytony.war.WarCommandHandler;
+
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.mappers.WarMapper;
-import com.tommytony.war.mappers.WarzoneMapper;
-
-import bukkit.tommytony.war.War;
-import bukkit.tommytony.war.WarCommandHandler;
+import com.tommytony.war.mappers.WarYmlMapper;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 
 /**
  * Deletes a warzone.
@@ -70,8 +70,8 @@ public class DeleteZoneCommand extends AbstractZoneMakerCommand {
 		}
 		zone.getVolume().resetBlocks();
 		War.war.getWarzones().remove(zone);
-		WarMapper.save();
-		WarzoneMapper.delete(zone.getName());
+		WarYmlMapper.save();
+		WarzoneYmlMapper.delete(zone.getName());
 		if (War.war.getWarHub() != null) { // warhub has to change
 			War.war.getWarHub().getVolume().resetBlocks();
 			War.war.getWarHub().initialize();

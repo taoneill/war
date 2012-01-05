@@ -194,7 +194,6 @@ public class VolumeMapper {
 									}
 								} else if (typeId == Material.DISPENSER.getId()) {
 									// Dispensers
-									String extra = "";
 									List<ItemStack> contents = volume.getInvBlockContents().get("dispenser-" + i + "-" + j + "-" + k);
 									if (contents != null) {
 										out.write(buildInventoryStringFromItemList(contents));

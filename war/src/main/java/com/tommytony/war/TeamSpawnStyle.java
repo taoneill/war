@@ -23,6 +23,6 @@ public enum TeamSpawnStyle {
 			}
 		}
 
-		return TeamSpawnStyle.BIG;
+		return TeamSpawnStyle.SMALL;
 	}
 }

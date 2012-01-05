@@ -6,14 +6,15 @@ import java.util.logging.Level;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.tommytony.war.Warzone;
-import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.mappers.PropertiesFile;
-import com.tommytony.war.mappers.WarMapper;
-import com.tommytony.war.mappers.WarzoneMapper;
-
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
+
+import com.tommytony.war.Warzone;
+import com.tommytony.war.ZoneLobby;
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.mappers.PropertiesFile;
+import com.tommytony.war.mappers.WarYmlMapper;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 
 public class RenameZoneCommand extends AbstractZoneMakerCommand {
 	public RenameZoneCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
@@ -74,20 +75,20 @@ public class RenameZoneCommand extends AbstractZoneMakerCommand {
 		warzoneConfig.close();
 
 		War.war.log("Loading zone " + this.args[0] + "...", Level.INFO);
-		Warzone newZone = WarzoneMapper.load(this.args[0], false);
+		Warzone newZone = WarzoneYmlMapper.load(this.args[0], false);
 		War.war.getWarzones().add(newZone);
 		// zone.getVolume().loadCorners();
 		newZone.getVolume().loadCorners();
 		if (newZone.getLobby() != null) {
 			newZone.getLobby().getVolume().resetBlocks();
 		}
-		if (newZone.isResetOnLoad()) {
+		if (newZone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONLOAD)) {
 			newZone.getVolume().resetBlocks();
 		}
 		newZone.initializeZone();
 
 		// save war config
-		WarMapper.save();
+		WarYmlMapper.save();
 
 		if (War.war.getWarHub() != null) { // warhub has to change
 			War.war.getWarHub().getVolume().resetBlocks();

@@ -21,6 +21,9 @@ import com.tommytony.war.FlagReturn;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.config.WarzoneConfig;
 
 /**
  *
@@ -89,8 +92,8 @@ public class WarBlockListener extends BlockListener {
 		}
 
 		// buildInZonesOnly
-		if (zone == null && War.war.isBuildInZonesOnly() && !War.war.canBuildOutsideZone(player)) {
-			if (!War.war.isDisableBuildMessage()) {
+		if (zone == null && War.war.getWarConfig().getBoolean(WarConfig.BUILDINZONESONLY) && !War.war.canBuildOutsideZone(player)) {
+			if (!War.war.getWarConfig().getBoolean(WarConfig.DISABLEBUILDMESSAGE)) {
 				War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
 			}
 			event.setCancelled(true);
@@ -112,7 +115,7 @@ public class WarBlockListener extends BlockListener {
 		}
 
 		// unbreakableZoneBlocks
-		if (zone != null && zone.isUnbreakableZoneBlocks() && (!isZoneMaker || (isZoneMaker && team != null))) {
+		if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE) && (!isZoneMaker || (isZoneMaker && team != null))) {
 			// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks)
 			War.war.badMsg(player, "The blocks in this zone are unbreakable - this also means you can't build!");
 			event.setCancelled(true);
@@ -169,7 +172,7 @@ public class WarBlockListener extends BlockListener {
 		Player player = event.getPlayer();
 		Block block = event.getBlock();
 		Warzone playerZone = Warzone.getZoneByLocation(player);
-		if (player != null && block != null && playerZone != null && playerZone.isInstaBreak()) {
+		if (player != null && block != null && playerZone != null && playerZone.getWarzoneConfig().getBoolean(WarzoneConfig.INSTABREAK)) {
 			Warzone blockZone = Warzone.getZoneByLocation(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ()));
 			if (blockZone != null && blockZone == playerZone) {
 				event.setInstaBreak(true);
@@ -232,8 +235,9 @@ public class WarBlockListener extends BlockListener {
 						block.setType(Material.AIR);
 
 						String spawnOrFlag = "spawn or flag";
-						if (warzone.getFlagReturn() == FlagReturn.FLAG || warzone.getFlagReturn() == FlagReturn.SPAWN) {
-							spawnOrFlag = warzone.getFlagReturn().toString();
+						if (team.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN).equals(FlagReturn.FLAG) 
+								|| team.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN) == FlagReturn.SPAWN) {
+							spawnOrFlag = team.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN).toString();
 						}
 
 						for (Team t : warzone.getTeams()) {
@@ -288,8 +292,8 @@ public class WarBlockListener extends BlockListener {
 
 		// buildInZonesOnly
 		Warzone blockZone = Warzone.getZoneByLocation(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ()));
-		if (blockZone == null && War.war.isBuildInZonesOnly() && !War.war.canBuildOutsideZone(player)) {
-			if (!War.war.isDisableBuildMessage()) {
+		if (blockZone == null && War.war.getWarConfig().getBoolean(WarConfig.BUILDINZONESONLY) && !War.war.canBuildOutsideZone(player)) {
+			if (!War.war.getWarConfig().getBoolean(WarConfig.DISABLEBUILDMESSAGE)) {
 				War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
 			}
 			event.setCancelled(true);
@@ -297,7 +301,7 @@ public class WarBlockListener extends BlockListener {
 		}
 
 		// unbreakableZoneBlocks
-		if (blockZone != null && blockZone.isUnbreakableZoneBlocks() && (!isZoneMaker || (isZoneMaker && team != null))) {
+		if (blockZone != null && blockZone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE) && (!isZoneMaker || (isZoneMaker && team != null))) {
 			// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks
 			War.war.badMsg(player, "The blocks in this zone are unbreakable!");
 			event.setCancelled(true);

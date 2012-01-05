@@ -9,6 +9,7 @@ import org.bukkit.inventory.PlayerInventory;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.WarzoneConfig;
 
 import bukkit.tommytony.war.War;
 
@@ -31,7 +32,7 @@ public class HelmetProtectionTask implements Runnable {
 				for (Player player : team.getPlayers()) {
 					PlayerInventory playerInv = player.getInventory();
 					Material teamBlockMaterial;
-					if (zone.isBlockHeads()) {
+					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
 						teamBlockMaterial = team.getKind().getMaterial();
 						// 1) Replace missing block head
 						if (playerInv.getHelmet().getType() != teamBlockMaterial) {

@@ -5,7 +5,8 @@ import java.util.logging.Level;
 import bukkit.tommytony.war.War;
 
 import com.tommytony.war.Warzone;
-import com.tommytony.war.mappers.WarzoneMapper;
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.mappers.WarzoneTxtMapper;
 
 public class RestoreWarzonesJob implements Runnable {
 
@@ -23,7 +24,7 @@ public class RestoreWarzonesJob implements Runnable {
 		for (String warzoneName : warzoneSplit) {
 			if (warzoneName != null && !warzoneName.equals("")) {
 				War.war.log("Loading zone " + warzoneName + "...", Level.INFO);
-				Warzone zone = WarzoneMapper.load(warzoneName, !this.newWarInstall);
+				Warzone zone = WarzoneTxtMapper.load(warzoneName, !this.newWarInstall);
 				if (zone != null) { // could have failed, would've been logged already
 					War.war.getWarzones().add(zone);
 					// zone.getVolume().loadCorners();
@@ -31,7 +32,7 @@ public class RestoreWarzonesJob implements Runnable {
 					if (zone.getLobby() != null) {
 						zone.getLobby().getVolume().resetBlocks();
 					}
-					if (zone.isResetOnLoad()) {
+					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONLOAD)) {
 						zone.getVolume().resetBlocks();
 					}
 					zone.initializeZone();

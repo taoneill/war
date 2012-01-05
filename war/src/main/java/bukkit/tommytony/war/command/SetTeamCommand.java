@@ -3,12 +3,13 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import bukkit.tommytony.war.WarCommandHandler;
+
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.mappers.WarzoneMapper;
-
-import bukkit.tommytony.war.WarCommandHandler;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 
 /**
  * Places a soawn
@@ -53,7 +54,7 @@ public class SetTeamCommand extends AbstractZoneMakerCommand {
 			} else {
 				// new team (use default TeamKind name for now)
 				Team newTeam = new Team(teamKind.toString(), teamKind, player.getLocation(), zone);
-				newTeam.setRemainingLives(zone.getLifePool());
+				newTeam.setRemainingLives(newTeam.getTeamConfig().getInt(TeamConfig.LIFEPOOL));
 				zone.getTeams().add(newTeam);
 				if (zone.getLobby() != null) {
 					zone.getLobby().getVolume().resetBlocks();
@@ -64,7 +65,7 @@ public class SetTeamCommand extends AbstractZoneMakerCommand {
 			}
 		}
 
-		WarzoneMapper.save(zone, false);
+		WarzoneYmlMapper.save(zone, false);
 
 		return true;
 	}

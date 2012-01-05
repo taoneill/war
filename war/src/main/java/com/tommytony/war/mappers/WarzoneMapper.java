@@ -443,7 +443,6 @@ public class WarzoneMapper {
 		warzoneConfig.setBoolean("friendlyFire", warzone.getFriendlyFire());
 
 		// loadout
-		String loadoutStr = "";
 		HashMap<Integer, ItemStack> items = warzone.getLoadout();
 		warzoneConfig.setString("loadout", fromLoadoutToString(items));
 		
@@ -494,7 +493,6 @@ public class WarzoneMapper {
 		warzoneConfig.setString("flagReturn", warzone.getFlagReturn().toString());
 
 		// reward
-		String rewardStr = "";
 		HashMap<Integer, ItemStack> rewardItems = warzone.getReward();
 		warzoneConfig.setString("reward", fromLoadoutToString(rewardItems));
 

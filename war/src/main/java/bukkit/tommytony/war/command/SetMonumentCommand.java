@@ -3,11 +3,11 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import bukkit.tommytony.war.WarCommandHandler;
+
 import com.tommytony.war.Monument;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.mappers.WarzoneMapper;
-
-import bukkit.tommytony.war.WarCommandHandler;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 
 /**
  * Places a monument
@@ -44,22 +44,20 @@ public class SetMonumentCommand extends AbstractZoneMakerCommand {
 			return false;
 		}
 
-		Warzone warzone = Warzone.getZoneByLocation(player);
-		if (warzone.hasMonument(this.args[0])) {
+		if (zone.hasMonument(this.args[0])) {
 			// move the existing monument
-			Monument monument = warzone.getMonument(this.args[0]);
+			Monument monument = zone.getMonument(this.args[0]);
 			monument.getVolume().resetBlocks();
 			monument.setLocation(player.getLocation());
 			this.msg("Monument " + monument.getName() + " was moved.");
 		} else {
 			// create a new monument
-			Monument monument = new Monument(this.args[0], warzone, player.getLocation());
-			warzone.getMonuments().add(monument);
+			Monument monument = new Monument(this.args[0], zone, player.getLocation());
+			zone.getMonuments().add(monument);
 			this.msg("Monument " + monument.getName() + " created.");
 		}
-		WarzoneMapper.save(warzone, false);
 
-		WarzoneMapper.save(zone, false);
+		WarzoneYmlMapper.save(zone, false);
 
 		return true;
 	}

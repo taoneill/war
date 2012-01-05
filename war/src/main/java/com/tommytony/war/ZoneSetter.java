@@ -6,8 +6,9 @@ import org.bukkit.entity.Player;
 
 import bukkit.tommytony.war.War;
 
-import com.tommytony.war.mappers.WarMapper;
-import com.tommytony.war.mappers.WarzoneMapper;
+import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.mappers.WarYmlMapper;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 import com.tommytony.war.volumes.NotNorthwestException;
 import com.tommytony.war.volumes.NotSoutheastException;
 import com.tommytony.war.volumes.TooBigException;
@@ -28,7 +29,7 @@ public class ZoneSetter {
 		Block northwestBlock = this.player.getLocation().getWorld().getBlockAt(this.player.getLocation());
 		StringBuilder msgString = new StringBuilder();
 		try {
-			if (warzone == null && War.war.getWarzones().size() >= War.war.getMaxZones()) {
+			if (warzone == null && War.war.getWarzones().size() >= War.war.getWarConfig().getInt(WarConfig.MAXZONES)) {
 				// max warzones reached
 				War.war.badMsg(player, "Too many warzones already! To change the maximum, use /warcfg maxzone:20.");
 				return;
@@ -71,7 +72,7 @@ public class ZoneSetter {
 		Block southeastBlock = this.player.getLocation().getWorld().getBlockAt(this.player.getLocation());
 		StringBuilder msgString = new StringBuilder();
 		try {
-			if (warzone == null && War.war.getWarzones().size() >= War.war.getMaxZones()) {
+			if (warzone == null && War.war.getWarzones().size() >= War.war.getWarConfig().getInt(WarConfig.MAXZONES)) {
 				// max warzones reached
 				War.war.badMsg(player, "Too many warzones already! To change the maximum, use /warcfg maxzone:20.");
 				return;
@@ -118,7 +119,7 @@ public class ZoneSetter {
 		Warzone warzone = War.war.findWarzone(this.zoneName);
 		StringBuilder msgString = new StringBuilder();
 		try {
-			if (warzone == null && War.war.getWarzones().size() >= War.war.getMaxZones()) {
+			if (warzone == null && War.war.getWarzones().size() >= War.war.getWarConfig().getInt(WarConfig.MAXZONES)) {
 				// max warzones reached
 				War.war.badMsg(player, "Too many warzones already! To change the maximum, use /warcfg maxzone:20.");
 				return;
@@ -160,7 +161,7 @@ public class ZoneSetter {
 		Warzone warzone = War.war.findWarzone(this.zoneName);
 		StringBuilder msgString = new StringBuilder();
 		try {
-			if (warzone == null && War.war.getWarzones().size() >= War.war.getMaxZones()) {
+			if (warzone == null && War.war.getWarzones().size() >= War.war.getWarConfig().getInt(WarConfig.MAXZONES)) {
 				// max warzones reached
 				War.war.badMsg(player, "Too many warzones already! To change the maximum, use /warcfg maxzone:20.");
 				return;
@@ -229,7 +230,7 @@ public class ZoneSetter {
 			if (War.war.getIncompleteZones().contains(warzone)) {
 				War.war.getIncompleteZones().remove(warzone);
 			}
-			WarMapper.save();
+			WarYmlMapper.save();
 			msgString.append("Saving new warzone blocks...");
 			War.war.msg(this.player, msgString.toString());
 			warzone.saveState(false); // we just changed the volume, cant reset walls
@@ -246,7 +247,7 @@ public class ZoneSetter {
 			}
 			
 			warzone.initializeZone();
-			WarzoneMapper.save(warzone, true);
+			WarzoneYmlMapper.save(warzone, true);
 			War.war.msg(this.player, "Warzone saved.");
 		} else {
 			if (warzone.getVolume().getCornerOne() == null) {

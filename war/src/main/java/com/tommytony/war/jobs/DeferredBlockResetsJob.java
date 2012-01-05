@@ -2,28 +2,20 @@ package com.tommytony.war.jobs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
 import org.bukkit.block.ContainerBlock;
-import org.bukkit.block.Dispenser;
-import org.bukkit.block.Furnace;
 import org.bukkit.block.NoteBlock;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
-import bukkit.tommytony.war.War;
-
-import com.tommytony.war.mappers.ZoneVolumeMapper;
 import com.tommytony.war.utils.DeferredBlockReset;
 import com.tommytony.war.volumes.Volume;
 

@@ -8,7 +8,7 @@ import bukkit.tommytony.war.WarCommandHandler;
 
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.mappers.WarzoneMapper;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 
 public class SaveZoneCommand extends AbstractZoneMakerCommand {
 
@@ -67,7 +67,7 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 
 		// changed settings: must reinitialize with new settings
 		String namedParamResult = War.war.updateZoneFromNamedParams(zone, commandSender, this.args);
-		WarzoneMapper.save(zone, true);
+		WarzoneYmlMapper.save(zone, true);
 		if (this.args.length > 0) {
 			// the config may have changed, requiring a reset for spawn styles etc.
 			zone.getVolume().resetBlocks();

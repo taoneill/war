@@ -3,12 +3,12 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import bukkit.tommytony.war.WarCommandHandler;
+
 import com.tommytony.war.Monument;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.mappers.WarzoneMapper;
-
-import bukkit.tommytony.war.WarCommandHandler;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 
 /**
  * Deletes a monument.
@@ -55,7 +55,7 @@ public class DeleteMonumentCommand extends AbstractZoneMakerCommand {
 		if (monument != null) {
 			monument.getVolume().resetBlocks();
 			zone.getMonuments().remove(monument);
-			WarzoneMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone, false);
 			this.msg("Monument " + monument.getName() + " removed.");
 		} else {
 			this.badMsg("No such monument.");

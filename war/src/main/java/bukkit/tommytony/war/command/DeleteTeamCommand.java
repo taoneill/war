@@ -3,13 +3,13 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import bukkit.tommytony.war.WarCommandHandler;
+
 import com.tommytony.war.Team;
+import com.tommytony.war.TeamKind;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.TeamKind;
-import com.tommytony.war.mappers.WarzoneMapper;
-
-import bukkit.tommytony.war.WarCommandHandler;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 
 /**
  * Deletes a team.
@@ -62,7 +62,7 @@ public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 			if (zone.getLobby() != null) {
 				zone.getLobby().initialize();
 			}
-			WarzoneMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone, false);
 			this.msg("Team " + team.getName() + " removed.");
 		} else {
 			this.badMsg("No such team.");

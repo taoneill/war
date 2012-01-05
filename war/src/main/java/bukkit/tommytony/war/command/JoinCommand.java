@@ -12,6 +12,8 @@ import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.WarzoneConfig;
 
 /**
  * Joins a team.
@@ -91,7 +93,7 @@ public class JoinCommand extends AbstractWarCommand {
 		// join new team
 		
 
-		if (zone.isDisabled()) {
+		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 			this.msg("This warzone is disabled.");
 		} else {
 			List<Team> teams = zone.getTeams();
@@ -102,7 +104,7 @@ public class JoinCommand extends AbstractWarCommand {
 						zone.keepPlayerState(player);
 						this.msg("Your inventory is in storage until you use '/war leave'.");
 					}
-					if (team.getPlayers().size() < zone.getTeamCap()) {
+					if (team.getPlayers().size() < team.getTeamConfig().getInt(TeamConfig.TEAMSIZE)) {
 						team.addPlayer(player);
 						team.resetSign();
 						zone.respawnPlayer(team, player);

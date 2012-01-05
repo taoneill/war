@@ -4,12 +4,12 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.tommytony.war.Warzone;
-import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.mappers.WarzoneMapper;
-
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
+
+import com.tommytony.war.Warzone;
+import com.tommytony.war.ZoneLobby;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 
 /**
  * Places the zonelobby
@@ -66,7 +66,7 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 					}
 					this.msg("Warzone lobby moved to your location.");
 				}
-				WarzoneMapper.save(givenWarzone, false);
+				WarzoneYmlMapper.save(givenWarzone, false);
 			}
 		} else if (!this.isSenderAuthorOfZone(zone)) {
 			return true;
@@ -110,7 +110,7 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 				}
 				this.msg("Warzone lobby created on " + wallStr + "side of zone.");
 			}
-			WarzoneMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone, false);
 		}
 
 		return true;

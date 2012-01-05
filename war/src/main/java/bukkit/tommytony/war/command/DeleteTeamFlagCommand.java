@@ -8,7 +8,7 @@ import bukkit.tommytony.war.WarCommandHandler;
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
-import com.tommytony.war.mappers.WarzoneMapper;
+import com.tommytony.war.mappers.WarzoneYmlMapper;
 
 /**
  * Deletes a monument.
@@ -60,7 +60,7 @@ public class DeleteTeamFlagCommand extends AbstractZoneMakerCommand {
 		if (teamFlagTeam != null) {
 			teamFlagTeam.deleteTeamFlag();
 			
-			WarzoneMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone, false);
 			this.msg(teamFlagTeam.getName() + " flag removed.");
 		} else {
 			this.badMsg("No such team flag.");

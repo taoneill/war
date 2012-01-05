@@ -13,6 +13,8 @@ import org.bukkit.entity.Player;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.BlockInfo;
 import com.tommytony.war.volumes.Volume;
@@ -246,7 +248,7 @@ public class ZoneLobby {
 
 	private void calculateLobbyWidth() {
 		int noOfTeams = this.warzone.getTeams().size();
-		if (this.warzone.isAutoAssignOnly()) {
+		if (this.warzone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
 			noOfTeams = 1;
 		}
 		int lobbyWidth = noOfTeams * 4 + 5;
@@ -365,7 +367,7 @@ public class ZoneLobby {
 			rightSide = BlockFace.SOUTH;
 		}
 		this.teamGateBlocks.clear();
-		if (this.warzone.isAutoAssignOnly()) {
+		if (this.warzone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
 			this.autoAssignGate = new BlockInfo(lobbyMiddleWallBlock);
 		} else {
 			this.autoAssignGate = null;
@@ -586,12 +588,12 @@ public class ZoneLobby {
 		if (gate != null) {
 			String[] lines = new String[4];
 			lines[0] = "Team " + team.getName();
-			lines[1] = team.getPlayers().size() + "/" + this.warzone.getTeamCap() + " players";
-			lines[2] = team.getPoints() + "/" + this.warzone.getScoreCap() + " pts";
-			if (this.warzone.getLifePool() == -1) {
+			lines[1] = team.getPlayers().size() + "/" + team.getTeamConfig().getInt(TeamConfig.TEAMSIZE) + " players";
+			lines[2] = team.getPoints() + "/" + team.getTeamConfig().getInt(TeamConfig.MAXSCORE) + " pts";
+			if (team.getTeamConfig().getInt(TeamConfig.LIFEPOOL) == -1) {
 				lines[3] = "unlimited lives";
 			} else {
-				lines[3] = team.getRemainingLifes() + "/" + this.warzone.getLifePool() + " lives left";
+				lines[3] = team.getRemainingLifes() + "/" + team.getTeamConfig().getInt(TeamConfig.TEAMSIZE) + " lives left";
 			}
 			this.resetGateSign(gate, lines, true);
 		}

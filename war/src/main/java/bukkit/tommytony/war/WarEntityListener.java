@@ -33,6 +33,9 @@ import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.jobs.DeferredBlockResetsJob;
 import com.tommytony.war.utils.DeferredBlockReset;
 
@@ -99,7 +102,7 @@ public class WarEntityListener extends EntityListener {
 					return;
 				}
 				
-				if (!attackerWarzone.isPvpInZone()) {
+				if (!attackerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.PVPINZONE)) {
 					// spleef-like, non-pvp, zone
 					event.setCancelled(true);
 					return;
@@ -151,7 +154,7 @@ public class WarEntityListener extends EntityListener {
 				}
 			} else if (attackerTeam != null && defenderTeam != null && attackerTeam == defenderTeam && attackerWarzone == defenderWarzone && attacker.getEntityId() != defender.getEntityId()) {
 				// same team, but not same person
-				if (attackerWarzone.getFriendlyFire()) {
+				if (attackerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.FRIENDLYFIRE)) {
 					War.war.badMsg(a, "Friendly fire is on! Please, don't hurt your teammates."); // if ff is on, let the attack go through
 				} else {
 					War.war.badMsg(a, "Your attack missed! Your target is on your team.");
@@ -160,7 +163,7 @@ public class WarEntityListener extends EntityListener {
 			} else if (attackerTeam == null && defenderTeam == null && War.war.canPvpOutsideZones(a)) {
 				// let normal PVP through is its not turned off or if you have perms
 			} else if (attackerTeam == null && defenderTeam == null && !War.war.canPvpOutsideZones(a)) {
-				if (!War.war.isDisablePvpMessage()) {
+				if (!War.war.getWarConfig().getBoolean(WarConfig.DISABLEPVPMESSAGE)) {
 					War.war.badMsg(a, "You need the 'war.pvp' permission to attack players outside warzones.");
 				}
 				event.setCancelled(true); // global pvp is off
@@ -218,7 +221,7 @@ public class WarEntityListener extends EntityListener {
 		
 		boolean explosionInAWarzone = event.getEntity() != null && Warzone.getZoneByLocation(event.getEntity().getLocation()) != null;
 		
-		if (!explosionInAWarzone && War.war.isTntInZonesOnly() && event.getEntity() instanceof TNTPrimed) {
+		if (!explosionInAWarzone && War.war.getWarConfig().getBoolean(WarConfig.TNTINZONESONLY) && event.getEntity() instanceof TNTPrimed) {
 			// if tntinzonesonly:true, no tnt blows up outside zones
 			event.setCancelled(true);
 			return;
@@ -394,7 +397,7 @@ public class WarEntityListener extends EntityListener {
 
 		Location location = event.getLocation();
 		Warzone zone = Warzone.getZoneByLocation(location);
-		if (zone != null && zone.isNoCreatures()) {
+		if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.NOCREATURES)) {
 			event.setCancelled(true);
 		}
 	}
@@ -421,9 +424,10 @@ public class WarEntityListener extends EntityListener {
 		Player player = (Player) entity;
 		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 		if (zone != null) {
+			Team team = Team.getTeamByPlayerName(player.getName());
 			if ((event.getRegainReason() == RegainReason.EATING 
 					|| event.getRegainReason().toString() != "SATIATED" ) 
-				&& zone.isNoHunger()) {
+				&& team.getTeamConfig().getBoolean(TeamConfig.NOHUNGER)) {
 				// noHunger setting means you can't auto-heal with full hunger bar (use saturation instead to control how fast you get hungry)
 				event.setCancelled(true);
 			} else if (event.getRegainReason() == RegainReason.REGEN) {
@@ -441,7 +445,8 @@ public class WarEntityListener extends EntityListener {
 		
 		Player player = (Player) event.getEntity();
 		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
-		if (zone != null && zone.isNoHunger()){
+		Team team = Team.getTeamByPlayerName(player.getName());
+		if (zone != null && team.getTeamConfig().getBoolean(TeamConfig.NOHUNGER)){
 			event.setCancelled(true);
 		}
 	}

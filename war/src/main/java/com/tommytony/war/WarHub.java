@@ -11,6 +11,8 @@ import org.bukkit.block.BlockFace;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.utils.SignHelper;
 import com.tommytony.war.volumes.BlockInfo;
 import com.tommytony.war.volumes.Volume;
@@ -105,7 +107,7 @@ public class WarHub {
 		this.zoneGateBlocks.clear();
 		int disabled = 0;
 		for (Warzone zone : War.war.getWarzones()) {
-			if (zone.isDisabled()) {
+			if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 				disabled++;
 			}
 		}
@@ -159,7 +161,7 @@ public class WarHub {
 			Block currentGateBlock = BlockInfo.getBlock(this.location.getWorld(), this.volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(front, hubDepth).getRelative(right, 2);
 
 			for (Warzone zone : War.war.getWarzones()) { // gonna use the index to find it again
-				if (!zone.isDisabled()) {
+				if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 					this.zoneGateBlocks.put(zone.getName(), currentGateBlock);
 					currentGateBlock.getRelative(BlockFace.DOWN).setType(Material.GLOWSTONE);
 					currentGateBlock.getRelative(left).setType(Material.OBSIDIAN);
@@ -186,7 +188,7 @@ public class WarHub {
 
 			// Warzone signs
 			for (Warzone zone : War.war.getWarzones()) {
-				if (!zone.isDisabled() && zone.ready()) {
+				if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED) && zone.ready()) {
 					this.resetZoneSign(zone);
 				}
 			}
@@ -233,7 +235,7 @@ public class WarHub {
 			int zonePlayers = 0;
 			for (Team t : zone.getTeams()) {
 				zonePlayers += t.getPlayers().size();
-				zoneCap += zone.getTeamCap();
+				zoneCap += t.getTeamConfig().getInt(TeamConfig.TEAMSIZE);
 			}
 			String[] lines = new String[4];
 			lines[0] = "Warzone";

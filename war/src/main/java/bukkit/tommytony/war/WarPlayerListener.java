@@ -34,6 +34,8 @@ import com.tommytony.war.WarHub;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.ZoneSetter;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.WarzoneConfig;
 
 /**
  * @author tommytony, Tim Düsterhus
@@ -75,7 +77,7 @@ public class WarPlayerListener extends PlayerListener {
 					// a flag thief can't drop his flag
 					War.war.badMsg(player, "Can't drop items while stealing flag. What are you doing?! Run!");
 					event.setCancelled(true);
-				} else if (zone.isNoDrops()) {
+				} else if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.NODROPS)) {
 					War.war.badMsg(player, "Can't drop items in this warzone.");
 					event.setCancelled(true);
 				} else {
@@ -270,12 +272,12 @@ public class WarPlayerListener extends PlayerListener {
 		Warzone playerWarzone = Warzone.getZoneByPlayerName(player.getName()); // this uses the teams, so it asks: get the player's team's warzone
 		boolean protecting = false;
 		if (currentTeam != null) {
-			if (playerWarzone.isGlassWalls()) {
+			if (playerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.GLASSWALLS)) {
 				protecting = playerWarzone.protectZoneWallAgainstPlayer(player);
 			}
 		} else {
 			Warzone nearbyZone = War.war.zoneOfZoneWallAtProximity(playerLoc);
-			if (nearbyZone != null && nearbyZone.isGlassWalls() && !isMaker) {
+			if (nearbyZone != null && nearbyZone.getWarzoneConfig().getBoolean(WarzoneConfig.GLASSWALLS) && !isMaker) {
 				protecting = nearbyZone.protectZoneWallAgainstPlayer(player);
 			}
 		}
@@ -296,15 +298,18 @@ public class WarPlayerListener extends PlayerListener {
 			if (oldTeam == null && canPlay) { // trying to counter spammy player move
 				isAutoAssignGate = zone.getLobby().isAutoAssignGate(playerLoc);
 				if (isAutoAssignGate) {
-					if (zone.isDisabled()) {
+					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 						this.handleDisabledZone(event, player, zone);
 					} else {
 						this.dropFromOldTeamIfAny(player);
 						int noOfPlayers = 0;
+						int totalCap = 0;
 						for (Team t : zone.getTeams()) {
 							noOfPlayers += t.getPlayers().size();
+							totalCap += t.getTeamConfig().getInt(TeamConfig.MAXSCORE);
 						}
-						if (noOfPlayers < zone.getTeams().size() * zone.getTeamCap()) {
+						
+						if (noOfPlayers < totalCap) {
 							zone.autoAssign(player);
 
 							if (War.war.getWarHub() != null) {
@@ -323,9 +328,9 @@ public class WarPlayerListener extends PlayerListener {
 				for (Team team : zone.getTeams()) {
 					if (zone.getLobby().isInTeamGate(team, playerLoc)) {
 						this.dropFromOldTeamIfAny(player);
-						if (zone.isDisabled()) {
+						if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 							this.handleDisabledZone(event, player, zone);
-						} else if (team.getPlayers().size() < zone.getTeamCap()) {
+						} else if (team.getPlayers().size() < team.getTeamConfig().getInt(TeamConfig.TEAMSIZE)) {
 							team.addPlayer(player);
 							team.resetSign();
 							if (War.war.getWarHub() != null) {
@@ -433,12 +438,13 @@ public class WarPlayerListener extends PlayerListener {
 			
 			if (!playerTeam.getSpawnVolume().contains(playerLoc)) {
 				if (!playerWarzone.isEnoughPlayers()) {
-					War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getMinPlayers() +" player(s) on at least " + playerWarzone.getMinTeams() + " team(s).");
+					War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getWarzoneConfig().getInt(WarzoneConfig.MINPLAYERS)
+							+" player(s) on at least " + playerWarzone.getWarzoneConfig().getInt(WarzoneConfig.MINTEAMS) + " team(s).");
 					event.setTo(playerTeam.getTeamSpawn());
 					return;
 				}
 				if (playerWarzone.isRespawning(player)) {
-					int rt = playerWarzone.getRespawnTimer();
+					int rt = playerTeam.getTeamConfig().getInt(TeamConfig.RESPAWNTIMER);
 					String isS = "s";
 					if (rt==1) isS = "";
 					War.war.badMsg(player, "Can't leave spawn for "+rt+" second"+isS+" after spawning!");
@@ -451,7 +457,7 @@ public class WarPlayerListener extends PlayerListener {
 			if (playerTeam != null && playerWarzone.nearAnyOwnedMonument(playerLoc, playerTeam) && player.getHealth() < 20 && player.getHealth() > 0 // don't heal the dead
 					&& this.random.nextInt(7) == 3) { // one chance out of many of getting healed
 				int currentHp = player.getHealth();
-				int newHp = Math.min(20, currentHp + locZone.getMonumentHeal());
+				int newHp = Math.min(20, currentHp + locZone.getWarzoneConfig().getInt(WarzoneConfig.MONUMENTHEAL));
 
 				player.setHealth(newHp);
 				String isS = "s";
@@ -473,18 +479,18 @@ public class WarPlayerListener extends PlayerListener {
 				boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
 				boolean inFlag = (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation()));
 
-				if (playerWarzone.getFlagReturn() == FlagReturn.BOTH) {
+				if (playerTeam.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN).equals(FlagReturn.BOTH)) {
 					if (!inSpawn && !inFlag) {
 						return;
 					}
-				} else if (playerWarzone.getFlagReturn() == FlagReturn.SPAWN) {
+				} else if (playerTeam.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN).equals(FlagReturn.SPAWN)) {
 					if (inFlag) {
 						War.war.badMsg(player, "You have to capture the enemy flag at your team's spawn.");
 						return;
 					} else if (!inSpawn) {
 						return;
 					}
-				} else if (playerWarzone.getFlagReturn() == FlagReturn.FLAG) {
+				} else if (playerTeam.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN).equals(FlagReturn.FLAG)) {
 					if (inSpawn) {
 						War.war.badMsg(player, "You have to capture the enemy flag at your team's flag.");
 						return;
@@ -493,13 +499,13 @@ public class WarPlayerListener extends PlayerListener {
 					}
 				}
 
-				if (playerWarzone.isTeamFlagStolen(playerTeam) && playerWarzone.isFlagMustBeHome()) {
+				if (playerWarzone.isTeamFlagStolen(playerTeam) && playerTeam.getTeamConfig().getBoolean(TeamConfig.FLAGMUSTBEHOME)) {
 					War.war.badMsg(player, "You can't capture the enemy flag until your team's flag is returned.");
 				} else {
 					synchronized (playerWarzone) {
 						// flags can be captured at own spawn or own flag pole
 						playerTeam.addPoint();
-						if (playerTeam.getPoints() >= playerWarzone.getScoreCap()) {
+						if (playerTeam.getPoints() >= playerTeam.getTeamConfig().getInt(TeamConfig.MAXSCORE)) {
 							if (playerWarzone.hasPlayerState(player.getName())) {
 								playerWarzone.restorePlayerState(player);
 							}
@@ -554,11 +560,11 @@ public class WarPlayerListener extends PlayerListener {
 		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());
 			Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
-			if (playerWarzone != null && playerTeam != null && playerWarzone.getExtraLoadouts().keySet().size() > 0 && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
+			if (playerWarzone != null && playerTeam != null && playerTeam.getInventories().resolveLoadouts().keySet().size() > 1 && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
 				if (playerWarzone.getLoadoutSelections().keySet().contains(event.getPlayer().getName())
 						&& playerWarzone.getLoadoutSelections().get(event.getPlayer().getName()).isStillInSpawn()) {
 					LoadoutSelection selection = playerWarzone.getLoadoutSelections().get(event.getPlayer().getName());
-					int currentIndex = (selection.getSelectedIndex() + 1) % (playerWarzone.getExtraLoadouts().keySet().size() + 1);
+					int currentIndex = (selection.getSelectedIndex() + 1) % (playerTeam.getInventories().resolveLoadouts().keySet().size());
 					selection.setSelectedIndex(currentIndex);
 					
 					playerWarzone.equipPlayerLoadoutSelection(event.getPlayer(), playerTeam, false, true);

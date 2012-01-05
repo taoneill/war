@@ -44,8 +44,8 @@ public class ScoreCapReachedJob implements Runnable {
 				}
 				if (this.winnersStr.contains(t.getName())) {
 					// give reward
-					for (Integer slot : this.zone.getReward().keySet()) {
-						ItemStack item = this.zone.getReward().get(slot);
+					for (Integer slot : t.getInventories().resolveReward().keySet()) {
+						ItemStack item = t.getInventories().resolveReward().get(slot);
 						if (item != null) {
 							tp.getInventory().addItem(item);
 						}

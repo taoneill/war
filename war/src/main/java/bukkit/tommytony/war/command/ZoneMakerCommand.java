@@ -3,10 +3,10 @@ package bukkit.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.tommytony.war.mappers.WarMapper;
-
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
+
+import com.tommytony.war.mappers.WarYmlMapper;
 
 /**
  * Makes a player zonemaker and other way round.
@@ -71,7 +71,7 @@ public class ZoneMakerCommand extends AbstractWarCommand {
 
 			War.war.getZoneMakersImpersonatingPlayers().remove(player.getName());
 			this.msg("You are back as a zone maker.");
-			WarMapper.save();
+			WarYmlMapper.save();
 		}
 
 		return true;

@@ -6,13 +6,15 @@ import org.bukkit.entity.Player;
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarCommandHandler;
 
+import com.tommytony.war.Team;
+import com.tommytony.war.TeamKind;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.WarzoneYmlMapper;
 
-public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
+public class SetTeamConfigCommand extends AbstractZoneMakerCommand {
 
-	public SetZoneConfigCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
+	public SetTeamConfigCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
 		super(handler, sender, args);
 	}
 
@@ -72,6 +74,28 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 			}
 
 			// args have been shifted if needed
+			Team team = null;
+			if (this.args.length > 0) {
+				// only printing
+				TeamKind kind = TeamKind.teamKindFromString(this.args[0]);
+				team = zone.getTeamByKind(kind);
+				
+				if (team == null) {
+					// Team not found
+					return false;
+				}
+				
+				// first param was team, shift again
+				String[] newargs = new String[this.args.length - 1];
+				for (int i = 1; i < this.args.length; i++) {
+					newargs[i - 1] = this.args[i];
+				}
+				this.args = newargs;
+			} else {
+				// No team param, show usage
+				return false;
+			}
+			
 			if (this.args.length > 0 && (this.args[0].equals("-p") || this.args[0].equals("print"))) {
 				// only printing
 				if (this.args.length == 1) {
@@ -88,8 +112,8 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 				wantsToPrint = true;
 			}
 
-			// We have a warzone and indexed-from-0 arguments, let's update
-			String namedParamReturn = War.war.updateZoneFromNamedParams(zone, player, this.args);
+			// We have a warzone, a team and indexed-from-0 arguments, let's update
+			String namedParamReturn = War.war.updateTeamFromNamedParams(team, player, this.args);
 			if (!namedParamReturn.equals("") && !namedParamReturn.equals("PARSE-ERROR")) {
 				this.msg("Saving config and resetting warzone " + zone.getName() + ".");
 				WarzoneYmlMapper.save(zone, false);
@@ -100,9 +124,9 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 				zone.initializeZone(); // bring back team spawns etc
 
 				if (wantsToPrint) {
-					this.msg("Warzone config saved. Zone reset." + namedParamReturn + " " + War.war.printConfig(zone));
+					this.msg("Team config saved. Zone reset." + namedParamReturn + " " + War.war.printConfig(team));
 				} else {
-					this.msg("Warzone config saved. Zone reset." + namedParamReturn);
+					this.msg("Team config saved. Zone reset." + namedParamReturn);
 				}
 
 				if (War.war.getWarHub() != null) { // maybe the zone was disabled/enabled
