@@ -77,7 +77,7 @@ public class WarSpoutListener extends SpoutListener {
 		linecounter = 0;
 		for (Team t : zone.getTeams()) {
 			// scores
-			line = new GenericLabel(t.getPoints()+"/"+t.getTeamConfig().getInt(TeamConfig.MAXSCORE)+" points");
+			line = new GenericLabel(t.getPoints()+"/"+t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)+" points");
 			if (t.getPlayers().size()==0) line.setTextColor(new Color(100,100,100));
 			line.setTooltip("Warzone: "+zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
 	        line.setAlign(WidgetAnchor.TOP_LEFT).setX(3+teammax+15+playmax+15).setY(3+linecounter*(GenericLabel.getStringHeight("O")+3)).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
@@ -92,7 +92,7 @@ public class WarSpoutListener extends SpoutListener {
 		// and finally, lives.
 		linecounter = 0;
 		for (Team t : zone.getTeams()) {
-			line = new GenericLabel(t.getRemainingLifes()+"/"+t.getTeamConfig().getInt(TeamConfig.LIFEPOOL)+" lives");
+			line = new GenericLabel(t.getRemainingLifes()+"/"+t.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL)+" lives");
 			if (t.getPlayers().size()==0) line.setTextColor(new Color(100,100,100));
 			line.setTooltip("Warzone: "+zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
 	        line.setAlign(WidgetAnchor.TOP_LEFT).setX(3+teammax+15+playmax+15+scoremax+15).setY(3+linecounter*(GenericLabel.getStringHeight("O")+3)).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));

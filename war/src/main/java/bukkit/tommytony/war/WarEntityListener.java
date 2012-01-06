@@ -427,7 +427,7 @@ public class WarEntityListener extends EntityListener {
 			Team team = Team.getTeamByPlayerName(player.getName());
 			if ((event.getRegainReason() == RegainReason.EATING 
 					|| event.getRegainReason().toString() != "SATIATED" ) 
-				&& team.getTeamConfig().getBoolean(TeamConfig.NOHUNGER)) {
+				&& team.getTeamConfig().resolveBoolean(TeamConfig.NOHUNGER)) {
 				// noHunger setting means you can't auto-heal with full hunger bar (use saturation instead to control how fast you get hungry)
 				event.setCancelled(true);
 			} else if (event.getRegainReason() == RegainReason.REGEN) {
@@ -446,7 +446,7 @@ public class WarEntityListener extends EntityListener {
 		Player player = (Player) event.getEntity();
 		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 		Team team = Team.getTeamByPlayerName(player.getName());
-		if (zone != null && team.getTeamConfig().getBoolean(TeamConfig.NOHUNGER)){
+		if (zone != null && team.getTeamConfig().resolveBoolean(TeamConfig.NOHUNGER)){
 			event.setCancelled(true);
 		}
 	}

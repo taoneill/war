@@ -104,9 +104,11 @@ public class WarzoneTxtMapper {
 			}
 			
 			for (String extraName : extraLoadoutsSplit) {
-				String loadoutString = warzoneConfig.getString(extraName + "Loadout");
-				HashMap<Integer, ItemStack> loadout = warzone.getDefaultInventories().getLoadouts().get(extraName);
-				LoadoutTxtMapper.fromStringToLoadout(loadoutString, loadout);
+				if (extraName != null && !extraName.equals("")) {
+					String loadoutString = warzoneConfig.getString(extraName + "Loadout");
+					HashMap<Integer, ItemStack> loadout = warzone.getDefaultInventories().getLoadouts().get(extraName);
+					LoadoutTxtMapper.fromStringToLoadout(loadoutString, loadout);
+				}
 			}
 
 			// authors
@@ -299,7 +301,7 @@ public class WarzoneTxtMapper {
 							teamLocation.setYaw(yaw);
 						}
 						Team team = new Team(teamStrSplit[0], TeamKind.teamKindFromString(teamStrSplit[0]), teamLocation, warzone);
-						team.setRemainingLives(warzone.getTeamDefaultConfig().getInt(TeamConfig.LIFEPOOL));
+						team.setRemainingLives(warzone.getTeamDefaultConfig().resolveInt(TeamConfig.LIFEPOOL));
 						warzone.getTeams().add(team);
 					}
 				}

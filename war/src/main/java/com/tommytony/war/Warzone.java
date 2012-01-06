@@ -45,51 +45,22 @@ import com.tommytony.war.volumes.ZoneVolume;
 public class Warzone {
 	private String name;
 	private ZoneVolume volume;
+	private World world;
 	private final List<Team> teams = new ArrayList<Team>();
 	private final List<Monument> monuments = new ArrayList<Monument>();
+	private Location teleport;
+	private ZoneLobby lobby;
+	private Location rallyPoint;
 	
 	private final List<String> authors = new ArrayList<String>();
-	private final List<Player> respawn = new ArrayList<Player>();
-
-	private Location teleport;
-//	private boolean friendlyFire = false;
-//	private int lifePool = 7;
-//	private int teamCap = 5;
-//	private int scoreCap = 5;
-//	private int monumentHeal = 5;
-//	private FlagReturn flagReturn = FlagReturn.BOTH;
-//	private TeamSpawnStyle spawnStyle = TeamSpawnStyle.BIG;
-
+	
+	private final int minSafeDistanceFromWall = 6;
+	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private HashMap<String, PlayerState> playerStates = new HashMap<String, PlayerState>();
 	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
 	private HashMap<String, LoadoutSelection> loadoutSelections = new HashMap<String, LoadoutSelection>();
-	private World world;
-	private final int minSafeDistanceFromWall = 6;
-	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
-	private ZoneLobby lobby;
-//	private boolean autoAssignOnly = false;
-//	private boolean flagPointsOnly = false;
-//	private boolean flagMustBeHome = true;
-//	private boolean blockHeads = true;
-//	private boolean unbreakableZoneBlocks = false;
-//	private boolean disabled = false;
-//	private boolean noCreatures = false;
-//	private boolean glassWalls = true;
-//	private boolean pvpInZone = true;
-//	private boolean instaBreak = false;
-//	private boolean noDrops = false;
-//	private boolean noHunger = false;
-//	private int respawnTimer = 0;
-//	private int saturation = 10;
-//	private int minPlayers = 1;
-//	private int minTeams = 1;
-	
-//	private boolean resetOnEmpty = false;
-//	private boolean resetOnLoad = false;
-//	private boolean resetOnUnload = false;
-
 	private HashMap<String, PlayerState> deadMenInventories = new HashMap<String, PlayerState>();
-	private Location rallyPoint;
+	private final List<Player> respawn = new ArrayList<Player>();
 	
 	private final WarzoneConfigBag warzoneConfig = new WarzoneConfigBag();
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
@@ -98,33 +69,6 @@ public class Warzone {
 	public Warzone(World world, String name) {
 		this.world = world;
 		this.name = name;
-//		this.friendlyFire = War.war.isDefaultFriendlyFire();
-//		this.setLifePool(War.war.getDefaultLifepool());
-//		this.loadouts = (HashMap<String, HashMap<Integer, ItemStack>>)War.war.getDefaultLoadouts().clone();
-//		this.reward = (HashMap<Integer, ItemStack>)War.war.getDefaultReward().clone();
-//		this.autoAssignOnly = War.war.isDefaultAutoAssignOnly();
-//		this.setFlagPointsOnly(War.war.isDefaultFlagPointsOnly());
-//		this.setFlagMustBeHome(War.war.isDefaultFlagMustBeHome());
-//		this.teamCap = War.war.getDefaultTeamCap();
-//		this.scoreCap = War.war.getDefaultScoreCap();
-//		this.monumentHeal = War.war.getDefaultMonumentHeal();
-//		this.spawnStyle = War.war.getDefaultSpawnStyle(); // don't use side-effect-full setters instead of this
-//		this.flagReturn = War.war.getDefaultFlagReturn();
-//		this.setBlockHeads(War.war.isDefaultBlockHeads());
-//		this.setUnbreakableZoneBlocks(War.war.isDefaultUnbreakableZoneBlocks());
-//		this.setNoCreatures(War.war.isDefaultNoCreatures());
-//		this.setGlassWalls(War.war.isDefaultGlassWalls());
-//		this.setPvpInZone(War.war.isDefaultPvpInZone());
-//		this.setInstaBreak(War.war.isDefaultInstaBreak());
-//		this.setNoDrops(War.war.isDefaultNoDrops());
-//		this.setNoHunger(War.war.isDefaultNoHunger());
-//		this.setRespawnTimer(War.war.getDefaultRespawnTimer());
-//		this.setSaturation(War.war.getDefaultSaturation());
-//		this.setMinPlayers(War.war.getDefaultMinPlayers());
-//		this.setMinTeams(War.war.getDefaultMinTeams());
-//		this.setResetOnEmpty(War.war.isDefaultResetOnEmpty());
-//		this.setResetOnLoad(War.war.isDefaultResetOnLoad());
-//		this.setResetOnUnload(War.war.isDefaultResetOnUnload());
 		this.volume = new ZoneVolume(name, this.getWorld(), this);
 	}
 
@@ -194,7 +138,7 @@ public class Warzone {
 		} else {
 			for (Team team : this.getTeams()) {
 				teamsMessage += team.getName() + " (" + team.getPoints() + " points, " + team.getRemainingLifes() + "/" 
-					+ team.getTeamConfig().getInt(TeamConfig.LIFEPOOL) + " lives left. ";
+					+ team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL) + " lives left. ";
 				for (Player member : team.getPlayers()) {
 					teamsMessage += member.getName() + " ";
 				}
@@ -273,7 +217,7 @@ public class Warzone {
 						this.respawnPlayer(team, player);
 					}
 				}
-				team.setRemainingLives(team.getTeamConfig().getInt(TeamConfig.LIFEPOOL));
+				team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				team.initializeTeamSpawn();
 				if (team.getTeamFlag() != null) {
 					team.setTeamFlag(team.getTeamFlag());
@@ -348,7 +292,7 @@ public class Warzone {
 		player.setRemainingAir(300);
 		player.setHealth(20);
 		player.setFoodLevel(20);
-		player.setSaturation(team.getTeamConfig().getInt(TeamConfig.SATURATION));
+		player.setSaturation(team.getTeamConfig().resolveInt(TeamConfig.SATURATION));
 		player.setExhaustion(0);
 		player.setFireTicks(0);		//this works fine here, why put it in LoudoutResetJob...? I'll keep it over there though
 		
@@ -374,7 +318,7 @@ public class Warzone {
 		}
 		
 		final LoadoutResetJob job = new LoadoutResetJob(this, team, player, isFirstRespawn, false);
-		if (team.getTeamConfig().getInt(TeamConfig.RESPAWNTIMER) == 0 || isFirstRespawn) {
+		if (team.getTeamConfig().resolveInt(TeamConfig.RESPAWNTIMER) == 0 || isFirstRespawn) {
 			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
 		}			
 		else {
@@ -386,7 +330,7 @@ public class Warzone {
 				    respawn.remove(player);
 					War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
 				}
-			}, team.getTeamConfig().getInt(TeamConfig.RESPAWNTIMER) * 20L); // 20 ticks = 1 second
+			}, team.getTeamConfig().resolveInt(TeamConfig.RESPAWNTIMER) * 20L); // 20 ticks = 1 second
 		}
 	}
 
@@ -464,31 +408,11 @@ public class Warzone {
 		return this.monuments;
 	}
 
-//	public boolean getFriendlyFire() {
-//		return this.friendlyFire;
-//	}
-//
-//	public void setFriendlyFire(boolean ffOn) {
-//		this.friendlyFire = ffOn;
-//	}
-//
 //	public void setLifePool(int lifePool) {
 //		this.lifePool = lifePool;
 //		for (Team team : this.teams) {
 //			team.setRemainingLives(lifePool);
 //		}
-//	}
-//
-//	public int getLifePool() {
-//		return this.lifePool;
-//	}
-//
-//	public void setMonumentHeal(int monumentHeal) {
-//		this.monumentHeal = monumentHeal;
-//	}
-//
-//	public int getMonumentHeal() {
-//		return this.monumentHeal;
 //	}
 
 	public boolean hasPlayerState(String playerName) {
@@ -743,16 +667,6 @@ public class Warzone {
 			if (guard.getPlayer().getName().equals(player.getName())) {
 				playerGuards.add(guard);
 				guard.deactivate();
-				// BlockFace guardWall = guard.getWall();
-				// getVolume().resetWallBlocks(guardWall);
-				// if (isDrawZoneOutline()) {
-				// addZoneOutline(guard.getWall());
-				// }
-				// if (lobby != null) {
-				// lobby.getVolume().resetBlocks(); // always reset the lobby even if the guard is on another wall
-				// // because player can go around corner
-				// lobby.initialize();
-				// }
 			}
 		}
 		// now remove those zone guards
@@ -792,37 +706,6 @@ public class Warzone {
 		return lowestNoOfPlayers;
 	}
 
-//	public void setTeamCap(int teamCap) {
-//		this.teamCap = teamCap;
-//	}
-//
-//	public int getTeamCap() {
-//		return this.teamCap;
-//	}
-//
-//	public void setScoreCap(int scoreCap) {
-//		this.scoreCap = scoreCap;
-//	}
-//
-//	public int getScoreCap() {
-//		return this.scoreCap;
-//	}
-
-//	public void setAutoAssignOnlyAndResetLobby(boolean autoAssignOnly) {
-//		this.autoAssignOnly = autoAssignOnly;
-//		if (this.getLobby() != null) {
-//			this.getLobby().setLocation(this.getTeleport());
-//		}
-//	}
-//	
-//	public void setAutoAssignOnlyWithoutResettingLobby(boolean autoAssignOnly) {
-//		this.autoAssignOnly = autoAssignOnly;
-//	}
-//
-//	public boolean isAutoAssignOnly() {
-//		return this.autoAssignOnly;
-//	}
-
 	public void handleDeath(Player player) {
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 		Warzone playerWarzone = Warzone.getZoneByPlayerName(player.getName());
@@ -837,13 +720,13 @@ public class Warzone {
 				for (Team t : teams) {
 					t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " + player.getName() + " died and there were no lives left in their life pool.");
 
-					if (t.getPlayers().size() != 0 && !t.getTeamConfig().getBoolean(TeamConfig.FLAGPOINTSONLY)) {
+					if (t.getPlayers().size() != 0 && !t.getTeamConfig().resolveBoolean(TeamConfig.FLAGPOINTSONLY)) {
 						if (!t.getName().equals(playerTeam.getName())) {
 							// all other teams get a point
 							t.addPoint();
 							t.resetSign();
 						}
-						scores += t.getName() + "(" + t.getPoints() + "/" + t.getTeamConfig().getInt(TeamConfig.MAXSCORE) + ") ";
+						scores += t.getName() + "(" + t.getPoints() + "/" + t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE) + ") ";
 					}
 				}
 				if (!scores.equals("")) {
@@ -854,7 +737,7 @@ public class Warzone {
 				// detect score cap
 				List<Team> scoreCapTeams = new ArrayList<Team>();
 				for (Team t : teams) {
-					if (t.getPoints() == t.getTeamConfig().getInt(TeamConfig.MAXSCORE)) {
+					if (t.getPoints() == t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
 						scoreCapTeams.add(t);
 					}
 				}
@@ -970,7 +853,7 @@ public class Warzone {
 				// reset the zone for a new game when the last player leaves
 				for (Team team : this.getTeams()) {
 					team.resetPoints();
-					team.setRemainingLives(team.getTeamConfig().getInt(TeamConfig.LIFEPOOL));
+					team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				}
 				this.getVolume().resetBlocksAsJob();
 				this.initializeZoneAsJob();
@@ -1052,56 +935,11 @@ public class Warzone {
 		}
 	}
 
-//	public void setBlockHeads(boolean blockHeads) {
-//		this.blockHeads = blockHeads;
-//	}
-//
-//	public boolean isBlockHeads() {
-//		return this.blockHeads;
-//	}
-
 //	public void setSpawnStyle(TeamSpawnStyle spawnStyle) {
 //		this.spawnStyle = spawnStyle;
 //		for (Team team : this.teams) {
 //			team.setTeamSpawn(team.getTeamSpawn());
 //		}
-//	}
-//
-//	public TeamSpawnStyle getSpawnStyle() {
-//		return this.spawnStyle;
-//	}
-//
-//
-//	public void setFlagReturn(FlagReturn flagReturn) {
-//		this.flagReturn = flagReturn;
-//	}
-//
-//	public FlagReturn getFlagReturn() {
-//		return this.flagReturn;
-//	}
-
-//	public void setUnbreakableZoneBlocks(boolean unbreakableZoneBlocks) {
-//		this.unbreakableZoneBlocks = unbreakableZoneBlocks;
-//	}
-//
-//	public boolean isUnbreakableZoneBlocks() {
-//		return this.unbreakableZoneBlocks;
-//	}
-//
-//	public void setDisabled(boolean disabled) {
-//		this.disabled = disabled;
-//	}
-//
-//	public boolean isDisabled() {
-//		return this.disabled;
-//	}
-//
-//	public boolean isNoCreatures() {
-//		return this.noCreatures;
-//	}
-//
-//	public void setNoCreatures(boolean noCreatures) {
-//		this.noCreatures = noCreatures;
 //	}
 
 	public boolean isDeadMan(String playerName) {
@@ -1158,113 +996,9 @@ public class Warzone {
 		return false;
 	}
 
-//	public void setResetOnLoad(boolean resetOnLoad) {
-//		this.resetOnLoad = resetOnLoad;
-//	}
-//
-//	public boolean isResetOnLoad() {
-//		return this.resetOnLoad;
-//	}
-//
-//	public void setResetOnUnload(boolean resetOnUnload) {
-//		this.resetOnUnload = resetOnUnload;
-//	}
-//
-//	public boolean isResetOnUnload() {
-//		return this.resetOnUnload;
-//	}
-//
-//	public void setResetOnEmpty(boolean resetOnEmpty) {
-//		this.resetOnEmpty = resetOnEmpty;
-//	}
-//
-//	public boolean isResetOnEmpty() {
-//		return this.resetOnEmpty;
-//	}
-//
-//	public void setGlassWalls(boolean glassWalls) {
-//		this.glassWalls = glassWalls;
-//	}
-//
-//	public boolean isGlassWalls() {
-//		return this.glassWalls;
-//	}
-	
-//	public void setFlagPointsOnly(boolean flagPointsOnly) {
-//		this.flagPointsOnly = flagPointsOnly;
-//	}
-//	
-//	public boolean isFlagPointsOnly() {
-//		return this.flagPointsOnly;
-//	}
-//	
-//	public void setFlagMustBeHome(boolean flagMustBeHome) {
-//		this.flagMustBeHome = flagMustBeHome;
-//	}
-//	
-//	public boolean isFlagMustBeHome() {
-//		return this.flagMustBeHome;
-//	}
-//
-//	public void setMinPlayers(int minPlayers) {
-//		this.minPlayers = minPlayers;
-//	}
-//
-//	public int getMinPlayers() {
-//		return minPlayers;
-//	}
-//
-//	public void setMinTeams(int minTeams) {
-//		this.minTeams = minTeams;
-//	}
-//
-//	public int getMinTeams() {
-//		return minTeams;
-//	}
-
 	public HashMap<String, LoadoutSelection> getLoadoutSelections() {
 		return loadoutSelections;
 	}
-
-//	public boolean isPvpInZone() {
-//		return pvpInZone;
-//	}
-//
-//	public void setPvpInZone(boolean stopPvp) {
-//		this.pvpInZone = stopPvp;
-//	}
-//
-//	public boolean isInstaBreak() {
-//		return instaBreak;
-//	}
-//
-//	public void setInstaBreak(boolean instaBreak) {
-//		this.instaBreak = instaBreak;
-//	}
-//
-//	public boolean isNoDrops() {
-//		return noDrops;
-//	}
-//
-//	public void setNoDrops(boolean noDrops) {
-//		this.noDrops = noDrops;
-//	}
-
-//	public boolean isNoHunger() {
-//		return noHunger;
-//	}
-//	
-//	public void setNoHunger(boolean noHunger) {
-//		this.noHunger = noHunger;
-//	}
-//
-//	public int getSaturation() {
-//		return this.saturation;
-//	}
-//	
-//	public void setSaturation(int saturation) {
-//		this.saturation = saturation;
-//	}
 
 	public boolean isAuthor(Player player) {
 		// if no authors, all zonemakers can edit the zone
@@ -1307,14 +1041,6 @@ public class Warzone {
 		    }
 		}
 	}
-
-//	public void setRespawnTimer(int respawnTimer) {
-//		this.respawnTimer = respawnTimer;
-//	}
-//
-//	public int getRespawnTimer() {
-//		return this.respawnTimer;
-//	}
 
 	public WarzoneConfigBag getWarzoneConfig() {
 		return this.warzoneConfig;

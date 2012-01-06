@@ -588,12 +588,12 @@ public class ZoneLobby {
 		if (gate != null) {
 			String[] lines = new String[4];
 			lines[0] = "Team " + team.getName();
-			lines[1] = team.getPlayers().size() + "/" + team.getTeamConfig().getInt(TeamConfig.TEAMSIZE) + " players";
-			lines[2] = team.getPoints() + "/" + team.getTeamConfig().getInt(TeamConfig.MAXSCORE) + " pts";
-			if (team.getTeamConfig().getInt(TeamConfig.LIFEPOOL) == -1) {
+			lines[1] = team.getPlayers().size() + "/" + team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE) + " players";
+			lines[2] = team.getPoints() + "/" + team.getTeamConfig().resolveInt(TeamConfig.MAXSCORE) + " pts";
+			if (team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL) == -1) {
 				lines[3] = "unlimited lives";
 			} else {
-				lines[3] = team.getRemainingLifes() + "/" + team.getTeamConfig().getInt(TeamConfig.TEAMSIZE) + " lives left";
+				lines[3] = team.getRemainingLifes() + "/" + team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL) + " lives left";
 			}
 			this.resetGateSign(gate, lines, true);
 		}

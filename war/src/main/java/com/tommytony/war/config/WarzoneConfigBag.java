@@ -81,8 +81,8 @@ public class WarzoneConfigBag {
 					this.bag.put(warzoneConfig, onOff.equals("on") || onOff.equals("true"));
 				}
 				returnMessage += warzoneConfig.toString() + " set to " + namedParams.get(namedParam); 
-			} else if (namedParam.startsWith("delete")) {
-				String toDelete = namedParam.replace("delete", "");
+			} else if (namedParam.equals("delete")) {
+				String toDelete = namedParams.get(namedParam);
 				warzoneConfig = WarzoneConfig.warzoneConfigFromString(toDelete);
 				
 				// param delete (to restore inheritance)

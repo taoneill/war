@@ -35,64 +35,100 @@ public class TeamConfigBag {
 	public void put(TeamConfig config, Object value) {
 		this.bag.put(config, value);
 	}
-	
+
 	public Object getValue(TeamConfig config) {
+		if (this.contains(config)) {
+			return this.bag.get(config);
+		} else {
+			return null;
+		}
+	}
+	
+	public Object resolveValue(TeamConfig config) {
 		if (this.contains(config)) {
 			return this.bag.get(config); 
 		} else if (this.warzone != null && this.warzone.getTeamDefaultConfig().contains(config)){
 			// use Warzone default config
-			return this.warzone.getTeamDefaultConfig().getValue(config);
+			return this.warzone.getTeamDefaultConfig().resolveValue(config);
 		} else {
 			// use War default config
-			return War.war.getTeamDefaultConfig().getValue(config);
+			return War.war.getTeamDefaultConfig().resolveValue(config);
 		}
 	}
 	
 	public Integer getInt(TeamConfig config) {
 		if (this.contains(config)) {
+			return (Integer)this.bag.get(config);
+		}
+		return null;
+	}
+	
+	public Integer resolveInt(TeamConfig config) {
+		if (this.contains(config)) {
 			return (Integer)this.bag.get(config); 
 		} else if (this.warzone != null && this.warzone.getTeamDefaultConfig().contains(config)){
 			// use Warzone default config
-			return this.warzone.getTeamDefaultConfig().getInt(config);
+			return this.warzone.getTeamDefaultConfig().resolveInt(config);
 		} else {
 			// use War default config
-			return War.war.getTeamDefaultConfig().getInt(config);
+			return War.war.getTeamDefaultConfig().resolveInt(config);
 		}
 	}
 	
 	public Boolean getBoolean(TeamConfig config) {
 		if (this.contains(config)) {
+			return (Boolean)this.bag.get(config);
+		}
+		return null;
+	}
+	
+	public Boolean resolveBoolean(TeamConfig config) {
+		if (this.contains(config)) {
 			return (Boolean)this.bag.get(config); 
 		} else if (this.warzone != null && this.warzone.getTeamDefaultConfig().contains(config)){
 			// use Warzone default config
-			return this.warzone.getTeamDefaultConfig().getBoolean(config);
+			return this.warzone.getTeamDefaultConfig().resolveBoolean(config);
 		} else {
 			// use War default config
-			return War.war.getTeamDefaultConfig().getBoolean(config);
+			return War.war.getTeamDefaultConfig().resolveBoolean(config);
 		}
 	}
 	
-	public FlagReturn getFlagReturn(TeamConfig config) {
-		if (this.contains(config)) {
-			return (FlagReturn)this.bag.get(config); 
-		} else if (this.warzone != null && this.warzone.getTeamDefaultConfig().contains(config)){
+	public FlagReturn resolveFlagReturn() {
+		if (this.contains(TeamConfig.FLAGRETURN)) {
+			return (FlagReturn)this.bag.get(TeamConfig.FLAGRETURN); 
+		} else if (this.warzone != null && this.warzone.getTeamDefaultConfig().contains(TeamConfig.FLAGRETURN)){
 			// use Warzone default config
-			return this.warzone.getTeamDefaultConfig().getFlagReturn(config);
+			return this.warzone.getTeamDefaultConfig().resolveFlagReturn();
 		} else {
 			// use War default config
-			return War.war.getTeamDefaultConfig().getFlagReturn(config);
+			return War.war.getTeamDefaultConfig().resolveFlagReturn();
 		}
 	}
 	
-	public TeamSpawnStyle getSpawnStyle(TeamConfig config) {
-		if (this.contains(config)) {
-			return (TeamSpawnStyle)this.bag.get(config); 
-		} else if (this.warzone != null && this.warzone.getTeamDefaultConfig().contains(config)){
-			// use War default config
-			return this.warzone.getTeamDefaultConfig().getSpawnStyle(config);
-		} else {
-			return War.war.getTeamDefaultConfig().getSpawnStyle(config);
+	public FlagReturn getFlagReturn() {
+		if (this.contains(TeamConfig.FLAGRETURN)) {
+			return (FlagReturn)this.bag.get(TeamConfig.FLAGRETURN); 
 		}
+		return null;
+	}
+	
+	public TeamSpawnStyle resolveSpawnStyle() {
+		if (this.contains(TeamConfig.SPAWNSTYLE)) {
+			return (TeamSpawnStyle)this.bag.get(TeamConfig.SPAWNSTYLE); 
+		} else if (this.warzone != null && this.warzone.getTeamDefaultConfig().contains(TeamConfig.SPAWNSTYLE)){
+			// use War default config
+			return this.warzone.getTeamDefaultConfig().resolveSpawnStyle();
+		} else {
+			return War.war.getTeamDefaultConfig().resolveSpawnStyle();
+		}
+	}
+	
+	public TeamSpawnStyle getSpawnStyle() {
+		if (this.contains(TeamConfig.SPAWNSTYLE)) {
+			return (TeamSpawnStyle)this.bag.get(TeamConfig.SPAWNSTYLE); 
+		}
+		return null;
 	}
 	
 	public void loadFrom(ConfigurationSection teamConfigSection) {
@@ -122,7 +158,12 @@ public class TeamConfigBag {
 	public void saveTo(ConfigurationSection teamConfigSection) {
 		for (TeamConfig config : TeamConfig.values()) {
 			if (this.contains(config)) {
-				teamConfigSection.set(config.toString(), this.bag.get(config).toString());
+				if (config.getConfigType().equals(Integer.class) 
+						|| config.getConfigType().equals(Boolean.class)) {
+					teamConfigSection.set(config.toString(), this.bag.get(config));
+				} else {
+					teamConfigSection.set(config.toString(), this.bag.get(config).toString());
+				}
 			}
 		}
 	}
@@ -145,15 +186,15 @@ public class TeamConfigBag {
 					TeamSpawnStyle spawnValue = TeamSpawnStyle.getStyleFromString(namedParams.get(namedParam));
 					this.bag.put(teamConfig, spawnValue);
 				}
-				returnMessage += teamConfig.toString() + " set to " + namedParams.get(namedParam); 
-			} else if (namedParam.startsWith("delete")) {
-				String toDelete = namedParam.replace("delete", "");
+				returnMessage += " " + teamConfig.toString() + " set to " + namedParams.get(namedParam); 
+			} else if (namedParam.equals("delete")) {
+				String toDelete = namedParams.get(namedParam);
 				teamConfig = TeamConfig.teamConfigFromString(toDelete);
 				
 				// param delete (to restore inheritance)
 				if (teamConfig != null) {
 					this.bag.remove(teamConfig);
-					returnMessage += teamConfig.toString() + " removed";
+					returnMessage += " " + teamConfig.toString() + " removed";
 				}
 			}
 		}

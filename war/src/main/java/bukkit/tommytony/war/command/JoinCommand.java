@@ -104,7 +104,7 @@ public class JoinCommand extends AbstractWarCommand {
 						zone.keepPlayerState(player);
 						this.msg("Your inventory is in storage until you use '/war leave'.");
 					}
-					if (team.getPlayers().size() < team.getTeamConfig().getInt(TeamConfig.TEAMSIZE)) {
+					if (team.getPlayers().size() < team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)) {
 						team.addPlayer(player);
 						team.resetSign();
 						zone.respawnPlayer(team, player);

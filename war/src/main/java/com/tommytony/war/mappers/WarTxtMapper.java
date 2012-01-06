@@ -55,14 +55,12 @@ public class WarTxtMapper {
 
 		// warzones
 		String warzonesStr = warConfig.getString("warzones");
-		if (!convertingToYml) {
-			// No need to load the warzones if we're about to convert them
-			RestoreWarzonesJob restoreWarzones = new RestoreWarzonesJob(warzonesStr, newWar);
-			if (War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, restoreWarzones) == -1) {
-				War.war.log("Failed to schedule warzone-restore job. No warzone was loaded.", Level.WARNING);
-			}
+		RestoreWarzonesJob restoreWarzones = new RestoreWarzonesJob(warzonesStr, newWar, convertingToYml);
+		// make sure warhub job is over before this one ends, because this job will launch conversion (which needs the warhub)
+		if (War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, restoreWarzones, 20) == -1) {
+			War.war.log("Failed to schedule warzone-restore job. No warzone was loaded.", Level.WARNING);
 		}
-
+		
 		// zone makers
 		String[] makers = warConfig.getString("zoneMakers").split(",");
 		War.war.getZoneMakerNames().clear();

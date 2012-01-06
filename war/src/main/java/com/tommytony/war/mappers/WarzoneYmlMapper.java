@@ -44,47 +44,53 @@ public class WarzoneYmlMapper {
 			War.war.log("File warzone-" + name + ".yml not found", Level.WARNING);
 		} else {
 			YamlConfiguration warzoneYmlConfig = YamlConfiguration.loadConfiguration(warzoneYmlFile);
+			ConfigurationSection warzoneRootSection = warzoneYmlConfig.getConfigurationSection("set");
+			
 			String zoneInfoPrefix = "warzone." + name + ".info.";
 			
 			// world
-			String worldStr = warzoneYmlConfig.getString(zoneInfoPrefix + "world");
+			String worldStr = warzoneRootSection.getString(zoneInfoPrefix + "world");
 			World world = War.war.getServer().getWorld(worldStr);
 			
 			// Create the zone
 			Warzone warzone = new Warzone(world, name);
 
 			// teleport
-			int teleX = warzoneYmlConfig.getInt(zoneInfoPrefix + "teleport.x");
-			int teleY = warzoneYmlConfig.getInt(zoneInfoPrefix + "teleport.y");
-			int teleZ = warzoneYmlConfig.getInt(zoneInfoPrefix + "teleport.z");
-			int teleYaw = warzoneYmlConfig.getInt(zoneInfoPrefix + "teleport.yaw");
+			int teleX = warzoneRootSection.getInt(zoneInfoPrefix + "teleport.x");
+			int teleY = warzoneRootSection.getInt(zoneInfoPrefix + "teleport.y");
+			int teleZ = warzoneRootSection.getInt(zoneInfoPrefix + "teleport.z");
+			int teleYaw = warzoneRootSection.getInt(zoneInfoPrefix + "teleport.yaw");
 			warzone.setTeleport(new Location(world, teleX, teleY, teleZ, teleYaw, 0));
 			
-			if (warzoneYmlConfig.contains("team.default")) {
-				// defaultLoadouts
-				ConfigurationSection loadoutsSection = warzoneYmlConfig.getConfigurationSection("team.default.loadout");
+			// defaultLoadouts
+			if (warzoneRootSection.contains("team.default.loadout")) {
+				ConfigurationSection loadoutsSection = warzoneRootSection.getConfigurationSection("team.default.loadout");
 				LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, warzone.getDefaultInventories().getLoadouts());
+			}
 
-				// defaultReward
-				ConfigurationSection rewardsSection = warzoneYmlConfig.getConfigurationSection("team.default.reward");
+			// defaultReward
+			if (warzoneRootSection.contains("team.default.reward")) {
+				ConfigurationSection rewardsSection = warzoneRootSection.getConfigurationSection("team.default.reward");
 				HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
 				LoadoutYmlMapper.fromConfigToLoadout(rewardsSection, reward, "default");
 				warzone.getDefaultInventories().setReward(reward);
-				
-				// Team default settings
-				ConfigurationSection teamConfigSection = warzoneYmlConfig.getConfigurationSection("team.default.config");
+			}
+			
+			// Team default settings
+			if (warzoneRootSection.contains("team.default.config")) {
+				ConfigurationSection teamConfigSection = warzoneRootSection.getConfigurationSection("team.default.config");
 				warzone.getTeamDefaultConfig().loadFrom(teamConfigSection);
 			}
 			
 			// Warzone settings
-			if (warzoneYmlConfig.contains("warzone.config")) {
-				ConfigurationSection warzoneConfigSection = warzoneYmlConfig.getConfigurationSection("warzone.config");
+			if (warzoneRootSection.contains("warzone." + warzone.getName() + ".config")) {
+				ConfigurationSection warzoneConfigSection = warzoneRootSection.getConfigurationSection("warzone." + warzone.getName() + ".config");
 				warzone.getWarzoneConfig().loadFrom(warzoneConfigSection);
 			}
 
 			// authors
-			if (warzoneYmlConfig.contains(zoneInfoPrefix + "authors")) {
-				for(String authorStr : warzoneYmlConfig.getStringList("authors")) {
+			if (warzoneRootSection.contains(zoneInfoPrefix + "authors")) {
+				for(String authorStr : warzoneRootSection.getStringList(zoneInfoPrefix + "authors")) {
 					if (!authorStr.equals("")) {
 						warzone.addAuthor(authorStr);
 					}
@@ -92,77 +98,79 @@ public class WarzoneYmlMapper {
 			}
 
 			// rallyPoint
-			if (warzoneYmlConfig.contains(zoneInfoPrefix + "rallypoint")) {
-				int rpX = warzoneYmlConfig.getInt(zoneInfoPrefix + "rallypoint.x");
-				int rpY = warzoneYmlConfig.getInt(zoneInfoPrefix + "rallypoint.y");
-				int rpZ = warzoneYmlConfig.getInt(zoneInfoPrefix + "rallypoint.z");
-				int rpYaw = warzoneYmlConfig.getInt(zoneInfoPrefix + "rallypoint.yaw");
+			if (warzoneRootSection.contains(zoneInfoPrefix + "rallypoint")) {
+				int rpX = warzoneRootSection.getInt(zoneInfoPrefix + "rallypoint.x");
+				int rpY = warzoneRootSection.getInt(zoneInfoPrefix + "rallypoint.y");
+				int rpZ = warzoneRootSection.getInt(zoneInfoPrefix + "rallypoint.z");
+				int rpYaw = warzoneRootSection.getInt(zoneInfoPrefix + "rallypoint.yaw");
 				Location rallyPoint = new Location(world, rpX, rpY, rpZ, rpYaw, 0);
 				warzone.setRallyPoint(rallyPoint);
 			}
 
 			// monuments
-			if (warzoneYmlConfig.contains(zoneInfoPrefix + "monument")) {
-				List<String> monunmentNames = warzoneYmlConfig.getStringList(zoneInfoPrefix + "monument.names");
+			if (warzoneRootSection.contains(zoneInfoPrefix + "monument")) {
+				List<String> monunmentNames = warzoneRootSection.getStringList(zoneInfoPrefix + "monument.names");
 				for (String monumentName : monunmentNames) {
 					if (monumentName != null && !monumentName.equals("")) {
 						String monumentPrefix = zoneInfoPrefix + "monument." + monumentName + ".";
-						int monumentX = warzoneYmlConfig.getInt(monumentPrefix + "x");
-						int monumentY = warzoneYmlConfig.getInt(monumentPrefix + "y");
-						int monumentZ = warzoneYmlConfig.getInt(monumentPrefix + "z");
-						int monumentYaw = warzoneYmlConfig.getInt(monumentPrefix + "yaw");
+						int monumentX = warzoneRootSection.getInt(monumentPrefix + "x");
+						int monumentY = warzoneRootSection.getInt(monumentPrefix + "y");
+						int monumentZ = warzoneRootSection.getInt(monumentPrefix + "z");
+						int monumentYaw = warzoneRootSection.getInt(monumentPrefix + "yaw");
 						Monument monument = new Monument(monumentName, warzone, new Location(world, monumentX, monumentY, monumentZ, monumentYaw, 0));
 						warzone.getMonuments().add(monument);
 					}
 				}
 			}
 			
-			// teams
-			List<String> teamsNames = warzoneYmlConfig.getStringList("team.names");
-			for (String teamName : teamsNames) {
-				// team info
-				String teamInfoPrefix = "team." + teamName + ".info";
-				int teamX = warzoneYmlConfig.getInt(teamInfoPrefix + "spawn.x");
-				int teamY = warzoneYmlConfig.getInt(teamInfoPrefix + "spawn.y");
-				int teamZ = warzoneYmlConfig.getInt(teamInfoPrefix + "spawn.z");
-				int teamYaw = warzoneYmlConfig.getInt(teamInfoPrefix + "spawn.yaw");
-				Location teamLocation = new Location(world, teamX, teamY, teamZ, teamYaw, 0);
-
-				Team team = new Team(teamName, TeamKind.teamKindFromString(teamName), teamLocation, warzone);
-				warzone.getTeams().add(team);
-				
-				if (warzoneYmlConfig.contains(teamInfoPrefix + "flag")) {
-					int flagX = warzoneYmlConfig.getInt(teamInfoPrefix + "flag.x");
-					int flagY = warzoneYmlConfig.getInt(teamInfoPrefix + "flag.y");
-					int flagZ = warzoneYmlConfig.getInt(teamInfoPrefix + "flag.z");
-					int flagYaw = warzoneYmlConfig.getInt(teamInfoPrefix + "flag.yaw");
-					Location flagLocation = new Location(world, flagX, flagY, flagZ, flagYaw, 0);
-					team.setTeamFlag(flagLocation);
-				}
-				
-				String teamConfigPrefix = "team." + teamName + ".config";
-				if (warzoneYmlConfig.contains(teamConfigPrefix)) {
-					// team specific config
-					ConfigurationSection teamConfigSection = warzoneYmlConfig.getConfigurationSection(teamConfigPrefix);
-					team.getTeamConfig().loadFrom(teamConfigSection);
-				}
-				
-				team.setRemainingLives(team.getTeamConfig().getInt(TeamConfig.LIFEPOOL));
-				
-				String teamLoadoutPrefix = "team." + teamName + ".loadout";
-				if (warzoneYmlConfig.contains(teamLoadoutPrefix)) {
-					// team specific loadouts
-					ConfigurationSection loadoutsSection = warzoneYmlConfig.getConfigurationSection(teamLoadoutPrefix);
-					LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, team.getInventories().getLoadouts());
-				}
-				
-				String teamRewardPrefix = "team." + teamName + ".reward";
-				if (warzoneYmlConfig.contains(teamRewardPrefix)) {
-					// team specific reward
-					ConfigurationSection rewardsSection = warzoneYmlConfig.getConfigurationSection(teamRewardPrefix);
-					HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
-					LoadoutYmlMapper.fromConfigToLoadout(rewardsSection, reward, "default");
-					warzone.getDefaultInventories().setReward(reward);
+			// teams (maybe no teams)
+			if (warzoneRootSection.contains("team.names")) {
+				List<String> teamsNames = warzoneRootSection.getStringList("team.names");
+				for (String teamName : teamsNames) {
+					// team info
+					String teamInfoPrefix = "team." + teamName + ".info";
+					int teamX = warzoneRootSection.getInt(teamInfoPrefix + "spawn.x");
+					int teamY = warzoneRootSection.getInt(teamInfoPrefix + "spawn.y");
+					int teamZ = warzoneRootSection.getInt(teamInfoPrefix + "spawn.z");
+					int teamYaw = warzoneRootSection.getInt(teamInfoPrefix + "spawn.yaw");
+					Location teamLocation = new Location(world, teamX, teamY, teamZ, teamYaw, 0);
+	
+					Team team = new Team(teamName, TeamKind.teamKindFromString(teamName), teamLocation, warzone);
+					warzone.getTeams().add(team);
+					
+					if (warzoneRootSection.contains(teamInfoPrefix + "flag")) {
+						int flagX = warzoneRootSection.getInt(teamInfoPrefix + "flag.x");
+						int flagY = warzoneRootSection.getInt(teamInfoPrefix + "flag.y");
+						int flagZ = warzoneRootSection.getInt(teamInfoPrefix + "flag.z");
+						int flagYaw = warzoneRootSection.getInt(teamInfoPrefix + "flag.yaw");
+						Location flagLocation = new Location(world, flagX, flagY, flagZ, flagYaw, 0);
+						team.setTeamFlag(flagLocation);
+					}
+					
+					String teamConfigPrefix = "team." + teamName + ".config";
+					if (warzoneRootSection.contains(teamConfigPrefix)) {
+						// team specific config
+						ConfigurationSection teamConfigSection = warzoneRootSection.getConfigurationSection(teamConfigPrefix);
+						team.getTeamConfig().loadFrom(teamConfigSection);
+					}
+					
+					team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
+					
+					String teamLoadoutPrefix = "team." + teamName + ".loadout";
+					if (warzoneRootSection.contains(teamLoadoutPrefix)) {
+						// team specific loadouts
+						ConfigurationSection loadoutsSection = warzoneRootSection.getConfigurationSection(teamLoadoutPrefix);
+						LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, team.getInventories().getLoadouts());
+					}
+					
+					String teamRewardPrefix = "team." + teamName + ".reward";
+					if (warzoneRootSection.contains(teamRewardPrefix)) {
+						// team specific reward
+						ConfigurationSection rewardsSection = warzoneRootSection.getConfigurationSection(teamRewardPrefix);
+						HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
+						LoadoutYmlMapper.fromConfigToLoadout(rewardsSection, reward, "default");
+						warzone.getDefaultInventories().setReward(reward);
+					}
 				}
 			}
 
@@ -188,7 +196,7 @@ public class WarzoneYmlMapper {
 			String lobbyPrefix = zoneInfoPrefix + "lobby.";
 			
 			// lobby orientation
-			String lobbyOrientation = warzoneYmlConfig.getString(lobbyPrefix + "orientation");
+			String lobbyOrientation = warzoneRootSection.getString(lobbyPrefix + "orientation");
 			BlockFace lobbyFace = null;
 			if (lobbyOrientation.equals("south")) {
 				lobbyFace = BlockFace.SOUTH;
@@ -201,7 +209,7 @@ public class WarzoneYmlMapper {
 			}
 			
 			// lobby world
-			String lobbyWorldName = warzoneYmlConfig.getString(lobbyPrefix + "world");
+			String lobbyWorldName = warzoneRootSection.getString(lobbyPrefix + "world");
 			World lobbyWorld = War.war.getServer().getWorld(lobbyWorldName);
 						
 			// create the lobby
@@ -217,114 +225,32 @@ public class WarzoneYmlMapper {
 	
 	public static void save(Warzone warzone, boolean saveAllBlocks) {
 		YamlConfiguration warzoneYmlConfig = new YamlConfiguration();
+		ConfigurationSection warzoneRootSection = warzoneYmlConfig.createSection("set");
 		(new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + warzone.getName())).mkdir();	// create folder
 		
-		String zoneInfoPrefix = "warzone." + warzone.getName() + ".info.";
-		
-		// world
-		warzoneYmlConfig.set(zoneInfoPrefix + "world", warzone.getWorld().getName());
-
-		// teleport
-		ConfigurationSection teleSection = warzoneYmlConfig.createSection(zoneInfoPrefix + "teleport");
-		teleSection.set(zoneInfoPrefix + "teleport.x", warzone.getTeleport().getBlockX());
-		teleSection.set(zoneInfoPrefix + "teleport.y", warzone.getTeleport().getBlockY());
-		teleSection.set(zoneInfoPrefix + "teleport.z", warzone.getTeleport().getBlockZ());
-		teleSection.set(zoneInfoPrefix + "teleport.yaw", toIntYaw(warzone.getTeleport().getYaw()));
-
-		// teams
-		List<Team> teams = warzone.getTeams();
-		List<String> teamNames = new ArrayList<String>();
-		for (Team team : teams) {
-			String teamPrefix = "team." + team.getName() + ".";
-			teamNames.add(team.getName());
-			
-			Location spawn = team.getTeamSpawn();
-			warzoneYmlConfig.set(teamPrefix + "spawn.x", spawn.getBlockX());
-			warzoneYmlConfig.set(teamPrefix + "spawn.y", spawn.getBlockY());
-			warzoneYmlConfig.set(teamPrefix + "spawn.z", spawn.getBlockZ());
-			warzoneYmlConfig.set(teamPrefix + "spawn.yaw", toIntYaw(spawn.getYaw()));
-			
-			if (team.getTeamFlag() != null) {
-				Location teamFlag = team.getTeamFlag();
-				warzoneYmlConfig.set(teamPrefix + "flag.x", teamFlag.getBlockX());
-				warzoneYmlConfig.set(teamPrefix + "flag.y", teamFlag.getBlockY());
-				warzoneYmlConfig.set(teamPrefix + "flag.z", teamFlag.getBlockZ());
-				warzoneYmlConfig.set(teamPrefix + "flag.yaw", toIntYaw(teamFlag.getYaw()));
-			}
-			
-			if (!team.getTeamConfig().isEmpty()) {
-				// team specific config
-				ConfigurationSection teamConfigSection = warzoneYmlConfig.createSection("team." + team.getName() + ".config");
-				team.getTeamConfig().saveTo(teamConfigSection);
-			}
-			
-			if (team.getInventories().hasLoadouts()) {
-				// team specific loadouts
-				ConfigurationSection loadoutsSection = warzoneYmlConfig.createSection("team." + team.getName() + ".loadout");
-				LoadoutYmlMapper.fromLoadoutsToConfig(team.getInventories().getLoadouts(), loadoutsSection);
-			}
-			
-			if (team.getInventories().hasReward()) {
-				// team specific reward
-				ConfigurationSection rewardsSection = warzoneYmlConfig.createSection("team." + team.getName() + ".reward");
-				LoadoutYmlMapper.fromLoadoutToConfig(team.getInventories().getReward(), rewardsSection, "default");
-			}
-		}
-		
-		if (teamNames.size() > 0) {
-			warzoneYmlConfig.set("team.names", teamNames);
-		}
-		
-		// defaultLoadouts
-		if (warzone.getDefaultInventories().hasLoadouts()) {
-			ConfigurationSection loadoutsSection = warzoneYmlConfig.createSection("team.default.loadout");
-			LoadoutYmlMapper.fromLoadoutsToConfig(warzone.getDefaultInventories().getLoadouts(), loadoutsSection);
-		}
-		
-		// defaultReward
-		if (warzone.getDefaultInventories().hasReward()) {
-			ConfigurationSection rewardsSection = warzoneYmlConfig.createSection("team.default.reward");
-			LoadoutYmlMapper.fromLoadoutToConfig(warzone.getDefaultInventories().getReward(), rewardsSection, "default");
-		}
+		ConfigurationSection warzoneSection = warzoneRootSection.createSection("warzone." + warzone.getName());
 		
 		// Warzone settings
 		if (!warzone.getWarzoneConfig().isEmpty()) {
-			ConfigurationSection warzoneConfigSection = warzoneYmlConfig.createSection("warzone." + warzone.getName() + ".config");
+			ConfigurationSection warzoneConfigSection = warzoneSection.createSection("config");
 			warzone.getWarzoneConfig().saveTo(warzoneConfigSection);
 		}
-		
-		// Team default settings
-		if (!warzone.getTeamDefaultConfig().isEmpty()) {
-			ConfigurationSection teamConfigSection = warzoneYmlConfig.createSection("team.default.config");
-			warzone.getTeamDefaultConfig().saveTo(teamConfigSection);
-		}
+				
+		ConfigurationSection warzoneInfoSection = warzoneSection.createSection("info");
 		
 		// authors
-		warzoneYmlConfig.set(zoneInfoPrefix + "authors", warzone.getAuthors());
+		warzoneInfoSection.set("authors", warzone.getAuthors());
 		
-		// rallyPoint
-		if (warzone.getRallyPoint() != null) {
-			ConfigurationSection rpSection = warzoneYmlConfig.createSection(zoneInfoPrefix + "rallypoint");
-			rpSection.set(zoneInfoPrefix + "x", warzone.getTeleport().getBlockX());
-			rpSection.set(zoneInfoPrefix + "y", warzone.getTeleport().getBlockY());
-			rpSection.set(zoneInfoPrefix + "z", warzone.getTeleport().getBlockZ());
-			rpSection.set(zoneInfoPrefix + "yaw", toIntYaw(warzone.getTeleport().getYaw()));
-		}
-
-		// monuments
-		if (warzone.getMonuments().size() > 0) {
-			ConfigurationSection monumentSection = warzoneYmlConfig.createSection(zoneInfoPrefix + "monument");
-			List<String> monumentNames = new ArrayList<String>();
-			for (Monument monument : warzone.getMonuments()) {
-				monumentNames.add(monument.getName());
-				monumentSection.set(monument.getName() + ".x", monument.getLocation().getBlockX());
-				monumentSection.set(monument.getName() + ".y", monument.getLocation().getBlockX());
-				monumentSection.set(monument.getName() + ".z", monument.getLocation().getBlockX());
-				monumentSection.set(monument.getName() + ".yaw", toIntYaw(monument.getLocation().getYaw()));
-			}
-			monumentSection.set("names", monumentNames);
-		}
-
+		// teleport
+		ConfigurationSection teleSection = warzoneInfoSection.createSection("teleport");
+		teleSection.set("x", warzone.getTeleport().getBlockX());
+		teleSection.set("y", warzone.getTeleport().getBlockY());
+		teleSection.set("z", warzone.getTeleport().getBlockZ());
+		teleSection.set("yaw", toIntYaw(warzone.getTeleport().getYaw()));
+	
+		// world
+		warzoneInfoSection.set("world", warzone.getWorld().getName());	
+		
 		// lobby
 		if (warzone.getLobby() != null) {
 			String lobbyOrientation = "";
@@ -338,10 +264,109 @@ public class WarzoneYmlMapper {
 				lobbyOrientation = "west";
 			}
 			
-			warzoneYmlConfig.set(zoneInfoPrefix + "lobby.orientation", lobbyOrientation);
-			warzoneYmlConfig.set(zoneInfoPrefix + "lobby.world", warzone.getLobby().getVolume().getWorld().getName());
+			ConfigurationSection lobbySection = warzoneInfoSection.createSection("lobby");
+			lobbySection.set("orientation", lobbyOrientation);
+			lobbySection.set("world", warzone.getLobby().getVolume().getWorld().getName());
 		}
 
+		// rallyPoint
+		if (warzone.getRallyPoint() != null) {
+			ConfigurationSection rpSection = warzoneInfoSection.createSection("rallypoint");
+			rpSection.set("x", warzone.getRallyPoint().getBlockX());
+			rpSection.set("y", warzone.getRallyPoint().getBlockY());
+			rpSection.set("z", warzone.getRallyPoint().getBlockZ());
+			rpSection.set("yaw", toIntYaw(warzone.getRallyPoint().getYaw()));
+		}
+		
+		// monuments
+		if (warzone.getMonuments().size() > 0) {
+			ConfigurationSection monumentsSection = warzoneInfoSection.createSection("monument");
+			
+			List<String> monumentNames = new ArrayList<String>();
+			for (Monument monument : warzone.getMonuments()) {
+				monumentNames.add(monument.getName());
+			}
+			monumentsSection.set("names", monumentNames);
+			
+			for (Monument monument : warzone.getMonuments()) {
+				
+				ConfigurationSection monumentSection = monumentsSection.createSection(monument.getName());
+				monumentSection.set("x", monument.getLocation().getBlockX());
+				monumentSection.set("y", monument.getLocation().getBlockY());
+				monumentSection.set("z", monument.getLocation().getBlockZ());
+				monumentSection.set("yaw", toIntYaw(monument.getLocation().getYaw()));
+			}
+		}
+		
+		ConfigurationSection teamsSection = warzoneRootSection.createSection("team");
+		
+		// teams
+		List<Team> teams = warzone.getTeams();
+		
+		List<String> teamNames = new ArrayList<String>();
+		for (Team team : teams) {
+			teamNames.add(team.getName());
+		}
+		if (teamNames.size() > 0) {
+			teamsSection.set("names", teamNames);
+		}
+
+		// Team default settings
+		if (!warzone.getTeamDefaultConfig().isEmpty()) {
+			ConfigurationSection teamConfigSection = teamsSection.createSection("default.config");
+			warzone.getTeamDefaultConfig().saveTo(teamConfigSection);
+		}		
+		
+		// defaultLoadouts
+		if (warzone.getDefaultInventories().hasLoadouts()) {
+			ConfigurationSection loadoutsSection = teamsSection.createSection("default.loadout");
+			LoadoutYmlMapper.fromLoadoutsToConfig(warzone.getDefaultInventories().getLoadouts(), loadoutsSection);
+		}
+		
+		// defaultReward
+		if (warzone.getDefaultInventories().hasReward()) {
+			ConfigurationSection rewardsSection = teamsSection.createSection("default.reward");
+			LoadoutYmlMapper.fromLoadoutToConfig("default", warzone.getDefaultInventories().getReward(), rewardsSection);
+		}	
+		
+		for (Team team : teams) {
+			if (!team.getTeamConfig().isEmpty()) {
+				// team specific config
+				ConfigurationSection teamConfigSection = teamsSection.createSection(team.getName() + ".config");
+				team.getTeamConfig().saveTo(teamConfigSection);
+			}
+			
+			if (team.getInventories().hasLoadouts()) {
+				// team specific loadouts
+				ConfigurationSection loadoutsSection = teamsSection.createSection(team.getName() + ".loadout");
+				LoadoutYmlMapper.fromLoadoutsToConfig(team.getInventories().getLoadouts(), loadoutsSection);
+			}
+			
+			if (team.getInventories().hasReward()) {
+				// team specific reward
+				ConfigurationSection rewardsSection = teamsSection.createSection(team.getName() + ".reward");
+				LoadoutYmlMapper.fromLoadoutToConfig("default", team.getInventories().getReward(), rewardsSection);
+			}
+
+			ConfigurationSection teamInfoSection = teamsSection.createSection(team.getName() + ".info");
+			
+			ConfigurationSection spawnSection = teamInfoSection.createSection("spawn");
+			Location spawn = team.getTeamSpawn();
+			spawnSection.set("x", spawn.getBlockX());
+			spawnSection.set("y", spawn.getBlockY());
+			spawnSection.set("z", spawn.getBlockZ());
+			spawnSection.set("yaw", toIntYaw(spawn.getYaw()));
+			
+			if (team.getTeamFlag() != null) {
+				ConfigurationSection flagSection = teamInfoSection.createSection("flag");
+				Location teamFlag = team.getTeamFlag();
+				flagSection.set("x", teamFlag.getBlockX());
+				flagSection.set("y", teamFlag.getBlockY());
+				flagSection.set("z", teamFlag.getBlockZ());
+				flagSection.set("yaw", toIntYaw(teamFlag.getYaw()));
+			}
+		}
+		
 		// monument blocks
 		for (Monument monument : warzone.getMonuments()) {
 			VolumeMapper.save(monument.getVolume(), warzone.getName());

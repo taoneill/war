@@ -54,7 +54,7 @@ public class SetTeamCommand extends AbstractZoneMakerCommand {
 			} else {
 				// new team (use default TeamKind name for now)
 				Team newTeam = new Team(teamKind.toString(), teamKind, player.getLocation(), zone);
-				newTeam.setRemainingLives(newTeam.getTeamConfig().getInt(TeamConfig.LIFEPOOL));
+				newTeam.setRemainingLives(newTeam.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				zone.getTeams().add(newTeam);
 				if (zone.getLobby() != null) {
 					zone.getLobby().getVolume().resetBlocks();

@@ -235,9 +235,9 @@ public class WarBlockListener extends BlockListener {
 						block.setType(Material.AIR);
 
 						String spawnOrFlag = "spawn or flag";
-						if (team.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN).equals(FlagReturn.FLAG) 
-								|| team.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN) == FlagReturn.SPAWN) {
-							spawnOrFlag = team.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN).toString();
+						if (team.getTeamConfig().resolveFlagReturn().equals(FlagReturn.FLAG) 
+								|| team.getTeamConfig().resolveFlagReturn() == FlagReturn.SPAWN) {
+							spawnOrFlag = team.getTeamConfig().resolveFlagReturn().toString();
 						}
 
 						for (Team t : warzone.getTeams()) {

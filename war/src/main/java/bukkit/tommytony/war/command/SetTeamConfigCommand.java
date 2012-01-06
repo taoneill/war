@@ -99,7 +99,7 @@ public class SetTeamConfigCommand extends AbstractZoneMakerCommand {
 			if (this.args.length > 0 && (this.args[0].equals("-p") || this.args[0].equals("print"))) {
 				// only printing
 				if (this.args.length == 1) {
-					this.msg(War.war.printConfig(zone));
+					this.msg(War.war.printConfig(team));
 					return true;
 				} else {
 					// first param was to print, shift again

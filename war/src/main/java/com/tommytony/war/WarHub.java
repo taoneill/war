@@ -235,7 +235,7 @@ public class WarHub {
 			int zonePlayers = 0;
 			for (Team t : zone.getTeams()) {
 				zonePlayers += t.getPlayers().size();
-				zoneCap += t.getTeamConfig().getInt(TeamConfig.TEAMSIZE);
+				zoneCap += t.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
 			}
 			String[] lines = new String[4];
 			lines[0] = "Warzone";

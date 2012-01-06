@@ -306,7 +306,7 @@ public class WarPlayerListener extends PlayerListener {
 						int totalCap = 0;
 						for (Team t : zone.getTeams()) {
 							noOfPlayers += t.getPlayers().size();
-							totalCap += t.getTeamConfig().getInt(TeamConfig.MAXSCORE);
+							totalCap += t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE);
 						}
 						
 						if (noOfPlayers < totalCap) {
@@ -330,7 +330,7 @@ public class WarPlayerListener extends PlayerListener {
 						this.dropFromOldTeamIfAny(player);
 						if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 							this.handleDisabledZone(event, player, zone);
-						} else if (team.getPlayers().size() < team.getTeamConfig().getInt(TeamConfig.TEAMSIZE)) {
+						} else if (team.getPlayers().size() < team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)) {
 							team.addPlayer(player);
 							team.resetSign();
 							if (War.war.getWarHub() != null) {
@@ -444,7 +444,7 @@ public class WarPlayerListener extends PlayerListener {
 					return;
 				}
 				if (playerWarzone.isRespawning(player)) {
-					int rt = playerTeam.getTeamConfig().getInt(TeamConfig.RESPAWNTIMER);
+					int rt = playerTeam.getTeamConfig().resolveInt(TeamConfig.RESPAWNTIMER);
 					String isS = "s";
 					if (rt==1) isS = "";
 					War.war.badMsg(player, "Can't leave spawn for "+rt+" second"+isS+" after spawning!");
@@ -479,18 +479,18 @@ public class WarPlayerListener extends PlayerListener {
 				boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
 				boolean inFlag = (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation()));
 
-				if (playerTeam.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN).equals(FlagReturn.BOTH)) {
+				if (playerTeam.getTeamConfig().resolveFlagReturn().equals(FlagReturn.BOTH)) {
 					if (!inSpawn && !inFlag) {
 						return;
 					}
-				} else if (playerTeam.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN).equals(FlagReturn.SPAWN)) {
+				} else if (playerTeam.getTeamConfig().resolveFlagReturn().equals(FlagReturn.SPAWN)) {
 					if (inFlag) {
 						War.war.badMsg(player, "You have to capture the enemy flag at your team's spawn.");
 						return;
 					} else if (!inSpawn) {
 						return;
 					}
-				} else if (playerTeam.getTeamConfig().getFlagReturn(TeamConfig.FLAGRETURN).equals(FlagReturn.FLAG)) {
+				} else if (playerTeam.getTeamConfig().resolveFlagReturn().equals(FlagReturn.FLAG)) {
 					if (inSpawn) {
 						War.war.badMsg(player, "You have to capture the enemy flag at your team's flag.");
 						return;
@@ -499,13 +499,13 @@ public class WarPlayerListener extends PlayerListener {
 					}
 				}
 
-				if (playerWarzone.isTeamFlagStolen(playerTeam) && playerTeam.getTeamConfig().getBoolean(TeamConfig.FLAGMUSTBEHOME)) {
+				if (playerWarzone.isTeamFlagStolen(playerTeam) && playerTeam.getTeamConfig().resolveBoolean(TeamConfig.FLAGMUSTBEHOME)) {
 					War.war.badMsg(player, "You can't capture the enemy flag until your team's flag is returned.");
 				} else {
 					synchronized (playerWarzone) {
 						// flags can be captured at own spawn or own flag pole
 						playerTeam.addPoint();
-						if (playerTeam.getPoints() >= playerTeam.getTeamConfig().getInt(TeamConfig.MAXSCORE)) {
+						if (playerTeam.getPoints() >= playerTeam.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
 							if (playerWarzone.hasPlayerState(player.getName())) {
 								playerWarzone.restorePlayerState(player);
 							}
