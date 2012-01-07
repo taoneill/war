@@ -22,7 +22,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -61,7 +60,7 @@ public class War extends JavaPlugin {
 	private WarPlayerListener playerListener = new WarPlayerListener();
 	private WarEntityListener entityListener = new WarEntityListener();
 	private WarBlockListener blockListener = new WarBlockListener();
-	private WarServerListener pluginListener = new WarServerListener();
+	private WarServerListener serverListener = new WarServerListener();
 	
 	private WarCommandHandler commandHandler = new WarCommandHandler();
 	private Logger logger;
@@ -160,7 +159,7 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PISTON_RETRACT, this.blockListener, Priority.Normal, this);
 			
-			pm.registerEvent(Event.Type.PLUGIN_DISABLE, this.pluginListener, Priority.Normal, this);
+			pm.registerEvent(Event.Type.PLUGIN_DISABLE, this.serverListener, Priority.Normal, this);
 			
 			if (this.isSpoutServer()) {
 				pm.registerEvent(Event.Type.CUSTOM_EVENT, new WarSpoutListener(this), Priority.Low, this);

@@ -119,7 +119,7 @@ public class WarSpoutListener extends SpoutListener {
 	private static void drawStats(SpoutPlayer sp, List<GenericLabel> lines) {
 		// remove old stats first
 		removeStats(sp);
-		for (GenericLabel l : lines) sp.getMainScreen().attachWidget(plugin,l.copy());
+		for (GenericLabel l : lines) sp.getMainScreen().attachWidget(plugin, l.copy());
 	}
 	
 	public static void removeStats(SpoutPlayer sp) {

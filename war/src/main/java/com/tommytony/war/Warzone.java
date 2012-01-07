@@ -833,6 +833,7 @@ public class Warzone {
 				SpoutPlayer sp = (SpoutPlayer) player;
 				if (sp.isSpoutCraftEnabled()) {
 					WarSpoutListener.removeStats(sp);
+					sp.setTitle(ChatColor.WHITE + player.getName());
 				}
 				sp.resetTitle();
 			}
