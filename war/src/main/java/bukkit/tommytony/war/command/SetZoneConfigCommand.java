@@ -37,17 +37,19 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 					wantsToPrint = true;
 				}
 			}
-
+			
 			if (this.getSender() instanceof Player) {
 				player = (Player) commandSender;
-
-				Warzone zoneByLoc = Warzone.getZoneByLocation(player);
-				ZoneLobby lobbyByLoc = ZoneLobby.getLobbyByLocation(player);
-				if (zoneByLoc == null && lobbyByLoc != null) {
-					zoneByLoc = lobbyByLoc.getZone();
-				}
-				if (zoneByLoc != null) {
-					zone = zoneByLoc;
+				if (zone == null) {
+					// zone not found, is he standing in it?
+					Warzone zoneByLoc = Warzone.getZoneByLocation(player);
+					ZoneLobby lobbyByLoc = ZoneLobby.getLobbyByLocation(player);
+					if (zoneByLoc == null && lobbyByLoc != null) {
+						zoneByLoc = lobbyByLoc.getZone();
+					}
+					if (zoneByLoc != null) {
+						zone = zoneByLoc;
+					}
 				}
 			}
 

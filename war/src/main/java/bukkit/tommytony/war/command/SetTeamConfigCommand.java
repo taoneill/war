@@ -25,6 +25,8 @@ public class SetTeamConfigCommand extends AbstractZoneMakerCommand {
 		CommandSender commandSender = this.getSender();
 		boolean isFirstParamWarzone = false;
 		boolean wantsToPrint = false;
+		
+		Team team = null;
 
 		if (this.args.length == 0) {
 			return false;
@@ -43,14 +45,19 @@ public class SetTeamConfigCommand extends AbstractZoneMakerCommand {
 			if (this.getSender() instanceof Player) {
 				player = (Player) commandSender;
 
-				Warzone zoneByLoc = Warzone.getZoneByLocation(player);
-				ZoneLobby lobbyByLoc = ZoneLobby.getLobbyByLocation(player);
-				if (zoneByLoc == null && lobbyByLoc != null) {
-					zoneByLoc = lobbyByLoc.getZone();
+				if (zone == null) {
+					// zone not found, is he standing in it?
+					Warzone zoneByLoc = Warzone.getZoneByLocation(player);
+					ZoneLobby lobbyByLoc = ZoneLobby.getLobbyByLocation(player);
+					if (zoneByLoc == null && lobbyByLoc != null) {
+						zoneByLoc = lobbyByLoc.getZone();
+					}
+					if (zoneByLoc != null) {
+						zone = zoneByLoc;
+					}
 				}
-				if (zoneByLoc != null) {
-					zone = zoneByLoc;
-				}
+				
+				team = Team.getTeamByPlayerName(player.getName());
 			}
 
 			if (zone == null) {
@@ -62,7 +69,7 @@ public class SetTeamConfigCommand extends AbstractZoneMakerCommand {
 
 			if (isFirstParamWarzone) {
 				if (this.args.length == 1) {
-					// Only one param: the warzone name - default to usage
+					// Only one param: the warzone name - pritn usage
 					return false;
 				}
 				// More than one param: the arguments need to be shifted
@@ -74,23 +81,33 @@ public class SetTeamConfigCommand extends AbstractZoneMakerCommand {
 			}
 
 			// args have been shifted if needed
-			Team team = null;
 			if (this.args.length > 0) {
-				// only printing
 				TeamKind kind = TeamKind.teamKindFromString(this.args[0]);
-				team = zone.getTeamByKind(kind);
+				Team teamByName = zone.getTeamByKind(kind);
 				
-				if (team == null) {
+				if (team == null && teamByName == null) {
 					// Team not found
-					return false;
+					this.badMsg("No such team. Use /teams.");
+					return true;
+				} else if (this.args.length == 1 && teamByName != null) {
+					// only team name, print config
+					this.msg(War.war.printConfig(teamByName));
+					return true;
 				}
 				
-				// first param was team, shift again
-				String[] newargs = new String[this.args.length - 1];
-				for (int i = 1; i < this.args.length; i++) {
-					newargs[i - 1] = this.args[i];
+				if (teamByName != null) {
+					// first param was team, shift again
+					String[] newargs = new String[this.args.length - 1];
+					for (int i = 1; i < this.args.length; i++) {
+						newargs[i - 1] = this.args[i];
+					}
+					this.args = newargs;
 				}
-				this.args = newargs;
+				
+				if (teamByName != null) {
+					// Named team > player's team
+					team = teamByName;
+				}
 			} else {
 				// No team param, show usage
 				return false;

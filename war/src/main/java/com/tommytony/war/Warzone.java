@@ -34,6 +34,7 @@ import com.tommytony.war.config.WarzoneConfigBag;
 import com.tommytony.war.jobs.InitZoneJob;
 import com.tommytony.war.jobs.LoadoutResetJob;
 import com.tommytony.war.jobs.ScoreCapReachedJob;
+import com.tommytony.war.mappers.LoadoutYmlMapper;
 import com.tommytony.war.utils.PlayerState;
 import com.tommytony.war.volumes.ZoneVolume;
 
@@ -1024,17 +1025,20 @@ public class Warzone {
 	public void equipPlayerLoadoutSelection(Player player, Team playerTeam, boolean isFirstRespawn, boolean isToggle) {
 		LoadoutSelection selection = this.getLoadoutSelections().get(player.getName());
 		if (selection != null && !this.isRespawning(player)) {
+			HashMap<String, HashMap<Integer, ItemStack>> loadouts = playerTeam.getInventories().resolveLoadouts();
+			List<String> sortedNames = LoadoutYmlMapper.sortNames(loadouts);
+			
 			int currentIndex = selection.getSelectedIndex();
 			int i = 0;
-			Iterator it = playerTeam.getInventories().resolveLoadouts().entrySet().iterator();
+			Iterator<String> it = sortedNames.iterator();
 		    while (it.hasNext()) {
-		        Map.Entry pairs = (Map.Entry)it.next();
+		        String name = (String)it.next();
 		        if (i == currentIndex) {
-					this.resetInventory(playerTeam, player, (HashMap<Integer, ItemStack>)pairs.getValue());
+					this.resetInventory(playerTeam, player, loadouts.get(name));
 					if (isFirstRespawn && playerTeam.getInventories().resolveLoadouts().keySet().size() > 1) {
-						War.war.msg(player, "Equipped " + pairs.getKey() + " loadout (sneak to switch).");
+						War.war.msg(player, "Equipped " + name + " loadout (sneak to switch).");
 					} else if (isToggle) {
-						War.war.msg(player, "Equipped " + pairs.getKey() + " loadout.");
+						War.war.msg(player, "Equipped " + name + " loadout.");
 					}
 		        }
 		        i++;

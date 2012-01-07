@@ -16,8 +16,8 @@ public class LoadoutYmlMapper {
 		loadouts.clear();
 		for (String name : loadoutNames) {
 			HashMap<Integer, ItemStack> newLoadout = new HashMap<Integer, ItemStack>();
-			loadouts.put(name, newLoadout);
 			fromConfigToLoadout(config, newLoadout, name);
+			loadouts.put(name, newLoadout);
 		}
 	}
 	
@@ -45,24 +45,37 @@ public class LoadoutYmlMapper {
 					}
 				}
 			}
+			
+			loadout.put(slot, stack);
 		}
 	}
 	
 	public static void fromLoadoutsToConfig(HashMap<String, HashMap<Integer, ItemStack>> loadouts, ConfigurationSection section) {
-		section.set("names", toStringList(loadouts.keySet()));
-		for (String name : loadouts.keySet()) {
+		List<String> sortedNames = sortNames(loadouts);
+		
+		section.set("names", sortedNames);
+		for (String name : sortedNames) {
 			fromLoadoutToConfig(name, loadouts.get(name), section);
 		}
 	}
 	
-	private static List<String> toStringList(Set<String> keySet) {
-		List<String> list = new ArrayList<String>();
-		for (String key : keySet) {
-			list.add(key);
+	public static List<String> sortNames(HashMap<String, HashMap<Integer, ItemStack>> loadouts) {
+		List<String> sortedNames = new ArrayList<String>();
+		
+		// default comes first
+		if (loadouts.containsKey("default")) {
+			sortedNames.add("default");
 		}
-		return list;
+		
+		for (String name : loadouts.keySet()) {
+			if (!name.equals("default")) {
+				sortedNames.add(name);
+			}
+		}
+		
+		return sortedNames; 
 	}
-	
+
 	private static List<Integer> toIntList(Set<Integer> keySet) {
 		List<Integer> list = new ArrayList<Integer>();
 		for (Integer key : keySet) {

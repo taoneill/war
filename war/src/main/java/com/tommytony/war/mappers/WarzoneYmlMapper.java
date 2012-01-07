@@ -128,7 +128,7 @@ public class WarzoneYmlMapper {
 				List<String> teamsNames = warzoneRootSection.getStringList("team.names");
 				for (String teamName : teamsNames) {
 					// team info
-					String teamInfoPrefix = "team." + teamName + ".info";
+					String teamInfoPrefix = "team." + teamName + ".info.";
 					int teamX = warzoneRootSection.getInt(teamInfoPrefix + "spawn.x");
 					int teamY = warzoneRootSection.getInt(teamInfoPrefix + "spawn.y");
 					int teamZ = warzoneRootSection.getInt(teamInfoPrefix + "spawn.z");

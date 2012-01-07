@@ -36,12 +36,14 @@ public class Team {
 	private Volume flagVolume;
 	private final Warzone warzone;
 	private TeamKind kind;
-	private InventoryBag inventories = new InventoryBag();
+
 	private TeamConfigBag teamConfig;
+	private InventoryBag inventories;
 
 	public Team(String name, TeamKind kind, Location teamSpawn, Warzone warzone) {
 		this.warzone = warzone;
 		this.teamConfig = new TeamConfigBag(warzone);
+		this.inventories = new InventoryBag(warzone);	// important constructors for cascading configs
 		this.setName(name);
 		this.teamSpawn = teamSpawn;
 		this.setSpawnVolume(new Volume(name, warzone.getWorld()));

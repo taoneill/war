@@ -80,7 +80,7 @@ public class WarzoneConfigBag {
 					String onOff = namedParams.get(namedParam);
 					this.bag.put(warzoneConfig, onOff.equals("on") || onOff.equals("true"));
 				}
-				returnMessage += warzoneConfig.toString() + " set to " + namedParams.get(namedParam); 
+				returnMessage += " " + warzoneConfig.toString() + " set to " + namedParams.get(namedParam); 
 			} else if (namedParam.equals("delete")) {
 				String toDelete = namedParams.get(namedParam);
 				warzoneConfig = WarzoneConfig.warzoneConfigFromString(toDelete);
@@ -88,7 +88,7 @@ public class WarzoneConfigBag {
 				// param delete (to restore inheritance)
 				if (warzoneConfig != null) {
 					this.bag.remove(warzoneConfig);
-					returnMessage += warzoneConfig.toString() + " removed";
+					returnMessage += " " + warzoneConfig.toString() + " removed";
 				}
 			}
 		}

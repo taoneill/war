@@ -543,9 +543,13 @@ public class War extends JavaPlugin {
 	
 	public String printConfig(Team team) {
 		ChatColor teamColor = ChatColor.AQUA;
+		
 		ChatColor normalColor = ChatColor.WHITE;
 		
 		String teamConfigStr = "";
+		InventoryBag invs = team.getInventories();
+		teamConfigStr += getLoadoutsString(invs);
+		
 		for (TeamConfig teamConfig : TeamConfig.values()) {
 			Object value = team.getTeamConfig().getValue(teamConfig);
 			if (value != null) {
@@ -553,14 +557,33 @@ public class War extends JavaPlugin {
 			}
 		}
 		
-		return teamColor + " ::" + normalColor + "Team " + team.getName() + " config" + teamColor + "::" + normalColor  
+		return " ::" + teamColor + "Team " + team.getName() + teamColor +  " config" + normalColor + "::"  
 			+ ifEmptyInheritedForTeam(teamConfigStr);
 	}
-		 
+
+	private String getLoadoutsString(InventoryBag invs) {
+		String loadoutsString = "";
+		ChatColor loadoutColor = ChatColor.GREEN;
+		ChatColor normalColor = ChatColor.WHITE;
+		
+		if (invs.hasLoadouts()) {
+			String loadouts = "";
+			for (String loadoutName : invs.getLoadouts().keySet()) {
+				loadouts += loadoutName + ",";
+			}
+			loadoutsString += " loadout:" + loadoutColor + loadouts + normalColor;
+		}
+		
+		if (invs.hasReward()) {
+			loadoutsString += " reward:" + loadoutColor + "default" + normalColor;
+		}
+		
+		return loadoutsString;
+	}
 
 	public String printConfig(Warzone zone) {
 		ChatColor teamColor = ChatColor.AQUA;
-		ChatColor zoneColor = ChatColor.RED;
+		ChatColor zoneColor = ChatColor.DARK_AQUA;
 		ChatColor authorColor = ChatColor.GREEN;
 		ChatColor normalColor = ChatColor.WHITE;
 		
@@ -573,6 +596,7 @@ public class War extends JavaPlugin {
 		}
 		
 		String teamDefaultsStr = "";
+		teamDefaultsStr += getLoadoutsString( zone.getDefaultInventories());
 		for (TeamConfig teamConfig : TeamConfig.values()) {
 			Object value = zone.getTeamDefaultConfig().getValue(teamConfig);
 			if (value != null) {
@@ -580,10 +604,10 @@ public class War extends JavaPlugin {
 			}
 		}
 		
-		return zoneColor + "::" + normalColor + "Warzone " + zone.getName() + " config" + zoneColor + "::" + normalColor 
+		return "::" + zoneColor + "Warzone " + authorColor + zone.getName() + zoneColor + " config" + normalColor + "::" 
 		 + " author:" + authorColor + ifEmptyEveryone(zone.getAuthorsString()) + normalColor
 		 + ifEmptyInheritedForWarzone(warzoneConfigStr)
-		 + teamColor + " ::" + normalColor + "Team defaults" + teamColor + "::" + normalColor
+		 + " ::" + teamColor + "Team defaults" + normalColor + "::"
 		 + ifEmptyInheritedForWarzone(teamDefaultsStr);
 	}
 	
@@ -611,8 +635,8 @@ public class War extends JavaPlugin {
 
 	public String printConfig() {
 		ChatColor teamColor = ChatColor.AQUA;
-		ChatColor zoneColor = ChatColor.RED;
-		ChatColor globalColor = ChatColor.GREEN;
+		ChatColor zoneColor = ChatColor.DARK_AQUA;
+		ChatColor globalColor = ChatColor.DARK_GREEN;
 		ChatColor normalColor = ChatColor.WHITE;
 		
 		String warConfigStr = "";
@@ -626,13 +650,14 @@ public class War extends JavaPlugin {
 		}
 		
 		String teamDefaultsStr = "";
+		teamDefaultsStr += getLoadoutsString(this.getDefaultInventories());
 		for (TeamConfig teamConfig : TeamConfig.values()) {
 			teamDefaultsStr += " " + teamConfig.toStringWithValue(this.getTeamDefaultConfig().getValue(teamConfig)).replace(":", ":" + teamColor) + normalColor;
 		}
 		
-		return globalColor + "::" + normalColor + "War config" + globalColor + "::" + normalColor + warConfigStr  
-			+ zoneColor + " ::" + normalColor + "Warzone defaults" + zoneColor + "::" + normalColor + warzoneDefaultsStr
-			+ teamColor + " ::" + normalColor + "Team defaults" + teamColor + "::" + normalColor + teamDefaultsStr; 
+		return normalColor + "::" + globalColor + "War config" + normalColor + "::" + warConfigStr  
+			+ normalColor + " ::" + zoneColor + "Warzone defaults" + normalColor + "::" + warzoneDefaultsStr
+			+ normalColor + " ::" + teamColor + "Team defaults" + normalColor + "::" + teamDefaultsStr; 
 	}
 
 	private void setZoneRallyPoint(String warzoneName, Player player) {
