@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 import bukkit.tommytony.war.War;
@@ -315,7 +316,7 @@ public class Warzone {
 		
 		// Spout
 		if (War.war.isSpoutServer()) {
-			((SpoutPlayer) player).setTitle(team.getKind().getColor() + player.getName());
+			SpoutManager.getPlayer(player).setTitle(team.getKind().getColor() + player.getName());
 		}
 		
 		final LoadoutResetJob job = new LoadoutResetJob(this, team, player, isFirstRespawn, false);
@@ -830,7 +831,7 @@ public class Warzone {
 			player.setRemainingAir(300);
 
 			if (War.war.isSpoutServer()) {
-				SpoutPlayer sp = (SpoutPlayer) player;
+				SpoutPlayer sp = SpoutManager.getPlayer(player);
 				if (sp.isSpoutCraftEnabled()) {
 					WarSpoutListener.removeStats(sp);
 					sp.setTitle(ChatColor.WHITE + player.getName());

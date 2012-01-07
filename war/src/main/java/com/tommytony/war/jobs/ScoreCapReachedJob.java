@@ -2,6 +2,7 @@ package com.tommytony.war.jobs;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 import bukkit.tommytony.war.War;
@@ -26,7 +27,7 @@ public class ScoreCapReachedJob implements Runnable {
 			boolean isSpoutServer = War.war.isSpoutServer();
 			for (Player tp : t.getPlayers()) {
 				if (isSpoutServer) {
-					SpoutPlayer sp = (SpoutPlayer) tp;
+					SpoutPlayer sp = SpoutManager.getPlayer(tp);
 					if (sp.isSpoutCraftEnabled()) { 
 						WarSpoutListener.removeStats(sp);
 					}

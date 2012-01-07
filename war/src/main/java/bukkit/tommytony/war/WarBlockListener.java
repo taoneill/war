@@ -15,6 +15,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.tommytony.war.FlagReturn;
@@ -245,7 +246,7 @@ public class WarBlockListener extends BlockListener {
 							if (t.getName().equals(lostFlagTeam.getName())) {
 								if (War.war.isSpoutServer()) {
 									for (Player p : t.getPlayers()) {
-										SpoutPlayer sp = (SpoutPlayer) p;
+										SpoutPlayer sp = SpoutManager.getPlayer(p);
 										if (sp.isSpoutCraftEnabled()) {
 											String tn = team.getName();
 							                sp.sendNotification(tn.substring(0,1).toUpperCase()+tn.substring(1).toLowerCase()+" stole your Flag!","Stolen by "+player.getName(),lostFlagTeam.getKind().getMaterial(),lostFlagTeam.getKind().getData(),3000);

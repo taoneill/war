@@ -40,8 +40,10 @@ import com.tommytony.war.config.WarConfigBag;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.config.WarzoneConfigBag;
 import com.tommytony.war.jobs.HelmetProtectionTask;
+import com.tommytony.war.jobs.SpoutFadeOutMessageJob;
 import com.tommytony.war.mappers.WarYmlMapper;
 import com.tommytony.war.mappers.WarzoneYmlMapper;
+import com.tommytony.war.spout.SpoutMessenger;
 import com.tommytony.war.utils.ChatFixUtil;
 import com.tommytony.war.utils.PlayerState;
 
@@ -88,6 +90,7 @@ public class War extends JavaPlugin {
 	private final WarConfigBag warConfig = new WarConfigBag();
 	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
+	private SpoutMessenger spoutMessenger = new SpoutMessenger();
 
 	public War() {
 		super();
@@ -260,6 +263,9 @@ public class War extends JavaPlugin {
 		// Start tasks
 		HelmetProtectionTask helmetProtectionTask = new HelmetProtectionTask();
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, helmetProtectionTask, 250, 100);
+		
+		SpoutFadeOutMessageJob fadeOutMessagesTask = new SpoutFadeOutMessageJob();
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, fadeOutMessagesTask, 100, 100);
 				
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
 	}
@@ -1006,5 +1012,9 @@ public class War extends JavaPlugin {
 	
 	public WarConfigBag getWarConfig() {
 		return this.warConfig;
+	}
+
+	public SpoutMessenger getSpoutMessenger() {
+		return this.spoutMessenger ;
 	}
 }

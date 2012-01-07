@@ -10,6 +10,8 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.getspout.spoutapi.SpoutManager;
+import org.getspout.spoutapi.player.SpoutPlayer;
 
 import bukkit.tommytony.war.War;
 import bukkit.tommytony.war.WarSpoutListener;
@@ -357,7 +359,12 @@ public class Team {
 
 	public void teamcast(String message) {
 		for (Player player : this.players) {
-			War.war.msg(player, message);
+			SpoutPlayer sp = SpoutManager.getPlayer(player);
+			if (sp.isSpoutCraftEnabled()) {
+				War.war.getSpoutMessenger().msg(sp, message);
+			} else {
+				War.war.msg(player, message);
+			}
 		}
 	}
 

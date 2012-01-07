@@ -25,6 +25,7 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.tommytony.war.FlagReturn;
@@ -519,7 +520,7 @@ public class WarPlayerListener extends PlayerListener {
 							for (Team t : playerWarzone.getTeams()) {
 								if (War.war.isSpoutServer()) {
 									for (Player p : t.getPlayers()) {
-										SpoutPlayer sp = (SpoutPlayer) p;
+										SpoutPlayer sp = SpoutManager.getPlayer(p);
 										if (sp.isSpoutCraftEnabled()) {
 											String tn = playerTeam.getName();
 							                sp.sendNotification(tn.substring(0,1).toUpperCase()+tn.substring(1).toLowerCase()+" captures Flag!","Capped by "+player.getName(),victim.getKind().getMaterial(),victim.getKind().getData(),3000);
