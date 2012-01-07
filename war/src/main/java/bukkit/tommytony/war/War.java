@@ -61,6 +61,8 @@ public class War extends JavaPlugin {
 	private WarPlayerListener playerListener = new WarPlayerListener();
 	private WarEntityListener entityListener = new WarEntityListener();
 	private WarBlockListener blockListener = new WarBlockListener();
+	private WarServerListener pluginListener = new WarServerListener();
+	
 	private WarCommandHandler commandHandler = new WarCommandHandler();
 	private Logger logger;
 	private PluginDescriptionFile desc = null;
@@ -157,6 +159,8 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PISTON_RETRACT, this.blockListener, Priority.Normal, this);
+			
+			pm.registerEvent(Event.Type.PLUGIN_DISABLE, this.pluginListener, Priority.Normal, this);
 			
 			if (this.isSpoutServer()) {
 				pm.registerEvent(Event.Type.CUSTOM_EVENT, new WarSpoutListener(this), Priority.Low, this);
@@ -265,15 +269,6 @@ public class War extends JavaPlugin {
 	 * Cleans up war
 	 */
 	public void unloadWar() {
-		if (this.isSpoutServer()) {
-			for (Player player : getServer().getOnlinePlayers()) {
-	            SpoutPlayer sp = (SpoutPlayer) player;
-	            if (sp.isSpoutCraftEnabled()) {
-	                sp.getMainScreen().removeWidgets(this);
-	            }
-	        }
-		}
-		
 		for (Warzone warzone : this.warzones) {
 			warzone.unload();
 		}
