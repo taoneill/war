@@ -517,7 +517,7 @@ public class WarPlayerListener extends PlayerListener {
 									if (sp.isSpoutCraftEnabled()) {
 						                sp.sendNotification(
 						                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
-						                		SpoutMessenger.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + " flag"),
+						                		SpoutMessenger.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + " flag!"),
 						                		victim.getKind().getMaterial(),
 						                		victim.getKind().getData(),
 						                		5000);

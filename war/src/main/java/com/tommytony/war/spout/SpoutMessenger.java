@@ -18,6 +18,7 @@ import bukkit.tommytony.war.War;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.TeamConfig;
 
 public class SpoutMessenger {
 
@@ -28,9 +29,13 @@ public class SpoutMessenger {
 			playerMessages.put(sp.getName(), new ArrayList<PlayerMessage>());
 		}
 		playerMessages.get(sp.getName()).add(new PlayerMessage(message));
-		drawMessages(sp.getName());
+
+		List<Integer> statsOffset = new ArrayList<Integer>(); 
+		List<GenericLabel> lines = getStatsLines(Warzone.getZoneByPlayerName(sp.getName()), statsOffset);
+		drawMessages(sp.getName(), lines, statsOffset.get(1));
+		
 	}
-	
+	 	
 	public void fadeOutOldMessages() {
 		for (String playerName : playerMessages.keySet()) {
 			List<PlayerMessage> messages = playerMessages.get(playerName);
@@ -48,7 +53,9 @@ public class SpoutMessenger {
 			}
 			
 			if (toRemove.size() > 0) {
-				drawMessages(playerName);
+				List<Integer> statsOffset = new ArrayList<Integer>(); 
+				List<GenericLabel> lines = getStatsLines(Warzone.getZoneByPlayerName(playerName), statsOffset);
+				drawMessages(playerName, lines, statsOffset.get(1));
 			}
 		}
 	}
@@ -82,7 +89,153 @@ public class SpoutMessenger {
 		return toNotify;
 	}
 	
-	private void drawMessages(String playerName) {
+	public void updateStats(Warzone zone) {
+		List<Integer> statsOffset = new ArrayList<Integer>(); 
+		List<GenericLabel> statsLines = getStatsLines(zone, statsOffset);
+		for (Team t : zone.getTeams()) {
+			for (Player p : t.getPlayers()) {
+				SpoutPlayer sp = SpoutManager.getPlayer(p);
+				if (sp.isSpoutCraftEnabled()) {
+					drawMessages(sp.getName(), statsLines, statsOffset.get(1));
+				}
+			}
+		}
+	}
+	
+
+	public void updateStats(Player player) {
+		SpoutPlayer sp = SpoutManager.getPlayer(player);
+		List<Integer> statsOffset = new ArrayList<Integer>(); 
+		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+		List<GenericLabel> statsLines = getStatsLines(zone, statsOffset);
+		if (sp.isSpoutCraftEnabled()) {
+			drawMessages(sp.getName(), statsLines, statsOffset.get(1));
+		}
+	}
+	
+	private static List<GenericLabel> getStatsLines(Warzone zone, List<Integer> offset) {
+		List<GenericLabel> lines = new ArrayList<GenericLabel>();
+		offset.add(0);
+		offset.add(0);
+		
+		if (zone != null) {
+			offset.clear();
+			
+			List<GenericLabel> teamlines = new ArrayList<GenericLabel>();
+			List<GenericLabel> playerlines = new ArrayList<GenericLabel>();
+			List<GenericLabel> scorelines = new ArrayList<GenericLabel>();
+			List<GenericLabel> lifelines = new ArrayList<GenericLabel>();
+			int teamMax = 5, scoreMax = 5, lifeMax = 5;
+			GenericLabel line;
+			
+			GenericLabel teamsHeader = new GenericLabel(ChatColor.GRAY + "War> " + ChatColor.WHITE + zone.getName());
+			int teamsHeaderWidth = GenericLabel.getStringWidth(teamsHeader.getText());
+			teamsHeader.setAlign(WidgetAnchor.TOP_LEFT).setX(2).setY(2).setWidth(teamsHeaderWidth);
+			lines.add(teamsHeader);
+	        
+			// First, we collect all the team names
+	        int lineCounter = 1;
+			for (Team t : zone.getTeams()) {
+				// team name
+				String teamStr = t.getName() + "-" + t.getPlayers().size() + "/" + t.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
+				line = new GenericLabel(teamStr);
+				if (t.getPlayers().size() == 0) {
+					line.setText(teamStr.replace("-", " "));
+					line.setTextColor(new Color(100,100,100));
+				}
+				else {
+					line.setText(t.getKind().getColor() + teamStr.replace("-", " " + ChatColor.WHITE));
+				}
+				line.setTooltip("Warzone: " + zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
+		        line.setAlign(WidgetAnchor.TOP_LEFT).setX(2).setY(4 + lineCounter * 8).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
+		        teamlines.add(line);
+		        lineCounter++;
+			}
+			
+			// We need to find the longest name
+			for (GenericLabel l : teamlines) {
+				if (GenericLabel.getStringWidth(l.getText()) > teamMax) {
+					teamMax = GenericLabel.getStringWidth(l.getText());
+				}
+				if (teamsHeaderWidth > teamMax) {
+					teamMax = teamsHeaderWidth;
+				}
+			}
+			
+			// First line with headers
+			int headerOffset = teamMax - 2;
+			
+			GenericLabel livesHeader = new GenericLabel(ChatColor.GRAY + "points");
+			int pointsHeaderWidth = GenericLabel.getStringWidth(livesHeader.getText());
+			livesHeader.setAlign(WidgetAnchor.TOP_LEFT).setX(headerOffset).setY(2).setWidth(pointsHeaderWidth);
+			headerOffset += pointsHeaderWidth + 6;
+			lines.add(livesHeader);
+			
+			GenericLabel pointsHeader = new GenericLabel(ChatColor.GRAY + "lives");
+			int livesHeaderWidth = GenericLabel.getStringWidth(pointsHeader.getText());
+			pointsHeader.setAlign(WidgetAnchor.TOP_LEFT).setX(headerOffset).setY(2).setWidth(livesHeaderWidth);
+			lines.add(pointsHeader);
+			
+			lineCounter = 1;
+			for (Team t : zone.getTeams()) {
+				// scores
+				line = new GenericLabel(t.getPoints() + "/" + t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE));
+				if (t.getPlayers().size() == 0) line.setTextColor(new Color(100, 100, 100));
+				line.setTooltip("Warzone: " + zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
+		        line.setAlign(WidgetAnchor.TOP_LEFT).setX(2 + teamMax + 2).setY(4 + lineCounter * 8).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
+		        scorelines.add(line);
+		        lineCounter++;
+			}
+			
+			for (GenericLabel l : scorelines) {
+				if (GenericLabel.getStringWidth(l.getText()) > scoreMax) {
+					scoreMax = GenericLabel.getStringWidth(l.getText());
+				}
+			}
+			if (pointsHeaderWidth > scoreMax) {
+				scoreMax = pointsHeaderWidth;
+			}
+			
+			// and finally, lives.
+			lineCounter = 1;
+			for (Team t : zone.getTeams()) {
+				line = new GenericLabel(t.getRemainingLifes() + "/" + t.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
+				if (t.getPlayers().size() == 0) line.setTextColor(new Color(100, 100, 100));
+				line.setTooltip("Warzone: " + zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
+		        line.setAlign(WidgetAnchor.TOP_LEFT).setX(2 + teamMax + 2 + scoreMax + 2).setY(4 + lineCounter * 8).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
+		        lifelines.add(line);
+		        lineCounter++;
+			}
+			
+			for (GenericLabel l : lifelines) {
+				if (GenericLabel.getStringWidth(l.getText()) > lifeMax) {
+					lifeMax = GenericLabel.getStringWidth(l.getText());
+				}
+			}
+			if (livesHeaderWidth > lifeMax) {
+				lifeMax = livesHeaderWidth;
+			}
+					
+			for (GenericLabel l : teamlines) { lines.add(l); }
+			for (GenericLabel l : playerlines) { lines.add(l); }
+			for (GenericLabel l : scorelines) { lines.add(l); }
+			for (GenericLabel l : lifelines) { lines.add(l); }
+			
+			offset.add(2 + teamMax + 2 + scoreMax + 2 + lifeMax + 2);
+			offset.add(2 + lineCounter * 8);
+			
+		}
+		return lines;
+		
+	}
+	
+	private static void drawStats(SpoutPlayer sp, List<GenericLabel> lines) {
+		for (GenericLabel l : lines) {
+			sp.getMainScreen().attachWidget(War.war, l.copy());
+		}
+	}
+	
+	private void drawMessages(String playerName, List<GenericLabel> statsLines, Integer statsOffset) {
 		Player bukkitPlayer = War.war.getServer().getPlayer(playerName);
 		if (bukkitPlayer != null) {
 			SpoutPlayer player = SpoutManager.getPlayer(bukkitPlayer);
@@ -91,20 +244,22 @@ public class SpoutMessenger {
 			// remove old widgets
 			clear(player);
 			
+			drawStats(player, statsLines);
+			
 			if (messages.size() > 0) {
 				int rank = 0;			
 				Warzone zone = Warzone.getZoneByPlayerName(playerName);			
-				int verticalOffset = 2; 
+				int verticalOffset = statsOffset + 4; 
 				
 				for (PlayerMessage message : messages) {
 					int horizontalOffset = 2;
 					
-					String messageStr = "War> " + message.getMessage();
+					String messageStr = ChatColor.GRAY + ">" + ChatColor.WHITE + " " + message.getMessage();
 					String[] words = messageStr.split(" ");
 					
 					for (String word : words) {
 						
-						if (horizontalOffset > 230) {	
+						if (horizontalOffset > 160) {	
 							horizontalOffset = 2;
 							verticalOffset += 8;
 						}

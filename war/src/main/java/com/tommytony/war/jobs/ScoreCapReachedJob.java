@@ -41,16 +41,9 @@ public class ScoreCapReachedJob implements Runnable {
 			}
 			String winnersStrAndExtra = "Score cap reached. Game is over! Winning team(s): " + this.winnersStr;
 			winnersStrAndExtra += ". Resetting warzone and your inventory...";
-			t.teamcast(winnersStr);
+			t.teamcast(winnersStrAndExtra);
 			boolean isSpoutServer = War.war.isSpoutServer();
 			for (Player tp : t.getPlayers()) {
-				
-				if (isSpoutServer) {
-					SpoutPlayer sp = SpoutManager.getPlayer(tp);
-					if (sp.isSpoutCraftEnabled()) { 
-						WarSpoutListener.removeStats(sp);
-					}
-				}
 				// Send everyone to rally point (or zone lobby if not rally point)
 				if (this.zone.getRallyPoint() != null) {
 					tp.teleport(this.zone.getRallyPoint());

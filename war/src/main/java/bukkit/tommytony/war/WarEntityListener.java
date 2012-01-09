@@ -150,6 +150,13 @@ public class WarEntityListener extends EntityListener {
 						team.teamcast(killMessage);
 					}
 					defenderWarzone.handleDeath(d);
+					
+
+					if (War.war.isSpoutServer()) {
+						// make sure score is updated
+						War.war.getSpoutMessenger().updateStats(defenderWarzone);
+					}
+					
 					event.setCancelled(true);
 				}
 			} else if (attackerTeam != null && defenderTeam != null && attackerTeam == defenderTeam && attackerWarzone == defenderWarzone && attacker.getEntityId() != defender.getEntityId()) {

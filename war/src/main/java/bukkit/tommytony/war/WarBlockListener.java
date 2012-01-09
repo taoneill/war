@@ -64,7 +64,7 @@ public class WarBlockListener extends BlockListener {
 						if (sp.isSpoutCraftEnabled()) {
 			                sp.sendNotification(
 			                		SpoutMessenger.cleanForNotification("Monument " + ChatColor.WHITE + monument.getName()),
-			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "capped by " + team.getKind().getColor() + player.getName()),
+			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "capped by " + team.getKind().getColor() + player.getName() + ChatColor.YELLOW + "!"),
 			                		team.getKind().getMaterial(),
 			                		team.getKind().getData(),
 			                		5000);
@@ -218,7 +218,7 @@ public class WarBlockListener extends BlockListener {
 						if (sp.isSpoutCraftEnabled()) {
 			                sp.sendNotification(
 			                		SpoutMessenger.cleanForNotification("Monument " + ChatColor.WHITE + monument.getName()),
-			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "freed by " + team.getKind().getColor() + player.getName()),
+			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "freed by " + team.getKind().getColor() + player.getName() + ChatColor.YELLOW + "!"),
 			                		Material.OBSIDIAN,
 			                		(short)0,
 			                		5000);
@@ -278,7 +278,7 @@ public class WarBlockListener extends BlockListener {
 										if (sp.isSpoutCraftEnabled()) {
 							                sp.sendNotification(
 							                		SpoutMessenger.cleanForNotification(team.getKind().getColor() + player.getName() + ChatColor.YELLOW + " stole"),
-							                		SpoutMessenger.cleanForNotification("your flag!"),
+							                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "your flag!"),
 							                		lostFlagTeam.getKind().getMaterial(),
 							                		lostFlagTeam.getKind().getData(),
 							                		5000);

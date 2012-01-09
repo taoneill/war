@@ -787,6 +787,21 @@ public class Warzone {
 					victim.getFlagVolume().resetBlocks();
 					victim.initializeTeamFlag();
 					playerWarzone.removeThief(player.getName());
+					
+					if (War.war.isSpoutServer()) {
+						for (Player p : victim.getPlayers()) {
+							SpoutPlayer sp = SpoutManager.getPlayer(p);
+							if (sp.isSpoutCraftEnabled()) {
+				                sp.sendNotification(
+				                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
+				                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "your flag."),
+				                		playerTeam.getKind().getMaterial(),
+				                		playerTeam.getKind().getData(),
+				                		5000);
+							}
+						}
+					}
+					
 					for (Team t : playerWarzone.getTeams()) {
 						t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
 					}
@@ -843,15 +858,9 @@ public class Warzone {
 			}
 			player.setFireTicks(0);
 			player.setRemainingAir(300);
-
-			if (War.war.isSpoutServer()) {
-				SpoutPlayer sp = SpoutManager.getPlayer(player);
-				if (sp.isSpoutCraftEnabled()) {
-					WarSpoutListener.removeStats(sp);
-					sp.setTitle(ChatColor.WHITE + player.getName());
-				}
-				sp.resetTitle();
-			}
+			
+			// To hide stats
+			War.war.getSpoutMessenger().updateStats(player);
 			
 			War.war.msg(player, "Your inventory is being restored.");
 			if (War.war.getWarHub() != null) {
