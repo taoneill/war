@@ -323,6 +323,10 @@ public class Team {
 
 			SignHelper.setToSign(War.war, signBlock, (byte) signData, lines);
 		}
+		
+		if (War.war.isSpoutServer()) {
+			War.war.getSpoutMessenger().updateStats(this.warzone);
+		}
 	}
 
 	private void setBlock(int x, int y, int z, TeamKind kind) {

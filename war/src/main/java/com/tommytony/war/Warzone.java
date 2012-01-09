@@ -726,8 +726,8 @@ public class Warzone {
 							SpoutPlayer sp = SpoutManager.getPlayer(p);
 							if (sp.isSpoutCraftEnabled()) {
 				                sp.sendNotification(
-				                		SpoutMessenger.cleanForNotification("Round over! " + ChatColor.WHITE + "Team " + playerTeam.getKind().getColor() + playerTeam.getName()),
-				                		SpoutMessenger.cleanForNotification("had no more lives."),
+				                		SpoutMessenger.cleanForNotification("Round over! " + playerTeam.getKind().getColor() + playerTeam.getName()),
+				                		SpoutMessenger.cleanForNotification("ran out of lives."),
 				                		playerTeam.getKind().getMaterial(),
 				                		playerTeam.getKind().getData(),
 				                		5000);

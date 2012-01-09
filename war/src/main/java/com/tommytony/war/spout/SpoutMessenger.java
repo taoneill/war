@@ -137,14 +137,13 @@ public class SpoutMessenger {
 	        int lineCounter = 1;
 			for (Team t : zone.getTeams()) {
 				// team name
-				String teamStr = t.getName() + "-" + t.getPlayers().size() + "/" + t.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
+				String teamStr = t.getName() + " (" + t.getPlayers().size() + "/" + t.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE) + ")";
 				line = new GenericLabel(teamStr);
 				if (t.getPlayers().size() == 0) {
-					line.setText(teamStr.replace("-", " "));
 					line.setTextColor(new Color(100,100,100));
 				}
 				else {
-					line.setText(t.getKind().getColor() + teamStr.replace("-", " " + ChatColor.WHITE));
+					line.setText(t.getKind().getColor() + teamStr.replace("(", ChatColor.GRAY + "(" + ChatColor.WHITE).replace(")", ChatColor.GRAY + ")" + ChatColor.WHITE));
 				}
 				line.setTooltip("Warzone: " + zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
 		        line.setAlign(WidgetAnchor.TOP_LEFT).setX(2).setY(4 + lineCounter * 8).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
@@ -246,7 +245,7 @@ public class SpoutMessenger {
 			
 			drawStats(player, statsLines);
 			
-			if (messages.size() > 0) {
+			if (messages != null && messages.size() > 0) {
 				int rank = 0;			
 				Warzone zone = Warzone.getZoneByPlayerName(playerName);			
 				int verticalOffset = statsOffset + 4; 

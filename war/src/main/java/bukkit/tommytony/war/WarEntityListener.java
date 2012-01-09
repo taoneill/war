@@ -151,12 +151,6 @@ public class WarEntityListener extends EntityListener {
 					}
 					defenderWarzone.handleDeath(d);
 					
-
-					if (War.war.isSpoutServer()) {
-						// make sure score is updated
-						War.war.getSpoutMessenger().updateStats(defenderWarzone);
-					}
-					
 					event.setCancelled(true);
 				}
 			} else if (attackerTeam != null && defenderTeam != null && attackerTeam == defenderTeam && attackerWarzone == defenderWarzone && attacker.getEntityId() != defender.getEntityId()) {
@@ -196,7 +190,7 @@ public class WarEntityListener extends EntityListener {
 			Warzone defenderWarzone = Warzone.getZoneByPlayerName(d.getName());
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
 				String deathMessage = "";
-				String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getDisplayName();
+				String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getName();
 				
 				if (event.getDamager() instanceof CraftTNTPrimed) {
 					deathMessage = defenderString + ChatColor.WHITE + " exploded";
@@ -360,7 +354,7 @@ public class WarEntityListener extends EntityListener {
 				} else if (event.getCause() == DamageCause.FALL) {
 					cause = " fell to an untimely death";
 				}
-				deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getDisplayName() + ChatColor.WHITE + cause;
+				deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE + cause;
 				for (Team team : zone.getTeams()) {
 					team.teamcast(deathMessage);
 				}
