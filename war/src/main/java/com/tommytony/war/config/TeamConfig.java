@@ -4,7 +4,7 @@ import com.tommytony.war.FlagReturn;
 import com.tommytony.war.TeamSpawnStyle;
 
 public enum TeamConfig {
-	FLAGMUSTBEHOME (Integer.class),
+	FLAGMUSTBEHOME (Boolean.class),
 	FLAGPOINTSONLY (Boolean.class),
 	FLAGRETURN (FlagReturn.class),
 	LIFEPOOL (Integer.class),

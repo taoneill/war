@@ -133,7 +133,7 @@ public class WarTxtMapper {
 
 		// defaultFlagPointsOnly
 		if (warConfig.keyExists("defaultFlagPointsOnly")) {
-			War.war.getTeamDefaultConfig().put(TeamConfig.LIFEPOOL, warConfig.getBoolean("defaultFlagPointsOnly"));
+			War.war.getTeamDefaultConfig().put(TeamConfig.FLAGPOINTSONLY, warConfig.getBoolean("defaultFlagPointsOnly"));
 		}
 		
 		// defaultFlagMustBeHome
