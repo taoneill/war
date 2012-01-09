@@ -25,6 +25,7 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.spout.SpoutMessenger;
 
 /**
  *
@@ -56,6 +57,20 @@ public class WarBlockListener extends BlockListener {
 			if (monument != null && !monument.hasOwner()) {
 				monument.capture(team);
 				List<Team> teams = zone.getTeams();
+				
+				if (War.war.isSpoutServer()) {
+					for (Player p : team.getPlayers()) {
+						SpoutPlayer sp = SpoutManager.getPlayer(p);
+						if (sp.isSpoutCraftEnabled()) {
+			                sp.sendNotification(
+			                		SpoutMessenger.cleanForNotification("Monument " + ChatColor.WHITE + monument.getName()),
+			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "capped by " + team.getKind().getColor() + player.getName()),
+			                		team.getKind().getMaterial(),
+			                		team.getKind().getData(),
+			                		5000);
+						}
+					}
+				}
 				for (Team t : teams) {
 					t.teamcast("Monument " + monument.getName() + " has been captured by team " + team.getName() + ".");
 				}
@@ -197,6 +212,19 @@ public class WarBlockListener extends BlockListener {
 			Monument monument = warzone.getMonumentFromCenterBlock(block);
 			if (monument.hasOwner()) {
 				List<Team> teams = warzone.getTeams();
+				if (War.war.isSpoutServer()) {
+					for (Player p : team.getPlayers()) {
+						SpoutPlayer sp = SpoutManager.getPlayer(p);
+						if (sp.isSpoutCraftEnabled()) {
+			                sp.sendNotification(
+			                		SpoutMessenger.cleanForNotification("Monument " + ChatColor.WHITE + monument.getName()),
+			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "freed by " + team.getKind().getColor() + player.getName()),
+			                		Material.OBSIDIAN,
+			                		(short)0,
+			                		5000);
+						}
+					}
+				}
 				for (Team t : teams) {
 					t.teamcast("Team " + monument.getOwnerTeam().getName() + " loses control of monument " + monument.getName());
 				}
@@ -248,8 +276,12 @@ public class WarBlockListener extends BlockListener {
 									for (Player p : t.getPlayers()) {
 										SpoutPlayer sp = SpoutManager.getPlayer(p);
 										if (sp.isSpoutCraftEnabled()) {
-											String tn = team.getName();
-							                sp.sendNotification(tn.substring(0,1).toUpperCase()+tn.substring(1).toLowerCase()+" stole your Flag!","Stolen by "+player.getName(),lostFlagTeam.getKind().getMaterial(),lostFlagTeam.getKind().getData(),3000);
+							                sp.sendNotification(
+							                		SpoutMessenger.cleanForNotification(team.getKind().getColor() + player.getName() + ChatColor.YELLOW + " stole"),
+							                		SpoutMessenger.cleanForNotification("your flag!"),
+							                		lostFlagTeam.getKind().getMaterial(),
+							                		lostFlagTeam.getKind().getData(),
+							                		5000);
 										}
 									}
 								}

@@ -4,23 +4,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.gui.Color;
-import org.getspout.spoutapi.gui.Container;
-import org.getspout.spoutapi.gui.ContainerType;
-import org.getspout.spoutapi.gui.GenericContainer;
 import org.getspout.spoutapi.gui.GenericLabel;
 import org.getspout.spoutapi.gui.WidgetAnchor;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
+import bukkit.tommytony.war.War;
+
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
 import com.tommytony.war.Warzone;
-
-import bukkit.tommytony.war.War;
 
 public class SpoutMessenger {
 
@@ -40,7 +37,8 @@ public class SpoutMessenger {
 			List<PlayerMessage> toRemove = new ArrayList<PlayerMessage>();
 			
 			for (PlayerMessage message : messages) {
-				if (System.currentTimeMillis() - message.getSendTime() > 10000) {
+				if (System.currentTimeMillis() - message.getSendTime() > 12000) {
+					
 					toRemove.add(message);
 				}				
 			}
@@ -49,7 +47,9 @@ public class SpoutMessenger {
 				messages.remove(removing);
 			}
 			
-			drawMessages(playerName);
+			if (toRemove.size() > 0) {
+				drawMessages(playerName);
+			}
 		}
 	}
 	
@@ -75,92 +75,101 @@ public class SpoutMessenger {
 		}
 	}
 	
+	public static String cleanForNotification(String toNotify) {
+		if (toNotify.length() > 26) {
+			return toNotify.substring(0, 25);
+		}
+		return toNotify;
+	}
+	
 	private void drawMessages(String playerName) {
-		SpoutPlayer player = SpoutManager.getPlayer(War.war.getServer().getPlayer(playerName));
-		List<PlayerMessage> messages = playerMessages.get(playerName);
+		Player bukkitPlayer = War.war.getServer().getPlayer(playerName);
+		if (bukkitPlayer != null) {
+			SpoutPlayer player = SpoutManager.getPlayer(bukkitPlayer);
+			List<PlayerMessage> messages = playerMessages.get(playerName);
 				
-		clear(player);
-		
-		if (messages.size() > 0) {
-//			Container msgListContainer = new GenericContainer();
-//			msgListContainer.setAlign(WidgetAnchor.TOP_LEFT);
-//			msgListContainer.setLayout(ContainerType.VERTICAL);
+			// remove old widgets
+			clear(player);
 			
-			int rank = 0;
-			int maxLineWidth = 0;
-			
-			int verticalOffset = 2; 
-			for (PlayerMessage message : messages) {
-//				Container msgContainer = new GenericContainer();
-//				msgContainer.setLayout(ContainerType.VERTICAL);
+			if (messages.size() > 0) {
+				int rank = 0;			
+				Warzone zone = Warzone.getZoneByPlayerName(playerName);			
+				int verticalOffset = 2; 
 				
-				int horizontalOffset = 2;
-				
-				String messageStr = "War> " + message.getMessage();
-				String[] words = messageStr.split(" ");
-				
-				int noOfLetters = 0;
-				for (String word : words) {
-					noOfLetters += word.length() + 1;
+				for (PlayerMessage message : messages) {
+					int horizontalOffset = 2;
 					
-					if (noOfLetters > 50) {						
-						horizontalOffset = 2;
-						verticalOffset += 12;
+					String messageStr = "War> " + message.getMessage();
+					String[] words = messageStr.split(" ");
+					
+					for (String word : words) {
+						
+						if (horizontalOffset > 230) {	
+							horizontalOffset = 2;
+							verticalOffset += 8;
+						}
+	
+						word = addMissingColor(word, zone);
+						
+						GenericLabel label = new GenericLabel(word);
+						int width = GenericLabel.getStringWidth(word);
+						label.setAlign(WidgetAnchor.TOP_LEFT);
+						label.setWidth(width);
+						label.setHeight(GenericLabel.getStringHeight(word));
+						label.setX(horizontalOffset);
+						label.setY(verticalOffset);
+						
+						player.getMainScreen().attachWidget(War.war, label);
+	
+						horizontalOffset += width + 2;
 					}
 					
-					GenericLabel label = new GenericLabel(word);
-					label.setTextColor(getWordColor(word, playerName));
+					verticalOffset += 9;
 					
-					int width = GenericLabel.getStringWidth(word);
-					label.setAlign(WidgetAnchor.TOP_LEFT);
-					label.setWidth(width);
-					label.setHeight(GenericLabel.getStringHeight(word));
-					label.setX(horizontalOffset);
-					label.setY(verticalOffset);
-					player.getMainScreen().attachWidget(War.war, label);
-					//label.shiftXPos(horizOffset);
-					
-					//lineContainer.addChild(label);
-					//lineWidth += GenericLabel.getStringWidth(word);
-					horizontalOffset += width + 2;
+					rank++;
 				}
-				
-//				lineContainer.setWidth(lineWidth + 50);
-//				lineContainer.setHeight(12);
-//				msgContainer.addChild(lineContainer);
-//				
-//				msgContainer.setWidth(maxLineWidth + 50);
-//				msgContainer.setHeight(40);
-//				msgListContainer.addChild(msgContainer);
-				
-				verticalOffset += 12;
-				
-				rank++;
-			}
-
-			// remove old message list
-			
-			
-			// new message list
-//			msgListContainer.setWidth(maxLineWidth);
-//			msgListContainer.setHeight(200);
-//			player.getMainScreen().attachWidget(War.war, msgListContainer);
-		}		
+			}		
+		}
 	}
 
-	private Color getWordColor(String word, String playerName) {
-		Warzone zone = Warzone.getZoneByPlayerName(playerName);
-		
-		for (Team team : zone.getTeams()) {
-			for (Player player : team.getPlayers()) {
-				if (word.contains(player.getName())) {
-					return team.getKind().getSpoutColor();
+	public static String addMissingColor(String word, Warzone zone) {
+		if (zone != null) {
+			for (Team team : zone.getTeams()) {
+				for (Player player : team.getPlayers()) {
+					if (word.startsWith(player.getName())) {
+						return team.getKind().getColor() + word + ChatColor.WHITE;
+					}
 				}
 			}
 		}
 		
 		for (TeamKind kind : TeamKind.values()) {
-			if (word.contains(kind.toString())) {
+			if (word.startsWith(kind.toString())) {
+				return kind.getColor() + word + ChatColor.WHITE;
+			}
+		}
+		
+		if (word.equals("War>")) {
+			return ChatColor.GRAY + word + ChatColor.WHITE;
+		}
+		
+		// white by default
+		return word;
+	}
+
+	private Color getWordColor(String word, Warzone zone) {
+		if (zone != null) {
+			for (Team team : zone.getTeams()) {
+				for (Player player : team.getPlayers()) {
+					if (word.startsWith(player.getName())) {
+						return team.getKind().getSpoutColor();
+					}
+				}
+			}
+		}
+		
+		for (TeamKind kind : TeamKind.values()) {
+			if (word.startsWith(kind.toString())) {
 				return kind.getSpoutColor();
 			}
 		}

@@ -37,6 +37,7 @@ import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.ZoneSetter;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.spout.SpoutMessenger;
 
 /**
  * @author tommytony, Tim Düsterhus
@@ -506,6 +507,28 @@ public class WarPlayerListener extends PlayerListener {
 					synchronized (playerWarzone) {
 						// flags can be captured at own spawn or own flag pole
 						playerTeam.addPoint();
+						Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+						
+						// Notify everyone
+						for (Team t : playerWarzone.getTeams()) {
+							if (War.war.isSpoutServer()) {
+								for (Player p : t.getPlayers()) {
+									SpoutPlayer sp = SpoutManager.getPlayer(p);
+									if (sp.isSpoutCraftEnabled()) {
+						                sp.sendNotification(
+						                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
+						                		SpoutMessenger.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + " flag"),
+						                		victim.getKind().getMaterial(),
+						                		victim.getKind().getData(),
+						                		5000);
+									}
+								}
+							}
+							t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE
+									+ " captured team " + victim.getName() + "'s flag. Team " + playerTeam.getName() + " scores one point.");
+						}
+						
+						// Detect win conditions
 						if (playerTeam.getPoints() >= playerTeam.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
 							if (playerWarzone.hasPlayerState(player.getName())) {
 								playerWarzone.restorePlayerState(player);
@@ -513,23 +536,10 @@ public class WarPlayerListener extends PlayerListener {
 							playerWarzone.handleScoreCapReached(player, playerTeam.getName());
 							event.setTo(playerWarzone.getTeleport());
 						} else {
-							// added a point
-							Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+							// just added a point
 							victim.getFlagVolume().resetBlocks(); // bring back flag to team that lost it
 							victim.initializeTeamFlag();
-							for (Team t : playerWarzone.getTeams()) {
-								if (War.war.isSpoutServer()) {
-									for (Player p : t.getPlayers()) {
-										SpoutPlayer sp = SpoutManager.getPlayer(p);
-										if (sp.isSpoutCraftEnabled()) {
-											String tn = playerTeam.getName();
-							                sp.sendNotification(tn.substring(0,1).toUpperCase()+tn.substring(1).toLowerCase()+" captures Flag!","Capped by "+player.getName(),victim.getKind().getMaterial(),victim.getKind().getData(),3000);
-										}
-									}
-								}
-								t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE
-										+ " captured team " + victim.getName() + "'s flag. Team " + playerTeam.getName() + " scores one point.");
-							}
+							
 							playerWarzone.respawnPlayer(event, playerTeam, player);
 							playerTeam.resetSign();
 							playerWarzone.getLobby().resetTeamGateSign(playerTeam);

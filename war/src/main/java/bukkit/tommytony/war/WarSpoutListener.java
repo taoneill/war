@@ -126,6 +126,6 @@ public class WarSpoutListener extends SpoutListener {
 	}
 	
 	public static void removeStats(SpoutPlayer sp) {
-		sp.getMainScreen().removeWidgets(plugin);
+		//sp.getMainScreen().removeWidgets(plugin);
 	}
 }

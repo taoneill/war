@@ -1,5 +1,7 @@
 package com.tommytony.war.jobs;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
@@ -10,6 +12,7 @@ import bukkit.tommytony.war.WarSpoutListener;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.spout.SpoutMessenger;
 
 public class ScoreCapReachedJob implements Runnable {
 
@@ -23,9 +26,25 @@ public class ScoreCapReachedJob implements Runnable {
 
 	public void run() {
 		for (Team t : this.zone.getTeams()) {
-			t.teamcast(this.winnersStr);
+			if (War.war.isSpoutServer()) {
+				for (Player p : t.getPlayers()) {
+					SpoutPlayer sp = SpoutManager.getPlayer(p);
+					if (sp.isSpoutCraftEnabled()) {
+		                sp.sendNotification(
+		                		SpoutMessenger.cleanForNotification("Match won! " + ChatColor.WHITE + "Winners:"),
+		                		SpoutMessenger.cleanForNotification(SpoutMessenger.addMissingColor(winnersStr, zone)),
+		                		Material.CAKE,
+		                		(short)0,
+		                		5000);
+					}
+				}
+			}
+			String winnersStrAndExtra = "Score cap reached. Game is over! Winning team(s): " + this.winnersStr;
+			winnersStrAndExtra += ". Resetting warzone and your inventory...";
+			t.teamcast(winnersStr);
 			boolean isSpoutServer = War.war.isSpoutServer();
 			for (Player tp : t.getPlayers()) {
+				
 				if (isSpoutServer) {
 					SpoutPlayer sp = SpoutManager.getPlayer(tp);
 					if (sp.isSpoutCraftEnabled()) { 

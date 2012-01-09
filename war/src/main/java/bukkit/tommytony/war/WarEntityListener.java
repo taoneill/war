@@ -115,8 +115,8 @@ public class WarEntityListener extends EntityListener {
 				// Detect death, prevent it and respawn the player
 				if (event.getDamage() >= d.getHealth()) {
 					String killMessage = "";
-					String attackerString = attackerTeam.getKind().getColor() + a.getDisplayName();
-					String defenderString = defenderTeam.getKind().getColor() + d.getDisplayName();
+					String attackerString = attackerTeam.getKind().getColor() + a.getName();
+					String defenderString = defenderTeam.getKind().getColor() + d.getName();
 					
 					if (attacker.getEntityId() != defender.getEntityId()) {
 						Material killerWeapon = a.getItemInHand().getType();

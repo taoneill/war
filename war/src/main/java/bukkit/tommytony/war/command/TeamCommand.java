@@ -36,7 +36,7 @@ public class TeamCommand extends AbstractWarCommand {
 		for (String part : this.args) {
 			teamMessage += part + " ";
 		}
-		playerTeam.teamcast(teamMessage);
+		playerTeam.teamcast(teamMessage, false);
 
 		return true;
 	}

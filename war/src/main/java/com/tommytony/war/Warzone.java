@@ -36,6 +36,7 @@ import com.tommytony.war.jobs.InitZoneJob;
 import com.tommytony.war.jobs.LoadoutResetJob;
 import com.tommytony.war.jobs.ScoreCapReachedJob;
 import com.tommytony.war.mappers.LoadoutYmlMapper;
+import com.tommytony.war.spout.SpoutMessenger;
 import com.tommytony.war.utils.PlayerState;
 import com.tommytony.war.volumes.ZoneVolume;
 
@@ -720,6 +721,19 @@ public class Warzone {
 				List<Team> teams = playerWarzone.getTeams();
 				String scores = "";
 				for (Team t : teams) {
+					if (War.war.isSpoutServer()) {
+						for (Player p : t.getPlayers()) {
+							SpoutPlayer sp = SpoutManager.getPlayer(p);
+							if (sp.isSpoutCraftEnabled()) {
+				                sp.sendNotification(
+				                		SpoutMessenger.cleanForNotification("Round over! " + ChatColor.WHITE + "Team " + playerTeam.getKind().getColor() + playerTeam.getName()),
+				                		SpoutMessenger.cleanForNotification("had no more lives."),
+				                		playerTeam.getKind().getMaterial(),
+				                		playerTeam.getKind().getData(),
+				                		5000);
+							}
+						}
+					}
 					t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " + player.getName() + " died and there were no lives left in their life pool.");
 
 					if (t.getPlayers().size() != 0 && !t.getTeamConfig().resolveBoolean(TeamConfig.FLAGPOINTSONLY)) {
@@ -839,7 +853,6 @@ public class Warzone {
 				sp.resetTitle();
 			}
 			
-			
 			War.war.msg(player, "Your inventory is being restored.");
 			if (War.war.getWarHub() != null) {
 				War.war.getWarHub().resetZoneSign(this);
@@ -925,8 +938,6 @@ public class Warzone {
 	}
 
 	public void handleScoreCapReached(Player player, String winnersStr) {
-		winnersStr = "Score cap reached. Game is over! Winning team(s): " + winnersStr;
-		winnersStr += ". Resetting warzone and your inventory...";
 		// Score cap reached. Reset everything.
 		ScoreCapReachedJob job = new ScoreCapReachedJob(this, winnersStr);
 		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
