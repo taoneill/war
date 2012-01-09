@@ -8,6 +8,12 @@
 
   <name>War</name>
   <url>http://war.tommytony.com</url>
+  <repositories>
+        <repository>
+            <id>spout-repo</id>
+            <url>http://nexus.getspout.org/content/groups/public/</url>
+        </repository>
+    </repositories>
   <build>
       <plugins>
           <plugin>
@@ -52,6 +58,12 @@
     	<scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>org.getspout</groupId>
+      <artifactId>spoutpluginapi</artifactId>
+      <version>dev-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
 	<groupId>junit</groupId>
 	<artifactId>junit</artifactId>
 	<version>4.8.1</version>
@@ -65,3 +77,4 @@
     </dependency>
   </dependencies>
 </project>
+
