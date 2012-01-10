@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.gui.Color;
+import org.getspout.spoutapi.gui.GenericGradient;
 import org.getspout.spoutapi.gui.GenericLabel;
 import org.getspout.spoutapi.gui.WidgetAnchor;
 import org.getspout.spoutapi.player.SpoutPlayer;
@@ -32,7 +33,7 @@ public class SpoutMessenger {
 
 		List<Integer> statsOffset = new ArrayList<Integer>(); 
 		List<GenericLabel> lines = getStatsLines(Warzone.getZoneByPlayerName(sp.getName()), statsOffset);
-		drawMessages(sp.getName(), lines, statsOffset.get(1));
+		drawMessages(sp.getName(), lines, statsOffset);
 		
 	}
 	 	
@@ -55,7 +56,7 @@ public class SpoutMessenger {
 			if (toRemove.size() > 0) {
 				List<Integer> statsOffset = new ArrayList<Integer>(); 
 				List<GenericLabel> lines = getStatsLines(Warzone.getZoneByPlayerName(playerName), statsOffset);
-				drawMessages(playerName, lines, statsOffset.get(1));
+				drawMessages(playerName, lines, statsOffset);
 			}
 		}
 	}
@@ -96,7 +97,7 @@ public class SpoutMessenger {
 			for (Player p : t.getPlayers()) {
 				SpoutPlayer sp = SpoutManager.getPlayer(p);
 				if (sp.isSpoutCraftEnabled()) {
-					drawMessages(sp.getName(), statsLines, statsOffset.get(1));
+					drawMessages(sp.getName(), statsLines, statsOffset);
 				}
 			}
 		}
@@ -109,7 +110,7 @@ public class SpoutMessenger {
 		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 		List<GenericLabel> statsLines = getStatsLines(zone, statsOffset);
 		if (sp.isSpoutCraftEnabled()) {
-			drawMessages(sp.getName(), statsLines, statsOffset.get(1));
+			drawMessages(sp.getName(), statsLines, statsOffset);
 		}
 	}
 	
@@ -130,7 +131,7 @@ public class SpoutMessenger {
 			
 			GenericLabel teamsHeader = new GenericLabel(ChatColor.GRAY + "War> " + ChatColor.WHITE + zone.getName());
 			int teamsHeaderWidth = GenericLabel.getStringWidth(teamsHeader.getText());
-			teamsHeader.setAlign(WidgetAnchor.TOP_LEFT).setX(2).setY(2).setWidth(teamsHeaderWidth);
+			teamsHeader.setAlign(WidgetAnchor.TOP_LEFT).setX(3).setY(2).setWidth(teamsHeaderWidth);
 			lines.add(teamsHeader);
 	        
 			// First, we collect all the team names
@@ -164,16 +165,18 @@ public class SpoutMessenger {
 			// First line with headers
 			int headerOffset = teamMax - 2;
 			
-			GenericLabel livesHeader = new GenericLabel(ChatColor.GRAY + "points");
-			int pointsHeaderWidth = GenericLabel.getStringWidth(livesHeader.getText());
-			livesHeader.setAlign(WidgetAnchor.TOP_LEFT).setX(headerOffset).setY(2).setWidth(pointsHeaderWidth);
+			GenericLabel pointsHeader = new GenericLabel(ChatColor.GRAY + "points");
+			//pointsHeader.setTextColor(new Color(100, 100, 100));
+			int pointsHeaderWidth = GenericLabel.getStringWidth(pointsHeader.getText());
+			pointsHeader.setAlign(WidgetAnchor.TOP_LEFT).setX(headerOffset).setY(2).setWidth(pointsHeaderWidth);
 			headerOffset += pointsHeaderWidth + 6;
-			lines.add(livesHeader);
-			
-			GenericLabel pointsHeader = new GenericLabel(ChatColor.GRAY + "lives");
-			int livesHeaderWidth = GenericLabel.getStringWidth(pointsHeader.getText());
-			pointsHeader.setAlign(WidgetAnchor.TOP_LEFT).setX(headerOffset).setY(2).setWidth(livesHeaderWidth);
 			lines.add(pointsHeader);
+			
+			GenericLabel livesHeader = new GenericLabel(ChatColor.GRAY + "lives");
+			//livesHeader.setTextColor(new Color(100, 100, 100));
+			int livesHeaderWidth = GenericLabel.getStringWidth(livesHeader.getText());
+			livesHeader.setAlign(WidgetAnchor.TOP_LEFT).setX(headerOffset).setY(2).setWidth(livesHeaderWidth);
+			lines.add(livesHeader);
 			
 			lineCounter = 1;
 			for (Team t : zone.getTeams()) {
@@ -181,7 +184,7 @@ public class SpoutMessenger {
 				line = new GenericLabel(t.getPoints() + "/" + t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE));
 				if (t.getPlayers().size() == 0) line.setTextColor(new Color(100, 100, 100));
 				line.setTooltip("Warzone: " + zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
-		        line.setAlign(WidgetAnchor.TOP_LEFT).setX(2 + teamMax + 2).setY(4 + lineCounter * 8).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
+		        line.setAlign(WidgetAnchor.TOP_LEFT).setX(3 + teamMax + 2).setY(4 + lineCounter * 8).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
 		        scorelines.add(line);
 		        lineCounter++;
 			}
@@ -201,7 +204,7 @@ public class SpoutMessenger {
 				line = new GenericLabel(t.getRemainingLifes() + "/" + t.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				if (t.getPlayers().size() == 0) line.setTextColor(new Color(100, 100, 100));
 				line.setTooltip("Warzone: " + zone.getName()).setAnchor(WidgetAnchor.TOP_LEFT);
-		        line.setAlign(WidgetAnchor.TOP_LEFT).setX(2 + teamMax + 2 + scoreMax + 2).setY(4 + lineCounter * 8).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
+		        line.setAlign(WidgetAnchor.TOP_LEFT).setX(3 + teamMax + 2 + scoreMax + 2).setY(4 + lineCounter * 8).setWidth(GenericLabel.getStringWidth(line.getText())).setHeight(GenericLabel.getStringHeight(line.getText()));
 		        lifelines.add(line);
 		        lineCounter++;
 			}
@@ -220,7 +223,7 @@ public class SpoutMessenger {
 			for (GenericLabel l : scorelines) { lines.add(l); }
 			for (GenericLabel l : lifelines) { lines.add(l); }
 			
-			offset.add(2 + teamMax + 2 + scoreMax + 2 + lifeMax + 2);
+			offset.add(3 + teamMax + 2 + scoreMax + 2 + lifeMax + 2);
 			offset.add(2 + lineCounter * 8);
 			
 		}
@@ -234,21 +237,44 @@ public class SpoutMessenger {
 		}
 	}
 	
-	private void drawMessages(String playerName, List<GenericLabel> statsLines, Integer statsOffset) {
+	private void drawMessages(String playerName, List<GenericLabel> statsLines, List<Integer> statsOffset) {
 		Player bukkitPlayer = War.war.getServer().getPlayer(playerName);
 		if (bukkitPlayer != null) {
 			SpoutPlayer player = SpoutManager.getPlayer(bukkitPlayer);
 			List<PlayerMessage> messages = playerMessages.get(playerName);
-				
+						
 			// remove old widgets
 			clear(player);
 			
+			// add bg
+			GenericGradient gradient = new GenericGradient();
+			gradient.setAnchor(WidgetAnchor.TOP_LEFT);
+			gradient.setTopColor(new Color(0.0F, 0.0F, 0.0F, 0.5F)); // (order is Red, Green, Blue, Alpha)
+			gradient.setBottomColor(new Color(0.0F, 0.0F, 0.0F, 0.0F));
+			gradient.setHeight(statsOffset.get(1) + 4).setWidth(statsOffset.get(0) - 3);
+			
+			player.getMainScreen().attachWidget(War.war, gradient);
+			
+			// border in color of team
+			GenericGradient teamGradient = new GenericGradient();
+			teamGradient.setAnchor(WidgetAnchor.TOP_LEFT);
+			Color spoutColor = Team.getTeamByPlayerName(playerName).getKind().getSpoutColor();
+			spoutColor.setAlpha(0.5F);
+			teamGradient.setY(10);
+			teamGradient.setTopColor(spoutColor);
+			teamGradient.setBottomColor(new Color(250.0F, 250.0F, 250.0F, 1.0F));
+			teamGradient.setHeight(2).setWidth(statsOffset.get(0) - 3);
+			
+			player.getMainScreen().attachWidget(War.war, teamGradient);
+			
+			// update stats panel
 			drawStats(player, statsLines);
 			
+			// finally messages
 			if (messages != null && messages.size() > 0) {
 				int rank = 0;			
 				Warzone zone = Warzone.getZoneByPlayerName(playerName);			
-				int verticalOffset = statsOffset + 4; 
+				int verticalOffset = statsOffset.get(1) + 4; 
 				
 				for (PlayerMessage message : messages) {
 					int horizontalOffset = 2;
