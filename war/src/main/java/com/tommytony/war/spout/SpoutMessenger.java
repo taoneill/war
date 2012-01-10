@@ -258,7 +258,12 @@ public class SpoutMessenger {
 			// border in color of team
 			GenericGradient teamGradient = new GenericGradient();
 			teamGradient.setAnchor(WidgetAnchor.TOP_LEFT);
-			Color spoutColor = Team.getTeamByPlayerName(playerName).getKind().getSpoutColor();
+			
+			Team team = Team.getTeamByPlayerName(playerName);
+			Color spoutColor = new Color(250.0F, 250.0F, 250.0F, 1.0F);
+			if (team != null) {
+				spoutColor = team.getKind().getSpoutColor();
+			}
 			spoutColor.setAlpha(0.5F);
 			teamGradient.setY(10);
 			teamGradient.setTopColor(spoutColor);
