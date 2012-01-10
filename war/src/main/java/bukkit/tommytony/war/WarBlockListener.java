@@ -212,6 +212,7 @@ public class WarBlockListener extends BlockListener {
 			Monument monument = warzone.getMonumentFromCenterBlock(block);
 			if (monument.hasOwner()) {
 				List<Team> teams = warzone.getTeams();
+				Team ownerTeam = monument.getOwnerTeam();
 				if (War.war.isSpoutServer()) {
 					for (Player p : team.getPlayers()) {
 						SpoutPlayer sp = SpoutManager.getPlayer(p);
@@ -219,14 +220,14 @@ public class WarBlockListener extends BlockListener {
 			                sp.sendNotification(
 			                		SpoutMessenger.cleanForNotification("Monument " + ChatColor.WHITE + monument.getName()),
 			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "freed by " + team.getKind().getColor() + player.getName() + ChatColor.YELLOW + "!"),
-			                		Material.OBSIDIAN,
-			                		(short)0,
+			                		ownerTeam.getKind().getMaterial(),
+			                		ownerTeam.getKind().getData(),
 			                		5000);
 						}
 					}
 				}
 				for (Team t : teams) {
-					t.teamcast("Team " + monument.getOwnerTeam().getName() + " loses control of monument " + monument.getName());
+					t.teamcast("Team " + ownerTeam.getName() + " loses control of monument " + monument.getName());
 				}
 				monument.uncapture();
 			}

@@ -90,7 +90,7 @@ public class War extends JavaPlugin {
 	private final WarConfigBag warConfig = new WarConfigBag();
 	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
-	private SpoutMessenger spoutMessenger = new SpoutMessenger();
+	private SpoutMessenger spoutMessenger = null;
 
 	public War() {
 		super();
@@ -128,6 +128,7 @@ public class War extends JavaPlugin {
 		try {
 			Class.forName("org.getspout.spoutapi.player.SpoutPlayer");
 			isSpoutServer = true;
+			spoutMessenger = new SpoutMessenger();
 		} catch (ClassNotFoundException e) {
 			isSpoutServer = false;
 		}
@@ -264,8 +265,10 @@ public class War extends JavaPlugin {
 		HelmetProtectionTask helmetProtectionTask = new HelmetProtectionTask();
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, helmetProtectionTask, 250, 100);
 		
-		SpoutFadeOutMessageJob fadeOutMessagesTask = new SpoutFadeOutMessageJob();
-		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, fadeOutMessagesTask, 100, 100);
+		if (this.isSpoutServer) {
+			SpoutFadeOutMessageJob fadeOutMessagesTask = new SpoutFadeOutMessageJob();
+			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, fadeOutMessagesTask, 100, 100);
+		}
 				
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
 	}

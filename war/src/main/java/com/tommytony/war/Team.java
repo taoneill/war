@@ -364,10 +364,14 @@ public class Team {
 
 	public void teamcast(String message, boolean isNotification) {
 		for (Player player : this.players) {
-			SpoutPlayer sp = SpoutManager.getPlayer(player);
-			if (sp.isSpoutCraftEnabled() && isNotification) {
-				// team notifications go to the top left for Spout players to lessen War spam in chat box
-				War.war.getSpoutMessenger().msg(sp, message);
+			if (War.war.isSpoutServer()) {
+				SpoutPlayer sp = SpoutManager.getPlayer(player);
+				if (sp.isSpoutCraftEnabled() && isNotification) {
+					// team notifications go to the top left for Spout players to lessen War spam in chat box
+					War.war.getSpoutMessenger().msg(sp, message);
+				} else {
+					War.war.msg(player, message);
+				}
 			} else {
 				War.war.msg(player, message);
 			}

@@ -860,7 +860,9 @@ public class Warzone {
 			player.setRemainingAir(300);
 			
 			// To hide stats
-			War.war.getSpoutMessenger().updateStats(player);
+			if (War.war.isSpoutServer()) {
+				War.war.getSpoutMessenger().updateStats(player);
+			}
 			
 			War.war.msg(player, "Your inventory is being restored.");
 			if (War.war.getWarHub() != null) {
