@@ -520,7 +520,7 @@ public class WarPlayerListener extends PlayerListener {
 						                		SpoutMessenger.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + " flag!"),
 						                		victim.getKind().getMaterial(),
 						                		victim.getKind().getData(),
-						                		5000);
+						                		10000);
 									}
 								}
 							}

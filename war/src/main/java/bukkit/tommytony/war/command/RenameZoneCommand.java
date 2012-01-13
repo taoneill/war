@@ -55,7 +55,7 @@ public class RenameZoneCommand extends AbstractZoneMakerCommand {
 		War.war.getWarzones().remove(zone);
 
 		// rename zone file
-		(new File(War.war.getDataFolder().getPath() + "/warzone-" + zone.getName() + ".txt")).renameTo(new File(War.war.getDataFolder().getPath() + "/warzone-" + this.args[0] + ".txt"));
+		(new File(War.war.getDataFolder().getPath() + "/warzone-" + zone.getName() + ".yml")).renameTo(new File(War.war.getDataFolder().getPath() + "/warzone-" + this.args[0] + ".yml"));
 		// rename zone folder
 		(new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + zone.getName())).renameTo(new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + this.args[0]));
 
@@ -69,7 +69,7 @@ public class RenameZoneCommand extends AbstractZoneMakerCommand {
 		(new File(oldStart + "invs")).renameTo(new File(newStart + "invs"));
 
 		// set new name
-		PropertiesFile warzoneConfig = new PropertiesFile(War.war.getDataFolder().getPath() + "/warzone-" + this.args[0] + ".txt");
+		PropertiesFile warzoneConfig = new PropertiesFile(War.war.getDataFolder().getPath() + "/warzone-" + this.args[0] + ".yml");
 		warzoneConfig.setString("name", this.args[0]);
 		warzoneConfig.save();
 		warzoneConfig.close();

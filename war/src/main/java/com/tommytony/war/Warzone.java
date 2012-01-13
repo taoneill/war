@@ -730,7 +730,7 @@ public class Warzone {
 				                		SpoutMessenger.cleanForNotification("ran out of lives."),
 				                		playerTeam.getKind().getMaterial(),
 				                		playerTeam.getKind().getData(),
-				                		5000);
+				                		10000);
 							}
 						}
 					}

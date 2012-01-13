@@ -35,7 +35,7 @@ public class ScoreCapReachedJob implements Runnable {
 		                		SpoutMessenger.cleanForNotification(SpoutMessenger.addMissingColor(winnersStr, zone)),
 		                		Material.CAKE,
 		                		(short)0,
-		                		5000);
+		                		10000);
 					}
 				}
 			}

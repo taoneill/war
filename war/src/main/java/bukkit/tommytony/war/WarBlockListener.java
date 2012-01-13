@@ -67,7 +67,7 @@ public class WarBlockListener extends BlockListener {
 			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "capped by " + team.getKind().getColor() + player.getName() + ChatColor.YELLOW + "!"),
 			                		team.getKind().getMaterial(),
 			                		team.getKind().getData(),
-			                		5000);
+			                		10000);
 						}
 					}
 				}
@@ -222,7 +222,7 @@ public class WarBlockListener extends BlockListener {
 			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "freed by " + team.getKind().getColor() + player.getName() + ChatColor.YELLOW + "!"),
 			                		ownerTeam.getKind().getMaterial(),
 			                		ownerTeam.getKind().getData(),
-			                		5000);
+			                		10000);
 						}
 					}
 				}
