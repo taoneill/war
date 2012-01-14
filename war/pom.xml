@@ -3,7 +3,7 @@
 
   <groupId>com.tommytony</groupId>
   <artifactId>war</artifactId>
-  <version>1.6</version>
+  <version>1.7</version>
   <packaging>jar</packaging>
 
   <name>War</name>
@@ -51,13 +51,6 @@
     	<scope>compile</scope>
     </dependency>
     <dependency>
-    	<groupId>com.nijikokun.bukkit</groupId>
-    	<artifactId>Permissions</artifactId>
-    	<version>2.7.4</version>
-    	<type>jar</type>
-    	<scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>org.getspout</groupId>
       <artifactId>spoutpluginapi</artifactId>
       <version>dev-SNAPSHOT</version>
@@ -74,6 +67,12 @@
 	<artifactId>mockito-all</artifactId>
 	<version>1.8.5</version>
 	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>com.nijikokun.bukkit</groupId>
+    	<artifactId>Permissions</artifactId>
+    	<version>2.7.4</version>
+    	<scope>compile</scope>
     </dependency>
   </dependencies>
 </project>
