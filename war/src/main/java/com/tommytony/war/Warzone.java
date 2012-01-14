@@ -427,9 +427,17 @@ public class Warzone {
 		ItemStack[] contents = inventory.getContents();
 		List<PotionEffect> potionEffects = PotionEffect.getCurrentPotionEffects(player);
 		this.playerStates.put(player.getName(), new PlayerState(player.getGameMode(), 
-																contents, inventory.getHelmet(), inventory.getChestplate(), inventory.getLeggings(), inventory.getBoots(), 
-																player.getHealth(), player.getExhaustion(), player.getSaturation(), 
-																player.getFoodLevel(), potionEffects));
+																contents, 
+																inventory.getHelmet(), 
+																inventory.getChestplate(), 
+																inventory.getLeggings(), 
+																inventory.getBoots(), 
+																player.getHealth(), 
+																player.getExhaustion(), 
+																player.getSaturation(), 
+																player.getFoodLevel(), 
+																potionEffects,
+																SpoutManager.getPlayer(player).getTitle()));
 	}
 
 	public void restorePlayerState(Player player) {
@@ -443,6 +451,7 @@ public class Warzone {
 			player.setSaturation(originalContents.getSaturation());
 			player.setFoodLevel(originalContents.getFoodLevel());
 			PotionEffect.restorePotionEffects(player, originalContents.getPotionEffects());
+			SpoutManager.getPlayer(player).setTitle(originalContents.getPlayerTitle());
 		}
 	}
 

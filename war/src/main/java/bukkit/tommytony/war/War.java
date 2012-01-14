@@ -18,13 +18,10 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 import com.tommytony.war.FlagReturn;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
@@ -54,7 +51,6 @@ import com.tommytony.war.utils.PlayerState;
  * @package bukkit.tommytony.war
  */
 public class War extends JavaPlugin {
-	public static PermissionHandler permissionHandler;
 	public static War war;
 	private static boolean loadedOnce = false;
 
@@ -120,9 +116,6 @@ public class War extends JavaPlugin {
 		this.setLoaded(true);
 		this.desc = this.getDescription();
 		this.logger = this.getServer().getLogger();
-		
-		// Permissions
-		this.setupPermissions();
 		
 		// Spout server detection
 		try {
@@ -291,20 +284,6 @@ public class War extends JavaPlugin {
 
 		this.log("War v" + this.desc.getVersion() + " is off.", Level.INFO);
 		this.setLoaded(false);
-	}
-
-	/**
-	 * Initializes Permissions
-	 */
-	public void setupPermissions() {
-		Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
-		if (War.permissionHandler == null) {
-			if (permissionsPlugin != null) {
-				War.permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-			} else {
-				this.log("Permissions system not enabled. Defaulting to regular War config.", Level.INFO);
-			}
-		}
 	}
 
 	/**
@@ -750,16 +729,7 @@ public class War extends JavaPlugin {
 	 * @return		true if the player may play war
 	 */
 	public boolean canPlayWar(Player player) {
-		if (War.permissionHandler != null) {
-			if (War.permissionHandler.has(player, "war.player")) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			// w/o Permissions, everyone can play
-			return player.hasPermission("war.player");
-		}
+		return player.hasPermission("war.player");
 	}
 
 	/**
@@ -769,17 +739,7 @@ public class War extends JavaPlugin {
 	 * @return		true if the player may warp
 	 */
 	public boolean canWarp(Player player) {
-		if (War.permissionHandler != null) {
-			if (War.permissionHandler.has(player, "war.warp")) {
-				return true; 
-			} else {
-				return false;
-			}
-			
-		} else {
-			// w/o Permissions, everyone can warp
-			return player.hasPermission("war.warp");
-		}
+		return player.hasPermission("war.warp");
 	}
 
 	/**
@@ -790,16 +750,7 @@ public class War extends JavaPlugin {
 	 */
 	public boolean canBuildOutsideZone(Player player) {
 		if (this.getWarConfig().getBoolean(WarConfig.BUILDINZONESONLY)) {
-			if (War.permissionHandler != null) {
-				if (War.permissionHandler.has(player, "war.build")) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				// w/o Permissions, if buildInZonesOnly, no one can build outside the zone except Zonemakers
-				return player.hasPermission("war.build");
-			}
+			return player.hasPermission("war.build");
 		} else {
 			return true;
 		}
@@ -813,16 +764,7 @@ public class War extends JavaPlugin {
 	 */
 	public boolean canPvpOutsideZones(Player player) {
 		if (this.getWarConfig().getBoolean(WarConfig.PVPINZONESONLY)) {
-			if (War.permissionHandler != null) {
-				if (War.permissionHandler.has(player, "war.pvp")) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				// w/o Permissions, if pvpInZoneOnly, no one can pvp outside the zone
-				return player.hasPermission("war.pvp");
-			}
+			return player.hasPermission("war.pvp");
 		} else {
 			return true;
 		}
@@ -848,17 +790,7 @@ public class War extends JavaPlugin {
 			}
 		}
 		
-		if (War.permissionHandler != null) {
-			if (War.permissionHandler.has(player, "war.zonemaker")) {
-				// War admins are zonemakers
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			// default to op, if no permissions are found
-			return player.hasPermission("war.zonemaker");
-		}
+		return player.hasPermission("war.zonemaker");
 	}
 	
 	/**
@@ -868,16 +800,7 @@ public class War extends JavaPlugin {
 	 * @return		true if the player is a War admin
 	 */
 	public boolean isWarAdmin(Player player) {
-		if (War.permissionHandler != null) {
-			if (War.permissionHandler.has(player, "war.*") || War.permissionHandler.has(player, "war.admin")) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			// default to op, if no permissions are found
-			return player.hasPermission("war.admin");
-		}
+		return player.hasPermission("war.admin");
 	}
 
 	public void addWandBearer(Player player, String zoneName) {

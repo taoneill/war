@@ -8,7 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/craftbukkit"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="C:/dev/war/war/lib/mockito-all-1.8.5.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Permissions"/>
 	<classpathentry kind="lib" path="C:/dev/war/war/lib/SpoutPluginAPI.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
