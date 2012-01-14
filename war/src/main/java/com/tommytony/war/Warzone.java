@@ -426,6 +426,12 @@ public class Warzone {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack[] contents = inventory.getContents();
 		List<PotionEffect> potionEffects = PotionEffect.getCurrentPotionEffects(player);
+		
+		String playerTitle = player.getName();
+		if (War.war.isSpoutServer()) {
+			playerTitle = SpoutManager.getPlayer(player).getTitle();
+		}
+		
 		this.playerStates.put(player.getName(), new PlayerState(player.getGameMode(), 
 																contents, 
 																inventory.getHelmet(), 
@@ -437,7 +443,7 @@ public class Warzone {
 																player.getSaturation(), 
 																player.getFoodLevel(), 
 																potionEffects,
-																SpoutManager.getPlayer(player).getTitle()));
+																playerTitle));
 	}
 
 	public void restorePlayerState(Player player) {
@@ -451,7 +457,10 @@ public class Warzone {
 			player.setSaturation(originalContents.getSaturation());
 			player.setFoodLevel(originalContents.getFoodLevel());
 			PotionEffect.restorePotionEffects(player, originalContents.getPotionEffects());
-			SpoutManager.getPlayer(player).setTitle(originalContents.getPlayerTitle());
+			
+			if (War.war.isSpoutServer()) {
+				SpoutManager.getPlayer(player).setTitle(originalContents.getPlayerTitle());
+			}
 		}
 	}
 
