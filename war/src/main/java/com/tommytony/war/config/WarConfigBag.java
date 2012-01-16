@@ -1,13 +1,13 @@
 package com.tommytony.war.config;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
 
 public class WarConfigBag {
 
-	HashMap<WarConfig, Object> bag = new HashMap<WarConfig, Object>();
+	EnumMap<WarConfig, Object> bag = new EnumMap<WarConfig, Object>(WarConfig.class);
 		
 	public void put(WarConfig config, Object value) {
 		this.bag.put(config, value);

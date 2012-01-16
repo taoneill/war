@@ -1,6 +1,6 @@
 package com.tommytony.war.config;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -13,7 +13,7 @@ import com.tommytony.war.Warzone;
 
 public class TeamConfigBag {
 
-	private HashMap<TeamConfig, Object> bag = new HashMap<TeamConfig, Object>();
+	private EnumMap<TeamConfig, Object> bag = new EnumMap<TeamConfig, Object>(TeamConfig.class);
 	private Warzone warzone;
 		
 	public TeamConfigBag(Warzone warzone) {

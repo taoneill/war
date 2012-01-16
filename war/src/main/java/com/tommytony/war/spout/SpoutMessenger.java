@@ -84,12 +84,18 @@ public class SpoutMessenger {
 	}
 
 	public void clearAll() {
+		List<String> namesToRemove = new ArrayList<String>();
 		for (String name : playerMessages.keySet()) {
 			Player player = War.war.getServer().getPlayer(name);
 			if (player != null && playerMessages.containsKey(name)) {
 				clear(SpoutManager.getPlayer(player));
 			}
-			playerMessages.remove(name);
+
+			namesToRemove.add(name);
+		}
+		
+		for (String toRemove : namesToRemove) {
+			playerMessages.remove(toRemove);
 		}
 	}
 	
@@ -97,6 +103,7 @@ public class SpoutMessenger {
 		if (toNotify.length() > 26) {
 			return toNotify.substring(0, 25);
 		}
+
 		return toNotify;
 	}
 	
