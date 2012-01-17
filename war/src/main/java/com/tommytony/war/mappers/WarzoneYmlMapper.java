@@ -16,6 +16,8 @@ import org.bukkit.inventory.ItemStack;
 
 import bukkit.tommytony.war.War;
 
+import com.tommytony.war.Bomb;
+import com.tommytony.war.Cake;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.TeamKind;
@@ -123,6 +125,38 @@ public class WarzoneYmlMapper {
 				}
 			}
 			
+			// bombs
+			if (warzoneRootSection.contains(zoneInfoPrefix + "bomb")) {
+				List<String> bombNames = warzoneRootSection.getStringList(zoneInfoPrefix + "bomb.names");
+				for (String bombName : bombNames) {
+					if (bombName != null && !bombName.equals("")) {
+						String bombPrefix = zoneInfoPrefix + "bomb." + bombName + ".";
+						int bombX = warzoneRootSection.getInt(bombPrefix + "x");
+						int bombY = warzoneRootSection.getInt(bombPrefix + "y");
+						int bombZ = warzoneRootSection.getInt(bombPrefix + "z");
+						int bombYaw = warzoneRootSection.getInt(bombPrefix + "yaw");
+						Bomb bomb = new Bomb(bombName, warzone, new Location(world, bombX, bombY, bombZ, bombYaw, 0));
+						warzone.getBombs().add(bomb);
+					}
+				}
+			}
+			
+			// cakes
+			if (warzoneRootSection.contains(zoneInfoPrefix + "cake")) {
+				List<String> cakeNames = warzoneRootSection.getStringList(zoneInfoPrefix + "cake.names");
+				for (String cakeName : cakeNames) {
+					if (cakeName != null && !cakeName.equals("")) {
+						String cakePrefix = zoneInfoPrefix + "cake." + cakeName + ".";
+						int cakeX = warzoneRootSection.getInt(cakePrefix + "x");
+						int cakeY = warzoneRootSection.getInt(cakePrefix + "y");
+						int cakeZ = warzoneRootSection.getInt(cakePrefix + "z");
+						int cakeYaw = warzoneRootSection.getInt(cakePrefix + "yaw");
+						Cake cake = new Cake(cakeName, warzone, new Location(world, cakeX, cakeY, cakeZ, cakeYaw, 0));
+						warzone.getCakes().add(cake);
+					}
+				}
+			}
+			
 			// teams (maybe no teams)
 			if (warzoneRootSection.contains("team.names")) {
 				List<String> teamsNames = warzoneRootSection.getStringList("team.names");
@@ -183,7 +217,17 @@ public class WarzoneYmlMapper {
 			for (Monument monument : warzone.getMonuments()) {
 				monument.setVolume(VolumeMapper.loadVolume(monument.getName(), warzone.getName(), world));
 			}
-
+			
+			// bomb blocks
+			for (Bomb bomb : warzone.getBombs()) {
+				bomb.setVolume(VolumeMapper.loadVolume("bomb-" + bomb.getName(), warzone.getName(), world));
+			}
+			
+			// cake blocks
+			for (Cake cake : warzone.getCakes()) {
+				cake.setVolume(VolumeMapper.loadVolume("cake-" + cake.getName(), warzone.getName(), world));
+			}
+			
 			// team spawn blocks
 			for (Team team : warzone.getTeams()) {
 				team.setSpawnVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), world));
@@ -298,6 +342,46 @@ public class WarzoneYmlMapper {
 			}
 		}
 		
+		// bombs
+		if (warzone.getMonuments().size() > 0) {
+			ConfigurationSection bombsSection = warzoneInfoSection.createSection("bomb");
+			
+			List<String> bombNames = new ArrayList<String>();
+			for (Bomb bomb : warzone.getBombs()) {
+				bombNames.add(bomb.getName());
+			}
+			bombsSection.set("names", bombNames);
+			
+			for (Bomb bomb : warzone.getBombs()) {
+				
+				ConfigurationSection bombSection = bombsSection.createSection(bomb.getName());
+				bombSection.set("x", bomb.getLocation().getBlockX());
+				bombSection.set("y", bomb.getLocation().getBlockY());
+				bombSection.set("z", bomb.getLocation().getBlockZ());
+				bombSection.set("yaw", toIntYaw(bomb.getLocation().getYaw()));
+			}
+		}
+		
+		// cakes
+		if (warzone.getMonuments().size() > 0) {
+			ConfigurationSection cakesSection = warzoneInfoSection.createSection("cake");
+			
+			List<String> cakeNames = new ArrayList<String>();
+			for (Cake cake : warzone.getCakes()) {
+				cakeNames.add(cake.getName());
+			}
+			cakesSection.set("names", cakeNames);
+			
+			for (Cake cake : warzone.getCakes()) {
+				
+				ConfigurationSection cakeSection = cakesSection.createSection(cake.getName());
+				cakeSection.set("x", cake.getLocation().getBlockX());
+				cakeSection.set("y", cake.getLocation().getBlockY());
+				cakeSection.set("z", cake.getLocation().getBlockZ());
+				cakeSection.set("yaw", toIntYaw(cake.getLocation().getYaw()));
+			}
+		}
+		
 		ConfigurationSection teamsSection = warzoneRootSection.createSection("team");
 		
 		// teams
@@ -370,6 +454,16 @@ public class WarzoneYmlMapper {
 		// monument blocks
 		for (Monument monument : warzone.getMonuments()) {
 			VolumeMapper.save(monument.getVolume(), warzone.getName());
+		}
+		
+		// bomb blocks
+		for (Bomb bomb : warzone.getBombs()) {
+			VolumeMapper.save(bomb.getVolume(), warzone.getName());
+		}
+		
+		// cake blocks
+		for (Cake cake : warzone.getCakes()) {
+			VolumeMapper.save(cake.getVolume(), warzone.getName());
 		}
 
 		// team spawn & flag blocks

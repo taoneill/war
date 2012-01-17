@@ -131,8 +131,8 @@ commands:
         Ex -
         /setteam <diamond/iron/gold/white/orange/magenta/blue/green/pink/gray/purple/navy/brown/darkgreen/red/black>
   setmonument:
-    description: War> Creates or moves a monument.
-    usage: Creates or moves a monument. Must be standing in warzone.
+    description: War> Creates or moves a monument. Monuments can be capture with wool from your team and give your health.
+    usage: Creates or moves a monument. Monuments can be capture with wool from your team and give your health. Must be standing in warzone.
         Ex -
         /setmonument <monument-name>
   setteamflag:
@@ -140,6 +140,16 @@ commands:
     usage: Creates/moves a team flag post for CTF. Must be standing in warzone.
         Ex -
         /setteamflag <team-color>
+  setbomb:
+    description: War> Creates or moves a bomb. Get the bomb to the other team's spawn. People from other teams can blow you up. 
+    usage: Creates or moves a bomb. Get the bomb to the other team's spawn. People from other teams can blow you up. Must be standing in warzone.
+        Ex -
+        /setbomb <bomb-name>
+  setcake:
+    description: War> Creates or moves a cake. Get the cake to your spawn to score a replenish your lifepool. 
+    usage: Creates or moves a bomb. Get the cake to your spawn to score a replenish your lifepool. Must be standing in warzone.
+        Ex -
+        /setcake <cake-name>   
   resetzone:
     description: War> Reloads zone blocks from disk. Everyone is teleported back to the lobby.
     usage: Reloads zone blocks from disk. Everyone is teleported back to the lobby. Provide a zone name if not standing in warzone or lobby.
@@ -170,6 +180,16 @@ commands:
     usage: Deletes the monument. Provide a zone name if not standing in warzone or lobby.
         Ex -
         /deletemonument [zone-name] <monument-name>
+  deletebomb:
+    description: War> Deletes the bomb.
+    usage: Deletes the bomb. Provide a zone name if not standing in warzone or lobby.
+        Ex -
+        /deletebomb [zone-name] <bomb-name>
+  deletecake:
+    description: War> Deletes the cake.
+    usage: Deletes the cake. Provide a zone name if not standing in warzone or lobby.
+        Ex -
+        /deletecake [zone-name] <cake-name>
   setzoneconfig:
     description: War> Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone.
     usage: Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone. Provide a zone name if not standing in warzone or lobby.

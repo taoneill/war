@@ -30,13 +30,17 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.getspout.spoutapi.SpoutManager;
+import org.getspout.spoutapi.player.SpoutPlayer;
 
+import com.tommytony.war.Bomb;
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.jobs.DeferredBlockResetsJob;
+import com.tommytony.war.spout.SpoutMessenger;
 import com.tommytony.war.utils.DeferredBlockReset;
 
 /**
@@ -79,14 +83,16 @@ public class WarEntityListener extends EntityListener {
 					|| (attackerTeam != null && defenderTeam != null && attacker.getEntityId() == defender.getEntityId())) {
 				// Make sure one of the players isn't in the spawn
 				if (defenderTeam.getSpawnVolume().contains(d.getLocation())) { // attacking person in spawn
-					if (!defenderWarzone.isFlagThief(d.getName())) { // thieves can always be attacked
+					if (!defenderWarzone.isFlagThief(d.getName()) 
+							&& !defenderWarzone.isBombThief(d.getName())) { // thieves can always be attacked
 						War.war.badMsg(a, "Can't attack a player that's inside his team's spawn.");
 						event.setCancelled(true);
 						return;
 					}
 				} else if (attackerTeam.getSpawnVolume().contains(a.getLocation()) && !attackerTeam.getSpawnVolume().contains(d.getLocation())) {
 					// only let a player inside spawn attack an enemy player if that player enters the spawn
-					if (!attackerWarzone.isFlagThief(a.getName())) { // thieves can always attack
+					if (!attackerWarzone.isFlagThief(a.getName())
+							&& !defenderWarzone.isBombThief(d.getName())) { // thieves can always attack
 						War.war.badMsg(a, "Can't attack a player from inside your spawn.");
 						event.setCancelled(true);
 						return;
@@ -152,6 +158,38 @@ public class WarEntityListener extends EntityListener {
 					defenderWarzone.handleDeath(d);
 					
 					event.setCancelled(true);
+				} else if (defenderWarzone.isBombThief(d.getName()) && d.getLocation().distance(a.getLocation()) < 2) {
+					Bomb bomb = defenderWarzone.getBombForThief(d.getName());
+					
+					// Kill the bomber
+					defenderWarzone.handleDeath(d);
+					
+					// blow up bomb man if attacker is close enough
+					defenderWarzone.getWorld().createExplosion(a.getLocation(), 4F);
+										
+					// Notify everyone
+					for (Team t : defenderWarzone.getTeams()) {
+						if (War.war.isSpoutServer()) {
+							for (Player p : t.getPlayers()) {
+								SpoutPlayer sp = SpoutManager.getPlayer(p);
+								if (sp.isSpoutCraftEnabled()) {
+					                sp.sendNotification(
+					                		SpoutMessenger.cleanForNotification(attackerTeam.getKind().getColor() + a.getName() + ChatColor.YELLOW + " made "),
+					                		SpoutMessenger.cleanForNotification(defenderTeam.getKind().getColor() + d.getName() + ChatColor.YELLOW + " blow up!"),
+					                		Material.TNT,
+					                		(short)0,
+					                		10000);
+								}
+							}
+						}
+						
+						// bring back tnt
+						bomb.getVolume().resetBlocks();
+						bomb.addBombBlocks();
+						
+						t.teamcast(attackerTeam.getKind().getColor() + a.getName() + ChatColor.WHITE
+								+ " made " + defenderTeam.getKind().getColor() + d.getName() + ChatColor.WHITE + " blow up!");
+					}
 				}
 			} else if (attackerTeam != null && defenderTeam != null && attackerTeam == defenderTeam && attackerWarzone == defenderWarzone && attacker.getEntityId() != defender.getEntityId()) {
 				// same team, but not same person

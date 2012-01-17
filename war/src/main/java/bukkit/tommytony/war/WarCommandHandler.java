@@ -93,7 +93,15 @@ public class WarCommandHandler {
 				commandObj = new SetMonumentCommand(this, sender, arguments);
 			} else if (command.equals("deletemonument")) {
 				commandObj = new DeleteMonumentCommand(this, sender, arguments);
-			} else if (command.equals("setteamconfig") || command.equals("teamcfg")) {
+			} else if (command.equals("setbomb")) {
+				commandObj = new SetBombCommand(this, sender, arguments);
+			} else if (command.equals("deletebomb")) {
+				commandObj = new DeleteBombCommand(this, sender, arguments);
+			} else if (command.equals("setcake")) {
+				commandObj = new SetCakeCommand(this, sender, arguments);
+			} else if (command.equals("deletecake")) {
+				commandObj = new DeleteCakeCommand(this, sender, arguments);
+			}else if (command.equals("setteamconfig") || command.equals("teamcfg")) {
 				commandObj = new SetTeamConfigCommand(this, sender, arguments);
 			} else if (command.equals("setzoneconfig") || command.equals("zonecfg")) {
 				commandObj = new SetZoneConfigCommand(this, sender, arguments);

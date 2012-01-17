@@ -42,7 +42,7 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 			return true;
 		}
 
-		zone.clearFlagThieves();
+		zone.clearThieves();
 		for (Team team : zone.getTeams()) {
 			team.teamcast("The war has ended. " + zone.getTeamInformation() + " Resetting warzone " + zone.getName() + " and teams...");
 			for (Player p : team.getPlayers()) {

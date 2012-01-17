@@ -78,15 +78,6 @@ public class JoinCommand extends AbstractWarCommand {
 			if (!previousTeam.removePlayer(player.getName())) {
 				War.war.log("Could not remove player " + player.getName() + " from team " + previousTeam.getName(), java.util.logging.Level.WARNING);
 			}
-			if (oldZone.isFlagThief(player.getName())) {
-				Team victim = oldZone.getVictimTeamForThief(player.getName());
-				victim.getFlagVolume().resetBlocks();
-				victim.initializeTeamFlag();
-				zone.removeThief(player.getName());
-				for (Team t : oldZone.getTeams()) {
-					t.teamcast("Team " + victim.getName() + " flag was returned.");
-				}
-			}
 			previousTeam.resetSign();
 		}
 

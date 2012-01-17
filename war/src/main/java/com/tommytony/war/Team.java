@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -395,8 +396,40 @@ public class Team {
 		}
 		if (thePlayer != null) {
 			this.players.remove(thePlayer);
+			
+			if (this.warzone.isFlagThief(thePlayer.getName())) {
+				Team victim = this.warzone.getVictimTeamForFlagThief(thePlayer.getName());
+				victim.getFlagVolume().resetBlocks();
+				victim.initializeTeamFlag();
+				this.warzone.removeFlagThief(thePlayer.getName());
+				for (Team t : this.warzone.getTeams()) {
+					t.teamcast("Team " + ChatColor.GREEN + victim.getName() + ChatColor.WHITE + " flag was returned.");
+				}
+			}
+			
+			if (this.warzone.isBombThief(thePlayer.getName())) {
+				Bomb bomb = this.warzone.getBombForThief(thePlayer.getName());
+				bomb.getVolume().resetBlocks();
+				bomb.addBombBlocks();
+				this.warzone.removeBombThief(thePlayer.getName());
+				for (Team t : this.warzone.getTeams()) {
+					t.teamcast("Bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.WHITE  + " was returned.");
+				}
+			}
+			
+			if (this.warzone.isCakeThief(thePlayer.getName())) {
+				Cake cake = this.warzone.getCakeForThief(thePlayer.getName());
+				cake.getVolume().resetBlocks();
+				cake.addCakeBlocks();
+				this.warzone.removeCakeThief(thePlayer.getName());
+				for (Team t : this.warzone.getTeams()) {
+					t.teamcast("Cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE  + " was returned.");
+				}
+			}
+						
 			return true;
-		}
+		}	
+		
 		return false;
 	}
 

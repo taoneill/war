@@ -51,6 +51,8 @@ public class Warzone {
 	private World world;
 	private final List<Team> teams = new ArrayList<Team>();
 	private final List<Monument> monuments = new ArrayList<Monument>();
+	private final List<Bomb> bombs = new ArrayList<Bomb>();
+	private final List<Cake> cakes = new ArrayList<Cake>();
 	private Location teleport;
 	private ZoneLobby lobby;
 	private Location rallyPoint;
@@ -61,6 +63,8 @@ public class Warzone {
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private HashMap<String, PlayerState> playerStates = new HashMap<String, PlayerState>();
 	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
+	private HashMap<String, Bomb> bombThieves = new HashMap<String, Bomb>();
+	private HashMap<String, Cake> cakeThieves = new HashMap<String, Cake>();
 	private HashMap<String, LoadoutSelection> loadoutSelections = new HashMap<String, LoadoutSelection>();
 	private HashMap<String, PlayerState> deadMenInventories = new HashMap<String, PlayerState>();
 	private final List<Player> respawn = new ArrayList<Player>();
@@ -246,6 +250,18 @@ public class Warzone {
 		for (Monument monument : this.monuments) {
 			monument.getVolume().resetBlocks();
 			monument.addMonumentBlocks();
+		}
+		
+		// reset bombs
+		for (Bomb bomb : this.bombs) {
+			bomb.getVolume().resetBlocks();
+			bomb.addBombBlocks();
+		}
+		
+		// reset cakes
+		for (Cake cake : this.cakes) {
+			cake.getVolume().resetBlocks();
+			cake.addCakeBlocks();
 		}
 
 		// reset lobby (here be demons)
@@ -498,7 +514,7 @@ public class Warzone {
 
 	public boolean hasMonument(String monumentName) {
 		for (Monument monument : this.monuments) {
-			if (monument.getName().equals(monumentName)) {
+			if (monument.getName().startsWith(monumentName)) {
 				return true;
 			}
 		}
@@ -513,11 +529,57 @@ public class Warzone {
 		}
 		return null;
 	}
+	
+	public boolean hasBomb(String bombName) {
+		for (Bomb bomb : this.bombs) {
+			if (bomb.getName().equals(bombName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public Bomb getBomb(String bombName) {
+		for (Bomb bomb : this.bombs) {
+			if (bomb.getName().startsWith(bombName)) {
+				return bomb;
+			}
+		}
+		return null;
+	}
+	
+	public boolean hasCake(String cakeName) {
+		for (Cake cake : this.cakes) {
+			if (cake.getName().equals(cakeName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public Cake getCake(String cakeName) {
+		for (Cake cake : this.cakes) {
+			if (cake.getName().startsWith(cakeName)) {
+				return cake;
+			}
+		}
+		return null;
+	}
 
 	public boolean isImportantBlock(Block block) {
 		if (this.ready()) {
 			for (Monument m : this.monuments) {
 				if (m.getVolume().contains(block)) {
+					return true;
+				}
+			}
+			for (Bomb b : this.bombs) {
+				if (b.getVolume().contains(block)) {
+					return true;
+				}
+			}
+			for (Cake c : this.cakes) {
+				if (c.getVolume().contains(block)) {
 					return true;
 				}
 			}
@@ -801,21 +863,21 @@ public class Warzone {
 				// player died without causing his team's demise
 				if (playerWarzone.isFlagThief(player.getName())) {
 					// died while carrying flag.. dropped it
-					Team victim = playerWarzone.getVictimTeamForThief(player.getName());
+					Team victim = playerWarzone.getVictimTeamForFlagThief(player.getName());
 					victim.getFlagVolume().resetBlocks();
 					victim.initializeTeamFlag();
-					playerWarzone.removeThief(player.getName());
+					playerWarzone.removeFlagThief(player.getName());
 					
 					if (War.war.isSpoutServer()) {
 						for (Player p : victim.getPlayers()) {
 							SpoutPlayer sp = SpoutManager.getPlayer(p);
 							if (sp.isSpoutCraftEnabled()) {
 				                sp.sendNotification(
-				                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-				                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "your flag."),
-				                		playerTeam.getKind().getMaterial(),
-				                		playerTeam.getKind().getData(),
-				                		5000);
+			                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
+			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "your flag."),
+			                		playerTeam.getKind().getMaterial(),
+			                		playerTeam.getKind().getData(),
+			                		5000);
 							}
 						}
 					}
@@ -824,6 +886,59 @@ public class Warzone {
 						t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
 					}
 				}
+				
+				// Bomb thieves
+				if (playerWarzone.isBombThief(player.getName())) {
+					// died while carrying bomb.. dropped it
+					Bomb bomb = playerWarzone.getBombForThief(player.getName());
+					bomb.getVolume().resetBlocks();
+					bomb.addBombBlocks();
+					playerWarzone.removeBombThief(player.getName());
+					
+					for (Team t : playerWarzone.getTeams()) {
+						t.teamcast(player.getName() + " died and dropped bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.WHITE + ".");
+						if (War.war.isSpoutServer()) {
+							for (Player p : t.getPlayers()) {
+								SpoutPlayer sp = SpoutManager.getPlayer(p);
+								if (sp.isSpoutCraftEnabled()) {
+					                sp.sendNotification(
+				                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
+				                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.YELLOW + "."),
+				                		Material.TNT,
+				                		(short)0,
+				                		5000);
+								}
+							}
+						}
+					}
+				}
+				
+				if (playerWarzone.isCakeThief(player.getName())) {
+					// died while carrying cake.. dropped it
+					Cake cake = playerWarzone.getCakeForThief(player.getName());
+					cake.getVolume().resetBlocks();
+					cake.addCakeBlocks();
+					playerWarzone.removeCakeThief(player.getName());
+					
+					for (Team t : playerWarzone.getTeams()) {
+						t.teamcast(player.getName() + " died and dropped cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE + ".");
+						if (War.war.isSpoutServer()) {
+							for (Player p : t.getPlayers()) {
+								SpoutPlayer sp = SpoutManager.getPlayer(p);
+								if (sp.isSpoutCraftEnabled()) {
+					                sp.sendNotification(
+				                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
+				                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "."),
+				                		Material.CAKE,
+				                		(short)0,
+				                		5000);
+								}
+							}
+						}
+					}
+				}
+				
+				// Lifepool empty warning
 				playerTeam.setRemainingLives(remaining - 1);
 				if (remaining - 1 == 0) {
 					for (Team t : playerWarzone.getTeams()) {
@@ -855,15 +970,7 @@ public class Warzone {
 				t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE + " left the zone.");
 			}
 			playerTeam.resetSign();
-			if (this.isFlagThief(player.getName())) {
-				Team victim = this.getVictimTeamForThief(player.getName());
-				victim.getFlagVolume().resetBlocks();
-				victim.initializeTeamFlag();
-				this.removeThief(player.getName());
-				for (Team t : this.getTeams()) {
-					t.teamcast("Team " + victim.getName() + " flag was returned.");
-				}
-			}
+			
 			if (this.getLobby() != null) {
 				this.getLobby().resetTeamGateSign(playerTeam);
 			}
@@ -933,7 +1040,44 @@ public class Warzone {
 		}
 		return null;
 	}
+	
+	public boolean isBombBlock(Block block) {
+		for (Bomb bomb : this.bombs) {
+			if (bomb.isBombBlock(block.getLocation())) {
+				return true;
+			}
+		}
+		return false;
+	}
 
+	public Bomb getBombForBlock(Block block) {
+		for (Bomb bomb : this.bombs) {
+			if (bomb.isBombBlock(block.getLocation())) {
+				return bomb;
+			}
+		}
+		return null;
+	}
+	
+	public boolean isCakeBlock(Block block) {
+		for (Cake cake : this.cakes) {
+			if (cake.isCakeBlock(block.getLocation())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public Cake getCakeForBlock(Block block) {
+		for (Cake cake : this.cakes) {
+			if (cake.isCakeBlock(block.getLocation())) {
+				return cake;
+			}
+		}
+		return null;
+	}
+
+	// Flags
 	public void addFlagThief(Team lostFlagTeam, String flagThief) {
 		this.flagThieves.put(flagThief, lostFlagTeam);
 	}
@@ -945,16 +1089,59 @@ public class Warzone {
 		return false;
 	}
 
-	public Team getVictimTeamForThief(String thief) {
+	public Team getVictimTeamForFlagThief(String thief) {
 		return this.flagThieves.get(thief);
 	}
 
-	public void removeThief(String thief) {
+	public void removeFlagThief(String thief) {
 		this.flagThieves.remove(thief);
 	}
 
-	public void clearFlagThieves() {
+	// Bomb
+	public void addBombThief(Bomb bomb, String bombThief) {
+		this.bombThieves.put(bombThief, bomb);
+	}
+
+	public boolean isBombThief(String suspect) {
+		if (this.bombThieves.containsKey(suspect)) {
+			return true;
+		}
+		return false;
+	}
+
+	public Bomb getBombForThief(String thief) {
+		return this.bombThieves.get(thief);
+	}
+
+	public void removeBombThief(String thief) {
+		this.bombThieves.remove(thief);
+	}
+	
+	// Cake
+	
+	public void addCakeThief(Cake cake, String cakeThief) {
+		this.cakeThieves.put(cakeThief, cake);
+	}
+
+	public boolean isCakeThief(String suspect) {
+		if (this.cakeThieves.containsKey(suspect)) {
+			return true;
+		}
+		return false;
+	}
+
+	public Cake getCakeForThief(String thief) {
+		return this.cakeThieves.get(thief);
+	}
+
+	public void removeCakeThief(String thief) {
+		this.cakeThieves.remove(thief);
+	}
+
+	public void clearThieves() {
 		this.flagThieves.clear();
+		this.bombThieves.clear();
+		this.cakeThieves.clear();
 	}
 
 	public boolean isTeamFlagStolen(Team team) {
@@ -965,7 +1152,7 @@ public class Warzone {
 		}
 		return false;
 	}
-
+	
 	public void handleScoreCapReached(Player player, String winnersStr) {
 		// Score cap reached. Reset everything.
 		ScoreCapReachedJob job = new ScoreCapReachedJob(this, winnersStr);
@@ -1098,5 +1285,13 @@ public class Warzone {
 
 	public InventoryBag getDefaultInventories() {
 		return this.defaultInventories ;
+	}
+
+	public List<Bomb> getBombs() {
+		return bombs;
+	}
+
+	public List<Cake> getCakes() {
+		return cakes;
 	}
 }

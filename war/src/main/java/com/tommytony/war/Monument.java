@@ -26,8 +26,6 @@ public class Monument {
 		this.warzone = warzone;
 		this.volume = new Volume(name, warzone.getWorld());
 		this.setLocation(location);
-
-		this.addMonumentBlocks();
 	}
 
 	public void addMonumentBlocks() {
@@ -54,7 +52,6 @@ public class Monument {
 		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1).setType(Material.OBSIDIAN);
 
 		// outer ring
-
 		this.warzone.getWorld().getBlockAt(x + 2, y - 1, z + 2).setType(Material.GLOWSTONE);
 		this.warzone.getWorld().getBlockAt(x + 2, y - 1, z + 1).setType(Material.OBSIDIAN);
 		this.warzone.getWorld().getBlockAt(x + 2, y - 1, z).setType(Material.OBSIDIAN);
@@ -144,6 +141,7 @@ public class Monument {
 		this.volume.setCornerTwo(locationBlock.getRelative(BlockFace.UP, 2).getRelative(BlockFace.WEST, 2).getRelative(BlockFace.NORTH, 2));
 		this.volume.saveBlocks();
 		this.location = location;
+		
 		this.addMonumentBlocks();
 	}
 

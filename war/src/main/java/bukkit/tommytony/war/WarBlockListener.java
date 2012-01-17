@@ -18,6 +18,8 @@ import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
+import com.tommytony.war.Bomb;
+import com.tommytony.war.Cake;
 import com.tommytony.war.FlagReturn;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
@@ -127,7 +129,21 @@ public class WarBlockListener extends BlockListener {
 		if (team != null && zone != null && zone.isFlagThief(player.getName())) {
 			War.war.badMsg(player, "Can't drop the flag. What are you doing? Run!");
 			event.setCancelled(true);
-
+			return;
+		}
+		
+		// a bomb thief can't drop his bomb
+		if (team != null && zone != null && zone.isBombThief(player.getName())) {
+			War.war.badMsg(player, "Can't drop the bomb. What are you doing? Run for your enemy's spawn!");
+			event.setCancelled(true);
+			return;
+		}
+		
+		// a cake thief can't drop his cake
+		if (team != null && zone != null && zone.isBombThief(player.getName())) {
+			War.war.badMsg(player, "Can't drop the cake. What are you doing? Run to your spawn!");
+			event.setCancelled(true);
+			return;
 		}
 
 		// unbreakableZoneBlocks
@@ -254,6 +270,8 @@ public class WarBlockListener extends BlockListener {
 				if (warzone.isFlagThief(player.getName())) {
 					// detect audacious thieves
 					War.war.badMsg(player, "You can only steal one flag at a time!");
+				} else if (warzone.isBombThief(player.getName()) || warzone.isCakeThief(player.getName())) {
+					War.war.badMsg(player, "You can only steal one thing at a time!");
 				} else {
 					Team lostFlagTeam = warzone.getTeamForFlagBlock(block);
 					if (lostFlagTeam.getPlayers().size() != 0) {
@@ -297,6 +315,90 @@ public class WarBlockListener extends BlockListener {
 						War.war.msg(player, "You can't steal team " + lostFlagTeam.getName() + "'s flag since no players are on that team.");
 					}
 				}
+				event.setCancelled(true);
+				return;
+			} else if (team != null && warzone.isBombBlock(block)) {
+				if (warzone.isBombThief(player.getName())) {
+					// detect audacious thieves
+					War.war.badMsg(player, "You can only steal one bomb at a time!");
+				} else if (warzone.isFlagThief(player.getName()) || warzone.isCakeThief(player.getName())) {
+					War.war.badMsg(player, "You can only steal one thing at a time!");
+				} else {
+					Bomb bomb = warzone.getBombForBlock(block);
+					// player just broke the bomb block: cancel to avoid drop, give player the block, set block to air
+					ItemStack tntBlock = new ItemStack(Material.TNT);
+					player.getInventory().clear();
+					player.getInventory().addItem(tntBlock);
+					warzone.addBombThief(bomb, player.getName());
+					block.setType(Material.AIR);
+
+					for (Team t : warzone.getTeams()) {
+						t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " has bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.WHITE + ".");
+						
+						if (War.war.isSpoutServer()) {
+							for (Player p : t.getPlayers()) {
+								SpoutPlayer sp = SpoutManager.getPlayer(p);
+								if (sp.isSpoutCraftEnabled()) {
+					                sp.sendNotification(
+					                		SpoutMessenger.cleanForNotification(team.getKind().getColor() + player.getName() + ChatColor.YELLOW + " has "),
+					                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.YELLOW + "!"),
+					                		Material.TNT,
+					                		(short)0,
+					                		5000);
+								}
+							}
+						}
+						
+						t.teamcast("Prevent " + team.getKind().getColor() + player.getName() + ChatColor.WHITE
+								+ " from reaching your spawn with the bomb!");
+					}
+
+
+					War.war.msg(player, "You have bomb " + bomb.getName() + ". Reach another team's spawn to score. Don't get touched by anyone or you'll blow up!");
+				}
+				
+				event.setCancelled(true);
+				return;
+			} else if (team != null && warzone.isCakeBlock(block)) {
+				if (warzone.isCakeThief(player.getName())) {
+					// detect audacious thieves
+					War.war.badMsg(player, "You can only steal one cake at a time!");
+				} else if (warzone.isFlagThief(player.getName()) || warzone.isBombThief(player.getName())) {
+					War.war.badMsg(player, "You can only steal one thing at a time!");
+				} else {
+					Cake cake = warzone.getCakeForBlock(block);
+					// player just broke the cake block: cancel to avoid drop, give player the block, set block to air
+					ItemStack cakeBlock = new ItemStack(Material.CAKE);
+					player.getInventory().clear();
+					player.getInventory().addItem(cakeBlock);
+					warzone.addCakeThief(cake, player.getName());
+					block.setType(Material.AIR);
+
+					for (Team t : warzone.getTeams()) {
+						t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " has cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE + ".");
+						
+						if (War.war.isSpoutServer()) {
+							for (Player p : t.getPlayers()) {
+								SpoutPlayer sp = SpoutManager.getPlayer(p);
+								if (sp.isSpoutCraftEnabled()) {
+					                sp.sendNotification(
+					                		SpoutMessenger.cleanForNotification(team.getKind().getColor() + player.getName() + ChatColor.YELLOW + " has "),
+					                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "!"),
+					                		Material.CAKE,
+					                		(short)0,
+					                		5000);
+								}
+							}
+						}
+						
+						t.teamcast("Prevent " + team.getKind().getColor() + player.getName() + ChatColor.WHITE
+								+ " from reaching their spawn with the cake!");
+					}
+
+
+					War.war.msg(player, "You have cake " + cake.getName() + ". Reach your team's spawn to score and replenish your lifepool.");
+				}
+				
 				event.setCancelled(true);
 				return;
 			} else if (!warzone.isMonumentCenterBlock(block)) {

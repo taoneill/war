@@ -39,7 +39,7 @@ public class NextBattleCommand extends AbstractZoneMakerCommand {
 			return false;
 		}
 
-		zone.clearFlagThieves();
+		zone.clearThieves();
 		for (Team team : zone.getTeams()) {
 			team.teamcast("The battle was interrupted. " + zone.getTeamInformation() + " Resetting warzone " + zone.getName() + " and life pools...");
 		}
