@@ -54,7 +54,8 @@ public class Cake {
 
 		// block holder
 		this.warzone.getWorld().getBlockAt(x, y, z).setType(Material.GLASS);
-		this.warzone.getWorld().getBlockAt(x, y + 1, z).setType(Material.CAKE_BLOCK);
+		Block cakeBlock = this.warzone.getWorld().getBlockAt(x, y + 1, z);
+		cakeBlock.setType(Material.CAKE_BLOCK);
 	}
 
 	public boolean isCakeBlock(Location otherLocation) {

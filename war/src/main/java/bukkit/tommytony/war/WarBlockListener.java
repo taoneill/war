@@ -79,8 +79,8 @@ public class WarBlockListener extends BlockListener {
 				event.setCancelled(false);
 				return; // important otherwise cancelled down a few line by isImportantblock
 			} else {
-				War.war.badMsg(player, "You can't capture a monument without a block of your team's material. Get one from your team spawn.");
-				event.setCancelled(true);
+				War.war.badMsg(player, "You must capture a monument with a block of your team's wool color. Get one from your team spawn.");
+				cancelAndKeepItem(event);
 				return;
 			}
 		}
@@ -89,7 +89,7 @@ public class WarBlockListener extends BlockListener {
 		// prevent build in important parts
 		if (zone != null && zone.isImportantBlock(block) && (!isZoneMaker || (isZoneMaker && team != null))) {
 			War.war.badMsg(player, "Can't build here.");
-			event.setCancelled(true);
+			cancelAndKeepItem(event);
 			return;
 		}
 
@@ -97,7 +97,7 @@ public class WarBlockListener extends BlockListener {
 		for (Warzone wz : War.war.getWarzones()) {
 			if (wz.getLobby() != null && wz.getLobby().getVolume() != null && wz.getLobby().getVolume().contains(block)) {
 				War.war.badMsg(player, "Can't build here.");
-				event.setCancelled(true);
+				cancelAndKeepItem(event);
 				return;
 			}
 		}
@@ -105,7 +105,7 @@ public class WarBlockListener extends BlockListener {
 		// protect the hub
 		if (War.war.getWarHub() != null && War.war.getWarHub().getVolume().contains(block)) {
 			War.war.badMsg(player, "Can't build here.");
-			event.setCancelled(true);
+			cancelAndKeepItem(event);
 			return;
 		}
 
@@ -114,35 +114,35 @@ public class WarBlockListener extends BlockListener {
 			if (!War.war.getWarConfig().getBoolean(WarConfig.DISABLEBUILDMESSAGE)) {
 				War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
 			}
-			event.setCancelled(true);
+			cancelAndKeepItem(event);
 			return;
 		}
 
 		// can't place a block of your team's color
 		if (team != null && block.getType() == team.getKind().getMaterial() && block.getData() == team.getKind().getData()) {
 			War.war.badMsg(player, "You can only use your team's blocks to capture monuments.");
-			event.setCancelled(true);
+			cancelAndKeepItem(event);
 			return;
 		}
 
 		// a flag thief can't drop his flag
 		if (team != null && zone != null && zone.isFlagThief(player.getName())) {
 			War.war.badMsg(player, "Can't drop the flag. What are you doing? Run!");
-			event.setCancelled(true);
+			cancelAndKeepItem(event);
 			return;
 		}
 		
 		// a bomb thief can't drop his bomb
 		if (team != null && zone != null && zone.isBombThief(player.getName())) {
 			War.war.badMsg(player, "Can't drop the bomb. What are you doing? Run for your enemy's spawn!");
-			event.setCancelled(true);
+			cancelAndKeepItem(event);
 			return;
 		}
 		
 		// a cake thief can't drop his cake
-		if (team != null && zone != null && zone.isBombThief(player.getName())) {
+		if (team != null && zone != null && zone.isCakeThief(player.getName())) {
 			War.war.badMsg(player, "Can't drop the cake. What are you doing? Run to your spawn!");
-			event.setCancelled(true);
+			cancelAndKeepItem(event);
 			return;
 		}
 
@@ -150,9 +150,15 @@ public class WarBlockListener extends BlockListener {
 		if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE) && (!isZoneMaker || (isZoneMaker && team != null))) {
 			// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks)
 			War.war.badMsg(player, "The blocks in this zone are unbreakable - this also means you can't build!");
-			event.setCancelled(true);
+			cancelAndKeepItem(event);
 			return;
 		}
+	}
+	
+	private void cancelAndKeepItem(BlockPlaceEvent event) {
+		event.setCancelled(true);
+		ItemStack inHand = event.getItemInHand();
+		event.getPlayer().setItemInHand(new ItemStack(inHand.getType(), inHand.getAmount(), inHand.getDurability(), inHand.getData().getData()));
 	}
 	
 	// Do not allow moving of block into or from important zones
@@ -326,7 +332,8 @@ public class WarBlockListener extends BlockListener {
 				} else {
 					Bomb bomb = warzone.getBombForBlock(block);
 					// player just broke the bomb block: cancel to avoid drop, give player the block, set block to air
-					ItemStack tntBlock = new ItemStack(Material.TNT);
+					ItemStack tntBlock = new ItemStack(Material.TNT, 1, (short)8, (byte)8);
+					tntBlock.setDurability((short)8);
 					player.getInventory().clear();
 					player.getInventory().addItem(tntBlock);
 					warzone.addBombThief(bomb, player.getName());
@@ -368,7 +375,8 @@ public class WarBlockListener extends BlockListener {
 				} else {
 					Cake cake = warzone.getCakeForBlock(block);
 					// player just broke the cake block: cancel to avoid drop, give player the block, set block to air
-					ItemStack cakeBlock = new ItemStack(Material.CAKE);
+					ItemStack cakeBlock = new ItemStack(Material.CAKE, 1, (short)8, (byte)8);
+					cakeBlock.setDurability((short)8);
 					player.getInventory().clear();
 					player.getInventory().addItem(cakeBlock);
 					warzone.addCakeThief(cake, player.getName());

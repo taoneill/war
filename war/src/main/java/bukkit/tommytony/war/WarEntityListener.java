@@ -22,6 +22,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -165,7 +166,7 @@ public class WarEntityListener extends EntityListener {
 					defenderWarzone.handleDeath(d);
 					
 					// blow up bomb man if attacker is close enough
-					defenderWarzone.getWorld().createExplosion(a.getLocation(), 4F);
+					defenderWarzone.getWorld().createExplosion(a.getLocation(), 2F);
 										
 					// Notify everyone
 					for (Team t : defenderWarzone.getTeams()) {
@@ -274,6 +275,13 @@ public class WarEntityListener extends EntityListener {
 				for (Warzone zone : War.war.getWarzones()) {
 					if (zone.isImportantBlock(block)) {
 						dontExplode.add(block);
+						if (zone.isBombBlock(block)) {
+							// tnt doesn't get reset like normal blocks, gotta schedule a later reset just for the Bomb
+							// structure's tnt block
+							DeferredBlockResetsJob job = new DeferredBlockResetsJob(block.getWorld());
+							job.add(new DeferredBlockReset(block.getX(), block.getY(), block.getZ(), Material.TNT.getId(), (byte)0));
+							War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job, 10);
+						}
 						inOneZone = true;
 						break;
 					} else if (zone.getLobby() != null && zone.getLobby().getVolume().contains(block)) {
@@ -329,7 +337,7 @@ public class WarEntityListener extends EntityListener {
 			}
 			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
 			
-			// Changed explosion yeild following proportion of explosion prevention (makes drops less buggy too) 
+			// Changed explosion yield following proportion of explosion prevention (makes drops less buggy too) 
 			int explodedSize = explodedBlocks.size();
 			float middleYeild = (float)(explodedSize - dontExplodeSize) / (float)explodedSize;
 			float newYeild = middleYeild * event.getYield();
@@ -504,6 +512,23 @@ public class WarEntityListener extends EntityListener {
 			
 			for (Team team : zone.getTeams()) {
 				team.teamcast(player.getName() + " died");
+			}
+		}
+	}
+	
+	@Override
+    public void onExplosionPrime(ExplosionPrimeEvent event) {
+		if (!War.war.isLoaded()) {
+			return;
+		}
+		
+		Location eventLocation = event.getEntity().getLocation();
+		
+		for (Warzone zone : War.war.getWarzones()) {
+			if (zone.isBombBlock(eventLocation.getBlock())) {
+				// prevent the Bomb from exploding on its pedestral
+				event.setCancelled(true);
+				return;
 			}
 		}
 	}

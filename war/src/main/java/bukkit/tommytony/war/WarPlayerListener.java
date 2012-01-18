@@ -577,7 +577,7 @@ public class WarPlayerListener extends PlayerListener {
 					Bomb bomb = playerWarzone.getBombForThief(player.getName());
 					
 					// Boom!
-					playerWarzone.getWorld().createExplosion(player.getLocation(), 1F);
+					playerWarzone.getWorld().createExplosion(player.getLocation(), 2F);
 					
 					playerTeam.addPoint();
 					

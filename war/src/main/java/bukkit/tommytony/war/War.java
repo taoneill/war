@@ -149,12 +149,15 @@ public class War extends JavaPlugin {
 			pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, this.entityListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, this.entityListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.ENTITY_DEATH, this.entityListener, Priority.Normal, this);
+			pm.registerEvent(Event.Type.EXPLOSION_PRIME, this.entityListener, Priority.Normal, this);
 
 			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_DAMAGE, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, this.blockListener, Priority.Normal, this);
 			pm.registerEvent(Event.Type.BLOCK_PISTON_RETRACT, this.blockListener, Priority.Normal, this);
+			
+			
 			
 			pm.registerEvent(Event.Type.PLUGIN_DISABLE, this.serverListener, Priority.Normal, this);
 			

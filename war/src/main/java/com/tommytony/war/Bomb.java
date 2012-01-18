@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.material.MaterialData;
 
 import com.tommytony.war.volumes.Volume;
 
@@ -54,7 +55,8 @@ public class Bomb {
 
 		// block holder
 		this.warzone.getWorld().getBlockAt(x, y, z).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x, y + 1, z).setType(Material.TNT);
+		Block tntBlock = this.warzone.getWorld().getBlockAt(x, y + 1, z);
+		tntBlock.setType(Material.TNT);
 	}
 
 	public boolean isBombBlock(Location otherLocation) {
