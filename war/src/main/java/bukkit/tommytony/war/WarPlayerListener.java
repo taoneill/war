@@ -246,9 +246,10 @@ public class WarPlayerListener extends PlayerListener {
 
 			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 			if (zone != null && zone.getLoadoutSelections().containsKey(player.getName()) 
-					&& zone.getLoadoutSelections().get(player.getName()).isStillInSpawn() && player.getItemInHand().getType() == Material.BOW) {
+					&& zone.getLoadoutSelections().get(player.getName()).isStillInSpawn()) {
 				event.setUseItemInHand(Result.DENY);
-				War.war.badMsg(player, "Can't shoot from inside the spawn.");
+				War.war.badMsg(player, "Can't use items while still in spawn.");
+				event.setCancelled(true);
 			}
 		}
 	}
