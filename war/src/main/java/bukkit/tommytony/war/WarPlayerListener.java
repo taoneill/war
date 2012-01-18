@@ -12,6 +12,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -249,7 +250,16 @@ public class WarPlayerListener extends PlayerListener {
 					&& zone.getLoadoutSelections().get(player.getName()).isStillInSpawn()) {
 				event.setUseItemInHand(Result.DENY);
 				War.war.badMsg(player, "Can't use items while still in spawn.");
-				event.setCancelled(true);
+
+				ItemStack inHand = event.getItem();
+				
+				if (inHand != null) {
+					ItemStack newItemInHand = new ItemStack(inHand.getType(), inHand.getAmount(), inHand.getDurability(), inHand.getData().getData());
+					newItemInHand.setDurability(inHand.getDurability());
+					event.getPlayer().setItemInHand(newItemInHand);
+					
+					event.setCancelled(true);
+				}
 			}
 		}
 	}

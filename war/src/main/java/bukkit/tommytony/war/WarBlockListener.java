@@ -158,7 +158,9 @@ public class WarBlockListener extends BlockListener {
 	private void cancelAndKeepItem(BlockPlaceEvent event) {
 		event.setCancelled(true);
 		ItemStack inHand = event.getItemInHand();
-		event.getPlayer().setItemInHand(new ItemStack(inHand.getType(), inHand.getAmount(), inHand.getDurability(), inHand.getData().getData()));
+		ItemStack newItemInHand = new ItemStack(inHand.getType(), inHand.getAmount(), inHand.getDurability(), inHand.getData().getData());
+		newItemInHand.setDurability(inHand.getDurability());
+		event.getPlayer().setItemInHand(newItemInHand);
 	}
 	
 	// Do not allow moving of block into or from important zones
