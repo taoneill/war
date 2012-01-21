@@ -14,8 +14,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -52,7 +50,6 @@ import com.tommytony.war.utils.PlayerState;
  */
 public class War extends JavaPlugin {
 	public static War war;
-	private static boolean loadedOnce = false;
 
 	// general
 	private WarPlayerListener playerListener = new WarPlayerListener();
@@ -126,45 +123,12 @@ public class War extends JavaPlugin {
 			isSpoutServer = false;
 		}
 
-		// Register hooks
-		if (!War.loadedOnce) {
-			War.loadedOnce = true; // This prevented multiple hookups of the same listener
-
-			PluginManager pm = this.getServer().getPluginManager();
-
-			pm.registerEvent(Event.Type.PLAYER_QUIT, this.playerListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.PLAYER_KICK, this.playerListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.PLAYER_MOVE, this.playerListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, this.playerListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.INVENTORY_OPEN, this.playerListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, this.playerListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, this.playerListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.PLAYER_INTERACT, this.playerListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.PLAYER_TOGGLE_SNEAK, this.playerListener, Priority.Normal, this);
-			
-			pm.registerEvent(Event.Type.ENTITY_EXPLODE, this.entityListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.ENTITY_DAMAGE, this.entityListener, Priority.High, this);
-			pm.registerEvent(Event.Type.ENTITY_COMBUST, this.entityListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.CREATURE_SPAWN, this.entityListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, this.entityListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, this.entityListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.ENTITY_DEATH, this.entityListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.EXPLOSION_PRIME, this.entityListener, Priority.Normal, this);
-
-			pm.registerEvent(Event.Type.BLOCK_PLACE, this.blockListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.BLOCK_DAMAGE, this.blockListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.BLOCK_BREAK, this.blockListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.BLOCK_PISTON_EXTEND, this.blockListener, Priority.Normal, this);
-			pm.registerEvent(Event.Type.BLOCK_PISTON_RETRACT, this.blockListener, Priority.Normal, this);
-			
-			
-			
-			pm.registerEvent(Event.Type.PLUGIN_DISABLE, this.serverListener, Priority.Normal, this);
-			
-			if (this.isSpoutServer()) {
-				pm.registerEvent(Event.Type.CUSTOM_EVENT, new WarSpoutListener(this), Priority.Low, this);
-			}
-		}
+		// Register events
+		PluginManager pm = this.getServer().getPluginManager();
+		pm.registerEvents(this.playerListener, this);
+		pm.registerEvents(this.entityListener, this);
+		pm.registerEvents(this.blockListener, this);
+		pm.registerEvents(this.serverListener, this);
 
 		// Add defaults
 		warConfig.put(WarConfig.BUILDINZONESONLY, false);

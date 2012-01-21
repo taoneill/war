@@ -18,17 +18,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
@@ -50,7 +51,7 @@ import com.tommytony.war.utils.DeferredBlockReset;
  * @author tommytony, Tim Düsterhus
  * @package bukkit.tommytony.war
  */
-public class WarEntityListener extends EntityListener {
+public class WarEntityListener implements Listener {
 
 	private final Random killSeed = new Random();
 			
@@ -250,8 +251,8 @@ public class WarEntityListener extends EntityListener {
 	 *
 	 * @see EntityListener.onEntityExplode()
 	 */
-	@Override
-	public void onEntityExplode(EntityExplodeEvent event) {
+	@EventHandler(event = EntityExplodeEvent.class)
+	public void onEntityExplode(final EntityExplodeEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}
@@ -365,8 +366,8 @@ public class WarEntityListener extends EntityListener {
 	 *
 	 * @see EntityListener.onEntityDamage()
 	 */
-	@Override
-	public void onEntityDamage(EntityDamageEvent event) {
+	@EventHandler(event = EntityDamageEvent.class)
+	public void onEntityDamage(final EntityDamageEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}
@@ -410,8 +411,8 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 
-	@Override
-	public void onEntityCombust(EntityCombustEvent event) {
+	@EventHandler(event = EntityCombustEvent.class)
+	public void onEntityCombust(final EntityCombustEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}
@@ -436,8 +437,8 @@ public class WarEntityListener extends EntityListener {
 	 *
 	 * @see EntityListener.onCreatureSpawn()
 	 */
-	@Override
-	public void onCreatureSpawn(CreatureSpawnEvent event) {
+	@EventHandler(event = CreatureSpawnEvent.class)
+	public void onCreatureSpawn(final CreatureSpawnEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}
@@ -454,8 +455,8 @@ public class WarEntityListener extends EntityListener {
 	 *
 	 * @see EntityListener.onEntityRegainHealth()
 	 */
-	@Override
-	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+	@EventHandler(event = EntityRegainHealthEvent.class)
+	public void onEntityRegainHealth(final EntityRegainHealthEvent event) {
 		if (!War.war.isLoaded() || 
 				(event.getRegainReason() != RegainReason.REGEN 
 						&& event.getRegainReason() != RegainReason.EATING 
@@ -484,8 +485,8 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 	
-	@Override
-	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+	@EventHandler(event = FoodLevelChangeEvent.class)
+	public void onFoodLevelChange(final FoodLevelChangeEvent event) {
 		if (!War.war.isLoaded() || !(event.getEntity() instanceof Player)) {
 			return;
 		}
@@ -498,8 +499,8 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 	
-	@Override
-	public void onEntityDeath(EntityDeathEvent event) {
+	@EventHandler(event = EntityDeathEvent.class)
+	public void onEntityDeath(final EntityDeathEvent event) {
 		if (!War.war.isLoaded() || !(event.getEntity() instanceof Player)) {
 			return;
 		}
@@ -516,8 +517,8 @@ public class WarEntityListener extends EntityListener {
 		}
 	}
 	
-	@Override
-    public void onExplosionPrime(ExplosionPrimeEvent event) {
+	@EventHandler(event = ExplosionPrimeEvent.class)
+    public void onExplosionPrime(final ExplosionPrimeEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}

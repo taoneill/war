@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import bukkit.tommytony.war.WarCommandHandler;
 
 import com.tommytony.war.Bomb;
-import com.tommytony.war.Monument;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.ZoneLobby;
 import com.tommytony.war.mappers.WarzoneYmlMapper;

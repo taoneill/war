@@ -8,9 +8,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -24,7 +25,6 @@ import com.tommytony.war.FlagReturn;
 import com.tommytony.war.Monument;
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.spout.SpoutMessenger;
@@ -34,13 +34,13 @@ import com.tommytony.war.spout.SpoutMessenger;
  * @author tommytony
  *
  */
-public class WarBlockListener extends BlockListener {
+public class WarBlockListener implements Listener {
 
 	/**
 	 * @see BlockListener.onBlockPlace()
 	 */
-	@Override
-	public void onBlockPlace(BlockPlaceEvent event) {
+	@EventHandler(event = BlockPlaceEvent.class)
+	public void onBlockPlace(final BlockPlaceEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}
@@ -163,8 +163,9 @@ public class WarBlockListener extends BlockListener {
 		event.getPlayer().setItemInHand(newItemInHand);
 	}
 	
+	@EventHandler(event = BlockPistonExtendEvent.class)
 	// Do not allow moving of block into or from important zones
-	public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+	public void onBlockPistonExtend(final BlockPistonExtendEvent event) {
 		Warzone zone = Warzone.getZoneByLocation(event.getBlock().getLocation());
 		if (zone!=null) {
 			for (Block b : event.getBlocks()) {
@@ -179,7 +180,9 @@ public class WarBlockListener extends BlockListener {
 			}
 		}
 	}
-	public void onBlockPistonRetract(BlockPistonRetractEvent event) {
+	
+	@EventHandler(event = BlockPistonRetractEvent.class)
+	public void onBlockPistonRetract(final BlockPistonRetractEvent event) {
 		Warzone zone = Warzone.getZoneByLocation(event.getBlock().getLocation());
 		if (zone!=null) {
 			Block b = event.getBlock().getRelative(event.getDirection(), 2);
@@ -193,8 +196,8 @@ public class WarBlockListener extends BlockListener {
 	/**
 	 * @see BlockListener.onBlockBreak()
 	 */
-	@Override
-	public void onBlockBreak(BlockBreakEvent event) {
+	@EventHandler(event = BlockBreakEvent.class)
+	public void onBlockBreak(final BlockBreakEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}
@@ -205,7 +208,8 @@ public class WarBlockListener extends BlockListener {
 		}
 	}
 	
-	public void onBlockDamage(BlockDamageEvent event) {
+	@EventHandler(event = BlockDamageEvent.class)
+	public void onBlockDamage(final BlockDamageEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}

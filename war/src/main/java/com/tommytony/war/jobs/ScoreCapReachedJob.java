@@ -8,7 +8,6 @@ import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 import bukkit.tommytony.war.War;
-import bukkit.tommytony.war.WarSpoutListener;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;

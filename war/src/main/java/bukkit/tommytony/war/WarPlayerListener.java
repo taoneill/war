@@ -11,14 +11,14 @@ import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerInventoryEvent;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -46,7 +46,7 @@ import com.tommytony.war.spout.SpoutMessenger;
  * @author tommytony, Tim Düsterhus
  * @package bukkit.tommytony.war
  */
-public class WarPlayerListener extends PlayerListener {
+public class WarPlayerListener implements Listener {
 	private java.util.Random random = new java.util.Random();
 	private HashMap<String, Location> latestLocations = new HashMap<String, Location>(); 
 
@@ -55,8 +55,8 @@ public class WarPlayerListener extends PlayerListener {
 	 *
 	 * @see PlayerListener.onPlayerQuit()
 	 */
-	@Override
-	public void onPlayerQuit(PlayerQuitEvent event) {
+	@EventHandler(event = PlayerQuitEvent.class)
+	public void onPlayerQuit(final PlayerQuitEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
 			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
@@ -70,8 +70,8 @@ public class WarPlayerListener extends PlayerListener {
 		}
 	}
 
-	@Override
-	public void onPlayerDropItem(PlayerDropItemEvent event) {
+	@EventHandler(event = PlayerDropItemEvent.class)
+	public void onPlayerDropItem(final PlayerDropItemEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
 			Team team = Team.getTeamByPlayerName(player.getName());
@@ -132,8 +132,8 @@ public class WarPlayerListener extends PlayerListener {
 		}
 	}
 
-	@Override
-	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+	@EventHandler(event = PlayerPickupItemEvent.class)
+	public void onPlayerPickupItem(final PlayerPickupItemEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
 			Team team = Team.getTeamByPlayerName(player.getName());
@@ -161,8 +161,8 @@ public class WarPlayerListener extends PlayerListener {
 		}
 	}
 
-	@Override
-	public void onInventoryOpen(PlayerInventoryEvent event) {
+	@EventHandler(event = PlayerInventoryEvent.class)
+	public void onInventoryOpen(final PlayerInventoryEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
 			Inventory inventory = event.getInventory();
@@ -181,8 +181,8 @@ public class WarPlayerListener extends PlayerListener {
 		}
 	}
 
-	@Override
-	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+	@EventHandler(event = PlayerCommandPreprocessEvent.class)
+	public void onPlayerCommandPreprocess(final PlayerCommandPreprocessEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
 			Team talkingPlayerTeam = Team.getTeamByPlayerName(player.getName());
@@ -207,8 +207,8 @@ public class WarPlayerListener extends PlayerListener {
 		}
 	}
 
-	@Override
-	public void onPlayerKick(PlayerKickEvent event) {
+	@EventHandler(event = PlayerKickEvent.class)
+	public void onPlayerKick(final PlayerKickEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
 			String reason = event.getReason();
@@ -227,7 +227,7 @@ public class WarPlayerListener extends PlayerListener {
 		}
 	}
 
-	@Override
+	@EventHandler(event = PlayerInteractEvent.class)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -264,8 +264,8 @@ public class WarPlayerListener extends PlayerListener {
 		}
 	}
 
-	@Override
-	public void onPlayerMove(PlayerMoveEvent event) {
+	@EventHandler(event = PlayerMoveEvent.class)
+	public void onPlayerMove(final PlayerMoveEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}
@@ -722,7 +722,7 @@ public class WarPlayerListener extends PlayerListener {
 		}
 	}
 	
-	@Override
+	@EventHandler(event = PlayerToggleSneakEvent.class)
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
 		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());

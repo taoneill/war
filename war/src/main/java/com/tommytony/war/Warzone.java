@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -25,7 +24,6 @@ import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 import bukkit.tommytony.war.War;
-import bukkit.tommytony.war.WarSpoutListener;
 
 import com.tommytony.war.config.InventoryBag;
 import com.tommytony.war.config.TeamConfig;
