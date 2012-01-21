@@ -343,7 +343,7 @@ public class WarzoneYmlMapper {
 		}
 		
 		// bombs
-		if (warzone.getMonuments().size() > 0) {
+		if (warzone.getBombs().size() > 0) {
 			ConfigurationSection bombsSection = warzoneInfoSection.createSection("bomb");
 			
 			List<String> bombNames = new ArrayList<String>();
@@ -363,7 +363,7 @@ public class WarzoneYmlMapper {
 		}
 		
 		// cakes
-		if (warzone.getMonuments().size() > 0) {
+		if (warzone.getCakes().size() > 0) {
 			ConfigurationSection cakesSection = warzoneInfoSection.createSection("cake");
 			
 			List<String> cakeNames = new ArrayList<String>();
