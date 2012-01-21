@@ -15,15 +15,15 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 
+import com.tommytony.war.Team;
+import com.tommytony.war.TeamKind;
 import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.game.Bomb;
-import com.tommytony.war.game.Cake;
-import com.tommytony.war.game.Monument;
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.TeamKind;
-import com.tommytony.war.game.Warzone;
-import com.tommytony.war.game.ZoneLobby;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.Monument;
+import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
 

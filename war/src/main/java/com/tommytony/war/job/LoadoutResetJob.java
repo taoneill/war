@@ -2,8 +2,8 @@ package com.tommytony.war.job;
 
 import org.bukkit.entity.Player;
 
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.Warzone;
+import com.tommytony.war.Team;
+import com.tommytony.war.Warzone;
 
 public class LoadoutResetJob implements Runnable {
 

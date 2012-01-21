@@ -4,10 +4,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
+import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.WarCommandHandler;
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.Warzone;
+import com.tommytony.war.Warzone;
 
 /**
  * Lists all warzones

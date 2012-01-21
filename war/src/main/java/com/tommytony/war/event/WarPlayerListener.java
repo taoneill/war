@@ -29,19 +29,19 @@ import org.bukkit.inventory.PlayerInventory;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
+import com.tommytony.war.Team;
 import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.ZoneSetter;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.game.Bomb;
-import com.tommytony.war.game.Cake;
-import com.tommytony.war.game.FlagReturn;
-import com.tommytony.war.game.LoadoutSelection;
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.WarHub;
-import com.tommytony.war.game.Warzone;
-import com.tommytony.war.game.ZoneLobby;
-import com.tommytony.war.game.ZoneSetter;
 import com.tommytony.war.spout.SpoutMessenger;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.FlagReturn;
+import com.tommytony.war.structure.WarHub;
+import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.LoadoutSelection;
 
 /**
  * @author tommytony, Tim Düsterhus

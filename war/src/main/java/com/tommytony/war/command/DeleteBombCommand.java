@@ -5,10 +5,10 @@ import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.WarCommandHandler;
-import com.tommytony.war.game.Bomb;
-import com.tommytony.war.game.Warzone;
-import com.tommytony.war.game.ZoneLobby;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.ZoneLobby;
 
 /**
  * Deletes a bomb.

@@ -1,4 +1,4 @@
-package com.tommytony.war.game;
+package com.tommytony.war.structure;
 
 /**
  *

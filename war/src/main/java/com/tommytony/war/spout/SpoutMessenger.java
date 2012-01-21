@@ -15,11 +15,11 @@ import org.getspout.spoutapi.gui.WidgetAnchor;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 
+import com.tommytony.war.Team;
+import com.tommytony.war.TeamKind;
 import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.TeamKind;
-import com.tommytony.war.game.Warzone;
 
 public class SpoutMessenger {
 	

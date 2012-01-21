@@ -1,4 +1,4 @@
-package com.tommytony.war.game;
+package com.tommytony.war;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

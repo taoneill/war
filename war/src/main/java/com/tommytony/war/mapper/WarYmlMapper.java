@@ -13,10 +13,10 @@ import org.bukkit.inventory.ItemStack;
 
 
 import com.tommytony.war.War;
-import com.tommytony.war.game.WarHub;
-import com.tommytony.war.game.Warzone;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.job.RestoreYmlWarhubJob;
 import com.tommytony.war.job.RestoreYmlWarzonesJob;
+import com.tommytony.war.structure.WarHub;
 
 public class WarYmlMapper {
 

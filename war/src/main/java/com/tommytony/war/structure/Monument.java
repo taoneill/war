@@ -1,10 +1,12 @@
-package com.tommytony.war.game;
+package com.tommytony.war.structure;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
+import com.tommytony.war.Team;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.volume.Volume;
 
 /**

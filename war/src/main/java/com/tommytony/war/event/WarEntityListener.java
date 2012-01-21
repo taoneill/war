@@ -35,15 +35,15 @@ import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
+import com.tommytony.war.Team;
 import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.game.Bomb;
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.Warzone;
 import com.tommytony.war.job.DeferredBlockResetsJob;
 import com.tommytony.war.spout.SpoutMessenger;
+import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.utility.DeferredBlockReset;
 
 /**

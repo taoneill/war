@@ -4,11 +4,11 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 
+import com.tommytony.war.Team;
 import com.tommytony.war.War;
-import com.tommytony.war.game.Monument;
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.Warzone;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
+import com.tommytony.war.structure.Monument;
 
 /**
  *

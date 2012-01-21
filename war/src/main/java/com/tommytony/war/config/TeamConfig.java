@@ -1,7 +1,7 @@
 package com.tommytony.war.config;
 
-import com.tommytony.war.game.FlagReturn;
-import com.tommytony.war.game.TeamSpawnStyle;
+import com.tommytony.war.structure.FlagReturn;
+import com.tommytony.war.structure.TeamSpawnStyle;
 
 public enum TeamConfig {
 	FLAGMUSTBEHOME (Boolean.class),

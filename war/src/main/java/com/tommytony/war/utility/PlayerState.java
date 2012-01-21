@@ -5,7 +5,6 @@ import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.inventory.ItemStack;
 
-import com.tommytony.war.game.PotionEffect;
 
 public class PlayerState {
 	private ItemStack[] contents;

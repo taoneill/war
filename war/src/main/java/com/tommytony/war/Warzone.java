@@ -1,4 +1,4 @@
-package com.tommytony.war.game;
+package com.tommytony.war;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +24,6 @@ import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 
-import com.tommytony.war.War;
 import com.tommytony.war.config.InventoryBag;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
@@ -35,7 +34,14 @@ import com.tommytony.war.job.LoadoutResetJob;
 import com.tommytony.war.job.ScoreCapReachedJob;
 import com.tommytony.war.mapper.LoadoutYmlMapper;
 import com.tommytony.war.spout.SpoutMessenger;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.Monument;
+import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.structure.ZoneWallGuard;
+import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.utility.PlayerState;
+import com.tommytony.war.utility.PotionEffect;
 import com.tommytony.war.volume.ZoneVolume;
 
 /**

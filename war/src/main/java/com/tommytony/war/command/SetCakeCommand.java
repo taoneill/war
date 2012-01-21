@@ -5,9 +5,9 @@ import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.WarCommandHandler;
-import com.tommytony.war.game.Cake;
-import com.tommytony.war.game.Warzone;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
+import com.tommytony.war.structure.Cake;
 
 /**
  * Places a cake

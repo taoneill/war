@@ -4,8 +4,8 @@ import java.util.logging.Level;
 
 
 import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.game.Warzone;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneTxtMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;

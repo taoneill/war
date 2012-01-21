@@ -8,9 +8,9 @@ import org.bukkit.configuration.ConfigurationSection;
 
 
 import com.tommytony.war.War;
-import com.tommytony.war.game.WarHub;
-import com.tommytony.war.game.Warzone;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.VolumeMapper;
+import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.volume.Volume;
 
 public class RestoreYmlWarhubJob implements Runnable {

@@ -1,4 +1,4 @@
-package com.tommytony.war.game;
+package com.tommytony.war;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,10 +15,12 @@ import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 
-import com.tommytony.war.War;
 import com.tommytony.war.config.InventoryBag;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.TeamSpawnStyle;
 import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.Volume;
 

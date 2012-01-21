@@ -1,4 +1,4 @@
-package com.tommytony.war.game;
+package com.tommytony.war.structure;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 
+import com.tommytony.war.Team;
 import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.utility.SignHelper;

@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
 import com.tommytony.war.WarCommandHandler;
-import com.tommytony.war.game.Warzone;
+import com.tommytony.war.Warzone;
 
 /**
  * Warps the player to the warhub.

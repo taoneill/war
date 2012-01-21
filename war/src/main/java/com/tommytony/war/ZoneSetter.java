@@ -1,14 +1,14 @@
-package com.tommytony.war.game;
+package com.tommytony.war;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 
-import com.tommytony.war.War;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
+import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.volume.NotNorthwestException;
 import com.tommytony.war.volume.NotSoutheastException;
 import com.tommytony.war.volume.TooBigException;

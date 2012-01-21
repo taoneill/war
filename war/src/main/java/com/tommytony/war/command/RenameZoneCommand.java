@@ -9,12 +9,12 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
 import com.tommytony.war.WarCommandHandler;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.game.Warzone;
-import com.tommytony.war.game.ZoneLobby;
 import com.tommytony.war.mapper.PropertiesFile;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
+import com.tommytony.war.structure.ZoneLobby;
 
 public class RenameZoneCommand extends AbstractZoneMakerCommand {
 	public RenameZoneCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {

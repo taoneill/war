@@ -18,6 +18,17 @@
 		  <url>http://mvn2.sk89q.com/repo</url>
 		 </repository>
     </repositories>
+  <issueManagement>
+  	<system>Github issues</system>
+  	<url>https://github.com/taoneill/war/issues</url>
+  </issueManagement>
+  <ciManagement>
+  	<system>Jenkins</system>
+  	<url>http://ci.tommytony.com</url>
+  </ciManagement>
+  <scm>
+  	<url>https://github.com/taoneill/war</url>
+  </scm>
   <build>
       <plugins>
           <plugin>
@@ -34,7 +45,7 @@
         <resource>
           <targetPath>.</targetPath>
           <filtering>true</filtering>
-          <directory>${basedir}/src/main/java/</directory>
+          <directory>${basedir}/src/main/resources/</directory>
           <includes>
             <include>plugin.yml</include>
           </includes>

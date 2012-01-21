@@ -4,11 +4,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
+import com.tommytony.war.Team;
+import com.tommytony.war.TeamKind;
 import com.tommytony.war.WarCommandHandler;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.TeamKind;
-import com.tommytony.war.game.Warzone;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 
 /**

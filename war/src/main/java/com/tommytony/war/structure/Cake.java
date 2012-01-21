@@ -1,4 +1,4 @@
-package com.tommytony.war.game;
+package com.tommytony.war.structure;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -6,6 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import com.tommytony.war.Warzone;
 import com.tommytony.war.volume.Volume;
 
 /**
@@ -13,7 +14,7 @@ import com.tommytony.war.volume.Volume;
  * @author tommytony
  *
  */
-public class Bomb {
+public class Cake {
 	private Location location;
 	private Volume volume;
 
@@ -21,15 +22,15 @@ public class Bomb {
 	private Warzone warzone;
 	private Player capturer;
 
-	public Bomb(String name, Warzone warzone, Location location) {
+	public Cake(String name, Warzone warzone, Location location) {
 		this.name = name;
 		this.location = location;
 		this.warzone = warzone;
-		this.volume = new Volume("bomb-" + name, warzone.getWorld());
+		this.volume = new Volume("cake-" + name, warzone.getWorld());
 		this.setLocation(location);
 	}
 
-	public void addBombBlocks() {
+	public void addCakeBlocks() {
 		this.volume.setToMaterial(Material.AIR);
 
 		int x = this.location.getBlockX();
@@ -40,25 +41,25 @@ public class Bomb {
 		this.warzone.getWorld().getBlockAt(x, y - 1, z).getState().setType(Material.OBSIDIAN);
 
 		// inner ring
-		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z + 1).setType(Material.GLOWSTONE);
+		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z + 1).setType(Material.OBSIDIAN);
 		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z - 1).setType(Material.GLOWSTONE);
+		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z - 1).setType(Material.OBSIDIAN);
 
 		this.warzone.getWorld().getBlockAt(x, y - 1, z + 1).setType(Material.OBSIDIAN);
 		this.warzone.getWorld().getBlockAt(x, y - 1, z).setType(Material.GLOWSTONE);
 		this.warzone.getWorld().getBlockAt(x, y - 1, z - 1).setType(Material.OBSIDIAN);
 
-		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z + 1).setType(Material.GLOWSTONE);
+		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z + 1).setType(Material.OBSIDIAN);
 		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1).setType(Material.GLOWSTONE);
+		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1).setType(Material.OBSIDIAN);
 
 		// block holder
-		this.warzone.getWorld().getBlockAt(x, y, z).setType(Material.OBSIDIAN);
-		Block tntBlock = this.warzone.getWorld().getBlockAt(x, y + 1, z);
-		tntBlock.setType(Material.TNT);
+		this.warzone.getWorld().getBlockAt(x, y, z).setType(Material.GLASS);
+		Block cakeBlock = this.warzone.getWorld().getBlockAt(x, y + 1, z);
+		cakeBlock.setType(Material.CAKE_BLOCK);
 	}
 
-	public boolean isBombBlock(Location otherLocation) {
+	public boolean isCakeBlock(Location otherLocation) {
 		int x = this.location.getBlockX();
 		int y = this.location.getBlockY() + 1;
 		int z = this.location.getBlockZ();
@@ -97,7 +98,7 @@ public class Bomb {
 		this.volume.setCornerTwo(locationBlock.getRelative(BlockFace.UP, 2).getRelative(BlockFace.WEST, 1).getRelative(BlockFace.NORTH, 1));
 		this.volume.saveBlocks();
 		this.location = location;
-		this.addBombBlocks();
+		this.addCakeBlocks();
 	}
 
 	public Volume getVolume() {

@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 
 import com.tommytony.war.War;
-import com.tommytony.war.game.Warzone;
+import com.tommytony.war.Warzone;
 
 public class InventoryBag {
 

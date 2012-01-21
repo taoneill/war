@@ -1,4 +1,4 @@
-package com.tommytony.war.game;
+package com.tommytony.war.structure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.volume.BlockInfo;
 
 

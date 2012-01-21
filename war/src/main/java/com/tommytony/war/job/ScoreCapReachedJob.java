@@ -8,9 +8,9 @@ import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 
+import com.tommytony.war.Team;
 import com.tommytony.war.War;
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.Warzone;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.spout.SpoutMessenger;
 
 public class ScoreCapReachedJob implements Runnable {

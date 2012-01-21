@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.WarCommandHandler;
-import com.tommytony.war.game.Warzone;
+import com.tommytony.war.Warzone;
 
 /**
  * Leaves a game.

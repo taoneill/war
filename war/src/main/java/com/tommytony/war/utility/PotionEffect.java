@@ -1,4 +1,4 @@
-package com.tommytony.war.game;
+package com.tommytony.war.utility;
 
 import java.util.ArrayList;
 import java.util.List;

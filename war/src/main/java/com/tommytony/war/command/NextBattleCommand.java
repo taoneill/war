@@ -3,10 +3,10 @@ package com.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.tommytony.war.Team;
 import com.tommytony.war.WarCommandHandler;
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.Warzone;
-import com.tommytony.war.game.ZoneLobby;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.structure.ZoneLobby;
 
 
 public class NextBattleCommand extends AbstractZoneMakerCommand {

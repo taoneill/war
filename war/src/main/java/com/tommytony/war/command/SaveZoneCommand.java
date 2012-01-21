@@ -6,9 +6,9 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
 import com.tommytony.war.WarCommandHandler;
-import com.tommytony.war.game.Warzone;
-import com.tommytony.war.game.ZoneLobby;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
+import com.tommytony.war.structure.ZoneLobby;
 
 public class SaveZoneCommand extends AbstractZoneMakerCommand {
 

@@ -11,16 +11,16 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
 
+import com.tommytony.war.Team;
+import com.tommytony.war.TeamKind;
 import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.game.FlagReturn;
-import com.tommytony.war.game.Monument;
-import com.tommytony.war.game.Team;
-import com.tommytony.war.game.TeamKind;
-import com.tommytony.war.game.TeamSpawnStyle;
-import com.tommytony.war.game.Warzone;
-import com.tommytony.war.game.ZoneLobby;
+import com.tommytony.war.structure.FlagReturn;
+import com.tommytony.war.structure.Monument;
+import com.tommytony.war.structure.TeamSpawnStyle;
+import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
 
