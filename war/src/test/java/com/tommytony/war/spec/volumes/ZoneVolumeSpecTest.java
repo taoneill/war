@@ -10,7 +10,10 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import com.tommytony.war.*;
-import com.tommytony.war.volumes.*;
+import com.tommytony.war.game.Monument;
+import com.tommytony.war.game.Team;
+import com.tommytony.war.game.Warzone;
+import com.tommytony.war.volume.*;
 
 public class ZoneVolumeSpecTest {
 

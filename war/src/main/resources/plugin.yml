@@ -2,8 +2,8 @@ name: War
 version: 1.7-PREVIEW (Doolittle)
 description: Lets you create TDM and CTF arenas (warzones) for a fast-paced and structured PVP experience.
 author: tommytony
-website: war.tommytony.com
-main: bukkit.tommytony.war.War
+website: http://war.tommytony.com
+main: com.tommytony.war.War
 softdepend: [Spout]
 permissions:
   war.*:

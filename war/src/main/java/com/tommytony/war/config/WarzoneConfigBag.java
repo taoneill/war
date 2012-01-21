@@ -5,7 +5,8 @@ import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import bukkit.tommytony.war.War;
+import com.tommytony.war.War;
+
 
 public class WarzoneConfigBag {
 

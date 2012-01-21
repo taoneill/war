@@ -4,9 +4,9 @@ import java.util.HashMap;
 
 import org.bukkit.inventory.ItemStack;
 
-import bukkit.tommytony.war.War;
 
-import com.tommytony.war.Warzone;
+import com.tommytony.war.War;
+import com.tommytony.war.game.Warzone;
 
 public class InventoryBag {
 

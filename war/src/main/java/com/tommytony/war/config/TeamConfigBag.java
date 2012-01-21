@@ -5,11 +5,11 @@ import java.util.Map;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import bukkit.tommytony.war.War;
 
-import com.tommytony.war.FlagReturn;
-import com.tommytony.war.TeamSpawnStyle;
-import com.tommytony.war.Warzone;
+import com.tommytony.war.War;
+import com.tommytony.war.game.FlagReturn;
+import com.tommytony.war.game.TeamSpawnStyle;
+import com.tommytony.war.game.Warzone;
 
 public class TeamConfigBag {
 

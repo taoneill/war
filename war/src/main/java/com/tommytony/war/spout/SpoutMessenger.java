@@ -14,12 +14,12 @@ import org.getspout.spoutapi.gui.GenericLabel;
 import org.getspout.spoutapi.gui.WidgetAnchor;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
-import bukkit.tommytony.war.War;
 
-import com.tommytony.war.Team;
-import com.tommytony.war.TeamKind;
-import com.tommytony.war.Warzone;
+import com.tommytony.war.War;
 import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.game.Team;
+import com.tommytony.war.game.TeamKind;
+import com.tommytony.war.game.Warzone;
 
 public class SpoutMessenger {
 	
@@ -315,7 +315,6 @@ public class SpoutMessenger {
 			
 			// finally messages
 			if (messages != null && messages.size() > 0) {
-				int rank = 0;			
 				Warzone zone = Warzone.getZoneByPlayerName(playerName);			
 				int verticalOffset = statsOffset.get(1) + 4; 
 				
@@ -348,8 +347,6 @@ public class SpoutMessenger {
 					}
 					
 					verticalOffset += LINE_HEIGHT_WITH_MARGIN + 1;
-					
-					rank++;
 				}
 			}		
 		}
@@ -380,28 +377,28 @@ public class SpoutMessenger {
 		return word;
 	}
 
-	private Color getWordColor(String word, Warzone zone) {
-		if (zone != null) {
-			for (Team team : zone.getTeams()) {
-				for (Player player : team.getPlayers()) {
-					if (word.startsWith(player.getName())) {
-						return team.getKind().getSpoutColor();
-					}
-				}
-			}
-		}
-		
-		for (TeamKind kind : TeamKind.values()) {
-			if (word.startsWith(kind.toString())) {
-				return kind.getSpoutColor();
-			}
-		}
-		
-		if (word.equals("War>")) {
-			return new Color(200,200,200);
-		}
-		
-		// white by default
-		return new Color(255,255,255);
-	}
+//	private Color getWordColor(String word, Warzone zone) {
+//		if (zone != null) {
+//			for (Team team : zone.getTeams()) {
+//				for (Player player : team.getPlayers()) {
+//					if (word.startsWith(player.getName())) {
+//						return team.getKind().getSpoutColor();
+//					}
+//				}
+//			}
+//		}
+//		
+//		for (TeamKind kind : TeamKind.values()) {
+//			if (word.startsWith(kind.toString())) {
+//				return kind.getSpoutColor();
+//			}
+//		}
+//		
+//		if (word.equals("War>")) {
+//			return new Color(200,200,200);
+//		}
+//		
+//		// white by default
+//		return new Color(255,255,255);
+//	}
 }
