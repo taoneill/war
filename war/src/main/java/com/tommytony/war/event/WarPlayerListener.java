@@ -56,7 +56,7 @@ public class WarPlayerListener implements Listener {
 	 *
 	 * @see PlayerListener.onPlayerQuit()
 	 */
-	@EventHandler(event = PlayerQuitEvent.class)
+	@EventHandler
 	public void onPlayerQuit(final PlayerQuitEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -71,7 +71,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(event = PlayerDropItemEvent.class)
+	@EventHandler
 	public void onPlayerDropItem(final PlayerDropItemEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -133,7 +133,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(event = PlayerPickupItemEvent.class)
+	@EventHandler
 	public void onPlayerPickupItem(final PlayerPickupItemEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -208,7 +208,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(event = PlayerKickEvent.class)
+	@EventHandler
 	public void onPlayerKick(final PlayerKickEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -228,7 +228,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(event = PlayerInteractEvent.class)
+	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -265,7 +265,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler(event = PlayerMoveEvent.class)
+	@EventHandler
 	public void onPlayerMove(final PlayerMoveEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
@@ -330,7 +330,7 @@ public class WarPlayerListener implements Listener {
 						int totalCap = 0;
 						for (Team t : zone.getTeams()) {
 							noOfPlayers += t.getPlayers().size();
-							totalCap += t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE);
+							totalCap += t.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
 						}
 						
 						if (noOfPlayers < totalCap) {
@@ -723,7 +723,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 	
-	@EventHandler(event = PlayerToggleSneakEvent.class)
+	@EventHandler
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
 		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());

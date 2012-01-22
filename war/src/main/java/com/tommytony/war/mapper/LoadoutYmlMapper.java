@@ -86,23 +86,26 @@ public class LoadoutYmlMapper {
 
 	public static void fromLoadoutToConfig(String loadoutName, HashMap<Integer, ItemStack> loadout, ConfigurationSection section) {
 		ConfigurationSection loadoutSection = section.createSection(loadoutName);
-		loadoutSection.set("slots", toIntList(loadout.keySet()));
-		for (Integer slot : loadout.keySet()) {
-			ConfigurationSection slotSection = loadoutSection.createSection(slot.toString());
-			ItemStack stack = loadout.get(slot);
-			
-			slotSection.set("id", stack.getTypeId());
-			slotSection.set("data", stack.getData().getData());
-			slotSection.set("amount", stack.getAmount());
-			slotSection.set("durability", stack.getDurability());
-
-			if (stack.getEnchantments().keySet().size() > 0) {
-				List<String> enchantmentStringList = new ArrayList<String>();
-				for (Enchantment enchantment : stack.getEnchantments().keySet()) {
-					int level = stack.getEnchantments().get(enchantment);
-					enchantmentStringList.add(enchantment.getId() + "," + level);
+		
+		if (loadoutSection != null) {
+			loadoutSection.set("slots", toIntList(loadout.keySet()));
+			for (Integer slot : loadout.keySet()) {
+				ConfigurationSection slotSection = loadoutSection.createSection(slot.toString());
+				ItemStack stack = loadout.get(slot);
+				
+				slotSection.set("id", stack.getTypeId());
+				slotSection.set("data", stack.getData().getData());
+				slotSection.set("amount", stack.getAmount());
+				slotSection.set("durability", stack.getDurability());
+	
+				if (stack.getEnchantments().keySet().size() > 0) {
+					List<String> enchantmentStringList = new ArrayList<String>();
+					for (Enchantment enchantment : stack.getEnchantments().keySet()) {
+						int level = stack.getEnchantments().get(enchantment);
+						enchantmentStringList.add(enchantment.getId() + "," + level);
+					}
+					slotSection.set("enchantments", enchantmentStringList);
 				}
-				slotSection.set("enchantments", enchantmentStringList);
 			}
 		}
 	}
