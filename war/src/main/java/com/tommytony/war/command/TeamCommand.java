@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.Team;
-import com.tommytony.war.WarCommandHandler;
 
 /**
  * Sends a message to all team-members

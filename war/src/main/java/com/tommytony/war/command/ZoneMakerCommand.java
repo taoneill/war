@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.War;
-import com.tommytony.war.WarCommandHandler;
 import com.tommytony.war.mapper.WarYmlMapper;
 
 /**

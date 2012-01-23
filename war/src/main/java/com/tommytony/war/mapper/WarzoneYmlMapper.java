@@ -16,10 +16,10 @@ import org.bukkit.inventory.ItemStack;
 
 
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamKind;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.structure.Monument;

@@ -4,8 +4,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
-import com.tommytony.war.WarCommandHandler;
-import com.tommytony.war.ZoneSetter;
 
 
 public class SetZoneCommand extends AbstractZoneMakerCommand {

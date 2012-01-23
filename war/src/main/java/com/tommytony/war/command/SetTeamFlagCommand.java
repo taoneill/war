@@ -6,9 +6,8 @@ import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamKind;
-import com.tommytony.war.WarCommandHandler;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 
 /**

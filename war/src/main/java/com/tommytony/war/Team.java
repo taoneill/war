@@ -18,9 +18,10 @@ import org.getspout.spoutapi.player.SpoutPlayer;
 import com.tommytony.war.config.InventoryBag;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
+import com.tommytony.war.config.TeamKind;
+import com.tommytony.war.config.TeamSpawnStyle;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.TeamSpawnStyle;
 import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.Volume;
 

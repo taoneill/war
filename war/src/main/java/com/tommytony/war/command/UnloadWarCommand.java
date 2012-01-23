@@ -3,7 +3,6 @@ package com.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 
 import com.tommytony.war.War;
-import com.tommytony.war.WarCommandHandler;
 
 
 /**

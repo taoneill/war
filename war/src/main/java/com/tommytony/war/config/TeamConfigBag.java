@@ -8,8 +8,6 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.structure.FlagReturn;
-import com.tommytony.war.structure.TeamSpawnStyle;
 
 public class TeamConfigBag {
 

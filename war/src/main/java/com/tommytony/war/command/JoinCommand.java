@@ -7,11 +7,10 @@ import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamKind;
 import com.tommytony.war.War;
-import com.tommytony.war.WarCommandHandler;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.structure.ZoneLobby;
 

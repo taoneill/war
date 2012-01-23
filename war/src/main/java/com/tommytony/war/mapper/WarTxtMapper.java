@@ -9,13 +9,13 @@ import org.bukkit.inventory.ItemStack;
 
 
 import com.tommytony.war.War;
+import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.TeamSpawnStyle;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.job.RestoreWarhubJob;
 import com.tommytony.war.job.RestoreWarzonesJob;
-import com.tommytony.war.structure.FlagReturn;
-import com.tommytony.war.structure.TeamSpawnStyle;
 
 /**
  *

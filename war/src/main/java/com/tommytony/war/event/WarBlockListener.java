@@ -22,12 +22,12 @@ import org.getspout.spoutapi.player.SpoutPlayer;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.spout.SpoutMessenger;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.FlagReturn;
 import com.tommytony.war.structure.Monument;
 
 /**

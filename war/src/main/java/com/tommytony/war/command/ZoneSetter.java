@@ -1,10 +1,12 @@
-package com.tommytony.war;
+package com.tommytony.war.command;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;

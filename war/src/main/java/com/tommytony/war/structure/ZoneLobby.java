@@ -13,10 +13,10 @@ import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.Team;
-import com.tommytony.war.TeamKind;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.BlockInfo;
@@ -509,13 +509,18 @@ public class ZoneLobby {
 				return true;
 			}
 		}
+		
 		return false;
 	}
 
 	public boolean isAutoAssignGate(Location location) {
-		if (this.autoAssignGate != null && (location.getBlockX() == this.autoAssignGate.getX() && location.getBlockY() == this.autoAssignGate.getY() && location.getBlockZ() == this.autoAssignGate.getZ())) {
+		if (this.autoAssignGate != null 
+				&& (location.getBlockX() == this.autoAssignGate.getX() 
+						&& location.getBlockY() == this.autoAssignGate.getY() 
+						&& location.getBlockZ() == this.autoAssignGate.getZ())) {
 			return true;
 		}
+		
 		return false;
 	}
 
@@ -532,9 +537,13 @@ public class ZoneLobby {
 	}
 
 	public boolean isInWarHubLinkGate(Location location) {
-		if (this.warHubLinkGate != null && location.getBlockX() == this.warHubLinkGate.getX() && location.getBlockY() == this.warHubLinkGate.getY() && location.getBlockZ() == this.warHubLinkGate.getZ()) {
+		if (this.warHubLinkGate != null 
+				&& location.getBlockX() == this.warHubLinkGate.getX() 
+				&& location.getBlockY() == this.warHubLinkGate.getY() 
+				&& location.getBlockZ() == this.warHubLinkGate.getZ()) {
 			return true;
 		}
+		
 		return false;
 	}
 
@@ -546,6 +555,7 @@ public class ZoneLobby {
 					return true;
 				}
 			}
+			
 			if (this.autoAssignGate != null && this.isPartOfGate(BlockInfo.getBlock(this.volume.getWorld(), this.autoAssignGate), block)) {
 				// auto assign
 				return true;
