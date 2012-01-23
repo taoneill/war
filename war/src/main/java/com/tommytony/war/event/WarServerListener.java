@@ -11,7 +11,7 @@ import com.tommytony.war.War;
 
 public class WarServerListener implements Listener {
 
-	@EventHandler
+	@EventHandler(event = PluginDisableEvent.class)
 	public void onPluginDisable(final PluginDisableEvent event) {
 		if (event.getPlugin().getDataFolder().getName().equals("Spout")) {
 			if (War.war.isSpoutServer()) {

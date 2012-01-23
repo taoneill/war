@@ -56,7 +56,7 @@ public class WarPlayerListener implements Listener {
 	 *
 	 * @see PlayerListener.onPlayerQuit()
 	 */
-	@EventHandler
+	@EventHandler(event = PlayerQuitEvent.class)
 	public void onPlayerQuit(final PlayerQuitEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -71,7 +71,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(event = PlayerDropItemEvent.class)
 	public void onPlayerDropItem(final PlayerDropItemEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -133,7 +133,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(event = PlayerPickupItemEvent.class)
 	public void onPlayerPickupItem(final PlayerPickupItemEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -208,7 +208,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(event = PlayerKickEvent.class)
 	public void onPlayerKick(final PlayerKickEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -228,7 +228,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(event = PlayerInteractEvent.class)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
@@ -265,7 +265,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(event = PlayerMoveEvent.class)
 	public void onPlayerMove(final PlayerMoveEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
@@ -723,7 +723,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(event = PlayerToggleSneakEvent.class)
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
 		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());

@@ -252,7 +252,7 @@ public class WarEntityListener implements Listener {
 	 *
 	 * @see EntityListener.onEntityExplode()
 	 */
-	@EventHandler
+	@EventHandler(event = EntityExplodeEvent.class)
 	public void onEntityExplode(final EntityExplodeEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
@@ -367,7 +367,7 @@ public class WarEntityListener implements Listener {
 	 *
 	 * @see EntityListener.onEntityDamage()
 	 */
-	@EventHandler
+	@EventHandler(event = EntityDamageEvent.class)
 	public void onEntityDamage(final EntityDamageEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
@@ -412,8 +412,8 @@ public class WarEntityListener implements Listener {
 		}
 	}
 
-	@EventHandler
-	public void onEntityCombust(final EntityCombustEvent event) {
+	@EventHandler(event = EntityDamageEvent.class)
+	public void onEntityCombust(final EntityDamageEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}
@@ -438,7 +438,7 @@ public class WarEntityListener implements Listener {
 	 *
 	 * @see EntityListener.onCreatureSpawn()
 	 */
-	@EventHandler
+	@EventHandler(event = CreatureSpawnEvent.class)
 	public void onCreatureSpawn(final CreatureSpawnEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
@@ -456,7 +456,7 @@ public class WarEntityListener implements Listener {
 	 *
 	 * @see EntityListener.onEntityRegainHealth()
 	 */
-	@EventHandler
+	@EventHandler(event = EntityRegainHealthEvent.class)
 	public void onEntityRegainHealth(final EntityRegainHealthEvent event) {
 		if (!War.war.isLoaded() || 
 				(event.getRegainReason() != RegainReason.REGEN 
@@ -486,7 +486,7 @@ public class WarEntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(event = FoodLevelChangeEvent.class)
 	public void onFoodLevelChange(final FoodLevelChangeEvent event) {
 		if (!War.war.isLoaded() || !(event.getEntity() instanceof Player)) {
 			return;
@@ -500,7 +500,7 @@ public class WarEntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(event = EntityDeathEvent.class)
 	public void onEntityDeath(final EntityDeathEvent event) {
 		if (!War.war.isLoaded() || !(event.getEntity() instanceof Player)) {
 			return;
@@ -518,7 +518,7 @@ public class WarEntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(event = ExplosionPrimeEvent.class)
     public void onExplosionPrime(final ExplosionPrimeEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
