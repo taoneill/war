@@ -57,6 +57,7 @@ public class HelmetProtectionTask implements Runnable {
 							}
 						}
 					} else {
+						// enfore helmet (good thing?)
 						if (team.getKind() == TeamKind.GOLD) {
 							teamBlockMaterial = Material.GOLD_HELMET;
 						} else if (team.getKind() == TeamKind.DIAMOND) {
@@ -75,6 +76,19 @@ public class HelmetProtectionTask implements Runnable {
 							playerInv.setItem(playerInv.firstEmpty(), new ItemStack(teamBlockMaterial));
 							War.war.badMsg(player, "All those helmets must have been heavy!");
 						}
+					}
+					
+					// check for thieves without their treasure in their hands
+					if (zone.isFlagThief(player.getName())) {
+						Team victim = zone.getVictimTeamForFlagThief(player.getName());
+						player.setItemInHand(null);
+						player.getInventory().addItem(new ItemStack(victim.getKind().getMaterial(), 2240, victim.getKind().getData(), victim.getKind().getData()));
+					} else if (zone.isBombThief(player.getName())) {
+						player.setItemInHand(null);
+						player.getInventory().addItem(new ItemStack(Material.TNT, 2240));
+					} else if (zone.isCakeThief(player.getName())) {
+						player.setItemInHand(null);
+						player.getInventory().addItem(new ItemStack(Material.CAKE_BLOCK, 2240));
 					}
 				}
 			}

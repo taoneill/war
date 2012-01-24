@@ -5,31 +5,33 @@ import org.bukkit.Material;
 import org.getspout.spoutapi.gui.Color;
 
 public enum TeamKind {
-	WHITE ((byte) 0, Material.WOOL, ChatColor.WHITE),
-	ORANGE ((byte) 1, Material.WOOL, ChatColor.GOLD),
-	MAGENTA ((byte) 2, Material.WOOL, ChatColor.LIGHT_PURPLE),
-	BLUE ((byte) 3, Material.WOOL, ChatColor.BLUE),
-	GOLD ((byte) 4, Material.WOOL, ChatColor.YELLOW), // yellow = gold
-	GREEN ((byte) 5, Material.WOOL, ChatColor.GREEN),
-	PINK ((byte) 6, Material.WOOL, ChatColor.WHITE),
-	GRAY ((byte) 7, Material.WOOL, ChatColor.DARK_GRAY),
-	IRON ((byte) 8, Material.WOOL, ChatColor.GRAY), // lightgrey = iron
-	DIAMOND ((byte) 9, Material.WOOL, ChatColor.DARK_AQUA), // cyan = diamond
-	PURPLE ((byte) 10, Material.WOOL, ChatColor.DARK_PURPLE),
-	NAVY ((byte) 11, Material.WOOL, ChatColor.DARK_BLUE),
-	BROWN ((byte) 12, Material.WOOL, ChatColor.DARK_RED),
-	DARKGREEN ((byte) 13, Material.WOOL, ChatColor.DARK_GREEN),
-	RED ((byte) 14, Material.WOOL, ChatColor.RED),
-	BLACK ((byte) 15, Material.WOOL, ChatColor.BLACK);
+	WHITE ((byte) 0, Material.WOOL, ChatColor.WHITE, 450),
+	ORANGE ((byte) 1, Material.WOOL, ChatColor.GOLD, 51),
+	MAGENTA ((byte) 2, Material.WOOL, ChatColor.LIGHT_PURPLE, 353),
+	BLUE ((byte) 3, Material.WOOL, ChatColor.BLUE, 23),
+	GOLD ((byte) 4, Material.WOOL, ChatColor.YELLOW, 403), // yellow = gold
+	GREEN ((byte) 5, Material.WOOL, ChatColor.GREEN, 612),
+	PINK ((byte) 6, Material.WOOL, ChatColor.WHITE, 929),
+	GRAY ((byte) 7, Material.WOOL, ChatColor.DARK_GRAY, 600),
+	IRON ((byte) 8, Material.WOOL, ChatColor.GRAY, 154), // lightgrey = iron
+	DIAMOND ((byte) 9, Material.WOOL, ChatColor.DARK_AQUA, 738), // cyan = diamond
+	PURPLE ((byte) 10, Material.WOOL, ChatColor.DARK_PURPLE, 153),
+	NAVY ((byte) 11, Material.WOOL, ChatColor.DARK_BLUE, 939),
+	BROWN ((byte) 12, Material.WOOL, ChatColor.DARK_RED, 908),
+	DARKGREEN ((byte) 13, Material.WOOL, ChatColor.DARK_GREEN, 612),
+	RED ((byte) 14, Material.WOOL, ChatColor.RED, 245),
+	BLACK ((byte) 15, Material.WOOL, ChatColor.BLACK, 0);
 
 	private final byte data;
 	private final ChatColor color;
 	private final Material material;
+	private final int potionEffectColor;
 
-	private TeamKind(byte data, Material material, ChatColor color) {
+	private TeamKind(byte data, Material material, ChatColor color, int potionEffectColor) {
 		this.data = data;
 		this.material = material;
 		this.color = color;
+		this.potionEffectColor = potionEffectColor;
 	}
 
 	public static TeamKind teamKindFromString(String str) {
@@ -100,5 +102,9 @@ public enum TeamKind {
 	@Override
 	public String toString() {
 		return super.toString().toLowerCase();
+	}
+
+	public int getPotionEffectColor() {
+		return this.potionEffectColor;
 	}
 }

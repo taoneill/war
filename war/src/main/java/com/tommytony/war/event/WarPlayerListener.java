@@ -2,8 +2,10 @@ package com.tommytony.war.event;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -459,7 +461,7 @@ public class WarPlayerListener implements Listener {
 					return;
 				}
 			}
-			
+						
 			if (!playerTeam.getSpawnVolume().contains(playerLoc)) {
 				if (!playerWarzone.isEnoughPlayers()) {
 					War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getWarzoneConfig().getInt(WarzoneConfig.MINPLAYERS)
@@ -500,6 +502,11 @@ public class WarPlayerListener implements Listener {
 
 			// Flag capture
 			if (playerWarzone.isFlagThief(player.getName())) {
+				// smoky
+				if (System.currentTimeMillis() % 3 == 0) {
+					playerWarzone.getWorld().playEffect(player.getLocation(), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
+				}
+				
 				boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
 				boolean inFlag = (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation()));
 
@@ -573,6 +580,9 @@ public class WarPlayerListener implements Listener {
 			
 			// Bomb detonation
 			if (playerWarzone.isBombThief(player.getName())) {
+				// smoky
+				playerWarzone.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 0);
+				
 				boolean inEnemySpawn = false;
 				Team victim = null;
 				for (Team team : playerWarzone.getTeams()) {
@@ -643,6 +653,11 @@ public class WarPlayerListener implements Listener {
 			
 			// Cake retrieval
 			if (playerWarzone.isCakeThief(player.getName())) {
+				// smoky
+				if (System.currentTimeMillis() % 3 == 0) {
+					playerWarzone.getWorld().playEffect(player.getLocation(), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
+				}
+				
 				boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
 															
 				if (inSpawn) {
