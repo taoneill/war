@@ -3,6 +3,7 @@ package com.tommytony.war.config;
 public enum WarzoneConfig {
 	AUTOASSIGN (Boolean.class),
 	BLOCKHEADS (Boolean.class),
+	DEATHMESSAGES (Boolean.class),
 	DISABLED (Boolean.class),
 	FRIENDLYFIRE (Boolean.class),
 	GLASSWALLS (Boolean.class),
@@ -13,10 +14,12 @@ public enum WarzoneConfig {
 	NOCREATURES (Boolean.class),
 	NODROPS (Boolean.class),
 	PVPINZONE (Boolean.class),
+	REALDEATHS (Boolean.class),
 	RESETONEMPTY (Boolean.class),
 	RESETONLOAD (Boolean.class),
 	RESETONUNLOAD (Boolean.class),
 	UNBREAKABLE (Boolean.class);
+	
 	
 	private final Class<?> configType;
 

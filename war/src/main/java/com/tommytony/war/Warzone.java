@@ -73,6 +73,7 @@ public class Warzone {
 	private HashMap<String, LoadoutSelection> loadoutSelections = new HashMap<String, LoadoutSelection>();
 	private HashMap<String, PlayerState> deadMenInventories = new HashMap<String, PlayerState>();
 	private final List<Player> respawn = new ArrayList<Player>();
+	private final List<String> reallyDeadFighters = new ArrayList<String>();
 	
 	private final WarzoneConfigBag warzoneConfig = new WarzoneConfigBag();
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
@@ -798,9 +799,14 @@ public class Warzone {
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 		Warzone playerWarzone = Warzone.getZoneByPlayerName(player.getName());
 		if (playerTeam != null && playerWarzone != null) {
-			// teleport to team spawn upon death
-
-			playerWarzone.respawnPlayer(playerTeam, player);
+			// teleport to team spawn upon fast respawn death, but not for real deaths
+			if (!playerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+				playerWarzone.respawnPlayer(playerTeam, player);
+			} else {
+				// onPlayerRespawn takes care of real deaths
+				playerWarzone.getReallyDeadFighters().add(player.getName());
+			}
+			
 			int remaining = playerTeam.getRemainingLifes();
 			if (remaining == 0) { // your death caused your team to lose
 				List<Team> teams = playerWarzone.getTeams();
@@ -1298,5 +1304,9 @@ public class Warzone {
 
 	public List<Cake> getCakes() {
 		return cakes;
+	}
+
+	public List<String> getReallyDeadFighters() {
+		return this.reallyDeadFighters ;
 	}
 }

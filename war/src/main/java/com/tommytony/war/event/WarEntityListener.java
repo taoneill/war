@@ -123,53 +123,74 @@ public class WarEntityListener implements Listener {
 
 				// Detect death, prevent it and respawn the player
 				if (event.getDamage() >= d.getHealth()) {
-					String killMessage = "";
-					String attackerString = attackerTeam.getKind().getColor() + a.getName();
-					String defenderString = defenderTeam.getKind().getColor() + d.getName();
+					if (defenderWarzone.getReallyDeadFighters().contains(d.getName())) {
+						// don't re-kill a dead person 
+						event.setCancelled(true);
+						return;
+					}
 					
-					if (attacker.getEntityId() != defender.getEntityId()) {
-						Material killerWeapon = a.getItemInHand().getType();
-						String weaponString = killerWeapon.toString();
-						if (killerWeapon == Material.AIR) {
-							weaponString = "hand";
-						} else if (killerWeapon == Material.BOW || event.getDamager() instanceof Arrow) {
-							int rand = killSeed.nextInt(3);
-							if (rand == 0) {
-								weaponString = "arrow";
-							} else if (rand == 1) {
-								weaponString = "bow";
-							} else {
+					if (attackerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+						String killMessage = "";
+						String attackerString = attackerTeam.getKind().getColor() + a.getName();
+						String defenderString = defenderTeam.getKind().getColor() + d.getName();
+						
+						if (attacker.getEntityId() != defender.getEntityId()) {
+							Material killerWeapon = a.getItemInHand().getType();
+							String weaponString = killerWeapon.toString();
+							if (killerWeapon == Material.AIR) {
+								weaponString = "hand";
+							} else if (killerWeapon == Material.BOW || event.getDamager() instanceof Arrow) {
+								int rand = killSeed.nextInt(3);
+								if (rand == 0) {
+									weaponString = "arrow";
+								} else if (rand == 1) {
+									weaponString = "bow";
+								} else {
+									weaponString = "aim";
+								}
+								
+							} else if (event.getDamager() instanceof Projectile) {
 								weaponString = "aim";
 							}
 							
-						} else if (event.getDamager() instanceof Projectile) {
-							weaponString = "aim";
+							String adjectiveString = War.war.getDeadlyAdjectives().get(this.killSeed.nextInt(War.war.getDeadlyAdjectives().size()));
+							String verbString = War.war.getKillerVerbs().get(this.killSeed.nextInt(War.war.getKillerVerbs().size()));
+							
+							killMessage = attackerString + ChatColor.WHITE + "'s " + adjectiveString + weaponString.toLowerCase().replace('_', ' ') 
+													+ " " + verbString + " " + defenderString;
+						} else {
+							killMessage = defenderString + ChatColor.WHITE + " committed accidental suicide";
 						}
 						
-						String adjectiveString = War.war.getDeadlyAdjectives().get(this.killSeed.nextInt(War.war.getDeadlyAdjectives().size()));
-						String verbString = War.war.getKillerVerbs().get(this.killSeed.nextInt(War.war.getKillerVerbs().size()));
-						
-						killMessage = attackerString + ChatColor.WHITE + "'s " + adjectiveString + weaponString.toLowerCase().replace('_', ' ') 
-												+ " " + verbString + " " + defenderString;
-					} else {
-						killMessage = defenderString + ChatColor.WHITE + " committed accidental suicide";
+						for (Team team : defenderWarzone.getTeams()) {
+							team.teamcast(killMessage);
+						}
 					}
 					
-					for (Team team : defenderWarzone.getTeams()) {
-						team.teamcast(killMessage);
-					}
 					defenderWarzone.handleDeath(d);
 					
-					event.setCancelled(true);
+					if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+						// fast respawn, don't really die
+						event.setCancelled(true);
+						return;
+					}
+					
 				} else if (defenderWarzone.isBombThief(d.getName()) && d.getLocation().distance(a.getLocation()) < 2) {
+					// Close combat, close enough to detonate					
 					Bomb bomb = defenderWarzone.getBombForThief(d.getName());
-					
-					// Kill the bomber
+										
+					// Kill the bomber 
 					defenderWarzone.handleDeath(d);
 					
-					// blow up bomb man if attacker is close enough
+					if (defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+						// and respawn him and remove from deadmen (cause realdeath + handleDeath means no respawn and getting queued up for onPlayerRespawn)
+						defenderWarzone.getReallyDeadFighters().remove(d.getName());
+						defenderWarzone.respawnPlayer(defenderTeam, d);
+					}
+					
+					// Blow up bomb
 					defenderWarzone.getWorld().createExplosion(a.getLocation(), 2F);
-										
+															
 					// Notify everyone
 					for (Team t : defenderWarzone.getTeams()) {
 						if (War.war.isSpoutServer()) {
@@ -230,19 +251,33 @@ public class WarEntityListener implements Listener {
 			Player d = (Player) defender;
 			Warzone defenderWarzone = Warzone.getZoneByPlayerName(d.getName());
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
-				String deathMessage = "";
-				String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getName();
+				if (defenderWarzone.getReallyDeadFighters().contains(d.getName())) {
+					// don't re-kill a dead person 
+					event.setCancelled(true);
+					return;
+				}
+								
+				if (defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+					String deathMessage = "";
+					String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getName();
+					
+					if (event.getDamager() instanceof CraftTNTPrimed) {
+						deathMessage = defenderString + ChatColor.WHITE + " exploded";
+					} else {
+						deathMessage = defenderString + ChatColor.WHITE + " died";
+					}
+					for (Team team : defenderWarzone.getTeams()) {
+						team.teamcast(deathMessage);
+					}
+				}
 				
-				if (event.getDamager() instanceof CraftTNTPrimed) {
-					deathMessage = defenderString + ChatColor.WHITE + " exploded";
-				} else {
-					deathMessage = defenderString + ChatColor.WHITE + " died";
-				}
-				for (Team team : defenderWarzone.getTeams()) {
-					team.teamcast(deathMessage);
-				}
 				defenderWarzone.handleDeath(d);
-				event.setCancelled(true);
+				
+				if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+					// fast respawn, don't really die
+					event.setCancelled(true);
+					return;
+				}
 			}
 		}
 	}
@@ -391,23 +426,36 @@ public class WarEntityListener implements Listener {
 			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 			
 			if (zone != null && event.getDamage() >= player.getHealth()) {
+				if (zone.getReallyDeadFighters().contains(player.getName())) {
+					// don't re-kill a dead person 
+					event.setCancelled(true);
+					return;
+				}
+				
 				// Detect death, prevent it and respawn the player
-				String deathMessage = "";
-				String cause = " died";
-				if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK 
-						|| event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LIGHTNING) {
-					cause = " burned to a crisp";
-				} else if (event.getCause() == DamageCause.DROWNING) {
-					cause = " drowned";
-				} else if (event.getCause() == DamageCause.FALL) {
-					cause = " fell to an untimely death";
+				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+					String deathMessage = "";
+					String cause = " died";
+					if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK 
+							|| event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LIGHTNING) {
+						cause = " burned to a crisp";
+					} else if (event.getCause() == DamageCause.DROWNING) {
+						cause = " drowned";
+					} else if (event.getCause() == DamageCause.FALL) {
+						cause = " fell to an untimely death";
+					}
+					deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE + cause;
+					for (Team team : zone.getTeams()) {
+						team.teamcast(deathMessage);
+					}
 				}
-				deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE + cause;
-				for (Team team : zone.getTeams()) {
-					team.teamcast(deathMessage);
-				}
+				
 				zone.handleDeath(player);
-				event.setCancelled(true);
+				
+				if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+					// fast respawn, don't really die
+					event.setCancelled(true);
+				}
 			}
 		}
 	}
@@ -461,7 +509,7 @@ public class WarEntityListener implements Listener {
 		if (!War.war.isLoaded() || 
 				(event.getRegainReason() != RegainReason.REGEN 
 						&& event.getRegainReason() != RegainReason.EATING 
-						&& event.getRegainReason().toString() != "SATIATED")) {
+						&& event.getRegainReason() != RegainReason.SATIATED)) {
 			return;
 		}
 
@@ -475,7 +523,7 @@ public class WarEntityListener implements Listener {
 		if (zone != null) {
 			Team team = Team.getTeamByPlayerName(player.getName());
 			if ((event.getRegainReason() == RegainReason.EATING 
-					|| event.getRegainReason().toString() != "SATIATED" ) 
+					|| event.getRegainReason() != RegainReason.SATIATED ) 
 				&& team.getTeamConfig().resolveBoolean(TeamConfig.NOHUNGER)) {
 				// noHunger setting means you can't auto-heal with full hunger bar (use saturation instead to control how fast you get hungry)
 				event.setCancelled(true);
@@ -510,10 +558,15 @@ public class WarEntityListener implements Listener {
 		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 		if (zone != null) {
 			event.getDrops().clear();
-			zone.handleDeath(player);
+			if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+				// catch the odd death that gets away from us when usually intercepting and preventing deaths
+				zone.handleDeath(player);
+			}
 			
-			for (Team team : zone.getTeams()) {
-				team.teamcast(player.getName() + " died");
+			if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+				for (Team team : zone.getTeams()) {
+					team.teamcast(player.getName() + " died");
+				}
 			}
 		}
 	}

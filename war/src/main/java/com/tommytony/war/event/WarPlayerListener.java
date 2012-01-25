@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -753,6 +754,26 @@ public class WarPlayerListener implements Listener {
 					playerWarzone.equipPlayerLoadoutSelection(event.getPlayer(), playerTeam, false, true);
 				} else {
 					War.war.badMsg(event.getPlayer(), "Can't change loadout after exiting the spawn.");
+				}
+			}
+		}
+	}
+	
+	@EventHandler(event = PlayerRespawnEvent.class)
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		if (War.war.isLoaded()) {
+			// Anyone who died in warzones needs to go back there pronto!
+			for (Warzone zone : War.war.getWarzones()) {
+				if (zone.getReallyDeadFighters().contains(event.getPlayer().getName())) {
+					zone.getReallyDeadFighters().remove(event.getPlayer().getName());
+					for (Team team : zone.getTeams()) {
+						if (team.getPlayers().contains(event.getPlayer())) {
+							event.setRespawnLocation(team.getTeamSpawn());
+							zone.respawnPlayer(team, event.getPlayer());
+							break;
+						}
+					}
+					break;
 				}
 			}
 		}
