@@ -276,6 +276,9 @@ public class Warzone {
 		}
 
 		this.flagThieves.clear();
+		this.bombThieves.clear();
+		this.cakeThieves.clear();
+		this.reallyDeadFighters.clear();
 
 		// nom drops
 		for(Entity entity : (this.getWorld().getEntities())) {
@@ -804,6 +807,7 @@ public class Warzone {
 				playerWarzone.respawnPlayer(playerTeam, player);
 			} else {
 				// onPlayerRespawn takes care of real deaths
+				//player.setHealth(0);
 				playerWarzone.getReallyDeadFighters().add(player.getName());
 			}
 			
@@ -825,6 +829,7 @@ public class Warzone {
 							}
 						}
 					}
+					
 					t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " + player.getName() + " died and there were no lives left in their life pool.");
 
 					if (t.getPlayers().size() != 0 && !t.getTeamConfig().resolveBoolean(TeamConfig.FLAGPOINTSONLY)) {

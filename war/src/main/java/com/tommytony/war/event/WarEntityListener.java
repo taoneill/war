@@ -125,7 +125,9 @@ public class WarEntityListener implements Listener {
 				if (event.getDamage() >= d.getHealth()) {
 					if (defenderWarzone.getReallyDeadFighters().contains(d.getName())) {
 						// don't re-kill a dead person 
-						event.setCancelled(true);
+						if (d.getHealth() != 0) {
+							d.setHealth(0);
+						}
 						return;
 					}
 					
@@ -253,7 +255,9 @@ public class WarEntityListener implements Listener {
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
 				if (defenderWarzone.getReallyDeadFighters().contains(d.getName())) {
 					// don't re-kill a dead person 
-					event.setCancelled(true);
+					if (d.getHealth() != 0) {
+						d.setHealth(0);
+					}
 					return;
 				}
 								
@@ -427,8 +431,11 @@ public class WarEntityListener implements Listener {
 			
 			if (zone != null && event.getDamage() >= player.getHealth()) {
 				if (zone.getReallyDeadFighters().contains(player.getName())) {
-					// don't re-kill a dead person 
-					event.setCancelled(true);
+					// don't re-count the death points of an already dead person, make sure they are dead though
+					// (reason for this is that onEntityDamage sometimes fires more than once for one death)
+					if (player.getHealth() != 0) {
+						player.setHealth(0);
+					}
 					return;
 				}
 				
@@ -561,11 +568,11 @@ public class WarEntityListener implements Listener {
 			if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
 				// catch the odd death that gets away from us when usually intercepting and preventing deaths
 				zone.handleDeath(player);
-			}
-			
-			if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
-				for (Team team : zone.getTeams()) {
-					team.teamcast(player.getName() + " died");
+				
+				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+					for (Team team : zone.getTeams()) {
+						team.teamcast(player.getName() + " died");
+					}
 				}
 			}
 		}

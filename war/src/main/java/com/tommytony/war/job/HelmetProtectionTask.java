@@ -51,7 +51,12 @@ public class HelmetProtectionTask implements Runnable {
 								}
 								i++;
 							}
-							playerInv.setItem(playerInv.firstEmpty(), this.createBlockHead(team));
+							
+							int firstEmpty = playerInv.firstEmpty();
+							if (firstEmpty > 0) {
+								playerInv.setItem(firstEmpty, this.createBlockHead(team));	
+							}
+							
 							if (removed > 1) {
 								War.war.badMsg(player, "All that " + team.getName() + " wool must have been heavy!");
 							}
