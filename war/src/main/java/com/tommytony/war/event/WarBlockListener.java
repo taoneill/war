@@ -40,7 +40,7 @@ public class WarBlockListener implements Listener {
 	/**
 	 * @see BlockListener.onBlockPlace()
 	 */
-	@EventHandler(event = BlockPlaceEvent.class)
+	@EventHandler
 	public void onBlockPlace(final BlockPlaceEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
@@ -164,7 +164,7 @@ public class WarBlockListener implements Listener {
 		event.getPlayer().setItemInHand(newItemInHand);
 	}
 	
-	@EventHandler(event = BlockPistonExtendEvent.class)
+	@EventHandler
 	// Do not allow moving of block into or from important zones
 	public void onBlockPistonExtend(final BlockPistonExtendEvent event) {
 		Warzone zone = Warzone.getZoneByLocation(event.getBlock().getLocation());
@@ -182,7 +182,7 @@ public class WarBlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(event = BlockPistonRetractEvent.class)
+	@EventHandler
 	public void onBlockPistonRetract(final BlockPistonRetractEvent event) {
 		Warzone zone = Warzone.getZoneByLocation(event.getBlock().getLocation());
 		if (zone!=null) {
@@ -197,7 +197,7 @@ public class WarBlockListener implements Listener {
 	/**
 	 * @see BlockListener.onBlockBreak()
 	 */
-	@EventHandler(event = BlockBreakEvent.class)
+	@EventHandler
 	public void onBlockBreak(final BlockBreakEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
@@ -209,7 +209,7 @@ public class WarBlockListener implements Listener {
 		}
 	}
 	
-	@EventHandler(event = BlockDamageEvent.class)
+	@EventHandler
 	public void onBlockDamage(final BlockDamageEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
