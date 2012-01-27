@@ -436,13 +436,6 @@ public class Warzone {
 		return this.monuments;
 	}
 
-//	public void setLifePool(int lifePool) {
-//		this.lifePool = lifePool;
-//		for (Team team : this.teams) {
-//			team.setRemainingLives(lifePool);
-//		}
-//	}
-
 	public boolean hasPlayerState(String playerName) {
 		return this.playerStates.containsKey(playerName);
 	}
@@ -468,23 +461,27 @@ public class Warzone {
 																player.getSaturation(), 
 																player.getFoodLevel(), 
 																potionEffects,
-																playerTitle));
+																playerTitle,
+																player.getLevel(),
+																player.getExp()));
 	}
 
 	public void restorePlayerState(Player player) {
-		PlayerState originalContents = this.playerStates.remove(player.getName());
+		PlayerState originalState = this.playerStates.remove(player.getName());
 		PlayerInventory playerInv = player.getInventory();
-		if (originalContents != null) {
-			this.playerInvFromInventoryStash(playerInv, originalContents);
-			player.setGameMode(originalContents.getGamemode());
-			player.setHealth(originalContents.getHealth());
-			player.setExhaustion(originalContents.getExhaustion());
-			player.setSaturation(originalContents.getSaturation());
-			player.setFoodLevel(originalContents.getFoodLevel());
-			PotionEffect.restorePotionEffects(player, originalContents.getPotionEffects());
+		if (originalState != null) {
+			this.playerInvFromInventoryStash(playerInv, originalState);
+			player.setGameMode(originalState.getGamemode());
+			player.setHealth(originalState.getHealth());
+			player.setExhaustion(originalState.getExhaustion());
+			player.setSaturation(originalState.getSaturation());
+			player.setFoodLevel(originalState.getFoodLevel());
+			PotionEffect.restorePotionEffects(player, originalState.getPotionEffects());
+			player.setLevel(originalState.getLevel());
+			player.setExp(originalState.getExp());
 			
 			if (War.war.isSpoutServer()) {
-				SpoutManager.getPlayer(player).setTitle(originalContents.getPlayerTitle());
+				SpoutManager.getPlayer(player).setTitle(originalState.getPlayerTitle());
 			}
 		}
 	}

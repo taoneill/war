@@ -19,8 +19,10 @@ public class PlayerState {
 	private final GameMode gamemode;
 	private final List<PotionEffect> potionEffects;
 	private final String playerTitle;
+	private final float exp;
+	private final int level;
 
-	public PlayerState(GameMode gamemode, ItemStack[] contents, ItemStack helmet, ItemStack chest, ItemStack legs, ItemStack feet, int health, float exhaustion, float saturation, int foodLevel, List<PotionEffect> potionEffects, String playerTitle) {
+	public PlayerState(GameMode gamemode, ItemStack[] contents, ItemStack helmet, ItemStack chest, ItemStack legs, ItemStack feet, int health, float exhaustion, float saturation, int foodLevel, List<PotionEffect> potionEffects, String playerTitle, int level, float exp) {
 		this.gamemode = gamemode;
 		this.health = health;
 		this.exhaustion = exhaustion;
@@ -28,6 +30,8 @@ public class PlayerState {
 		this.foodLevel = foodLevel;
 		this.potionEffects = potionEffects;
 		this.playerTitle = playerTitle;
+		this.level = level;
+		this.exp = exp;
 		this.setContents(contents);
 		this.setHelmet(helmet);
 		this.setChest(chest);
@@ -101,6 +105,14 @@ public class PlayerState {
 
 	public String getPlayerTitle() {
 		return playerTitle;
+	}
+
+	public float getExp() {
+		return exp;
+	}
+
+	public int getLevel() {
+		return level;
 	}
 
 }
