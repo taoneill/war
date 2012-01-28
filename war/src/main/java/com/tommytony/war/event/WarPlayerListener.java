@@ -503,7 +503,7 @@ public class WarPlayerListener implements Listener {
 			// Flag capture
 			if (playerWarzone.isFlagThief(player.getName())) {
 				// smoky
-				if (System.currentTimeMillis() % 3 == 0) {
+				if (System.currentTimeMillis() % 13 == 0) {
 					playerWarzone.getWorld().playEffect(player.getLocation(), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
 				}
 				
@@ -654,7 +654,7 @@ public class WarPlayerListener implements Listener {
 			// Cake retrieval
 			if (playerWarzone.isCakeThief(player.getName())) {
 				// smoky
-				if (System.currentTimeMillis() % 3 == 0) {
+				if (System.currentTimeMillis() % 13 == 0) {
 					playerWarzone.getWorld().playEffect(player.getLocation(), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
 				}
 				

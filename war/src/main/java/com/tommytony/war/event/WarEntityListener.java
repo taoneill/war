@@ -192,7 +192,11 @@ public class WarEntityListener implements Listener {
 					
 					// Blow up bomb
 					defenderWarzone.getWorld().createExplosion(a.getLocation(), 2F);
-															
+
+					// bring back tnt
+					bomb.getVolume().resetBlocks();
+					bomb.addBombBlocks();
+					
 					// Notify everyone
 					for (Team t : defenderWarzone.getTeams()) {
 						if (War.war.isSpoutServer()) {
@@ -209,13 +213,10 @@ public class WarEntityListener implements Listener {
 							}
 						}
 						
-						// bring back tnt
-						bomb.getVolume().resetBlocks();
-						bomb.addBombBlocks();
-						
 						t.teamcast(attackerTeam.getKind().getColor() + a.getName() + ChatColor.WHITE
 								+ " made " + defenderTeam.getKind().getColor() + d.getName() + ChatColor.WHITE + " blow up!");
 					}
+					
 				}
 			} else if (attackerTeam != null && defenderTeam != null && attackerTeam == defenderTeam && attackerWarzone == defenderWarzone && attacker.getEntityId() != defender.getEntityId()) {
 				// same team, but not same person
