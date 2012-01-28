@@ -159,8 +159,17 @@ public class WarBlockListener implements Listener {
 	private void cancelAndKeepItem(BlockPlaceEvent event) {
 		event.setCancelled(true);
 		ItemStack inHand = event.getItemInHand();
-		ItemStack newItemInHand = new ItemStack(inHand.getType(), inHand.getAmount(), inHand.getDurability(), inHand.getData().getData());
-		newItemInHand.setDurability(inHand.getDurability());
+		ItemStack newItemInHand = null;
+		
+		if (inHand.getType() == Material.FIRE) {
+			// Weird bukkit/mc behavior where item in hand is reported as fire while using flint & steel.
+			// Just give the user his f&s back but almost broken (max durability is 8). 
+			newItemInHand = new ItemStack(Material.FLINT_AND_STEEL, 1, (short)1);
+		} else {
+			newItemInHand = new ItemStack(inHand.getType(), inHand.getAmount(), inHand.getDurability(), inHand.getData().getData());
+			newItemInHand.setDurability(inHand.getDurability());
+		}
+		
 		event.getPlayer().setItemInHand(newItemInHand);
 	}
 	

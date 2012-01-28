@@ -253,16 +253,15 @@ public class WarPlayerListener implements Listener {
 			if (zone != null && zone.getLoadoutSelections().containsKey(player.getName()) 
 					&& zone.getLoadoutSelections().get(player.getName()).isStillInSpawn()) {
 				event.setUseItemInHand(Result.DENY);
-				War.war.badMsg(player, "Can't use items while still in spawn.");
-
 				ItemStack inHand = event.getItem();
 				
 				if (inHand != null) {
 					ItemStack newItemInHand = new ItemStack(inHand.getType(), inHand.getAmount(), inHand.getDurability(), inHand.getData().getData());
 					newItemInHand.setDurability(inHand.getDurability());
 					event.getPlayer().setItemInHand(newItemInHand);
-					
 					event.setCancelled(true);
+					
+					War.war.badMsg(player, "Can't use items while still in spawn.");
 				}
 			}
 		}
