@@ -39,7 +39,7 @@ import com.tommytony.war.job.HelmetProtectionTask;
 import com.tommytony.war.job.SpoutFadeOutMessageJob;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
-import com.tommytony.war.spout.SpoutMessenger;
+import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.ChatFixUtil;
@@ -86,7 +86,7 @@ public class War extends JavaPlugin {
 	private final WarConfigBag warConfig = new WarConfigBag();
 	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
-	private SpoutMessenger spoutMessenger = null;
+	private SpoutDisplayer spoutMessenger = null;
 
 	public War() {
 		super();
@@ -121,7 +121,7 @@ public class War extends JavaPlugin {
 		try {
 			Class.forName("org.getspout.spoutapi.player.SpoutPlayer");
 			isSpoutServer = true;
-			spoutMessenger = new SpoutMessenger();
+			spoutMessenger = new SpoutDisplayer();
 		} catch (ClassNotFoundException e) {
 			isSpoutServer = false;
 		}
@@ -912,7 +912,7 @@ public class War extends JavaPlugin {
 		return this.warConfig;
 	}
 
-	public SpoutMessenger getSpoutMessenger() {
+	public SpoutDisplayer getSpoutMessenger() {
 		return this.spoutMessenger ;
 	}
 }

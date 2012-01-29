@@ -21,7 +21,7 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamKind;
 
-public class SpoutMessenger {
+public class SpoutDisplayer {
 	
 	private static int LINE_HEIGHT = 5;
 	private static int LINE_HEIGHT_WITH_MARGIN = 8;
@@ -123,10 +123,10 @@ public class SpoutMessenger {
 
 	public void updateStats(Player player) {
 		SpoutPlayer sp = SpoutManager.getPlayer(player);
-		List<Integer> statsOffset = new ArrayList<Integer>(); 
-		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
-		List<GenericLabel> statsLines = getStatsLines(zone, statsOffset);
 		if (sp.isSpoutCraftEnabled()) {
+			List<Integer> statsOffset = new ArrayList<Integer>(); 
+			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+			List<GenericLabel> statsLines = getStatsLines(zone, statsOffset);
 			drawMessages(sp.getName(), statsLines, statsOffset);
 		}
 	}
@@ -148,7 +148,7 @@ public class SpoutMessenger {
 			
 			GenericLabel teamsHeader = new GenericLabel(ChatColor.GRAY + "War> " + ChatColor.WHITE + zone.getName());
 			int teamsHeaderWidth = GenericLabel.getStringWidth(teamsHeader.getText()) + 1;
-			teamsHeader.setAlign(WidgetAnchor.TOP_LEFT)
+			teamsHeader.setAnchor(WidgetAnchor.TOP_LEFT)
 				.setX(3)
 				.setY(2)
 				.setWidth(teamsHeaderWidth)
@@ -167,7 +167,7 @@ public class SpoutMessenger {
 				else {
 					line.setText(t.getKind().getColor() + teamStr.replace("(", ChatColor.GRAY + "(" + ChatColor.WHITE).replace(")", ChatColor.GRAY + ")" + ChatColor.WHITE));
 				}
-		        line.setAlign(WidgetAnchor.TOP_LEFT)
+		        line.setAnchor(WidgetAnchor.TOP_LEFT)
 		        	.setX(3)
 		        	.setY(4 + lineCounter * LINE_HEIGHT_WITH_MARGIN)
 		        	.setWidth(GenericLabel.getStringWidth(line.getText()))
@@ -189,7 +189,7 @@ public class SpoutMessenger {
 			// points header
 			GenericLabel pointsHeader = new GenericLabel(ChatColor.GRAY + "score");
 			int pointsHeaderWidth = GenericLabel.getStringWidth(pointsHeader.getText());
-			pointsHeader.setAlign(WidgetAnchor.TOP_LEFT)
+			pointsHeader.setAnchor(WidgetAnchor.TOP_LEFT)
 				.setX(3 + teamMax + 2)
 				.setY(2)
 				.setWidth(pointsHeaderWidth)
@@ -202,7 +202,7 @@ public class SpoutMessenger {
 				// scores
 				line = new GenericLabel(t.getPoints() + "/" + t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE));
 				if (t.getPlayers().size() == 0) line.setTextColor(new Color(100, 100, 100));
-		        line.setAlign(WidgetAnchor.TOP_LEFT)
+		        line.setAnchor(WidgetAnchor.TOP_LEFT)
 		        	.setX(3 + teamMax + 4)
 		        	.setY(4 + lineCounter * LINE_HEIGHT_WITH_MARGIN)
 		        	.setWidth(GenericLabel.getStringWidth(line.getText()))
@@ -223,7 +223,7 @@ public class SpoutMessenger {
 			// lifepool header
 			GenericLabel livesHeader = new GenericLabel(ChatColor.GRAY + "lives");
 			int livesHeaderWidth = GenericLabel.getStringWidth(livesHeader.getText());
-			livesHeader.setAlign(WidgetAnchor.TOP_LEFT)
+			livesHeader.setAnchor(WidgetAnchor.TOP_LEFT)
 				.setX(3 + teamMax + 4 + scoreMax + 2)
 				.setY(2)
 				.setWidth(livesHeaderWidth)
@@ -236,7 +236,7 @@ public class SpoutMessenger {
 			for (Team t : zone.getTeams()) {
 				line = new GenericLabel(t.getRemainingLifes() + "/" + t.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				if (t.getPlayers().size() == 0) line.setTextColor(new Color(100, 100, 100));
-		        line.setAlign(WidgetAnchor.TOP_LEFT)
+		        line.setAnchor(WidgetAnchor.TOP_LEFT)
 		        	.setX(3 + teamMax + 4 + scoreMax + 4)
 		        	.setY(4 + lineCounter * LINE_HEIGHT_WITH_MARGIN)
 		        	.setWidth(GenericLabel.getStringWidth(line.getText()))
@@ -259,7 +259,7 @@ public class SpoutMessenger {
 			for (GenericLabel l : scorelines) { lines.add(l); }
 			for (GenericLabel l : lifelines) { lines.add(l); }
 			
-			offset.add(3 + teamMax + 1 + scoreMax + 1 + lifeMax + 2);
+			offset.add(3 + teamMax + 1 + scoreMax + 1 + lifeMax + 5);
 			offset.add(4 + lineCounter * LINE_HEIGHT_WITH_MARGIN);
 			
 		}
@@ -287,7 +287,7 @@ public class SpoutMessenger {
 			gradient.setAnchor(WidgetAnchor.TOP_LEFT);
 			gradient.setTopColor(new Color(0.0F, 0.0F, 0.0F, 0.4F)); // (order is Red, Green, Blue, Alpha)
 			gradient.setBottomColor(new Color(0.0F, 0.0F, 0.0F, 0.0F));
-			gradient.setHeight(statsOffset.get(1) + 4).setWidth((int)(statsOffset.get(0) * 1.15));
+			gradient.setHeight(statsOffset.get(1) + 4).setWidth((int)(statsOffset.get(0)));
 			
 			player.getMainScreen().attachWidget(War.war, gradient);
 			
@@ -306,7 +306,7 @@ public class SpoutMessenger {
 			teamGradient.setY(2 + LINE_HEIGHT_WITH_MARGIN);
 			teamGradient.setTopColor(spoutColor);
 			teamGradient.setBottomColor(new Color(256, 256, 256, 1.0F));
-			teamGradient.setHeight(2).setWidth((int)(statsOffset.get(0) * 1.15));
+			teamGradient.setHeight(2).setWidth((int)(statsOffset.get(0)));
 			
 			player.getMainScreen().attachWidget(War.war, teamGradient);
 			
@@ -335,7 +335,7 @@ public class SpoutMessenger {
 						
 						GenericLabel label = new GenericLabel(word);
 						int width = GenericLabel.getStringWidth(word);
-						label.setAlign(WidgetAnchor.TOP_LEFT);
+						label.setAnchor(WidgetAnchor.TOP_LEFT);
 						label.setWidth(width);
 						label.setHeight(LINE_HEIGHT);
 						label.setX(horizontalOffset);

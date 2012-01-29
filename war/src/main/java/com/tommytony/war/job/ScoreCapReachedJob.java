@@ -11,7 +11,7 @@ import org.getspout.spoutapi.player.SpoutPlayer;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.spout.SpoutMessenger;
+import com.tommytony.war.spout.SpoutDisplayer;
 
 public class ScoreCapReachedJob implements Runnable {
 
@@ -30,8 +30,8 @@ public class ScoreCapReachedJob implements Runnable {
 					SpoutPlayer sp = SpoutManager.getPlayer(p);
 					if (sp.isSpoutCraftEnabled()) {
 		                sp.sendNotification(
-		                		SpoutMessenger.cleanForNotification("Match won! " + ChatColor.WHITE + "Winners:"),
-		                		SpoutMessenger.cleanForNotification(SpoutMessenger.addMissingColor(winnersStr, zone)),
+		                		SpoutDisplayer.cleanForNotification("Match won! " + ChatColor.WHITE + "Winners:"),
+		                		SpoutDisplayer.cleanForNotification(SpoutDisplayer.addMissingColor(winnersStr, zone)),
 		                		Material.CAKE,
 		                		(short)0,
 		                		10000);

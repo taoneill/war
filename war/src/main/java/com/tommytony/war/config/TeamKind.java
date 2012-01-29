@@ -11,7 +11,7 @@ public enum TeamKind {
 	BLUE ((byte) 3, Material.WOOL, ChatColor.BLUE, 23),
 	GOLD ((byte) 4, Material.WOOL, ChatColor.YELLOW, 403), // yellow = gold
 	GREEN ((byte) 5, Material.WOOL, ChatColor.GREEN, 612),
-	PINK ((byte) 6, Material.WOOL, ChatColor.WHITE, 929),
+	PINK ((byte) 6, Material.WOOL, ChatColor.LIGHT_PURPLE, 929),
 	GRAY ((byte) 7, Material.WOOL, ChatColor.DARK_GRAY, 600),
 	IRON ((byte) 8, Material.WOOL, ChatColor.GRAY, 154), // lightgrey = iron
 	DIAMOND ((byte) 9, Material.WOOL, ChatColor.DARK_AQUA, 738), // cyan = diamond
@@ -67,11 +67,11 @@ public enum TeamKind {
 			case 3:
 				return new Color(0,0,255);
 			case 4:
-				return new Color(0,255,255);
+				return new Color(255,215,0);
 			case 5:
 				return new Color(0,255,0);
 			case 6:
-				return new Color(255,255,255);
+				return new Color(255,128,255);
 			case 7:
 				return new Color(100,100,100);
 			case 8:

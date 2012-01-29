@@ -42,7 +42,7 @@ import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.job.DeferredBlockResetsJob;
-import com.tommytony.war.spout.SpoutMessenger;
+import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.utility.DeferredBlockReset;
 
@@ -204,8 +204,8 @@ public class WarEntityListener implements Listener {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
 								if (sp.isSpoutCraftEnabled()) {
 					                sp.sendNotification(
-					                		SpoutMessenger.cleanForNotification(attackerTeam.getKind().getColor() + a.getName() + ChatColor.YELLOW + " made "),
-					                		SpoutMessenger.cleanForNotification(defenderTeam.getKind().getColor() + d.getName() + ChatColor.YELLOW + " blow up!"),
+					                		SpoutDisplayer.cleanForNotification(attackerTeam.getKind().getColor() + a.getName() + ChatColor.YELLOW + " made "),
+					                		SpoutDisplayer.cleanForNotification(defenderTeam.getKind().getColor() + d.getName() + ChatColor.YELLOW + " blow up!"),
 					                		Material.TNT,
 					                		(short)0,
 					                		10000);

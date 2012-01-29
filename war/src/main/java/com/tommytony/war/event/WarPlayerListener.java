@@ -39,7 +39,7 @@ import com.tommytony.war.command.ZoneSetter;
 import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.spout.SpoutMessenger;
+import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.structure.WarHub;
@@ -544,8 +544,8 @@ public class WarPlayerListener implements Listener {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
 								if (sp.isSpoutCraftEnabled()) {
 					                sp.sendNotification(
-					                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
-					                		SpoutMessenger.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + " flag!"),
+					                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
+					                		SpoutDisplayer.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + " flag!"),
 					                		victim.getKind().getMaterial(),
 					                		victim.getKind().getData(),
 					                		10000);
@@ -610,8 +610,8 @@ public class WarPlayerListener implements Listener {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
 								if (sp.isSpoutCraftEnabled()) {
 					                sp.sendNotification(
-					                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " blew up "),
-					                		SpoutMessenger.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + "'s spawn!"),
+					                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " blew up "),
+					                		SpoutDisplayer.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + "'s spawn!"),
 					                		victim.getKind().getMaterial(),
 					                		victim.getKind().getData(),
 					                		10000);
@@ -683,8 +683,8 @@ public class WarPlayerListener implements Listener {
 									SpoutPlayer sp = SpoutManager.getPlayer(p);
 									if (sp.isSpoutCraftEnabled()) {
 						                sp.sendNotification(
-						                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
-						                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "!"),
+						                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
+						                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "!"),
 						                		playerTeam.getKind().getMaterial(),
 						                		playerTeam.getKind().getData(),
 						                		10000);

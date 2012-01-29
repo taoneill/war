@@ -25,7 +25,7 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.spout.SpoutMessenger;
+import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.structure.Monument;
@@ -66,8 +66,8 @@ public class WarBlockListener implements Listener {
 						SpoutPlayer sp = SpoutManager.getPlayer(p);
 						if (sp.isSpoutCraftEnabled()) {
 			                sp.sendNotification(
-			                		SpoutMessenger.cleanForNotification("Monument " + ChatColor.WHITE + monument.getName()),
-			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "capped by " + team.getKind().getColor() + player.getName() + ChatColor.YELLOW + "!"),
+			                		SpoutDisplayer.cleanForNotification("Monument " + ChatColor.WHITE + monument.getName()),
+			                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "capped by " + team.getKind().getColor() + player.getName() + ChatColor.YELLOW + "!"),
 			                		team.getKind().getMaterial(),
 			                		team.getKind().getData(),
 			                		10000);
@@ -256,8 +256,8 @@ public class WarBlockListener implements Listener {
 						SpoutPlayer sp = SpoutManager.getPlayer(p);
 						if (sp.isSpoutCraftEnabled()) {
 			                sp.sendNotification(
-			                		SpoutMessenger.cleanForNotification("Monument " + ChatColor.WHITE + monument.getName()),
-			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "freed by " + team.getKind().getColor() + player.getName() + ChatColor.YELLOW + "!"),
+			                		SpoutDisplayer.cleanForNotification("Monument " + ChatColor.WHITE + monument.getName()),
+			                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "freed by " + team.getKind().getColor() + player.getName() + ChatColor.YELLOW + "!"),
 			                		ownerTeam.getKind().getMaterial(),
 			                		ownerTeam.getKind().getData(),
 			                		10000);
@@ -318,8 +318,8 @@ public class WarBlockListener implements Listener {
 										SpoutPlayer sp = SpoutManager.getPlayer(p);
 										if (sp.isSpoutCraftEnabled()) {
 							                sp.sendNotification(
-							                		SpoutMessenger.cleanForNotification(team.getKind().getColor() + player.getName() + ChatColor.YELLOW + " stole"),
-							                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "your flag!"),
+							                		SpoutDisplayer.cleanForNotification(team.getKind().getColor() + player.getName() + ChatColor.YELLOW + " stole"),
+							                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "your flag!"),
 							                		lostFlagTeam.getKind().getMaterial(),
 							                		lostFlagTeam.getKind().getData(),
 							                		5000);
@@ -363,8 +363,8 @@ public class WarBlockListener implements Listener {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
 								if (sp.isSpoutCraftEnabled()) {
 					                sp.sendNotification(
-					                		SpoutMessenger.cleanForNotification(team.getKind().getColor() + player.getName() + ChatColor.YELLOW + " has "),
-					                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.YELLOW + "!"),
+					                		SpoutDisplayer.cleanForNotification(team.getKind().getColor() + player.getName() + ChatColor.YELLOW + " has "),
+					                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.YELLOW + "!"),
 					                		Material.TNT,
 					                		(short)0,
 					                		5000);
@@ -406,8 +406,8 @@ public class WarBlockListener implements Listener {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
 								if (sp.isSpoutCraftEnabled()) {
 					                sp.sendNotification(
-					                		SpoutMessenger.cleanForNotification(team.getKind().getColor() + player.getName() + ChatColor.YELLOW + " has "),
-					                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "!"),
+					                		SpoutDisplayer.cleanForNotification(team.getKind().getColor() + player.getName() + ChatColor.YELLOW + " has "),
+					                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "!"),
 					                		Material.CAKE,
 					                		(short)0,
 					                		5000);

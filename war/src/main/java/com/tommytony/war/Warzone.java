@@ -34,7 +34,7 @@ import com.tommytony.war.job.InitZoneJob;
 import com.tommytony.war.job.LoadoutResetJob;
 import com.tommytony.war.job.ScoreCapReachedJob;
 import com.tommytony.war.mapper.LoadoutYmlMapper;
-import com.tommytony.war.spout.SpoutMessenger;
+import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.structure.Monument;
@@ -818,8 +818,8 @@ public class Warzone {
 							SpoutPlayer sp = SpoutManager.getPlayer(p);
 							if (sp.isSpoutCraftEnabled()) {
 				                sp.sendNotification(
-				                		SpoutMessenger.cleanForNotification("Round over! " + playerTeam.getKind().getColor() + playerTeam.getName()),
-				                		SpoutMessenger.cleanForNotification("ran out of lives."),
+				                		SpoutDisplayer.cleanForNotification("Round over! " + playerTeam.getKind().getColor() + playerTeam.getName()),
+				                		SpoutDisplayer.cleanForNotification("ran out of lives."),
 				                		playerTeam.getKind().getMaterial(),
 				                		playerTeam.getKind().getData(),
 				                		10000);
@@ -886,8 +886,8 @@ public class Warzone {
 							SpoutPlayer sp = SpoutManager.getPlayer(p);
 							if (sp.isSpoutCraftEnabled()) {
 				                sp.sendNotification(
-			                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-			                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "your flag."),
+			                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
+			                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "your flag."),
 			                		playerTeam.getKind().getMaterial(),
 			                		playerTeam.getKind().getData(),
 			                		5000);
@@ -915,8 +915,8 @@ public class Warzone {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
 								if (sp.isSpoutCraftEnabled()) {
 					                sp.sendNotification(
-				                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-				                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.YELLOW + "."),
+				                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
+				                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.YELLOW + "."),
 				                		Material.TNT,
 				                		(short)0,
 				                		5000);
@@ -940,8 +940,8 @@ public class Warzone {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
 								if (sp.isSpoutCraftEnabled()) {
 					                sp.sendNotification(
-				                		SpoutMessenger.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-				                		SpoutMessenger.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "."),
+				                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
+				                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "."),
 				                		Material.CAKE,
 				                		(short)0,
 				                		5000);
