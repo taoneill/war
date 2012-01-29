@@ -6,12 +6,23 @@ import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 
 
 public class WarzoneConfigBag {
 
 	EnumMap<WarzoneConfig, Object> bag = new EnumMap<WarzoneConfig, Object>(WarzoneConfig.class);
+	private final Warzone warzone;
 		
+	public WarzoneConfigBag(Warzone warzone) {
+		this.warzone = warzone;
+	}
+
+	public WarzoneConfigBag() {
+		// default zone settings (at War level) don't have a warzone
+		this.warzone = null;
+	}
+
 	public void put(WarzoneConfig config, Object value) {
 		bag.put(config, value);
 	}
@@ -80,6 +91,10 @@ public class WarzoneConfigBag {
 				} else if (warzoneConfig.getConfigType().equals(Boolean.class)) {
 					String onOff = namedParams.get(namedParam);
 					this.bag.put(warzoneConfig, onOff.equals("on") || onOff.equals("true"));
+					if (this.warzone != null && namedParam.equals(WarzoneConfig.AUTOASSIGN.toString())) {
+						this.warzone.getLobby().setLocation(this.warzone.getTeleport());
+						this.warzone.getLobby().initialize();
+					}
 				}
 				returnMessage += " " + warzoneConfig.toString() + " set to " + namedParams.get(namedParam); 
 			} else if (namedParam.equals("delete")) {

@@ -75,13 +75,15 @@ public class Warzone {
 	private final List<Player> respawn = new ArrayList<Player>();
 	private final List<String> reallyDeadFighters = new ArrayList<String>();
 	
-	private final WarzoneConfigBag warzoneConfig = new WarzoneConfigBag();
-	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
+	private final WarzoneConfigBag warzoneConfig;
+	private final TeamConfigBag teamDefaultConfig;
 	private InventoryBag defaultInventories = new InventoryBag();
 
 	public Warzone(World world, String name) {
 		this.world = world;
 		this.name = name;
+		this.warzoneConfig = new WarzoneConfigBag(this);
+		this.teamDefaultConfig = new TeamConfigBag();	// don't use ctor with Warzone, as this changes config resolution
 		this.volume = new ZoneVolume(name, this.getWorld(), this);
 	}
 
