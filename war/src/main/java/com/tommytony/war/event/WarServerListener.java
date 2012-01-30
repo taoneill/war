@@ -21,7 +21,7 @@ public class WarServerListener implements Listener {
 		                sp.getMainScreen().removeWidgets(War.war);
 		            }
 		        }
-				War.war.getSpoutMessenger().clearAll();
+				War.war.getSpoutDisplayer().clearAll();
 			}
 		}
 	}

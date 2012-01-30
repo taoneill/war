@@ -912,7 +912,7 @@ public class War extends JavaPlugin {
 		return this.warConfig;
 	}
 
-	public SpoutDisplayer getSpoutMessenger() {
+	public SpoutDisplayer getSpoutDisplayer() {
 		return this.spoutMessenger ;
 	}
 }

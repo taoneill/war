@@ -8,7 +8,7 @@ public class SpoutFadeOutMessageJob implements Runnable {
 	}
 
 	public void run() {
-		War.war.getSpoutMessenger().fadeOutOldMessages();
+		War.war.getSpoutDisplayer().fadeOutOldMessages();
 	}
 
 }

@@ -328,7 +328,7 @@ public class Team {
 		}
 		
 		if (War.war.isSpoutServer()) {
-			War.war.getSpoutMessenger().updateStats(this.warzone);
+			War.war.getSpoutDisplayer().updateStats(this.warzone);
 		}
 	}
 
@@ -371,7 +371,7 @@ public class Team {
 				SpoutPlayer sp = SpoutManager.getPlayer(player);
 				if (sp.isSpoutCraftEnabled() && isNotification) {
 					// team notifications go to the top left for Spout players to lessen War spam in chat box
-					War.war.getSpoutMessenger().msg(sp, message);
+					War.war.getSpoutDisplayer().msg(sp, message);
 				} else {
 					War.war.msg(player, message);
 				}
