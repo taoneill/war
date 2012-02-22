@@ -8,6 +8,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Level;
 
+import com.tommytony.war.job.ZoneTimeJob;
 import com.tommytony.war.structure.*;
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -137,6 +138,8 @@ public class Warzone {
 	private boolean isReinitializing = false;
 	//private final Object gameEndLock = new Object();
 
+    private boolean pvpReady = true;
+    
 	public Warzone(World world, String name) {
 		this.world = world;
 		this.name = name;
@@ -144,6 +147,7 @@ public class Warzone {
 		this.teamDefaultConfig = new TeamConfigBag();	// don't use ctor with Warzone, as this changes config resolution
 		this.volume = new ZoneVolume(name, this.getWorld(), this);
 		this.lobbyMaterials = War.war.getWarhubMaterials().clone();
+		this.pvpReady = true;
 	}
 
 	public static Warzone getZoneByName(String name) {
@@ -423,6 +427,17 @@ public class Warzone {
 				}
 			}
 		}
+		this.reallyDeadFighters.clear();
+		
+		//get them config (here be crazy grinning's!)
+		int pvpready = warzoneConfig.getInt(WarzoneConfig.PREPTIME);
+		
+		if(pvpready != 0) { //if it is equalz to zeroz then dinosaurs will take over the earth
+			this.pvpReady = false;
+			ZoneTimeJob timer = new ZoneTimeJob(this);
+			War.war.getServer().getScheduler().runTaskLater(War.war, timer, pvpready * 20);
+		}
+
 		// nom drops
 		for(Entity entity : (this.getWorld().getEntities())) {
 			if (!(entity instanceof Item)) {
@@ -2100,5 +2115,13 @@ public class Warzone {
 	 */
 	public boolean isThief(Player suspect) {
 		return this.isFlagThief(suspect) || this.isBombThief(suspect) || this.isCakeThief(suspect);
+	}
+	
+	public void setPvpReady(boolean ready) {
+		this.pvpReady = ready;
+	}
+	
+	public boolean getPvpReady() {
+		return this.pvpReady;
 	}
 }

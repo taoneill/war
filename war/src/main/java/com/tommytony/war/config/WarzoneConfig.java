@@ -26,7 +26,8 @@ public enum WarzoneConfig {
 	SOUPHEALING (Boolean.class, "Soup Healing", "If true, allow players to heal by consuming soup"),
 	ALLOWENDER (Boolean.class, "Allow Ender Chests", "If true, ender chests are allowed\nEnder chests are usually blocked to prevent item duplication"),
 	RESETBLOCKS (Boolean.class, "Reset Blocks", "If true, reset warzone blocks each battle"),
-	CAPTUREPOINTTIME (Integer.class, "Capture Control Time", "Time, in seconds, required to gain control of a capture point");
+	CAPTUREPOINTTIME (Integer.class, "Capture Control Time", "Time, in seconds, required to gain control of a capture point"),
+	PREPTIME(Integer.class, "Preparation Time", "Time, in seconds, before players are allowed to fight");
 	
 	
 	private final Class<?> configType;

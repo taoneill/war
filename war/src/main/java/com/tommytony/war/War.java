@@ -220,6 +220,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.ALLOWENDER, true);
 		warzoneDefaultConfig.put(WarzoneConfig.RESETBLOCKS, true);
 		warzoneDefaultConfig.put(WarzoneConfig.CAPTUREPOINTTIME, 15);
+		warzoneDefaultConfig.put(WarzoneConfig.PREPTIME, 0);
 
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);
 		teamDefaultConfig.put(TeamConfig.FLAGPOINTSONLY, false);

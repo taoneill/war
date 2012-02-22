@@ -96,6 +96,12 @@ public class WarEntityListener implements Listener {
 					War.war.badMsg(a, "pvp.self.respawn");
 					event.setCancelled(true);
 					return;
+				} 
+				
+				if(!defenderWarzone.getPvpReady()) {
+					//if the timer is still tickin we gotta handle defense! (there be notchz in virgina) 
+					event.setCancelled(true);
+					return;
 				}
 
 				if (!attackerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.PVPINZONE)) {
