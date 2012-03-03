@@ -823,10 +823,6 @@ public class War extends JavaPlugin {
 			this.wandBearers.remove(player.getName());
 		}
 	}
-
-	public Logger getLogger() {
-		return this.logger;
-	}
 	
 	public boolean isSpoutServer() {
 		return this.isSpoutServer;

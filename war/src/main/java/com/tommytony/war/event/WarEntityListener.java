@@ -8,11 +8,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.ContainerBlock;
 import org.bukkit.block.NoteBlock;
 import org.bukkit.block.Sign;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.entity.CraftTNTPrimed;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -21,7 +18,6 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -31,6 +27,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
@@ -266,7 +263,7 @@ public class WarEntityListener implements Listener {
 					String deathMessage = "";
 					String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getName();
 					
-					if (event.getDamager() instanceof CraftTNTPrimed) {
+					if (event.getDamager() instanceof TNTPrimed) {
 						deathMessage = defenderString + ChatColor.WHITE + " exploded";
 					} else {
 						deathMessage = defenderString + ChatColor.WHITE + " died";
@@ -352,11 +349,11 @@ public class WarEntityListener implements Listener {
 				if (dont.getState() instanceof Sign) {
 					String[] lines = ((Sign)dont.getState()).getLines();
 					deferred = new DeferredBlockReset(dont.getX(), dont.getY(), dont.getZ(), dont.getTypeId(), dont.getData(), lines);
-				} else if (dont.getState() instanceof ContainerBlock) {
-					ItemStack[] contents = ((ContainerBlock)dont.getState()).getInventory().getContents();
+				} else if (dont.getState() instanceof InventoryHolder) {
+					ItemStack[] contents = ((InventoryHolder)dont.getState()).getInventory().getContents();
 					Block worldBlock = dont.getWorld().getBlockAt(dont.getLocation());
-					if (worldBlock.getState() instanceof ContainerBlock) {
-						((ContainerBlock)worldBlock.getState()).getInventory().clear();
+					if (worldBlock.getState() instanceof InventoryHolder) {
+						((InventoryHolder)worldBlock.getState()).getInventory().clear();
 					}
 					deferred = new DeferredBlockReset(dont.getX(), dont.getY(), dont.getZ(), dont.getTypeId(), dont.getData(), copyItems(contents));
 				} else if (dont.getTypeId() == Material.NOTE_BLOCK.getId()) {
@@ -479,11 +476,8 @@ public class WarEntityListener implements Listener {
 			Team team = Team.getTeamByPlayerName(player.getName());
 			if (team != null && team.getSpawnVolume().contains(player.getLocation())) {
 				// smother out the fire that didn't burn out when you respawned
-				// Stop fire (upcast, watch out!)
-				if (player instanceof CraftPlayer) {
-					net.minecraft.server.Entity playerEntity = ((CraftPlayer) player).getHandle();
-					playerEntity.fireTicks = 0;
-				}
+				// Stop fire
+				player.setFireTicks(0);
 				event.setCancelled(true);
 			}
 		}

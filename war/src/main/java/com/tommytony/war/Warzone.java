@@ -13,7 +13,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -42,7 +41,7 @@ import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.structure.ZoneWallGuard;
 import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.utility.PlayerState;
-import com.tommytony.war.utility.PotionEffect;
+import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.ZoneVolume;
 
 /**
@@ -284,9 +283,10 @@ public class Warzone {
 
 		// nom drops
 		for(Entity entity : (this.getWorld().getEntities())) {
-			if (!(entity instanceof Item) && !(entity instanceof CraftItem)) {
+			if (!(entity instanceof Item)) {
 				continue;
 			}
+			
 			// validate position
 			if (!this.getVolume().contains(entity.getLocation())) {
 				continue;
@@ -332,7 +332,7 @@ public class Warzone {
 			player.setGameMode(GameMode.SURVIVAL);
 		}
 		// clear potion effects
-		PotionEffect.clearPotionEffects(player);
+		PotionEffectHelper.clearPotionEffects(player);
 		
 		boolean isFirstRespawn = false;
 		if (!this.getLoadoutSelections().keySet().contains(player.getName())) {
@@ -445,7 +445,6 @@ public class Warzone {
 	public void keepPlayerState(Player player) {
 		PlayerInventory inventory = player.getInventory();
 		ItemStack[] contents = inventory.getContents();
-		List<PotionEffect> potionEffects = PotionEffect.getCurrentPotionEffects(player);
 		
 		String playerTitle = player.getName();
 		if (War.war.isSpoutServer()) {
@@ -462,7 +461,7 @@ public class Warzone {
 																player.getExhaustion(), 
 																player.getSaturation(), 
 																player.getFoodLevel(), 
-																potionEffects,
+																player.getActivePotionEffects(),
 																playerTitle,
 																player.getLevel(),
 																player.getExp()));
@@ -478,7 +477,7 @@ public class Warzone {
 			player.setExhaustion(originalState.getExhaustion());
 			player.setSaturation(originalState.getSaturation());
 			player.setFoodLevel(originalState.getFoodLevel());
-			PotionEffect.restorePotionEffects(player, originalState.getPotionEffects());
+			PotionEffectHelper.restorePotionEffects(player, originalState.getPotionEffects());
 			player.setLevel(originalState.getLevel());
 			player.setExp(originalState.getExp());
 			

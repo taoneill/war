@@ -9,11 +9,11 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.ContainerBlock;
 import org.bukkit.block.NoteBlock;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.utility.DeferredBlockReset;
@@ -75,8 +75,8 @@ public class DeferredBlockResetsJob implements Runnable {
 					worldBlock.setType(Material.getMaterial(reset.getBlockType()));
 					worldBlock.setData(reset.getBlockData());
 					BlockState state = worldBlock.getState();
-					if (state instanceof ContainerBlock) {
-						ContainerBlock container = (ContainerBlock) state;
+					if (state instanceof InventoryHolder) {
+						InventoryHolder container = (InventoryHolder) state;
 						if (items != null) {
 							int ii = 0;
 							container.getInventory().clear();

@@ -2,14 +2,12 @@ package com.tommytony.war.event;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.entity.CraftItem;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
@@ -19,16 +17,13 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerInventoryEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
@@ -149,37 +144,14 @@ public class WarPlayerListener implements Listener {
 					event.setCancelled(true);
 				} else {
 					Item item = event.getItem();
-					if (item != null && item instanceof CraftItem) {
-						CraftItem cItem = (CraftItem) item;
-						if (cItem != null) {
-							ItemStack itemStack = cItem.getItemStack();
-							if (itemStack != null && itemStack.getType() == team.getKind().getMaterial() && player.getInventory().contains(new ItemStack(team.getKind().getMaterial(), team.getKind().getData()))) {
-								// Can't pick up a second precious block
-								event.setCancelled(true);
-								return;
-							}
+					if (item != null) {
+						ItemStack itemStack = item.getItemStack();
+						if (itemStack != null && itemStack.getType() == team.getKind().getMaterial() && player.getInventory().contains(new ItemStack(team.getKind().getMaterial(), team.getKind().getData()))) {
+							// Can't pick up a second precious block
+							event.setCancelled(true);
+							return;
 						}
 					}
-				}
-			}
-		}
-	}
-
-	@EventHandler
-	public void onInventoryOpen(final PlayerInventoryEvent event) {
-		if (War.war.isLoaded()) {
-			Player player = event.getPlayer();
-			Inventory inventory = event.getInventory();
-			Team team = Team.getTeamByPlayerName(player.getName());
-			if (team != null && inventory instanceof PlayerInventory) {
-				// make sure the player doesn't have too many precious blocks
-				// or illegal armor (i.e. armor not found in loadout)
-				PlayerInventory playerInv = (PlayerInventory) inventory;
-				ItemStack teamKindBlock = new ItemStack(team.getKind().getMaterial(), team.getKind().getData());
-				if (playerInv.contains(teamKindBlock, 2)) {
-					playerInv.remove(teamKindBlock);
-					playerInv.addItem(teamKindBlock);
-					War.war.badMsg(player, "All that " + team.getName() + " must have been heavy!");
 				}
 			}
 		}
