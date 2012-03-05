@@ -147,7 +147,7 @@ commands:
         /setbomb <bomb-name>
   setcake:
     description: War> Creates or moves a cake. Get the cake to your spawn to score a replenish your lifepool. 
-    usage: Creates or moves a bomb. Get the cake to your spawn to score a replenish your lifepool. Must be standing in warzone.
+    usage: Creates or moves a cake. Get the cake to your spawn to score a replenish your lifepool. Must be standing in warzone.
         Ex -
         /setcake <cake-name>   
   resetzone:
