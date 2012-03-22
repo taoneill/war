@@ -17,7 +17,7 @@ public class PotionEffectHelper {
 	public static void clearPotionEffects(Player player) {
 		for(PotionEffect effect : player.getActivePotionEffects())
 		{
-			player.removePotionEffect(effect.getType());	
+			player.addPotionEffect(new PotionEffect(effect.getType(), 0, 0), true);
 		}
 	}
 }
