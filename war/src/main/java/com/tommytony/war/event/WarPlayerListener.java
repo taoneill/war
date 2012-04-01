@@ -388,7 +388,9 @@ public class WarPlayerListener implements Listener {
 			// Player belongs to a warzone team but is outside: he snuck out or is at spawn and died
 			if (locZone == null && playerTeam != null && playerWarzone.getLobby() != null && !playerWarzone.getLobby().getVolume().contains(playerLoc) && !isLeaving) {
 				List<BlockFace> nearestWalls = playerWarzone.getNearestWalls(playerLoc);
-				War.war.badMsg(player, "Use /leave (or /war leave) to exit the zone.");
+				if (!playerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+					War.war.badMsg(player, "Use /leave (or /war leave) to exit the zone.");
+				}
 				if(nearestWalls != null && nearestWalls.size() > 0) {
 					// First, try to bump the player back in
 					int northSouthMove = 0;
@@ -571,7 +573,10 @@ public class WarPlayerListener implements Listener {
 					Bomb bomb = playerWarzone.getBombForThief(player.getName());
 					
 					// Boom!
-					playerWarzone.getWorld().createExplosion(player.getLocation(), 2F);
+					if (!playerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)) {
+						// Don't blow up if warzone is unbreakable
+						playerWarzone.getWorld().createExplosion(player.getLocation(), 2F);
+					}
 					
 					playerTeam.addPoint();
 					

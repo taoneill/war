@@ -292,6 +292,9 @@ public class War extends JavaPlugin {
 		if (inv.getChestplate() != null && inv.getChestplate().getType() != Material.AIR) {
 			loadout.put(102, this.copyStack(inv.getChestplate()));
 		}
+		if (inv.getHelmet() != null && inv.getHelmet().getType() != Material.AIR) {
+			loadout.put(103, this.copyStack(inv.getHelmet()));
+		}
 	}
 	
 	public ItemStack copyStack(ItemStack originalStack) {

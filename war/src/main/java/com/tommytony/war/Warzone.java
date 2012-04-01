@@ -374,6 +374,7 @@ public class Warzone {
 		playerInv.clear(playerInv.getSize() + 1);
 		playerInv.clear(playerInv.getSize() + 2);
 		playerInv.clear(playerInv.getSize() + 3); // helmet/blockHead
+		boolean helmetIsInLoadout = false;
 		for (Integer slot : loadout.keySet()) {
 			if (slot == 100) {
 				playerInv.setBoots(War.war.copyStack(loadout.get(slot)));
@@ -381,6 +382,9 @@ public class Warzone {
 				playerInv.setLeggings(War.war.copyStack(loadout.get(slot)));
 			} else if (slot == 102) {
 				playerInv.setChestplate(War.war.copyStack(loadout.get(slot)));
+			} else if (slot == 103) {
+				playerInv.setHelmet(War.war.copyStack(loadout.get(slot)));
+				helmetIsInLoadout = true;
 			} else {
 				ItemStack item = loadout.get(slot);
 				if (item != null) {
@@ -391,14 +395,16 @@ public class Warzone {
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
 			playerInv.setHelmet(new ItemStack(team.getKind().getMaterial(), 1, (short) 1, new Byte(team.getKind().getData())));
 		} else {
-			if (team.getKind() == TeamKind.GOLD) {
-				playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
-			} else if (team.getKind() == TeamKind.DIAMOND) {
-				playerInv.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-			} else if (team.getKind() == TeamKind.IRON) {
-				playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
-			} else {
-				playerInv.setHelmet(new ItemStack(Material.LEATHER_HELMET));
+			if (!helmetIsInLoadout) {
+				if (team.getKind() == TeamKind.GOLD) {
+					playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
+				} else if (team.getKind() == TeamKind.DIAMOND) {
+					playerInv.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+				} else if (team.getKind() == TeamKind.IRON) {
+					playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
+				} else {
+					playerInv.setHelmet(new ItemStack(Material.LEATHER_HELMET));
+				}
 			}
 		}
 	}
@@ -512,13 +518,6 @@ public class Warzone {
 		if (originalContents.getFeet() != null && originalContents.getFeet().getType() != Material.AIR) {
 			playerInv.setBoots(originalContents.getFeet());
 		}
-	}
-
-	public PlayerState getPlayerState(String playerName) {
-		if (this.playerStates.containsKey(playerName)) {
-			return this.playerStates.get(playerName);
-		}
-		return null;
 	}
 
 	public boolean hasMonument(String monumentName) {
