@@ -329,8 +329,10 @@ public class Warzone {
 		player.getInventory().clear();
 		
 		if (player.getGameMode() == GameMode.CREATIVE) {
+			// Players are always in survival mode in warzones
 			player.setGameMode(GameMode.SURVIVAL);
 		}
+		
 		// clear potion effects
 		PotionEffectHelper.clearPotionEffects(player);
 		

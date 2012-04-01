@@ -80,8 +80,6 @@ public class JoinCommand extends AbstractWarCommand {
 		}
 
 		// join new team
-		
-
 		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 			this.msg("This warzone is disabled.");
 		} else {

@@ -32,12 +32,14 @@ public class HelmetProtectionTask implements Runnable {
 				for (Player player : team.getPlayers()) {
 					PlayerInventory playerInv = player.getInventory();
 					Material teamBlockMaterial;
+					
 					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
 						teamBlockMaterial = team.getKind().getMaterial();
 						// 1) Replace missing block head
-						if (playerInv.getHelmet().getType() != teamBlockMaterial) {
+						if (playerInv.getHelmet() == null || playerInv.getHelmet().getType() != teamBlockMaterial) {
 							playerInv.setHelmet(this.createBlockHead(team));
 						}
+						
 						// 2) Get rid of extra blocks in inventory: only keep one
 						HashMap<Integer, ? extends ItemStack> blocks = playerInv.all(teamBlockMaterial);
 						if (blocks.size() > 1 || (blocks.size() == 1 && blocks.get(blocks.keySet().iterator().next()).getAmount() > 1)) {
@@ -62,7 +64,7 @@ public class HelmetProtectionTask implements Runnable {
 							}
 						}
 					} else {
-						// enfore helmet (good thing?)
+						// enforce helmet (good thing?)
 						if (team.getKind() == TeamKind.GOLD) {
 							teamBlockMaterial = Material.GOLD_HELMET;
 						} else if (team.getKind() == TeamKind.DIAMOND) {
@@ -72,9 +74,11 @@ public class HelmetProtectionTask implements Runnable {
 						} else {
 							teamBlockMaterial = Material.LEATHER_HELMET;
 						}
-						if (playerInv.getHelmet() != null && playerInv.getHelmet().getType() != teamBlockMaterial) {
+						
+						if (playerInv.getHelmet() == null || playerInv.getHelmet().getType() != teamBlockMaterial) {
 							playerInv.setHelmet(new ItemStack(teamBlockMaterial));
 						}
+						
 						HashMap<Integer, ? extends ItemStack> helmets = playerInv.all(teamBlockMaterial);
 						if (helmets.size() > 1 || (helmets.size() == 1 && helmets.get(helmets.keySet().iterator().next()).getAmount() > 1)) {
 							playerInv.remove(teamBlockMaterial);
