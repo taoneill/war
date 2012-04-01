@@ -210,7 +210,7 @@ public class WarPlayerListener implements Listener {
 			if (player.getItemInHand().getType() == Material.WOOD_SWORD && War.war.isWandBearer(player)) {
 				String zoneName = War.war.getWandBearerZone(player);
 				ZoneSetter setter = new ZoneSetter(player, zoneName);
-				if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR) {
+				if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_AIR) {
 					War.war.badMsg(player, "Too far.");
 				} else if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
 					setter.placeCorner1(event.getClickedBlock());
