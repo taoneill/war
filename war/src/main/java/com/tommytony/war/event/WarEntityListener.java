@@ -188,7 +188,9 @@ public class WarEntityListener implements Listener {
 					}
 					
 					// Blow up bomb
-					defenderWarzone.getWorld().createExplosion(a.getLocation(), 2F);
+					if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)) {
+						defenderWarzone.getWorld().createExplosion(a.getLocation(), 2F);
+					}
 
 					// bring back tnt
 					bomb.getVolume().resetBlocks();
