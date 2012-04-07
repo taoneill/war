@@ -284,6 +284,9 @@ public class Warzone {
 
 		// reset lobby (here be demons)
 		if (this.lobby != null) {
+			if (this.lobby.getVolume() != null) {
+				this.lobby.getVolume().resetBlocks();
+			}
 			this.lobby.initialize();
 		}
 
@@ -880,7 +883,7 @@ public class Warzone {
 						}
 	
 						this.handleScoreCapReached(player, winnersStr);
-						// player.teleport(playerWarzone.getTeleport());
+
 						// player will die because it took too long :(
 						// we dont restore his inventory in handleScoreCapReached
 						// check out PLAYER_MOVE for the rest of the fix

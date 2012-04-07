@@ -134,9 +134,6 @@ public class SetTeamConfigCommand extends AbstractZoneMakerCommand {
 			if (!namedParamReturn.equals("") && !namedParamReturn.equals("PARSE-ERROR")) {
 				
 				WarzoneYmlMapper.save(zone, false);
-				if (zone.getLobby() != null) {
-					zone.getLobby().getVolume().resetBlocks();
-				}
 				
 				String zoneReset = "Some changes may require a /resetzone. "; 
 				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONCONFIGCHANGE)) {

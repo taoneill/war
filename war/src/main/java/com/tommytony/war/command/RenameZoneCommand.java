@@ -78,9 +78,7 @@ public class RenameZoneCommand extends AbstractZoneMakerCommand {
 		War.war.getWarzones().add(newZone);
 		// zone.getVolume().loadCorners();
 		newZone.getVolume().loadCorners();
-		if (newZone.getLobby() != null) {
-			newZone.getLobby().getVolume().resetBlocks();
-		}
+		
 		if (newZone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONLOAD)) {
 			newZone.getVolume().resetBlocks();
 		}

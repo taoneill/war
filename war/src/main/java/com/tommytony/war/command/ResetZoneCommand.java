@@ -54,9 +54,7 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 		}
 
 		this.msg("Reloading warzone " + zone.getName() + ".");
-		if (zone.getLobby() != null) {
-			zone.getLobby().getVolume().resetBlocksAsJob();
-		}
+		
 		zone.reinitialize();
 
 		return true;
