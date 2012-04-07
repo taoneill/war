@@ -16,6 +16,7 @@ public enum WarzoneConfig {
 	PVPINZONE (Boolean.class),
 	REALDEATHS (Boolean.class),
 	RESETONEMPTY (Boolean.class),
+	RESETONCONFIGCHANGE (Boolean.class),
 	RESETONLOAD (Boolean.class),
 	RESETONUNLOAD (Boolean.class),
 	UNBREAKABLE (Boolean.class);

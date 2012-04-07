@@ -8,6 +8,7 @@ import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamKind;
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.ZoneLobby;
 
@@ -131,18 +132,22 @@ public class SetTeamConfigCommand extends AbstractZoneMakerCommand {
 			// We have a warzone, a team and indexed-from-0 arguments, let's update
 			String namedParamReturn = War.war.updateTeamFromNamedParams(team, player, this.args);
 			if (!namedParamReturn.equals("") && !namedParamReturn.equals("PARSE-ERROR")) {
-				this.msg("Saving config and resetting warzone " + zone.getName() + ".");
+				
 				WarzoneYmlMapper.save(zone, false);
-				zone.getVolume().resetBlocks();
 				if (zone.getLobby() != null) {
 					zone.getLobby().getVolume().resetBlocks();
 				}
-				zone.initializeZone(); // bring back team spawns etc
+				
+				String zoneReset = "Some changes may require a /resetzone. "; 
+				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONCONFIGCHANGE)) {
+					zone.reinitialize(); // bring back team spawns etc
+					zoneReset = "Zone reset. ";
+				}
 
 				if (wantsToPrint) {
-					this.msg("Team config saved. Zone reset." + namedParamReturn + " " + War.war.printConfig(team));
+					this.msg("Team config saved. " + zoneReset + namedParamReturn + " " + War.war.printConfig(team));
 				} else {
-					this.msg("Team config saved. Zone reset." + namedParamReturn);
+					this.msg("Team config saved. " + zoneReset + namedParamReturn);
 				}
 
 				if (War.war.getWarHub() != null) { // maybe the zone was disabled/enabled

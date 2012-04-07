@@ -42,8 +42,7 @@ public class NextBattleCommand extends AbstractZoneMakerCommand {
 		for (Team team : zone.getTeams()) {
 			team.teamcast("The battle was interrupted. " + zone.getTeamInformation() + " Resetting warzone " + zone.getName() + " and life pools...");
 		}
-		zone.getVolume().resetBlocksAsJob();
-		zone.initializeZoneAsJob();
+		zone.reinitialize();
 
 		return true;
 	}
