@@ -165,7 +165,7 @@ public class WarPlayerListener implements Listener {
 			if (talkingPlayerTeam != null) {
 				String msg = event.getMessage();
 				String[] split = msg.split(" ");
-				if (!War.war.isZoneMaker(player) && split.length > 0 && split[0].startsWith("/")) {
+				if (!War.war.isWarAdmin(player) && split.length > 0 && split[0].startsWith("/")) {
 					String command = split[0].substring(1);
 					if (!command.equals("war") && !command.equals("zones") && !command.equals("warzones") && !command.equals("zone") && !command.equals("warzone") && !command.equals("teams") && !command.equals("join") && !command.equals("leave") && !command.equals("team") && !command.equals("warhub") && !command.equals("zonemaker")) {
 						// allow white commands
