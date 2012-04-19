@@ -182,10 +182,10 @@ public class WarHub {
 			Block signBlock = locationBlock.getRelative(front);
 
 			String[] lines = new String[4];
-			lines[0] = "War hub";
-			lines[1] = "(/warhub)";
-			lines[2] = "Pick your";
-			lines[3] = "battle!";
+			lines[0] = "¤cWar Hub";
+			lines[1] = "¤1(/warhub)";
+			lines[2] = "¤aChoose Your";
+			lines[3] = "¤aBattle!";
 			SignHelper.setToSign(War.war, signBlock, data, lines);
 
 			// Warzone signs
