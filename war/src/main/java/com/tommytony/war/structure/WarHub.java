@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -182,10 +183,10 @@ public class WarHub {
 			Block signBlock = locationBlock.getRelative(front);
 
 			String[] lines = new String[4];
-			lines[0] = "¤cWar Hub";
-			lines[1] = "¤1(/warhub)";
-			lines[2] = "¤aChoose Your";
-			lines[3] = "¤aBattle!";
+			lines[0] = ChatColor.RED + "War Hub";
+			lines[1] = ChatColor.DARK_BLUE + "¤1(/warhub)";
+			lines[2] = ChatColor.GREEN + "Choose Your";
+			lines[3] = ChatColor.GREEN + "Battle!";
 			SignHelper.setToSign(War.war, signBlock, data, lines);
 
 			// Warzone signs
