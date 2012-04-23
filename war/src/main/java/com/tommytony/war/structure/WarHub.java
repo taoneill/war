@@ -184,7 +184,7 @@ public class WarHub {
 
 			String[] lines = new String[4];
 			lines[0] = ChatColor.RED + "War Hub";
-			lines[1] = ChatColor.DARK_BLUE + "¤1(/warhub)";
+			lines[1] = ChatColor.DARK_BLUE + "(/warhub)";
 			lines[2] = ChatColor.GREEN + "Choose Your";
 			lines[3] = ChatColor.GREEN + "Battle!";
 			SignHelper.setToSign(War.war, signBlock, data, lines);
