@@ -48,10 +48,19 @@ public class WarzoneYmlMapper {
 			YamlConfiguration warzoneYmlConfig = YamlConfiguration.loadConfiguration(warzoneYmlFile);
 			ConfigurationSection warzoneRootSection = warzoneYmlConfig.getConfigurationSection("set");
 			
+			// Bukkit config API forces all Yml nodes to lowercase, now, it seems, sigh...
+			// We need to keep this original (non-lowercase) implementation because old warzone.yml
+			// files are not lowercased yet if they haven't been saved since the API change.
 			String zoneInfoPrefix = "warzone." + name + ".info.";
 			
-			// world
+			// world of the warzone
 			String worldStr = warzoneRootSection.getString(zoneInfoPrefix + "world");
+			if (worldStr == null) {
+				// Ah! Seems that the new (post 1.2.3-ish) Bukkit config API has lowercased our map name on the previous save.
+				// Retry with lowercase warzone name.
+				zoneInfoPrefix = "warzone." + name.toLowerCase() + ".info.";
+				worldStr = warzoneRootSection.getString(zoneInfoPrefix + "world");
+			}
 			World world = War.war.getServer().getWorld(worldStr);
 			
 			// Create the zone
@@ -88,6 +97,10 @@ public class WarzoneYmlMapper {
 			if (warzoneRootSection.contains("warzone." + warzone.getName() + ".config")) {
 				ConfigurationSection warzoneConfigSection = warzoneRootSection.getConfigurationSection("warzone." + warzone.getName() + ".config");
 				warzone.getWarzoneConfig().loadFrom(warzoneConfigSection);
+			} else if (warzoneRootSection.contains("warzone." + warzone.getName().toLowerCase() + ".config")) {
+				// Workaround for broken Bukkit backward-compatibility for non-lowercase Yml nodes
+				ConfigurationSection warzoneConfigSection = warzoneRootSection.getConfigurationSection("warzone." + warzone.getName().toLowerCase() + ".config");
+				warzone.getWarzoneConfig().loadFrom(warzoneConfigSection);
 			}
 
 			// authors
@@ -115,6 +128,10 @@ public class WarzoneYmlMapper {
 				for (String monumentName : monunmentNames) {
 					if (monumentName != null && !monumentName.equals("")) {
 						String monumentPrefix = zoneInfoPrefix + "monument." + monumentName + ".";
+						if (!warzoneRootSection.contains(monumentPrefix + "x")) {
+							// try lowercase instead
+							monumentPrefix = zoneInfoPrefix + "monument." + monumentName.toLowerCase() + ".";
+						}
 						int monumentX = warzoneRootSection.getInt(monumentPrefix + "x");
 						int monumentY = warzoneRootSection.getInt(monumentPrefix + "y");
 						int monumentZ = warzoneRootSection.getInt(monumentPrefix + "z");
@@ -131,6 +148,10 @@ public class WarzoneYmlMapper {
 				for (String bombName : bombNames) {
 					if (bombName != null && !bombName.equals("")) {
 						String bombPrefix = zoneInfoPrefix + "bomb." + bombName + ".";
+						if (!warzoneRootSection.contains(bombPrefix + "x")) {
+							// try lowercase instead
+							bombPrefix = zoneInfoPrefix + "bomb." + bombName.toLowerCase() + ".";
+						}
 						int bombX = warzoneRootSection.getInt(bombPrefix + "x");
 						int bombY = warzoneRootSection.getInt(bombPrefix + "y");
 						int bombZ = warzoneRootSection.getInt(bombPrefix + "z");
@@ -147,6 +168,10 @@ public class WarzoneYmlMapper {
 				for (String cakeName : cakeNames) {
 					if (cakeName != null && !cakeName.equals("")) {
 						String cakePrefix = zoneInfoPrefix + "cake." + cakeName + ".";
+						if (!warzoneRootSection.contains(cakePrefix + "x")) {
+							// try lowercase instead
+							cakePrefix = zoneInfoPrefix + "cake." + cakeName + ".";
+						}
 						int cakeX = warzoneRootSection.getInt(cakePrefix + "x");
 						int cakeY = warzoneRootSection.getInt(cakePrefix + "y");
 						int cakeZ = warzoneRootSection.getInt(cakePrefix + "z");
@@ -163,6 +188,10 @@ public class WarzoneYmlMapper {
 				for (String teamName : teamsNames) {
 					// team info
 					String teamInfoPrefix = "team." + teamName + ".info.";
+					if (!warzoneRootSection.contains(teamInfoPrefix + "spawn.x")) {
+						// try lowercase instead - supports custom team names
+						teamInfoPrefix = "team." + teamName.toLowerCase() + ".info.";
+					}
 					int teamX = warzoneRootSection.getInt(teamInfoPrefix + "spawn.x");
 					int teamY = warzoneRootSection.getInt(teamInfoPrefix + "spawn.y");
 					int teamZ = warzoneRootSection.getInt(teamInfoPrefix + "spawn.z");
@@ -186,8 +215,13 @@ public class WarzoneYmlMapper {
 						// team specific config
 						ConfigurationSection teamConfigSection = warzoneRootSection.getConfigurationSection(teamConfigPrefix);
 						team.getTeamConfig().loadFrom(teamConfigSection);
+					} else if (warzoneRootSection.contains(teamConfigPrefix.toLowerCase())) {
+						// try lowercase instead
+						ConfigurationSection teamConfigSection = warzoneRootSection.getConfigurationSection(teamConfigPrefix.toLowerCase());
+						team.getTeamConfig().loadFrom(teamConfigSection);
 					}
 					
+					// LIFEPOOL INITIALIZATION HERE
 					team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 					
 					String teamLoadoutPrefix = "team." + teamName + ".loadout";
@@ -195,7 +229,11 @@ public class WarzoneYmlMapper {
 						// team specific loadouts
 						ConfigurationSection loadoutsSection = warzoneRootSection.getConfigurationSection(teamLoadoutPrefix);
 						LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, team.getInventories().getLoadouts());
-					}
+					} else if (warzoneRootSection.contains(teamLoadoutPrefix.toLowerCase())) {
+						// try lowercase instead
+						ConfigurationSection loadoutsSection = warzoneRootSection.getConfigurationSection(teamLoadoutPrefix.toLowerCase());
+						LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, team.getInventories().getLoadouts());
+					} 
 					
 					String teamRewardPrefix = "team." + teamName + ".reward";
 					if (warzoneRootSection.contains(teamRewardPrefix)) {
@@ -204,7 +242,13 @@ public class WarzoneYmlMapper {
 						HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
 						LoadoutYmlMapper.fromConfigToLoadout(rewardsSection, reward, "default");
 						warzone.getDefaultInventories().setReward(reward);
-					}
+					} else if (warzoneRootSection.contains(teamRewardPrefix.toLowerCase())) {
+						// try lowercase instead
+						ConfigurationSection rewardsSection = warzoneRootSection.getConfigurationSection(teamRewardPrefix.toLowerCase());
+						HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
+						LoadoutYmlMapper.fromConfigToLoadout(rewardsSection, reward, "default");
+						warzone.getDefaultInventories().setReward(reward);
+					} 
 				}
 			}
 

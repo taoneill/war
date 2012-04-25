@@ -230,7 +230,7 @@ public class Warzone {
 			// everyone back to team spawn with full health
 			for (Team team : this.teams) {
 				for (Player player : team.getPlayers()) {
-					if (player != respawnExempted) {
+					if (!player.getName().equals(respawnExempted.getName())) {
 						this.respawnPlayer(team, player);
 					}
 				}
@@ -861,6 +861,7 @@ public class Warzone {
 							scores += t.getName() + "(" + t.getPoints() + "/" + t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE) + ") ";
 						}
 					}
+					
 					if (!scores.equals("")) {
 						for (Team t : teams) {
 							t.teamcast("New scores - " + scores);
