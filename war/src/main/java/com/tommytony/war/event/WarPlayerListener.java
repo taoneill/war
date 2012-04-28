@@ -230,6 +230,7 @@ public class WarPlayerListener implements Listener {
 				if (inHand != null) {
 					ItemStack newItemInHand = new ItemStack(inHand.getType(), inHand.getAmount(), inHand.getDurability(), inHand.getData().getData());
 					newItemInHand.setDurability(inHand.getDurability());
+					newItemInHand.addEnchantments(inHand.getEnchantments());
 					event.getPlayer().setItemInHand(newItemInHand);
 					event.setCancelled(true);
 					
