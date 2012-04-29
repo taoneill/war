@@ -70,6 +70,7 @@ import com.tommytony.war.structure.ZoneWallGuard;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.ModifyPermissions;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.Volume;
@@ -940,6 +941,7 @@ public class Warzone {
 			this.keepPlayerState(player);
 			War.war.msg(player, "join.inventorystored");
 		}
+		ModifyPermissions.removePermissions(player);
 		this.respawnPlayer(team, player);
 		this.broadcast("join.broadcast", player.getName(), team.getKind().getFormattedName());
 		return true;
@@ -1156,6 +1158,7 @@ public class Warzone {
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 		if (playerTeam != null) {
 			playerTeam.removePlayer(player);
+			ModifyPermissions.removeAttachment(player);
 			this.broadcast("leave.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE);
 			playerTeam.resetSign();
 			if (this.getPlayerCount() == 0 && this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONEMPTY)) {

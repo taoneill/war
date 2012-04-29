@@ -9,6 +9,7 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.ModifyPermissions;
 
 /**
  * Joins a team.

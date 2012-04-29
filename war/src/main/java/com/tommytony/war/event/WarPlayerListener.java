@@ -41,6 +41,7 @@ import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.ModifyPermissions;
 import com.tommytony.war.volume.Volume;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -70,6 +71,7 @@ public class WarPlayerListener implements Listener {
 			if (War.war.isWandBearer(player)) {
 				War.war.removeWandBearer(player);
 			}
+			ModifyPermissions.removeAttachment(player);
 		}
 	}
 

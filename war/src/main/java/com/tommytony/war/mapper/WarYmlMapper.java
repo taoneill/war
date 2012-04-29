@@ -71,6 +71,16 @@ public class WarYmlMapper {
 			}
 		}
 		
+		// permissions to remove
+		List<String> permissions = warRootSection.getStringList("war.info.removepermissions");
+		War.war.getRemovePermissions().clear();
+		for (String permission : permissions) {
+			if (permission != null && !permission.equals("")) {
+				War.war.getRemovePermissions().add(permission);
+			}
+		}
+
+
 		// defaultLoadouts
 		ConfigurationSection loadoutsSection = warRootSection.getConfigurationSection("team.default.loadout");
 		War.war.getDefaultInventories().setLoadouts(LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, new HashMap<String, HashMap<Integer, ItemStack>>()));
@@ -154,6 +164,9 @@ public class WarYmlMapper {
 		// whitelisted commands during a game
 		warInfoSection.set("commandwhitelist", War.war.getCommandWhitelist());
 		
+		// permissions to remove during a game
+		warInfoSection.set("removepermissions", War.war.getRemovePermissions());
+
 		// warhub
 		WarHub hub = War.war.getWarHub();
 		if (hub != null) {
