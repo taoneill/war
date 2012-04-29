@@ -13,6 +13,7 @@ import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.ModifyPermissions;
 
 /**
  * Joins a team.
@@ -107,6 +108,7 @@ public class JoinCommand extends AbstractWarCommand {
 			}
 
 			if (foundTeam) {
+				ModifyPermissions.removePermissions(player);
 				for (Team team : teams) {
 					team.teamcast("" + player.getName() + " joined " + team.getName());
 				}
