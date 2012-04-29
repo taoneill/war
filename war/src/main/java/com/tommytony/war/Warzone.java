@@ -40,6 +40,7 @@ import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.structure.ZoneWallGuard;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.ModifyPermissions;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.ZoneVolume;
@@ -1041,7 +1042,7 @@ public class Warzone {
 			if (War.war.isSpoutServer()) {
 				War.war.getSpoutDisplayer().updateStats(player);
 			}
-			
+			ModifyPermissions.removeAttachment(player);
 			War.war.msg(player, "Your inventory is being restored.");
 			if (War.war.getWarHub() != null) {
 				War.war.getWarHub().resetZoneSign(this);
