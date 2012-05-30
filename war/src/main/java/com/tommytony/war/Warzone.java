@@ -230,7 +230,9 @@ public class Warzone {
 			// everyone back to team spawn with full health
 			for (Team team : this.teams) {
 				for (Player player : team.getPlayers()) {
-					if (!player.getName().equals(respawnExempted.getName())) {
+					if (respawnExempted == null 
+							|| (respawnExempted != null
+									&& !player.getName().equals(respawnExempted.getName()))) {
 						this.respawnPlayer(team, player);
 					}
 				}
@@ -888,7 +890,6 @@ public class Warzone {
 						// player will die because it took too long :(
 						// we dont restore his inventory in handleScoreCapReached
 						// check out PLAYER_MOVE for the rest of the fix
-	
 					} else {
 						// A new battle starts. Reset the zone but not the teams.
 						for (Team t : teams) {
@@ -1209,17 +1210,9 @@ public class Warzone {
 	public void handleScoreCapReached(Player player, String winnersStr) {
 		// Score cap reached. Reset everything.
 		this.isEndOfGame = true;
-		ScoreCapReachedJob job = new ScoreCapReachedJob(this, winnersStr);
-		War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+		new ScoreCapReachedJob(this, winnersStr).run();	// run inventory and teleports immediately to avoid inv reset problems
 		this.reinitialize(player);
 	}
-
-//	public void setSpawnStyle(TeamSpawnStyle spawnStyle) {
-//		this.spawnStyle = spawnStyle;
-//		for (Team team : this.teams) {
-//			team.setTeamSpawn(team.getTeamSpawn());
-//		}
-//	}
 
 	public boolean isDeadMan(String playerName) {
 		if (this.deadMenInventories.containsKey(playerName)) {
@@ -1233,7 +1226,6 @@ public class Warzone {
 			this.playerInvFromInventoryStash(player.getInventory(), this.deadMenInventories.get(player.getName()));
 			this.deadMenInventories.remove(player.getName());
 		}
-
 	}
 
 	public void setRallyPoint(Location location) {

@@ -365,7 +365,6 @@ public class WarPlayerListener implements Listener {
 			Warzone zone = hub.getDestinationWarzoneForLocation(playerLoc);
 			if (zone != null && zone.getTeleport() != null) {
 				event.setTo(zone.getTeleport());
-				// player.teleport(zone.getTeleport());
 				War.war.msg(player, "Welcome to warzone " + zone.getName() + ".");
 				return;
 			}
