@@ -594,6 +594,9 @@ public class Warzone {
 			}
 		}
 		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+
+		// Restore permissions
+		ModifyPermissions.clearModifications(player);
 	}
 
 	private void preventItemHackingThroughOpenedInventory(Player player) {
@@ -941,7 +944,7 @@ public class Warzone {
 			this.keepPlayerState(player);
 			War.war.msg(player, "join.inventorystored");
 		}
-		ModifyPermissions.removePermissions(player);
+		ModifyPermissions.applyModifications(player);
 		this.respawnPlayer(team, player);
 		this.broadcast("join.broadcast", player.getName(), team.getKind().getFormattedName());
 		return true;
@@ -1158,7 +1161,7 @@ public class Warzone {
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 		if (playerTeam != null) {
 			playerTeam.removePlayer(player);
-			ModifyPermissions.removeAttachment(player);
+			ModifyPermissions.clearModifications(player);
 			this.broadcast("leave.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE);
 			playerTeam.resetSign();
 			if (this.getPlayerCount() == 0 && this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONEMPTY)) {

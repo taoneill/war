@@ -71,7 +71,7 @@ public class WarPlayerListener implements Listener {
 			if (War.war.isWandBearer(player)) {
 				War.war.removeWandBearer(player);
 			}
-			ModifyPermissions.removeAttachment(player);
+			ModifyPermissions.clearModifications(player);
 		}
 	}
 
