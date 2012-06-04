@@ -63,8 +63,6 @@ public class WarEntityListener implements Listener {
 		Entity attacker = event.getDamager();
 		Entity defender = event.getEntity();
 		
-		//DamageCause cause = event.getCause();
-		//War.war.log(cause.toString(), Level.INFO);
 		// Maybe an arrow was thrown
 		if (attacker != null && event.getDamager() instanceof Projectile && ((Projectile)event.getDamager()).getShooter() instanceof Player){
 			attacker = ((Player)((Projectile)event.getDamager()).getShooter());
@@ -81,24 +79,9 @@ public class WarEntityListener implements Listener {
 			
 			if ((attackerTeam != null && defenderTeam != null && attackerTeam != defenderTeam && attackerWarzone == defenderWarzone)
 					|| (attackerTeam != null && defenderTeam != null && attacker.getEntityId() == defender.getEntityId())) {
-				// Make sure one of the players isn't in the spawn
-				if (defenderTeam.getSpawnVolume().contains(d.getLocation())) { // attacking person in spawn
-					if (!defenderWarzone.isFlagThief(d.getName()) 
-							&& !defenderWarzone.isBombThief(d.getName())) { // thieves can always be attacked
-						War.war.badMsg(a, "Can't attack a player that's inside his team's spawn.");
-						event.setCancelled(true);
-						return;
-					}
-				} else if (attackerTeam.getSpawnVolume().contains(a.getLocation()) && !attackerTeam.getSpawnVolume().contains(d.getLocation())) {
-					// only let a player inside spawn attack an enemy player if that player enters the spawn
-					if (!attackerWarzone.isFlagThief(a.getName())
-							&& !defenderWarzone.isBombThief(d.getName())) { // thieves can always attack
-						War.war.badMsg(a, "Can't attack a player from inside your spawn.");
-						event.setCancelled(true);
-						return;
-					}
+				
 				// Make sure none of them are respawning
-				} else if (defenderWarzone.isRespawning(d)) {
+				if (defenderWarzone.isRespawning(d)) {
 					War.war.badMsg(a, "The target is currently respawning!");
 					event.setCancelled(true);
 					return;
