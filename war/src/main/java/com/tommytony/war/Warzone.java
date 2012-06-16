@@ -80,6 +80,7 @@ public class Warzone {
 	
 	private boolean isEndOfGame = false;
 	private boolean isReinitializing = false;
+	private final Object gameEndLock = new Object();
 
 	public Warzone(World world, String name) {
 		this.world = world;
@@ -367,7 +368,7 @@ public class Warzone {
 		
 		final LoadoutResetJob job = new LoadoutResetJob(this, team, player, isFirstRespawn, false);
 		if (team.getTeamConfig().resolveInt(TeamConfig.RESPAWNTIMER) == 0 || isFirstRespawn) {
-			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
+			job.run();
 		}			
 		else {
 			// "Respawn" Timer - player will not be able to leave spawn for a few seconds
@@ -513,25 +514,30 @@ public class Warzone {
 
 	private void playerInvFromInventoryStash(PlayerInventory playerInv, PlayerState originalContents) {
 		playerInv.clear();
+		
 		playerInv.clear(playerInv.getSize() + 0);
 		playerInv.clear(playerInv.getSize() + 1);
 		playerInv.clear(playerInv.getSize() + 2);
 		playerInv.clear(playerInv.getSize() + 3); // helmet/blockHead
+		
+		int invIndex = 0;
 		for (ItemStack item : originalContents.getContents()) {
 			if (item != null && item.getTypeId() != 0) {
-				playerInv.addItem(item);
+				playerInv.setItem(invIndex, item);
 			}
+			invIndex++;
 		}
-		if (originalContents.getHelmet() != null && originalContents.getHelmet().getType() != Material.AIR) {
+		
+		if (originalContents.getHelmet() != null) {
 			playerInv.setHelmet(originalContents.getHelmet());
 		}
-		if (originalContents.getChest() != null && originalContents.getChest().getType() != Material.AIR) {
+		if (originalContents.getChest() != null) {
 			playerInv.setChestplate(originalContents.getChest());
 		}
-		if (originalContents.getLegs() != null && originalContents.getLegs().getType() != Material.AIR) {
+		if (originalContents.getLegs() != null) {
 			playerInv.setLeggings(originalContents.getLegs());
 		}
-		if (originalContents.getFeet() != null && originalContents.getFeet().getType() != Material.AIR) {
+		if (originalContents.getFeet() != null) {
 			playerInv.setBoots(originalContents.getFeet());
 		}
 	}
@@ -814,190 +820,189 @@ public class Warzone {
 	}
 
 	public void handleDeath(Player player) {
-		Team playerTeam = Team.getTeamByPlayerName(player.getName());
-		if (playerTeam != null) {
-			// teleport to team spawn upon fast respawn death, but not for real deaths
-			if (!this.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
-				this.respawnPlayer(playerTeam, player);
-			} else {
-				// onPlayerRespawn takes care of real deaths
-				//player.setHealth(0);
-				this.getReallyDeadFighters().add(player.getName());
-			}
-			
-			int remaining = playerTeam.getRemainingLifes();
-			if (remaining == 0) { // your death caused your team to lose
-				if (this.isEndOfGame) {
-					// Prevent duplicate game end. You died just after the game ending death/point. Too bad!
-					this.gameEndTeleport(player);
-				} else if (this.isReinitializing) {
-					// Prevent duplicate battle end. You died just after the battle ending death.
+		// Every death and player movement should ideally occur in sequence because
+		// 1) a death can cause the end of the game by emptying a lifepool causing the max score to be reached
+		// 2) a player movement from one block to the next (getting a flag home or causing a bomb to go off perhaps) could win the game
+		//
+		// Concurrent execution of these events could cause the inventory reset of the last players to die to fail as
+		// they get tp'ed back to the lobby, or perhaps kills to bleed into the next round.
+		synchronized (this.getGameEndLock()) {
+			Team playerTeam = Team.getTeamByPlayerName(player.getName());
+
+			// Make sure the player that died is still part of a team, game may have ended while waiting on synchronized.
+			// Ignore dying players that essentially just got tp'ed to lobby and got their state restored.
+			// Gotta take care of restoring ReallyDeadFighters' game-end state when in onRespawn as well.
+			if (playerTeam != null) {
+				// teleport to team spawn upon fast respawn death, but not for real deaths
+				if (!this.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
 					this.respawnPlayer(playerTeam, player);
 				} else {
-					// Handle team loss
-					List<Team> teams = this.getTeams();
-					String scores = "";
-					for (Team t : teams) {
-						if (War.war.isSpoutServer()) {
-							for (Player p : t.getPlayers()) {
-								SpoutPlayer sp = SpoutManager.getPlayer(p);
-								if (sp.isSpoutCraftEnabled()) {
-					                sp.sendNotification(
-					                		SpoutDisplayer.cleanForNotification("Round over! " + playerTeam.getKind().getColor() + playerTeam.getName()),
-					                		SpoutDisplayer.cleanForNotification("ran out of lives."),
-					                		playerTeam.getKind().getMaterial(),
-					                		playerTeam.getKind().getData(),
-					                		10000);
-								}
-							}
-						}
-						
-						t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " + player.getName() + " died and there were no lives left in their life pool.");
-	
-						if (t.getPlayers().size() != 0 && !t.getTeamConfig().resolveBoolean(TeamConfig.FLAGPOINTSONLY)) {
-							if (!t.getName().equals(playerTeam.getName())) {
-								// all other teams get a point
-								t.addPoint();
-								t.resetSign();
-							}
-							scores += t.getName() + "(" + t.getPoints() + "/" + t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE) + ") ";
-						}
-					}
-					
-					if (!scores.equals("")) {
-						for (Team t : teams) {
-							t.teamcast("New scores - " + scores);
-						}
-					}
-					
-					// detect score cap
-					List<Team> scoreCapTeams = new ArrayList<Team>();
-					for (Team t : teams) {
-						if (t.getPoints() == t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
-							scoreCapTeams.add(t);
-						}
-					}
-					if (!scoreCapTeams.isEmpty()) {
-						String winnersStr = "";
-						for (Team winner : scoreCapTeams) {
-							if (winner.getPlayers().size() != 0) {
-								winnersStr += winner.getName() + " ";
-							}
-						}
-	
-						this.handleScoreCapReached(player, winnersStr);
-
-						// player will die because it took too long :(
-						// we dont restore his inventory in handleScoreCapReached
-						// check out PLAYER_MOVE for the rest of the fix
+					// onPlayerRespawn takes care of real deaths
+					//player.setHealth(0);
+					this.getReallyDeadFighters().add(player.getName());
+				}
+				
+				int remaining = playerTeam.getRemainingLifes();
+				if (remaining == 0) { // your death caused your team to lose
+					if (this.isReinitializing()) {
+						// Prevent duplicate battle end. You died just after the battle ending death.
+						this.respawnPlayer(playerTeam, player);
 					} else {
-						// A new battle starts. Reset the zone but not the teams.
+						// Handle team loss
+						List<Team> teams = this.getTeams();
+						String scores = "";
 						for (Team t : teams) {
-							t.teamcast("A new battle begins. Resetting warzone...");
+							if (War.war.isSpoutServer()) {
+								for (Player p : t.getPlayers()) {
+									SpoutPlayer sp = SpoutManager.getPlayer(p);
+									if (sp.isSpoutCraftEnabled()) {
+						                sp.sendNotification(
+						                		SpoutDisplayer.cleanForNotification("Round over! " + playerTeam.getKind().getColor() + playerTeam.getName()),
+						                		SpoutDisplayer.cleanForNotification("ran out of lives."),
+						                		playerTeam.getKind().getMaterial(),
+						                		playerTeam.getKind().getData(),
+						                		10000);
+									}
+								}
+							}
+							
+							t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " + player.getName() + " died and there were no lives left in their life pool.");
+		
+							if (t.getPlayers().size() != 0 && !t.getTeamConfig().resolveBoolean(TeamConfig.FLAGPOINTSONLY)) {
+								if (!t.getName().equals(playerTeam.getName())) {
+									// all other teams get a point
+									t.addPoint();
+									t.resetSign();
+								}
+								scores += t.getName() + "(" + t.getPoints() + "/" + t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE) + ") ";
+							}
 						}
 						
-						this.reinitialize(player);
-					}
-				}
-			} else {
-				// player died without causing his team's demise
-				if (this.isFlagThief(player.getName())) {
-					// died while carrying flag.. dropped it
-					Team victim = this.getVictimTeamForFlagThief(player.getName());
-					victim.getFlagVolume().resetBlocks();
-					victim.initializeTeamFlag();
-					this.removeFlagThief(player.getName());
-					
-					if (War.war.isSpoutServer()) {
-						for (Player p : victim.getPlayers()) {
-							SpoutPlayer sp = SpoutManager.getPlayer(p);
-							if (sp.isSpoutCraftEnabled()) {
-				                sp.sendNotification(
-			                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-			                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "your flag."),
-			                		playerTeam.getKind().getMaterial(),
-			                		playerTeam.getKind().getData(),
-			                		5000);
+						if (!scores.equals("")) {
+							for (Team t : teams) {
+								t.teamcast("New scores - " + scores);
 							}
 						}
+						
+						// detect score cap
+						List<Team> scoreCapTeams = new ArrayList<Team>();
+						for (Team t : teams) {
+							if (t.getPoints() == t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
+								scoreCapTeams.add(t);
+							}
+						}
+						if (!scoreCapTeams.isEmpty()) {
+							String winnersStr = "";
+							for (Team winner : scoreCapTeams) {
+								if (winner.getPlayers().size() != 0) {
+									winnersStr += winner.getName() + " ";
+								}
+							}
+		
+							this.handleScoreCapReached(winnersStr);
+						} else {
+							// A new battle starts. Reset the zone but not the teams.
+							for (Team t : teams) {
+								t.teamcast("A new battle begins. Resetting warzone...");
+							}
+							
+							this.reinitialize();
+						}
 					}
-					
-					for (Team t : this.getTeams()) {
-						t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
-					}
-				}
-				
-				// Bomb thieves
-				if (this.isBombThief(player.getName())) {
-					// died while carrying bomb.. dropped it
-					Bomb bomb = this.getBombForThief(player.getName());
-					bomb.getVolume().resetBlocks();
-					bomb.addBombBlocks();
-					this.removeBombThief(player.getName());
-					
-					for (Team t : this.getTeams()) {
-						t.teamcast(player.getName() + " died and dropped bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.WHITE + ".");
+				} else {
+					// player died without causing his team's demise
+					if (this.isFlagThief(player.getName())) {
+						// died while carrying flag.. dropped it
+						Team victim = this.getVictimTeamForFlagThief(player.getName());
+						victim.getFlagVolume().resetBlocks();
+						victim.initializeTeamFlag();
+						this.removeFlagThief(player.getName());
+						
 						if (War.war.isSpoutServer()) {
-							for (Player p : t.getPlayers()) {
+							for (Player p : victim.getPlayers()) {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
 								if (sp.isSpoutCraftEnabled()) {
 					                sp.sendNotification(
 				                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-				                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.YELLOW + "."),
-				                		Material.TNT,
-				                		(short)0,
+				                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "your flag."),
+				                		playerTeam.getKind().getMaterial(),
+				                		playerTeam.getKind().getData(),
 				                		5000);
 								}
 							}
 						}
+						
+						for (Team t : this.getTeams()) {
+							t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
+						}
 					}
-				}
-				
-				if (this.isCakeThief(player.getName())) {
-					// died while carrying cake.. dropped it
-					Cake cake = this.getCakeForThief(player.getName());
-					cake.getVolume().resetBlocks();
-					cake.addCakeBlocks();
-					this.removeCakeThief(player.getName());
 					
-					for (Team t : this.getTeams()) {
-						t.teamcast(player.getName() + " died and dropped cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE + ".");
-						if (War.war.isSpoutServer()) {
-							for (Player p : t.getPlayers()) {
-								SpoutPlayer sp = SpoutManager.getPlayer(p);
-								if (sp.isSpoutCraftEnabled()) {
-					                sp.sendNotification(
-				                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-				                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "."),
-				                		Material.CAKE,
-				                		(short)0,
-				                		5000);
+					// Bomb thieves
+					if (this.isBombThief(player.getName())) {
+						// died while carrying bomb.. dropped it
+						Bomb bomb = this.getBombForThief(player.getName());
+						bomb.getVolume().resetBlocks();
+						bomb.addBombBlocks();
+						this.removeBombThief(player.getName());
+						
+						for (Team t : this.getTeams()) {
+							t.teamcast(player.getName() + " died and dropped bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.WHITE + ".");
+							if (War.war.isSpoutServer()) {
+								for (Player p : t.getPlayers()) {
+									SpoutPlayer sp = SpoutManager.getPlayer(p);
+									if (sp.isSpoutCraftEnabled()) {
+						                sp.sendNotification(
+					                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
+					                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.YELLOW + "."),
+					                		Material.TNT,
+					                		(short)0,
+					                		5000);
+									}
 								}
 							}
 						}
 					}
-				}
-				
-				// Decrement lifepool
-				playerTeam.setRemainingLives(remaining - 1);
-				
-				// Lifepool empty warning
-				if (remaining - 1 == 0) {
-					for (Team t : this.getTeams()) {
-						t.teamcast("Team " + playerTeam.getName() + "'s life pool is empty. One more death and they lose the battle!");
+					
+					if (this.isCakeThief(player.getName())) {
+						// died while carrying cake.. dropped it
+						Cake cake = this.getCakeForThief(player.getName());
+						cake.getVolume().resetBlocks();
+						cake.addCakeBlocks();
+						this.removeCakeThief(player.getName());
+						
+						for (Team t : this.getTeams()) {
+							t.teamcast(player.getName() + " died and dropped cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE + ".");
+							if (War.war.isSpoutServer()) {
+								for (Player p : t.getPlayers()) {
+									SpoutPlayer sp = SpoutManager.getPlayer(p);
+									if (sp.isSpoutCraftEnabled()) {
+						                sp.sendNotification(
+					                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
+					                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "."),
+					                		Material.CAKE,
+					                		(short)0,
+					                		5000);
+									}
+								}
+							}
+						}
+					}
+					
+					// Decrement lifepool
+					playerTeam.setRemainingLives(remaining - 1);
+					
+					// Lifepool empty warning
+					if (remaining - 1 == 0) {
+						for (Team t : this.getTeams()) {
+							t.teamcast("Team " + playerTeam.getName() + "'s life pool is empty. One more death and they lose the battle!");
+						}
 					}
 				}
+				playerTeam.resetSign();
 			}
-			playerTeam.resetSign();
 		}
 	}
 
-	private void reinitialize(Player player) {
-		this.isReinitializing = true;
-		this.getVolume().resetBlocksAsJob();
-		this.initializeZoneAsJob(player);
-	}
-	
 	public void reinitialize() {
 		this.isReinitializing = true;
 		this.getVolume().resetBlocksAsJob();
@@ -1207,11 +1212,11 @@ public class Warzone {
 		return false;
 	}
 	
-	public void handleScoreCapReached(Player player, String winnersStr) {
+	public void handleScoreCapReached(String winnersStr) {
 		// Score cap reached. Reset everything.
 		this.isEndOfGame = true;
 		new ScoreCapReachedJob(this, winnersStr).run();	// run inventory and teleports immediately to avoid inv reset problems
-		this.reinitialize(player);
+		this.reinitialize();
 	}
 
 	public boolean isDeadMan(String playerName) {
@@ -1294,7 +1299,9 @@ public class Warzone {
 
 	public void equipPlayerLoadoutSelection(Player player, Team playerTeam, boolean isFirstRespawn, boolean isToggle) {
 		LoadoutSelection selection = this.getLoadoutSelections().get(player.getName());
-		if (selection != null && !this.isRespawning(player)) {
+		if (selection != null && !this.isRespawning(player) && playerTeam.getPlayers().contains(player)) {
+			// Make sure that inventory resets dont occur if player has already tp'ed out (due to game end, or somesuch) 
+			// - repawn timer + this method is why inventories were getting wiped as players exited the warzone. 
 			HashMap<String, HashMap<Integer, ItemStack>> loadouts = playerTeam.getInventories().resolveLoadouts();
 			List<String> sortedNames = LoadoutYmlMapper.sortNames(loadouts);
 			
@@ -1358,7 +1365,11 @@ public class Warzone {
 		return this.isEndOfGame;
 	}
 
-	public boolean isReinitalizing() {
+	public boolean isReinitializing() {
 		return this.isReinitializing;
+	}
+
+	public Object getGameEndLock() {
+		return gameEndLock;
 	}
 }

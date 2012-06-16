@@ -475,218 +475,56 @@ public class WarPlayerListener implements Listener {
 
 			// Flag capture
 			if (playerWarzone.isFlagThief(player.getName())) {
+				
 				// smoky
 				if (System.currentTimeMillis() % 13 == 0) {
 					playerWarzone.getWorld().playEffect(player.getLocation(), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
 				}
 				
-				boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
-				boolean inFlag = (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation()));
-
-				if (playerTeam.getTeamConfig().resolveFlagReturn().equals(FlagReturn.BOTH)) {
-					if (!inSpawn && !inFlag) {
-						return;
-					}
-				} else if (playerTeam.getTeamConfig().resolveFlagReturn().equals(FlagReturn.SPAWN)) {
-					if (inFlag) {
-						War.war.badMsg(player, "You have to capture the enemy flag at your team's spawn.");
-						return;
-					} else if (!inSpawn) {
-						return;
-					}
-				} else if (playerTeam.getTeamConfig().resolveFlagReturn().equals(FlagReturn.FLAG)) {
-					if (inSpawn) {
-						War.war.badMsg(player, "You have to capture the enemy flag at your team's flag.");
-						return;
-					} else if (!inFlag) {
-						return;
-					}
-				}
-
-				if (playerWarzone.isTeamFlagStolen(playerTeam) && playerTeam.getTeamConfig().resolveBoolean(TeamConfig.FLAGMUSTBEHOME)) {
-					War.war.badMsg(player, "You can't capture the enemy flag until your team's flag is returned.");
-				} else {
-					// flags can be captured at own spawn or own flag pole
-					if (playerWarzone.isEndOfGame()) {
-						// max already reached - game has already ended. Too bad!
-						if (playerWarzone.hasPlayerState(player.getName())) {
-							playerWarzone.restorePlayerState(player);
+				// Make sure game ends can't occur simultaneously. 
+				// See Warzone.handleDeath() for details.
+				synchronized (playerWarzone.getGameEndLock()) {	
+					
+					boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
+					boolean inFlag = (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation()));
+	
+					if (playerTeam.getTeamConfig().resolveFlagReturn().equals(FlagReturn.BOTH)) {
+						if (!inSpawn && !inFlag) {
+							return;
 						}
-						event.setTo(playerWarzone.getTeleport());
-					} else if (playerWarzone.isReinitalizing()) {
-						// Battle already ended or interrupted
-						playerWarzone.respawnPlayer(event, playerTeam, player);
+					} else if (playerTeam.getTeamConfig().resolveFlagReturn().equals(FlagReturn.SPAWN)) {
+						if (inFlag) {
+							War.war.badMsg(player, "You have to capture the enemy flag at your team's spawn.");
+							return;
+						} else if (!inSpawn) {
+							return;
+						}
+					} else if (playerTeam.getTeamConfig().resolveFlagReturn().equals(FlagReturn.FLAG)) {
+						if (inSpawn) {
+							War.war.badMsg(player, "You have to capture the enemy flag at your team's flag.");
+							return;
+						} else if (!inFlag) {
+							return;
+						}
+					}
+					
+					if (!playerTeam.getPlayers().contains(player)) {
+						// Make sure player is still part of team, game may have ended while waiting on synchronized)
+						// Ignore the scorers that happened immediately after the game end.
+						return;
+					}
+	
+					if (playerWarzone.isTeamFlagStolen(playerTeam) && playerTeam.getTeamConfig().resolveBoolean(TeamConfig.FLAGMUSTBEHOME)) {
+						War.war.badMsg(player, "You can't capture the enemy flag until your team's flag is returned.");
 					} else {
-						// All good - proceed with scoring
-						playerTeam.addPoint();
-						Team victim = playerWarzone.getVictimTeamForFlagThief(player.getName());
-						
-						// Notify everyone
-						for (Team t : playerWarzone.getTeams()) {
-							if (War.war.isSpoutServer()) {
-								for (Player p : t.getPlayers()) {
-									SpoutPlayer sp = SpoutManager.getPlayer(p);
-									if (sp.isSpoutCraftEnabled()) {
-						                sp.sendNotification(
-						                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
-						                		SpoutDisplayer.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + " flag!"),
-						                		victim.getKind().getMaterial(),
-						                		victim.getKind().getData(),
-						                		10000);
-									}
-								}
-							}
-							t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE
-									+ " captured team " + victim.getName() + "'s flag. Team " + playerTeam.getName() + " scores one point.");
-						}
-						
-						// Detect win conditions
-						if (playerTeam.getPoints() >= playerTeam.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
-							if (playerWarzone.hasPlayerState(player.getName())) {
-								playerWarzone.restorePlayerState(player);
-							}
-							playerWarzone.handleScoreCapReached(player, playerTeam.getName());
-							event.setTo(playerWarzone.getTeleport());
-						} else {
-							// just added a point
-							victim.getFlagVolume().resetBlocks(); // bring back flag to team that lost it
-							victim.initializeTeamFlag();
-							
-							playerWarzone.respawnPlayer(event, playerTeam, player);
-							playerTeam.resetSign();
-							playerWarzone.getLobby().resetTeamGateSign(playerTeam);
-						}
-					}
-					
-					playerWarzone.removeFlagThief(player.getName());
-				}
-				
-				return;
-			}
-			
-			// Bomb detonation
-			if (playerWarzone.isBombThief(player.getName())) {
-				// smoky
-				playerWarzone.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 0);
-				
-				boolean inEnemySpawn = false;
-				Team victim = null;
-				for (Team team : playerWarzone.getTeams()) {
-					if (team != playerTeam 
-							&& team.getSpawnVolume().contains(player.getLocation()) 
-							&& team.getPlayers().size() > 0) {
-						inEnemySpawn = true;
-						victim = team;
-						break;
-					}
-				}
-				
-				if (inEnemySpawn) {
-					Bomb bomb = playerWarzone.getBombForThief(player.getName());
-					
-					// Boom!
-					if (!playerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)) {
-						// Don't blow up if warzone is unbreakable
-						playerWarzone.getWorld().createExplosion(player.getLocation(), 2F);
-					}
-					
-					if (playerWarzone.isEndOfGame()) {
-						// max already reached - game has already ended. Too bad!
-						if (playerWarzone.hasPlayerState(player.getName())) {
-							playerWarzone.restorePlayerState(player);
-						}
-						event.setTo(playerWarzone.getTeleport());
-					} else if (playerWarzone.isReinitalizing()) {
-						// Battle already ended or interrupted
-						playerWarzone.respawnPlayer(event, playerTeam, player);
-					} else {
-						// All good - proceed with scoring
-						playerTeam.addPoint();
-						
-						// Notify everyone
-						for (Team t : playerWarzone.getTeams()) {
-							if (War.war.isSpoutServer()) {
-								for (Player p : t.getPlayers()) {
-									SpoutPlayer sp = SpoutManager.getPlayer(p);
-									if (sp.isSpoutCraftEnabled()) {
-						                sp.sendNotification(
-						                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " blew up "),
-						                		SpoutDisplayer.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + "'s spawn!"),
-						                		victim.getKind().getMaterial(),
-						                		victim.getKind().getData(),
-						                		10000);
-									}
-								}
-							}
-							t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE
-									+ " blew up team " + victim.getName() + "'s spawn. Team " + playerTeam.getName() + " scores one point.");
-						}
-						
-						// Detect win conditions
-						if (playerTeam.getPoints() >= playerTeam.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
-							if (playerWarzone.hasPlayerState(player.getName())) {
-								playerWarzone.restorePlayerState(player);
-							}
-							playerWarzone.handleScoreCapReached(player, playerTeam.getName());
-							event.setTo(playerWarzone.getTeleport());
-						} else {
-							// just added a point
-							
-							// restore bombed team's spawn
-							victim.getSpawnVolume().resetBlocks(); 
-							victim.initializeTeamSpawn();
-							
-							// bring back tnt
-							bomb.getVolume().resetBlocks();
-							bomb.addBombBlocks();
-							
-							playerWarzone.respawnPlayer(event, playerTeam, player);
-							playerTeam.resetSign();
-							playerWarzone.getLobby().resetTeamGateSign(playerTeam);
-						}					
-					}
-					
-					playerWarzone.removeBombThief(player.getName());
-				}
-				
-				return;
-			}
-			
-			// Cake retrieval
-			if (playerWarzone.isCakeThief(player.getName())) {
-				// smoky
-				if (System.currentTimeMillis() % 13 == 0) {
-					playerWarzone.getWorld().playEffect(player.getLocation(), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
-				}
-				
-				boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
-															
-				if (inSpawn) {
-					boolean hasOpponent = false; 
-					for (Team t : playerWarzone.getTeams()) {
-						if (t != playerTeam && t.getPlayers().size() > 0) {
-							hasOpponent = true;
-						}
-					}
-					
-					// Don't let someone alone make points off cakes
-					if (hasOpponent) {
-						Cake cake = playerWarzone.getCakeForThief(player.getName());
-						
-						if (playerWarzone.isEndOfGame()) {
-							// max already reached - game has already ended. Too bad!
-							if (playerWarzone.hasPlayerState(player.getName())) {
-								playerWarzone.restorePlayerState(player);
-							}
-							event.setTo(playerWarzone.getTeleport());
-						} else if (playerWarzone.isReinitalizing()) {
+						// flags can be captured at own spawn or own flag pole
+						if (playerWarzone.isReinitializing()) {
 							// Battle already ended or interrupted
 							playerWarzone.respawnPlayer(event, playerTeam, player);
 						} else {
 							// All good - proceed with scoring
-							// Woot! Cake effect: 1 pt + full lifepool
 							playerTeam.addPoint();
-							playerTeam.setRemainingLives(playerTeam.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
+							Team victim = playerWarzone.getVictimTeamForFlagThief(player.getName());
 							
 							// Notify everyone
 							for (Team t : playerWarzone.getTeams()) {
@@ -696,16 +534,15 @@ public class WarPlayerListener implements Listener {
 										if (sp.isSpoutCraftEnabled()) {
 							                sp.sendNotification(
 							                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
-							                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "!"),
-							                		playerTeam.getKind().getMaterial(),
-							                		playerTeam.getKind().getData(),
+							                		SpoutDisplayer.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + " flag!"),
+							                		victim.getKind().getMaterial(),
+							                		victim.getKind().getData(),
 							                		10000);
 										}
 									}
 								}
-								
 								t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE
-										+ " captured cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE + ". Team " + playerTeam.getName() + " scores one point and gets a full lifepool.");
+										+ " captured team " + victim.getName() + "'s flag. Team " + playerTeam.getName() + " scores one point.");
 							}
 							
 							// Detect win conditions
@@ -713,14 +550,12 @@ public class WarPlayerListener implements Listener {
 								if (playerWarzone.hasPlayerState(player.getName())) {
 									playerWarzone.restorePlayerState(player);
 								}
-								playerWarzone.handleScoreCapReached(player, playerTeam.getName());
+								playerWarzone.handleScoreCapReached(playerTeam.getName());
 								event.setTo(playerWarzone.getTeleport());
 							} else {
 								// just added a point
-								
-								// bring back cake
-								cake.getVolume().resetBlocks();
-								cake.addCakeBlocks();
+								victim.getFlagVolume().resetBlocks(); // bring back flag to team that lost it
+								victim.initializeTeamFlag();
 								
 								playerWarzone.respawnPlayer(event, playerTeam, player);
 								playerTeam.resetSign();
@@ -728,11 +563,183 @@ public class WarPlayerListener implements Listener {
 							}
 						}
 						
-						playerWarzone.removeCakeThief(player.getName());
+						playerWarzone.removeFlagThief(player.getName());
 					}
+					
+					return;
+				}
+			}
+			
+			// Bomb detonation
+			if (playerWarzone.isBombThief(player.getName())) {
+				// smoky
+				playerWarzone.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 0);
+				
+				// Make sure game ends can't occur simultaneously. 
+				// See Warzone.handleDeath() for details.
+				synchronized (playerWarzone.getGameEndLock()) {
+					
+					boolean inEnemySpawn = false;
+					Team victim = null;
+					for (Team team : playerWarzone.getTeams()) {
+						if (team != playerTeam 
+								&& team.getSpawnVolume().contains(player.getLocation()) 
+								&& team.getPlayers().size() > 0) {
+							inEnemySpawn = true;
+							victim = team;
+							break;
+						}
+					}
+					
+					if (inEnemySpawn && playerTeam.getPlayers().contains(player)) {
+						// Made sure player is still part of team, game may have ended while waiting on synchronized.
+						// Ignored the scorers that happened immediately after the game end.
+						Bomb bomb = playerWarzone.getBombForThief(player.getName());
+						
+						// Boom!
+						if (!playerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)) {
+							// Don't blow up if warzone is unbreakable
+							playerWarzone.getWorld().createExplosion(player.getLocation(), 2F);
+						}
+						
+						if (playerWarzone.isReinitializing()) {
+							// Battle already ended or interrupted
+							playerWarzone.respawnPlayer(event, playerTeam, player);
+						} else {
+							// All good - proceed with scoring
+							playerTeam.addPoint();
+							
+							// Notify everyone
+							for (Team t : playerWarzone.getTeams()) {
+								if (War.war.isSpoutServer()) {
+									for (Player p : t.getPlayers()) {
+										SpoutPlayer sp = SpoutManager.getPlayer(p);
+										if (sp.isSpoutCraftEnabled()) {
+							                sp.sendNotification(
+							                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " blew up "),
+							                		SpoutDisplayer.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + "'s spawn!"),
+							                		victim.getKind().getMaterial(),
+							                		victim.getKind().getData(),
+							                		10000);
+										}
+									}
+								}
+								t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE
+										+ " blew up team " + victim.getName() + "'s spawn. Team " + playerTeam.getName() + " scores one point.");
+							}
+							
+							// Detect win conditions
+							if (playerTeam.getPoints() >= playerTeam.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
+								if (playerWarzone.hasPlayerState(player.getName())) {
+									playerWarzone.restorePlayerState(player);
+								}
+								playerWarzone.handleScoreCapReached(playerTeam.getName());
+								event.setTo(playerWarzone.getTeleport());
+							} else {
+								// just added a point
+								
+								// restore bombed team's spawn
+								victim.getSpawnVolume().resetBlocks(); 
+								victim.initializeTeamSpawn();
+								
+								// bring back tnt
+								bomb.getVolume().resetBlocks();
+								bomb.addBombBlocks();
+								
+								playerWarzone.respawnPlayer(event, playerTeam, player);
+								playerTeam.resetSign();
+								playerWarzone.getLobby().resetTeamGateSign(playerTeam);
+							}					
+						}
+						
+						playerWarzone.removeBombThief(player.getName());
+					}
+					
+					return;
+				}
+			}
+			
+			// Cake retrieval
+			if (playerWarzone.isCakeThief(player.getName())) {
+				// smoky
+				if (System.currentTimeMillis() % 13 == 0) {
+					playerWarzone.getWorld().playEffect(player.getLocation(), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
 				}
 				
-				return;
+				// Make sure game ends can't occur simultaneously. 
+				// See Warzone.handleDeath() for details.
+				synchronized (playerWarzone.getGameEndLock()) {
+					boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
+																
+					if (inSpawn && playerTeam.getPlayers().contains(player)) {
+						// Made sure player is still part of team, game may have ended while waiting on synchronized to unlock.
+						// Ignored the scorers that happened immediately after the game end.
+						boolean hasOpponent = false; 
+						for (Team t : playerWarzone.getTeams()) {
+							if (t != playerTeam && t.getPlayers().size() > 0) {
+								hasOpponent = true;
+							}
+						}
+						
+						// Don't let someone alone make points off cakes
+						if (hasOpponent) {
+							Cake cake = playerWarzone.getCakeForThief(player.getName());
+							
+							if (playerWarzone.isReinitializing()) {
+								// Battle already ended or interrupted
+								playerWarzone.respawnPlayer(event, playerTeam, player);
+							} else {
+								// All good - proceed with scoring
+								// Woot! Cake effect: 1 pt + full lifepool
+								playerTeam.addPoint();
+								playerTeam.setRemainingLives(playerTeam.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
+								
+								// Notify everyone
+								for (Team t : playerWarzone.getTeams()) {
+									if (War.war.isSpoutServer()) {
+										for (Player p : t.getPlayers()) {
+											SpoutPlayer sp = SpoutManager.getPlayer(p);
+											if (sp.isSpoutCraftEnabled()) {
+								                sp.sendNotification(
+								                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
+								                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "!"),
+								                		playerTeam.getKind().getMaterial(),
+								                		playerTeam.getKind().getData(),
+								                		10000);
+											}
+										}
+									}
+									
+									t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE
+											+ " captured cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE + ". Team " + playerTeam.getName() + " scores one point and gets a full lifepool.");
+								}
+								
+								// Detect win conditions
+								if (playerTeam.getPoints() >= playerTeam.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
+									if (playerWarzone.hasPlayerState(player.getName())) {
+										playerWarzone.restorePlayerState(player);
+									}
+									playerWarzone.handleScoreCapReached(playerTeam.getName());
+									event.setTo(playerWarzone.getTeleport());
+								} else {
+									// just added a point
+									
+									// bring back cake
+									cake.getVolume().resetBlocks();
+									cake.addCakeBlocks();
+									
+									playerWarzone.respawnPlayer(event, playerTeam, player);
+									playerTeam.resetSign();
+									playerWarzone.getLobby().resetTeamGateSign(playerTeam);
+								}
+							}
+							
+							playerWarzone.removeCakeThief(player.getName());
+						}
+					}
+					
+					return;
+				}
 			}
 			
 			// Class selection lock
@@ -785,6 +792,12 @@ public class WarPlayerListener implements Listener {
 							break;
 						}
 					}
+					
+					if (zone.hasPlayerState(event.getPlayer().getName())) {
+						// If not member of a team and zone has your state, then game ended while you were dead
+						zone.gameEndTeleport(event.getPlayer());
+					}
+					
 					break;
 				}
 			}
