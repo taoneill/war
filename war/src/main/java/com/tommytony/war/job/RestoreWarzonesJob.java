@@ -55,7 +55,7 @@ public class RestoreWarzonesJob implements Runnable {
 			War.war.log("Converted war.txt to war.yml.", Level.INFO);
 			
 			for (Warzone zone : War.war.getWarzones()) {
-				WarzoneYmlMapper.save(zone, false);
+				WarzoneYmlMapper.save(zone);
 				War.war.log("Converted warzone-" + zone.getName() + ".txt to warzone-" + zone.getName() + ".yml.", Level.INFO);
 			}			
 		}

@@ -1,5 +1,7 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -54,8 +56,10 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 		}
 
 		this.msg("Reloading warzone " + zone.getName() + ".");
-		
+			
 		zone.reinitialize();
+		
+		War.war.log(this.getSender().getName() + " reset warzone " + zone.getName(), Level.INFO);
 
 		return true;
 	}

@@ -1,5 +1,7 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -50,32 +52,19 @@ public class DeleteZoneCommand extends AbstractZoneMakerCommand {
 			return true;
 		}
 
-		for (Team t : zone.getTeams()) {
-			if (t.getTeamFlag() != null) {
-				t.getFlagVolume().resetBlocks();
-			}
-			t.getSpawnVolume().resetBlocks();
-
-			// reset inventory
-			for (Player p : t.getPlayers()) {
-				zone.restorePlayerState(p);
-			}
-		}
-		for (Monument m : zone.getMonuments()) {
-			m.getVolume().resetBlocks();
-		}
-		if (zone.getLobby() != null) {
-			zone.getLobby().getVolume().resetBlocks();
-		}
-		zone.getVolume().resetBlocks();
 		War.war.getWarzones().remove(zone);
 		WarYmlMapper.save();
-		WarzoneYmlMapper.delete(zone.getName());
+		
+		WarzoneYmlMapper.delete(zone);
+		
 		if (War.war.getWarHub() != null) { // warhub has to change
 			War.war.getWarHub().getVolume().resetBlocks();
 			War.war.getWarHub().initialize();
 		}
-		this.msg("Warzone " + zone.getName() + " removed.");
+		
+		String msg = "Warzone " + zone.getName() + " removed by " + this.getSender().getName() + ".";
+		War.war.log(msg, Level.INFO);
+		this.msg(msg);
 
 		return true;
 	}

@@ -1,5 +1,7 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -42,6 +44,7 @@ public class ZoneSetter {
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setNorthwest(northwestBlock);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Northwesternmost point set to x:" + warzone.getVolume().getNorthwestX() + " z:" + warzone.getVolume().getNorthwestZ() + ". ");
+				War.war.log(player.getName() + " created warzone " + zoneName + " by setting its nw corner", Level.INFO);
 			} else if (!this.isPlayerAuthorOfZoneOrAdmin(warzone)) {
 				return;
 			} else {
@@ -49,6 +52,7 @@ public class ZoneSetter {
 				this.resetWarzone(warzone, msgString);
 				warzone.getVolume().setNorthwest(northwestBlock);
 				msgString.append("Warzone " + warzone.getName() + " modified. Northwesternmost point set to x:" + warzone.getVolume().getNorthwestX() + " z:" + warzone.getVolume().getNorthwestZ() + ". ");
+				War.war.log(player.getName() + " updated warzone " + zoneName + " by setting its nw corner", Level.INFO);
 			}
 			this.saveIfReady(warzone, msgString);
 		} catch (NotNorthwestException e) {
@@ -85,6 +89,7 @@ public class ZoneSetter {
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setSoutheast(southeastBlock);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Southeasternmost point set to x:" + warzone.getVolume().getSoutheastX() + " z:" + warzone.getVolume().getSoutheastZ() + ". ");
+				War.war.log(player.getName() + " created warzone " + zoneName + " by setting its se corner", Level.INFO);
 			} else if (!this.isPlayerAuthorOfZoneOrAdmin(warzone)) {
 				return;
 			} else {
@@ -92,6 +97,7 @@ public class ZoneSetter {
 				this.resetWarzone(warzone, msgString);
 				warzone.getVolume().setSoutheast(southeastBlock);
 				msgString.append("Warzone " + warzone.getName() + " modified. Southeasternmost point set to x:" + warzone.getVolume().getSoutheastX() + " z:" + warzone.getVolume().getSoutheastZ() + ". ");
+				War.war.log(player.getName() + " updated warzone " + zoneName + " by setting its se corner", Level.INFO);
 			}
 			this.saveIfReady(warzone, msgString);
 		} catch (NotSoutheastException e) {
@@ -132,6 +138,7 @@ public class ZoneSetter {
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setZoneCornerOne(corner1Block);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Corner 1 set to x:" + corner1Block.getX() + " y:" + corner1Block.getY() + " z:" + corner1Block.getZ() + ". ");
+				War.war.log(player.getName() + " created warzone " + zoneName + " by setting its corner 1", Level.INFO);
 			} else if (!this.isPlayerAuthorOfZoneOrAdmin(warzone)) {
 				return;
 			} else {
@@ -139,6 +146,7 @@ public class ZoneSetter {
 				this.resetWarzone(warzone, msgString);
 				warzone.getVolume().setZoneCornerOne(corner1Block);
 				msgString.append("Warzone " + warzone.getName() + " modified. Corner 1 set to x:" + corner1Block.getX() + " y:" + corner1Block.getY() + " z:" + corner1Block.getZ() + ". ");
+				War.war.log(player.getName() + " updated warzone " + zoneName + " by setting its corner 1", Level.INFO);
 			}
 			this.saveIfReady(warzone, msgString);
 		} catch (TooSmallException e) {
@@ -174,6 +182,7 @@ public class ZoneSetter {
 				War.war.getIncompleteZones().add(warzone);
 				warzone.getVolume().setZoneCornerTwo(corner2Block);
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Corner 2 set to x:" + corner2Block.getX() + " y:" + corner2Block.getY() + " z:" + corner2Block.getZ() + ". ");
+				War.war.log(player.getName() + " created warzone " + zoneName + " by setting its corner 2", Level.INFO);
 			} else if (!this.isPlayerAuthorOfZoneOrAdmin(warzone)) {
 				return;
 			} else {
@@ -181,6 +190,7 @@ public class ZoneSetter {
 				this.resetWarzone(warzone, msgString);
 				warzone.getVolume().setZoneCornerTwo(corner2Block);
 				msgString.append("Warzone " + warzone.getName() + " modified. Corner 2 set to x:" + corner2Block.getX() + " y:" + corner2Block.getY() + " z:" + corner2Block.getZ() + ". ");
+				War.war.log(player.getName() + " updated warzone " + zoneName + " by setting its corner 2", Level.INFO);
 			}
 			this.saveIfReady(warzone, msgString);
 		} catch (TooSmallException e) {
@@ -249,8 +259,9 @@ public class ZoneSetter {
 			}
 			
 			warzone.initializeZone();
-			WarzoneYmlMapper.save(warzone, true);
+			WarzoneYmlMapper.save(warzone);
 			War.war.msg(this.player, "Warzone saved.");
+			War.war.log(this.player.getName() + " saved first version of warzone " + zoneName, Level.INFO);
 		} else {
 			if (warzone.getVolume().getCornerOne() == null) {
 				msgString.append("Still missing corner 1.");

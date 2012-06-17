@@ -1,11 +1,14 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.Team;
+import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
@@ -51,7 +54,8 @@ public class SetTeamFlagCommand extends AbstractZoneMakerCommand {
 			Location playerLoc = player.getLocation();
 			player.teleport(new Location(playerLoc.getWorld(), playerLoc.getBlockX() + 1, playerLoc.getBlockY(), playerLoc.getBlockZ()));
 			this.msg("Team " + team.getName() + " flag added here.");
-			WarzoneYmlMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone);
+			War.war.log(this.getSender().getName() + " created team " + team.getName() + " flag in warzone " + zone.getName(), Level.INFO);
 		} else {
 			// relocate flag
 			team.getFlagVolume().resetBlocks();
@@ -59,7 +63,8 @@ public class SetTeamFlagCommand extends AbstractZoneMakerCommand {
 			Location playerLoc = player.getLocation();
 			player.teleport(new Location(playerLoc.getWorld(), playerLoc.getBlockX() + 1, playerLoc.getBlockY(), playerLoc.getBlockZ() + 1));
 			this.msg("Team " + team.getName() + " flag moved.");
-			WarzoneYmlMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone);
+			War.war.log(this.getSender().getName() + " moved team " + team.getName() + " flag in warzone " + zone.getName(), Level.INFO);
 		}
 
 		return true;

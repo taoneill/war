@@ -5,6 +5,7 @@ public enum WarConfig {
 	BUILDINZONESONLY (Boolean.class),
 	DISABLEBUILDMESSAGE (Boolean.class),
 	DISABLEPVPMESSAGE (Boolean.class),
+	KEEPOLDZONEVERSIONS (Boolean.class),
 	MAXZONES (Integer.class),
 	PVPINZONESONLY (Boolean.class),
 	TNTINZONESONLY (Boolean.class);

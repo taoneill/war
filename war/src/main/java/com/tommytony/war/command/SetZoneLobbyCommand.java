@@ -1,5 +1,7 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -65,7 +67,7 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 					}
 					this.msg("Warzone lobby moved to your location.");
 				}
-				WarzoneYmlMapper.save(givenWarzone, false);
+				WarzoneYmlMapper.save(givenWarzone);
 			}
 		} else if (!this.isSenderAuthorOfZone(zone)) {
 			return true;
@@ -109,7 +111,8 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 				}
 				this.msg("Warzone lobby created on " + wallStr + "side of zone.");
 			}
-			WarzoneYmlMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone);
+			War.war.log(player.getName() + " moved lobby of warzone " + zone.getName(), Level.INFO);
 		}
 
 		return true;

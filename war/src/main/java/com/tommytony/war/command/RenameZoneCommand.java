@@ -6,11 +6,10 @@ import java.util.logging.Level;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.mapper.PropertiesFile;
+import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.ZoneLobby;
@@ -23,7 +22,7 @@ public class RenameZoneCommand extends AbstractZoneMakerCommand {
 	@Override
 	public boolean handle() {
 		Warzone zone;
-
+		
 		if (this.args.length == 2) {
 			zone = Warzone.getZoneByName(this.args[0]);
 			this.args[0] = this.args[1];
@@ -48,43 +47,52 @@ public class RenameZoneCommand extends AbstractZoneMakerCommand {
 		} else if (!this.isSenderAuthorOfZone(zone)) {
 			return true;
 		}
-
-		// kill old reference
+		
+		// Kill old warzone, but use it to create the renamed copy
 		zone.unload();
+		zone.getVolume().resetBlocks();	// We're going to use the blocks to save the new copy, reset to base state.
+		
+		String newName = this.args[0];
+		String oldName = zone.getName();
+		
+		// Update the name
+		zone.setName(newName);
+		zone.saveState(false); // Save new volume files. Don't clear anything, we already unloaded.
+		WarzoneYmlMapper.save(zone);	// Save new config files for warzone.
+				
+		// Get rid of old unloaded zone instance
 		War.war.getWarzones().remove(zone);
+				
+		// Move old files
+		(new File(War.war.getDataFolder().getPath() + "/temp/renamed/")).mkdir();
+		(new File(War.war.getDataFolder().getPath() + "/warzone-" + oldName + ".yml")).renameTo(new File(War.war.getDataFolder().getPath() + "/temp/renamed/warzone-" + oldName + ".yml"));
+		(new File(War.war.getDataFolder().getPath() + "/temp/renamed/dat/warzone-" + oldName)).mkdirs();
 
-		// rename zone file
-		(new File(War.war.getDataFolder().getPath() + "/warzone-" + zone.getName() + ".yml")).renameTo(new File(War.war.getDataFolder().getPath() + "/warzone-" + this.args[0] + ".yml"));
-		// rename zone folder
-		(new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + zone.getName())).renameTo(new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + this.args[0]));
+		String oldPath = War.war.getDataFolder().getPath() + "/dat/warzone-" + oldName + "/";
+		File oldZoneFolder = new File(oldPath);
+		File[] oldZoneFiles = oldZoneFolder.listFiles();
+		for (File file : oldZoneFiles) {
+			file.renameTo(new File(War.war.getDataFolder().getPath() + "/temp/renamed/dat/warzone-" + oldName + "/" + file.getName()));
+		}
+		oldZoneFolder.delete();
 
-		// TODO: Move renaming into ZoneVolumeMapper?
-		// rename volume files
-		String oldStart = War.war.getDataFolder().getPath() + "/dat/warzone-" + this.args[0] + "/volume-" + zone.getName() + ".";
-		String newStart = War.war.getDataFolder().getPath() + "/dat/warzone-" + this.args[0] + "/volume-" + this.args[0] + ".";
-		(new File(oldStart + "corners")).renameTo(new File(newStart + "corners"));
-		(new File(oldStart + "blocks")).renameTo(new File(newStart + "blocks"));
-		(new File(oldStart + "signs")).renameTo(new File(newStart + "signs"));
-		(new File(oldStart + "invs")).renameTo(new File(newStart + "invs"));
-
-		// set new name
-		PropertiesFile warzoneConfig = new PropertiesFile(War.war.getDataFolder().getPath() + "/warzone-" + this.args[0] + ".yml");
-		warzoneConfig.setString("name", this.args[0]);
-		warzoneConfig.save();
-		warzoneConfig.close();
-
-		War.war.log("Loading zone " + this.args[0] + "...", Level.INFO);
-		Warzone newZone = WarzoneYmlMapper.load(this.args[0], false);
+		// Load new warzone
+		War.war.log("Loading zone " + newName + "...", Level.INFO);
+		Warzone newZone = WarzoneYmlMapper.load(newName, false);
 		War.war.getWarzones().add(newZone);
-		// zone.getVolume().loadCorners();
 		newZone.getVolume().loadCorners();
 		
-		if (newZone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONLOAD)) {
-			newZone.getVolume().resetBlocks();
+		zone.getVolume().loadCorners();
+		if (zone.getLobby() != null) {
+			zone.getLobby().getVolume().resetBlocks();
 		}
+		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONLOAD)) {
+			zone.getVolume().resetBlocks();
+		}
+
 		newZone.initializeZone();
 
-		// save war config
+		// Update war config
 		WarYmlMapper.save();
 
 		if (War.war.getWarHub() != null) { // warhub has to change
@@ -92,7 +100,8 @@ public class RenameZoneCommand extends AbstractZoneMakerCommand {
 			War.war.getWarHub().initialize();
 		}
 
-		this.msg("Warzone " + zone.getName() + " renamed to " + this.args[0] + ".");
+		War.war.log(this.getSender().getName() + " renamed warzone " + oldName + " to " + newName, Level.INFO);
+		this.msg("Warzone " + oldName + " renamed to " + newName + ".");
 
 		return true;
 	}

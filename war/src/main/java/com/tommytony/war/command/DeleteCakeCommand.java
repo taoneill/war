@@ -1,9 +1,12 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
+import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.Cake;
@@ -54,8 +57,9 @@ public class DeleteCakeCommand extends AbstractZoneMakerCommand {
 		if (cake != null) {
 			cake.getVolume().resetBlocks();
 			zone.getCakes().remove(cake);
-			WarzoneYmlMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone);
 			this.msg("Cake " + cake.getName() + " removed.");
+			War.war.log(this.getSender().getName() + " deleted cake " + cake.getName() + " in warzone " + zone.getName(), Level.INFO);
 		} else {
 			this.badMsg("No such cake.");
 		}

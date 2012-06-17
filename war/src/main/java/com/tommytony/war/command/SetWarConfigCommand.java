@@ -1,5 +1,7 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 
 
@@ -30,10 +32,11 @@ public class SetWarConfigCommand extends AbstractWarAdminCommand {
 			WarYmlMapper.save();
 			if (wantsToPrint) {
 				String config = War.war.printConfig();
-				this.msg("War config saved." + namedParamReturn + " " + config);
+				this.msg("War config saved. " + namedParamReturn + " " + config);
 			} else {
-				this.msg("War config saved." + namedParamReturn);
+				this.msg("War config saved. " + namedParamReturn);
 			}
+			War.war.log(this.getSender().getName() + " updated War configuration. " + namedParamReturn, Level.INFO);
 		} else if (namedParamReturn.equals("PARSE-ERROR")) {
 			this.msg("Failed to read named parameters.");
 		} else {

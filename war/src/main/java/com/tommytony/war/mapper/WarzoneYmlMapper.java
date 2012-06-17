@@ -38,7 +38,7 @@ public class WarzoneYmlMapper {
 			// Since we're converting, WarTxtMapper didn't load the warzones. 
 			// We need to load the old-text-format-Warzone into memory.
 			Warzone zoneToConvert = WarzoneTxtMapper.load(name, false);
-			WarzoneYmlMapper.save(zoneToConvert, false);
+			WarzoneYmlMapper.save(zoneToConvert);
 			War.war.log("Converted warzone-" + name + ".txt to warzone-" + name + ".yml", Level.INFO);
 		}
 		
@@ -311,7 +311,7 @@ public class WarzoneYmlMapper {
 		return null;
 	}
 	
-	public static void save(Warzone warzone, boolean saveAllBlocks) {
+	public static void save(Warzone warzone) {
 		YamlConfiguration warzoneYmlConfig = new YamlConfiguration();
 		ConfigurationSection warzoneRootSection = warzoneYmlConfig.createSection("set");
 		(new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + warzone.getName())).mkdir();	// create folder
@@ -542,30 +542,24 @@ public class WarzoneYmlMapper {
 		return intYaw;
 	}
 
-	public static void delete(String name) {
-		File zoneFolder = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name);
-		File[] files = zoneFolder.listFiles();
-		for (File file : files) {
-			boolean deletedData = file.delete();
-			if (!deletedData) {
-				War.war.log("Failed to delete file " + file.getName(), Level.WARNING);
-			}
+	public static void delete(Warzone zone) {
+		// Kill old warzone, but use it to create the renamed copy
+		zone.unload();
+		zone.getVolume().resetBlocks();	// We're need a clean land
+		
+		String name = zone.getName();
+				
+		// Move old files
+		(new File(War.war.getDataFolder().getPath() + "/temp/deleted/")).mkdir();
+		(new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".yml")).renameTo(new File(War.war.getDataFolder().getPath() + "/temp/deleted/warzone-" + name + ".yml"));
+		(new File(War.war.getDataFolder().getPath() + "/temp/deleted/dat/warzone-" + name)).mkdirs();
+
+		String oldPath = War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/";
+		File oldZoneFolder = new File(oldPath);
+		File[] oldZoneFiles = oldZoneFolder.listFiles();
+		for (File file : oldZoneFiles) {
+			file.renameTo(new File(War.war.getDataFolder().getPath() + "/temp/deleted/dat/warzone-" + name + "/" + file.getName()));
 		}
-		boolean deletedData = zoneFolder.delete();
-		if (!deletedData) {
-			War.war.log("Failed to delete folder " + zoneFolder.getName(), Level.WARNING);
-		}
-		File zoneFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
-		if (zoneFile.exists()) {
-			deletedData = zoneFile.delete();
-			if (!deletedData) {
-				War.war.log("Failed to delete file " + zoneFile.getName(), Level.WARNING);
-			}
-		}
-		zoneFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".yml");
-		deletedData = zoneFile.delete();
-		if (!deletedData) {
-			War.war.log("Failed to delete file " + zoneFile.getName(), Level.WARNING);
-		}
+		oldZoneFolder.delete();
 	}
 }

@@ -1,9 +1,12 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
+import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.Cake;
@@ -49,14 +52,16 @@ public class SetCakeCommand extends AbstractZoneMakerCommand {
 			cake.getVolume().resetBlocks();
 			cake.setLocation(player.getLocation());
 			this.msg("Cake " + cake.getName() + " was moved.");
+			War.war.log(this.getSender().getName() + " moved cake " + cake.getName() + " in warzone " + zone.getName(), Level.INFO);
 		} else {
 			// create a new cake
 			Cake cake = new Cake(this.args[0], zone, player.getLocation());
 			zone.getCakes().add(cake);
 			this.msg("Cake " + cake.getName() + " created.");
+			War.war.log(this.getSender().getName() + " created cake " + cake.getName() + " in warzone " + zone.getName(), Level.INFO);
 		}
 
-		WarzoneYmlMapper.save(zone, false);
+		WarzoneYmlMapper.save(zone);
 
 		return true;
 	}

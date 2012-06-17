@@ -1,5 +1,7 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 
 
@@ -38,6 +40,7 @@ public class DeleteWarhubCommand extends AbstractWarAdminCommand {
 			}
 
 			this.msg("War hub removed.");
+			War.war.log(this.getSender().getName() + " deleted warhub", Level.INFO);
 		} else {
 			this.badMsg("No War hub to delete.");
 		}

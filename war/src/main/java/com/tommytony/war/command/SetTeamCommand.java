@@ -1,10 +1,13 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.Team;
+import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamKind;
@@ -50,6 +53,7 @@ public class SetTeamCommand extends AbstractZoneMakerCommand {
 				// relocate
 				existingTeam.setTeamSpawn(player.getLocation());
 				this.msg("Team " + existingTeam.getName() + " spawn relocated.");
+				War.war.log(this.getSender().getName() + " moved team " + existingTeam.getName() + " in warzone " + zone.getName(), Level.INFO);
 			} else {
 				// new team (use default TeamKind name for now)
 				Team newTeam = new Team(teamKind.toString(), teamKind, player.getLocation(), zone);
@@ -61,10 +65,11 @@ public class SetTeamCommand extends AbstractZoneMakerCommand {
 				}
 				newTeam.setTeamSpawn(player.getLocation());
 				this.msg("Team " + newTeam.getName() + " created with spawn here.");
+				War.war.log(this.getSender().getName() + " created team " + newTeam.getName() + " in warzone " + zone.getName(), Level.INFO);
 			}
 		}
 
-		WarzoneYmlMapper.save(zone, false);
+		WarzoneYmlMapper.save(zone);
 
 		return true;
 	}

@@ -1,5 +1,7 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -50,6 +52,7 @@ public class ZoneMakerCommand extends AbstractWarCommand {
 					Player kickedMaker = War.war.getServer().getPlayer(this.args[0]);
 					if (kickedMaker != null) {
 						War.war.msg(kickedMaker, player.getName() + " took away your warzone maker priviledges.");
+						War.war.log(player.getName() + " took away zonemaker rights from " + kickedMaker, Level.INFO);
 					}
 				} else {
 					// add
@@ -58,6 +61,7 @@ public class ZoneMakerCommand extends AbstractWarCommand {
 					Player newMaker = War.war.getServer().getPlayer(this.args[0]);
 					if (newMaker != null) {
 						War.war.msg(newMaker, player.getName() + " made you warzone maker.");
+						War.war.log(player.getName() + " made " + newMaker + " a zonemaker", Level.INFO);
 					}
 				}
 			} else {

@@ -1,11 +1,21 @@
 package com.tommytony.war.command;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.ZoneLobby;
 
@@ -61,12 +71,65 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 			}
 		}
 
-		// We have a warzone and indexed-from-0 arguments, let's updatethis.msg(player, "Saving warzone " + warzone.getName() + ".");
+		// We have a warzone and indexed-from-0 arguments
+		if (War.war.getWarConfig().getBoolean(WarConfig.KEEPOLDZONEVERSIONS)) {
+			// Keep a copy of the old version, just in case. First, find the version number
+			File oldVersionsFolder = new File(War.war.getDataFolder().getPath() + "/temp/oldversions/warzone-" + zone.getName());
+			oldVersionsFolder.mkdirs();
+			
+			File[] versionFolders = oldVersionsFolder.listFiles();
+			File last = null;
+			if (versionFolders.length > 0) {
+				last = versionFolders[versionFolders.length - 1];
+			}
+			
+			int oldVersion = 0;
+			if (last != null) {
+				// at least one version
+				try {
+					String numVersion = last.getName().split("-")[1];	// get rid of datetime prefix
+					oldVersion = Integer.parseInt(numVersion);
+				} catch (NumberFormatException badname) {
+					War.war.log("Failed to read old version of warzone " + zone.getName(), Level.WARNING);
+				}
+			}
+			
+			int newVersion = oldVersion + 1;
+			SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss"); 
+			String newVersionString = format.format(new Date()) + "-" + newVersion;
+			String newVersionPath = War.war.getDataFolder().getPath() + "/temp/oldversions/warzone-" + zone.getName() + "/" + newVersionString;
+			File newVersionFolder = new File(newVersionPath);
+			newVersionFolder.mkdir();
+			
+			// Copy all warzone files to new version folder before they get overwritten
+			try {
+				copyFile(new File(War.war.getDataFolder().getPath() + "/warzone-" + zone.getName() + ".yml"), new File(newVersionPath + "/warzone-" + zone.getName() + ".yml"));
+				(new File(newVersionPath + "/dat/warzone-" + zone.getName())).mkdirs();
+				String oldPath = War.war.getDataFolder().getPath() + "/dat/warzone-" + zone.getName() + "/";
+				File currentZoneFolder = new File(oldPath);
+				
+				File[] currentZoneFiles = currentZoneFolder.listFiles();
+				for (File file : currentZoneFiles) {
+					copyFile(file, new File(newVersionPath + "/dat/warzone-" + zone.getName() + "/" + file.getName()));
+				}
+		    } catch (IOException badCopy) {
+		    	War.war.log("Failed to make backup copy version " + newVersion + " of warzone " + zone.getName(), Level.WARNING);
+		    }
+			
+			int currentVersion = newVersion + 1;
+			this.msg("Saving version " + currentVersion + " of warzone " + zone.getName());
+			War.war.log(this.getSender().getName() + " is saving version " + currentVersion + " of warzone " + zone.getName(), Level.INFO);
+		} else {
+			this.msg("Saving new permanent version of warzone " + zone.getName());
+			War.war.log(this.getSender().getName() + " is saving new permanent version of warzone " + zone.getName(), Level.INFO);
+		}
+		
+		// Let's save the new version update
 		int savedBlocks = zone.saveState(true);
 
 		// changed settings: must reinitialize with new settings
 		String namedParamResult = War.war.updateZoneFromNamedParams(zone, commandSender, this.args);
-		WarzoneYmlMapper.save(zone, true);
+		WarzoneYmlMapper.save(zone);
 		if (this.args.length > 0) {
 			// the config may have changed, requiring a reset for spawn styles etc.
 			zone.getVolume().resetBlocks();
@@ -81,8 +144,34 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 			War.war.getWarHub().initialize();
 		}
 
-		this.msg("Warzone " + zone.getName() + " initial state changed. Saved " + savedBlocks + " blocks." + namedParamResult);
+		this.msg("Saved " + savedBlocks + " blocks in warzone " + zone.getName() + "." + namedParamResult);
+		if (namedParamResult != null && namedParamResult.length() > 0) {
+			War.war.log(this.getSender().getName() + " also updated warzone " + zone.getName() + " configuration." + namedParamResult, Level.INFO);
+		}
 
 		return true;
+	}
+	
+	public static void copyFile(File sourceFile, File destFile) throws IOException {
+	    if(!destFile.exists()) {
+	        destFile.createNewFile();
+	    }
+
+	    FileChannel source = null;
+	    FileChannel destination = null;
+
+	    try {
+	        source = new FileInputStream(sourceFile).getChannel();
+	        destination = new FileOutputStream(destFile).getChannel();
+	        destination.transferFrom(source, 0, source.size());
+	    }
+	    finally {
+	        if(source != null) {
+	            source.close();
+	        }
+	        if(destination != null) {
+	            destination.close();
+	        }
+	    }
 	}
 }

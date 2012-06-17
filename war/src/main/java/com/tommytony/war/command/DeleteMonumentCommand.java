@@ -1,9 +1,12 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
+import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.Monument;
@@ -54,8 +57,9 @@ public class DeleteMonumentCommand extends AbstractZoneMakerCommand {
 		if (monument != null) {
 			monument.getVolume().resetBlocks();
 			zone.getMonuments().remove(monument);
-			WarzoneYmlMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone);
 			this.msg("Monument " + monument.getName() + " removed.");
+			War.war.log(this.getSender().getName() + " deleted monument " + monument.getName() + " in warzone " + zone.getName(), Level.INFO);
 		} else {
 			this.badMsg("No such monument.");
 		}

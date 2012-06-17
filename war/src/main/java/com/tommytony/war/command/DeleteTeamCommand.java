@@ -1,10 +1,13 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
 import com.tommytony.war.Team;
+import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
@@ -62,8 +65,9 @@ public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 				zone.getLobby().setLocation(zone.getTeleport());
 				zone.getLobby().initialize();
 			}
-			WarzoneYmlMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone);
 			this.msg("Team " + team.getName() + " removed.");
+			War.war.log(this.getSender().getName() + " deleted team " + team.getName() + " in warzone " + zone.getName(), Level.INFO);
 		} else {
 			this.badMsg("No such team.");
 		}

@@ -1,9 +1,12 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
+import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.Bomb;
@@ -54,8 +57,9 @@ public class DeleteBombCommand extends AbstractZoneMakerCommand {
 		if (bomb != null) {
 			bomb.getVolume().resetBlocks();
 			zone.getBombs().remove(bomb);
-			WarzoneYmlMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone);
 			this.msg("Bomb " + bomb.getName() + " removed.");
+			War.war.log(this.getSender().getName() + " deleted bomb " + bomb.getName() + " in warzone " + zone.getName(), Level.INFO);
 		} else {
 			this.badMsg("No such bomb.");
 		}

@@ -1,5 +1,7 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -94,7 +96,7 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 			String namedParamReturn = War.war.updateZoneFromNamedParams(zone, player, this.args);
 			if (!namedParamReturn.equals("") && !namedParamReturn.equals("PARSE-ERROR")) {
 
-				WarzoneYmlMapper.save(zone, false);
+				WarzoneYmlMapper.save(zone);
 				
 				String zoneReset = "Some changes may require a /resetzone. "; 
 				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONCONFIGCHANGE)) {
@@ -107,6 +109,8 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 				} else {
 					this.msg("Warzone config saved. " + zoneReset + namedParamReturn);
 				}
+				
+				War.war.log(this.getSender().getName() + " updated warzone " + zone.getName() + " configuration." + namedParamReturn, Level.INFO);
 
 				if (War.war.getWarHub() != null) { // maybe the zone was disabled/enabled
 					War.war.getWarHub().getVolume().resetBlocks();

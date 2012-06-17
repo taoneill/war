@@ -1251,12 +1251,10 @@ public class Warzone {
 		}
 		if (this.getLobby() != null) {
 			this.getLobby().getVolume().resetBlocks();
-			this.getLobby().getVolume().finalize();
 		}
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONUNLOAD)) {
 			this.getVolume().resetBlocks();
 		}
-		this.getVolume().finalize();
 	}
 
 	public boolean isEnoughPlayers() {
@@ -1371,5 +1369,10 @@ public class Warzone {
 
 	public Object getGameEndLock() {
 		return gameEndLock;
+	}
+
+	public void setName(String newName) {
+		this.name = newName;
+		this.volume.setName(newName);
 	}
 }

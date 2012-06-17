@@ -1,5 +1,7 @@
 package com.tommytony.war.command;
 
+import java.util.logging.Level;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -38,6 +40,7 @@ public class SetWarHubCommand extends AbstractWarAdminCommand {
 				War.war.getWarHub().setLocation(player.getLocation());
 				War.war.getWarHub().initialize();
 				this.msg("War hub moved.");
+				War.war.log(this.getSender().getName() + " moved the warhub", Level.INFO);
 			} else {
 				War.war.setWarHub(new WarHub(player.getLocation()));
 				War.war.getWarHub().initialize();
@@ -48,6 +51,7 @@ public class SetWarHubCommand extends AbstractWarAdminCommand {
 					}
 				}
 				this.msg("War hub created.");
+				War.war.log(this.getSender().getName() + " created the warhub", Level.INFO);
 			}
 			WarYmlMapper.save();
 		} else {

@@ -27,9 +27,8 @@ import com.tommytony.war.job.BlockResetJob;
  *
  */
 public class Volume {
-	private final String name;
+	private String name;
 	private World world;
-	// private final Warzone warzone;
 	private BlockInfo cornerOne;
 	private BlockInfo cornerTwo;
 	private int[][][] blockTypes = null;
@@ -40,6 +39,10 @@ public class Volume {
 	public Volume(String name, World world) {
 		this.name = name;
 		this.world = world;
+	}
+	
+	public void setName(String newName) {
+		this.name = newName;
 	}
 
 	public World getWorld() {
@@ -63,9 +66,6 @@ public class Volume {
 	}
 
 	public int saveBlocks() {
-		// BlockSaveJob job = new BlockSaveJob(this);
-		// war.getServer().getScheduler().scheduleSyncDelayedTask(war, job);
-		// return 0;
 		int noOfSavedBlocks = 0;
 		int x = 0;
 		int y = 0;

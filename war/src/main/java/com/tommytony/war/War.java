@@ -1,10 +1,14 @@
 package com.tommytony.war;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -43,6 +47,7 @@ import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.ChatFixUtil;
 import com.tommytony.war.utility.PlayerState;
+import com.tommytony.war.utility.WarLogFormatter;
 
 /**
  * Main class of War
@@ -85,6 +90,8 @@ public class War extends JavaPlugin {
 	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
 	private SpoutDisplayer spoutMessenger = null;
+
+	private Logger warLogger;
 
 	public War() {
 		super();
@@ -134,6 +141,7 @@ public class War extends JavaPlugin {
 		warConfig.put(WarConfig.BUILDINZONESONLY, false);
 		warConfig.put(WarConfig.DISABLEBUILDMESSAGE, false);
 		warConfig.put(WarConfig.DISABLEPVPMESSAGE, false);
+		warConfig.put(WarConfig.KEEPOLDZONEVERSIONS, true);
 		warConfig.put(WarConfig.MAXZONES, 12);
 		warConfig.put(WarConfig.PVPINZONESONLY, false);
 		warConfig.put(WarConfig.TNTINZONESONLY, false);
@@ -157,6 +165,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.RESETONUNLOAD, false);
 		warzoneDefaultConfig.put(WarzoneConfig.UNBREAKABLE, false);
 		warzoneDefaultConfig.put(WarzoneConfig.DEATHMESSAGES, true);
+		
 		
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);
 		teamDefaultConfig.put(TeamConfig.FLAGPOINTSONLY, false);
@@ -231,6 +240,21 @@ public class War extends JavaPlugin {
 		if (this.isSpoutServer) {
 			SpoutFadeOutMessageJob fadeOutMessagesTask = new SpoutFadeOutMessageJob();
 			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, fadeOutMessagesTask, 100, 100);
+		}
+		
+		// Get own log file
+		try {
+		    // Create an appending file handler
+		    FileHandler handler = new FileHandler(this.getDataFolder() + "/temp/war.log", true);
+
+		    // Add to War-specific logger
+		    this.warLogger = Logger.getLogger("com.tommytony.War.log");
+		    this.warLogger.setUseParentHandlers(false);
+		    Formatter formatter = new WarLogFormatter();
+	        handler.setFormatter(formatter);   
+		    this.warLogger.addHandler(handler);
+		} catch (IOException e) {
+			this.getLogger().log(Level.WARNING, "Failed to create War log file");
 		}
 				
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
@@ -621,7 +645,7 @@ public class War extends JavaPlugin {
 			this.badMsg(player, "Can't set rally point. No such warzone.");
 		} else {
 			zone.setRallyPoint(player.getLocation());
-			WarzoneYmlMapper.save(zone, false);
+			WarzoneYmlMapper.save(zone);
 		}
 	}
 
@@ -677,7 +701,12 @@ public class War extends JavaPlugin {
 	 *                lvl level to use
 	 */
 	public void log(String str, Level lvl) {
-		this.getLogger().log(lvl, "War> " + str);
+		// Log to Bukkit console 
+		this.getLogger().log(lvl, str);
+		
+		if (this.warLogger != null) {
+			this.warLogger.log(lvl, str);
+		}
 	}
 
 	// the only way to find a zone that has only one corner
@@ -804,6 +833,7 @@ public class War extends JavaPlugin {
 				player.getInventory().addItem(new ItemStack(Material.WOOD_SWORD, 1, (byte) 8));
 				// player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.WOOD_SWORD));
 				this.msg(player, "You now have a wand for zone " + zoneName + ". Left-click with wodden sword for corner 1. Right-click for corner 2.");
+				War.war.log(player.getName() + " now has a wand for warzone " + zoneName, Level.INFO);
 			}
 		}
 	}
