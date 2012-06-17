@@ -1,5 +1,6 @@
 package com.tommytony.war;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -245,6 +246,7 @@ public class War extends JavaPlugin {
 		// Get own log file
 		try {
 		    // Create an appending file handler
+			new File(this.getDataFolder() + "/temp/").mkdir();
 		    FileHandler handler = new FileHandler(this.getDataFolder() + "/temp/war.log", true);
 
 		    // Add to War-specific logger
