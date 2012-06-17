@@ -1,5 +1,6 @@
 package com.tommytony.war;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -123,6 +124,18 @@ public class Warzone {
 			if (team != null) {
 				return warzone;
 			}
+		}
+		return null;
+	}
+
+	public static Warzone getZoneByTeam(Team team) {
+		for (Warzone warzone : War.war.getWarzones()) {
+			for (Team teamToCheck : warzone.getTeams()) {
+				if (teamToCheck.getName().equals(team.getName())) {
+					return warzone;
+				}				
+			}
+
 		}
 		return null;
 	}

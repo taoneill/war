@@ -361,6 +361,19 @@ public class War extends JavaPlugin {
 					String loadoutName = namedParams.get("loadout");
 					HashMap<Integer, ItemStack> loadout = team.getInventories().getLoadouts().get(loadoutName);
 					if (loadout == null) {
+						// Check if any loadouts exist, if not gotta use the default inventories then add the newly created one
+						if(team.getInventories().getLoadouts().isEmpty()) {
+							Warzone warzone = Warzone.getZoneByTeam(team);
+							for (String key : warzone.getDefaultInventories().resolveLoadouts().keySet()) {
+								HashMap<Integer, ItemStack> transferredLoadout = warzone.getDefaultInventories().resolveLoadouts().get(key);
+								if (transferredLoadout != null) {
+									team.getInventories().getLoadouts().put(key, transferredLoadout);
+								} else {
+									War.war.log("Failed to transfer loadout " + key + " down to team " + team.getName() + " in warzone " + warzone.getName(), Level.WARNING);
+								}
+							}
+						}
+						
 						loadout = new HashMap<Integer, ItemStack>();
 						team.getInventories().getLoadouts().put(loadoutName, loadout);
 						returnMessage.append(loadoutName + " respawn loadout added.");
@@ -430,6 +443,19 @@ public class War extends JavaPlugin {
 					HashMap<Integer, ItemStack> loadout = warzone.getDefaultInventories().getLoadouts().get(loadoutName);
 					if (loadout == null) {
 						loadout = new HashMap<Integer, ItemStack>();
+
+						// Check if any loadouts exist, if not gotta use the default inventories then add the newly created one
+						if(warzone.getDefaultInventories().getLoadouts().isEmpty()) {
+							for (String key : warzone.getDefaultInventories().resolveLoadouts().keySet()) {
+								HashMap<Integer, ItemStack> transferredLoadout = warzone.getDefaultInventories().resolveLoadouts().get(key);
+								if (transferredLoadout != null) {
+									warzone.getDefaultInventories().getLoadouts().put(key, transferredLoadout);
+								} else {
+									War.war.log("Failed to transfer loadout " + key + " down to warzone " + warzone.getName(), Level.WARNING);
+								}
+							}
+						}
+						
 						warzone.getDefaultInventories().getLoadouts().put(loadoutName, loadout);
 						returnMessage.append(loadoutName + " respawn loadout added.");
 					} else {
