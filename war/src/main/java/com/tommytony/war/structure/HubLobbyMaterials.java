@@ -1,8 +1,11 @@
-package com.tommytony.war.utility;
+package com.tommytony.war.structure;
 
-public class WarhubMaterials {
+public class HubLobbyMaterials {
 	private final int floorId;
 	private final byte floorData;
+	
+	private final int outlineId;
+	private final byte outlineData;
 	
 	private final int gateId;
 	private final byte gateData;
@@ -10,9 +13,11 @@ public class WarhubMaterials {
 	private final int lightId;
 	private final byte lightData;
 	
-	public WarhubMaterials(int floorId, byte floorData, int gateId, byte gateData, int lightId, byte lightData) {
+	public HubLobbyMaterials(int floorId, byte floorData, int outlineId, byte outlineData, int gateId, byte gateData, int lightId, byte lightData) {
 		this.floorId = floorId;
 		this.floorData = floorData;
+		this.outlineId = outlineId;
+		this.outlineData = outlineData;
 		this.gateId = gateId;
 		this.gateData = gateData;
 		this.lightId = lightId;
@@ -41,6 +46,14 @@ public class WarhubMaterials {
 
 	public byte getLightData() {
 		return lightData;
+	}
+
+	public int getOutlineId() {
+		return outlineId;
+	}
+
+	public byte getOutlineData() {
+		return outlineData;
 	}
 	
 }

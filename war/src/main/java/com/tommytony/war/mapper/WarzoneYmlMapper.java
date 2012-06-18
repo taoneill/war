@@ -22,6 +22,7 @@ import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.volume.Volume;
@@ -296,6 +297,41 @@ public class WarzoneYmlMapper {
 				lobbyFace = BlockFace.WEST;
 			}
 			
+			// lobby materials
+			int floorId = War.war.getWarhubMaterials().getFloorId();	// default warhub
+			int floorData = War.war.getWarhubMaterials().getFloorData();	
+			ConfigurationSection floorMaterialSection = warzoneRootSection.getConfigurationSection(lobbyPrefix + "materials.floor");
+			if (floorMaterialSection != null) {
+				floorId = floorMaterialSection.getInt("id");
+				floorData = floorMaterialSection.getInt("data");
+			}
+			
+			int outlineId = War.war.getWarhubMaterials().getOutlineId();
+			int outlineData = War.war.getWarhubMaterials().getOutlineData();	
+			ConfigurationSection outlineMaterialSection = warzoneRootSection.getConfigurationSection(lobbyPrefix + "materials.outline");
+			if (outlineMaterialSection != null) {
+				outlineId = outlineMaterialSection.getInt("id");
+				outlineData = outlineMaterialSection.getInt("data");
+			}
+			
+			int gateId = War.war.getWarhubMaterials().getGateId();
+			int gateData = War.war.getWarhubMaterials().getGateData();;	
+			ConfigurationSection gateMaterialSection = warzoneRootSection.getConfigurationSection(lobbyPrefix + "materials.gate");
+			if (gateMaterialSection != null) {
+				gateId = gateMaterialSection.getInt("id");
+				gateData = gateMaterialSection.getInt("data");
+			}
+			
+			int lightId = War.war.getWarhubMaterials().getLightId();
+			int lightData = War.war.getWarhubMaterials().getLightData();	
+			ConfigurationSection lightMaterialSection = warzoneRootSection.getConfigurationSection(lobbyPrefix + "materials.light");
+			if (lightMaterialSection != null) {
+				lightId = lightMaterialSection.getInt("id");
+				lightData = lightMaterialSection.getInt("data");
+			}
+			
+			warzone.setLobbyMaterials(new HubLobbyMaterials(floorId, (byte)floorData, outlineId, (byte)outlineData, gateId, (byte)gateData, lightId, (byte)lightData));
+			
 			// lobby world
 			String lobbyWorldName = warzoneRootSection.getString(lobbyPrefix + "world");
 			World lobbyWorld = War.war.getServer().getWorld(lobbyWorldName);
@@ -355,6 +391,19 @@ public class WarzoneYmlMapper {
 			ConfigurationSection lobbySection = warzoneInfoSection.createSection("lobby");
 			lobbySection.set("orientation", lobbyOrientation);
 			lobbySection.set("world", warzone.getLobby().getVolume().getWorld().getName());
+			
+			ConfigurationSection floorSection = lobbySection.createSection("materials.floor");
+			floorSection.set("id", warzone.getLobbyMaterials().getFloorId());
+			floorSection.set("data", warzone.getLobbyMaterials().getFloorData());
+			ConfigurationSection outlineSection = lobbySection.createSection("materials.outline");
+			outlineSection.set("id", warzone.getLobbyMaterials().getOutlineId());
+			outlineSection.set("data", warzone.getLobbyMaterials().getOutlineData());
+			ConfigurationSection gateSection = lobbySection.createSection("materials.gate");
+			gateSection.set("id", warzone.getLobbyMaterials().getGateId());
+			gateSection.set("data", warzone.getLobbyMaterials().getGateData());
+			ConfigurationSection lightSection = lobbySection.createSection("materials.light");
+			lightSection.set("id", warzone.getLobbyMaterials().getLightId());
+			lightSection.set("data", warzone.getLobbyMaterials().getLightData());
 		}
 
 		// rallyPoint

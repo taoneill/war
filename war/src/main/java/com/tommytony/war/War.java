@@ -45,11 +45,11 @@ import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.WarHub;
+import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.ChatFixUtil;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.WarLogFormatter;
-import com.tommytony.war.utility.WarhubMaterials;
 
 /**
  * Main class of War
@@ -95,7 +95,7 @@ public class War extends JavaPlugin {
 
 	private Logger warLogger;
 
-	private WarhubMaterials warhubMaterials;
+	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(20, (byte)0, 5, (byte)0, 49, (byte)0, 89, (byte)0);	// default floor glass, outline planks, gate obsidian, light glowstone
 
 	public War() {
 		super();
@@ -974,11 +974,11 @@ public class War extends JavaPlugin {
 		return this.spoutMessenger ;
 	}
 
-	public void setWarhubMaterials(WarhubMaterials warhubMaterials) {
+	public void setWarhubMaterials(HubLobbyMaterials warhubMaterials) {
 		this.warhubMaterials = warhubMaterials;
 	}
 	
-	public WarhubMaterials getWarhubMaterials() {
+	public HubLobbyMaterials getWarhubMaterials() {
 		return this.warhubMaterials;
 	}
 }

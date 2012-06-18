@@ -36,6 +36,7 @@ import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.structure.Monument;
+import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.structure.ZoneWallGuard;
 import com.tommytony.war.utility.LoadoutSelection;
@@ -77,6 +78,8 @@ public class Warzone {
 	private final TeamConfigBag teamDefaultConfig;
 	private InventoryBag defaultInventories = new InventoryBag();
 	
+	private HubLobbyMaterials lobbyMaterials = null;
+	
 	private boolean isEndOfGame = false;
 	private boolean isReinitializing = false;
 	private final Object gameEndLock = new Object();
@@ -87,6 +90,16 @@ public class Warzone {
 		this.warzoneConfig = new WarzoneConfigBag(this);
 		this.teamDefaultConfig = new TeamConfigBag();	// don't use ctor with Warzone, as this changes config resolution
 		this.volume = new ZoneVolume(name, this.getWorld(), this);
+		this.lobbyMaterials = new HubLobbyMaterials(
+				War.war.getWarhubMaterials().getFloorId(),
+				War.war.getWarhubMaterials().getFloorData(),
+				War.war.getWarhubMaterials().getOutlineId(),
+				War.war.getWarhubMaterials().getOutlineData(),
+				War.war.getWarhubMaterials().getGateId(),
+				War.war.getWarhubMaterials().getGateData(),
+				War.war.getWarhubMaterials().getLightId(),
+				War.war.getWarhubMaterials().getLightData()
+			);
 	}
 
 	public static Warzone getZoneByName(String name) {
@@ -1385,5 +1398,13 @@ public class Warzone {
 	public void setName(String newName) {
 		this.name = newName;
 		this.volume.setName(newName);
+	}
+
+	public HubLobbyMaterials getLobbyMaterials() {
+		return this.lobbyMaterials;
+	}
+
+	public void setLobbyMaterials(HubLobbyMaterials lobbyMaterials) {
+		this.lobbyMaterials = lobbyMaterials;
 	}
 }

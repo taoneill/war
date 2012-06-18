@@ -473,6 +473,28 @@ public class Volume {
 			War.war.log("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
+	
+	public void setFloorOutlineMaterial(Material outline, byte outlineData) {
+		try {
+			if (this.hasTwoCorners() && this.isSaved()) {
+				int x = this.getMinX();
+				for (int i = 0; i < this.getSizeX(); i++) {
+					int z = this.getMinZ();
+					for (int k = 0; k < this.getSizeZ(); k++) {
+						if (x == this.getMinX() || x == this.getMaxX() || z == this.getMinZ() || z == this.getMaxZ()) {
+							Block currentBlock = this.getWorld().getBlockAt(x, this.getMinY(), z);
+							currentBlock.setType(outline);
+							currentBlock.setData(outlineData);
+						}
+						z++;
+					}
+					x++;
+				}
+			}
+		} catch (Exception e) {
+			War.war.log("Failed to set floor ouline block to " + outline + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
+		}
+	}
 
 	private void switchMaterials(Material[] oldTypes, Material newType) {
 		try {

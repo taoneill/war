@@ -10,7 +10,7 @@ import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.structure.WarHub;
-import com.tommytony.war.utility.WarhubMaterials;
+import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.volume.Volume;
 
 public class RestoreYmlWarhubJob implements Runnable {
@@ -38,6 +38,14 @@ public class RestoreYmlWarhubJob implements Runnable {
 			floorData = floorMaterialSection.getInt("data");
 		}
 		
+		int outlineId = 5;	// default planks
+		int outlineData = 0;	
+		ConfigurationSection outlineMaterialSection = warhubConfig.getConfigurationSection("materials.outline");
+		if (outlineMaterialSection != null) {
+			outlineId = outlineMaterialSection.getInt("id");
+			outlineData = outlineMaterialSection.getInt("data");
+		}
+		
 		int gateId = 49;	// default obsidian
 		int gateData = 0;	
 		ConfigurationSection gateMaterialSection = warhubConfig.getConfigurationSection("materials.gate");
@@ -54,7 +62,7 @@ public class RestoreYmlWarhubJob implements Runnable {
 			lightData = lightMaterialSection.getInt("data");
 		}
 		
-		War.war.setWarhubMaterials(new WarhubMaterials(floorId, (byte)floorData, gateId, (byte)gateData, lightId, (byte)lightData));
+		War.war.setWarhubMaterials(new HubLobbyMaterials(floorId, (byte)floorData, outlineId, (byte)outlineData, gateId, (byte)gateData, lightId, (byte)lightData));
 
 		World world = War.war.getServer().getWorld(worldName);
 		if (world != null) {

@@ -171,6 +171,9 @@ public class WarYmlMapper {
 			ConfigurationSection floorSection = hubConfigSection.createSection("materials.floor");
 			floorSection.set("id", War.war.getWarhubMaterials().getFloorId());
 			floorSection.set("data", War.war.getWarhubMaterials().getFloorData());
+			ConfigurationSection outlineSection = hubConfigSection.createSection("materials.outline");
+			outlineSection.set("id", War.war.getWarhubMaterials().getOutlineId());
+			outlineSection.set("data", War.war.getWarhubMaterials().getOutlineData());
 			ConfigurationSection gateSection = hubConfigSection.createSection("materials.gate");
 			gateSection.set("id", War.war.getWarhubMaterials().getGateId());
 			gateSection.set("data", War.war.getWarhubMaterials().getGateData());

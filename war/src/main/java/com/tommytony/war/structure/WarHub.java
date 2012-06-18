@@ -157,6 +157,8 @@ public class WarHub {
 			// materials
 			Material floor = Material.getMaterial(War.war.getWarhubMaterials().getFloorId());
 			byte floorData = War.war.getWarhubMaterials().getFloorData();
+			Material outline = Material.getMaterial(War.war.getWarhubMaterials().getOutlineId());
+			byte outlineData = War.war.getWarhubMaterials().getOutlineData();
 			Material gate = Material.getMaterial(War.war.getWarhubMaterials().getGateId());
 			byte gateData = War.war.getWarhubMaterials().getGateData();
 			Material light = Material.getMaterial(War.war.getWarhubMaterials().getLightId());
@@ -167,6 +169,11 @@ public class WarHub {
 			if (!floor.equals(Material.AIR)) {
 				// If air, don't set floor to air, just leave original ground. Otherwise apply material.
 				this.volume.setFaceMaterial(BlockFace.DOWN, floor, floorData);	
+			}
+			
+			if (!outline.equals(Material.AIR)) {
+				// If air, leave original blocks.
+				this.volume.setFloorOutlineMaterial(outline, outlineData);
 			}
 			
 

@@ -276,13 +276,37 @@ public class ZoneLobby {
 			this.setGatePositions(BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock));
 			// flatten the area (set all but floor to air, then replace any floor air blocks with glass)
 			this.volume.clearBlocksThatDontFloat();
-			this.volume.setToMaterial(Material.AIR);
-			this.volume.setFaceMaterial(BlockFace.DOWN, Material.GLASS, (byte)0); // beautiful
+			
+			Volume withoutFloor = new Volume(this.volume.getName() + "-nofloor", this.volume.getWorld());
+			withoutFloor.setCornerOne(new BlockInfo(this.volume.getCornerOne().getX(), 
+					this.volume.getCornerOne().getY(), 
+					this.volume.getCornerOne().getZ(),
+					this.volume.getCornerOne().getTypeId(),
+					this.volume.getCornerOne().getData()));
+			withoutFloor.setCornerOne(this.volume.getCornerTwo());
+			withoutFloor.setToMaterial(Material.AIR);
+			
+			Material floor = Material.getMaterial(warzone.getLobbyMaterials().getFloorId());
+			byte floorData = warzone.getLobbyMaterials().getFloorData();
+			Material outline = Material.getMaterial(warzone.getLobbyMaterials().getOutlineId());
+			byte outlineData = warzone.getLobbyMaterials().getOutlineData();
+			Material gate = Material.getMaterial(warzone.getLobbyMaterials().getGateId());
+			byte gateData = warzone.getLobbyMaterials().getGateData();
+			
+			if (!floor.equals(Material.AIR)) {
+				// If air, leave original blocks.
+				this.volume.setFaceMaterial(BlockFace.DOWN, floor, floorData);
+			}
+			
+			if (!outline.equals(Material.AIR)) {
+				// If air, leave original blocks.
+				this.volume.setFloorOutlineMaterial(outline, outlineData);
+			}
 
 			// add war hub link gate
 			if (War.war.getWarHub() != null) {
 				Block linkGateBlock = BlockInfo.getBlock(this.volume.getWorld(), this.warHubLinkGate);
-				this.placeGate(linkGateBlock, Material.OBSIDIAN);
+				this.placeGate(linkGateBlock, gate, gateData);
 				// add warhub sign
 				String[] lines = new String[4];
 				lines[0] = "";
@@ -341,12 +365,22 @@ public class ZoneLobby {
 			SignHelper.setToSign(War.war, zoneSignBlock, data, lines);
 
 			// lets get some light in here
+			Material light = Material.getMaterial(this.warzone.getLobbyMaterials().getLightId());
+			byte lightData = this.warzone.getLobbyMaterials().getLightData();
 			if (this.wall == BlockFace.NORTH || this.wall == BlockFace.SOUTH) {
-				BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.WEST, this.lobbyHalfSide - 1).getRelative(this.wall, 9).setType(Material.GLOWSTONE);
-				BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST, this.lobbyHalfSide - 1).getRelative(this.wall, 9).setType(Material.GLOWSTONE);
+				Block one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.WEST, this.lobbyHalfSide - 1).getRelative(this.wall, 9);
+				one.setType(light);
+				one.setData(lightData);
+				Block two = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST, this.lobbyHalfSide - 1).getRelative(this.wall, 9);
+				two.setType(light);
+				two.setData(lightData);
 			} else {
-				BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH, this.lobbyHalfSide - 1).getRelative(this.wall, 9).setType(Material.GLOWSTONE);
-				BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.SOUTH, this.lobbyHalfSide - 1).getRelative(this.wall, 9).setType(Material.GLOWSTONE);
+				Block one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH, this.lobbyHalfSide - 1).getRelative(this.wall, 9);
+				one.setType(light);
+				one.setData(lightData);
+				Block two = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.SOUTH, this.lobbyHalfSide - 1).getRelative(this.wall, 9);
+				two.setType(light);
+				two.setData(lightData);
 			}
 		} else {
 			War.war.log("Failed to initalize zone lobby for zone " + this.warzone.getName(), java.util.logging.Level.WARNING);
@@ -416,7 +450,8 @@ public class ZoneLobby {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}
-			block.getRelative(BlockFace.DOWN).setType(Material.GLOWSTONE);
+			block.getRelative(BlockFace.DOWN).setType(Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()));
+			block.getRelative(BlockFace.DOWN).setData(this.warzone.getLobbyMaterials().getLightData());
 			this.setBlock(block.getRelative(leftSide), teamKind);
 			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP), teamKind);
 			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), teamKind);
@@ -427,7 +462,7 @@ public class ZoneLobby {
 		}
 	}
 
-	private void placeGate(Block block, Material material) {
+	private void placeGate(Block block, Material material, byte data) {
 		if (block != null) {
 			BlockFace leftSide = null; // look at the zone
 			BlockFace rightSide = null;
@@ -444,14 +479,15 @@ public class ZoneLobby {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}
-			block.getRelative(BlockFace.DOWN).setType(Material.GLOWSTONE);
-			this.setBlock(block.getRelative(leftSide), material);
-			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP), material);
-			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), material);
-			this.setBlock(block.getRelative(rightSide), material);
-			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP), material);
-			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), material);
-			this.setBlock(block.getRelative(BlockFace.UP).getRelative(BlockFace.UP), material);
+			block.getRelative(BlockFace.DOWN).setType(Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()));
+			block.getRelative(BlockFace.DOWN).setData(this.warzone.getLobbyMaterials().getLightData());
+			this.setBlock(block.getRelative(leftSide), material, data);
+			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP), material, data);
+			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), material, data);
+			this.setBlock(block.getRelative(rightSide), material, data);
+			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP), material, data);
+			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), material, data);
+			this.setBlock(block.getRelative(BlockFace.UP).getRelative(BlockFace.UP), material, data);
 		}
 	}
 
@@ -460,8 +496,9 @@ public class ZoneLobby {
 		block.setData(kind.getData());
 	}
 
-	private void setBlock(Block block, Material material) {
+	private void setBlock(Block block, Material material, byte data) {
 		block.setType(material);
+		block.setData(data);
 	}
 
 	private void placeAutoAssignGate() {
@@ -484,7 +521,9 @@ public class ZoneLobby {
 			List<Team> teams = this.warzone.getTeams();
 			
 			Block autoAssignGateBlock = BlockInfo.getBlock(this.volume.getWorld(), this.autoAssignGate);
-			this.setBlock(autoAssignGateBlock.getRelative(BlockFace.DOWN), (Material.GLOWSTONE));
+			this.setBlock(autoAssignGateBlock.getRelative(BlockFace.DOWN), 
+					Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()), 
+					this.warzone.getLobbyMaterials().getLightData());
 			int size = teams.size();
 			if (size > 0) {
 				TeamKind[] doorBlockKinds = new TeamKind[7];
