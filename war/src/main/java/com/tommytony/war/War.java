@@ -481,6 +481,48 @@ public class War extends JavaPlugin {
 					warzone.getDefaultInventories().setReward(reward);
 					returnMessage.append(" game end reward updated.");
 				}
+				if (namedParams.containsKey("lobbymaterial")) {
+					String whichBlocks = namedParams.get("lobbymaterial");
+					ItemStack blockInHand = player.getItemInHand();
+					boolean updatedLobbyMaterials = false;
+					
+					int id = blockInHand.getTypeId();
+					byte data = (byte)0;
+					if (blockInHand.getData() != null) {
+						data = blockInHand.getData().getData();
+					}
+					
+					if (!blockInHand.getType().isBlock() && !blockInHand.getType().equals(Material.AIR)) {
+						this.badMsg(player, "Can only use blocks or air as lobby material.");
+					} else {
+						if (whichBlocks.equals("floor")) {
+							warzone.getLobbyMaterials().setFloorId(id);
+							warzone.getLobbyMaterials().setFloorData(data);
+							returnMessage.append(" lobby floor material set to id:" + id + " data:" + data + ".");
+							updatedLobbyMaterials = true;
+						} else if (whichBlocks.equals("outline")) {
+							warzone.getLobbyMaterials().setOutlineId(id);
+							warzone.getLobbyMaterials().setOutlineData(data);
+							returnMessage.append(" lobby outline material set to id:" + id + " data:" + data + ".");
+							updatedLobbyMaterials = true;
+						} else if (whichBlocks.equals("gate")) {
+							warzone.getLobbyMaterials().setGateId(id);
+							warzone.getLobbyMaterials().setGateData(data);
+							returnMessage.append(" lobby gate material set to id:" + id + " data:" + data + ".");
+							updatedLobbyMaterials = true;
+						} else if (whichBlocks.equals("light")) {
+							warzone.getLobbyMaterials().setLightId(id);
+							warzone.getLobbyMaterials().setLightData(data);
+							returnMessage.append(" lobby light material set to id:" + id + " data:" + data + ".");
+							updatedLobbyMaterials = true;
+						}
+						
+						if (updatedLobbyMaterials && warzone.getLobby() != null) {
+							warzone.getLobby().getVolume().resetBlocks();
+							warzone.getLobby().initialize();
+						}
+					}
+				}
 			}
 
 			return returnMessage.toString();
@@ -542,6 +584,48 @@ public class War extends JavaPlugin {
 					String zoneName = namedParams.get("rallypoint");
 					this.setZoneRallyPoint(zoneName, player);
 					returnMessage.append(" rallypoint set for zone " + zoneName + ".");
+				}
+				if (namedParams.containsKey("warhubmaterial")) {
+					String whichBlocks = namedParams.get("warhubmaterial");
+					ItemStack blockInHand = player.getItemInHand();
+					boolean updatedWarhubMaterials = false;
+					
+					int id = blockInHand.getTypeId();
+					byte data = (byte)0;
+					if (blockInHand.getData() != null) {
+						data = blockInHand.getData().getData();
+					}
+					
+					if (!blockInHand.getType().isBlock() && !blockInHand.getType().equals(Material.AIR)) {
+						this.badMsg(player, "Can only use blocks or air as warhub material.");
+					} else {
+						if (whichBlocks.equals("floor")) {
+							War.war.getWarhubMaterials().setFloorId(id);
+							War.war.getWarhubMaterials().setFloorData(data);
+							returnMessage.append(" warhub floor material set to id:" + id + " data:" + data + ".");
+							updatedWarhubMaterials = true;
+						} else if (whichBlocks.equals("outline")) {
+							War.war.getWarhubMaterials().setOutlineId(id);
+							War.war.getWarhubMaterials().setOutlineData(data);
+							returnMessage.append(" warhub outline material set to id:" + id + " data:" + data + ".");
+							updatedWarhubMaterials = true;
+						} else if (whichBlocks.equals("gate")) {
+							War.war.getWarhubMaterials().setGateId(id);
+							War.war.getWarhubMaterials().setGateData(data);
+							returnMessage.append(" warhub gate material set to id:" + id + " data:" + data + ".");
+							updatedWarhubMaterials = true;
+						} else if (whichBlocks.equals("light")) {
+							War.war.getWarhubMaterials().setLightId(id);
+							War.war.getWarhubMaterials().setLightData(data);
+							returnMessage.append(" warhub light material set to id:" + id + " data:" + data + ".");
+							updatedWarhubMaterials = true;
+						}
+						
+						if (updatedWarhubMaterials && War.war.getWarHub() != null) {
+							War.war.getWarHub().getVolume().resetBlocks();
+							War.war.getWarHub().initialize();
+						}
+					}
 				}
 			}
 

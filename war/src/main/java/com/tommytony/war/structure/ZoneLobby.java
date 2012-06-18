@@ -272,20 +272,10 @@ public class ZoneLobby {
 
 	public void initialize() {
 		// maybe the number of teams change, now reset the gate positions
-		if (this.lobbyMiddleWallBlock != null && this.volume != null /* && volume.isSaved() */) {
+		if (this.lobbyMiddleWallBlock != null && this.volume != null) {
 			this.setGatePositions(BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock));
-			// flatten the area (set all but floor to air, then replace any floor air blocks with glass)
-			this.volume.clearBlocksThatDontFloat();
 			
-			Volume withoutFloor = new Volume(this.volume.getName() + "-nofloor", this.volume.getWorld());
-			withoutFloor.setCornerOne(new BlockInfo(this.volume.getCornerOne().getX(), 
-					this.volume.getCornerOne().getY(), 
-					this.volume.getCornerOne().getZ(),
-					this.volume.getCornerOne().getTypeId(),
-					this.volume.getCornerOne().getData()));
-			withoutFloor.setCornerOne(this.volume.getCornerTwo());
-			withoutFloor.setToMaterial(Material.AIR);
-			
+			// Add the floor and outline
 			Material floor = Material.getMaterial(warzone.getLobbyMaterials().getFloorId());
 			byte floorData = warzone.getLobbyMaterials().getFloorData();
 			Material outline = Material.getMaterial(warzone.getLobbyMaterials().getOutlineId());
@@ -306,7 +296,7 @@ public class ZoneLobby {
 			// add war hub link gate
 			if (War.war.getWarHub() != null) {
 				Block linkGateBlock = BlockInfo.getBlock(this.volume.getWorld(), this.warHubLinkGate);
-				this.placeGate(linkGateBlock, gate, gateData);
+				this.placeWarhubLinkGate(linkGateBlock, gate, gateData);
 				// add warhub sign
 				String[] lines = new String[4];
 				lines[0] = "";
@@ -320,7 +310,7 @@ public class ZoneLobby {
 			this.placeAutoAssignGate();
 			for (String teamName : this.teamGateBlocks.keySet()) {
 				BlockInfo gateInfo = this.teamGateBlocks.get(teamName);
-				this.placeGate(BlockInfo.getBlock(this.volume.getWorld(), gateInfo), TeamKind.teamKindFromString(teamName));
+				this.placeTeamGate(BlockInfo.getBlock(this.volume.getWorld(), gateInfo), TeamKind.teamKindFromString(teamName));
 			}
 			for (Team t : this.warzone.getTeams()) {
 				this.resetTeamGateSign(t);
@@ -340,6 +330,21 @@ public class ZoneLobby {
 			}
 			this.warzone.setTeleport(new Location(this.volume.getWorld(), this.zoneTeleportBlock.getX(), this.zoneTeleportBlock.getY(), this.zoneTeleportBlock.getZ(), yaw, 0));
 
+			// set to air the minimum path
+			Block clearedPathStartBlock = BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getRelative(this.wall, 2);
+			clearedPathStartBlock.setType(Material.AIR);
+			clearedPathStartBlock.getRelative(BlockFace.UP).setType(Material.AIR);
+			clearedPathStartBlock.getRelative(this.wall).setType(Material.AIR);
+			clearedPathStartBlock.getRelative(this.wall).getRelative(BlockFace.UP).setType(Material.AIR);
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);	// teleport block
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(BlockFace.UP).setType(Material.AIR);
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);	
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(BlockFace.UP).setType(Material.AIR);
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);	
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(BlockFace.UP).setType(Material.AIR);
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).setType(Material.AIR);	
+			clearedPathStartBlock.getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(this.wall).getRelative(BlockFace.UP).setType(Material.AIR);
+			
 			// set zone sign
 			Block zoneSignBlock = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(this.wall, 4);
 			byte data = 0;
@@ -433,10 +438,12 @@ public class ZoneLobby {
 		this.warHubLinkGate = new BlockInfo(lobbyMiddleWallBlock.getRelative(this.wall, 9));
 	}
 
-	private void placeGate(Block block, TeamKind teamKind) {
+	private void placeTeamGate(Block block, TeamKind teamKind) {
 		if (block != null) {
-			BlockFace leftSide = null; // look at the zone
+			BlockFace front = this.wall;
+			BlockFace leftSide = null; // looking at the zone
 			BlockFace rightSide = null;
+			
 			if (this.wall == BlockFace.NORTH) {
 				leftSide = BlockFace.EAST;
 				rightSide = BlockFace.WEST;
@@ -450,6 +457,11 @@ public class ZoneLobby {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}
+			
+			// minimal air path
+			this.clearGatePath(block, front, leftSide, rightSide);
+			
+			// gate blocks
 			block.getRelative(BlockFace.DOWN).setType(Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()));
 			block.getRelative(BlockFace.DOWN).setData(this.warzone.getLobbyMaterials().getLightData());
 			this.setBlock(block.getRelative(leftSide), teamKind);
@@ -462,13 +474,27 @@ public class ZoneLobby {
 		}
 	}
 
-	private void placeGate(Block block, Material material, byte data) {
+	private void placeWarhubLinkGate(Block block, Material material, byte data) {
 		if (block != null) {
-			BlockFace leftSide = null; // look at the zone
+			BlockFace front = null;
+			BlockFace leftSide = null; // looking at the zone
 			BlockFace rightSide = null;
+			
+			// warhub link is opposite direction as zone wall
+			if (this.wall == BlockFace.NORTH) {
+				front = BlockFace.SOUTH;
+			} else if (this.wall == BlockFace.EAST) {
+				front = BlockFace.WEST;
+			} else if (this.wall == BlockFace.SOUTH) {
+				front = BlockFace.NORTH;
+			} else if (this.wall == BlockFace.WEST) {
+				front = BlockFace.EAST;
+			}
+			
 			if (this.wall == BlockFace.NORTH) {
 				leftSide = BlockFace.EAST;
 				rightSide = BlockFace.WEST;
+				
 			} else if (this.wall == BlockFace.EAST) {
 				leftSide = BlockFace.SOUTH;
 				rightSide = BlockFace.NORTH;
@@ -479,6 +505,11 @@ public class ZoneLobby {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}
+			
+			// minimal air path
+			this.clearGatePath(block, front, leftSide, rightSide);
+
+			// gate blocks
 			block.getRelative(BlockFace.DOWN).setType(Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()));
 			block.getRelative(BlockFace.DOWN).setData(this.warzone.getLobbyMaterials().getLightData());
 			this.setBlock(block.getRelative(leftSide), material, data);
@@ -503,8 +534,10 @@ public class ZoneLobby {
 
 	private void placeAutoAssignGate() {
 		if (this.autoAssignGate != null) {
-			BlockFace leftSide = null; // look at the zone
+			BlockFace front = this.wall;
+			BlockFace leftSide = null; // lookingat the zone
 			BlockFace rightSide = null;
+			
 			if (this.wall == BlockFace.NORTH) {
 				leftSide = BlockFace.EAST;
 				rightSide = BlockFace.WEST;
@@ -518,9 +551,16 @@ public class ZoneLobby {
 				leftSide = BlockFace.NORTH;
 				rightSide = BlockFace.SOUTH;
 			}
+			
+			
 			List<Team> teams = this.warzone.getTeams();
 			
 			Block autoAssignGateBlock = BlockInfo.getBlock(this.volume.getWorld(), this.autoAssignGate);
+			
+			// minimal air path
+			this.clearGatePath(autoAssignGateBlock, front, leftSide, rightSide);
+			
+			// gate blocks
 			this.setBlock(autoAssignGateBlock.getRelative(BlockFace.DOWN), 
 					Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()), 
 					this.warzone.getLobbyMaterials().getLightData());
@@ -747,5 +787,27 @@ public class ZoneLobby {
 		}
 
 		return false;
+	}
+	
+	private void clearGatePath(Block gateBlock, BlockFace awayFromGate, BlockFace left, BlockFace right) {
+		gateBlock.setType(Material.AIR);
+		gateBlock.getRelative(BlockFace.UP).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(BlockFace.UP).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(right).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(left).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(BlockFace.UP).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(right).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(left).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(right).getRelative(right).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(right).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(left).getRelative(left).setType(Material.AIR);
+		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(left).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
+		
 	}
 }

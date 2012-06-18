@@ -165,7 +165,6 @@ public class WarHub {
 			byte lightData = War.war.getWarhubMaterials().getLightData();
 
 			// glass floor
-			this.volume.clearBlocksThatDontFloat();
 			if (!floor.equals(Material.AIR)) {
 				// If air, don't set floor to air, just leave original ground. Otherwise apply material.
 				this.volume.setFaceMaterial(BlockFace.DOWN, floor, floorData);	
@@ -176,13 +175,42 @@ public class WarHub {
 				this.volume.setFloorOutlineMaterial(outline, outlineData);
 			}
 			
-
+			// clear minimal path
+			locationBlock.setType(Material.AIR);
+			locationBlock.getRelative(BlockFace.UP).setType(Material.AIR);
+			locationBlock.getRelative(this.getOrientation()).setType(Material.AIR);
+			locationBlock.getRelative(this.getOrientation()).getRelative(BlockFace.UP).setType(Material.AIR);
+			locationBlock.getRelative(this.getOrientation()).getRelative(this.getOrientation()).setType(Material.AIR);
+			locationBlock.getRelative(this.getOrientation()).getRelative(this.getOrientation()).getRelative(BlockFace.UP).setType(Material.AIR);
+		
 			// draw gates
 			Block currentGateBlock = BlockInfo.getBlock(this.location.getWorld(), this.volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(front, hubDepth).getRelative(right, 2);
 
 			for (Warzone zone : War.war.getWarzones()) { // gonna use the index to find it again
 				if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 					this.zoneGateBlocks.put(zone.getName(), currentGateBlock);
+					
+					// minimal air path
+					currentGateBlock.setType(Material.AIR);
+					currentGateBlock.getRelative(BlockFace.UP).setType(Material.AIR);
+					currentGateBlock.getRelative(back).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(BlockFace.UP).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(right).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(left).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(back).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(back).getRelative(BlockFace.UP).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(back).getRelative(right).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(back).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(back).getRelative(left).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(back).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(back).getRelative(right).getRelative(right).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(back).getRelative(right).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(back).getRelative(left).getRelative(left).setType(Material.AIR);
+					currentGateBlock.getRelative(back).getRelative(back).getRelative(left).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
+					
+					// gate blocks
 					currentGateBlock.getRelative(BlockFace.DOWN).setType(light);
 					currentGateBlock.getRelative(BlockFace.DOWN).setData(lightData);
 					
