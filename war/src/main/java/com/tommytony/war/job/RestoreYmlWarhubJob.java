@@ -6,11 +6,11 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.structure.WarHub;
+import com.tommytony.war.utility.WarhubMaterials;
 import com.tommytony.war.volume.Volume;
 
 public class RestoreYmlWarhubJob implements Runnable {
@@ -28,6 +28,33 @@ public class RestoreYmlWarhubJob implements Runnable {
 
 		String worldName = warhubConfig.getString("world");
 		String hubOrientation = warhubConfig.getString("orientation");
+		
+		// materials
+		int floorId = 20;	// default glass
+		int floorData = 0;	
+		ConfigurationSection floorMaterialSection = warhubConfig.getConfigurationSection("materials.floor");
+		if (floorMaterialSection != null) {
+			floorId = floorMaterialSection.getInt("id");
+			floorData = floorMaterialSection.getInt("data");
+		}
+		
+		int gateId = 49;	// default obsidian
+		int gateData = 0;	
+		ConfigurationSection gateMaterialSection = warhubConfig.getConfigurationSection("materials.gate");
+		if (gateMaterialSection != null) {
+			gateId = gateMaterialSection.getInt("id");
+			gateData = gateMaterialSection.getInt("data");
+		}
+		
+		int lightId = 89;	// default glowstone
+		int lightData = 0;	
+		ConfigurationSection lightMaterialSection = warhubConfig.getConfigurationSection("materials.light");
+		if (lightMaterialSection != null) {
+			lightId = lightMaterialSection.getInt("id");
+			lightData = lightMaterialSection.getInt("data");
+		}
+		
+		War.war.setWarhubMaterials(new WarhubMaterials(floorId, (byte)floorData, gateId, (byte)gateData, lightId, (byte)lightData));
 
 		World world = War.war.getServer().getWorld(worldName);
 		if (world != null) {

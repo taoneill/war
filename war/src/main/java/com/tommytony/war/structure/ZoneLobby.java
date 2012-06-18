@@ -277,7 +277,7 @@ public class ZoneLobby {
 			// flatten the area (set all but floor to air, then replace any floor air blocks with glass)
 			this.volume.clearBlocksThatDontFloat();
 			this.volume.setToMaterial(Material.AIR);
-			this.volume.setFaceMaterial(BlockFace.DOWN, Material.GLASS); // beautiful
+			this.volume.setFaceMaterial(BlockFace.DOWN, Material.GLASS, (byte)0); // beautiful
 
 			// add war hub link gate
 			if (War.war.getWarHub() != null) {

@@ -1,6 +1,5 @@
 package com.tommytony.war;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
-
 
 import com.tommytony.war.config.InventoryBag;
 import com.tommytony.war.config.TeamConfig;

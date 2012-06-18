@@ -66,7 +66,7 @@ public class WarYmlMapper {
 				War.war.getCommandWhitelist().add(command);
 			}
 		}
-
+		
 		// defaultLoadouts
 		ConfigurationSection loadoutsSection = warRootSection.getConfigurationSection("team.default.loadout");
 		LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, War.war.getDefaultInventories().getLoadouts());
@@ -167,6 +167,16 @@ public class WarYmlMapper {
 			hubConfigSection.set("z", hub.getLocation().getBlockZ());
 			hubConfigSection.set("world", hub.getLocation().getWorld().getName());
 			hubConfigSection.set("orientation", orientationStr);
+			
+			ConfigurationSection floorSection = hubConfigSection.createSection("materials.floor");
+			floorSection.set("id", War.war.getWarhubMaterials().getFloorId());
+			floorSection.set("data", War.war.getWarhubMaterials().getFloorData());
+			ConfigurationSection gateSection = hubConfigSection.createSection("materials.gate");
+			gateSection.set("id", War.war.getWarhubMaterials().getGateId());
+			gateSection.set("data", War.war.getWarhubMaterials().getGateData());
+			ConfigurationSection lightSection = hubConfigSection.createSection("materials.light");
+			lightSection.set("id", War.war.getWarhubMaterials().getLightId());
+			lightSection.set("data", War.war.getWarhubMaterials().getLightData());
 
 			VolumeMapper.save(hub.getVolume(), "");
 		}

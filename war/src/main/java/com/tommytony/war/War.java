@@ -49,6 +49,7 @@ import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.ChatFixUtil;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.WarLogFormatter;
+import com.tommytony.war.utility.WarhubMaterials;
 
 /**
  * Main class of War
@@ -93,6 +94,8 @@ public class War extends JavaPlugin {
 	private SpoutDisplayer spoutMessenger = null;
 
 	private Logger warLogger;
+
+	private WarhubMaterials warhubMaterials;
 
 	public War() {
 		super();
@@ -969,5 +972,13 @@ public class War extends JavaPlugin {
 
 	public SpoutDisplayer getSpoutDisplayer() {
 		return this.spoutMessenger ;
+	}
+
+	public void setWarhubMaterials(WarhubMaterials warhubMaterials) {
+		this.warhubMaterials = warhubMaterials;
+	}
+	
+	public WarhubMaterials getWarhubMaterials() {
+		return this.warhubMaterials;
 	}
 }

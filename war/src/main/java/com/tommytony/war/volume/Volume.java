@@ -448,7 +448,7 @@ public class Volume {
 		}
 	}
 
-	public void setFaceMaterial(BlockFace face, Material material) {
+	public void setFaceMaterial(BlockFace face, Material material, byte data) {
 		try {
 			if (this.hasTwoCorners() && this.isSaved()) {
 				int x = this.getMinX();
@@ -460,6 +460,7 @@ public class Volume {
 							if ((face == BlockFace.DOWN && y == this.getMinY()) || (face == BlockFace.UP && y == this.getMaxY()) || (face == BlockFace.NORTH && x == this.getMinX()) || (face == BlockFace.EAST && z == this.getMinZ()) || (face == BlockFace.SOUTH && x == this.getMaxX()) || (face == BlockFace.WEST && z == this.getMaxZ())) {
 								Block currentBlock = this.getWorld().getBlockAt(x, y, z);
 								currentBlock.setType(material);
+								currentBlock.setData(data);
 							}
 							z++;
 						}
