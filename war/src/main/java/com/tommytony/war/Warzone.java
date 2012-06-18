@@ -852,7 +852,7 @@ public class Warzone {
 		//
 		// Concurrent execution of these events could cause the inventory reset of the last players to die to fail as
 		// they get tp'ed back to the lobby, or perhaps kills to bleed into the next round.
-		synchronized (this.getGameEndLock()) {
+		//synchronized (this.getGameEndLock()) {
 			Team playerTeam = Team.getTeamByPlayerName(player.getName());
 
 			// Make sure the player that died is still part of a team, game may have ended while waiting on synchronized.
@@ -1026,7 +1026,7 @@ public class Warzone {
 				}
 				playerTeam.resetSign();
 			}
-		}
+		//}
 	}
 
 	public void reinitialize() {
@@ -1393,9 +1393,9 @@ public class Warzone {
 		return this.isReinitializing;
 	}
 
-	public Object getGameEndLock() {
-		return gameEndLock;
-	}
+//	public Object getGameEndLock() {
+//		return gameEndLock;
+//	}
 
 	public void setName(String newName) {
 		this.name = newName;
