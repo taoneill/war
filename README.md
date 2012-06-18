@@ -25,7 +25,7 @@ All official releases are at https://github.com/taoneill/war/downloads.
 
 Dev Builds
 ----------
-Continuous integration builds are available at http://ci.tommytony.com/jobs/War.
+Continuous integration builds are available at http://ci.tommytony.com/job/War.
 
 Author
 ------
