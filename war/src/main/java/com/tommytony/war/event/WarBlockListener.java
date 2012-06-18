@@ -88,7 +88,9 @@ public class WarBlockListener implements Listener {
 
 		boolean isZoneMaker = War.war.isZoneMaker(player);
 		// prevent build in important parts
-		if (zone != null && zone.isImportantBlock(block) && (!isZoneMaker || (isZoneMaker && team != null))) {
+		if (zone != null 
+				&& (zone.isImportantBlock(block) || zone.isOpponentSpawnPeripheryBlock(team, block)) 
+				&& (!isZoneMaker || (isZoneMaker && team != null))) {
 			War.war.badMsg(player, "Can't build here.");
 			cancelAndKeepItem(event);
 			return;

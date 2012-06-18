@@ -42,6 +42,8 @@ import com.tommytony.war.structure.ZoneWallGuard;
 import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.PotionEffectHelper;
+import com.tommytony.war.volume.BlockInfo;
+import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
 
 /**
@@ -1406,5 +1408,20 @@ public class Warzone {
 
 	public void setLobbyMaterials(HubLobbyMaterials lobbyMaterials) {
 		this.lobbyMaterials = lobbyMaterials;
+	}
+
+	public boolean isOpponentSpawnPeripheryBlock(Team team, Block block) {
+		for (Team maybeOpponent : this.getTeams()) {
+			if (maybeOpponent != team) {
+				Volume periphery = new Volume("periphery", this.getWorld());
+				periphery.setCornerOne(new BlockInfo(maybeOpponent.getSpawnVolume().getMinX()-1 , maybeOpponent.getSpawnVolume().getMinY()-1, maybeOpponent.getSpawnVolume().getMinZ()-1, 0, (byte)0));
+				periphery.setCornerTwo(new BlockInfo(maybeOpponent.getSpawnVolume().getMaxX()+1, maybeOpponent.getSpawnVolume().getMaxY()+1, maybeOpponent.getSpawnVolume().getMaxZ()+1, 0, (byte)0));
+				
+				if (periphery.contains(block)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
