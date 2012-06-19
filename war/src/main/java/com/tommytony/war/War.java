@@ -96,7 +96,7 @@ public class War extends JavaPlugin {
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
 	private SpoutDisplayer spoutMessenger = null;
 
-	//private Logger warLogger;
+	private Logger warLogger;
 
 	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(20, (byte)0, 5, (byte)0, 49, (byte)0, 89, (byte)0);	// default floor glass, outline planks, gate obsidian, light glowstone
 
@@ -249,21 +249,21 @@ public class War extends JavaPlugin {
 			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, fadeOutMessagesTask, 100, 100);
 		}
 		
-//		// Get own log file
-//		try {
-//		    // Create an appending file handler
-//			new File(this.getDataFolder() + "/temp/").mkdir();
-//		    FileHandler handler = new FileHandler(this.getDataFolder() + "/temp/war.log", true);
-//
-//		    // Add to War-specific logger
-//		    this.warLogger = Logger.getLogger("com.tommytony.War.log");
-//		    this.warLogger.setUseParentHandlers(false);
-//		    Formatter formatter = new WarLogFormatter();
-//	        handler.setFormatter(formatter);   
-//		    this.warLogger.addHandler(handler);
-//		} catch (IOException e) {
-//			this.getLogger().log(Level.WARNING, "Failed to create War log file");
-//		}
+		// Get own log file
+		try {
+		    // Create an appending file handler
+			new File(this.getDataFolder() + "/temp/").mkdir();
+		    FileHandler handler = new FileHandler(this.getDataFolder() + "/temp/war.log", true);
+
+		    // Add to War-specific logger
+		    this.warLogger = Logger.getLogger("com.tommytony.War.log");
+		    this.warLogger.setUseParentHandlers(false);
+		    Formatter formatter = new WarLogFormatter();
+	        handler.setFormatter(formatter);   
+		    this.warLogger.addHandler(handler);
+		} catch (IOException e) {
+			this.getLogger().log(Level.WARNING, "Failed to create War log file");
+		}
 				
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
 	}
@@ -878,9 +878,9 @@ public class War extends JavaPlugin {
 		// Log to Bukkit console 
 		this.getLogger().log(lvl, str);
 		
-//		if (this.warLogger != null) {
-//			this.warLogger.log(lvl, str);
-//		}
+		if (this.warLogger != null) {
+			this.warLogger.log(lvl, str);
+		}
 	}
 
 	// the only way to find a zone that has only one corner
