@@ -427,7 +427,7 @@ public class Volume {
 
 	public void setToMaterial(Material material) {
 		try {
-			if (this.hasTwoCorners() && this.isSaved()) {
+			if (this.hasTwoCorners()) {
 				int x = this.getMinX();
 				for (int i = 0; i < this.getSizeX(); i++) {
 					int y = this.getMaxY();

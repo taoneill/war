@@ -115,6 +115,7 @@ commands:
         /savezone [zone-name] reward:default => sets the winner's reward to your current items.
         /savezone [zone-name] author:tommytony,someguy => adds these players as authors of the warzone, allowing them to edit it.
         /savezone [zone-name] deleteauthor:tommytony,someguy => removes these players from the warzone authors.
+        /savezone [zone-name] warhubmaterial:<floor/outline/gate/light> => while holding block, changes look for different parts of warhub.
   setzonelobby:
     description: War> Creates or changes the position of the warzone lobby.
     usage: Creates or changes the position of the warzone lobby.
@@ -202,6 +203,8 @@ commands:
         /setzoneconfig [zone-name] reward:default => sets the winner's reward to your current items.
         /setzoneconfig [zone-name] author:tommytony,someguy => adds these players as authors of the warzone, allowing them to edit it.
         /setzoneconfig [zone-name] deleteauthor:tommytony,someguy => removes these players from the warzone authors.
+        /setzoneconfig [zone-name] material:<main/stand/light> => while holding block, changes look for structures like flag stands and monuments.
+        /setzoneconfig [zone-name] lobbymaterial:<floor/outline/gate/light> => while holding block, changes look for different parts of lobby.
   zonecfg:
     description: War> Alias for /setzoneconfig
     usage: Use named parameters to change the configuration of the warzone and default team settings. Resets blocks like /nextbattle. Does not save zone blocks like /savezone. Provide a zone name if not standing in warzone or lobby.
@@ -214,6 +217,8 @@ commands:
         /zonecfg [zone-name] reward:default => sets the winner's reward to your current items.
         /zonecfg [zone-name] author:tommytony,someguy => adds these players as authors of the warzone, allowing them to edit it.
         /zonecfg [zone-name] deleteauthor:tommytony,someguy => removes these players from the warzone authors.
+        /zonecfg [zone-name] material:<main/stand/light> => while holding block, changes look for structures like flag stands and monuments.
+        /zonecfg [zone-name] lobbymaterial:<floor/outline/gate/light> => while holding block, changes look for different parts of lobby.
   setteamconfig:
     description: War> Use named parameters to change team-specific settings. Resets warzone blocks like /nextbattle. Does not save zone blocks like /savezone.
     usage: Use named parameters to change the configuration of the warzone. Resets blocks like /nextbattle. Does not save zone blocks like /savezone. Provide a zone name if not standing in warzone or lobby.

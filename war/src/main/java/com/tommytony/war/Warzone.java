@@ -37,6 +37,7 @@ import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.HubLobbyMaterials;
+import com.tommytony.war.structure.WarzoneMaterials;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.structure.ZoneWallGuard;
 import com.tommytony.war.utility.LoadoutSelection;
@@ -81,6 +82,7 @@ public class Warzone {
 	private InventoryBag defaultInventories = new InventoryBag();
 	
 	private HubLobbyMaterials lobbyMaterials = null;
+	private WarzoneMaterials warzoneMaterials = new WarzoneMaterials(49, (byte)0, 85, (byte)0, 89, (byte)0);	// default main obsidian, stand ladder, light glowstone
 	
 	private boolean isEndOfGame = false;
 	private boolean isReinitializing = false;
@@ -852,7 +854,7 @@ public class Warzone {
 		//
 		// Concurrent execution of these events could cause the inventory reset of the last players to die to fail as
 		// they get tp'ed back to the lobby, or perhaps kills to bleed into the next round.
-		//synchronized (this.getGameEndLock()) {
+		synchronized (this.getGameEndLock()) {
 			Team playerTeam = Team.getTeamByPlayerName(player.getName());
 
 			// Make sure the player that died is still part of a team, game may have ended while waiting on synchronized.
@@ -1026,7 +1028,7 @@ public class Warzone {
 				}
 				playerTeam.resetSign();
 			}
-		//}
+		}
 	}
 
 	public void reinitialize() {
@@ -1393,9 +1395,9 @@ public class Warzone {
 		return this.isReinitializing;
 	}
 
-//	public Object getGameEndLock() {
-//		return gameEndLock;
-//	}
+	public Object getGameEndLock() {
+		return gameEndLock;
+	}
 
 	public void setName(String newName) {
 		this.name = newName;
@@ -1423,5 +1425,13 @@ public class Warzone {
 			}
 		}
 		return false;
+	}
+
+	public void setWarzoneMaterials(WarzoneMaterials warzoneMaterials) {
+		this.warzoneMaterials = warzoneMaterials;
+	}
+
+	public WarzoneMaterials getWarzoneMaterials() {
+		return warzoneMaterials;
 	}
 }

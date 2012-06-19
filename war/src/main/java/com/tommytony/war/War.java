@@ -44,6 +44,9 @@ import com.tommytony.war.job.SpoutFadeOutMessageJob;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.ZoneLobby;
@@ -520,6 +523,62 @@ public class War extends JavaPlugin {
 						if (updatedLobbyMaterials && warzone.getLobby() != null) {
 							warzone.getLobby().getVolume().resetBlocks();
 							warzone.getLobby().initialize();
+						}
+					}
+				}
+				if (namedParams.containsKey("material")) {
+					String whichBlocks = namedParams.get("material");
+					ItemStack blockInHand = player.getItemInHand();
+					boolean updatedMaterials = false;
+					
+					int id = blockInHand.getTypeId();
+					byte data = (byte)0;
+					if (blockInHand.getData() != null) {
+						data = blockInHand.getData().getData();
+					}
+					
+					if (!blockInHand.getType().isBlock()) {
+						this.badMsg(player, "Can only use blocks as material.");
+					} else {
+						if (whichBlocks.equals("main")) {
+							warzone.getWarzoneMaterials().setMainId(id);
+							warzone.getWarzoneMaterials().setMainData(data);
+							returnMessage.append(" main material set to id:" + id + " data:" + data + ".");
+							updatedMaterials = true;
+						} else if (whichBlocks.equals("stand")) {
+							warzone.getWarzoneMaterials().setStandId(id);
+							warzone.getWarzoneMaterials().setStandData(data);
+							returnMessage.append(" stand material set to id:" + id + " data:" + data + ".");
+							updatedMaterials = true;
+						} else if (whichBlocks.equals("light")) {
+							warzone.getWarzoneMaterials().setLightId(id);
+							warzone.getWarzoneMaterials().setLightData(data);
+							returnMessage.append(" light material set to id:" + id + " data:" + data + ".");
+							updatedMaterials = true;
+						}
+						
+						if (updatedMaterials) {
+							// reset all structures
+							for (Monument monument : warzone.getMonuments()) {
+								monument.getVolume().resetBlocks();
+								monument.addMonumentBlocks();
+							}
+							for (Cake cake : warzone.getCakes()) {
+								cake.getVolume().resetBlocks();
+								cake.addCakeBlocks();
+							}
+							for (Bomb bomb : warzone.getBombs()) {
+								bomb.getVolume().resetBlocks();
+								bomb.addBombBlocks();
+							}
+							for (Team team : warzone.getTeams()) {
+								team.getSpawnVolume().resetBlocks();
+								team.initializeTeamSpawn();
+								if (team.getTeamFlag() != null) {
+									team.getFlagVolume().resetBlocks();
+									team.initializeTeamFlag();
+								}
+							}
 						}
 					}
 				}

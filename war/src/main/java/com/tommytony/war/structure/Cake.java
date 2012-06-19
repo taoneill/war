@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import com.tommytony.war.Warzone;
+import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 
 /**
@@ -31,30 +32,74 @@ public class Cake {
 	}
 
 	public void addCakeBlocks() {
-		this.volume.setToMaterial(Material.AIR);
-
+		// make air (old two-high above floor)
+		Volume airGap = new Volume("airgap", this.warzone.getWorld());
+		airGap.setCornerOne(new BlockInfo(
+				this.volume.getCornerOne().getX(), 
+				this.volume.getCornerOne().getY() + 1, 
+				this.volume.getCornerOne().getZ(),
+				0,
+				(byte)0));
+		airGap.setCornerTwo(new BlockInfo(
+				this.volume.getCornerTwo().getX(), 
+				this.volume.getCornerOne().getY() + 2, 
+				this.volume.getCornerTwo().getZ(),
+				0,
+				(byte)0));
+		airGap.setToMaterial(Material.AIR);
+		
 		int x = this.location.getBlockX();
 		int y = this.location.getBlockY();
 		int z = this.location.getBlockZ();
 
+		Material main = Material.getMaterial(this.warzone.getWarzoneMaterials().getMainId());
+		byte mainData = this.warzone.getWarzoneMaterials().getMainData();
+		Material stand = Material.getMaterial(this.warzone.getWarzoneMaterials().getStandId());
+		byte standData = this.warzone.getWarzoneMaterials().getStandData();
+		Material light = Material.getMaterial(this.warzone.getWarzoneMaterials().getLightId());
+		byte lightData = this.warzone.getWarzoneMaterials().getLightData();
+		
 		// center
-		this.warzone.getWorld().getBlockAt(x, y - 1, z).getState().setType(Material.OBSIDIAN);
+		Block current = this.warzone.getWorld().getBlockAt(x, y - 1, z);
+		current.setType(main);
+		current.setData(mainData);
 
 		// inner ring
-		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z + 1).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x + 1, y - 1, z - 1).setType(Material.OBSIDIAN);
+		current = this.warzone.getWorld().getBlockAt(x + 1, y - 1, z + 1);
+		current.setType(main);
+		current.setData(mainData);
+		current = this.warzone.getWorld().getBlockAt(x + 1, y - 1, z);
+		current.setType(main);
+		current.setData(mainData);
+		current = this.warzone.getWorld().getBlockAt(x + 1, y - 1, z - 1);
+		current.setType(light);
+		current.setData(lightData);
 
-		this.warzone.getWorld().getBlockAt(x, y - 1, z + 1).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x, y - 1, z).setType(Material.GLOWSTONE);
-		this.warzone.getWorld().getBlockAt(x, y - 1, z - 1).setType(Material.OBSIDIAN);
+		current = this.warzone.getWorld().getBlockAt(x, y - 1, z + 1);
+		current.setType(main);
+		current.setData(mainData);
+		current = this.warzone.getWorld().getBlockAt(x, y - 1, z);
+		current.setType(light);
+		current.setData(lightData);
+		current = this.warzone.getWorld().getBlockAt(x, y - 1, z - 1);
+		current.setType(main);
+		current.setData(mainData);
 
-		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z + 1).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z).setType(Material.OBSIDIAN);
-		this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1).setType(Material.OBSIDIAN);
+		current = this.warzone.getWorld().getBlockAt(x - 1, y - 1, z + 1);
+		current.setType(light);
+		current.setData(lightData);
+		current = this.warzone.getWorld().getBlockAt(x - 1, y - 1, z);
+		current.setType(main);
+		current.setData(mainData);
+		current = this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1);
+		current.setType(main);
+		current.setData(mainData);
 
 		// block holder
-		this.warzone.getWorld().getBlockAt(x, y, z).setType(Material.GLASS);
+		current = this.warzone.getWorld().getBlockAt(x, y, z);
+		current.setType(stand);
+		current.setData(standData);
+		
 		Block cakeBlock = this.warzone.getWorld().getBlockAt(x, y + 1, z);
 		cakeBlock.setType(Material.CAKE_BLOCK);
 	}

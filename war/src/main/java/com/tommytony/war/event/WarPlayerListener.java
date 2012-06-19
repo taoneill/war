@@ -484,7 +484,7 @@ public class WarPlayerListener implements Listener {
 				
 				// Make sure game ends can't occur simultaneously. 
 				// See Warzone.handleDeath() for details.
-				//synchronized (playerWarzone.getGameEndLock()) {	
+				synchronized (playerWarzone.getGameEndLock()) {	
 					
 					boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
 					boolean inFlag = (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation()));
@@ -568,7 +568,7 @@ public class WarPlayerListener implements Listener {
 					}
 					
 					return;
-				//}
+				}
 			}
 			
 			// Bomb detonation
@@ -578,7 +578,7 @@ public class WarPlayerListener implements Listener {
 				
 				// Make sure game ends can't occur simultaneously. 
 				// See Warzone.handleDeath() for details.
-				//synchronized (playerWarzone.getGameEndLock()) {
+				synchronized (playerWarzone.getGameEndLock()) {
 					
 					boolean inEnemySpawn = false;
 					Team victim = null;
@@ -657,7 +657,7 @@ public class WarPlayerListener implements Listener {
 					}
 					
 					return;
-				//}
+				}
 			}
 			
 			// Cake retrieval
@@ -669,7 +669,7 @@ public class WarPlayerListener implements Listener {
 				
 				// Make sure game ends can't occur simultaneously. 
 				// See Warzone.handleDeath() for details.
-				//synchronized (playerWarzone.getGameEndLock()) {
+				synchronized (playerWarzone.getGameEndLock()) {
 					boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
 																
 					if (inSpawn && playerTeam.getPlayers().contains(player)) {
@@ -740,7 +740,7 @@ public class WarPlayerListener implements Listener {
 					}
 					
 					return;
-				//}
+				}
 			}
 			
 			// Class selection lock
