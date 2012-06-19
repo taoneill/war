@@ -77,23 +77,8 @@ public class SaveZoneCommand extends AbstractZoneMakerCommand {
 			oldVersionsFolder.mkdirs();
 			
 			File[] versionFolders = oldVersionsFolder.listFiles();
-			File last = null;
-			if (versionFolders.length > 0) {
-				last = versionFolders[versionFolders.length - 1];
-			}
-			
-			int oldVersion = 0;
-			if (last != null) {
-				// at least one version
-				try {
-					String numVersion = last.getName().split("-")[1];	// get rid of datetime prefix
-					oldVersion = Integer.parseInt(numVersion);
-				} catch (NumberFormatException badname) {
-					War.war.log("Failed to read old version of warzone " + zone.getName(), Level.WARNING);
-				}
-			}
-			
-			int newVersion = oldVersion + 1;
+			int newVersion = versionFolders.length + 1;
+						
 			SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss"); 
 			String newVersionString = format.format(new Date()) + "-" + newVersion;
 			String newVersionPath = War.war.getDataFolder().getPath() + "/temp/oldversions/warzone-" + zone.getName() + "/" + newVersionString;
