@@ -10,13 +10,13 @@
   <url>http://war.tommytony.com</url>
   <repositories>
         <repository>
-            <id>spout-repo</id>
-            <url>http://nexus.getspout.org/content/groups/public/</url>
+            <id>bukkit-repo</id>
+            <url>http://repo.bukkit.org/content/groups/public</url>
         </repository>
-		<repository>
-		  <id>sk89q-mvn2</id>
-		  <url>http://mvn2.sk89q.com/repo</url>
-		 </repository>
+        <repository>
+            <id>spout-repo</id>
+            <url>http://nexus.spout.org/content/groups/public/</url>
+        </repository>
     </repositories>
   <issueManagement>
   	<system>Github issues</system>
@@ -68,22 +68,15 @@
     <dependency>
     	<groupId>org.bukkit</groupId>
     	<artifactId>bukkit</artifactId>
-    	<version>1.1-R6</version>
-    	<type>pom</type>
-    </dependency>
-    <dependency>
-    	<groupId>org.bukkit</groupId>
-    	<artifactId>craftbukkit</artifactId>
-    	<version>1.1-R6</version>
-    	<type>pom</type>
+    	<version>1.2.5-R4.0</version>
+    	<scope>compile</scope>
     </dependency>
     <dependency>
     	<groupId>org.mockito</groupId>
     	<artifactId>mockito-all</artifactId>
     	<version>1.8.5</version>
     	<type>jar</type>
-    	<scope>compile</scope>
+    	<scope>test</scope>
     </dependency>
   </dependencies>
 </project>
-
