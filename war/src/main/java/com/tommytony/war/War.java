@@ -180,10 +180,12 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.LIFEPOOL, 7);
 		teamDefaultConfig.put(TeamConfig.MAXSCORE, 10);
 		teamDefaultConfig.put(TeamConfig.NOHUNGER, false);
+		teamDefaultConfig.put(TeamConfig.PLAYERLOADOUTASDEFAULT, false);
 		teamDefaultConfig.put(TeamConfig.RESPAWNTIMER, 0);
 		teamDefaultConfig.put(TeamConfig.SATURATION, 10);
 		teamDefaultConfig.put(TeamConfig.SPAWNSTYLE, TeamSpawnStyle.SMALL);
 		teamDefaultConfig.put(TeamConfig.TEAMSIZE, 10);
+		
 		
 		this.getDefaultInventories().getLoadouts().clear();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();

@@ -1337,7 +1337,13 @@ public class Warzone {
 		    while (it.hasNext()) {
 		        String name = (String)it.next();
 		        if (i == currentIndex) {
-					this.resetInventory(playerTeam, player, loadouts.get(name));
+		        	if (playerTeam.getTeamConfig().resolveBoolean(TeamConfig.PLAYERLOADOUTASDEFAULT) && name.equals("default")) {
+		        		// Use player's own inventory as loadout
+		        		this.resetInventory(playerTeam, player, this.getPlayerInventoryFromSavedState(player));
+		        	} else {
+		        		// Use the loadout from the list in the settings
+		        		this.resetInventory(playerTeam, player, loadouts.get(name));
+		        	}
 					if (isFirstRespawn && playerTeam.getInventories().resolveLoadouts().keySet().size() > 1) {
 						War.war.msg(player, "Equipped " + name + " loadout (sneak to switch).");
 					} else if (isToggle) {
@@ -1347,6 +1353,28 @@ public class Warzone {
 		        i++;
 		    }
 		}
+	}
+
+	private HashMap<Integer, ItemStack> getPlayerInventoryFromSavedState(Player player) {
+		HashMap<Integer, ItemStack> playerItems = new HashMap<Integer, ItemStack>();
+		PlayerState originalState = this.playerStates.get(player.getName());
+
+		if (originalState != null) {
+			int invIndex = 0;
+			playerItems = new HashMap<Integer, ItemStack>();
+			for (ItemStack item : originalState.getContents()) {
+				if (item != null && item.getTypeId() != 0) {
+					playerItems.put(invIndex, item);
+				}
+				invIndex++;
+			}
+			
+			if (War.war.isSpoutServer()) {
+				SpoutManager.getPlayer(player).setTitle(originalState.getPlayerTitle());
+			}
+		}
+		
+		return playerItems;
 	}
 
 	public WarzoneConfigBag getWarzoneConfig() {

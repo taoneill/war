@@ -8,6 +8,7 @@ public enum TeamConfig {
 	LIFEPOOL (Integer.class),
 	MAXSCORE (Integer.class),
 	NOHUNGER (Boolean.class),
+	PLAYERLOADOUTASDEFAULT (Boolean.class),
 	RESPAWNTIMER (Integer.class),
 	SATURATION (Integer.class),
 	SPAWNSTYLE (TeamSpawnStyle.class),
