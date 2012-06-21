@@ -437,6 +437,7 @@ public class WarPlayerListener implements Listener {
 			}
 						
 			LoadoutSelection loadoutSelectionState = playerWarzone.getLoadoutSelections().get(player.getName());
+			FlagReturn flagReturn = playerTeam.getTeamConfig().resolveFlagReturn();
 			if (!playerTeam.getSpawnVolume().contains(playerLoc)) {
 				if (!playerWarzone.isEnoughPlayers()) {
 					War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getWarzoneConfig().getInt(WarzoneConfig.MINPLAYERS)
@@ -454,8 +455,11 @@ public class WarPlayerListener implements Listener {
 					event.setTo(playerTeam.getTeamSpawn());
 					return;
 				}
-			} else if (loadoutSelectionState != null && !loadoutSelectionState.isStillInSpawn()) { 
+			} else if (loadoutSelectionState != null && !loadoutSelectionState.isStillInSpawn() 
+					&& (flagReturn.equals(FlagReturn.BOTH) || flagReturn.equals(FlagReturn.SPAWN)) 
+					&& !playerWarzone.isFlagThief(player.getName())) { 
 				// player is in spawn, but has left already: he should NOT be let back in - kick him out gently
+				// (also, be sure you aren't preventing the flag from being captured) 
 				int diffZ = playerLoc.getBlockZ() - playerTeam.getTeamSpawn().getBlockZ();
 				int diffX = playerLoc.getBlockX() - playerTeam.getTeamSpawn().getBlockX();
 				
