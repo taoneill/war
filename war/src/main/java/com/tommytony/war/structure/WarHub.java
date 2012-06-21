@@ -175,13 +175,11 @@ public class WarHub {
 				this.volume.setFloorOutlineMaterial(outline, outlineData);
 			}
 			
-			// clear minimal path
-			locationBlock.setType(Material.AIR);
-			locationBlock.getRelative(BlockFace.UP).setType(Material.AIR);
-			locationBlock.getRelative(this.getOrientation()).setType(Material.AIR);
-			locationBlock.getRelative(this.getOrientation()).getRelative(BlockFace.UP).setType(Material.AIR);
-			locationBlock.getRelative(this.getOrientation()).getRelative(this.getOrientation()).setType(Material.AIR);
-			locationBlock.getRelative(this.getOrientation()).getRelative(this.getOrientation()).getRelative(BlockFace.UP).setType(Material.AIR);
+			// clear minimal path around warhub tp
+			Volume warhubTpVolume = new Volume("warhubtp", this.location.getWorld());
+			warhubTpVolume.setCornerOne(locationBlock.getRelative(back).getRelative(left));
+			warhubTpVolume.setCornerTwo(locationBlock.getRelative(front, 2).getRelative(right).getRelative(BlockFace.UP));
+			warhubTpVolume.setToMaterial(Material.AIR);
 		
 			// draw gates
 			Block currentGateBlock = BlockInfo.getBlock(this.location.getWorld(), this.volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(front, hubDepth).getRelative(right, 2);
@@ -241,7 +239,7 @@ public class WarHub {
 			}
 
 			// War hub sign
-			Block signBlock = locationBlock.getRelative(front);
+			Block signBlock = locationBlock.getRelative(front, 2);
 
 			String[] lines = new String[4];
 			lines[0] = "War hub";

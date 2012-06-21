@@ -42,6 +42,7 @@ import com.tommytony.war.job.DeferredBlockResetsJob;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.utility.DeferredBlockReset;
+import com.tommytony.war.utility.LoadoutSelection;
 
 /**
  * Handles Entity-Events
@@ -80,7 +81,21 @@ public class WarEntityListener implements Listener {
 			if ((attackerTeam != null && defenderTeam != null && attackerTeam != defenderTeam && attackerWarzone == defenderWarzone)
 					|| (attackerTeam != null && defenderTeam != null && attacker.getEntityId() == defender.getEntityId())) {
 				
-				// Make sure none of them are respawning
+				LoadoutSelection defenderLoadoutState = defenderWarzone.getLoadoutSelections().get(d.getName());
+				if (defenderLoadoutState != null && defenderLoadoutState.isStillInSpawn()) {
+					War.war.badMsg(a, "The target is still in spawn!");
+					event.setCancelled(true);
+					return;
+				}
+				
+				LoadoutSelection attackerLoadoutState = attackerWarzone.getLoadoutSelections().get(a.getName());
+				if (attackerLoadoutState != null && attackerLoadoutState.isStillInSpawn()) {
+					War.war.badMsg(a, "You can't attack while still in spawn!");
+					event.setCancelled(true);
+					return;
+				}
+				
+				// Make sure none of them are locked in by respawn timer
 				if (defenderWarzone.isRespawning(d)) {
 					War.war.badMsg(a, "The target is currently respawning!");
 					event.setCancelled(true);
@@ -411,40 +426,48 @@ public class WarEntityListener implements Listener {
 			this.handlerAttackDefend((EntityDamageByEntityEvent) event);
 		} else  {
 			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+			Team team = Team.getTeamByPlayerName(player.getName());
 			
-			if (zone != null && event.getDamage() >= player.getHealth()) {
-				if (zone.getReallyDeadFighters().contains(player.getName())) {
-					// don't re-count the death points of an already dead person, make sure they are dead though
-					// (reason for this is that onEntityDamage sometimes fires more than once for one death)
-					if (player.getHealth() != 0) {
-						player.setHealth(0);
-					}
-					return;
-				}
-				
-				// Detect death, prevent it and respawn the player
-				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
-					String deathMessage = "";
-					String cause = " died";
-					if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK 
-							|| event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LIGHTNING) {
-						cause = " burned to a crisp";
-					} else if (event.getCause() == DamageCause.DROWNING) {
-						cause = " drowned";
-					} else if (event.getCause() == DamageCause.FALL) {
-						cause = " fell to an untimely death";
-					}
-					deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE + cause;
-					for (Team team : zone.getTeams()) {
-						team.teamcast(deathMessage);
-					}
-				}
-				
-				zone.handleDeath(player);
-				
-				if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
-					// fast respawn, don't really die
+			if (zone != null && team != null) {
+				LoadoutSelection playerLoadoutState = zone.getLoadoutSelections().get(player.getName()); 
+				if (team.getSpawnVolume().contains(player.getLocation())
+						&& playerLoadoutState != null && playerLoadoutState.isStillInSpawn()) {
+					// don't let a player still in spawn get damaged
 					event.setCancelled(true);
+				} else if (event.getDamage() >= player.getHealth()) {
+					if (zone.getReallyDeadFighters().contains(player.getName())) {
+						// don't re-count the death points of an already dead person, make sure they are dead though
+						// (reason for this is that onEntityDamage sometimes fires more than once for one death)
+						if (player.getHealth() != 0) {
+							player.setHealth(0);
+						}
+						return;
+					}
+					
+					// Detect death, prevent it and respawn the player
+					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+						String deathMessage = "";
+						String cause = " died";
+						if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK 
+								|| event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LIGHTNING) {
+							cause = " burned to a crisp";
+						} else if (event.getCause() == DamageCause.DROWNING) {
+							cause = " drowned";
+						} else if (event.getCause() == DamageCause.FALL) {
+							cause = " fell to an untimely death";
+						}
+						deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE + cause;
+						for (Team teamToMsg : zone.getTeams()) {
+							teamToMsg.teamcast(deathMessage);
+						}
+					}
+					
+					zone.handleDeath(player);
+					
+					if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+						// fast respawn, don't really die
+						event.setCancelled(true);
+					}
 				}
 			}
 		}

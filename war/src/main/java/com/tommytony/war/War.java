@@ -173,7 +173,6 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.UNBREAKABLE, false);
 		warzoneDefaultConfig.put(WarzoneConfig.DEATHMESSAGES, true);
 		
-		
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);
 		teamDefaultConfig.put(TeamConfig.FLAGPOINTSONLY, false);
 		teamDefaultConfig.put(TeamConfig.FLAGRETURN, FlagReturn.BOTH);
@@ -185,7 +184,6 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.SATURATION, 10);
 		teamDefaultConfig.put(TeamConfig.SPAWNSTYLE, TeamSpawnStyle.SMALL);
 		teamDefaultConfig.put(TeamConfig.TEAMSIZE, 10);
-		
 		
 		this.getDefaultInventories().getLoadouts().clear();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();

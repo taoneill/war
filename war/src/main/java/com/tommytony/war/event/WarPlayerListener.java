@@ -247,7 +247,7 @@ public class WarPlayerListener implements Listener {
 		}
 		
 		Player player = event.getPlayer();
-		Location playerLoc = event.getFrom(); // same as player.getLoc. Don't call again we need same result.
+		Location playerLoc = event.getTo(); // Don't call again we need same result.
 		
 		Location previousLocation = latestLocations.get(player.getName());
 		if (previousLocation != null &&
@@ -436,6 +436,7 @@ public class WarPlayerListener implements Listener {
 				}
 			}
 						
+			LoadoutSelection loadoutSelectionState = playerWarzone.getLoadoutSelections().get(player.getName());
 			if (!playerTeam.getSpawnVolume().contains(playerLoc)) {
 				if (!playerWarzone.isEnoughPlayers()) {
 					War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getWarzoneConfig().getInt(WarzoneConfig.MINPLAYERS)
@@ -446,11 +447,57 @@ public class WarPlayerListener implements Listener {
 				if (playerWarzone.isRespawning(player)) {
 					int rt = playerTeam.getTeamConfig().resolveInt(TeamConfig.RESPAWNTIMER);
 					String isS = "s";
-					if (rt==1) isS = "";
-					War.war.badMsg(player, "Can't leave spawn for "+rt+" second"+isS+" after spawning!");
+					if (rt == 1) {
+						isS = "";
+					}
+					War.war.badMsg(player, "Can't leave spawn for " + rt + " second" + isS + " after spawning!");
 					event.setTo(playerTeam.getTeamSpawn());
 					return;
 				}
+			} else if (loadoutSelectionState != null && !loadoutSelectionState.isStillInSpawn()) { 
+				// player is in spawn, but has left already: he should NOT be let back in - kick him out gently
+				int diffZ = playerLoc.getBlockZ() - playerTeam.getTeamSpawn().getBlockZ();
+				int diffX = playerLoc.getBlockX() - playerTeam.getTeamSpawn().getBlockX();
+				
+				int finalZ = playerLoc.getBlockZ();
+				int finalX = playerLoc.getBlockX();
+				int bumpDistance = 1;
+				if (diffZ == 0 && diffX == 0) {
+					// at spawn already, get him moving
+					finalZ += bumpDistance + 1;
+					finalX += bumpDistance + 1;
+				} else if (diffZ > 0 && diffX > 0) {
+					finalZ += bumpDistance;
+					finalX += bumpDistance;
+				} else if (diffZ == 0 && diffX > 0) {
+					finalX += bumpDistance;
+				}else if (diffZ < 0 && diffX > 0) {
+					finalZ -= bumpDistance;
+					finalX += bumpDistance;
+				} else if (diffZ < 0 && diffX == 0) {
+					finalZ -= bumpDistance;
+				} else if (diffZ > 0 && diffX < 0) {
+					finalZ -= bumpDistance;
+					finalX -= bumpDistance;
+				} else if (diffZ == 0 && diffX < 0) {
+					finalX -= bumpDistance;
+				} else if (diffZ > 0 && diffX < 0) {
+					finalZ += bumpDistance;
+					finalX -= bumpDistance;
+				} else if (diffZ > 0 && diffX == 0) {
+					finalZ += bumpDistance;
+				}
+				
+				event.setTo(new Location(playerLoc.getWorld(),
+						finalX,
+						playerLoc.getY(),
+						finalZ,
+						playerLoc.getYaw(),
+						playerLoc.getPitch()
+				));
+				
+				War.war.badMsg(player, "Can't re-enter spawn!");
+				return;
 			}
 
 			// Monuments
