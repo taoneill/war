@@ -46,11 +46,10 @@ import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.WarHub;
-import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.ZoneLobby;
-import com.tommytony.war.utility.ChatFixUtil;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.SizeCounter;
 import com.tommytony.war.utility.WarLogFormatter;
@@ -843,7 +842,7 @@ public class War extends JavaPlugin {
 	public void msg(CommandSender sender, String str) {
 		if (sender instanceof Player) {
 			String out = ChatColor.GRAY + "War> " + ChatColor.WHITE + this.colorKnownTokens(str, ChatColor.WHITE) + " ";
-			ChatFixUtil.sendMessage(sender, out);
+			sender.sendMessage(out);
 		} else {
 			sender.sendMessage("War> " + str);
 		}
@@ -852,7 +851,7 @@ public class War extends JavaPlugin {
 	public void badMsg(CommandSender sender, String str) {
 		if (sender instanceof Player) {
 			String out = ChatColor.GRAY + "War> " + ChatColor.RED + this.colorKnownTokens(str, ChatColor.RED) + " ";
-			ChatFixUtil.sendMessage(sender, out);
+			sender.sendMessage(out);
 		} else {
 			sender.sendMessage("War> " + str);
 		}
