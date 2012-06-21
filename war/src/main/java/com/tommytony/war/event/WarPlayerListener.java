@@ -455,11 +455,12 @@ public class WarPlayerListener implements Listener {
 					event.setTo(playerTeam.getTeamSpawn());
 					return;
 				}
-			} else if (loadoutSelectionState != null && !loadoutSelectionState.isStillInSpawn() 
+			} else if (loadoutSelectionState != null && !loadoutSelectionState.isStillInSpawn()
+					&& !playerWarzone.isCakeThief(player.getName())
 					&& (flagReturn.equals(FlagReturn.BOTH) || flagReturn.equals(FlagReturn.SPAWN)) 
 					&& !playerWarzone.isFlagThief(player.getName())) { 
 				// player is in spawn, but has left already: he should NOT be let back in - kick him out gently
-				// (also, be sure you aren't preventing the flag from being captured) 
+				// (also, be sure you aren't preventing the flag or cake from being captured) 
 				int diffZ = playerLoc.getBlockZ() - playerTeam.getTeamSpawn().getBlockZ();
 				int diffX = playerLoc.getBlockX() - playerTeam.getTeamSpawn().getBlockX();
 				
