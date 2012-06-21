@@ -52,6 +52,7 @@ import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.ChatFixUtil;
 import com.tommytony.war.utility.PlayerState;
+import com.tommytony.war.utility.SizeCounter;
 import com.tommytony.war.utility.WarLogFormatter;
 
 /**
@@ -263,6 +264,14 @@ public class War extends JavaPlugin {
 		    this.warLogger.addHandler(handler);
 		} catch (IOException e) {
 			this.getLogger().log(Level.WARNING, "Failed to create War log file");
+		}
+		
+		// Size check
+		long datSize = SizeCounter.getFileOrDirectorySize(new File(this.getDataFolder() + "/dat/")) / 1024 / 1024;
+		long tempSize = SizeCounter.getFileOrDirectorySize(new File(this.getDataFolder() + "/temp/")) / 1024 / 1024;
+		
+		if (datSize + tempSize > 100) {
+			this.log("War data files are taking " + datSize + "MB and its temp files " + tempSize + "MB. Consider permanently deleting old warzone versions and backups in /plugins/War/temp/.", Level.WARNING);
 		}
 				
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
