@@ -439,7 +439,9 @@ public class WarPlayerListener implements Listener {
 			LoadoutSelection loadoutSelectionState = playerWarzone.getLoadoutSelections().get(player.getName());
 			FlagReturn flagReturn = playerTeam.getTeamConfig().resolveFlagReturn();
 			if (!playerTeam.getSpawnVolume().contains(playerLoc)) {
-				if (!playerWarzone.isEnoughPlayers()) {
+				if (!playerWarzone.isEnoughPlayers() && loadoutSelectionState != null && loadoutSelectionState.isStillInSpawn()) {
+					// Be sure to keep only players that just respawned locked inside the spawn for minplayer/minteams restrictions - otherwise 
+					// this will conflict with the can't-renter-spawn bump just a few lines below  
 					War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getWarzoneConfig().getInt(WarzoneConfig.MINPLAYERS)
 							+" player(s) on at least " + playerWarzone.getWarzoneConfig().getInt(WarzoneConfig.MINTEAMS) + " team(s).");
 					event.setTo(playerTeam.getTeamSpawn());
