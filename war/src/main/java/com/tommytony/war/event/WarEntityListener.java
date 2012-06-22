@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -48,7 +49,7 @@ import com.tommytony.war.utility.LoadoutSelection;
  * Handles Entity-Events
  *
  * @author tommytony, Tim Düsterhus
- * @package bukkit.tommytony.war
+ * @package com.tommytony.war.event
  */
 public class WarEntityListener implements Listener {
 
@@ -404,7 +405,7 @@ public class WarEntityListener implements Listener {
 	 *
 	 * @see EntityListener.onEntityDamage()
 	 */
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityDamage(final EntityDamageEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
