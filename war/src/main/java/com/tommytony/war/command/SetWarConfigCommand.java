@@ -8,10 +8,10 @@ import org.bukkit.command.CommandSender;
 import com.tommytony.war.War;
 import com.tommytony.war.mapper.WarYmlMapper;
 
-public class SetWarConfigCommand extends AbstractWarAdminCommand {
+public class SetWarConfigCommand extends AbstractOptionalWarAdminCommand {
 
 	public SetWarConfigCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotWarAdminException {
-		super(handler, sender, args);
+		super(handler, sender, args, false);
 	}
 
 	@Override
@@ -27,6 +27,11 @@ public class SetWarConfigCommand extends AbstractWarAdminCommand {
 			wantsToPrint = true;
 		}
 
+		if (!this.isSenderWarAdmin()) {
+			War.war.badMsg(this.getSender(), "You can't do this if you are not a War admin (permission war.admin).");
+			return true;
+		}
+		
 		String namedParamReturn = War.war.updateFromNamedParams(this.getSender(), this.args); 
 		if (!namedParamReturn.equals("") && !namedParamReturn.equals("PARSE-ERROR")) {
 			WarYmlMapper.save();

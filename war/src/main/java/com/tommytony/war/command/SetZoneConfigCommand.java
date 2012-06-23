@@ -12,10 +12,10 @@ import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.ZoneLobby;
 
-public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
+public class SetZoneConfigCommand extends AbstractOptionalZoneMakerCommand {
 
 	public SetZoneConfigCommand(WarCommandHandler handler, CommandSender sender, String[] args) throws NotZoneMakerException {
-		super(handler, sender, args);
+		super(handler, sender, args, false);
 	}
 
 	@Override
@@ -58,8 +58,6 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 			if (zone == null) {
 				// No warzone found, whatever the mean, escape
 				return false;
-			} else if (!this.isSenderAuthorOfZone(zone)) {
-				return true;
 			}
 
 			if (isFirstParamWarzone) {
@@ -90,6 +88,13 @@ public class SetZoneConfigCommand extends AbstractZoneMakerCommand {
 					this.args = newargs;
 				}
 				wantsToPrint = true;
+			}
+
+			if (!this.isSenderZoneMaker()) {
+				War.war.badMsg(this.getSender(), "You can't do this if you are not a warzone maker (permission war.zonemaker).");
+				return true;
+			} else if (!this.isSenderAuthorOfZone(zone)) {
+				return true;
 			}
 
 			// We have a warzone and indexed-from-0 arguments, let's update
