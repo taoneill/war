@@ -867,10 +867,24 @@ public class War extends JavaPlugin {
 	 * @return String Message with colored teams
 	 */
 	private String colorKnownTokens(String str, ChatColor msgColor) {
+		str = str.replaceAll("Ex -", ChatColor.BLUE + "Ex -" + ChatColor.GRAY);
+		str = str.replaceAll("\\\\", ChatColor.BLUE + "\\\\" + ChatColor.GRAY);
+		str = str.replaceAll("->", ChatColor.LIGHT_PURPLE + "->" + ChatColor.GRAY);
+		str = str.replaceAll("/teamcfg", ChatColor.AQUA + "/teamcfg" + ChatColor.GRAY);
+		str = str.replaceAll("Team defaults", ChatColor.AQUA + "Team defaults" + ChatColor.GRAY);
+		str = str.replaceAll("Team config", ChatColor.AQUA + "Team config" + ChatColor.GRAY);
+		str = str.replaceAll("/zonecfg", ChatColor.DARK_AQUA + "/zonecfg" + ChatColor.GRAY);
+		str = str.replaceAll("Warzone defaults", ChatColor.DARK_AQUA + "Warzone defaults" + ChatColor.GRAY);
+		str = str.replaceAll("Warzone config", ChatColor.DARK_AQUA + "Warzone config" + ChatColor.GRAY);
+		str = str.replaceAll("/warcfg", ChatColor.DARK_GREEN + "/warcfg" + ChatColor.GRAY);
+		str = str.replaceAll("War config", ChatColor.DARK_GREEN + "War config" + ChatColor.GRAY);
+		str = str.replaceAll("Print config", ChatColor.WHITE + "Print config" + ChatColor.GREEN);
+		
 		for (TeamKind kind : TeamKind.values()) {
 			str = str.replaceAll(" " + kind.toString(), " " + kind.getColor() + kind.toString() + msgColor);
+			str = str.replaceAll(kind.toString() + "/", kind.getColor() + kind.toString() + ChatColor.GRAY + "/");
 		}
-		str = str.replaceAll("Ex -", ChatColor.GRAY + "Ex -");
+		
 		return str;
 	}
 
