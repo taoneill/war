@@ -5,6 +5,8 @@ import java.util.HashMap;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
+import com.tommytony.war.War;
+
 public class LoadoutTxtMapper {
 	
 	public static String fromLoadoutToString(HashMap<Integer, ItemStack> loadout) {
@@ -51,7 +53,7 @@ public class LoadoutTxtMapper {
 							String[] enchantmentSplit = enchantmentStr.split(":");
 							int enchantId = Integer.parseInt(enchantmentSplit[0]);
 							int level = Integer.parseInt(enchantmentSplit[1]);
-							item.addEnchantment(Enchantment.getById(enchantId), level);
+							War.war.safelyEnchant(item, Enchantment.getById(enchantId), level);
 						}
 					}
 				}

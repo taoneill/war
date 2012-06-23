@@ -9,6 +9,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
+import com.tommytony.war.War;
+
 public class LoadoutYmlMapper {
 	
 	public static void fromConfigToLoadouts(ConfigurationSection config, HashMap<String, HashMap<Integer, ItemStack>> loadouts) {
@@ -41,7 +43,7 @@ public class LoadoutYmlMapper {
 					if (enchantmentStringSplit.length == 2) {
 						int enchantId = Integer.parseInt(enchantmentStringSplit[0]);
 						int level = Integer.parseInt(enchantmentStringSplit[1]);
-						stack.addEnchantment(Enchantment.getById(enchantId), level);
+						War.war.safelyEnchant(stack, Enchantment.getById(enchantId), level);
 					}
 				}
 			}

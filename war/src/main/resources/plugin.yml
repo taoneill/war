@@ -201,7 +201,7 @@ commands:
         /zonecfg playerloadoutasdefault:true -> the player can bring a copy of his outside-world inventory to fight, it replaces the default loadout. \\
         /zonecfg reward:default -> sets the winner's reward to your current items. 
         \\\\ Print config \\
-        /zonecfg [zone-name] -print (or /zonecfg -p) -> prints out the current warzone settings. \\ 
+        /zonecfg [zone-name] print (or /zonecfg -p) -> prints out the warzone settings. \\ 
     aliases: 
         - setzoneconfig
   teamcfg:
@@ -217,7 +217,7 @@ commands:
         /teamcfg <team-name> playerloadoutasdefault:true -> the player can bring a copy of his outside-world inventory to fight, it replaces the default loadout. \\ 
         /teamcfg <team-name> reward:default -> sets the winner's reward to your current items.  
         \\\\ Print config \\
-        /teamcfg [zone-name] <team-name> -print (or /teamcfg -p) -> prints out the current team settings. \\  
+        /teamcfg [zone-name] <team-name> print (or /teamcfg -p) -> prints out the team settings. \\  
     aliases: 
         - setteamconfig
   zonemaker:
@@ -280,7 +280,7 @@ commands:
         /warcfg playerloadoutasdefault:true -> the player can bring a copy of his outside-world inventory to fight, it replaces the default loadout. \\
         /warcfg reward:default -> sets the winner's reward to your current items. 
         \\\\ Print config \\
-        /warcfg -print (or /warcfg -p) -> prints out the current War settings. \\ 
+        /warcfg print (or /warcfg -p) -> prints out the current War settings. \\ 
     aliases: 
         - setwarconfig
 # Fallback

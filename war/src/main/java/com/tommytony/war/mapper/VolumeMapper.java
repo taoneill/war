@@ -252,7 +252,7 @@ public class VolumeMapper {
 							String[] enchantmentSplit = enchantmentStr.split(":");
 							int enchantId = Integer.parseInt(enchantmentSplit[0]);
 							int level = Integer.parseInt(enchantmentSplit[1]);
-							stack.addEnchantment(Enchantment.getById(enchantId), level);
+							War.war.safelyEnchant(stack, Enchantment.getById(enchantId), level);
 						}
 					}
 					

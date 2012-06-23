@@ -338,10 +338,28 @@ public class War extends JavaPlugin {
 	public ItemStack copyStack(ItemStack originalStack) {
 		ItemStack copiedStack = new ItemStack(originalStack.getType(), originalStack.getAmount(), originalStack.getDurability(), new Byte(originalStack.getData().getData()));
 		copiedStack.setDurability(originalStack.getDurability());
-		for (Enchantment enchantment : originalStack.getEnchantments().keySet()) {
-			copiedStack.addEnchantment(Enchantment.getById(enchantment.getId()), originalStack.getEnchantments().get(enchantment));
-		}
+		copyEnchantments(originalStack, copiedStack);	
+		
 		return copiedStack;
+	}
+	
+	public void copyEnchantments(ItemStack originalStack, ItemStack copiedStack) {
+		for (Enchantment enchantment : originalStack.getEnchantments().keySet()) {
+			int level = originalStack.getEnchantments().get(enchantment);
+			safelyEnchant(copiedStack, enchantment, level);
+		}
+	}
+	
+	public void safelyEnchant(ItemStack target, Enchantment enchantment, int level) {
+		try {
+			if (level > enchantment.getMaxLevel()) {
+				target.addUnsafeEnchantment(Enchantment.getById(enchantment.getId()), level);
+			} else {
+				target.addEnchantment(Enchantment.getById(enchantment.getId()), level);
+			}
+		} catch (Exception e) {
+			War.war.log("Failed to apply enchantment id:" + enchantment.getId() + " level:" + level, Level.WARNING);
+		}
 	}
 
 	/**

@@ -2,12 +2,14 @@ package com.tommytony.war.event;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
@@ -228,9 +230,8 @@ public class WarPlayerListener implements Listener {
 				ItemStack inHand = event.getItem();
 				
 				if (inHand != null) {
-					ItemStack newItemInHand = new ItemStack(inHand.getType(), inHand.getAmount(), inHand.getDurability(), inHand.getData().getData());
-					newItemInHand.setDurability(inHand.getDurability());
-					newItemInHand.addEnchantments(inHand.getEnchantments());
+					ItemStack newItemInHand = War.war.copyStack(inHand);
+				
 					event.getPlayer().setItemInHand(newItemInHand);
 					event.setCancelled(true);
 					
