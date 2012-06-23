@@ -559,7 +559,7 @@ public class WarEntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityDeath(final EntityDeathEvent event) {
 		if (!War.war.isLoaded() || !(event.getEntity() instanceof Player)) {
 			return;
