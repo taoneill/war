@@ -429,9 +429,52 @@ public class WarPlayerListener implements Listener {
 											playerLoc.getYaw(),
 											playerLoc.getPitch()));
 					return;
-				} else {				
-					// Otherwise, send him to spawn
-					event.setTo(playerTeam.getTeamSpawn());
+					
+					// Otherwise, send him to spawn (first make sure he drops his flag/cake/bomb to prevent auto-cap and as punishment)
+				} else if (playerWarzone.isFlagThief(player.getName())) {
+					Team victimTeam = playerWarzone.getVictimTeamForFlagThief(player.getName());
+
+					// Get player back to spawn
+					playerWarzone.respawnPlayer(event, playerTeam, player);
+					playerWarzone.removeFlagThief(player.getName());
+					
+					// Bring back flag of victim team
+					victimTeam.getFlagVolume().resetBlocks();
+					victimTeam.initializeTeamFlag();
+					
+					for (Team team : playerWarzone.getTeams()) {
+						team.teamcast(player.getName() + " dropped the " + victimTeam.getName() + " flag!");
+					}					
+					return;
+				} else if (playerWarzone.isCakeThief(player.getName())) {
+					Cake cake = playerWarzone.getCakeForThief(player.getName());
+					
+					// Get player back to spawn
+					playerWarzone.respawnPlayer(event, playerTeam, player);
+					playerWarzone.removeCakeThief(player.getName());
+					
+					// Bring back cake
+					cake.getVolume().resetBlocks();
+					cake.addCakeBlocks();
+					
+					for (Team team : playerWarzone.getTeams()) {
+						team.teamcast(player.getName() + " dropped the " + cake.getName() + " cake!");
+					}		
+					return;
+				} else if (playerWarzone.isBombThief(player.getName())) {
+					Bomb bomb = playerWarzone.getBombForThief(player.getName());
+					
+					// Get player back to spawn
+					playerWarzone.respawnPlayer(event, playerTeam, player);
+					playerWarzone.removeBombThief(player.getName());
+					
+					// Bring back bomb
+					bomb.getVolume().resetBlocks();
+					bomb.addBombBlocks();
+
+					for (Team team : playerWarzone.getTeams()) {
+						team.teamcast(player.getName() + " dropped the " + bomb.getName() + " bomb!");
+					}		
 					return;
 				}
 			}
