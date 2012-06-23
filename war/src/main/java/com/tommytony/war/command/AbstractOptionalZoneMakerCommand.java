@@ -18,15 +18,7 @@ public abstract class AbstractOptionalZoneMakerCommand extends AbstractWarComman
 	public AbstractOptionalZoneMakerCommand(WarCommandHandler handler, CommandSender sender, String[] args, boolean zoneMakersOnly) throws NotZoneMakerException {
 		super(handler, sender, args);
 
-		if (zoneMakersOnly) {
-			this.throwIfNotZoneMaker();
-		}
-	}
-	
-	public void throwIfNotZoneMaker() throws NotZoneMakerException {
-		if (!this.isSenderZoneMaker()) {
-				throw new NotZoneMakerException();
-		} else if (!(this.getSender() instanceof ConsoleCommandSender)) {
+		if (zoneMakersOnly && !this.isSenderZoneMaker()) {
 			throw new NotZoneMakerException();
 		}
 	}

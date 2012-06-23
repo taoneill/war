@@ -259,7 +259,7 @@ commands:
     description: War> Change gobal settings and the default warzone configuration values.
     usage: Change global settings and the default warzone and team configuration values.
         \\\\ War config \\
-        /warcfg buildinzonesonly:on disablebuildmessage:off -> requires war.build permission to build outside warzones. \\ 
+        /warcfg buildinzonesonly:on disablebuildmessage:off -> makes war.build permission required to build outside warzones. \\ 
         /warcfg pvpinzonesonly:on disablepvpmessage:off tntinzonesonly:off -> pvp and tnt denied outside zones (use war.pvp permission to allow pvp). \\
         /warcfg maxzones:12 keepoldzoneversions:on -> manage War's resource usage. \\
         /warcfg warhubmaterial:<floor/outline/gate/light> -> while holding block, change the look of the warhub (use air block to keep original floor). \\
