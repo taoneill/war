@@ -189,24 +189,17 @@ public class WarHub {
 					this.zoneGateBlocks.put(zone.getName(), currentGateBlock);
 					
 					// minimal air path
-					currentGateBlock.setType(Material.AIR);
-					currentGateBlock.getRelative(BlockFace.UP).setType(Material.AIR);
-					currentGateBlock.getRelative(back).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(BlockFace.UP).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(right).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(left).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(back).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(back).getRelative(BlockFace.UP).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(back).getRelative(right).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(back).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(back).getRelative(left).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(back).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(back).getRelative(right).getRelative(right).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(back).getRelative(right).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(back).getRelative(left).getRelative(left).setType(Material.AIR);
-					currentGateBlock.getRelative(back).getRelative(back).getRelative(left).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
+					Volume gateAirVolume = new Volume("gateAir", currentGateBlock.getWorld());
+					gateAirVolume.setCornerOne(currentGateBlock.getRelative(right));
+					gateAirVolume.setCornerTwo(currentGateBlock.getRelative(left).getRelative(back, 2).getRelative(BlockFace.UP, 2));
+					gateAirVolume.setToMaterial(Material.AIR);
+					
+					currentGateBlock.getRelative(back, 2).getRelative(right, 2).setType(Material.AIR);
+					currentGateBlock.getRelative(back, 2).getRelative(right, 2).getRelative(BlockFace.UP).setType(Material.AIR);
+					currentGateBlock.getRelative(back, 2).getRelative(right, 2).getRelative(BlockFace.UP, 2).setType(Material.AIR);
+					currentGateBlock.getRelative(back, 2).getRelative(left, 2).setType(Material.AIR);
+					currentGateBlock.getRelative(back, 2).getRelative(left, 2).getRelative(BlockFace.UP).setType(Material.AIR);
+					currentGateBlock.getRelative(back, 2).getRelative(left, 2).getRelative(BlockFace.UP, 2).setType(Material.AIR);
 					
 					// gate blocks
 					currentGateBlock.getRelative(BlockFace.DOWN).setType(light);

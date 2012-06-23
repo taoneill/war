@@ -331,7 +331,30 @@ public class ZoneLobby {
 			this.warzone.setTeleport(new Location(this.volume.getWorld(), this.zoneTeleportBlock.getX(), this.zoneTeleportBlock.getY(), this.zoneTeleportBlock.getZ(), yaw, 0));
 
 			// set to air the minimum path
+			BlockFace front = this.wall;
+			BlockFace leftSide = null; // looking at the zone
+			BlockFace rightSide = null;
+			
+			if (this.wall == BlockFace.NORTH) {
+				leftSide = BlockFace.EAST;
+				rightSide = BlockFace.WEST;
+			} else if (this.wall == BlockFace.EAST) {
+				leftSide = BlockFace.SOUTH;
+				rightSide = BlockFace.NORTH;
+			} else if (this.wall == BlockFace.SOUTH) {
+				leftSide = BlockFace.WEST;
+				rightSide = BlockFace.EAST;
+			} else if (this.wall == BlockFace.WEST) {
+				leftSide = BlockFace.NORTH;
+				rightSide = BlockFace.SOUTH;
+			}
+			
 			Block clearedPathStartBlock = BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getRelative(this.wall, 2);
+			Volume warzoneTeleportAir = new Volume("warzoneTeleport", clearedPathStartBlock.getWorld());
+			warzoneTeleportAir.setCornerOne(clearedPathStartBlock.getRelative(leftSide));
+			warzoneTeleportAir.setCornerTwo(clearedPathStartBlock.getRelative(rightSide).getRelative(front, 4).getRelative(BlockFace.UP));
+			warzoneTeleportAir.setToMaterial(Material.AIR);
+			
 			clearedPathStartBlock.setType(Material.AIR);
 			clearedPathStartBlock.getRelative(BlockFace.UP).setType(Material.AIR);
 			clearedPathStartBlock.getRelative(this.wall).setType(Material.AIR);
@@ -459,7 +482,7 @@ public class ZoneLobby {
 			}
 			
 			// minimal air path
-			this.clearGatePath(block, front, leftSide, rightSide);
+			this.clearGatePath(block, front, leftSide, rightSide, true);
 			
 			// gate blocks
 			block.getRelative(BlockFace.DOWN).setType(Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()));
@@ -507,7 +530,7 @@ public class ZoneLobby {
 			}
 			
 			// minimal air path
-			this.clearGatePath(block, front, leftSide, rightSide);
+			this.clearGatePath(block, front, leftSide, rightSide, false);
 
 			// gate blocks
 			block.getRelative(BlockFace.DOWN).setType(Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()));
@@ -558,7 +581,7 @@ public class ZoneLobby {
 			Block autoAssignGateBlock = BlockInfo.getBlock(this.volume.getWorld(), this.autoAssignGate);
 			
 			// minimal air path
-			this.clearGatePath(autoAssignGateBlock, front, leftSide, rightSide);
+			this.clearGatePath(autoAssignGateBlock, front, leftSide, rightSide, false);
 			
 			// gate blocks
 			this.setBlock(autoAssignGateBlock.getRelative(BlockFace.DOWN), 
@@ -789,25 +812,20 @@ public class ZoneLobby {
 		return false;
 	}
 	
-	private void clearGatePath(Block gateBlock, BlockFace awayFromGate, BlockFace left, BlockFace right) {
-		gateBlock.setType(Material.AIR);
-		gateBlock.getRelative(BlockFace.UP).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(BlockFace.UP).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(right).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(left).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(BlockFace.UP).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(right).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(left).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(right).getRelative(right).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(right).getRelative(right).getRelative(BlockFace.UP).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(left).getRelative(left).setType(Material.AIR);
-		gateBlock.getRelative(awayFromGate).getRelative(awayFromGate).getRelative(left).getRelative(left).getRelative(BlockFace.UP).setType(Material.AIR);
+	private void clearGatePath(Block gateBlock, BlockFace awayFromGate, BlockFace left, BlockFace right, boolean clearPathForPlayer) {
+		Volume gateAirVolume = new Volume("gateAir", gateBlock.getWorld());
+		gateAirVolume.setCornerOne(gateBlock.getRelative(right));
+		gateAirVolume.setCornerTwo(gateBlock.getRelative(left).getRelative(awayFromGate, 2).getRelative(BlockFace.UP, 2));
+		gateAirVolume.setToMaterial(Material.AIR);
+		
+		if (clearPathForPlayer) {
+			gateBlock.getRelative(awayFromGate, 2).getRelative(right, 2).setType(Material.AIR);
+			gateBlock.getRelative(awayFromGate, 2).getRelative(right, 2).getRelative(BlockFace.UP).setType(Material.AIR);
+			gateBlock.getRelative(awayFromGate, 2).getRelative(right, 2).getRelative(BlockFace.UP, 2).setType(Material.AIR);
+			gateBlock.getRelative(awayFromGate, 2).getRelative(left, 2).setType(Material.AIR);
+			gateBlock.getRelative(awayFromGate, 2).getRelative(left, 2).getRelative(BlockFace.UP).setType(Material.AIR);
+			gateBlock.getRelative(awayFromGate, 2).getRelative(left, 2).getRelative(BlockFace.UP, 2).setType(Material.AIR);
+		}
 		
 	}
 }
