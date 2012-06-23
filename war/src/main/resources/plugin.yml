@@ -1,6 +1,6 @@
 name: War
-version: 1.7.2-PREVIEW (Doolittle)
-description: Lets you create TDM and CTF arenas (warzones) for a fast-paced and structured PVP experience.
+version: 1.7.2 (Doolittle)
+description: Minecraft PVP arenas (called warzones) for a fast-paced and structured PVP experience with TDM, CTF & more!
 author: tommytony
 website: http://war.tommytony.com
 main: com.tommytony.war.War
