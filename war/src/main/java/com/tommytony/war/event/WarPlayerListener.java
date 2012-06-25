@@ -34,6 +34,7 @@ import com.tommytony.war.command.ZoneSetter;
 import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.job.CantReEnterSpawnJob;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
@@ -502,50 +503,15 @@ public class WarPlayerListener implements Listener {
 			} else if (loadoutSelectionState != null && !loadoutSelectionState.isStillInSpawn()
 					&& !playerWarzone.isCakeThief(player.getName())
 					&& (flagReturn.equals(FlagReturn.BOTH) || flagReturn.equals(FlagReturn.SPAWN)) 
-					&& !playerWarzone.isFlagThief(player.getName())) { 
+					&& !playerWarzone.isFlagThief(player.getName())) {
+				
 				// player is in spawn, but has left already: he should NOT be let back in - kick him out gently
-				// (also, be sure you aren't preventing the flag or cake from being captured) 
-				int diffZ = playerLoc.getBlockZ() - playerTeam.getTeamSpawn().getBlockZ();
-				int diffX = playerLoc.getBlockX() - playerTeam.getTeamSpawn().getBlockX();
-				
-				int finalZ = playerLoc.getBlockZ();
-				int finalX = playerLoc.getBlockX();
-				int bumpDistance = 1;
-				if (diffZ == 0 && diffX == 0) {
-					// at spawn already, get him moving
-					finalZ += bumpDistance + 1;
-					finalX += bumpDistance + 1;
-				} else if (diffZ > 0 && diffX > 0) {
-					finalZ += bumpDistance;
-					finalX += bumpDistance;
-				} else if (diffZ == 0 && diffX > 0) {
-					finalX += bumpDistance;
-				}else if (diffZ < 0 && diffX > 0) {
-					finalZ -= bumpDistance;
-					finalX += bumpDistance;
-				} else if (diffZ < 0 && diffX == 0) {
-					finalZ -= bumpDistance;
-				} else if (diffZ > 0 && diffX < 0) {
-					finalZ -= bumpDistance;
-					finalX -= bumpDistance;
-				} else if (diffZ == 0 && diffX < 0) {
-					finalX -= bumpDistance;
-				} else if (diffZ > 0 && diffX < 0) {
-					finalZ += bumpDistance;
-					finalX -= bumpDistance;
-				} else if (diffZ > 0 && diffX == 0) {
-					finalZ += bumpDistance;
+				// if he sticks around too long.
+				// (also, be sure you aren't preventing the flag or cake from being captured)
+				if (!CantReEnterSpawnJob.getPlayersUnderSuspicion().contains(player.getName())) {
+					CantReEnterSpawnJob job = new CantReEnterSpawnJob(player, playerTeam);
+					War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job, 12);
 				}
-				
-				event.setTo(new Location(playerLoc.getWorld(),
-						finalX,
-						playerLoc.getY(),
-						finalZ,
-						playerLoc.getYaw(),
-						playerLoc.getPitch()
-				));
-				
-				War.war.badMsg(player, "Can't re-enter spawn!");
 				return;
 			}
 
