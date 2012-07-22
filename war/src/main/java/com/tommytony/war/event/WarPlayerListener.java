@@ -188,18 +188,11 @@ public class WarPlayerListener implements Listener {
 	public void onPlayerKick(final PlayerKickEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
-			String reason = event.getReason();
-			if (reason.contains("moved") || reason.contains("too quickly") || reason.contains("Hacking")) {
-				boolean inWarzone = Warzone.getZoneByLocation(player) != null;
-				boolean inLobby = ZoneLobby.getLobbyByLocation(player) != null;
-				boolean inWarhub = false;
-				if (War.war.getWarHub() != null && War.war.getWarHub().getVolume().contains(player.getLocation())) {
-					inWarhub = true;
-				}
-				if (inWarzone || inLobby || inWarhub) {
-					event.setCancelled(true);
-					War.war.log("Prevented " + player.getName() + " from getting kicked.", java.util.logging.Level.WARNING);
-				}
+			Warzone warzone = Warzone.getZoneByLocation(player);
+			
+			if (warzone != null) {
+				// kick player from warzone as well
+				warzone.handlePlayerLeave(player, warzone.getTeleport(), true);
 			}
 		}
 	}
