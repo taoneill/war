@@ -205,7 +205,8 @@ public class ZoneVolumeMapper {
 											deferred.add(new DeferredBlockReset(x, y, z, diskBlockType, diskBlockData));
 										} else {
 											// regular block
-											worldBlock.setType(Material.getMaterial(diskBlockType));
+											if(diskBlockType >-1){
+											worldBlock.setType(Material.getMaterial(diskBlockType))	
 											worldBlock.setData(diskBlockData);
 										}
 										noOfResetBlocks++;
