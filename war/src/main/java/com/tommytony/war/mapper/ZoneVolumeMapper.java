@@ -56,6 +56,7 @@ public class ZoneVolumeMapper {
 		File signsFile = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".signs");
 		File invsFile = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".invs");
 		int noOfResetBlocks = 0;
+		boolean failed = false;
 		if (!blocksFile.exists()) {
 			// The post 1.6 formatted files haven't been created yet so
 			// we need to use the old load.
@@ -205,9 +206,14 @@ public class ZoneVolumeMapper {
 											deferred.add(new DeferredBlockReset(x, y, z, diskBlockType, diskBlockData));
 										} else {
 											// regular block
-											if(diskBlockType >-1){
-											worldBlock.setType(Material.getMaterial(diskBlockType))	
-											worldBlock.setData(diskBlockData);
+											if (diskBlockType >= 0) {
+												worldBlock.setType(Material.getMaterial(diskBlockType));
+												worldBlock.setData(diskBlockData);
+											} else {
+												War.war.getLogger().warning("Bad block type:" + diskBlockType + " data:" + diskBlockData + " at x:" + x + " y:" + y + " z:" + z);
+												worldBlock.setType(Material.getMaterial(Math.abs(diskBlockType)));
+												worldBlock.setData(diskBlockData);
+											}
 										}
 										noOfResetBlocks++;
 									}
@@ -216,8 +222,12 @@ public class ZoneVolumeMapper {
 									blockReads++;
 
 								} catch (Exception e) {
-									War.war.getLogger().warning("Failed to reset block in zone volume " + volume.getName() + ". " + "Blocks read: " + blockReads + ". Visited blocks so far:" + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
-									e.printStackTrace();
+									if (!failed) {
+										// Don't spam the console
+										War.war.getLogger().warning("Failed to reset block in zone volume " + volume.getName() + ". " + "Blocks read: " + blockReads + ". Visited blocks so far:" + visitedBlocks + ". Blocks reset: " + noOfResetBlocks + ". Error at x:" + x + " y:" + y + " z:" + z + ". Exception:" + e.getClass().toString() + " " + e.getMessage());
+										e.printStackTrace();
+										failed = true;
+									}
 								} finally {
 									z++;
 								}
