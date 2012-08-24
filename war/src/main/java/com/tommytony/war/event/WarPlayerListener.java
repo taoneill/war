@@ -410,6 +410,7 @@ public class WarPlayerListener implements Listener {
 							War.war.getWarHub().getLocation() : playerWarzone.getTeleport(), event, true);
 					return;
 				}
+				return;
 			}
 		}
 
