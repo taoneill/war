@@ -214,8 +214,7 @@ public class ZoneVolumeMapper {
 												// but now -128 to -1 are the result of the bad cast from byte 
 												// to int array above. To make matters worse let's make this
 												// quick a dirty patch. Anyway everything will break horribly 
-												// once block ids get higher than 255.											
-												War.war.getLogger().warning("Bad block type:" + diskBlockType + " data:" + diskBlockData + " at x:" + x + " y:" + y + " z:" + z);
+												// once block ids get higher than 255.
 												worldBlock.setType(Material.getMaterial(256 + diskBlockType));
 												worldBlock.setData(diskBlockData);
 											}
