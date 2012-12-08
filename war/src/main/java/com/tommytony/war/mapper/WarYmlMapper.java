@@ -93,7 +93,7 @@ public class WarYmlMapper {
 		ConfigurationSection hubConfigSection = warRootSection.getConfigurationSection("war.info.warhub");
 		if (hubConfigSection != null) {
 			RestoreYmlWarhubJob restoreWarhub = new RestoreYmlWarhubJob(hubConfigSection);
-			if (War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, restoreWarhub) == -1) {
+			if (War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, restoreWarhub, 20) == -1) {
 				War.war.log("Failed to schedule warhub-restore job. War hub was not loaded.", Level.WARNING);
 			}
 		}

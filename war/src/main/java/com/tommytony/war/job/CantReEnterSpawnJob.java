@@ -128,7 +128,7 @@ public class CantReEnterSpawnJob implements Runnable {
 			
 			player.teleport(nextCandidate);
 			
-			War.war.badMsg(player, "Can't re-enter spawn! after " + attempts + " attemps!");
+			War.war.badMsg(player, "Can't re-enter spawn!");
 		}
 		
 		if (playersUnderSuspicion.contains(player.getName())) {

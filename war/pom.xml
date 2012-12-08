@@ -3,7 +3,7 @@
 
   <groupId>com.tommytony</groupId>
   <artifactId>war</artifactId>
-  <version>1.7.3-PREVIEW</version>
+  <version>1.7.3</version>
   <packaging>jar</packaging>
 
   <name>War</name>
@@ -68,7 +68,7 @@
     <dependency>
     	<groupId>org.bukkit</groupId>
     	<artifactId>bukkit</artifactId>
-    	<version>1.2.5-R4.0</version>
+    	<version>1.4.5-R0.2</version>
     	<scope>compile</scope>
     </dependency>
     <dependency>
