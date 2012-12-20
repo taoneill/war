@@ -15,6 +15,7 @@ import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
@@ -34,16 +35,16 @@ public class WarHub {
 		int yaw = 0;
 		if (hubOrientation.equals("south")) {
 			yaw = 270;
-			this.setOrientation(BlockFace.SOUTH);
+			this.setOrientation(Direction.SOUTH());
 		} else if (hubOrientation.equals("north")) {
 			yaw = 90;
-			this.setOrientation(BlockFace.NORTH);
+			this.setOrientation(Direction.NORTH());
 		} else if (hubOrientation.equals("east")) {
 			yaw = 180;
-			this.setOrientation(BlockFace.EAST);
+			this.setOrientation(Direction.EAST());
 		} else {
 			yaw = 0;
-			this.setOrientation(BlockFace.WEST);
+			this.setOrientation(Direction.WEST());
 		}
 
 		this.location = new Location(location.getWorld(),
@@ -78,13 +79,13 @@ public class WarHub {
 
 		BlockFace facing = null;
 		if ((yaw >= 0 && yaw < 45) || (yaw >= 315 && yaw <= 360)) {
-			facing = BlockFace.WEST;
+			facing = Direction.WEST();
 		} else if (yaw >= 45 && yaw < 135) {
-			facing = BlockFace.NORTH;
+			facing = Direction.NORTH();
 		} else if (yaw >= 135 && yaw < 225) {
-			facing = BlockFace.EAST;
+			facing = Direction.EAST();
 		} else if (yaw >= 225 && yaw < 315) {
-			facing = BlockFace.SOUTH;
+			facing = Direction.SOUTH();
 		}
 		this.setOrientation(facing);
 	}
@@ -125,26 +126,26 @@ public class WarHub {
 			BlockFace front = this.getOrientation();
 			BlockFace back;
 			byte data;
-			if (this.getOrientation() == BlockFace.SOUTH) {
+			if (this.getOrientation() == Direction.SOUTH()) {
 				data = (byte) 4;
-				left = BlockFace.EAST;
-				right = BlockFace.WEST;
-				back = BlockFace.NORTH;
-			} else if (this.getOrientation() == BlockFace.NORTH) {
+				left = Direction.EAST();
+				right = Direction.WEST();
+				back = Direction.NORTH();
+			} else if (this.getOrientation() == Direction.NORTH()) {
 				data = (byte) 12;
-				left = BlockFace.WEST;
-				right = BlockFace.EAST;
-				back = BlockFace.SOUTH;
-			} else if (this.getOrientation() == BlockFace.EAST) {
+				left = Direction.WEST();
+				right = Direction.EAST();
+				back = Direction.SOUTH();
+			} else if (this.getOrientation() == Direction.EAST()) {
 				data = (byte) 0;
-				left = BlockFace.NORTH;
-				right = BlockFace.SOUTH;
-				back = BlockFace.WEST;
+				left = Direction.NORTH();
+				right = Direction.SOUTH();
+				back = Direction.WEST();
 			} else {
 				data = (byte) 8;
-				left = BlockFace.SOUTH;
-				right = BlockFace.NORTH;
-				back = BlockFace.EAST;
+				left = Direction.SOUTH();
+				right = Direction.NORTH();
+				back = Direction.EAST();
 			}
 
 			Block locationBlock = this.location.getWorld().getBlockAt(this.location.getBlockX(), this.location.getBlockY(), this.location.getBlockZ());
@@ -260,22 +261,22 @@ public class WarHub {
 		BlockFace left;
 		BlockFace back;
 		byte data;
-		if (this.getOrientation() == BlockFace.SOUTH) {
+		if (this.getOrientation() == Direction.SOUTH()) {
 			data = (byte) 4;
-			left = BlockFace.EAST;
-			back = BlockFace.NORTH;
-		} else if (this.getOrientation() == BlockFace.NORTH) {
+			left = Direction.EAST();
+			back = Direction.NORTH();
+		} else if (this.getOrientation() == Direction.NORTH()) {
 			data = (byte) 12;
-			left = BlockFace.WEST;
-			back = BlockFace.SOUTH;
-		} else if (this.getOrientation() == BlockFace.EAST) {
+			left = Direction.WEST();
+			back = Direction.SOUTH();
+		} else if (this.getOrientation() == Direction.EAST()) {
 			data = (byte) 0;
-			left = BlockFace.NORTH;
-			back = BlockFace.WEST;
+			left = Direction.NORTH();
+			back = Direction.WEST();
 		} else {
 			data = (byte) 8;
-			left = BlockFace.SOUTH;
-			back = BlockFace.EAST;
+			left = Direction.SOUTH();
+			back = Direction.EAST();
 		}
 
 		Block zoneGate = this.zoneGateBlocks.get(zone.getName());

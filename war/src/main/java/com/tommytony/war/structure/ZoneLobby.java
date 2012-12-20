@@ -18,6 +18,7 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
@@ -95,14 +96,14 @@ public class ZoneLobby {
 		this.setVolume(volume);
 
 		// we're setting the zoneVolume directly, so we need to figure out the lobbyMiddleWallBlock on our own
-		if (wall == BlockFace.NORTH) {
-			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(BlockFace.EAST, this.lobbyHalfSide));
-		} else if (wall == BlockFace.EAST) {
-			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(BlockFace.SOUTH, this.lobbyHalfSide));
-		} else if (wall == BlockFace.SOUTH) {
-			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(BlockFace.WEST, this.lobbyHalfSide));
-		} else if (wall == BlockFace.WEST) {
-			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(BlockFace.NORTH, this.lobbyHalfSide));
+		if (wall == Direction.NORTH()) {
+			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(Direction.EAST(), this.lobbyHalfSide));
+		} else if (wall == Direction.EAST()) {
+			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(Direction.SOUTH(), this.lobbyHalfSide));
+		} else if (wall == Direction.SOUTH()) {
+			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(Direction.WEST(), this.lobbyHalfSide));
+		} else if (wall == Direction.WEST()) {
+			this.lobbyMiddleWallBlock = new BlockInfo(BlockInfo.getBlock(warzone.getWorld(), volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(Direction.NORTH(), this.lobbyHalfSide));
 		}
 	}
 
@@ -138,17 +139,17 @@ public class ZoneLobby {
 		BlockFace facing = null;
 		BlockFace opposite = null;
 		if ((yaw >= 0 && yaw < 45) || (yaw >= 315 && yaw <= 360)) {
-			facing = BlockFace.WEST;
-			opposite = BlockFace.EAST;
+			facing = Direction.WEST();
+			opposite = Direction.EAST();
 		} else if (yaw >= 45 && yaw < 135) {
-			facing = BlockFace.NORTH;
-			opposite = BlockFace.SOUTH;
+			facing = Direction.NORTH();
+			opposite = Direction.SOUTH();
 		} else if (yaw >= 135 && yaw < 225) {
-			facing = BlockFace.EAST;
-			opposite = BlockFace.WEST;
+			facing = Direction.EAST();
+			opposite = Direction.WEST();
 		} else if (yaw >= 225 && yaw < 315) {
-			facing = BlockFace.SOUTH;
-			opposite = BlockFace.NORTH;
+			facing = Direction.SOUTH();
+			opposite = Direction.NORTH();
 		}
 
 		this.wall = opposite; // a player facing south places a lobby that looks just like a lobby stuck to the north wall
@@ -162,16 +163,16 @@ public class ZoneLobby {
 		int y = this.lobbyMiddleWallBlock.getY();
 		int z = this.lobbyMiddleWallBlock.getZ();
 
-		if (this.wall == BlockFace.NORTH) {
+		if (this.wall == Direction.NORTH()) {
 			corner1 = lobbyWorld.getBlockAt(x, y - 1, z + this.lobbyHalfSide);
 			corner2 = lobbyWorld.getBlockAt(x - this.lobbyDepth, y + 1 + this.lobbyHeight, z - this.lobbyHalfSide);
-		} else if (this.wall == BlockFace.EAST) {
+		} else if (this.wall == Direction.EAST()) {
 			corner1 = lobbyWorld.getBlockAt(x - this.lobbyHalfSide, y - 1, z);
 			corner2 = lobbyWorld.getBlockAt(x + this.lobbyHalfSide, y + 1 + this.lobbyHeight, z - this.lobbyDepth);
-		} else if (this.wall == BlockFace.SOUTH) {
+		} else if (this.wall == Direction.SOUTH()) {
 			corner1 = lobbyWorld.getBlockAt(x, y - 1, z - this.lobbyHalfSide);
 			corner2 = lobbyWorld.getBlockAt(x + this.lobbyDepth, y + 1 + this.lobbyHeight, z + this.lobbyHalfSide);
-		} else if (this.wall == BlockFace.WEST) {
+		} else if (this.wall == Direction.WEST()) {
 			corner1 = lobbyWorld.getBlockAt(x + this.lobbyHalfSide, y - 1, z);
 			corner2 = lobbyWorld.getBlockAt(x - this.lobbyHalfSide, y + 1 + this.lobbyHeight, z + this.lobbyDepth);
 		}
@@ -194,7 +195,7 @@ public class ZoneLobby {
 		Block corner1 = null;
 		Block corner2 = null;
 
-		if (this.wall == BlockFace.NORTH) {
+		if (this.wall == Direction.NORTH()) {
 			int wallStart = zoneVolume.getMinZ();
 			int wallEnd = zoneVolume.getMaxZ();
 			int x = zoneVolume.getMinX();
@@ -204,7 +205,7 @@ public class ZoneLobby {
 			this.lobbyMiddleWallBlock = new BlockInfo(this.warzone.getWorld().getBlockAt(x, y, wallCenterPos));
 			corner1 = this.warzone.getWorld().getBlockAt(x, y - 1, wallCenterPos + this.lobbyHalfSide);
 			corner2 = this.warzone.getWorld().getBlockAt(x - this.lobbyDepth, y + 1 + this.lobbyHeight, wallCenterPos - this.lobbyHalfSide);
-		} else if (this.wall == BlockFace.EAST) {
+		} else if (this.wall == Direction.EAST()) {
 			int wallStart = zoneVolume.getMinX();
 			int wallEnd = zoneVolume.getMaxX();
 			int z = zoneVolume.getMinZ();
@@ -214,7 +215,7 @@ public class ZoneLobby {
 			this.lobbyMiddleWallBlock = new BlockInfo(this.warzone.getWorld().getBlockAt(wallCenterPos, y, z));
 			corner1 = this.warzone.getWorld().getBlockAt(wallCenterPos - this.lobbyHalfSide, y - 1, z);
 			corner2 = this.warzone.getWorld().getBlockAt(wallCenterPos + this.lobbyHalfSide, y + 1 + this.lobbyHeight, z - this.lobbyDepth);
-		} else if (this.wall == BlockFace.SOUTH) {
+		} else if (this.wall == Direction.SOUTH()) {
 			int wallStart = zoneVolume.getMinZ();
 			int wallEnd = zoneVolume.getMaxZ();
 			int x = zoneVolume.getMaxX();
@@ -224,7 +225,7 @@ public class ZoneLobby {
 			this.lobbyMiddleWallBlock = new BlockInfo(this.warzone.getWorld().getBlockAt(x, y, wallCenterPos));
 			corner1 = this.warzone.getWorld().getBlockAt(x, y - 1, wallCenterPos - this.lobbyHalfSide);
 			corner2 = this.warzone.getWorld().getBlockAt(x + this.lobbyDepth, y + 1 + this.lobbyHeight, wallCenterPos + this.lobbyHalfSide);
-		} else if (this.wall == BlockFace.WEST) {
+		} else if (this.wall == Direction.WEST()) {
 			int wallStart = zoneVolume.getMinX();
 			int wallEnd = zoneVolume.getMaxX();
 			int z = zoneVolume.getMaxZ();
@@ -319,13 +320,13 @@ public class ZoneLobby {
 			// set zone tp
 			this.zoneTeleportBlock = new BlockInfo(BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(this.wall, 6));
 			int yaw = 0;
-			if (this.wall == BlockFace.WEST) {
+			if (this.wall == Direction.WEST()) {
 				yaw = 180;
-			} else if (this.wall == BlockFace.SOUTH) {
+			} else if (this.wall == Direction.SOUTH()) {
 				yaw = 90;
-			} else if (this.wall == BlockFace.EAST) {
+			} else if (this.wall == Direction.EAST()) {
 				yaw = 0;
-			} else if (this.wall == BlockFace.NORTH) {
+			} else if (this.wall == Direction.NORTH()) {
 				yaw = 270;
 			}
 			this.warzone.setTeleport(new Location(this.volume.getWorld(), this.zoneTeleportBlock.getX(), this.zoneTeleportBlock.getY(), this.zoneTeleportBlock.getZ(), yaw, 0));
@@ -335,18 +336,18 @@ public class ZoneLobby {
 			BlockFace leftSide = null; // looking at the zone
 			BlockFace rightSide = null;
 			
-			if (this.wall == BlockFace.NORTH) {
-				leftSide = BlockFace.EAST;
-				rightSide = BlockFace.WEST;
-			} else if (this.wall == BlockFace.EAST) {
-				leftSide = BlockFace.SOUTH;
-				rightSide = BlockFace.NORTH;
-			} else if (this.wall == BlockFace.SOUTH) {
-				leftSide = BlockFace.WEST;
-				rightSide = BlockFace.EAST;
-			} else if (this.wall == BlockFace.WEST) {
-				leftSide = BlockFace.NORTH;
-				rightSide = BlockFace.SOUTH;
+			if (this.wall == Direction.NORTH()) {
+				leftSide = Direction.EAST();
+				rightSide = Direction.WEST();
+			} else if (this.wall == Direction.EAST()) {
+				leftSide = Direction.SOUTH();
+				rightSide = Direction.NORTH();
+			} else if (this.wall == Direction.SOUTH()) {
+				leftSide = Direction.WEST();
+				rightSide = Direction.EAST();
+			} else if (this.wall == Direction.WEST()) {
+				leftSide = Direction.NORTH();
+				rightSide = Direction.SOUTH();
 			}
 			
 			Block clearedPathStartBlock = BlockInfo.getBlock(this.warzone.getWorld(), this.lobbyMiddleWallBlock).getRelative(this.wall, 2);
@@ -371,13 +372,13 @@ public class ZoneLobby {
 			// set zone sign
 			Block zoneSignBlock = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(this.wall, 4);
 			byte data = 0;
-			if (this.wall == BlockFace.NORTH) {
+			if (this.wall == Direction.NORTH()) {
 				data = (byte) 4;
-			} else if (this.wall == BlockFace.EAST) {
+			} else if (this.wall == Direction.EAST()) {
 				data = (byte) 8;
-			} else if (this.wall == BlockFace.SOUTH) {
+			} else if (this.wall == Direction.SOUTH()) {
 				data = (byte) 12;
-			} else if (this.wall == BlockFace.WEST) {
+			} else if (this.wall == Direction.WEST()) {
 				data = (byte) 0;
 			}
 			String[] lines = new String[4];
@@ -395,18 +396,18 @@ public class ZoneLobby {
 			// lets get some light in here
 			Material light = Material.getMaterial(this.warzone.getLobbyMaterials().getLightId());
 			byte lightData = this.warzone.getLobbyMaterials().getLightData();
-			if (this.wall == BlockFace.NORTH || this.wall == BlockFace.SOUTH) {
-				Block one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.WEST, this.lobbyHalfSide - 1).getRelative(this.wall, 9);
+			if (this.wall == Direction.NORTH() || this.wall == Direction.SOUTH()) {
+				Block one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.WEST(), this.lobbyHalfSide - 1).getRelative(this.wall, 9);
 				one.setType(light);
 				one.setData(lightData);
-				Block two = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST, this.lobbyHalfSide - 1).getRelative(this.wall, 9);
+				Block two = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.EAST(), this.lobbyHalfSide - 1).getRelative(this.wall, 9);
 				two.setType(light);
 				two.setData(lightData);
 			} else {
-				Block one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH, this.lobbyHalfSide - 1).getRelative(this.wall, 9);
+				Block one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.NORTH(), this.lobbyHalfSide - 1).getRelative(this.wall, 9);
 				one.setType(light);
 				one.setData(lightData);
-				Block two = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(BlockFace.SOUTH, this.lobbyHalfSide - 1).getRelative(this.wall, 9);
+				Block two = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.SOUTH(), this.lobbyHalfSide - 1).getRelative(this.wall, 9);
 				two.setType(light);
 				two.setData(lightData);
 			}
@@ -418,18 +419,18 @@ public class ZoneLobby {
 	private void setGatePositions(Block lobbyMiddleWallBlock) {
 		BlockFace leftSide = null; // look at the zone
 		BlockFace rightSide = null;
-		if (this.wall == BlockFace.NORTH) {
-			leftSide = BlockFace.EAST;
-			rightSide = BlockFace.WEST;
-		} else if (this.wall == BlockFace.EAST) {
-			leftSide = BlockFace.SOUTH;
-			rightSide = BlockFace.NORTH;
-		} else if (this.wall == BlockFace.SOUTH) {
-			leftSide = BlockFace.WEST;
-			rightSide = BlockFace.EAST;
-		} else if (this.wall == BlockFace.WEST) {
-			leftSide = BlockFace.NORTH;
-			rightSide = BlockFace.SOUTH;
+		if (this.wall == Direction.NORTH()) {
+			leftSide = Direction.EAST();
+			rightSide = Direction.WEST();
+		} else if (this.wall == Direction.EAST()) {
+			leftSide = Direction.SOUTH();
+			rightSide = Direction.NORTH();
+		} else if (this.wall == Direction.SOUTH()) {
+			leftSide = Direction.WEST();
+			rightSide = Direction.EAST();
+		} else if (this.wall == Direction.WEST()) {
+			leftSide = Direction.NORTH();
+			rightSide = Direction.SOUTH();
 		}
 		this.teamGateBlocks.clear();
 		if (this.warzone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
@@ -467,18 +468,18 @@ public class ZoneLobby {
 			BlockFace leftSide = null; // looking at the zone
 			BlockFace rightSide = null;
 			
-			if (this.wall == BlockFace.NORTH) {
-				leftSide = BlockFace.EAST;
-				rightSide = BlockFace.WEST;
-			} else if (this.wall == BlockFace.EAST) {
-				leftSide = BlockFace.SOUTH;
-				rightSide = BlockFace.NORTH;
-			} else if (this.wall == BlockFace.SOUTH) {
-				leftSide = BlockFace.WEST;
-				rightSide = BlockFace.EAST;
-			} else if (this.wall == BlockFace.WEST) {
-				leftSide = BlockFace.NORTH;
-				rightSide = BlockFace.SOUTH;
+			if (this.wall == Direction.NORTH()) {
+				leftSide = Direction.EAST();
+				rightSide = Direction.WEST();
+			} else if (this.wall == Direction.EAST()) {
+				leftSide = Direction.SOUTH();
+				rightSide = Direction.NORTH();
+			} else if (this.wall == Direction.SOUTH()) {
+				leftSide = Direction.WEST();
+				rightSide = Direction.EAST();
+			} else if (this.wall == Direction.WEST()) {
+				leftSide = Direction.NORTH();
+				rightSide = Direction.SOUTH();
 			}
 			
 			// minimal air path
@@ -504,29 +505,29 @@ public class ZoneLobby {
 			BlockFace rightSide = null;
 			
 			// warhub link is opposite direction as zone wall
-			if (this.wall == BlockFace.NORTH) {
-				front = BlockFace.SOUTH;
-			} else if (this.wall == BlockFace.EAST) {
-				front = BlockFace.WEST;
-			} else if (this.wall == BlockFace.SOUTH) {
-				front = BlockFace.NORTH;
-			} else if (this.wall == BlockFace.WEST) {
-				front = BlockFace.EAST;
+			if (this.wall == Direction.NORTH()) {
+				front = Direction.SOUTH();
+			} else if (this.wall == Direction.EAST()) {
+				front = Direction.WEST();
+			} else if (this.wall == Direction.SOUTH()) {
+				front = Direction.NORTH();
+			} else if (this.wall == Direction.WEST()) {
+				front = Direction.EAST();
 			}
 			
-			if (this.wall == BlockFace.NORTH) {
-				leftSide = BlockFace.EAST;
-				rightSide = BlockFace.WEST;
+			if (this.wall == Direction.NORTH()) {
+				leftSide = Direction.EAST();
+				rightSide = Direction.WEST();
 				
-			} else if (this.wall == BlockFace.EAST) {
-				leftSide = BlockFace.SOUTH;
-				rightSide = BlockFace.NORTH;
-			} else if (this.wall == BlockFace.SOUTH) {
-				leftSide = BlockFace.WEST;
-				rightSide = BlockFace.EAST;
-			} else if (this.wall == BlockFace.WEST) {
-				leftSide = BlockFace.NORTH;
-				rightSide = BlockFace.SOUTH;
+			} else if (this.wall == Direction.EAST()) {
+				leftSide = Direction.SOUTH();
+				rightSide = Direction.NORTH();
+			} else if (this.wall == Direction.SOUTH()) {
+				leftSide = Direction.WEST();
+				rightSide = Direction.EAST();
+			} else if (this.wall == Direction.WEST()) {
+				leftSide = Direction.NORTH();
+				rightSide = Direction.SOUTH();
 			}
 			
 			// minimal air path
@@ -561,18 +562,18 @@ public class ZoneLobby {
 			BlockFace leftSide = null; // lookingat the zone
 			BlockFace rightSide = null;
 			
-			if (this.wall == BlockFace.NORTH) {
-				leftSide = BlockFace.EAST;
-				rightSide = BlockFace.WEST;
-			} else if (this.wall == BlockFace.EAST) {
-				leftSide = BlockFace.SOUTH;
-				rightSide = BlockFace.NORTH;
-			} else if (this.wall == BlockFace.SOUTH) {
-				leftSide = BlockFace.WEST;
-				rightSide = BlockFace.EAST;
-			} else if (this.wall == BlockFace.WEST) {
-				leftSide = BlockFace.NORTH;
-				rightSide = BlockFace.SOUTH;
+			if (this.wall == Direction.NORTH()) {
+				leftSide = Direction.EAST();
+				rightSide = Direction.WEST();
+			} else if (this.wall == Direction.EAST()) {
+				leftSide = Direction.SOUTH();
+				rightSide = Direction.NORTH();
+			} else if (this.wall == Direction.SOUTH()) {
+				leftSide = Direction.WEST();
+				rightSide = Direction.EAST();
+			} else if (this.wall == Direction.WEST()) {
+				leftSide = Direction.NORTH();
+				rightSide = Direction.SOUTH();
 			}
 			
 			
@@ -670,18 +671,18 @@ public class ZoneLobby {
 		if (gateBlock != null) {
 			BlockFace leftSide = null; // look at the zone
 			BlockFace rightSide = null;
-			if (this.wall == BlockFace.NORTH) {
-				leftSide = BlockFace.EAST;
-				rightSide = BlockFace.WEST;
-			} else if (this.wall == BlockFace.EAST) {
-				leftSide = BlockFace.SOUTH;
-				rightSide = BlockFace.NORTH;
-			} else if (this.wall == BlockFace.SOUTH) {
-				leftSide = BlockFace.WEST;
-				rightSide = BlockFace.EAST;
-			} else if (this.wall == BlockFace.WEST) {
-				leftSide = BlockFace.NORTH;
-				rightSide = BlockFace.SOUTH;
+			if (this.wall == Direction.NORTH()) {
+				leftSide = Direction.EAST();
+				rightSide = Direction.WEST();
+			} else if (this.wall == Direction.EAST()) {
+				leftSide = Direction.SOUTH();
+				rightSide = Direction.NORTH();
+			} else if (this.wall == Direction.SOUTH()) {
+				leftSide = Direction.WEST();
+				rightSide = Direction.EAST();
+			} else if (this.wall == Direction.WEST()) {
+				leftSide = Direction.NORTH();
+				rightSide = Direction.SOUTH();
 			}
 			return (block.getX() == gateBlock.getX() && block.getY() == gateBlock.getY() && block.getZ() == gateBlock.getZ()) || (block.getX() == gateBlock.getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(leftSide).getX() && block.getY() == gateBlock.getRelative(leftSide).getY() && block.getZ() == gateBlock.getRelative(leftSide).getZ()) || (block.getX() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(BlockFace.UP).getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getX() && block.getY() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getY() && block.getZ() == gateBlock.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP).getZ()) || (block.getX() == gateBlock.getRelative(rightSide).getX() && block.getY() == gateBlock.getRelative(rightSide).getY() && block.getZ() == gateBlock.getRelative(rightSide).getZ()) || (block.getX() == gateBlock.getX() && block.getY() == gateBlock.getY() - 1 && block.getZ() == gateBlock.getZ());
 		}
@@ -719,39 +720,39 @@ public class ZoneLobby {
 		BlockFace direction = null;
 		if (awayFromWall) {
 			direction = this.wall;
-		} else if (this.wall == BlockFace.NORTH) {
-			direction = BlockFace.SOUTH;
-		} else if (this.wall == BlockFace.EAST) {
-			direction = BlockFace.WEST;
-		} else if (this.wall == BlockFace.SOUTH) {
-			direction = BlockFace.NORTH;
-		} else if (this.wall == BlockFace.WEST) {
-			direction = BlockFace.EAST;
+		} else if (this.wall == Direction.NORTH()) {
+			direction = Direction.SOUTH();
+		} else if (this.wall == Direction.EAST()) {
+			direction = Direction.WEST();
+		} else if (this.wall == Direction.SOUTH()) {
+			direction = Direction.NORTH();
+		} else if (this.wall == Direction.WEST()) {
+			direction = Direction.EAST();
 		}
 		byte data = 0;
-		if (this.wall == BlockFace.NORTH) {
-			block = gate.getRelative(direction).getRelative(BlockFace.EAST);
+		if (this.wall == Direction.NORTH()) {
+			block = gate.getRelative(direction).getRelative(Direction.EAST());
 			if (awayFromWall) {
 				data = (byte) 4;
 			} else {
 				data = (byte) 12;
 			}
-		} else if (this.wall == BlockFace.EAST) {
-			block = gate.getRelative(direction).getRelative(BlockFace.SOUTH);
+		} else if (this.wall == Direction.EAST()) {
+			block = gate.getRelative(direction).getRelative(Direction.SOUTH());
 			if (awayFromWall) {
 				data = (byte) 8;
 			} else {
 				data = (byte) 0;
 			}
-		} else if (this.wall == BlockFace.SOUTH) {
-			block = gate.getRelative(direction).getRelative(BlockFace.WEST);
+		} else if (this.wall == Direction.SOUTH()) {
+			block = gate.getRelative(direction).getRelative(Direction.WEST());
 			if (awayFromWall) {
 				data = (byte) 12;
 			} else {
 				data = (byte) 4;
 			}
-		} else if (this.wall == BlockFace.WEST) {
-			block = gate.getRelative(direction).getRelative(BlockFace.NORTH);
+		} else if (this.wall == Direction.WEST()) {
+			block = gate.getRelative(direction).getRelative(Direction.NORTH());
 			if (awayFromWall) {
 				data = (byte) 0;
 			} else {
@@ -766,22 +767,22 @@ public class ZoneLobby {
 		BlockFace inside = null;
 		BlockFace left = null;
 		BlockFace right = null;
-		if (this.wall == BlockFace.NORTH) {
-			inside = BlockFace.SOUTH;
-			left = BlockFace.WEST;
-			right = BlockFace.EAST;
-		} else if (this.wall == BlockFace.EAST) {
-			inside = BlockFace.WEST;
-			left = BlockFace.NORTH;
-			right = BlockFace.SOUTH;
-		} else if (this.wall == BlockFace.SOUTH) {
-			inside = BlockFace.NORTH;
-			left = BlockFace.EAST;
-			right = BlockFace.WEST;
-		} else if (this.wall == BlockFace.WEST) {
-			inside = BlockFace.EAST;
-			left = BlockFace.SOUTH;
-			right = BlockFace.NORTH;
+		if (this.wall == Direction.NORTH()) {
+			inside = Direction.SOUTH();
+			left = Direction.WEST();
+			right = Direction.EAST();
+		} else if (this.wall == Direction.EAST()) {
+			inside = Direction.WEST();
+			left = Direction.NORTH();
+			right = Direction.SOUTH();
+		} else if (this.wall == Direction.SOUTH()) {
+			inside = Direction.NORTH();
+			left = Direction.EAST();
+			right = Direction.WEST();
+		} else if (this.wall == Direction.WEST()) {
+			inside = Direction.EAST();
+			left = Direction.SOUTH();
+			right = Direction.NORTH();
 		}
 		if (this.autoAssignGate != null) {
 			if (this.leaving(location, BlockInfo.getBlock(this.volume.getWorld(), this.autoAssignGate), inside, left, right)) {

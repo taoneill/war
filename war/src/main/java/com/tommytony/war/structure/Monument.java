@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 
@@ -225,8 +226,8 @@ public class Monument {
 
 	public void setLocation(Location location) {
 		Block locationBlock = this.warzone.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-		this.volume.setCornerOne(locationBlock.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST, 2).getRelative(BlockFace.SOUTH, 2));
-		this.volume.setCornerTwo(locationBlock.getRelative(BlockFace.UP, 2).getRelative(BlockFace.WEST, 2).getRelative(BlockFace.NORTH, 2));
+		this.volume.setCornerOne(locationBlock.getRelative(BlockFace.DOWN).getRelative(Direction.EAST(), 2).getRelative(Direction.SOUTH(), 2));
+		this.volume.setCornerTwo(locationBlock.getRelative(BlockFace.UP, 2).getRelative(Direction.WEST(), 2).getRelative(Direction.NORTH(), 2));
 		this.volume.saveBlocks();
 		this.location = location;
 		

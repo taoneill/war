@@ -21,6 +21,7 @@ import com.tommytony.war.config.TeamSpawnStyle;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
 
@@ -360,13 +361,13 @@ public class WarzoneTxtMapper {
 				if (lobbyStrSplit.length > 0) {
 					// lobby orientation
 					if (lobbyStrSplit[0].equals("south")) {
-						lobbyFace = BlockFace.SOUTH;
+						lobbyFace = Direction.SOUTH();
 					} else if (lobbyStrSplit[0].equals("east")) {
-						lobbyFace = BlockFace.EAST;
+						lobbyFace = Direction.EAST();
 					} else if (lobbyStrSplit[0].equals("north")) {
-						lobbyFace = BlockFace.NORTH;
+						lobbyFace = Direction.NORTH();
 					} else if (lobbyStrSplit[0].equals("west")) {
-						lobbyFace = BlockFace.WEST;
+						lobbyFace = Direction.WEST();
 					}
 					
 					// lobby world
@@ -572,13 +573,13 @@ public class WarzoneTxtMapper {
 //		// lobby
 //		String lobbyStr = "";
 //		if (warzone.getLobby() != null) {
-//			if (BlockFace.SOUTH == warzone.getLobby().getWall()) {
+//			if (Direction.SOUTH() == warzone.getLobby().getWall()) {
 //				lobbyStr = "south";
-//			} else if (BlockFace.EAST == warzone.getLobby().getWall()) {
+//			} else if (Direction.EAST() == warzone.getLobby().getWall()) {
 //				lobbyStr = "east";
-//			} else if (BlockFace.NORTH == warzone.getLobby().getWall()) {
+//			} else if (Direction.NORTH() == warzone.getLobby().getWall()) {
 //				lobbyStr = "north";
-//			} else if (BlockFace.WEST == warzone.getLobby().getWall()) {
+//			} else if (Direction.WEST() == warzone.getLobby().getWall()) {
 //				lobbyStr = "west";
 //			}
 //		}

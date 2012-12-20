@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 import com.tommytony.war.War;
+import com.tommytony.war.utility.Direction;
 
 
 /**
@@ -73,7 +74,7 @@ public class VerticalVolume extends Volume {
 		int noOfResetBlocks = 0;
 		try {
 			if (this.hasTwoCorners() && this.getBlockTypes() != null) {
-				if (wall == BlockFace.EAST) {
+				if (wall == Direction.EAST()) {
 					int z = this.getMinZ();
 					int k = 0;
 					int y = this.getMinY();
@@ -90,7 +91,7 @@ public class VerticalVolume extends Volume {
 						}
 						y++;
 					}
-				} else if (wall == BlockFace.WEST) {
+				} else if (wall == Direction.WEST()) {
 					int z = this.getMaxZ();
 					int k = this.getSizeZ() - 1;
 					int y = this.getMinY();
@@ -107,7 +108,7 @@ public class VerticalVolume extends Volume {
 						}
 						y++;
 					}
-				} else if (wall == BlockFace.NORTH) {
+				} else if (wall == Direction.NORTH()) {
 					int x = this.getMinX();
 					int i = 0;
 					int y = this.getMinY();
@@ -124,7 +125,7 @@ public class VerticalVolume extends Volume {
 						}
 						y++;
 					}
-				} else if (wall == BlockFace.SOUTH) {
+				} else if (wall == Direction.SOUTH()) {
 					int x = this.getMaxX();
 					int i = this.getSizeX() - 1;
 					int y = this.getMinY();

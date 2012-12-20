@@ -17,6 +17,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.utility.DeferredBlockReset;
+import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
 
 public class DeferredBlockResetsJob implements Runnable {
@@ -154,8 +155,8 @@ public class DeferredBlockResetsJob implements Runnable {
 	private void scrubDroppedDoors(Block block) {
 		Chunk chunk = block.getWorld().getChunkAt(block);
 		Volume scrubVolume = new Volume("scrub", block.getWorld());
-		scrubVolume.setCornerOne(block.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).getRelative(BlockFace.NORTH));
-		scrubVolume.setCornerTwo(block.getRelative(BlockFace.UP).getRelative(BlockFace.WEST).getRelative(BlockFace.SOUTH));
+		scrubVolume.setCornerOne(block.getRelative(BlockFace.DOWN).getRelative(Direction.EAST()).getRelative(Direction.NORTH()));
+		scrubVolume.setCornerTwo(block.getRelative(BlockFace.UP).getRelative(Direction.WEST()).getRelative(Direction.SOUTH()));
 		for (Entity entity : chunk.getEntities()) {
 			if ((entity instanceof Item && (((Item)entity).getItemStack().getTypeId() == Material.IRON_DOOR.getId() 
 												|| ((Item)entity).getItemStack().getTypeId() == Material.WOOD_DOOR.getId()))

@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.War;
 import com.tommytony.war.job.BlockResetJob;
+import com.tommytony.war.utility.Direction;
 
 /**
  *
@@ -169,7 +170,7 @@ public class Volume {
 									if (oldBlockType == Material.WALL_SIGN.getId() || oldBlockType == Material.SIGN_POST.getId()) {
 										// Signs
 										if (oldBlockType == Material.SIGN_POST.getId() && ((oldBlockData & 0x04) == 0x04) && i + 1 != this.getSizeX()) {
-											Block southBlock = currentBlock.getRelative(BlockFace.SOUTH);
+											Block southBlock = currentBlock.getRelative(Direction.SOUTH());
 											int oldSouthBlockType = this.getBlockTypes()[i + 1][j][k];
 											byte oldSouthBlockData = this.getBlockDatas()[i + 1][j][k];
 											if (southBlock.getTypeId() != oldSouthBlockType) {
@@ -255,7 +256,7 @@ public class Volume {
 										}
 									} else if (((oldBlockType == Material.TORCH.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.REDSTONE_TORCH_OFF.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.REDSTONE_TORCH_ON.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.LEVER.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.STONE_BUTTON.getId() && ((oldBlockData & 0x02) == 0x02)) || (oldBlockType == Material.LADDER.getId() && ((oldBlockData & 0x04) == 0x04)) || (oldBlockType == Material.RAILS.getId() && ((oldBlockData & 0x02) == 0x02))) && i + 1 != this.getSizeX()) {
 										// Blocks that hang on a block south of themselves need to make sure that block is there before placing themselves... lol
-										Block southBlock = currentBlock.getRelative(BlockFace.SOUTH);
+										Block southBlock = currentBlock.getRelative(Direction.SOUTH());
 										int oldSouthBlockType = this.getBlockTypes()[i + 1][j][k];
 										byte oldSouthBlockData = this.getBlockDatas()[i + 1][j][k];
 										if (southBlock.getTypeId() != oldSouthBlockType) {
@@ -457,7 +458,7 @@ public class Volume {
 					for (int j = 0; j < this.getSizeY(); j++) {
 						int z = this.getMinZ();
 						for (int k = 0; k < this.getSizeZ(); k++) {
-							if ((face == BlockFace.DOWN && y == this.getMinY()) || (face == BlockFace.UP && y == this.getMaxY()) || (face == BlockFace.NORTH && x == this.getMinX()) || (face == BlockFace.EAST && z == this.getMinZ()) || (face == BlockFace.SOUTH && x == this.getMaxX()) || (face == BlockFace.WEST && z == this.getMaxZ())) {
+							if ((face == BlockFace.DOWN && y == this.getMinY()) || (face == BlockFace.UP && y == this.getMaxY()) || (face == Direction.NORTH() && x == this.getMinX()) || (face == Direction.EAST() && z == this.getMinZ()) || (face == Direction.SOUTH() && x == this.getMaxX()) || (face == Direction.WEST() && z == this.getMaxZ())) {
 								Block currentBlock = this.getWorld().getBlockAt(x, y, z);
 								currentBlock.setType(material);
 								currentBlock.setData(data);

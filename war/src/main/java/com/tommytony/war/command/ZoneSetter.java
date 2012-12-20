@@ -13,6 +13,7 @@ import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.NotNorthwestException;
 import com.tommytony.war.volume.NotSoutheastException;
 import com.tommytony.war.volume.TooBigException;
@@ -249,7 +250,7 @@ public class ZoneSetter {
 			
 			if (warzone.getLobby() == null) {
 				// Set default lobby on south side
-				ZoneLobby lobby = new ZoneLobby(warzone, BlockFace.SOUTH);
+				ZoneLobby lobby = new ZoneLobby(warzone, Direction.SOUTH());
 				warzone.setLobby(lobby);
 				if (War.war.getWarHub() != null) { // warhub has to change
 					War.war.getWarHub().getVolume().resetBlocks();

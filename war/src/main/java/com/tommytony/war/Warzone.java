@@ -40,6 +40,7 @@ import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.WarzoneMaterials;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.structure.ZoneWallGuard;
+import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.PotionEffectHelper;
@@ -745,22 +746,22 @@ public class Warzone {
 		List<BlockFace> walls = new ArrayList<BlockFace>();
 		if (Math.abs(this.volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX() && latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near east wall
-			walls.add(BlockFace.EAST);
+			walls.add(Direction.EAST());
 		}
 
 		if (Math.abs(this.volume.getSoutheastX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ() && latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near south wall
-			walls.add(BlockFace.SOUTH);
+			walls.add(Direction.SOUTH());
 		}
 
 		if (Math.abs(this.volume.getNorthwestX() - latestPlayerLocation.getBlockX()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockZ() <= this.volume.getNorthwestZ() && latestPlayerLocation.getBlockZ() >= this.volume.getSoutheastZ() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near north wall
-			walls.add(BlockFace.NORTH);
+			walls.add(Direction.NORTH());
 		}
 
 		if (Math.abs(this.volume.getNorthwestZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX() && latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
 			// near west wall
-			walls.add(BlockFace.WEST);
+			walls.add(Direction.WEST());
 		}
 
 		if (Math.abs(this.volume.getMaxY() - latestPlayerLocation.getBlockY()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getMaxX() && latestPlayerLocation.getBlockX() >= this.volume.getMinX() && latestPlayerLocation.getBlockZ() <= this.volume.getMaxZ() && latestPlayerLocation.getBlockZ() >= this.volume.getMinZ()) {

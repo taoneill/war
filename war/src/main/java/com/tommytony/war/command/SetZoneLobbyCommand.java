@@ -11,6 +11,7 @@ import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.Direction;
 
 /**
  * Places the zonelobby
@@ -78,19 +79,19 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 			}
 			ZoneLobby lobby = zone.getLobby();
 
-			BlockFace wall = BlockFace.WEST;
+			BlockFace wall = Direction.WEST();
 			String wallStr = "";
 			if (this.args[0].equals("north") || this.args[0].equals("n")) {
-				wall = BlockFace.NORTH;
+				wall = Direction.NORTH();
 				wallStr = "north";
 			} else if (this.args[0].equals("east") || this.args[0].equals("e")) {
-				wall = BlockFace.EAST;
+				wall = Direction.EAST();
 				wallStr = "east";
 			} else if (this.args[0].equals("south") || this.args[0].equals("s")) {
-				wall = BlockFace.SOUTH;
+				wall = Direction.SOUTH();
 				wallStr = "south";
 			} else if (this.args[0].equals("west") || this.args[0].equals("w")) {
-				wall = BlockFace.WEST;
+				wall = Direction.WEST();
 				wallStr = "west";
 			}
 

@@ -26,6 +26,7 @@ import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.WarzoneMaterials;
 import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
 
@@ -289,13 +290,13 @@ public class WarzoneYmlMapper {
 			String lobbyOrientation = warzoneRootSection.getString(lobbyPrefix + "orientation");
 			BlockFace lobbyFace = null;
 			if (lobbyOrientation.equals("south")) {
-				lobbyFace = BlockFace.SOUTH;
+				lobbyFace = Direction.SOUTH();
 			} else if (lobbyOrientation.equals("east")) {
-				lobbyFace = BlockFace.EAST;
+				lobbyFace = Direction.EAST();
 			} else if (lobbyOrientation.equals("north")) {
-				lobbyFace = BlockFace.NORTH;
+				lobbyFace = Direction.NORTH();
 			} else if (lobbyOrientation.equals("west")) {
-				lobbyFace = BlockFace.WEST;
+				lobbyFace = Direction.WEST();
 			}
 			
 			// lobby materials
@@ -406,13 +407,13 @@ public class WarzoneYmlMapper {
 		// lobby
 		if (warzone.getLobby() != null) {
 			String lobbyOrientation = "";
-			if (BlockFace.SOUTH == warzone.getLobby().getWall()) {
+			if (Direction.SOUTH() == warzone.getLobby().getWall()) {
 				lobbyOrientation = "south";
-			} else if (BlockFace.EAST == warzone.getLobby().getWall()) {
+			} else if (Direction.EAST() == warzone.getLobby().getWall()) {
 				lobbyOrientation = "east";
-			} else if (BlockFace.NORTH == warzone.getLobby().getWall()) {
+			} else if (Direction.NORTH() == warzone.getLobby().getWall()) {
 				lobbyOrientation = "north";
-			} else if (BlockFace.WEST == warzone.getLobby().getWall()) {
+			} else if (Direction.WEST() == warzone.getLobby().getWall()) {
 				lobbyOrientation = "west";
 			}
 			

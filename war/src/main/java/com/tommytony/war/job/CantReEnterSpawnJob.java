@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
+import com.tommytony.war.utility.Direction;
 
 public class CantReEnterSpawnJob implements Runnable {
 
@@ -84,16 +85,16 @@ public class CantReEnterSpawnJob implements Runnable {
 				
 				switch (zeroToSeven) {
 					case 0: 
-						nextCandidateBlock = playerTeam.getTeamSpawn().getBlock().getRelative(BlockFace.WEST, distanceAwayMultiplier);
+						nextCandidateBlock = playerTeam.getTeamSpawn().getBlock().getRelative(Direction.WEST(), distanceAwayMultiplier);
 						break;
 					case 1:
-						nextCandidateBlock = playerTeam.getTeamSpawn().getBlock().getRelative(BlockFace.EAST, distanceAwayMultiplier);
+						nextCandidateBlock = playerTeam.getTeamSpawn().getBlock().getRelative(Direction.EAST(), distanceAwayMultiplier);
 						break;
 					case 2: 
-						nextCandidateBlock = playerTeam.getTeamSpawn().getBlock().getRelative(BlockFace.NORTH, distanceAwayMultiplier);
+						nextCandidateBlock = playerTeam.getTeamSpawn().getBlock().getRelative(Direction.NORTH(), distanceAwayMultiplier);
 						break;
 					case 3:	
-						nextCandidateBlock = playerTeam.getTeamSpawn().getBlock().getRelative(BlockFace.SOUTH, distanceAwayMultiplier);
+						nextCandidateBlock = playerTeam.getTeamSpawn().getBlock().getRelative(Direction.SOUTH(), distanceAwayMultiplier);
 						break;
 					case 4: 
 						nextCandidateBlock = playerTeam.getTeamSpawn().getBlock().getRelative(BlockFace.NORTH_WEST, distanceAwayMultiplier);

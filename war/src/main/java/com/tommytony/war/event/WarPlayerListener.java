@@ -40,6 +40,7 @@ import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.LoadoutSelection;
 
 /**
@@ -391,18 +392,18 @@ public class WarPlayerListener implements Listener {
 					int upDownMove = 0;
 					int moveDistance = 1;
 					
-					if (nearestWalls.contains(BlockFace.NORTH)) {
+					if (nearestWalls.contains(Direction.NORTH())) {
 						// move south
 						northSouthMove += moveDistance;
-					} else if (nearestWalls.contains(BlockFace.SOUTH)) {
+					} else if (nearestWalls.contains(Direction.SOUTH())) {
 						// move north
 						northSouthMove -= moveDistance;
 					} 
 					
-					if (nearestWalls.contains(BlockFace.EAST)) {
+					if (nearestWalls.contains(Direction.EAST())) {
 						// move west
 						eastWestMove += moveDistance;
-					} else if (nearestWalls.contains(BlockFace.WEST)) {
+					} else if (nearestWalls.contains(Direction.WEST())) {
 						// move east
 						eastWestMove -= moveDistance;
 					} 

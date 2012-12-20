@@ -7,6 +7,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import com.tommytony.war.Warzone;
+import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 
@@ -139,8 +140,8 @@ public class Cake {
 
 	public void setLocation(Location location) {
 		Block locationBlock = this.warzone.getWorld().getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-		this.volume.setCornerOne(locationBlock.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST, 1).getRelative(BlockFace.SOUTH, 1));
-		this.volume.setCornerTwo(locationBlock.getRelative(BlockFace.UP, 2).getRelative(BlockFace.WEST, 1).getRelative(BlockFace.NORTH, 1));
+		this.volume.setCornerOne(locationBlock.getRelative(BlockFace.DOWN).getRelative(Direction.EAST(), 1).getRelative(Direction.SOUTH(), 1));
+		this.volume.setCornerTwo(locationBlock.getRelative(BlockFace.UP, 2).getRelative(Direction.WEST(), 1).getRelative(Direction.NORTH(), 1));
 		this.volume.saveBlocks();
 		this.location = location;
 		this.addCakeBlocks();
