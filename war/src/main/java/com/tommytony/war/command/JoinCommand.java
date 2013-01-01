@@ -32,10 +32,6 @@ public class JoinCommand extends AbstractWarCommand {
 		}
 
 		Player player = (Player) this.getSender();
-		if (!War.war.canPlayWar(player)) {
-			this.badMsg("Cannot play war. You need the war.player permission.");
-			return true;
-		}
 
 		Warzone zone;
 		if (this.args.length == 0) {
@@ -87,6 +83,10 @@ public class JoinCommand extends AbstractWarCommand {
 			boolean foundTeam = false;
 			for (Team team : teams) {
 				if (team.getName().startsWith(name) || team.getKind() == kind) {
+                                        if (!War.war.canPlayWar(player, team)) {
+                                                this.badMsg("You don't have permission to join this team.");
+                                                return true;
+                                        }
 					if (!zone.hasPlayerState(player.getName())) {
 						zone.keepPlayerState(player);
 						this.msg("Your inventory is in storage until you use '/war leave'.");

@@ -184,6 +184,7 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.SATURATION, 10);
 		teamDefaultConfig.put(TeamConfig.SPAWNSTYLE, TeamSpawnStyle.SMALL);
 		teamDefaultConfig.put(TeamConfig.TEAMSIZE, 10);
+		teamDefaultConfig.put(TeamConfig.PERMISSION, "war.player");
 		
 		this.getDefaultInventories().getLoadouts().clear();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
@@ -937,15 +938,16 @@ public class War extends JavaPlugin {
 		}
 		return null;
 	}
-
+        
 	/**
-	 * Checks whether the given player is allowed to play war.
+	 * Checks whether the given player is allowed to play in a certain team
 	 *
 	 * @param 	player	Player to check
-	 * @return		true if the player may play war
+         * @param         team  Team to check  
+	 * @return		true if the player may play in the team
 	 */
-	public boolean canPlayWar(Player player) {
-		return player.hasPermission("war.player");
+	public boolean canPlayWar(Player player, Team team) {
+		return player.hasPermission(team.getTeamConfig().resolveString(TeamConfig.PERMISSION));
 	}
 
 	/**
