@@ -4,7 +4,7 @@ import org.bukkit.block.BlockFace;
 
 public class Direction {
 	
-	private static boolean isLegacy = BlockFace.NORTH.getModX() == -1;
+	public final static boolean isLegacy = BlockFace.NORTH.getModX() == -1;
 	
 	public static BlockFace NORTH() {
 		if (!isLegacy) {

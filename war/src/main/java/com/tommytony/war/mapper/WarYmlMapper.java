@@ -17,6 +17,7 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.job.RestoreYmlWarhubJob;
 import com.tommytony.war.job.RestoreYmlWarzonesJob;
 import com.tommytony.war.structure.WarHub;
+import com.tommytony.war.utility.Direction;
 
 public class WarYmlMapper {
 
@@ -147,17 +148,21 @@ public class WarYmlMapper {
 			String orientationStr = "";
 			switch (hub.getOrientation()) {
 				case SOUTH:
-					orientationStr = "south";
+					if (Direction.isLegacy) orientationStr = "south";
+					else orientationStr = "west";	// temp fix for rotating warhub 
 					break;
 				case EAST:
-					orientationStr = "east";
+					if (Direction.isLegacy) orientationStr = "east";
+					else orientationStr = "south";
 					break;
 				case NORTH:
-					orientationStr = "north";
+					if (Direction.isLegacy) orientationStr = "north";
+					else orientationStr = "east";
 					break;
 				case WEST:
 				default:
-					orientationStr = "west";
+					if (Direction.isLegacy) orientationStr = "west";
+					else orientationStr = "north";
 					break;
 			}
 			
