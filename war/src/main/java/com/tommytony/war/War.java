@@ -373,6 +373,7 @@ public class War extends JavaPlugin {
 	public ItemStack copyStack(ItemStack originalStack) {
 		ItemStack copiedStack = new ItemStack(originalStack.getType(), originalStack.getAmount(), originalStack.getDurability(), new Byte(originalStack.getData().getData()));
 		copiedStack.setDurability(originalStack.getDurability());
+                copiedStack.setItemMeta(originalStack.getItemMeta());
 		copyEnchantments(originalStack, copiedStack);	
 		
 		return copiedStack;

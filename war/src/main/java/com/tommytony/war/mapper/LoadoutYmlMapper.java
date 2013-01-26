@@ -10,6 +10,11 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.War;
+import java.util.Arrays;
+import java.util.logging.Level;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 public class LoadoutYmlMapper {
 	
@@ -27,7 +32,6 @@ public class LoadoutYmlMapper {
 		List<Integer> slots = config.getIntegerList(loadoutName + ".slots");
 		for (Integer slot : slots) {
 			String prefix = loadoutName + "." + slot + ".";
-			
 			int id = config.getInt(prefix + "id");
 			byte data = (byte)config.getInt(prefix + "data");
 			int amount = config.getInt(prefix + "amount");
@@ -47,6 +51,13 @@ public class LoadoutYmlMapper {
 					}
 				}
 			}
+                        if (config.contains(prefix + "armorcolor")) {
+                            int rgb = config.getInt(prefix + "armorcolor");
+                            Color clr = Color.fromRGB(rgb);
+                            LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
+                            meta.setColor(clr);
+                            stack.setItemMeta(meta);
+                        }
 			
 			loadout.put(slot, stack);
 		}
@@ -108,6 +119,12 @@ public class LoadoutYmlMapper {
 					}
 					slotSection.set("enchantments", enchantmentStringList);
 				}
+                                if (stack.hasItemMeta() && stack.getItemMeta() instanceof LeatherArmorMeta 
+                                        && ((LeatherArmorMeta)stack.getItemMeta()).getColor() != null) {
+                                    LeatherArmorMeta meta = (LeatherArmorMeta)stack.getItemMeta();
+                                    int rgb = meta.getColor().asRGB();
+                                    slotSection.set("armorcolor", rgb);
+                                }
 			}
 		}
 	}
