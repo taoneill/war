@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 public class LoadoutYmlMapper {
@@ -56,6 +57,18 @@ public class LoadoutYmlMapper {
                             Color clr = Color.fromRGB(rgb);
                             LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
                             meta.setColor(clr);
+                            stack.setItemMeta(meta);
+                        }
+                        if (config.contains(prefix + "name")) {
+                            String itemName = config.getString(prefix + "name");
+                            ItemMeta meta = stack.getItemMeta();
+                            meta.setDisplayName(itemName);
+                            stack.setItemMeta(meta);
+                        }
+                        if (config.contains(prefix + "lore")) {
+                            List<String> itemLore = config.getStringList(prefix + "lore");
+                            ItemMeta meta = stack.getItemMeta();
+                            meta.setLore(itemLore);
                             stack.setItemMeta(meta);
                         }
 			
@@ -124,6 +137,14 @@ public class LoadoutYmlMapper {
                                     LeatherArmorMeta meta = (LeatherArmorMeta)stack.getItemMeta();
                                     int rgb = meta.getColor().asRGB();
                                     slotSection.set("armorcolor", rgb);
+                                }
+                                if (stack.hasItemMeta() && stack.getItemMeta().hasDisplayName()) {
+                                    ItemMeta meta = stack.getItemMeta();
+                                    slotSection.set("name", meta.getDisplayName());
+                                }
+                                if (stack.hasItemMeta() && stack.getItemMeta().hasLore()) {
+                                    ItemMeta meta = stack.getItemMeta();
+                                    slotSection.set("lore", meta.getLore());
                                 }
 			}
 		}
