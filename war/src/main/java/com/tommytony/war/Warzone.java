@@ -51,6 +51,7 @@ import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 /**
  *
@@ -515,15 +516,11 @@ public class Warzone {
 			playerInv.setHelmet(new ItemStack(team.getKind().getMaterial(), 1, (short) 1, new Byte(team.getKind().getData())));
 		} else {
 			if (!helmetIsInLoadout) {
-				if (team.getKind() == TeamKind.GOLD) {
-					playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
-				} else if (team.getKind() == TeamKind.DIAMOND) {
-					playerInv.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-				} else if (team.getKind() == TeamKind.IRON) {
-					playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
-				} else {
-					playerInv.setHelmet(new ItemStack(Material.LEATHER_HELMET));
-				}
+				ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
+				LeatherArmorMeta meta = (LeatherArmorMeta) helmet.getItemMeta();
+				meta.setColor(team.getKind().getBukkitColor());
+				helmet.setItemMeta(meta);
+				playerInv.setHelmet(helmet);
 			}
 		}
 	}
