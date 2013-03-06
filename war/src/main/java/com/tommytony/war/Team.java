@@ -26,6 +26,7 @@ import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
+import org.kitteh.tag.TagAPI;
 
 /**
  *
@@ -376,6 +377,9 @@ public class Team {
 
 	public void addPlayer(Player player) {
 		this.players.add(player);
+		if (War.war.isTagServer()) {
+			TagAPI.refreshPlayer(player);
+		}
 	}
 
 	public List<Player> getPlayers() {
@@ -450,7 +454,9 @@ public class Team {
 					t.teamcast("Cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE  + " was returned.");
 				}
 			}
-						
+			if (War.war.isTagServer()) {
+				TagAPI.refreshPlayer(thePlayer);
+			}
 			return true;
 		}	
 		
