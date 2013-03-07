@@ -251,6 +251,10 @@ public class WarPlayerListener implements Listener {
 					}
 				}
 			}
+			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST) {
+				event.setCancelled(true);
+				War.war.badMsg(player, "Can't use ender chests while playing in a warzone!");
+			}
 		}
 	}
 
