@@ -820,7 +820,8 @@ public class WarPlayerListener implements Listener {
 				if (playerWarzone.getLoadoutSelections().keySet().contains(event.getPlayer().getName())
 						&& playerWarzone.getLoadoutSelections().get(event.getPlayer().getName()).isStillInSpawn()) {
 					LoadoutSelection selection = playerWarzone.getLoadoutSelections().get(event.getPlayer().getName());
-					int currentIndex = (selection.getSelectedIndex() + 1) % (playerTeam.getInventories().resolveLoadouts().keySet().size());
+					boolean hasFirstLoadout = playerTeam.getInventories().resolveLoadouts().containsKey("first");
+					int currentIndex = (selection.getSelectedIndex() + 1) % (playerTeam.getInventories().resolveLoadouts().keySet().size() - (hasFirstLoadout ? 1 : 0));
 					selection.setSelectedIndex(currentIndex);
 					
 					playerWarzone.equipPlayerLoadoutSelection(event.getPlayer(), playerTeam, false, true);
