@@ -165,8 +165,25 @@ public class WarEntityListener implements Listener {
 							team.teamcast(killMessage);
 						}
 					}
-					
+					// this is just an idea for further discussion
+//					if (defenderWarzone.getKillCount(d.getName()) >= 5) {
+//						defenderTeam.addPoint();
+//						for (Team team : defenderWarzone.getTeams()) {
+//							team.teamcast(defenderTeam.getKind().getColor() + d.getName() + ChatColor.WHITE + " killed " + attackerTeam.getKind().getColor() + a.getName()
+//									+ ChatColor.WHITE + " and scored an extra point for their team.");
+//						}
+//					}
 					defenderWarzone.handleDeath(d);
+					defenderWarzone.addKillCount(a.getName(), 1);
+					if (attacker.getEntityId() != defender.getEntityId() && defenderWarzone.getKillCount(a.getName()) >= 5) {
+						for (Team team : defenderWarzone.getTeams()) {
+							team.teamcast(attackerTeam.getKind().getColor() + a.getName() + ChatColor.WHITE + " is on a " + ChatColor.RED + "killstreak"
+									+ ChatColor.WHITE + "! (" + defenderWarzone.getKillCount(a.getName()) + " kills)");
+						}
+					}
+					if (attacker.getEntityId() != defender.getEntityId() && defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.XPKILLMETER)) {
+						a.setLevel(defenderWarzone.getKillCount(a.getName()));
+					}
 					
 					if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
 						// fast respawn, don't really die

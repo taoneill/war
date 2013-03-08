@@ -22,7 +22,8 @@ public enum WarzoneConfig {
 	UNBREAKABLE (Boolean.class),
 	JOINMIDBATTLE (Boolean.class),
 	AUTOJOIN (Boolean.class),
-	SCOREBOARD (ScoreboardType.class)
+	SCOREBOARD (ScoreboardType.class),
+	XPKILLMETER (Boolean.class)
 	;
 	
 	

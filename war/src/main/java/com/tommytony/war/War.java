@@ -190,6 +190,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.JOINMIDBATTLE, true);
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOJOIN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.SCOREBOARD, ScoreboardType.NONE);
+		warzoneDefaultConfig.put(WarzoneConfig.XPKILLMETER, false);
 		
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);
 		teamDefaultConfig.put(TeamConfig.FLAGPOINTSONLY, false);

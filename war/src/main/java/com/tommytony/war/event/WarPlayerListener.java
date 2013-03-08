@@ -46,6 +46,7 @@ import com.tommytony.war.volume.Volume;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 
 /**
  * @author tommytony, Tim Düsterhus
@@ -232,6 +233,20 @@ public class WarPlayerListener implements Listener {
 			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST) {
 				event.setCancelled(true);
 				War.war.badMsg(player, "Can't use ender chests while playing in a warzone!");
+			}
+			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENCHANTMENT_TABLE && zone.getWarzoneConfig().getBoolean(WarzoneConfig.XPKILLMETER)) {
+				event.setCancelled(true);
+				War.war.badMsg(player, "Can't use enchantment tables in this warzone!");
+				if (zone.getAuthors().contains(player.getName())) {
+					War.war.badMsg(player, "This is due to the xpkillmeter option being enabled.");
+				}
+			}
+			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ANVIL && zone.getWarzoneConfig().getBoolean(WarzoneConfig.XPKILLMETER)) {
+				event.setCancelled(true);
+				War.war.badMsg(player, "Can't use anvils in this warzone!");
+				if (zone.getAuthors().contains(player.getName())) {
+					War.war.badMsg(player, "This is due to the xpkillmeter option being enabled.");
+				}
 			}
 		}
 	}
@@ -987,6 +1002,16 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onPlayerExpChange(PlayerExpChangeEvent event) {
+		if (War.war.isLoaded()) {
+			Warzone zone = Warzone.getZoneByPlayerName(event.getPlayer().getName());
+			if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.XPKILLMETER)) {
+				event.setAmount(0);
+			}
+		}
+	}
+
 	public void purgeLatestPositions() {
 		this.latestLocations.clear();	
 	}
