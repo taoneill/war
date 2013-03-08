@@ -424,6 +424,9 @@ public class Warzone {
 		if (!this.getLoadoutSelections().keySet().contains(player.getName())) {
 			isFirstRespawn = true;
 			this.getLoadoutSelections().put(player.getName(), new LoadoutSelection(true, 0));
+		} else if (this.isReinitializing) {
+			isFirstRespawn = true;
+			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
 		} else {
 			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
 		}
@@ -1416,28 +1419,34 @@ public class Warzone {
 			// - repawn timer + this method is why inventories were getting wiped as players exited the warzone. 
 			HashMap<String, HashMap<Integer, ItemStack>> loadouts = playerTeam.getInventories().resolveLoadouts();
 			List<String> sortedNames = LoadoutYmlMapper.sortNames(loadouts);
+			if (sortedNames.contains("first")) {
+				sortedNames.remove("first");
+			}
 			
 			int currentIndex = selection.getSelectedIndex();
 			int i = 0;
 			Iterator<String> it = sortedNames.iterator();
-		    while (it.hasNext()) {
-		        String name = (String)it.next();
-		        if (i == currentIndex) {
-		        	if (playerTeam.getTeamConfig().resolveBoolean(TeamConfig.PLAYERLOADOUTASDEFAULT) && name.equals("default")) {
-		        		// Use player's own inventory as loadout
-		        		this.resetInventory(playerTeam, player, this.getPlayerInventoryFromSavedState(player));
-		        	} else {
-		        		// Use the loadout from the list in the settings
-		        		this.resetInventory(playerTeam, player, loadouts.get(name));
-		        	}
+			while (it.hasNext()) {
+				String name = (String) it.next();
+				if (i == currentIndex) {
+					if (playerTeam.getTeamConfig().resolveBoolean(TeamConfig.PLAYERLOADOUTASDEFAULT) && name.equals("default")) {
+						// Use player's own inventory as loadout
+						this.resetInventory(playerTeam, player, this.getPlayerInventoryFromSavedState(player));
+					} else if (isFirstRespawn && loadouts.containsKey("first") && name.equals("default")) {
+						// Get the loadout for the first spawn
+						this.resetInventory(playerTeam, player, loadouts.get("first"));
+					} else {
+						// Use the loadout from the list in the settings
+						this.resetInventory(playerTeam, player, loadouts.get(name));
+					}
 					if (isFirstRespawn && playerTeam.getInventories().resolveLoadouts().keySet().size() > 1) {
 						War.war.msg(player, "Equipped " + name + " loadout (sneak to switch).");
 					} else if (isToggle) {
 						War.war.msg(player, "Equipped " + name + " loadout.");
 					}
-		        }
-		        i++;
-		    }
+				}
+				i++;
+			}
 		}
 	}
 
