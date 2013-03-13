@@ -27,7 +27,6 @@ public class CantReEnterSpawnJob implements Runnable {
 		playersUnderSuspicion.add(player.getName());
 	}
 	
-	@Override
 	public void run() {
 		Location playerLoc = this.player.getLocation();
 		if (playerTeam.getSpawnVolume().contains(playerLoc)) { 
