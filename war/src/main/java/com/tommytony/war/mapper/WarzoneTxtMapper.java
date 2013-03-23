@@ -86,12 +86,12 @@ public class WarzoneTxtMapper {
 			}
 
 			// loadout
-			warzone.getDefaultInventories().getLoadouts().clear();
+			warzone.getDefaultInventories().clearLoadouts();
 			
 			String loadoutStr = warzoneConfig.getString("loadout");
 			if (loadoutStr != null && !loadoutStr.equals("")) {
-				warzone.getDefaultInventories().getLoadouts().put("default", new HashMap<Integer, ItemStack>());
-				LoadoutTxtMapper.fromStringToLoadout(loadoutStr, warzone.getDefaultInventories().getLoadouts().get("default"));
+				warzone.getDefaultInventories().setLoadout("default", new HashMap<Integer, ItemStack>());
+				LoadoutTxtMapper.fromStringToLoadout(loadoutStr, warzone.getDefaultInventories().getLoadout("default"));
 			}
 			
 			// extraLoadouts
@@ -100,14 +100,14 @@ public class WarzoneTxtMapper {
 			
 			for (String nameStr : extraLoadoutsSplit) {
 				if (nameStr != null && !nameStr.equals("")) {
-					warzone.getDefaultInventories().getLoadouts().put(nameStr, new HashMap<Integer, ItemStack>());
+					warzone.getDefaultInventories().setLoadout(nameStr, new HashMap<Integer, ItemStack>());
 				}
 			}
 			
 			for (String extraName : extraLoadoutsSplit) {
 				if (extraName != null && !extraName.equals("")) {
 					String loadoutString = warzoneConfig.getString(extraName + "Loadout");
-					HashMap<Integer, ItemStack> loadout = warzone.getDefaultInventories().getLoadouts().get(extraName);
+					HashMap<Integer, ItemStack> loadout = warzone.getDefaultInventories().getLoadout(extraName);
 					LoadoutTxtMapper.fromStringToLoadout(loadoutString, loadout);
 				}
 			}
