@@ -80,12 +80,12 @@ public class WarTxtMapper {
 		}
 		
 		// defaultLoadout
-		War.war.getDefaultInventories().getLoadouts().clear();
+		War.war.getDefaultInventories().clearLoadouts();
 		
 		String loadoutStr = warConfig.getString("defaultLoadout");
 		if (loadoutStr != null && !loadoutStr.equals("")) {
 			War.war.getDefaultInventories().addLoadout("default", new HashMap<Integer, ItemStack>());
-			LoadoutTxtMapper.fromStringToLoadout(loadoutStr, War.war.getDefaultInventories().getLoadouts().get("default"));
+			LoadoutTxtMapper.fromStringToLoadout(loadoutStr, War.war.getDefaultInventories().getLoadout("default"));
 		}
 		
 		// defaultExtraLoadouts
@@ -101,7 +101,7 @@ public class WarTxtMapper {
 		for (String extraName : extraLoadoutsSplit) {
 			if (extraName != null && !extraName.equals("")) {
 				String loadoutString = warConfig.getString(extraName + "Loadout");
-				HashMap<Integer, ItemStack> loadout = War.war.getDefaultInventories().getLoadouts().get(extraName);
+				HashMap<Integer, ItemStack> loadout = War.war.getDefaultInventories().getLoadout(extraName);
 				LoadoutTxtMapper.fromStringToLoadout(loadoutString, loadout);
 			}
 		}
