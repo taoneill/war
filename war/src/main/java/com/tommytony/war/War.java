@@ -378,11 +378,15 @@ public class War extends JavaPlugin {
 	
 	public String updateTeamFromNamedParams(Team team, CommandSender commandSender, String[] arguments) {
 		try {
-			Map<String, String> namedParams = new HashMap<String, String>();
+			Map<String, String> namedParams = new HashMap();
+			Map<String, String> thirdParameter = new HashMap();
 			for (String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if (pairSplit.length == 2) {
 					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
+				} else if (pairSplit.length == 3) {
+					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
+					thirdParameter.put(pairSplit[0].toLowerCase(), pairSplit[2]);
 				}
 			}
 			
@@ -415,6 +419,15 @@ public class War extends JavaPlugin {
 						returnMessage.append(loadoutName + " respawn loadout updated.");
 					}
 					this.inventoryToLoadout(player, loadout);
+					Loadout ldt = team.getInventories().getNewLoadout(loadoutName);
+					if (thirdParameter.containsKey("loadout")) {
+						String permission = thirdParameter.get("loadout");
+						ldt.setPermission(permission);
+						returnMessage.append(' ').append(loadoutName).append(" respawn loadout permission set to ").append(permission).append('.');
+					} else if (ldt.requiresPermission()) {
+						ldt.setPermission(null);
+						returnMessage.append(' ').append(loadoutName).append(" respawn loadout permission deleted.");
+					}
 				} 
 				if (namedParams.containsKey("deleteloadout")) {
 					String loadoutName = namedParams.get("deleteloadout");
@@ -441,11 +454,15 @@ public class War extends JavaPlugin {
 
 	public String updateZoneFromNamedParams(Warzone warzone, CommandSender commandSender, String[] arguments) {
 		try {
-			Map<String, String> namedParams = new HashMap<String, String>();
+			Map<String, String> namedParams = new HashMap();
+			Map<String, String> thirdParameter = new HashMap();
 			for (String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if (pairSplit.length == 2) {
 					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
+				} else if (pairSplit.length == 3) {
+					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
+					thirdParameter.put(pairSplit[0].toLowerCase(), pairSplit[2]);
 				}
 			}
 			
@@ -496,6 +513,15 @@ public class War extends JavaPlugin {
 						returnMessage.append(loadoutName + " respawn loadout updated.");
 					}
 					this.inventoryToLoadout(player, loadout);
+					Loadout ldt = warzone.getDefaultInventories().getNewLoadout(loadoutName);
+					if (thirdParameter.containsKey("loadout")) {
+						String permission = thirdParameter.get("loadout");
+						ldt.setPermission(permission);
+						returnMessage.append(' ').append(loadoutName).append(" respawn loadout permission set to ").append(permission).append('.');
+					} else if (ldt.requiresPermission()) {
+						ldt.setPermission(null);
+						returnMessage.append(' ').append(loadoutName).append(" respawn loadout permission deleted.");
+					}
 				} 
 				if (namedParams.containsKey("deleteloadout")) {
 					String loadoutName = namedParams.get("deleteloadout");
@@ -620,11 +646,15 @@ public class War extends JavaPlugin {
 
 	public String updateFromNamedParams(CommandSender commandSender, String[] arguments) {
 		try {
-			Map<String, String> namedParams = new HashMap<String, String>();
+			Map<String, String> namedParams = new HashMap();
+			Map<String, String> thirdParameter = new HashMap();
 			for (String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if (pairSplit.length == 2) {
 					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
+				} else if (pairSplit.length == 3) {
+					namedParams.put(pairSplit[0].toLowerCase(), pairSplit[1]);
+					thirdParameter.put(pairSplit[0].toLowerCase(), pairSplit[2]);
 				}
 			}
 			
@@ -647,6 +677,15 @@ public class War extends JavaPlugin {
 						returnMessage.append(loadoutName + " respawn loadout updated.");
 					}
 					this.inventoryToLoadout(player, loadout);
+					Loadout ldt = this.getDefaultInventories().getNewLoadout(loadoutName);
+					if (thirdParameter.containsKey("loadout")) {
+						String permission = thirdParameter.get("loadout");
+						ldt.setPermission(permission);
+						returnMessage.append(' ').append(loadoutName).append(" respawn loadout permission set to ").append(permission).append('.');
+					} else if (ldt.requiresPermission()) {
+						ldt.setPermission(null);
+						returnMessage.append(' ').append(loadoutName).append(" respawn loadout permission deleted.");
+					}
 				} 
 				if (namedParams.containsKey("deleteloadout")) {
 					String loadoutName = namedParams.get("deleteloadout");
@@ -743,23 +782,27 @@ public class War extends JavaPlugin {
 	}
 
 	private String getLoadoutsString(InventoryBag invs) {
-		String loadoutsString = "";
+		StringBuilder loadoutsString = new StringBuilder();
 		ChatColor loadoutColor = ChatColor.GREEN;
 		ChatColor normalColor = ChatColor.WHITE;
 		
 		if (invs.hasLoadouts()) {
-			String loadouts = "";
-			for (String loadoutName : invs.getLoadouts().keySet()) {
-				loadouts += loadoutName + ",";
+			StringBuilder loadouts = new StringBuilder();
+			for (Loadout ldt : invs.getNewLoadouts()) {
+				if (ldt.requiresPermission()) {
+					loadouts.append(ldt.getName()).append(":").append(ldt.getPermission()).append(",");
+				} else {
+					loadouts.append(ldt.getName()).append(",");
+				}
 			}
-			loadoutsString += " loadout:" + loadoutColor + loadouts + normalColor;
+			loadoutsString.append(" loadout:").append(loadoutColor).append(loadouts.toString()).append(normalColor);
 		}
 		
 		if (invs.hasReward()) {
-			loadoutsString += " reward:" + loadoutColor + "default" + normalColor;
+			loadoutsString.append(" reward:").append(loadoutColor).append("default").append(normalColor);
 		}
 		
-		return loadoutsString;
+		return loadoutsString.toString();
 	}
 
 	public String printConfig(Warzone zone) {
