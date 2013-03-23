@@ -10,26 +10,47 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.War;
-import java.util.Arrays;
-import java.util.logging.Level;
-import org.bukkit.Bukkit;
+import com.tommytony.war.utility.Loadout;
+import java.util.Collections;
 import org.bukkit.Color;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 public class LoadoutYmlMapper {
 	
-	public static void fromConfigToLoadouts(ConfigurationSection config, HashMap<String, HashMap<Integer, ItemStack>> loadouts) {
+	/**
+	 * Deserializes loadouts from the configuration.
+	 * Backwards compatibility: returns new-style loadouts and still modifies
+	 * the loadouts parameter.
+	 * @param config A configuration section that contains loadouts
+	 * @param loadouts Map of the loadout names and the items. This will be
+	 * cleared and written to by the method, cannot be final.
+	 * @return list of new style loadouts
+	 */
+	public static List<Loadout> fromConfigToLoadouts(ConfigurationSection config, HashMap<String, HashMap<Integer, ItemStack>> loadouts) {
 		List<String> loadoutNames = config.getStringList("names");
 		loadouts.clear();
+		List<Loadout> ldts = new ArrayList();
 		for (String name : loadoutNames) {
 			HashMap<Integer, ItemStack> newLoadout = new HashMap<Integer, ItemStack>();
-			fromConfigToLoadout(config, newLoadout, name);
+			Loadout ldt = fromConfigToLoadout(config, newLoadout, name);
+			ldts.add(ldt);
 			loadouts.put(name, newLoadout);
 		}
+		Collections.sort(ldts);
+		return ldts;
 	}
-	
-	public static void fromConfigToLoadout(ConfigurationSection config, HashMap<Integer, ItemStack> loadout, String loadoutName) {
+	/**
+	 * Deserialize a loadout from the configuration.
+	 * Backwards compatibility: returns new-style loadout and still modifies the
+	 * loadout parameter.
+	 * @param config A configuration section that contains loadouts
+	 * @param loadout Map of slots and items in the loadout. Will be written to
+	 * by the method, cannot be final.
+	 * @param loadoutName The name of the loadout
+	 * @return new style loadout
+	 */
+	public static Loadout fromConfigToLoadout(ConfigurationSection config, HashMap<Integer, ItemStack> loadout, String loadoutName) {
 		List<Integer> slots = config.getIntegerList(loadoutName + ".slots");
 		for (Integer slot : slots) {
 			String prefix = loadoutName + "." + slot + ".";
@@ -52,28 +73,29 @@ public class LoadoutYmlMapper {
 					}
 				}
 			}
-                        if (config.contains(prefix + "armorcolor")) {
-                            int rgb = config.getInt(prefix + "armorcolor");
-                            Color clr = Color.fromRGB(rgb);
-                            LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
-                            meta.setColor(clr);
-                            stack.setItemMeta(meta);
-                        }
-                        if (config.contains(prefix + "name")) {
-                            String itemName = config.getString(prefix + "name");
-                            ItemMeta meta = stack.getItemMeta();
-                            meta.setDisplayName(itemName);
-                            stack.setItemMeta(meta);
-                        }
-                        if (config.contains(prefix + "lore")) {
-                            List<String> itemLore = config.getStringList(prefix + "lore");
-                            ItemMeta meta = stack.getItemMeta();
-                            meta.setLore(itemLore);
-                            stack.setItemMeta(meta);
-                        }
-			
+			if (config.contains(prefix + "armorcolor")) {
+				int rgb = config.getInt(prefix + "armorcolor");
+				Color clr = Color.fromRGB(rgb);
+				LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
+				meta.setColor(clr);
+				stack.setItemMeta(meta);
+			}
+			if (config.contains(prefix + "name")) {
+				String itemName = config.getString(prefix + "name");
+				ItemMeta meta = stack.getItemMeta();
+				meta.setDisplayName(itemName);
+				stack.setItemMeta(meta);
+			}
+			if (config.contains(prefix + "lore")) {
+				List<String> itemLore = config.getStringList(prefix + "lore");
+				ItemMeta meta = stack.getItemMeta();
+				meta.setLore(itemLore);
+				stack.setItemMeta(meta);
+			}
 			loadout.put(slot, stack);
 		}
+		String permission = config.getString(loadoutName + ".permission", "");
+		return new Loadout(loadoutName, loadout, permission);
 	}
 	
 	public static void fromLoadoutsToConfig(HashMap<String, HashMap<Integer, ItemStack>> loadouts, ConfigurationSection section) {
@@ -83,6 +105,21 @@ public class LoadoutYmlMapper {
 		for (String name : sortedNames) {
 			fromLoadoutToConfig(name, loadouts.get(name), section);
 		}
+	}
+
+	/**
+	 * Serializes a list of new style loadouts to the configuration.
+	 * @param loadouts List of new style loadouts
+	 * @param section Section of the configuration to write to
+	 */
+	public static void fromLoadoutsToConfig(List<Loadout> loadouts, ConfigurationSection section) {
+		Collections.sort(loadouts);
+		List<String> names = new ArrayList();
+		for (Loadout ldt : loadouts) {
+			names.add(ldt.getName());
+			LoadoutYmlMapper.fromLoadoutToConfig(ldt, section);
+		}
+		section.set("names", names);
 	}
 	
 	public static List<String> sortNames(HashMap<String, HashMap<Integer, ItemStack>> loadouts) {
@@ -110,6 +147,17 @@ public class LoadoutYmlMapper {
 		return list;
 	}
 
+	/**
+	 * Serialize a new style loadout to the configuration
+	 * @param loadout New style loadout
+	 * @param section Section of the configuration to write to
+	 */
+	public static void fromLoadoutToConfig(Loadout loadout, ConfigurationSection section) {
+		LoadoutYmlMapper.fromLoadoutToConfig(loadout.getName(), loadout.getContents(), section);
+		if (loadout.requiresPermission()) {
+			section.set(loadout.getName() + ".permission", loadout.getPermission());
+		}
+	}
 	public static void fromLoadoutToConfig(String loadoutName, HashMap<Integer, ItemStack> loadout, ConfigurationSection section) {
 		ConfigurationSection loadoutSection = section.createSection(loadoutName);
 		
@@ -132,20 +180,20 @@ public class LoadoutYmlMapper {
 					}
 					slotSection.set("enchantments", enchantmentStringList);
 				}
-                                if (stack.hasItemMeta() && stack.getItemMeta() instanceof LeatherArmorMeta 
-                                        && ((LeatherArmorMeta)stack.getItemMeta()).getColor() != null) {
-                                    LeatherArmorMeta meta = (LeatherArmorMeta)stack.getItemMeta();
-                                    int rgb = meta.getColor().asRGB();
-                                    slotSection.set("armorcolor", rgb);
-                                }
-                                if (stack.hasItemMeta() && stack.getItemMeta().hasDisplayName()) {
-                                    ItemMeta meta = stack.getItemMeta();
-                                    slotSection.set("name", meta.getDisplayName());
-                                }
-                                if (stack.hasItemMeta() && stack.getItemMeta().hasLore()) {
-                                    ItemMeta meta = stack.getItemMeta();
-                                    slotSection.set("lore", meta.getLore());
-                                }
+				if (stack.hasItemMeta() && stack.getItemMeta() instanceof LeatherArmorMeta 
+						&& ((LeatherArmorMeta)stack.getItemMeta()).getColor() != null) {
+					LeatherArmorMeta meta = (LeatherArmorMeta)stack.getItemMeta();
+					int rgb = meta.getColor().asRGB();
+					slotSection.set("armorcolor", rgb);
+				}
+				if (stack.hasItemMeta() && stack.getItemMeta().hasDisplayName()) {
+					ItemMeta meta = stack.getItemMeta();
+					slotSection.set("name", meta.getDisplayName());
+				}
+				if (stack.hasItemMeta() && stack.getItemMeta().hasLore()) {
+					ItemMeta meta = stack.getItemMeta();
+					slotSection.set("lore", meta.getLore());
+				}
 			}
 		}
 	}
