@@ -468,7 +468,8 @@ public class WarEntityListener implements Listener {
 							teamToMsg.teamcast(deathMessage);
 						}
 					}
-					
+					//we still must 0 your killstreaks for dying stupidly
+					team.zeroKills(player);
 					zone.handleDeath(player);
 					
 					if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
