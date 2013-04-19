@@ -279,7 +279,8 @@ public class WarEntityListener implements Listener {
 						team.teamcast(deathMessage);
 					}
 				}
-				
+				//zero your kills for dying from something that is inhuman
+				Team.getTeamByPlayerName(d.getName()).zeroKills(d);
 				defenderWarzone.handleDeath(d);
 				
 				if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
