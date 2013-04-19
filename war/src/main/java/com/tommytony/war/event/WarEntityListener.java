@@ -165,6 +165,12 @@ public class WarEntityListener implements Listener {
 						}
 					}
 					
+					//death stuff
+					attackerTeam.incKills(a);
+					defenderTeam.zeroKills(d);
+					//now check for kill streaks
+					this.checkKillStreak(a, attackerTeam);
+					
 					defenderWarzone.handleDeath(d);
 					
 					if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
@@ -599,4 +605,17 @@ public class WarEntityListener implements Listener {
 		}
 	}
 
+	private void checkKillStreak(Player p, Team t) {
+		int kills = t.getKills(p);
+		if(kills == 3) { //UNDECIDED
+			
+		} else if(kills == 5) { //AIRSTRIKE
+			
+		} else if(kills == 7) { //DOGGIES
+			
+		} else {
+			War.war.msg(p, "You have " + kills + "kills this life!");
+		}
+	}
+	
 }

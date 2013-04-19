@@ -2,7 +2,9 @@ package com.tommytony.war;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -29,11 +31,12 @@ import com.tommytony.war.volume.Volume;
 
 /**
  *
- * @author tommytony
+ * @author tommytony, grinning
  *
  */
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
+	private Map<Player, Integer> kills = new HashMap<Player, Integer>(); //keeps track of kills per life
 	private Location teamSpawn = null;
 	private Location teamFlag = null;
 	private String name;
@@ -376,6 +379,7 @@ public class Team {
 
 	public void addPlayer(Player player) {
 		this.players.add(player);
+		this.kills.put(player, 0);
 	}
 
 	public List<Player> getPlayers() {
@@ -420,6 +424,7 @@ public class Team {
 		}
 		if (thePlayer != null) {
 			this.players.remove(thePlayer);
+			this.kills.remove(thePlayer);
 			
 			if (this.warzone.isFlagThief(thePlayer.getName())) {
 				Team victim = this.warzone.getVictimTeamForFlagThief(thePlayer.getName());
@@ -683,5 +688,21 @@ public class Team {
 
 	public TeamConfigBag getTeamConfig() {
 		return this.teamConfig;
+	}
+	
+	public int getKills(Player p) {
+		Integer i = this.kills.get(p);
+		if(i == null) {
+			return 0; //if you dont exist, you must have 0 kills and our logic is bugged...
+		}
+		return i; //automatic compiler typing
+	}
+	
+	public void incKills(Player p) {
+		this.kills.put(p, this.getKills(p) + 1);
+	}
+	
+	public void zeroKills(Player p) {
+		this.kills.put(p, 0);
 	}
 }
