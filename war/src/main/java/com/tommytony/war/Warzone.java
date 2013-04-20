@@ -400,6 +400,10 @@ public class Warzone {
 			player.setGameMode(GameMode.SURVIVAL);
 		}
 		
+		if(this.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)) {
+			player.setGameMode(GameMode.ADVENTURE);
+		}
+		
 		// clear potion effects
 		PotionEffectHelper.clearPotionEffects(player);
 		
