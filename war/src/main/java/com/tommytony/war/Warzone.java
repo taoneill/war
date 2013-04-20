@@ -414,6 +414,11 @@ public class Warzone {
 		} else {
 			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
 		}
+		if(!this.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
+			if(player.getInventory().getArmorContents()[0].getType() == Material.LEATHER_HELMET) {
+				player.getInventory().setHelmet(null);
+			}
+		}
 		
 		// Spout
 		if (War.war.isSpoutServer()) {
