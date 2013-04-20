@@ -235,7 +235,7 @@ public class WarPlayerListener implements Listener {
 			} else if(zone != null && zone.getLoadoutSelections().containsKey(player.getName())) {
 				Team t = zone.getPlayerTeam(player.getName());
 				if((t != null) && (t.hasSevenKillStreak(player))) {
-					if((player.getItemInHand().getType() == Material.BLAZE_ROD) && 
+					if((player.getItemInHand().getType() == Material.RAW_BEEF) && 
 							((event.getAction() == Action.LEFT_CLICK_AIR) || (event.getAction() == Action.LEFT_CLICK_BLOCK)
 							|| (event.getAction() == Action.RIGHT_CLICK_AIR) || (event.getAction() == Action.RIGHT_CLICK_BLOCK))) {
 						t.removeSevenKillStreak(player);

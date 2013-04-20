@@ -669,7 +669,7 @@ public class WarEntityListener implements Listener {
 			this.broadcastKillstreak(p, t, 5);
 		} else if(kills == 7) { //DOGGIES
 			t.addSevenKillStreak(p);
-			p.getInventory().addItem(new ItemStack(Material.BLAZE_ROD));
+			p.getInventory().addItem(new ItemStack(Material.RAW_BEEF));
 			War.war.msg(p, "Congratulations on the seven killstreak!");
 			War.war.msg(p, "You have been awarded dogs! Left Click with the Blaze Rod when you would like to call in the dogs");
 			this.broadcastKillstreak(p, t, 7);
