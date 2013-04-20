@@ -695,6 +695,8 @@ public class WarEntityListener implements Listener {
 			f = (Wolf) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.WOLF);
 			f.setAdult();
 			f.setAngry(true);
+			f.setMaxHealth(15);
+			f.setHealth(15);
 			f.setTarget(enemies.get(this.killSeed.nextInt(enemies.size())));
 		}
 	}
