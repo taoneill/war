@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -645,6 +646,8 @@ public class WarEntityListener implements Listener {
 					if((t != null) && (t.hasFiveKillStreak(p))) {
 						this.eggsForExplosion.add((Egg) event.getEntity());
 						t.removeFiveKillStreak(p);
+						t.teamcast(t.getKind().getColor() + p.getDisplayName() + ChatColor.WHITE + 
+								" called in an airstrike!");
 					}
 				}
 			}
@@ -652,19 +655,26 @@ public class WarEntityListener implements Listener {
 	}
 
 	private void checkKillStreak(Player p, Team t) {
+		if(!Warzone.getZoneByLocation(p).getWarzoneConfig().getBoolean(WarzoneConfig.KILLSTREAKS)) {
+			return;
+		}
 		int kills = t.getKills(p);
 		if(kills == 3) { //UNDECIDED
-			
+			this.broadcastKillstreak(p, t, 3);
 		} else if(kills == 5) { //AIRSTRIKE
 			t.addFiveKillStreak(p);
 			p.getInventory().addItem(new ItemStack(Material.EGG));
 			War.war.msg(p, "Congratulations on the five killstreak!");
 			War.war.msg(p, "You have been awarded an airstrike! Throw the Egg where you would like the airstrike!");
+			this.broadcastKillstreak(p, t, 5);
 		} else if(kills == 7) { //DOGGIES
 			t.addSevenKillStreak(p);
 			p.getInventory().addItem(new ItemStack(Material.BLAZE_ROD));
 			War.war.msg(p, "Congratulations on the seven killstreak!");
 			War.war.msg(p, "You have been awarded dogs! Left Click with the Blaze Rod when you would like to call in the dogs");
+			this.broadcastKillstreak(p, t, 7);
+		} else if(kills > 7) {
+			this.broadcastKillstreak(p, t, kills);
 		} else {
 			War.war.msg(p, "You have " + kills + " kills this life!");
 		}
@@ -686,6 +696,13 @@ public class WarEntityListener implements Listener {
 			f.setAdult();
 			f.setAngry(true);
 			f.setTarget(enemies.get(this.killSeed.nextInt(enemies.size())));
+		}
+	}
+	
+	private void broadcastKillstreak(Player p, Team t, int streak) {
+		Warzone zone = Warzone.getZoneByLocation(p);
+		for(Team team : zone.getTeams()) {
+			team.teamcast(t.getKind().getColor() + p.getDisplayName() + ChatColor.WHITE + " is on a " + streak + " killstreak");
 		}
 	}
 	
