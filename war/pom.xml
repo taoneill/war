@@ -3,11 +3,15 @@
 
   <groupId>com.tommytony</groupId>
   <artifactId>war</artifactId>
-  <version>1.7.4-PREVIEW</version>
+  <version>1.7.4</version>
   <packaging>jar</packaging>
 
   <name>War</name>
   <url>http://war.tommytony.com</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <repositories>
         <repository>
             <id>bukkit-repo</id>
@@ -15,7 +19,7 @@
         </repository>
         <repository>
             <id>spout-repo</id>
-            <url>http://nexus.spout.org/content/groups/public/</url>
+            <url>http://repo.spout.org/</url>
         </repository>
     </repositories>
   <issueManagement>
@@ -55,9 +59,10 @@
   <dependencies>
     <dependency>
       <groupId>org.getspout</groupId>
-      <artifactId>spoutpluginapi</artifactId>
-      <version>dev-SNAPSHOT</version>
+      <artifactId>spoutplugin</artifactId>
+      <version>1.4.6-R0.2-SNAPSHOT</version>
       <scope>compile</scope>
+      <type>jar</type>
     </dependency>
     <dependency>
 	<groupId>junit</groupId>
@@ -68,8 +73,7 @@
     <dependency>
     	<groupId>org.bukkit</groupId>
     	<artifactId>bukkit</artifactId>
-    	<version>1.4.5-R1.0</version>
-    	<scope>compile</scope>
+    	<version>1.4.7-R1.0</version>
     </dependency>
     <dependency>
     	<groupId>org.mockito</groupId>
