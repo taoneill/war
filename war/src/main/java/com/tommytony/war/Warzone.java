@@ -286,6 +286,9 @@ public class Warzone {
 									&& !player.getName().equals(respawnExempted.getName()))) {
 						this.respawnPlayer(team, player);
 					}
+					team.zeroKills(player);
+					team.removeFiveKillStreak(player);
+					team.removeSevenKillStreak(player);
 				}
 				team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				team.initializeTeamSpawn();
