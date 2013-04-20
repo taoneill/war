@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -36,9 +37,10 @@ import com.tommytony.war.volume.Volume;
  */
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
-	private Map<Player, Integer> kills = new HashMap<Player, Integer>(); //keeps track of kills per life
-	private List<Player> fiveKillStreak = new ArrayList<Player>(); //keeps track of who has a five killstreak (airstrike)
-	private List<Player> sevenKillStreak = new ArrayList<Player>(); //keeps track of who has a seven killstrea (dogs)
+	private Map<Player, Integer> kills = new HashMap<Player, Integer>(6); //keeps track of kills per life
+	private List<Player> fiveKillStreak = new ArrayList<Player>(4); //keeps track of who has a five killstreak (airstrike)
+	private List<Player> sevenKillStreak = new ArrayList<Player>(4); //keeps track of who has a seven killstrea (dogs)
+	private List<Player> inTeamChat = new CopyOnWriteArrayList<Player>(); //keeps track of who is in teamchat
 	private Location teamSpawn = null;
 	private Location teamFlag = null;
 	private String name;
@@ -749,5 +751,22 @@ public class Team {
 	
 	public void removeSevenKillStreak(Player p) {
 		this.sevenKillStreak.remove(p);
+	}
+	
+	public boolean inTeamChat(Player p) {
+		for(Player pl : this.inTeamChat) {
+			if(pl.equals(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addToTeamchat(Player p) {
+		this.inTeamChat.add(p);
+	}
+	
+	public void removeFromTeamchat(Player p) {
+		this.inTeamChat.remove(p);
 	}
 }

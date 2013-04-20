@@ -10,7 +10,7 @@ import com.tommytony.war.Team;
 /**
  * Sends a message to all team-members
  *
- * @author Tim Düsterhus
+ * @author Tim Düsterhus, grinning
  */
 public class TeamCommand extends AbstractWarCommand {
 	public TeamCommand(WarCommandHandler handler, CommandSender sender, String[] args) {
@@ -32,6 +32,12 @@ public class TeamCommand extends AbstractWarCommand {
 
 		ChatColor color = playerTeam.getKind().getColor();
 		String teamMessage = color + player.getName() + ": " + ChatColor.WHITE;
+		
+		if(this.args.length == 0) {
+			playerTeam.addToTeamchat(player);
+			return true;
+		}
+		
 		for (String part : this.args) {
 			teamMessage += part + " ";
 		}

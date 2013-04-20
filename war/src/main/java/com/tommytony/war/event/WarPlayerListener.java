@@ -14,6 +14,8 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -886,5 +888,25 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onPlayerChat(final AsyncPlayerChatEvent event) {
+		final Player player = event.getPlayer();
+		Warzone zone = Warzone.getZoneByLocation(player);
+		//not in a zone, we dont need to worry about this then
+		if(zone == null) {
+			return;
+		}
+		Team team = Team.getTeamByPlayerName(player.getDisplayName());
+		//not on a team, we don't need to worry about this then...
+		if(team == null) {
+			return;
+		}
+		//check if we have team-only chat on for this person
+		if(!team.inTeamChat(player)) { //this is a concurrently safe list, so we are good
+			return;
+		}
+		//we are in team chat!
+		team.teamcast(team.getKind().getColor() + player.getDisplayName() + ": " + ChatColor.WHITE + event.getMessage());
+	}
 	
 }
