@@ -697,7 +697,9 @@ public class WarEntityListener implements Listener {
 			f.setAngry(true);
 			f.setMaxHealth(15);
 			f.setHealth(15);
-			f.setTarget(enemies.get(this.killSeed.nextInt(enemies.size())));
+			int index = this.killSeed.nextInt(enemies.size() - 1);
+			f.setTarget(enemies.get(index));
+			f.damage(0, enemies.get(index)); //fix to f.setTarget not working
 		}
 	}
 	
