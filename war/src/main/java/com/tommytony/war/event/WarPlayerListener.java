@@ -44,7 +44,7 @@ import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.LoadoutSelection;
 
 /**
- * @author tommytony, Tim Düsterhus
+ * @author tommytony, Tim Düsterhus, grinning
  * @package bukkit.tommytony.war
  */
 public class WarPlayerListener implements Listener {
@@ -229,6 +229,16 @@ public class WarPlayerListener implements Listener {
 					event.setCancelled(true);
 					
 					War.war.badMsg(player, "Can't use items while still in spawn.");
+				}
+			} else if(zone != null && zone.getLoadoutSelections().containsKey(player.getName())) {
+				Team t = zone.getPlayerTeam(player.getName());
+				if((t != null) && (t.hasSevenKillStreak(player))) {
+					if((player.getItemInHand().getType() == Material.BLAZE_ROD) && 
+							((event.getAction() == Action.LEFT_CLICK_AIR) || (event.getAction() == Action.LEFT_CLICK_BLOCK)
+							|| (event.getAction() == Action.RIGHT_CLICK_AIR) || (event.getAction() == Action.RIGHT_CLICK_BLOCK))) {
+						t.removeSevenKillStreak(player);
+						War.war.getEntityListener().spawnDogs(player, t);
+					}
 				}
 			}
 		}

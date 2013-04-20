@@ -1165,4 +1165,8 @@ public class War extends JavaPlugin {
 	public HubLobbyMaterials getWarhubMaterials() {
 		return this.warhubMaterials;
 	}
+	
+	public WarEntityListener getEntityListener() {
+		return this.entityListener;
+	}
 }

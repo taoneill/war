@@ -37,6 +37,8 @@ import com.tommytony.war.volume.Volume;
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
 	private Map<Player, Integer> kills = new HashMap<Player, Integer>(); //keeps track of kills per life
+	private List<Player> fiveKillStreak = new ArrayList<Player>(); //keeps track of who has a five killstreak (airstrike)
+	private List<Player> sevenKillStreak = new ArrayList<Player>(); //keeps track of who has a seven killstrea (dogs)
 	private Location teamSpawn = null;
 	private Location teamFlag = null;
 	private String name;
@@ -426,6 +428,15 @@ public class Team {
 			this.players.remove(thePlayer);
 			this.kills.remove(thePlayer);
 			
+			//prevent memory leaks!
+			if(this.hasFiveKillStreak(thePlayer)) {
+				this.removeFiveKillStreak(thePlayer);
+			}
+			
+			if(this.hasSevenKillStreak(thePlayer)) {
+				this.removeSevenKillStreak(thePlayer);
+			}
+			
 			if (this.warzone.isFlagThief(thePlayer.getName())) {
 				Team victim = this.warzone.getVictimTeamForFlagThief(thePlayer.getName());
 				victim.getFlagVolume().resetBlocks();
@@ -704,5 +715,39 @@ public class Team {
 	
 	public void zeroKills(Player p) {
 		this.kills.put(p, 0);
+	}
+	
+	public boolean hasFiveKillStreak(Player p) {
+		for(Player pl : this.fiveKillStreak) {
+			if(pl.equals(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addFiveKillStreak(Player p) {
+		this.fiveKillStreak.add(p);
+	}
+	
+	public void removeFiveKillStreak(Player p) {
+		this.fiveKillStreak.remove(p);
+	}
+	
+	public boolean hasSevenKillStreak(Player p) {
+		for(Player pl : this.sevenKillStreak) {
+			if(pl.equals(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addSevenKillStreak(Player p) {
+		this.sevenKillStreak.add(p);
+	}
+	
+	public void removeSevenKillStreak(Player p) {
+		this.sevenKillStreak.remove(p);
 	}
 }

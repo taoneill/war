@@ -11,10 +11,14 @@ import org.bukkit.block.Block;
 import org.bukkit.block.NoteBlock;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Egg;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -28,6 +32,8 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
@@ -48,12 +54,13 @@ import com.tommytony.war.utility.LoadoutSelection;
 /**
  * Handles Entity-Events
  *
- * @author tommytony, Tim Düsterhus
+ * @author tommytony, Tim Düsterhus, grinning
  * @package com.tommytony.war.event
  */
 public class WarEntityListener implements Listener {
 
 	private final Random killSeed = new Random();
+	private List<Egg> eggsForExplosion = new ArrayList<Egg>();
 			
 	/**
 	 * Handles PVP-Damage
@@ -606,17 +613,79 @@ public class WarEntityListener implements Listener {
 			}
 		}
 	}
+	
+	@EventHandler
+	public void onProjectileHit(final ProjectileHitEvent event) {
+		//check to see if we are loaded
+		if(!War.war.isLoaded()) {
+			return;
+		}
+		//eggs will be our airstrike thing...
+		if(event.getEntityType() == EntityType.EGG) {
+			if(this.eggsForExplosion.contains((Egg) event.getEntity())) {
+			    Location l = event.getEntity().getLocation();
+			    l.getWorld().createExplosion(l, 10F); //4 is a single tnt
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onProjectileLaunch(final ProjectileLaunchEvent event) {
+		if(!War.war.isLoaded()) {
+			return;
+		}
+		//now we can add our eggs :D
+		if(event.getEntityType() == EntityType.EGG) {
+			LivingEntity e = event.getEntity().getShooter();
+			if(e instanceof Player) {
+				Player p = (Player) e;
+				Warzone zone = Warzone.getZoneByLocation(p);
+				if(zone != null) {
+					Team t = zone.getPlayerTeam(p.getDisplayName());
+					if((t != null) && (t.hasFiveKillStreak(p))) {
+						this.eggsForExplosion.add((Egg) event.getEntity());
+						t.removeFiveKillStreak(p);
+					}
+				}
+			}
+		}
+	}
 
 	private void checkKillStreak(Player p, Team t) {
 		int kills = t.getKills(p);
 		if(kills == 3) { //UNDECIDED
 			
 		} else if(kills == 5) { //AIRSTRIKE
-			
+			t.addFiveKillStreak(p);
+			p.getInventory().addItem(new ItemStack(Material.EGG));
+			War.war.msg(p, "Congratulations on the five killstreak!");
+			War.war.msg(p, "You have been awarded an airstrike! Throw the Egg where you would like the airstrike!");
 		} else if(kills == 7) { //DOGGIES
-			
+			t.addSevenKillStreak(p);
+			p.getInventory().addItem(new ItemStack(Material.BLAZE_ROD));
+			War.war.msg(p, "Congratulations on the seven killstreak!");
+			War.war.msg(p, "You have been awarded dogs! Left Click with the Blaze Rod when you would like to call in the dogs");
 		} else {
-			War.war.msg(p, "You have " + kills + "kills this life!");
+			War.war.msg(p, "You have " + kills + " kills this life!");
+		}
+	}
+	
+	protected void spawnDogs(Player p, Team t) {
+		Location spawnLoc = t.getTeamSpawn();
+		Warzone w = Warzone.getZoneByLocation(t.getTeamSpawn());
+		//logic for determining all enemies in a warzone
+		List<Player> enemies = new ArrayList<Player>();
+		for(Team team : w.getTeams()) {
+			if(!team.equals(t)) {
+				enemies.addAll(team.getPlayers());
+			}
+		}
+		Wolf[] dogs = new Wolf[4];
+		for(Wolf f : dogs) {
+			f = (Wolf) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.WOLF);
+			f.setAdult();
+			f.setAngry(true);
+			f.setTarget(enemies.get(this.killSeed.nextInt(enemies.size())));
 		}
 	}
 	
