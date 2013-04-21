@@ -694,12 +694,14 @@ public class WarEntityListener implements Listener {
 		for(Wolf f : dogs) {
 			f = (Wolf) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.WOLF);
 			f.setAdult();
-			f.setAngry(true);
-			f.setMaxHealth(15);
-			f.setHealth(15);
-			int index = this.killSeed.nextInt(enemies.size() - 1);
+			f.setMaxHealth(16);
+			f.setHealth(16); //goes down to 15 after we damage the wolf
+			int index = this.killSeed.nextInt(enemies.size()) - 1;
+			if(index < 0) {
+				index = 0;
+			}
 			f.setTarget(enemies.get(index));
-			f.damage(0, enemies.get(index)); //fix to f.setTarget not working
+			f.damage(1, enemies.get(index)); //fix to f.setTarget not working
 		}
 	}
 	
