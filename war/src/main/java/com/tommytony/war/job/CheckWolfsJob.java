@@ -3,6 +3,8 @@ package com.tommytony.war.job;
 import java.util.Random;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 
@@ -34,9 +36,18 @@ public class CheckWolfsJob implements Runnable {
 			double dist = wolves[i].getLocation().distanceSquared(players[i].getLocation());
 			if(dist > 900) { //we are too far away, teleport closer
 				Location l = players[i].getLocation();
-				wolves[i].getLocation().setX(l.getBlockX() + r.nextInt(11) - 10);
-				wolves[i].getLocation().setZ(l.getBlockZ() + r.nextInt(11) - 10);
-				wolves[i].getLocation().setY(l.getBlockY());
+				boolean notSpawned = true;
+				int x = 0, y = 0, z = 0;
+				while(notSpawned) {
+				    Block b = l.getWorld().getBlockAt(l.getBlockX() + r.nextInt(11) - 10, l.getBlockZ() + r.nextInt(11) - 10,
+				    		l.getBlockY() + r.nextInt(11) - 10);
+				    if(b.getType() == Material.AIR) {
+				    	notSpawned = false;
+				    }
+				}
+				wolves[i].getLocation().setX(x);
+				wolves[i].getLocation().setY(y);
+				wolves[i].getLocation().setZ(z);
 			}
 		}
 		if(shouldDie == 10) {

@@ -708,6 +708,9 @@ public class WarEntityListener implements Listener {
 			if(index < 0) {
 				index = 0;
 			}
+			if(index > enemies.size()) {
+				index = enemies.size() - 1;
+			}
 			f.setTarget(enemies.get(index));
 			f.damage(1, enemies.get(index)); //fix to f.setTarget not working
 			indices[i] = index;
