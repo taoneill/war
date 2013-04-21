@@ -667,6 +667,9 @@ public class WarEntityListener implements Listener {
 		}
 		int kills = t.getKills(p);
 		if(kills == 3) { //UNDECIDED
+			this.doThreeKillstreak(p, t);
+			War.war.msg(p, "Congratulations on the three killstreak!");
+			War.war.msg(p, "You have been awarded 5 extra health and your health has been filled!");
 			this.broadcastKillstreak(p, t, 3);
 		} else if(kills == 5) { //AIRSTRIKE
 			t.addFiveKillStreak(p);
@@ -679,6 +682,7 @@ public class WarEntityListener implements Listener {
 			p.getInventory().addItem(new ItemStack(Material.RAW_BEEF));
 			War.war.msg(p, "Congratulations on the seven killstreak!");
 			War.war.msg(p, "You have been awarded dogs! Left Click with the Steak when you would like to call in the dogs");
+			War.war.msg(p, "You have been awarded dogs! Left Click with the Steak when you would like to call in the dogs!");
 			this.broadcastKillstreak(p, t, 7);
 		} else if(kills > 7) {
 			this.broadcastKillstreak(p, t, kills);
@@ -739,5 +743,10 @@ public class WarEntityListener implements Listener {
 		l.getWorld().spawnEntity(tntPlace.add(new Vector(2, 0, 0)), EntityType.PRIMED_TNT);
 		l.getWorld().spawnEntity(tntPlace.add(new Vector(2, 0, 2)), EntityType.PRIMED_TNT);
 		l.getWorld().spawnEntity(tntPlace.add(new Vector(0, 0, 2)), EntityType.PRIMED_TNT);
+	}
+	
+	private void doThreeKillstreak(Player p, Team t) {
+		p.setMaxHealth(25);
+		p.setHealth(25);
 	}
 }

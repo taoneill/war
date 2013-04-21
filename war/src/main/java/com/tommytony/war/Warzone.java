@@ -392,6 +392,8 @@ public class Warzone {
 		// Fill hp
 		player.setRemainingAir(300);
 		player.setHealth(20);
+		//take away 3 killstreak if any
+		player.resetMaxHealth();
 		player.setFoodLevel(20);
 		player.setSaturation(team.getTeamConfig().resolveInt(TeamConfig.SATURATION));
 		player.setExhaustion(0);

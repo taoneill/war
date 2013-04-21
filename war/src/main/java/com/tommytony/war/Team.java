@@ -431,6 +431,7 @@ public class Team {
 		if (thePlayer != null) {
 			this.players.remove(thePlayer);
 			this.kills.remove(thePlayer);
+			thePlayer.resetMaxHealth(); //take away three killstreak if any
 			
 			//prevent memory leaks!
 			if(this.hasFiveKillStreak(thePlayer)) {
