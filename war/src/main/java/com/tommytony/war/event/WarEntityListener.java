@@ -681,7 +681,6 @@ public class WarEntityListener implements Listener {
 			t.addSevenKillStreak(p);
 			p.getInventory().addItem(new ItemStack(Material.RAW_BEEF));
 			War.war.msg(p, "Congratulations on the seven killstreak!");
-			War.war.msg(p, "You have been awarded dogs! Left Click with the Steak when you would like to call in the dogs");
 			War.war.msg(p, "You have been awarded dogs! Left Click with the Steak when you would like to call in the dogs!");
 			this.broadcastKillstreak(p, t, 7);
 		} else if(kills > 7) {
