@@ -38,6 +38,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
@@ -631,7 +632,7 @@ public class WarEntityListener implements Listener {
 			    if(w == null) { //we are not in a zone, dont explode
 			    	return;
 			    }
-			    l.getWorld().createExplosion(l, 10F); //4 is a single tnt
+			    this.callInAirstrike(l);
 			}
 		}
 	}
@@ -732,4 +733,11 @@ public class WarEntityListener implements Listener {
 		}
 	}
 	
+	private void callInAirstrike(Location l) {
+		Location tntPlace = new Location(l.getWorld(), l.getX(), Warzone.getZoneByLocation(l).getVolume().getMaxY(), l.getZ());
+		l.getWorld().spawnEntity(tntPlace, EntityType.PRIMED_TNT);
+		l.getWorld().spawnEntity(tntPlace.add(new Vector(2, 0, 0)), EntityType.PRIMED_TNT);
+		l.getWorld().spawnEntity(tntPlace.add(new Vector(2, 0, 2)), EntityType.PRIMED_TNT);
+		l.getWorld().spawnEntity(tntPlace.add(new Vector(0, 0, 2)), EntityType.PRIMED_TNT);
+	}
 }
