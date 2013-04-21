@@ -627,6 +627,10 @@ public class WarEntityListener implements Listener {
 		if(event.getEntityType() == EntityType.EGG) {
 			if(this.eggsForExplosion.contains((Egg) event.getEntity())) {
 			    Location l = event.getEntity().getLocation();
+			    Warzone w = Warzone.getZoneByLocation(l);
+			    if(w == null) { //we are not in a zone, dont explode
+			    	return;
+			    }
 			    l.getWorld().createExplosion(l, 10F); //4 is a single tnt
 			}
 		}
