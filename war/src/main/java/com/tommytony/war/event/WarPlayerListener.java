@@ -239,6 +239,7 @@ public class WarPlayerListener implements Listener {
 							((event.getAction() == Action.LEFT_CLICK_AIR) || (event.getAction() == Action.LEFT_CLICK_BLOCK)
 							|| (event.getAction() == Action.RIGHT_CLICK_AIR) || (event.getAction() == Action.RIGHT_CLICK_BLOCK))) {
 						t.removeSevenKillStreak(player);
+						player.getItemInHand().setType(Material.AIR);
 						t.teamcast(t.getKind().getColor() + player.getDisplayName() + ChatColor.WHITE +
 								" called in dogs!");
 						War.war.getEntityListener().spawnDogs(player, t);
