@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
@@ -41,6 +42,7 @@ public class Team {
 	private List<Player> fiveKillStreak = new ArrayList<Player>(4); //keeps track of who has a five killstreak (airstrike)
 	private List<Player> sevenKillStreak = new ArrayList<Player>(4); //keeps track of who has a seven killstrea (dogs)
 	private List<Player> inTeamChat = new CopyOnWriteArrayList<Player>(); //keeps track of who is in teamchat
+	private List<BukkitTask> doggieManagers = new ArrayList<BukkitTask>(); //keeps track of doggie's and keeping them in the fight!
 	private Location teamSpawn = null;
 	private Location teamFlag = null;
 	private String name;
@@ -769,4 +771,14 @@ public class Team {
 	public void removeFromTeamchat(Player p) {
 		this.inTeamChat.remove(p);
 	}
+	
+	public void addDoggyManager(BukkitTask task) {
+		this.doggieManagers.add(task);
+	}
+	
+	public void clearDoggyManagers() {
+		for(BukkitTask y : this.doggieManagers) {
+			y.cancel();
+		}
+	}	
 }

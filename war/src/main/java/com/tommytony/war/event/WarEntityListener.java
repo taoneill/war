@@ -37,6 +37,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
@@ -46,6 +47,7 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.job.CheckWolfsJob;
 import com.tommytony.war.job.DeferredBlockResetsJob;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
@@ -671,7 +673,7 @@ public class WarEntityListener implements Listener {
 			t.addSevenKillStreak(p);
 			p.getInventory().addItem(new ItemStack(Material.RAW_BEEF));
 			War.war.msg(p, "Congratulations on the seven killstreak!");
-			War.war.msg(p, "You have been awarded dogs! Left Click with the Blaze Rod when you would like to call in the dogs");
+			War.war.msg(p, "You have been awarded dogs! Left Click with the Steak when you would like to call in the dogs");
 			this.broadcastKillstreak(p, t, 7);
 		} else if(kills > 7) {
 			this.broadcastKillstreak(p, t, kills);
@@ -691,6 +693,8 @@ public class WarEntityListener implements Listener {
 			}
 		}
 		Wolf[] dogs = new Wolf[4];
+		int[] indices = new int[4];
+		int i = 0;
 		for(Wolf f : dogs) {
 			f = (Wolf) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.WOLF);
 			f.setAdult();
@@ -702,7 +706,16 @@ public class WarEntityListener implements Listener {
 			}
 			f.setTarget(enemies.get(index));
 			f.damage(1, enemies.get(index)); //fix to f.setTarget not working
+			indices[i] = index;
+			i++;
 		}
+		Player[] ps = new Player[4];
+		for(int j = 0; j < 4; j++) {
+			ps[i] = enemies.get(indices[i]);
+		}
+		BukkitTask z = War.war.getServer().getScheduler().runTaskTimer(War.war, new CheckWolfsJob(dogs, ps), 60, 200);
+		t.addDoggyManager(z);
+		
 	}
 	
 	private void broadcastKillstreak(Player p, Team t, int streak) {

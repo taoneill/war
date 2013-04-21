@@ -292,6 +292,7 @@ public class Warzone {
 				}
 				team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				team.initializeTeamSpawn();
+				team.clearDoggyManagers();
 				if (team.getTeamFlag() != null) {
 					team.setTeamFlag(team.getTeamFlag());
 				}
