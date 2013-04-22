@@ -17,9 +17,8 @@ public class KillstreakMetadata implements MetadataValue {
 		this.data = this.pack(killstreak, value);
 	}
 	
-	private long pack(int killstreak, int value) {
-		return (killstreak << 32) | value;
-		
+	public long pack(int killstreak, int value) {
+		return (((long) killstreak) << 32) | value;
 	}
 	
 	public Object value() {
@@ -65,5 +64,4 @@ public class KillstreakMetadata implements MetadataValue {
 	public void invalidate() {
 		return;
 	}
-
 }
