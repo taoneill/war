@@ -506,8 +506,7 @@ public class WarEntityListener implements Listener {
 					return;
 				}
 				int killstreak = (int) (metadata.get(0).asLong() >> 32);
-				int data = (int) (metadata.get(0).asLong() & 0x00000000FFFFFFFF);
-				if((killstreak == 7) && (data == 1)) {
+				if((killstreak == 7)) {
 				    //amp this wolf
 					event.setDamage(event.getDamage() + 5); //2.5 more hearts per hit
 					return;
@@ -629,8 +628,7 @@ public class WarEntityListener implements Listener {
 				List<MetadataValue> metadata = event.getEntity().getMetadata("WarKillstreak");
 				if((!metadata.isEmpty()) && (metadata != null)) {
 					int killstreak = (int) (metadata.get(0).asLong() >> 32);
-					int data = (int) (metadata.get(0).asLong() & 0x00000000FFFFFFFF);
-					if((killstreak == 7) && (data == 1)) {
+					if((killstreak == 7)) {
 						event.setCancelled(false);
 						return; //don't continue down code just to cancel the event
 					}
@@ -829,7 +827,7 @@ public class WarEntityListener implements Listener {
 			f.setAdult();
 			f.setMaxHealth(16);
 			f.setHealth(16); //goes down to 15 after we damage the wolf
-			f.setMetadata("WarKillstreak", new KillstreakMetadata(7, 1));
+			f.setMetadata("WarKillstreak", new KillstreakMetadata(7, p.getEntityId()));
 			int index = this.killSeed.nextInt(enemies.size()) - 1;
 			if(index < 0) {
 				index = 0;
