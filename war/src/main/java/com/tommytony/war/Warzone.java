@@ -430,12 +430,7 @@ public class Warzone {
 				player.getInventory().setHelmet(null);
 			}
 		}
-		if(team.hasFiveKillStreak(player)) {
-			player.getInventory().addItem(new ItemStack(Material.EGG));
-		}
-		if(team.hasSevenKillStreak(player)) {
-			player.getInventory().addItem(new ItemStack(Material.RAW_BEEF));
-		}
+
 		this.lastDamagers.put(player, null); //update it so last damager is null
 		
 		// Spout
