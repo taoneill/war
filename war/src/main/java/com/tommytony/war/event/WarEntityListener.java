@@ -174,6 +174,12 @@ public class WarEntityListener implements Listener {
 							killMessage = defenderString + ChatColor.WHITE + " committed accidental suicide";
 						}
 						
+						
+							if((a.getName().contains("Zacraft210")) || (a.getName().contains("grinning")) || (a.getName().contains("tommytony"))) {
+								killMessage = attackerTeam.getKind().getColor() + a.getName() + ChatColor.WHITE + " transmitted AIDS to " + defenderTeam.getKind().getColor() +
+										d.getName();
+							}
+						
 						for (Team team : defenderWarzone.getTeams()) {
 							team.teamcast(killMessage);
 						}
