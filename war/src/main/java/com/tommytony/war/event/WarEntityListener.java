@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -92,6 +93,7 @@ public class WarEntityListener implements Listener {
 			Team attackerTeam = Team.getTeamByPlayerName(a.getName());
 			Warzone defenderWarzone = Warzone.getZoneByPlayerName(d.getName());
 			Team defenderTeam = Team.getTeamByPlayerName(d.getName());
+			attackerWarzone.updateLastDamager(d, a);
 			
 			if ((attackerTeam != null && defenderTeam != null && attackerTeam != defenderTeam && attackerWarzone == defenderWarzone)
 					|| (attackerTeam != null && defenderTeam != null && attacker.getEntityId() == defender.getEntityId())) {
@@ -313,6 +315,7 @@ public class WarEntityListener implements Listener {
 						if(defenderWarzone == Warzone.getZoneByTeam(aTeam)) {
 							//give them credit for killing them
 							aTeam.incKills(lastAttacker);
+							this.checkKillStreak(lastAttacker, aTeam);
 						}
 					}
 				}
@@ -518,6 +521,7 @@ public class WarEntityListener implements Listener {
 							if(zone == Warzone.getZoneByTeam(aTeam)) {
 								//give them credit for killing them
 								aTeam.incKills(lastAttacker);
+								this.checkKillStreak(lastAttacker, aTeam);
 							}
 						}
 					}
