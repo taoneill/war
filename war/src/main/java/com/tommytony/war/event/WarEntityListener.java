@@ -315,12 +315,7 @@ public class WarEntityListener implements Listener {
 						int killstreak = (int) (metadata.get(0).asLong() << 32);
 						int data = (int) (metadata.get(0).asLong() & 0x00000000FFFFFFFF);
 						if(killstreak == 5) {
-							Player p = null;
-							for(Player pl : defenderWarzone.getTeleport().getWorld().getPlayers()) {
-								if(pl.getEntityId() == data) {
-									p = pl;
-								}
-							}
+							Player p = this.getPlayerForId(data);
 							Team pTeam = Team.getTeamByPlayerName(p.getDisplayName());
 							if(pTeam != null) {
 								pTeam.incKills(p);
@@ -338,12 +333,7 @@ public class WarEntityListener implements Listener {
 						int killstreak = (int) (metadata.get(0).asLong() << 32);
 						int data = (int) (metadata.get(0).asLong() & 0x00000000FFFFFFFF);
 						if(killstreak == 7) {
-							Player p = null;
-							for(Player pl : defenderWarzone.getTeleport().getWorld().getPlayers()) {
-								if(pl.getEntityId() == data) {
-									p = pl;
-								}
-							}
+							Player p = this.getPlayerForId(data);
 							Team pTeam = Team.getTeamByPlayerName(p.getDisplayName());
 							if(pTeam != null) {
 								pTeam.incKills(p);
@@ -758,12 +748,8 @@ public class WarEntityListener implements Listener {
 					int killstreak = (int) (metadata.get(0).asLong() >> 32);
 					int data = (int) (metadata.get(0).asLong() & 0x00000000FFFFFFFF);
 					if(killstreak == 5) {
-			            Player p = null;
-				        for(Player pl : w.getTeleport().getWorld().getPlayers()) {
-					        if(pl.getEntityId() == data) {
-						        p = pl;
-					        }
-				        }
+			            Player p = this.getPlayerForId(data);
+			            event.getEntity().removeMetadata("WarKillstreak", War.war);
 			            this.callInAirstrike(l, p);
 					}
 			    }
@@ -887,5 +873,16 @@ public class WarEntityListener implements Listener {
 	private void doThreeKillstreak(Player p, Team t) {
 		p.setMaxHealth(25);
 		p.setHealth(25);
+	}
+	
+	private Player getPlayerForId(int id) {
+		Player p = null;
+		for(Player pl : War.war.getServer().getOnlinePlayers()) {
+			if(pl.getEntityId() == id) {
+				p = pl;
+				break;
+			}
+		}
+		return p;
 	}
 }
