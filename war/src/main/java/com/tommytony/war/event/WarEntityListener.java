@@ -1,7 +1,9 @@
 package com.tommytony.war.event;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
@@ -65,6 +67,7 @@ public class WarEntityListener implements Listener {
 
 	private final Random killSeed = new Random();
 	private List<Egg> eggsForExplosion = new ArrayList<Egg>();
+	private Map<Player, Player> lastDamager = new HashMap<Player, Player>();
 			
 	/**
 	 * Handles PVP-Damage
@@ -190,6 +193,8 @@ public class WarEntityListener implements Listener {
 						return;
 					}
 					
+				} else if(event.getDamage() >= d.getHealth()) {
+					defenderWarzone.updateLastDamager(d, a); //lets update so we can give credit
 				} else if (defenderWarzone.isBombThief(d.getName()) && d.getLocation().distance(a.getLocation()) < 2) {
 					// Close combat, close enough to detonate					
 					Bomb bomb = defenderWarzone.getBombForThief(d.getName());
@@ -292,6 +297,19 @@ public class WarEntityListener implements Listener {
 				}
 				//zero your kills for dying from something that is inhuman
 				Team.getTeamByPlayerName(d.getName()).zeroKills(d);
+				//lets see if we can give someone partial credit
+				Player lastAttacker = defenderWarzone.getLastDamager(d);
+				//null checks
+				if(lastAttacker != null) {
+					Team aTeam = Team.getTeamByPlayerName(lastAttacker.getName());
+					if(aTeam != null) {
+						//check if they are in the same warzone too
+						if(defenderWarzone == Warzone.getZoneByTeam(aTeam)) {
+							//give them credit for killing them
+							aTeam.incKills(lastAttacker);
+						}
+					}
+				}
 				defenderWarzone.handleDeath(d);
 				
 				if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
@@ -480,8 +498,24 @@ public class WarEntityListener implements Listener {
 							teamToMsg.teamcast(deathMessage);
 						}
 					}
+					
 					//we still must 0 your killstreaks for dying stupidly
 					team.zeroKills(player);
+					
+					//lets see if we can give partial credit
+					Player lastAttacker = zone.getLastDamager(player);
+					//null checks
+					if(lastAttacker != null) {
+						Team aTeam = Team.getTeamByPlayerName(lastAttacker.getName());
+						if(aTeam != null) {
+							//check if they are in the same warzone too
+							if(zone == Warzone.getZoneByTeam(aTeam)) {
+								//give them credit for killing them
+								aTeam.incKills(lastAttacker);
+							}
+						}
+					}
+					
 					zone.handleDeath(player);
 					
 					if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {

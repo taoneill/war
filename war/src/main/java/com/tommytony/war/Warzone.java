@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -90,6 +91,9 @@ public class Warzone {
 	private boolean isEndOfGame = false;
 	private boolean isReinitializing = false;
 	//private final Object gameEndLock = new Object();
+	
+	private Map<Player, Player> lastDamagers = new HashMap<Player, Player>();
+	//this is to give people credit for being the last damager to a person before they die
 	
 	private static final int[] rgbLookupTable = new int[] {
 		(new RGBColor(255, 255, 255)).get(),
@@ -297,7 +301,8 @@ public class Warzone {
 					team.setTeamFlag(team.getTeamFlag());
 				}
 			}
-
+            this.lastDamagers.clear(); //clear last damagers so it doesn't carry over
+            
 			this.initZone();
 			
 			if (War.war.getWarHub() != null) {
@@ -431,6 +436,7 @@ public class Warzone {
 		if(team.hasSevenKillStreak(player)) {
 			player.getInventory().addItem(new ItemStack(Material.RAW_BEEF));
 		}
+		this.lastDamagers.put(player, null); //update it so last damager is null
 		
 		// Spout
 		if (War.war.isSpoutServer()) {
@@ -1162,7 +1168,9 @@ public class Warzone {
 			if (War.war.getWarHub() != null) {
 				War.war.getWarHub().resetZoneSign(this);
 			}
-
+			
+            this.lastDamagers.remove(player); //will prevent a memory leak!
+            
 			boolean zoneEmpty = true;
 			for (Team team : this.getTeams()) {
 				if (team.getPlayers().size() > 0) {
@@ -1543,6 +1551,14 @@ public class Warzone {
 
 	public WarzoneMaterials getWarzoneMaterials() {
 		return warzoneMaterials;
+	}
+	
+	public void updateLastDamager(Player defender, Player attacker) {
+		this.lastDamagers.put(defender, attacker);
+	}
+	
+	public Player getLastDamager(Player defender) {
+		return this.lastDamagers.get(defender);
 	}
 }
 
