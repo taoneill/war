@@ -497,15 +497,19 @@ public class WarEntityListener implements Listener {
 			return;
 		}
 
+		Entity entity = event.getEntity();
+		
+		if(!(entity instanceof Player)) {
+			return;
+		}
 		
 		if(event instanceof EntityDamageByEntityEvent) {
-		    Entity entit = event.getEntity();
-		    if ((entit instanceof Player)) {
+		    if (entity instanceof Player) {
 			    EntityDamageByEntityEvent even = (EntityDamageByEntityEvent) event;
 			    //we need to make wolves stronger if they are from killstreaks
 			    if(even.getDamager() instanceof Wolf) {
 				    List<MetadataValue> metadata = even.getDamager().getMetadata("WarKillstreak");
-				    if((metadata.isEmpty()) && (metadata == null)) {
+				    if((metadata.isEmpty()) || (metadata == null)) {
 					    return;
 				    }
 				    int killstreak = (int) (metadata.get(0).asLong() >> 32);
@@ -515,10 +519,9 @@ public class WarEntityListener implements Listener {
 					    return;
 				    }
 			    }
-			    return;
 			}
 		}
-		Player player = (Player) event.getEntity();
+		Player player = (Player) entity;
 
 		// prevent godmode
 		if (Warzone.getZoneByPlayerName(player.getName()) != null) {
@@ -789,10 +792,10 @@ public class WarEntityListener implements Listener {
 			return;
 		}
 		int kills = t.getKills(p);
-		if(kills == 3) { //UNDECIDED
+		if(kills == 3) { //EXTRAHEALTH AND REFILL
 			this.doThreeKillstreak(p, t);
 			War.war.msg(p, "Congratulations on the three killstreak!");
-			War.war.msg(p, "You have been awarded 5 extra health and your health has been filled!");
+			War.war.msg(p, "You have been awarded 5 extra health, and your health has been refilled!");
 			this.broadcastKillstreak(p, t, 3);
 		} else if(kills == 5) { //AIRSTRIKE
 			t.addFiveKillStreak(p);
@@ -842,6 +845,7 @@ public class WarEntityListener implements Listener {
 			f.setTarget(enemies.get(index));
 			f.damage(1, enemies.get(index)); //fix to f.setTarget not working
 			indices[i] = index;
+			dogs[i] = f; //should unnull wolves
 			i++;
 		}
 		Player[] ps = new Player[4];
