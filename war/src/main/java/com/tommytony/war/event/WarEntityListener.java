@@ -497,24 +497,28 @@ public class WarEntityListener implements Listener {
 			return;
 		}
 
-		Entity entity = event.getEntity();
-		if (!(entity instanceof Player)) {
-			//we need to make wolves stronger if they are from killstreaks
-			if(entity instanceof Wolf) {
-				List<MetadataValue> metadata = entity.getMetadata("WarKillstreak");
-				if((!metadata.isEmpty()) && (metadata != null)) {
-					return;
-				}
-				int killstreak = (int) (metadata.get(0).asLong() >> 32);
-				if((killstreak == 7)) {
-				    //amp this wolf
-					event.setDamage(event.getDamage() + 5); //2.5 more hearts per hit
-					return;
-				}
+		
+		if(event instanceof EntityDamageByEntityEvent) {
+		    Entity entit = event.getEntity();
+		    if ((entit instanceof Player)) {
+			    EntityDamageByEntityEvent even = (EntityDamageByEntityEvent) event;
+			    //we need to make wolves stronger if they are from killstreaks
+			    if(even.getDamager() instanceof Wolf) {
+				    List<MetadataValue> metadata = even.getDamager().getMetadata("WarKillstreak");
+				    if((metadata.isEmpty()) && (metadata == null)) {
+					    return;
+				    }
+				    int killstreak = (int) (metadata.get(0).asLong() >> 32);
+				    if((killstreak == 7)) {
+				        //amp this wolf
+					    event.setDamage(event.getDamage() + 5); //2.5 more hearts per hit
+					    return;
+				    }
+			    }
+			    return;
 			}
-			return;
 		}
-		Player player = (Player) entity;
+		Player player = (Player) event.getEntity();
 
 		// prevent godmode
 		if (Warzone.getZoneByPlayerName(player.getName()) != null) {
