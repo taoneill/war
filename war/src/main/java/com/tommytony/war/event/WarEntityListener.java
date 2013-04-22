@@ -756,7 +756,7 @@ public class WarEntityListener implements Listener {
 		}
 		Player[] ps = new Player[4];
 		for(int j = 0; j < 4; j++) {
-			ps[i] = enemies.get(indices[i]);
+			ps[j] = enemies.get(indices[j]);
 		}
 		BukkitTask z = War.war.getServer().getScheduler().runTaskTimer(War.war, new CheckWolfsJob(dogs, ps), 60, 200);
 		t.addDoggyManager(z);
