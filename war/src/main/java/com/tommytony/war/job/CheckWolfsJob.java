@@ -37,7 +37,7 @@ public class CheckWolfsJob implements Runnable {
 				continue;
 			}
 			double dist = wolves[i].getLocation().distanceSquared(players[i].getLocation());
-			if(dist > 900) { //we are too far away, teleport closer
+			if(dist > 400) { //we are too far away, teleport closer
 				Location l = players[i].getLocation();
 				boolean notSpawned = true;
 				int x = 0, y = 0, z = 0;
