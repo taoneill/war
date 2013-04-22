@@ -781,5 +781,6 @@ public class Team {
 		for(BukkitTask y : this.doggieManagers) {
 			y.cancel();
 		}
+		this.doggieManagers.clear();
 	}	
 }
