@@ -40,6 +40,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import org.getspout.spoutapi.SpoutManager;
@@ -56,6 +57,7 @@ import com.tommytony.war.job.DeferredBlockResetsJob;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.utility.DeferredBlockReset;
+import com.tommytony.war.utility.KillstreakMetadata;
 import com.tommytony.war.utility.LoadoutSelection;
 
 /**
@@ -303,8 +305,56 @@ public class WarEntityListener implements Listener {
 						team.teamcast(deathMessage);
 					}
 				}
-				//zero your kills for dying from something that is inhuman
+				//zero defender kills for dying from something that is inhuman
 				Team.getTeamByPlayerName(d.getName()).zeroKills(d);
+				//lets see if it was an airstrike that was called in by us that killed you
+				if(event.getDamager() instanceof TNTPrimed) {
+					TNTPrimed tnt = (TNTPrimed) event.getDamager();
+					List<MetadataValue> metadata = tnt.getMetadata("WarKillstreak");
+					if((!metadata.isEmpty()) && (metadata != null)) {
+						int killstreak = (int) (metadata.get(0).asLong() << 32);
+						int data = (int) (metadata.get(0).asLong() & 0x00000000FFFFFFFF);
+						if(killstreak == 5) {
+							Player p = null;
+							for(Player pl : defenderWarzone.getTeleport().getWorld().getPlayers()) {
+								if(pl.getEntityId() == data) {
+									p = pl;
+								}
+							}
+							Team pTeam = Team.getTeamByPlayerName(p.getDisplayName());
+							if(pTeam != null) {
+								pTeam.incKills(p);
+								this.checkKillStreak(p, pTeam);
+								defenderWarzone.updateLastDamager(d, null); //make it so we give no more extra credit
+							}
+						}
+					}
+				}
+				//lets see if it was one of our killstreak wolves that killed you
+				if(event.getDamager() instanceof Wolf) {
+					Wolf wolf = (Wolf) event.getDamager();
+					List<MetadataValue> metadata = wolf.getMetadata("WarKillstreak");
+					if((!metadata.isEmpty()) && (metadata != null)) {
+						int killstreak = (int) (metadata.get(0).asLong() << 32);
+						int data = (int) (metadata.get(0).asLong() & 0x00000000FFFFFFFF);
+						if(killstreak == 7) {
+							Player p = null;
+							for(Player pl : defenderWarzone.getTeleport().getWorld().getPlayers()) {
+								if(pl.getEntityId() == data) {
+									p = pl;
+								}
+							}
+							Team pTeam = Team.getTeamByPlayerName(p.getDisplayName());
+							if(pTeam != null) {
+								pTeam.incKills(p);
+								this.checkKillStreak(p, pTeam);
+								defenderWarzone.updateLastDamager(d, null);
+							}
+						}
+					}
+				}
+				
+				
 				//lets see if we can give someone partial credit
 				Player lastAttacker = defenderWarzone.getLastDamager(d);
 				//null checks
@@ -319,6 +369,7 @@ public class WarEntityListener implements Listener {
 						}
 					}
 				}
+				
 				defenderWarzone.handleDeath(d);
 				
 				if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
@@ -458,6 +509,20 @@ public class WarEntityListener implements Listener {
 
 		Entity entity = event.getEntity();
 		if (!(entity instanceof Player)) {
+			//we need to make wolves stronger if they are from killstreaks
+			if(entity instanceof Wolf) {
+				List<MetadataValue> metadata = entity.getMetadata("WarKillstreak");
+				if((!metadata.isEmpty()) && (metadata != null)) {
+					return;
+				}
+				int killstreak = (int) (metadata.get(0).asLong() >> 32);
+				int data = (int) (metadata.get(0).asLong() & 0x00000000FFFFFFFF);
+				if((killstreak == 7) && (data == 1)) {
+				    //amp this wolf
+					event.setDamage(event.getDamage() + 5); //2.5 more hearts per hit
+					return;
+				}
+			}
 			return;
 		}
 		Player player = (Player) entity;
@@ -568,7 +633,19 @@ public class WarEntityListener implements Listener {
 
 		Location location = event.getLocation();
 		Warzone zone = Warzone.getZoneByLocation(location);
+		
 		if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.NOCREATURES)) {
+			if(event.getEntityType() == EntityType.WOLF) {
+				List<MetadataValue> metadata = event.getEntity().getMetadata("WarKillstreak");
+				if((!metadata.isEmpty()) && (metadata != null)) {
+					int killstreak = (int) (metadata.get(0).asLong() >> 32);
+					int data = (int) (metadata.get(0).asLong() & 0x00000000FFFFFFFF);
+					if((killstreak == 7) && (data == 1)) {
+						event.setCancelled(false);
+						return; //don't continue down code just to cancel the event
+					}
+				}
+			}
 			event.setCancelled(true);
 		}
 	}
@@ -676,7 +753,20 @@ public class WarEntityListener implements Listener {
 			    if(w == null) { //we are not in a zone, dont explode
 			    	return;
 			    }
-			    this.callInAirstrike(l);
+			    List<MetadataValue> metadata = event.getEntity().getMetadata("WarKillstreak");
+				if((!metadata.isEmpty()) && (metadata != null)) {
+					int killstreak = (int) (metadata.get(0).asLong() >> 32);
+					int data = (int) (metadata.get(0).asLong() & 0x00000000FFFFFFFF);
+					if(killstreak == 5) {
+			            Player p = null;
+				        for(Player pl : w.getTeleport().getWorld().getPlayers()) {
+					        if(pl.getEntityId() == data) {
+						        p = pl;
+					        }
+				        }
+			            this.callInAirstrike(l, p);
+					}
+			    }
 			}
 		}
 	}
@@ -695,6 +785,7 @@ public class WarEntityListener implements Listener {
 				if(zone != null) {
 					Team t = zone.getPlayerTeam(p.getDisplayName());
 					if((t != null) && (t.hasFiveKillStreak(p))) {
+						event.getEntity().setMetadata("WarKillstreak", new KillstreakMetadata(5, p.getEntityId()));
 						this.eggsForExplosion.add((Egg) event.getEntity());
 						t.removeFiveKillStreak(p);
 						t.teamcast(t.getKind().getColor() + p.getDisplayName() + ChatColor.WHITE + 
@@ -752,6 +843,7 @@ public class WarEntityListener implements Listener {
 			f.setAdult();
 			f.setMaxHealth(16);
 			f.setHealth(16); //goes down to 15 after we damage the wolf
+			f.setMetadata("WarKillstreak", new KillstreakMetadata(7, 1));
 			int index = this.killSeed.nextInt(enemies.size()) - 1;
 			if(index < 0) {
 				index = 0;
@@ -780,12 +872,16 @@ public class WarEntityListener implements Listener {
 		}
 	}
 	
-	private void callInAirstrike(Location l) {
+	private void callInAirstrike(Location l, Player p) {
 		Location tntPlace = new Location(l.getWorld(), l.getX(), Warzone.getZoneByLocation(l).getVolume().getMaxY(), l.getZ());
-		l.getWorld().spawnEntity(tntPlace, EntityType.PRIMED_TNT);
-		l.getWorld().spawnEntity(tntPlace.add(new Vector(2, 0, 0)), EntityType.PRIMED_TNT);
-		l.getWorld().spawnEntity(tntPlace.add(new Vector(2, 0, 2)), EntityType.PRIMED_TNT);
-		l.getWorld().spawnEntity(tntPlace.add(new Vector(0, 0, 2)), EntityType.PRIMED_TNT);
+		TNTPrimed[] tnt = new TNTPrimed[4];
+		tnt[0] = (TNTPrimed) l.getWorld().spawnEntity(tntPlace, EntityType.PRIMED_TNT);
+		tnt[1] = (TNTPrimed) l.getWorld().spawnEntity(tntPlace.add(new Vector(2, 0, 0)), EntityType.PRIMED_TNT);
+		tnt[2] = (TNTPrimed) l.getWorld().spawnEntity(tntPlace.add(new Vector(2, 0, 2)), EntityType.PRIMED_TNT);
+		tnt[3] = (TNTPrimed) l.getWorld().spawnEntity(tntPlace.add(new Vector(0, 0, 2)), EntityType.PRIMED_TNT);
+		for(TNTPrimed t : tnt) {
+			t.setMetadata("WarKillstreak", new KillstreakMetadata(5, p.getEntityId()));
+		}
 	}
 	
 	private void doThreeKillstreak(Player p, Team t) {
