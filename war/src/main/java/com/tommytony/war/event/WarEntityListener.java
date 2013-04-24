@@ -510,13 +510,13 @@ public class WarEntityListener implements Listener {
 			    if(even.getDamager() instanceof Wolf) {
 				    List<MetadataValue> metadata = even.getDamager().getMetadata("WarKillstreak");
 				    if((metadata.isEmpty()) || (metadata == null)) {
-					    return;
-				    }
-				    int killstreak = (int) (metadata.get(0).asLong() >> 32);
-				    if((killstreak == 7)) {
-				        //amp this wolf
-					    event.setDamage(event.getDamage() + 5); //2.5 more hearts per hit
-					    return;
+				    	
+				    } else {
+				        int killstreak = (int) (metadata.get(0).asLong() >> 32);
+				        if((killstreak == 7)) {
+				            //amp this wolf
+					        event.setDamage(event.getDamage() + 5); //2.5 more hearts per hit
+				        }
 				    }
 			    }
 			}
