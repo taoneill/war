@@ -34,7 +34,13 @@ public class TeamCommand extends AbstractWarCommand {
 		String teamMessage = color + player.getName() + ": " + ChatColor.WHITE;
 		
 		if(this.args.length == 0) {
-			playerTeam.addToTeamchat(player);
+			if(playerTeam.inTeamChat(player)) {
+			    playerTeam.addToTeamchat(player);
+			    this.msg("You are now in teamchat.");
+			} else {
+				playerTeam.removeFromTeamchat(player);
+				this.msg("You are in normal chat now.");
+			}
 			return true;
 		}
 		
