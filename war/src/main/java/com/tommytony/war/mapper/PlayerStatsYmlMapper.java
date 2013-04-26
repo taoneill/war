@@ -77,15 +77,15 @@ public class PlayerStatsYmlMapper {
 	}
 	
 	public static ConfigurationSection getConfigSection(Player p) {
-		ConfigurationSection rootConfigSection = getConfig().createSection("set");
+		ConfigurationSection rootConfigSection = getConfig().getConfigurationSection("set");
 		ConfigurationSection playerConfigSection;
-		if(!getConfig().contains(p.getName())) {
+		if(rootConfigSection.get("war.stats." + p.getName()) == null){
 			War.war.log("No section for player " + p.getName() + " in stats file, creating one.", Level.INFO);
 			playerConfigSection = rootConfigSection.createSection("war.stats." + p.getName());
-			playerConfigSection.addDefault("kill", 0);
-			playerConfigSection.addDefault("death", 0);
-			playerConfigSection.addDefault("win", 0);
-			playerConfigSection.addDefault("loss", 0);
+			playerConfigSection.set("kill", 0);
+			playerConfigSection.set("death", 0);
+			playerConfigSection.set("win", 0);
+			playerConfigSection.set("loss", 0);
 		} else {
 			playerConfigSection = rootConfigSection.getConfigurationSection("war.stats." + p.getName());
 		}
@@ -94,5 +94,13 @@ public class PlayerStatsYmlMapper {
 	
 	public static YamlConfiguration getConfig() {
 		return pStatsYml;
+	}
+	
+	public static void saveToDisk() {
+		try {
+		    pStatsYml.save(new File(War.war.getDataFolder().getPath() + "/stat/pstat.yml"));
+		} catch(IOException e) {
+			War.war.log("Failed to save Stats file to disk", Level.SEVERE);
+		}
 	}
 }

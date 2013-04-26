@@ -27,6 +27,7 @@ import com.tommytony.war.config.TeamSpawnStyle;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.utility.Direction;
+import com.tommytony.war.utility.PlayerStatTracker;
 import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
@@ -716,6 +717,7 @@ public class Team {
 	
 	public void incKills(Player p) {
 		this.kills.put(p, this.getKills(p) + 1);
+		PlayerStatTracker.getStats(p).incKills(); //increment our kills
 	}
 	
 	public void zeroKills(Player p) {

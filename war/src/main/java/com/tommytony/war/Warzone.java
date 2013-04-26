@@ -45,6 +45,7 @@ import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.structure.ZoneWallGuard;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.PlayerStatTracker;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.BlockInfo;
@@ -432,6 +433,7 @@ public class Warzone {
 		}
 
 		this.lastDamagers.put(player, null); //update it so last damager is null
+		PlayerStatTracker.getStats(player).incDeaths(); //update our deaths
 		
 		// Spout
 		if (War.war.isSpoutServer()) {
@@ -1166,6 +1168,7 @@ public class Warzone {
 			}
 			
             this.lastDamagers.remove(player); //will prevent a memory leak!
+            playerTeam.removeFromTeamchat(player);
             
 			boolean zoneEmpty = true;
 			for (Team team : this.getTeams()) {

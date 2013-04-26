@@ -3,6 +3,7 @@ package com.tommytony.war;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -41,6 +45,7 @@ import com.tommytony.war.event.WarPlayerListener;
 import com.tommytony.war.event.WarServerListener;
 import com.tommytony.war.job.HelmetProtectionTask;
 import com.tommytony.war.job.SpoutFadeOutMessageJob;
+import com.tommytony.war.mapper.PlayerStatsYmlMapper;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
@@ -95,6 +100,9 @@ public class War extends JavaPlugin {
 	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
 	private SpoutDisplayer spoutMessenger = null;
+	
+	private File storageConfigFile = new File(this.getDataFolder() + "storagecfg.yml");
+	private FileConfiguration storageConfiguration = null;
 
 	private Logger warLogger;
 
@@ -241,6 +249,7 @@ public class War extends JavaPlugin {
 		
 		// Load files
 		WarYmlMapper.load();
+		PlayerStatsYmlMapper.init();
 		
 		// Start tasks
 		HelmetProtectionTask helmetProtectionTask = new HelmetProtectionTask();
@@ -249,6 +258,12 @@ public class War extends JavaPlugin {
 		if (this.isSpoutServer) {
 			SpoutFadeOutMessageJob fadeOutMessagesTask = new SpoutFadeOutMessageJob();
 			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, fadeOutMessagesTask, 100, 100);
+		}
+		
+		try {
+			this.storageConfigFile.createNewFile();
+		} catch(IOException e) {
+			this.getLogger().log(Level.WARNING, "Failed to open storage configuration file");
 		}
 		
 		// Get own log file
@@ -293,6 +308,7 @@ public class War extends JavaPlugin {
 
 		this.getServer().getScheduler().cancelTasks(this);
 		this.playerListener.purgeLatestPositions();
+		PlayerStatsYmlMapper.saveToDisk();
 
 		this.log("War v" + this.desc.getVersion() + " is off.", Level.INFO);
 		this.setLoaded(false);
@@ -1169,5 +1185,25 @@ public class War extends JavaPlugin {
 	
 	public WarEntityListener getEntityListener() {
 		return this.entityListener;
+	}
+	
+	public FileConfiguration getStorageConfig() {
+		if(this.storageConfiguration == null) {
+			this.reloadStorageConfig();
+		}
+		return this.storageConfiguration;
+	}
+	
+	public void reloadStorageConfig() {
+		this.storageConfiguration = YamlConfiguration.loadConfiguration(this.storageConfigFile);
+		Map<String, Object> storageDefaults = Collections.emptyMap();
+		//defaults for storage config
+		storageDefaults.put("flatfile", false);
+		storageDefaults.put("database.sql.host", "localhost");
+		storageDefaults.put("database.sql.user", "root");
+		storageDefaults.put("database.sql.password", "12345");
+		storageDefaults.put("database.sql.databasename", "war_stats");
+		storageDefaults.put("database.sql.database", "mysql"); //mysql or sqllite
+		this.storageConfiguration.addDefaults(storageDefaults);
 	}
 }

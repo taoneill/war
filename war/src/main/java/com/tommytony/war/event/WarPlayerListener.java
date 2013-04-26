@@ -44,6 +44,7 @@ import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.PlayerStatTracker;
 
 /**
  * @author tommytony, Tim Düsterhus, grinning
@@ -66,7 +67,9 @@ public class WarPlayerListener implements Listener {
 			if (zone != null) {
 				zone.handlePlayerLeave(player, zone.getTeleport(), true);
 			}
-
+			//serialize your stats, removes you from the stat tracking in memory, preventing a long term leak
+			PlayerStatTracker.serialize(player);
+			
 			if (War.war.isWandBearer(player)) {
 				War.war.removeWandBearer(player);
 			}
@@ -253,6 +256,10 @@ public class WarPlayerListener implements Listener {
 	public void onPlayerMove(final PlayerMoveEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
+		}
+		
+		if(PlayerStatTracker.getStats(event.getPlayer()) == null) {
+			new PlayerStatTracker(event.getPlayer());
 		}
 		
 		Player player = event.getPlayer();
