@@ -908,6 +908,7 @@ public class WarPlayerListener implements Listener {
 		}
 		//we are in team chat!
 		team.teamcast(team.getKind().getColor() + player.getDisplayName() + ": " + ChatColor.WHITE + event.getMessage());
+		event.setCancelled(true); //will come up in normal chat if we let it
 	}
 	
 }
