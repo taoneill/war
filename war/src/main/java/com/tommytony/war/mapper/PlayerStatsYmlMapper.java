@@ -10,16 +10,11 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
 
-public class PlayerStatsYmlMapper {
+public class PlayerStatsYmlMapper implements PlayerStatsMapper {
 
 	private static YamlConfiguration pStatsYml;
 	
-	public final static int KILL = 4;
-	public final static int LOSS = 5;
-	public final static int WIN = 6;
-	public final static int DEATH = 7;
-	
-	public static File load() {
+	public File load() {
 		(War.war.getDataFolder()).mkdir();
 		(new File(War.war.getDataFolder(), "stat")).mkdir();
 		File pStatFile = new File(War.war.getDataFolder().getPath() + "/stat/pstat.yml");
@@ -35,12 +30,12 @@ public class PlayerStatsYmlMapper {
 		return pStatFile;
 	}
 	
-	public static void init() {
-		pStatsYml = YamlConfiguration.loadConfiguration(load());
+	public void init() {
+		pStatsYml = YamlConfiguration.loadConfiguration(this.load());
 		pStatsYml.createSection("set");
 	}
 	
-	public static int load(Player p, int stat) {
+	public int load(Player p, int stat) {
 		ConfigurationSection playerConfigSection = getConfigSection(p);
 		switch(stat) {
 		    case KILL:
@@ -56,28 +51,46 @@ public class PlayerStatsYmlMapper {
 		}
 	}
 	
-	public static void save(Player p, int stat, int updateAmt) {
+	public int[] load(Player p) {
+		ConfigurationSection playerConfigSection = getConfigSection(p);
+		int[] ret = new int[4];
+		ret[0] = playerConfigSection.getInt("kill");
+		ret[1] = playerConfigSection.getInt("death");
+		ret[2] = playerConfigSection.getInt("win");
+		ret[3] = playerConfigSection.getInt("loss");
+		return ret;
+	}
+	
+	public void save(Player p, int stat, int amt) {
 		ConfigurationSection playerConfigSection = getConfigSection(p);
 		switch(stat) {
 		    case KILL:
-		        playerConfigSection.set("kill", playerConfigSection.getInt("kill") + updateAmt);
+		        playerConfigSection.set("kill", amt);
 		        return;
 		    case DEATH:
-			    playerConfigSection.set("death", playerConfigSection.getInt("death") + updateAmt);
+			    playerConfigSection.set("death", amt);
 			    return;
 		    case WIN:
-			    playerConfigSection.set("win", playerConfigSection.getInt("win") + updateAmt);
+			    playerConfigSection.set("win", amt);
 			    return;
 		    case LOSS:
-			    playerConfigSection.set("loss", playerConfigSection.getInt("loss") + updateAmt);
+			    playerConfigSection.set("loss", amt);
 			    return;
 			default:
 				return;
 		}
 	}
 	
-	public static ConfigurationSection getConfigSection(Player p) {
-		ConfigurationSection rootConfigSection = getConfig().getConfigurationSection("set");
+	public void save(Player p, int[] stats) {
+		ConfigurationSection playerConfigSection = getConfigSection(p);
+		playerConfigSection.set("kill", stats[0]);
+		playerConfigSection.set("death", stats[1]);
+		playerConfigSection.set("win", stats[2]);
+		playerConfigSection.set("loss", stats[3]);
+	}
+	
+	public ConfigurationSection getConfigSection(Player p) {
+		ConfigurationSection rootConfigSection = this.getConfig().getConfigurationSection("set");
 		ConfigurationSection playerConfigSection;
 		if(rootConfigSection.get("war.stats." + p.getName()) == null){
 			War.war.log("No section for player " + p.getName() + " in stats file, creating one.", Level.INFO);
@@ -92,15 +105,19 @@ public class PlayerStatsYmlMapper {
 		return playerConfigSection;
 	}
 	
-	public static YamlConfiguration getConfig() {
+	public YamlConfiguration getConfig() {
 		return pStatsYml;
 	}
 	
-	public static void saveToDisk() {
+	public void saveToDisk() {
 		try {
 		    pStatsYml.save(new File(War.war.getDataFolder().getPath() + "/stat/pstat.yml"));
 		} catch(IOException e) {
 			War.war.log("Failed to save Stats file to disk", Level.SEVERE);
 		}
+	}
+
+	public void close() {
+		this.saveToDisk();
 	}
 }

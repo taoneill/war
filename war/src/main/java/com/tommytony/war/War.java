@@ -45,6 +45,9 @@ import com.tommytony.war.event.WarPlayerListener;
 import com.tommytony.war.event.WarServerListener;
 import com.tommytony.war.job.HelmetProtectionTask;
 import com.tommytony.war.job.SpoutFadeOutMessageJob;
+import com.tommytony.war.mapper.PlayerStatsMapper;
+import com.tommytony.war.mapper.PlayerStatsMySqlMapper;
+import com.tommytony.war.mapper.PlayerStatsSqliteMapper;
 import com.tommytony.war.mapper.PlayerStatsYmlMapper;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
@@ -103,6 +106,8 @@ public class War extends JavaPlugin {
 	
 	private File storageConfigFile = new File(this.getDataFolder() + "storagecfg.yml");
 	private FileConfiguration storageConfiguration = null;
+	
+	private PlayerStatsMapper statMapper = null;
 
 	private Logger warLogger;
 
@@ -249,7 +254,6 @@ public class War extends JavaPlugin {
 		
 		// Load files
 		WarYmlMapper.load();
-		PlayerStatsYmlMapper.init();
 		
 		// Start tasks
 		HelmetProtectionTask helmetProtectionTask = new HelmetProtectionTask();
@@ -262,6 +266,17 @@ public class War extends JavaPlugin {
 		
 		try {
 			this.storageConfigFile.createNewFile();
+			FileConfiguration storageYmlFile = this.getStorageConfig();
+			if(storageYmlFile.getBoolean("flatfile")) { //use a flatfile
+				this.statMapper = new PlayerStatsYmlMapper();
+			} else {
+				if(storageYmlFile.getString("database.sql.database") == "sqlite") {
+					this.statMapper = new PlayerStatsSqliteMapper();
+				} else { //if we are not sqlite we will use mysql 
+					this.statMapper = new PlayerStatsMySqlMapper();
+				}
+			}
+			this.statMapper.init();
 		} catch(IOException e) {
 			this.getLogger().log(Level.WARNING, "Failed to open storage configuration file");
 		}
@@ -308,7 +323,7 @@ public class War extends JavaPlugin {
 
 		this.getServer().getScheduler().cancelTasks(this);
 		this.playerListener.purgeLatestPositions();
-		PlayerStatsYmlMapper.saveToDisk();
+		this.statMapper.close();
 
 		this.log("War v" + this.desc.getVersion() + " is off.", Level.INFO);
 		this.setLoaded(false);
@@ -1194,7 +1209,7 @@ public class War extends JavaPlugin {
 		return this.storageConfiguration;
 	}
 	
-	public void reloadStorageConfig() {
+	private void reloadStorageConfig() {
 		this.storageConfiguration = YamlConfiguration.loadConfiguration(this.storageConfigFile);
 		Map<String, Object> storageDefaults = Collections.emptyMap();
 		//defaults for storage config
@@ -1205,5 +1220,9 @@ public class War extends JavaPlugin {
 		storageDefaults.put("database.sql.databasename", "war_stats");
 		storageDefaults.put("database.sql.database", "mysql"); //mysql or sqllite
 		this.storageConfiguration.addDefaults(storageDefaults);
+	}
+	
+	public PlayerStatsMapper getStatMapper() {
+		return this.statMapper;
 	}
 }

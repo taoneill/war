@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
+import com.tommytony.war.War;
 import com.tommytony.war.mapper.PlayerStatsYmlMapper;
 
 /*
@@ -27,10 +28,9 @@ public class PlayerStatTracker {
 	
 	public static void serialize(Player p) {
 		//write to disk
-		PlayerStatsYmlMapper.save(p, PlayerStatsYmlMapper.KILL, stats.get(p).getKills());
-		PlayerStatsYmlMapper.save(p, PlayerStatsYmlMapper.DEATH, stats.get(p).getDeaths());
-		PlayerStatsYmlMapper.save(p, PlayerStatsYmlMapper.WIN, stats.get(p).getWins());
-		PlayerStatsYmlMapper.save(p, PlayerStatsYmlMapper.LOSS, stats.get(p).getLosses());
+		PlayerStatTracker statTrack = stats.get(p);
+		War.war.getStatMapper().save(p, new int[] {statTrack.getKills(), statTrack.getDeaths(),
+				statTrack.getWins(), statTrack.getLosses()});
 		//and remove player from memory
 		stats.remove(p);
 	}
