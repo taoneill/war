@@ -43,10 +43,11 @@ public class PlayerStatTracker {
 	private int losses;
 	
 	public PlayerStatTracker(Player p) {
-		this.kills = 0;
-		this.deaths = 0;
-		this.wins = 0;
-		this.losses = 0;
+		int[] stats = War.war.getStatMapper().load(p);
+		this.kills = stats[0];
+		this.deaths = stats[0];
+		this.wins = stats[0];
+		this.losses = stats[0];
 		addTracking(p, this);
 	}
 	

@@ -104,7 +104,7 @@ public class War extends JavaPlugin {
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
 	private SpoutDisplayer spoutMessenger = null;
 	
-	private File storageConfigFile = new File(this.getDataFolder() + "storagecfg.yml");
+	private File storageConfigFile = new File("plugins/War/storagecfg.yml");
 	private FileConfiguration storageConfiguration = null;
 	
 	private PlayerStatsMapper statMapper = null;
@@ -270,10 +270,12 @@ public class War extends JavaPlugin {
 			if(storageYmlFile.getBoolean("flatfile")) { //use a flatfile
 				this.statMapper = new PlayerStatsYmlMapper();
 			} else {
-				if(storageYmlFile.getString("database.sql.database") == "sqlite") {
+				if(storageYmlFile.getString("database.sql.database").trim().contains("sqlite")) {
 					this.statMapper = new PlayerStatsSqliteMapper();
-				} else { //if we are not sqlite we will use mysql 
+				} else if(storageYmlFile.getString("database.sql.database").contains("mysql")) { //if we are not sqlite we will use mysql 
 					this.statMapper = new PlayerStatsMySqlMapper();
+				} else {
+					this.statMapper = new PlayerStatsYmlMapper();
 				}
 			}
 			this.statMapper.init();
@@ -1211,18 +1213,32 @@ public class War extends JavaPlugin {
 	
 	private void reloadStorageConfig() {
 		this.storageConfiguration = YamlConfiguration.loadConfiguration(this.storageConfigFile);
-		Map<String, Object> storageDefaults = Collections.emptyMap();
+		Map<String, Object> storageDefaults = new HashMap<String, Object>(6);
 		//defaults for storage config
 		storageDefaults.put("flatfile", false);
 		storageDefaults.put("database.sql.host", "localhost");
 		storageDefaults.put("database.sql.user", "root");
 		storageDefaults.put("database.sql.password", "12345");
-		storageDefaults.put("database.sql.databasename", "war_stats");
-		storageDefaults.put("database.sql.database", "mysql"); //mysql or sqllite
+		storageDefaults.put("database.sql.database", "sqlite"); //mysql or sqllite
 		this.storageConfiguration.addDefaults(storageDefaults);
+		if(this.storageConfigFile.lastModified() < 50) {
+	        for(Map.Entry<String, Object> entry : storageDefaults.entrySet()) {
+	    	    this.storageConfiguration.set(entry.getKey(), entry.getValue());
+	        }
+		}
+		try {
+			this.storageConfiguration.save(this.storageConfigFile);
+		} catch (IOException e) {
+			War.war.log("Failed to save Storage Configuration File", Level.WARNING);
+		}
 	}
 	
 	public PlayerStatsMapper getStatMapper() {
 		return this.statMapper;
+	}
+	
+	public void setStatMapper(PlayerStatsMapper map) {
+		this.statMapper = map;
+		this.statMapper.init();
 	}
 }

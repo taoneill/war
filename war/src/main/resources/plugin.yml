@@ -1,10 +1,11 @@
 name: War
-version: 1.7.4 (Doolittle)
+version: 1.8.1 (Lee)
 description: Minecraft PVP arenas (called warzones) for a fast-paced and structured PVP experience with TDM, CTF & more!
 author: tommytony
 website: http://war.tommytony.com
 main: com.tommytony.war.War
 softdepend: [Spout]
+database: true
 permissions:
   war.*:
     description: Full War permissions. Create and destroy warzones. Change War configuration.

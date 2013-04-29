@@ -12,9 +12,14 @@ public class PlayerStatsSqliteMapper extends PlayerStatsDatabaseMapper {
 	@Override
 	protected Connection getConnection() {
 		try {
-			return DriverManager.getConnection("jdbc:sqlite:plugins/War/" + War.war.getStorageConfig().getString("database.sql.database_name"));
+			Class.forName("org.sqlite.JDBC");
+			return DriverManager.getConnection("jdbc:sqlite:" + War.war.getDataFolder().getAbsolutePath() + "/War.db");
 		} catch (SQLException e) {
-			War.war.log("Failed to connect to sqlite database", Level.SEVERE);
+			War.war.log("Failed to connect to sqlite database ", Level.SEVERE);
+			e.printStackTrace();
+			return null;
+		} catch (ClassNotFoundException e) {
+			War.war.log("No Sqlite library found!", Level.SEVERE);
 			return null;
 		}
 	}

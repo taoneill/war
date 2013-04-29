@@ -1,6 +1,7 @@
 package com.tommytony.war.mapper;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,17 +22,26 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		try {
 		    Connection c = this.getConnection();
 		    Statement s = c.createStatement();
-		    s.executeUpdate("CREATE TABLE if not exists stats ("
-		            + "name varchar(64)" //64 should be enough characters for the name
-		            + "kills int"
-		            + "deaths int"
-		            + "wins int"
+		    ResultSet r = null;
+		    DatabaseMetaData dbm = c.getMetaData();
+		    r = dbm.getTables(null, null, "stats", null);
+		    if(!r.next()) {
+		        s.execute("CREATE TABLE stats ("
+		            + "name varchar(64)," //64 should be enough characters for the name
+		            + "kills int,"
+		            + "deaths int,"
+		            + "wins int,"
 		            + "losses int"
-		    		+ ")");
+		    		+ ");");
+		    }
 		    s.close();
 		    c.close();
 		} catch (SQLException e) {
-			War.war.log("Failed to connect to " + this.getDatabaseString() + " database", Level.WARNING);
+			War.war.log("Error initializing database", Level.WARNING);
+			e.printStackTrace();
+			System.out.println(e.getErrorCode());
+			War.war.log("Reverting to flatfile storage!", Level.INFO);
+			War.war.setStatMapper(new PlayerStatsYmlMapper());
 		}
 	}
 	
@@ -48,22 +58,22 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		        case KILL:
 		    	    ps = c.prepareStatement("SELECT kills FROM stats WHERE name = ?");
 		    	    ps.setString(1, player.getName());
-		    	    ret = this.determineResult(ps.executeQuery());
+		    	    ret = this.determineResult(ps.executeQuery(), player);
 		    	    break;
 		        case DEATH:
 		    	    ps = c.prepareStatement("SELECT deaths FROM stats WHERE name = ?");
 		    	    ps.setString(1, player.getName());
-		    	    ret = this.determineResult(ps.executeQuery());
+		    	    ret = this.determineResult(ps.executeQuery(), player);
 		    	    break;
 		        case WIN:
 		    	    ps = c.prepareStatement("SELECT wins FROM stats WHERE name = ?");
 		    	    ps.setString(1, player.getName());
-		    	    ret = this.determineResult(ps.executeQuery());
+		    	    ret = this.determineResult(ps.executeQuery(), player);
 		    	    break;
 		        case LOSS:
 		    	    ps = c.prepareStatement("SELECT losses FROM stats WHERE name = ?");
 		    	    ps.setString(1, player.getName());
-		    	    ret = this.determineResult(ps.executeQuery());
+		    	    ret = this.determineResult(ps.executeQuery(), player);
 		    	    break;
 		        default:
 		    	    ret = 0;
@@ -84,6 +94,12 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		    PreparedStatement ps = c.prepareStatement("SELECT kills,deaths,wins,losses FROM stats where name = ?");
 		    ps.setString(1, p.getName());
 		    ResultSet res = ps.executeQuery();
+		    if(this.determineResult(res, p) == -1) { //this should create a new entry for them, we happen to know the stats for that instance
+		    	res.close(); //cleanup and return
+		    	ps.close();
+		    	c.close();
+		    	return new int[] {0, 0, 0, 0};
+		    }
 		    for(int i = 0; i < 4; i++) {
 		    	ret[i] = res.getInt(i + 1);
 		    }
@@ -166,9 +182,10 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		}
 	}
 	
-	private int determineResult(ResultSet set) {
+	private int determineResult(ResultSet set, Player p) {
 		try {
 		    if(set.wasNull()) {
+		    	this.save(p, null, true);
 			    return -1;
 		    } 
 		    return set.getInt(1);
