@@ -12,7 +12,8 @@ public enum TeamConfig {
 	RESPAWNTIMER (Integer.class),
 	SATURATION (Integer.class),
 	SPAWNSTYLE (TeamSpawnStyle.class),
-	TEAMSIZE (Integer.class);
+	TEAMSIZE (Integer.class),
+        PERMISSION (String.class);
 	
 	private final Class<?> configType;
 
