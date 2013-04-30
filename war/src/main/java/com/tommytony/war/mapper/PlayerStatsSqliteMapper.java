@@ -13,7 +13,7 @@ public class PlayerStatsSqliteMapper extends PlayerStatsDatabaseMapper {
 	protected Connection getConnection() {
 		try {
 			Class.forName("org.sqlite.JDBC");
-			return DriverManager.getConnection("jdbc:sqlite:" + War.war.getDataFolder().getAbsolutePath() + "/War.db");
+			return DriverManager.getConnection("jdbc:sqlite:" + this.parseDatabaseName(War.war.getStorageConfig().getString("database.sql.databaselocation")));
 		} catch (SQLException e) {
 			War.war.log("Failed to connect to sqlite database ", Level.SEVERE);
 			e.printStackTrace();

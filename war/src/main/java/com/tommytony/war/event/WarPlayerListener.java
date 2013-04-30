@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -37,6 +38,7 @@ import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.job.CantReEnterSpawnJob;
+import com.tommytony.war.mapper.PlayerStatsMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
@@ -916,6 +918,14 @@ public class WarPlayerListener implements Listener {
 		//we are in team chat!
 		team.teamcast(team.getKind().getColor() + player.getDisplayName() + ": " + ChatColor.WHITE + event.getMessage());
 		event.setCancelled(true); //will come up in normal chat if we let it
+	}
+	
+	@EventHandler
+	public void onPlayerLogin(final AsyncPlayerPreLoginEvent event) {
+		//we are going to be totaly async because we are just checking OUR database
+		if(War.war.getStatMapper().load(event.getName(), PlayerStatsMapper.KILL) == -1) {
+			War.war.getStatMapper().save(event.getName(), null, true); //this is the only reason we fire the event...
+		}
 	}
 	
 }

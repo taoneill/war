@@ -6,7 +6,6 @@ import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
 
@@ -35,7 +34,7 @@ public class PlayerStatsYmlMapper implements PlayerStatsMapper {
 		pStatsYml.createSection("set");
 	}
 	
-	public int load(Player p, int stat) {
+	public int load(String p, int stat) {
 		ConfigurationSection playerConfigSection = getConfigSection(p);
 		switch(stat) {
 		    case KILL:
@@ -47,12 +46,15 @@ public class PlayerStatsYmlMapper implements PlayerStatsMapper {
 		    case LOSS:
 		    	return playerConfigSection.getInt("loss");
 		    default:
-		    	return 0;
+		    	return -1;
 		}
 	}
 	
-	public int[] load(Player p) {
+	public int[] load(String p) {
 		ConfigurationSection playerConfigSection = getConfigSection(p);
+		if(playerConfigSection == null) {
+			return new int[] {0, 0, 0, 0};
+		}
 		int[] ret = new int[4];
 		ret[0] = playerConfigSection.getInt("kill");
 		ret[1] = playerConfigSection.getInt("death");
@@ -61,7 +63,7 @@ public class PlayerStatsYmlMapper implements PlayerStatsMapper {
 		return ret;
 	}
 	
-	public void save(Player p, int stat, int amt) {
+	public void save(String p, int stat, int amt) {
 		ConfigurationSection playerConfigSection = getConfigSection(p);
 		switch(stat) {
 		    case KILL:
@@ -81,28 +83,13 @@ public class PlayerStatsYmlMapper implements PlayerStatsMapper {
 		}
 	}
 	
-	public void save(Player p, int[] stats) {
-		ConfigurationSection playerConfigSection = getConfigSection(p);
-		playerConfigSection.set("kill", stats[0]);
-		playerConfigSection.set("death", stats[1]);
-		playerConfigSection.set("win", stats[2]);
-		playerConfigSection.set("loss", stats[3]);
+	public void save(String p, int[] stats) {
+		this.save(p, stats, false);
 	}
 	
-	public ConfigurationSection getConfigSection(Player p) {
+	public ConfigurationSection getConfigSection(String p) {
 		ConfigurationSection rootConfigSection = this.getConfig().getConfigurationSection("set");
-		ConfigurationSection playerConfigSection;
-		if(rootConfigSection.get("war.stats." + p.getName()) == null){
-			War.war.log("No section for player " + p.getName() + " in stats file, creating one.", Level.INFO);
-			playerConfigSection = rootConfigSection.createSection("war.stats." + p.getName());
-			playerConfigSection.set("kill", 0);
-			playerConfigSection.set("death", 0);
-			playerConfigSection.set("win", 0);
-			playerConfigSection.set("loss", 0);
-		} else {
-			playerConfigSection = rootConfigSection.getConfigurationSection("war.stats." + p.getName());
-		}
-		return playerConfigSection;
+		return rootConfigSection.getConfigurationSection("war.stats." + p);
 	}
 	
 	public YamlConfiguration getConfig() {
@@ -119,5 +106,23 @@ public class PlayerStatsYmlMapper implements PlayerStatsMapper {
 
 	public void close() {
 		this.saveToDisk();
+	}
+
+	public void save(String player, int[] stats, boolean makeNewPlayer) {
+		ConfigurationSection rootConfigSection = this.getConfig().getConfigurationSection("set");
+		ConfigurationSection playerConfigSection;
+		if(makeNewPlayer) {
+			playerConfigSection = rootConfigSection.createSection("war.stats." + player);
+			playerConfigSection.set("kill", 0);
+			playerConfigSection.set("death", 0);
+			playerConfigSection.set("win", 0);
+			playerConfigSection.set("loss", 0);
+		} else {
+            playerConfigSection = rootConfigSection.createSection("war.stats." + player);
+			playerConfigSection.set("kill", stats[0]);
+			playerConfigSection.set("death", stats[1]);
+			playerConfigSection.set("win", stats[2]);
+			playerConfigSection.set("loss", stats[3]);
+		}
 	}
 }

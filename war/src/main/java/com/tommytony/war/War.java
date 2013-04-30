@@ -1218,8 +1218,10 @@ public class War extends JavaPlugin {
 		storageDefaults.put("flatfile", false);
 		storageDefaults.put("database.sql.host", "localhost");
 		storageDefaults.put("database.sql.user", "root");
+		storageDefaults.put("database.sql.databaselocation", "$WAR/War.db");
 		storageDefaults.put("database.sql.password", "12345");
 		storageDefaults.put("database.sql.database", "sqlite"); //mysql or sqllite
+		storageDefaults.put("database.sql.databasename", "bukkit");
 		this.storageConfiguration.addDefaults(storageDefaults);
 		if(this.storageConfigFile.lastModified() < 50) {
 	        for(Map.Entry<String, Object> entry : storageDefaults.entrySet()) {

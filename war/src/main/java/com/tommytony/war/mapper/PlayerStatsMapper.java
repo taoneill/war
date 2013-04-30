@@ -17,12 +17,14 @@ public interface PlayerStatsMapper {
 	public void close();
 	
 	//loads the stats for the given player
-	public int load(Player player, int stat);
+	public int load(String player, int stat);
 	
-	public int[] load(Player player);
+	public int[] load(String player);
 	
 	//saves the stats for the given player
-	public void save(Player player, int stat, int amt);
+	public void save(String player, int stat, int amt);
 	
-	public void save(Player player, int[] stats);
+	public void save(String player, int[] stats);
+	
+	public void save(String player, int stats[], boolean makeNewPlayer);
 }

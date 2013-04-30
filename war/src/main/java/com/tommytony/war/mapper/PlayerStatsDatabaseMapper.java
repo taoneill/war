@@ -8,8 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-import org.bukkit.entity.Player;
-
 import com.tommytony.war.War;
 
 public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
@@ -22,6 +20,7 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		try {
 		    Connection c = this.getConnection();
 		    Statement s = c.createStatement();
+		    //check for an existing table!
 		    ResultSet r = null;
 		    DatabaseMetaData dbm = c.getMetaData();
 		    r = dbm.getTables(null, null, "stats", null);
@@ -32,7 +31,7 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		            + "deaths int,"
 		            + "wins int,"
 		            + "losses int"
-		    		+ ");");
+		    		+ ")");
 		    }
 		    s.close();
 		    c.close();
@@ -49,7 +48,7 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		
 	}
     
-    public int load(Player player, int stat) {
+    public int load(String player, int stat) {
 		Connection c = this.getConnection();
 		PreparedStatement ps = null;
 		int ret = 0;
@@ -57,22 +56,22 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		    switch(stat) {
 		        case KILL:
 		    	    ps = c.prepareStatement("SELECT kills FROM stats WHERE name = ?");
-		    	    ps.setString(1, player.getName());
+		    	    ps.setString(1, player);
 		    	    ret = this.determineResult(ps.executeQuery(), player);
 		    	    break;
 		        case DEATH:
 		    	    ps = c.prepareStatement("SELECT deaths FROM stats WHERE name = ?");
-		    	    ps.setString(1, player.getName());
+		    	    ps.setString(1, player);
 		    	    ret = this.determineResult(ps.executeQuery(), player);
 		    	    break;
 		        case WIN:
 		    	    ps = c.prepareStatement("SELECT wins FROM stats WHERE name = ?");
-		    	    ps.setString(1, player.getName());
+		    	    ps.setString(1, player);
 		    	    ret = this.determineResult(ps.executeQuery(), player);
 		    	    break;
 		        case LOSS:
 		    	    ps = c.prepareStatement("SELECT losses FROM stats WHERE name = ?");
-		    	    ps.setString(1, player.getName());
+		    	    ps.setString(1, player);
 		    	    ret = this.determineResult(ps.executeQuery(), player);
 		    	    break;
 		        default:
@@ -87,12 +86,12 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		return ret;
 	}
     
-    public int[] load(Player p) {
+    public int[] load(String p) {
     	int[] ret = new int[4];
     	try {
 		    Connection c = this.getConnection();
 		    PreparedStatement ps = c.prepareStatement("SELECT kills,deaths,wins,losses FROM stats where name = ?");
-		    ps.setString(1, p.getName());
+		    ps.setString(1, p);
 		    ResultSet res = ps.executeQuery();
 		    if(this.determineResult(res, p) == -1) { //this should create a new entry for them, we happen to know the stats for that instance
 		    	res.close(); //cleanup and return
@@ -112,7 +111,7 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		return ret;
 	}
     
-	public void save(Player player, int stat, int data) {
+	public void save(String player, int stat, int data) {
 		try {
 			Connection c = this.getConnection();
 			PreparedStatement ps = null;
@@ -135,7 +134,7 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 			        	return;
 			    }
 			    ps.setInt(1, data);
-			    ps.setString(2, player.getName());
+			    ps.setString(2, player);
 			    ps.executeUpdate();
 		    } else { //we need to create their stuff...
 		    	this.save(player, null, true); //it actually doesn't matter about the second arg in this case
@@ -145,17 +144,17 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		}
 	}
 	
-	public void save(Player player, int[] stats) {
+	public void save(String player, int[] stats) {
 		this.save(player, stats, false);
 	}
 	
-	private void save(Player player, int[] stats, boolean makeNewPlayer) {
+	public void save(String player, int[] stats, boolean makeNewPlayer) {
 		try {
 			Connection c = this.getConnection();
 			PreparedStatement ps = null;
 			if(makeNewPlayer) {
 				ps = c.prepareStatement("INSERT INTO stats (name, kills, deaths, wins, losses) VALUES (?, ?, ?, ?, ?)");
-				ps.setString(1, player.getName());
+				ps.setString(1, player);
 				for(int i = 2; i < 6; i++) {
 					ps.setInt(i, 0);
 				}
@@ -167,11 +166,11 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 				for(int i = 0; i < 4; i++) {
 					ps.setInt(i + 1, stats[i]);
 				}
-				ps.setString(5, player.getName());
+				ps.setString(5, player);
 				ps.executeUpdate();
 			} else {
 				ps = c.prepareStatement("INSERT INTO stats (name, kills, deaths, wins, losses) VALUES (?, ?, ?, ?, ?)");
-				ps.setString(1, player.getName());
+				ps.setString(1, player);
 				for(int i = 2; i < 6; i++) {
 					ps.setInt(i, 0);
 				}
@@ -182,16 +181,27 @@ public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 		}
 	}
 	
-	private int determineResult(ResultSet set, Player p) {
+	private int determineResult(ResultSet set, String p) {
 		try {
-		    if(set.wasNull()) {
-		    	this.save(p, null, true);
-			    return -1;
+		    if(set.next()) {
+			    set.getInt("kills");
+			    if(set.wasNull()) {
+			    	return -1;
+			    }
 		    } 
 		    return set.getInt(1);
 		} catch(SQLException e) {
 			War.war.log(this.getDatabaseString() + " error", Level.WARNING);
+			e.printStackTrace();
 		}
 		return -1;
+	}
+	
+	protected String parseDatabaseName(String configFileString) {
+		if(configFileString.startsWith("$WAR")) {
+			return War.war.getDataFolder().getAbsolutePath() + configFileString.substring(4, configFileString.length()); //@War means the War data folder
+		} else {
+			return configFileString;  //if we have no @WAR then we assume they entered the correct path to the database
+		}
 	}
 }
