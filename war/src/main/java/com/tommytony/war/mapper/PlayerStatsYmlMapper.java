@@ -9,6 +9,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.tommytony.war.War;
 
+/** 
+ * @author grinning
+ * @package com.tommytony.war.mapper
+ * @description Implementation of a Player Stats tracker for the YML format
+ */
+
 public class PlayerStatsYmlMapper implements PlayerStatsMapper {
 
 	private static YamlConfiguration pStatsYml;

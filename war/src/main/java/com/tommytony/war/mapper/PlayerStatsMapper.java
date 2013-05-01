@@ -1,6 +1,10 @@
 package com.tommytony.war.mapper;
 
-import org.bukkit.entity.Player;
+/**
+ * @author grinning
+ * @package com.tommytony.war.mapper
+ * @description Interface for any stat mapping data source
+ */
 
 public interface PlayerStatsMapper {
 

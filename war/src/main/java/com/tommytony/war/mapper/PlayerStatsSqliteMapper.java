@@ -7,6 +7,12 @@ import java.util.logging.Level;
 
 import com.tommytony.war.War;
 
+/**
+ * @author grinning
+ * @package com.tommytony.war.mapper
+ * @description A subclass that completes the Database Mapper class for the Sqlite Database
+ */
+
 public class PlayerStatsSqliteMapper extends PlayerStatsDatabaseMapper {
 	
 	@Override

@@ -830,7 +830,7 @@ public class WarEntityListener implements Listener {
 		int[] indices = new int[4];
 		int i = 0;
 		for(Wolf f : dogs) {
-			f = (Wolf) spawnLoc.getWorld().spawnEntity(spawnLoc, EntityType.WOLF);
+			f = (Wolf) spawnLoc.getWorld().spawnEntity(spawnLoc.add(new Vector(0, 1, 0)), EntityType.WOLF);
 			f.setAdult();
 			f.setMaxHealth(16);
 			f.setHealth(16); //goes down to 15 after we damage the wolf

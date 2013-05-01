@@ -10,6 +10,12 @@ import java.util.logging.Level;
 
 import com.tommytony.war.War;
 
+/**
+ * @author grinning
+ * @package com.tommytony.war.mapper
+ * @description Implementation of a Player Stat Tracker for a SQL (Standard Query Language) based database
+ */
+
 public abstract class PlayerStatsDatabaseMapper implements PlayerStatsMapper {
 
 	protected abstract String getDatabaseString();
