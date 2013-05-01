@@ -59,6 +59,7 @@ import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.utility.DeferredBlockReset;
 import com.tommytony.war.utility.KillstreakMetadata;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.PlayerStatTracker;
 
 /**
  * Handles Entity-Events
@@ -203,8 +204,6 @@ public class WarEntityListener implements Listener {
 						return;
 					}
 					
-				} else if(event.getDamage() >= d.getHealth()) {
-					defenderWarzone.updateLastDamager(d, a); //lets update so we can give credit
 				} else if (defenderWarzone.isBombThief(d.getName()) && d.getLocation().distance(a.getLocation()) < 2) {
 					// Close combat, close enough to detonate					
 					Bomb bomb = defenderWarzone.getBombForThief(d.getName());
@@ -215,6 +214,7 @@ public class WarEntityListener implements Listener {
 					if (defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
 						// and respawn him and remove from deadmen (cause realdeath + handleDeath means no respawn and getting queued up for onPlayerRespawn)
 						defenderWarzone.getReallyDeadFighters().remove(d.getName());
+						PlayerStatTracker.getStats(d).incDeaths();
 						defenderWarzone.respawnPlayer(defenderTeam, d);
 					}
 					

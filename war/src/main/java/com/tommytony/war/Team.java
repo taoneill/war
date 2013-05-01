@@ -61,6 +61,7 @@ public class Team {
 
 	private TeamConfigBag teamConfig;
 	private InventoryBag inventories;
+	private boolean spectator; //Zacraft feature request, setting grounds for it
 
 	public Team(String name, TeamKind kind, Location teamSpawn, Warzone warzone) {
 		this.warzone = warzone;
@@ -71,6 +72,7 @@ public class Team {
 		this.setSpawnVolume(new Volume(name, warzone.getWorld()));
 		this.kind = kind;
 		this.setFlagVolume(null); // no flag at the start
+		this.spectator = false;
 	}
 
 	public static Team getTeamByPlayerName(String playerName) {
@@ -451,6 +453,10 @@ public class Team {
 				this.removeSevenKillStreak(thePlayer);
 			}
 			
+			if(this.isSpectate()) {
+				thePlayer.setCanPickupItems(true); //spectators cant pick up anything
+			}
+			
 			if (this.warzone.isFlagThief(thePlayer.getName())) {
 				Team victim = this.warzone.getVictimTeamForFlagThief(thePlayer.getName());
 				victim.getFlagVolume().resetBlocks();
@@ -808,5 +814,9 @@ public class Team {
 			y.cancel();
 		}
 		this.doggieManagers.clear();
-	}	
+	}
+	
+	public boolean isSpectate() {
+		return this.spectator;
+	}
 }

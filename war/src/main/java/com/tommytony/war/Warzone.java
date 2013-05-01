@@ -475,7 +475,6 @@ public class Warzone {
 		}
 
 		this.lastDamagers.put(player, null); //update it so last damager is null
-		PlayerStatTracker.getStats(player).incDeaths(); //update our deaths
 		
 		// Spout
 		if (War.war.isSpoutServer()) {
@@ -984,6 +983,7 @@ public class Warzone {
 
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 
+		PlayerStatTracker.getStats(player).incDeaths();
 		// Make sure the player that died is still part of a team, game may have ended while waiting.
 		// Ignore dying players that essentially just got tp'ed to lobby and got their state restored.
 		// Gotta take care of restoring ReallyDeadFighters' game-end state when in onRespawn as well.

@@ -2,6 +2,7 @@ package com.tommytony.war.mapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -37,52 +38,52 @@ public class PlayerStatsYmlMapper implements PlayerStatsMapper {
 	
 	public void init() {
 		pStatsYml = YamlConfiguration.loadConfiguration(this.load());
-		pStatsYml.createSection("set");
 	}
 	
 	public int load(String p, int stat) {
-		ConfigurationSection playerConfigSection = getConfigSection(p);
+		String path = "war.stats." + p + ".";
+		if(!this.getConfig().isInt(path + "kill")) {
+			this.save(p, null, true);
+			return -1;
+		}
 		switch(stat) {
 		    case KILL:
-		    	return playerConfigSection.getInt("kill");
+		    	return this.getConfig().getInt(path + "kill");
 		    case DEATH:
-		    	return playerConfigSection.getInt("death");
+		    	return this.getConfig().getInt(path + "death");
 		    case WIN:
-		    	return playerConfigSection.getInt("win");
+		    	return this.getConfig().getInt(path + "win");
 		    case LOSS:
-		    	return playerConfigSection.getInt("loss");
+		    	return this.getConfig().getInt(path + "loss");
 		    default:
 		    	return -1;
 		}
 	}
 	
 	public int[] load(String p) {
-		ConfigurationSection playerConfigSection = getConfigSection(p);
-		if(playerConfigSection == null) {
-			return new int[] {0, 0, 0, 0};
-		}
+		String path = "war.stats." + p + ".";
 		int[] ret = new int[4];
-		ret[0] = playerConfigSection.getInt("kill");
-		ret[1] = playerConfigSection.getInt("death");
-		ret[2] = playerConfigSection.getInt("win");
-		ret[3] = playerConfigSection.getInt("loss");
+		ret[0] = this.getConfig().getInt(path + "kill");
+		ret[1] = this.getConfig().getInt(path + "death");
+		ret[2] = this.getConfig().getInt(path + "win");
+		ret[3] = this.getConfig().getInt(path + "loss");
 		return ret;
 	}
 	
 	public void save(String p, int stat, int amt) {
-		ConfigurationSection playerConfigSection = getConfigSection(p);
+		String path = "war.stats." + p + ".";
 		switch(stat) {
 		    case KILL:
-		        playerConfigSection.set("kill", amt);
+		        this.getConfig().set(path + "kill", amt);
 		        return;
 		    case DEATH:
-			    playerConfigSection.set("death", amt);
+			    this.getConfig().set(path + "death", amt);
 			    return;
 		    case WIN:
-			    playerConfigSection.set("win", amt);
+			    this.getConfig().set(path + "win", amt);
 			    return;
 		    case LOSS:
-			    playerConfigSection.set("loss", amt);
+			    this.getConfig().set(path + "loss", amt);
 			    return;
 			default:
 				return;
@@ -94,8 +95,7 @@ public class PlayerStatsYmlMapper implements PlayerStatsMapper {
 	}
 	
 	public ConfigurationSection getConfigSection(String p) {
-		ConfigurationSection rootConfigSection = this.getConfig().getConfigurationSection("set");
-		return rootConfigSection.getConfigurationSection("war.stats." + p);
+		return this.getConfig().getConfigurationSection("war.stats." + p);
 	}
 	
 	public YamlConfiguration getConfig() {
@@ -115,20 +115,17 @@ public class PlayerStatsYmlMapper implements PlayerStatsMapper {
 	}
 
 	public void save(String player, int[] stats, boolean makeNewPlayer) {
-		ConfigurationSection rootConfigSection = this.getConfig().getConfigurationSection("set");
-		ConfigurationSection playerConfigSection;
+		String path = "war.stats." + player + ".";
 		if(makeNewPlayer) {
-			playerConfigSection = rootConfigSection.createSection("war.stats." + player);
-			playerConfigSection.set("kill", 0);
-			playerConfigSection.set("death", 0);
-			playerConfigSection.set("win", 0);
-			playerConfigSection.set("loss", 0);
+			this.getConfig().set(path + "kill", 0);
+			this.getConfig().set(path + "death", 0);
+			this.getConfig().set(path + "win", 0);
+			this.getConfig().set(path + "loss", 0);
 		} else {
-            playerConfigSection = rootConfigSection.createSection("war.stats." + player);
-			playerConfigSection.set("kill", stats[0]);
-			playerConfigSection.set("death", stats[1]);
-			playerConfigSection.set("win", stats[2]);
-			playerConfigSection.set("loss", stats[3]);
+			this.getConfig().set(path + "kill", stats[0]);
+			this.getConfig().set(path + "death", stats[1]);
+			this.getConfig().set(path + "win", stats[2]);
+			this.getConfig().set(path + "loss", stats[3]);
 		}
 	}
 }
