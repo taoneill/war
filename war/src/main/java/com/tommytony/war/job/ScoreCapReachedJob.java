@@ -45,8 +45,13 @@ public class ScoreCapReachedJob implements Runnable {
 			for (Player tp : t.getPlayers()) {
 				// Send everyone to rally point (or zone lobby if not rally point)
 				this.zone.gameEndTeleport(tp);
+				
 				//update stats
-				PlayerStatTracker.getStats(tp).incWins();
+				if(this.winnersStr.contains(t.getName())) {
+					PlayerStatTracker.getStats(tp).incWins();
+				} else {
+					PlayerStatTracker.getStats(tp).incLosses();
+				}
 				
 				if (this.winnersStr.contains(t.getName())) {
 					// give reward
