@@ -1,5 +1,6 @@
 package com.tommytony.war;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,12 +42,14 @@ import com.tommytony.war.structure.WarzoneMaterials;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.structure.ZoneWallGuard;
 import com.tommytony.war.utility.Direction;
+import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 /**
  *
@@ -386,6 +389,9 @@ public class Warzone {
 		if (!this.getLoadoutSelections().keySet().contains(player.getName())) {
 			isFirstRespawn = true;
 			this.getLoadoutSelections().put(player.getName(), new LoadoutSelection(true, 0));
+		} else if (this.isReinitializing) {
+			isFirstRespawn = true;
+			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
 		} else {
 			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
 		}
@@ -442,15 +448,11 @@ public class Warzone {
 			playerInv.setHelmet(new ItemStack(team.getKind().getMaterial(), 1, (short) 1, new Byte(team.getKind().getData())));
 		} else {
 			if (!helmetIsInLoadout) {
-				if (team.getKind() == TeamKind.GOLD) {
-					playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
-				} else if (team.getKind() == TeamKind.DIAMOND) {
-					playerInv.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-				} else if (team.getKind() == TeamKind.IRON) {
-					playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
-				} else {
-					playerInv.setHelmet(new ItemStack(Material.LEATHER_HELMET));
-				}
+				ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
+				LeatherArmorMeta meta = (LeatherArmorMeta) helmet.getItemMeta();
+				meta.setColor(team.getKind().getBukkitColor());
+				helmet.setItemMeta(meta);
+				playerInv.setHelmet(helmet);
 			}
 		}
 	}
@@ -1331,30 +1333,48 @@ public class Warzone {
 		if (selection != null && !this.isRespawning(player) && playerTeam.getPlayers().contains(player)) {
 			// Make sure that inventory resets dont occur if player has already tp'ed out (due to game end, or somesuch) 
 			// - repawn timer + this method is why inventories were getting wiped as players exited the warzone. 
-			HashMap<String, HashMap<Integer, ItemStack>> loadouts = playerTeam.getInventories().resolveLoadouts();
-			List<String> sortedNames = LoadoutYmlMapper.sortNames(loadouts);
-			
+			List<Loadout> loadouts = playerTeam.getInventories().resolveNewLoadouts();
+			List<String> sortedNames = LoadoutYmlMapper.sortNames(Loadout.toLegacyFormat(loadouts));
+			sortedNames.remove("first");
+			for (Iterator<String> it = sortedNames.iterator(); it.hasNext();) {
+				String loadoutName = it.next();
+				Loadout ldt = Loadout.getLoadout(loadouts, loadoutName);
+				if (ldt.requiresPermission() && !player.hasPermission(ldt.getPermission())) {
+					it.remove();
+				}
+			}
+			if (sortedNames.isEmpty()) {
+				// Fix for zones that mistakenly only specify a `first' loadout, but do not add any others.
+				this.handlePlayerLeave(player, this.getTeleport(), true);
+				War.war.badMsg(player, "We couldn't find a loadout for you! Please alert the warzone maker to add a `default' loadout to this warzone.");
+				return;
+			}
 			int currentIndex = selection.getSelectedIndex();
+			Loadout firstLoadout = Loadout.getLoadout(loadouts, "first");
 			int i = 0;
 			Iterator<String> it = sortedNames.iterator();
-		    while (it.hasNext()) {
-		        String name = (String)it.next();
-		        if (i == currentIndex) {
-		        	if (playerTeam.getTeamConfig().resolveBoolean(TeamConfig.PLAYERLOADOUTASDEFAULT) && name.equals("default")) {
-		        		// Use player's own inventory as loadout
-		        		this.resetInventory(playerTeam, player, this.getPlayerInventoryFromSavedState(player));
-		        	} else {
-		        		// Use the loadout from the list in the settings
-		        		this.resetInventory(playerTeam, player, loadouts.get(name));
-		        	}
+			while (it.hasNext()) {
+				String name = (String) it.next();
+				if (i == currentIndex) {
+					if (playerTeam.getTeamConfig().resolveBoolean(TeamConfig.PLAYERLOADOUTASDEFAULT) && name.equals("default")) {
+						// Use player's own inventory as loadout
+						this.resetInventory(playerTeam, player, this.getPlayerInventoryFromSavedState(player));
+					} else if (isFirstRespawn && firstLoadout != null && name.equals("default")
+							&& (firstLoadout.requiresPermission() ? player.hasPermission(firstLoadout.getPermission()) : true)) {
+						// Get the loadout for the first spawn
+						this.resetInventory(playerTeam, player, Loadout.getLoadout(loadouts, "first").getContents());
+					} else {
+						// Use the loadout from the list in the settings
+						this.resetInventory(playerTeam, player, Loadout.getLoadout(loadouts, name).getContents());
+					}
 					if (isFirstRespawn && playerTeam.getInventories().resolveLoadouts().keySet().size() > 1) {
 						War.war.msg(player, "Equipped " + name + " loadout (sneak to switch).");
 					} else if (isToggle) {
 						War.war.msg(player, "Equipped " + name + " loadout.");
 					}
-		        }
-		        i++;
-		    }
+				}
+				i++;
+			}
 		}
 	}
 

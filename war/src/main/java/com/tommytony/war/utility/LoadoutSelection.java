@@ -6,8 +6,8 @@ public class LoadoutSelection {
 	private int selectedIndex;
 
 	public LoadoutSelection(boolean stillInSpawn, int selectedIndex) {
-		this.setStillInSpawn(stillInSpawn);
-		this.setSelectedIndex(selectedIndex);
+		this.stillInSpawn = stillInSpawn;
+		this.selectedIndex = selectedIndex;
 		
 	}
 

@@ -94,6 +94,49 @@ public enum TeamKind {
 				return new Color(255,255,255);
 		}
 	}
+	/**
+	 * Gets the color for Bukkit
+	 * @return the color
+	 */
+	public org.bukkit.Color getBukkitColor() {
+		int colorCode = (int)this.data;
+		switch (colorCode) {
+			case 0:
+				return org.bukkit.Color.fromRGB(255,255,255);
+			case 1:
+				return org.bukkit.Color.fromRGB(255,128,0);
+			case 2:
+				return org.bukkit.Color.fromRGB(255,128,255);
+			case 3:
+				return org.bukkit.Color.fromRGB(0,0,255);
+			case 4:
+				return org.bukkit.Color.fromRGB(255,215,0);
+			case 5:
+				return org.bukkit.Color.fromRGB(0,255,0);
+			case 6:
+				return org.bukkit.Color.fromRGB(255,128,255);
+			case 7:
+				return org.bukkit.Color.fromRGB(100,100,100);
+			case 8:
+				return org.bukkit.Color.fromRGB(200,200,200);
+			case 9:
+				return org.bukkit.Color.fromRGB(128,255,255);
+			case 10:
+				return org.bukkit.Color.fromRGB(128,0,255);
+			case 11:
+				return org.bukkit.Color.fromRGB(0,0,128);
+			case 12:
+				return org.bukkit.Color.fromRGB(128,0,0);
+			case 13:
+				return org.bukkit.Color.fromRGB(0,128,0);
+			case 14:
+				return org.bukkit.Color.fromRGB(255,0,0);
+			case 15:
+				return org.bukkit.Color.fromRGB(0,0,0);
+			default:
+				return org.bukkit.Color.fromRGB(255,255,255);
+		}
+	}
 
 	public Material getMaterial() {
 		return this.material;

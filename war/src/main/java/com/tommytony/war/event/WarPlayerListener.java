@@ -41,7 +41,10 @@ import com.tommytony.war.structure.Cake;
 import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
+import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * @author tommytony, Tim Düsterhus
@@ -230,6 +233,10 @@ public class WarPlayerListener implements Listener {
 					
 					War.war.badMsg(player, "Can't use items while still in spawn.");
 				}
+			}
+			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST) {
+				event.setCancelled(true);
+				War.war.badMsg(player, "Can't use ender chests while playing in a warzone!");
 			}
 		}
 	}
@@ -823,7 +830,19 @@ public class WarPlayerListener implements Listener {
 				if (playerWarzone.getLoadoutSelections().keySet().contains(event.getPlayer().getName())
 						&& playerWarzone.getLoadoutSelections().get(event.getPlayer().getName()).isStillInSpawn()) {
 					LoadoutSelection selection = playerWarzone.getLoadoutSelections().get(event.getPlayer().getName());
-					int currentIndex = (selection.getSelectedIndex() + 1) % (playerTeam.getInventories().resolveLoadouts().keySet().size());
+					List<Loadout> loadouts = (List<Loadout>)new ArrayList(playerTeam.getInventories().resolveNewLoadouts()).clone();
+					for (Iterator<Loadout> it = loadouts.iterator(); it.hasNext();) {
+						Loadout ldt = it.next();
+						if ("first".equals(ldt.getName())) {
+							it.remove();
+							continue;
+						}
+						if (ldt.requiresPermission() && !event.getPlayer().hasPermission(ldt.getPermission())) {
+							it.remove();
+							continue;
+						}
+					}
+					int currentIndex = (selection.getSelectedIndex() + 1) % loadouts.size();
 					selection.setSelectedIndex(currentIndex);
 					
 					playerWarzone.equipPlayerLoadoutSelection(event.getPlayer(), playerTeam, false, true);

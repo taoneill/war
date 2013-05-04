@@ -197,6 +197,7 @@ commands:
         /zonecfg teamsize:10 flagmustbehome:on flagpointsonly:off flagreturn:<both/flag/spawn> nohunger:off respawntimer:0 saturation:10 spawnstyle:<small/flat/big/invisible> \\
         /zonecfg loadout:default -> sets the default respawn inventory to your current items. \\
         /zonecfg loadout:<extra-loadout-name> -> adds an extra loadout (i.e. another player class) that the players can toggle to by sneaking while inside the spawn. \\
+        /zonecfg loadout:<extra-loadout-name>:<permission> -> add/update a loadout that requires a permission. \\
         /zonecfg deleteloadout:<extra-loadout-name> -> removes the specified loadout from the choices. \\
         /zonecfg playerloadoutasdefault:true -> the player can bring a copy of his outside-world inventory to fight, it replaces the default loadout. \\
         /zonecfg reward:default -> sets the winner's reward to your current items. 
