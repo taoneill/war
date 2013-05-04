@@ -3,7 +3,7 @@
 
   <groupId>com.tommytony</groupId>
   <artifactId>war</artifactId>
-  <version>1.7.4</version>
+  <version>1.8-PREVIEW</version>
   <packaging>jar</packaging>
 
   <name>War</name>
