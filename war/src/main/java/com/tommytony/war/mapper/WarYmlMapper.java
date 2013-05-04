@@ -70,7 +70,7 @@ public class WarYmlMapper {
 		
 		// defaultLoadouts
 		ConfigurationSection loadoutsSection = warRootSection.getConfigurationSection("team.default.loadout");
-		LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, War.war.getDefaultInventories().getLoadouts());
+		War.war.getDefaultInventories().setLoadouts(LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, new HashMap()));
 
 		// defaultReward
 		ConfigurationSection rewardsSection = warRootSection.getConfigurationSection("team.default.reward");
@@ -121,7 +121,7 @@ public class WarYmlMapper {
 		
 		// defaultLoadouts
 		ConfigurationSection loadoutSection = teamDefault.createSection("loadout");
-		LoadoutYmlMapper.fromLoadoutsToConfig(War.war.getDefaultInventories().getLoadouts(), loadoutSection);
+		LoadoutYmlMapper.fromLoadoutsToConfig(War.war.getDefaultInventories().getNewLoadouts(), loadoutSection);
 				
 		// defaultReward
 		ConfigurationSection rewardsSection = teamDefault.createSection("reward");
