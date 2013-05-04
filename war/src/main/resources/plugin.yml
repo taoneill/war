@@ -4,7 +4,7 @@ description: Minecraft PVP arenas (called warzones) for a fast-paced and structu
 author: tommytony
 website: http://war.tommytony.com
 main: com.tommytony.war.War
-softdepend: [Spout]
+softdepend: [Spout, TagAPI]
 permissions:
   war.*:
     description: Full War permissions. Create and destroy warzones. Change War configuration.

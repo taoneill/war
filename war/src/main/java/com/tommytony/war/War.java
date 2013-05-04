@@ -39,6 +39,7 @@ import com.tommytony.war.event.WarBlockListener;
 import com.tommytony.war.event.WarEntityListener;
 import com.tommytony.war.event.WarPlayerListener;
 import com.tommytony.war.event.WarServerListener;
+import com.tommytony.war.event.WarTagListener;
 import com.tommytony.war.job.HelmetProtectionTask;
 import com.tommytony.war.job.SpoutFadeOutMessageJob;
 import com.tommytony.war.mapper.WarYmlMapper;
@@ -74,6 +75,7 @@ public class War extends JavaPlugin {
 	private PluginDescriptionFile desc = null;
 	private boolean loaded = false;
 	private boolean isSpoutServer = false;
+	private boolean tagServer = false;
 
 	// Zones and hub
 	private List<Warzone> warzones = new ArrayList<Warzone>();
@@ -144,6 +146,15 @@ public class War extends JavaPlugin {
 		pm.registerEvents(this.entityListener, this);
 		pm.registerEvents(this.blockListener, this);
 		pm.registerEvents(this.serverListener, this);
+		if (pm.isPluginEnabled("TagAPI")) {
+			try {
+				Class.forName("org.kitteh.tag.TagAPI");
+				pm.registerEvents(new WarTagListener(), this);
+				this.tagServer = true;
+			} catch (ClassNotFoundException e) {
+				this.tagServer = false;
+			}
+		}
 
 		// Add defaults
 		warConfig.put(WarConfig.BUILDINZONESONLY, false);
@@ -1210,5 +1221,9 @@ public class War extends JavaPlugin {
 	
 	public HubLobbyMaterials getWarhubMaterials() {
 		return this.warhubMaterials;
+	}
+
+	public boolean isTagServer() {
+		return tagServer;
 	}
 }
