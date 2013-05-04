@@ -96,8 +96,29 @@ public class War extends JavaPlugin {
 	private HashMap<String, PlayerState> disconnected = new HashMap<String, PlayerState>();
 	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
 
-	private final List<String> deadlyAdjectives = new ArrayList<String>();
-	private final List<String> killerVerbs = new ArrayList<String>();
+	private final List<String> deadlyAdjectives = new ArrayList<String>() {{
+        clear();
+		add("");
+		add("");
+		add("mighty ");
+		add("deadly ");
+		add("fine ");
+		add("precise ");
+		add("brutal ");
+		add("powerful ");	
+	}};
+	
+	private final List<String> killerVerbs = new ArrayList<String>() {{
+		clear();
+		add("killed");
+		add("killed");
+		add("killed");
+		add("finished");
+		add("annihilated");
+		add("murdered");
+		add("obliterated");
+		add("exterminated");
+	}};
 
 	private final InventoryBag defaultInventories = new InventoryBag();
 
@@ -236,26 +257,6 @@ public class War extends JavaPlugin {
 		this.getZoneMakerNames().add("tommytony");
 		
 		// Add constants
-		this.getDeadlyAdjectives().clear();
-		this.getDeadlyAdjectives().add("");
-		this.getDeadlyAdjectives().add("");
-		this.getDeadlyAdjectives().add("mighty ");
-		this.getDeadlyAdjectives().add("deadly ");
-		this.getDeadlyAdjectives().add("fine ");
-		this.getDeadlyAdjectives().add("precise ");
-		this.getDeadlyAdjectives().add("brutal ");
-		this.getDeadlyAdjectives().add("powerful ");
-		
-		this.getKillerVerbs().clear();
-		this.getKillerVerbs().add("killed");
-		this.getKillerVerbs().add("killed");
-		this.getKillerVerbs().add("killed");
-		this.getKillerVerbs().add("finished");
-		this.getKillerVerbs().add("annihilated");
-		this.getKillerVerbs().add("murdered");
-		this.getKillerVerbs().add("obliterated");
-		this.getKillerVerbs().add("exterminated");
-		
 		// Load files
 		WarYmlMapper.load();
 		
@@ -1219,15 +1220,16 @@ public class War extends JavaPlugin {
 	
 	private void reloadStorageConfig() {
 		this.storageConfiguration = YamlConfiguration.loadConfiguration(this.storageConfigFile);
-		Map<String, Object> storageDefaults = new HashMap<String, Object>(6);
 		//defaults for storage config
-		storageDefaults.put("flatfile", false);
-		storageDefaults.put("database.sql.host", "localhost");
-		storageDefaults.put("database.sql.user", "root");
-		storageDefaults.put("database.sql.databaselocation", "$WAR/War.db");
-		storageDefaults.put("database.sql.password", "12345");
-		storageDefaults.put("database.sql.database", "sqlite"); //mysql or sqllite
-		storageDefaults.put("database.sql.databasename", "bukkit");
+		Map<String, Object> storageDefaults = new HashMap<String, Object>(6) {{
+			put("flatfile", false);
+			put("database.sql.host", "localhost");
+			put("database.sql.user", "root");
+			put("database.sql.databaselocation", "$WAR/War.db");
+			put("database.sql.password", "12345");
+			put("database.sql.database", "sqlite"); //mysql or sqllite
+			put("database.sql.databasename", "bukkit");
+		}};
 		this.storageConfiguration.addDefaults(storageDefaults);
 		if(this.storageConfigFile.lastModified() < 50) {
 	        for(Map.Entry<String, Object> entry : storageDefaults.entrySet()) {

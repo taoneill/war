@@ -549,7 +549,7 @@ public class WarPlayerListener implements Listener {
 					&& this.random.nextInt(7) == 3) { // one chance out of many of getting healed
 				int currentHp = player.getHealth();
 				int newHp = Math.min(20, currentHp + locZone.getWarzoneConfig().getInt(WarzoneConfig.MONUMENTHEAL));
-
+				
 				player.setHealth(newHp);
 				String isS = "s";
 				String heartNum = ""; // since (newHp-currentHp)/2 won't give the right amount
