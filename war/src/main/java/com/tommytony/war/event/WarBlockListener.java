@@ -77,6 +77,10 @@ public class WarBlockListener implements Listener {
 				for (Team t : teams) {
 					t.teamcast("Monument " + monument.getName() + " has been captured by team " + team.getName() + ".");
 				}
+				//mehh this is where the sign stuff will go @Finolaoh
+				for (Team t : teams) {
+					this.updateSign(t, monument);
+				}
 				event.setCancelled(false);
 				return; // important otherwise cancelled down a few line by isImportantblock
 			} else {
@@ -469,5 +473,10 @@ public class WarBlockListener implements Listener {
 			event.setCancelled(true);
 			return;
 		}
+	}
+	
+	//@unimplemented
+	private void updateSign(Team t, Monument m) {
+		//TODO:
 	}
 }

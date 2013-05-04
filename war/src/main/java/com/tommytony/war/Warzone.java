@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,10 +21,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.tommytony.war.config.InventoryBag;
+import com.tommytony.war.config.ScoreboardType;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.config.TeamKind;
@@ -42,11 +46,19 @@ import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.structure.ZoneWallGuard;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.PlayerStatTracker;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 
 /**
  *
@@ -81,6 +93,8 @@ public class Warzone {
 	private final WarzoneConfigBag warzoneConfig;
 	private final TeamConfigBag teamDefaultConfig;
 	private InventoryBag defaultInventories = new InventoryBag();
+
+	private Scoreboard scoreboard;
 	
 	private HubLobbyMaterials lobbyMaterials = null;
 	private WarzoneMaterials warzoneMaterials = new WarzoneMaterials(49, (byte)0, 85, (byte)0, 89, (byte)0);	// default main obsidian, stand ladder, light glowstone
@@ -88,6 +102,28 @@ public class Warzone {
 	private boolean isEndOfGame = false;
 	private boolean isReinitializing = false;
 	//private final Object gameEndLock = new Object();
+	
+	private Map<Player, Player> lastDamagers = new HashMap<Player, Player>();
+	//this is to give people credit for being the last damager to a person before they die
+	
+	private static final int[] rgbLookupTable = new int[] {
+		(new RGBColor(255, 255, 255)).get(),
+		(new RGBColor(255, 128, 0)).get(),
+		(new RGBColor(255, 128, 255)).get(),
+		(new RGBColor(0, 0, 255)).get(),
+		(new RGBColor(255, 215, 0)).get(),
+		(new RGBColor(0, 255, 0)).get(),
+		(new RGBColor(255, 128, 255)).get(),
+		(new RGBColor(100, 100, 100)).get(),
+		(new RGBColor(200, 200, 200)).get(),
+		(new RGBColor(128, 255, 255)).get(),
+		(new RGBColor(128, 0, 255)).get(),
+		(new RGBColor(0, 0, 128)).get(),
+		(new RGBColor(128, 0, 0)).get(),
+		(new RGBColor(0, 128, 0)).get(),
+		(new RGBColor(255, 0, 0)).get(),
+		(new RGBColor(0, 0, 0)).get()
+	};
 
 	public Warzone(World world, String name) {
 		this.world = world;
@@ -257,6 +293,16 @@ public class Warzone {
 
 	public void initializeZone(Player respawnExempted) {
 		if (this.ready() && this.volume.isSaved()) {
+			if (this.scoreboard != null) {
+				for (OfflinePlayer opl : this.scoreboard.getPlayers()) {
+					this.scoreboard.resetScores(opl);
+				}
+				this.scoreboard.clearSlot(DisplaySlot.SIDEBAR);
+				for (Objective obj : this.scoreboard.getObjectives()) {
+					obj.unregister();
+				}
+				this.scoreboard = null;
+			}
 			// everyone back to team spawn with full health
 			for (Team team : this.teams) {
 				for (Player player : team.getPlayers()) {
@@ -265,14 +311,19 @@ public class Warzone {
 									&& !player.getName().equals(respawnExempted.getName()))) {
 						this.respawnPlayer(team, player);
 					}
+					team.zeroKills(player);
+					team.removeFiveKillStreak(player);
+					team.removeSevenKillStreak(player);
 				}
 				team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				team.initializeTeamSpawn();
+				team.clearDoggyManagers();
 				if (team.getTeamFlag() != null) {
 					team.setTeamFlag(team.getTeamFlag());
 				}
 			}
-
+            this.lastDamagers.clear(); //clear last damagers so it doesn't carry over
+            
 			this.initZone();
 			
 			if (War.war.getWarHub() != null) {
@@ -326,7 +377,26 @@ public class Warzone {
 		this.bombThieves.clear();
 		this.cakeThieves.clear();
 		this.reallyDeadFighters.clear();
-
+		if (this.getScoreboardType() != ScoreboardType.NONE) {
+			this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+			scoreboard.registerNewObjective(this.getScoreboardType().getDisplayName(), "dummy");
+			Objective obj = scoreboard.getObjective(this.getScoreboardType().getDisplayName());
+			Validate.isTrue(obj.isModifiable(), "Cannot modify players' scores on the " + this.name + " scoreboard.");
+			for (Team team : this.getTeams()) {
+				String teamName = team.getKind().getColor() + team.getName() + ChatColor.RESET;
+				if (this.getScoreboardType() == ScoreboardType.POINTS) {
+					obj.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(team.getPoints());
+				} else if (this.getScoreboardType() == ScoreboardType.LIFEPOOL) {
+					obj.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(team.getRemainingLifes());
+				}
+			}
+			obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+			for (Team team : this.getTeams()) {
+				for (Player player : team.getPlayers()) {
+					player.setScoreboard(scoreboard);
+				}
+			}
+		}
 		// nom drops
 		for(Entity entity : (this.getWorld().getEntities())) {
 			if (!(entity instanceof Item)) {
@@ -367,6 +437,8 @@ public class Warzone {
 		// Fill hp
 		player.setRemainingAir(300);
 		player.setHealth(20);
+		//take away 3 killstreak if any
+		player.resetMaxHealth();
 		player.setFoodLevel(20);
 		player.setSaturation(team.getTeamConfig().resolveInt(TeamConfig.SATURATION));
 		player.setExhaustion(0);
@@ -379,6 +451,10 @@ public class Warzone {
 			player.setGameMode(GameMode.SURVIVAL);
 		}
 		
+		if(this.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)) {
+			player.setGameMode(GameMode.ADVENTURE);
+		}
+		
 		// clear potion effects
 		PotionEffectHelper.clearPotionEffects(player);
 		
@@ -386,9 +462,19 @@ public class Warzone {
 		if (!this.getLoadoutSelections().keySet().contains(player.getName())) {
 			isFirstRespawn = true;
 			this.getLoadoutSelections().put(player.getName(), new LoadoutSelection(true, 0));
+		} else if (this.isReinitializing) {
+			isFirstRespawn = true;
+			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
 		} else {
 			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
 		}
+		if(!this.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
+			if(player.getInventory().getArmorContents()[0].getType() == Material.LEATHER_HELMET) {
+				player.getInventory().setHelmet(null);
+			}
+		}
+
+		this.lastDamagers.put(player, null); //update it so last damager is null
 		
 		// Spout
 		if (War.war.isSpoutServer()) {
@@ -423,13 +509,41 @@ public class Warzone {
 		boolean helmetIsInLoadout = false;
 		for (Integer slot : loadout.keySet()) {
 			if (slot == 100) {
-				playerInv.setBoots(War.war.copyStack(loadout.get(slot)));
+				if(this.getWarzoneConfig().getBoolean(WarzoneConfig.COLOREDARMOR) && (loadout.get(slot).getType() == Material.LEATHER_BOOTS)) {
+					ItemStack stack = loadout.get(slot);
+					LeatherArmorMeta met = (LeatherArmorMeta) stack.getItemMeta();
+					met.setColor(Color.fromRGB(this.getRGB(team.getKind().getColor())));
+					playerInv.setBoots(War.war.copyStack(stack));
+				} else {
+					playerInv.setBoots(War.war.copyStack(loadout.get(slot)));
+				}
 			} else if (slot == 101) {
-				playerInv.setLeggings(War.war.copyStack(loadout.get(slot)));
+				if(this.getWarzoneConfig().getBoolean(WarzoneConfig.COLOREDARMOR) && (loadout.get(slot).getType() == Material.LEATHER_LEGGINGS)) {
+					ItemStack stack = loadout.get(slot);
+					LeatherArmorMeta met = (LeatherArmorMeta) stack.getItemMeta();
+					met.setColor(Color.fromRGB(this.getRGB(team.getKind().getColor())));
+					playerInv.setLeggings(War.war.copyStack(stack));
+				} else {
+				    playerInv.setLeggings(War.war.copyStack(loadout.get(slot)));
+				}
 			} else if (slot == 102) {
-				playerInv.setChestplate(War.war.copyStack(loadout.get(slot)));
+				if(this.getWarzoneConfig().getBoolean(WarzoneConfig.COLOREDARMOR) && (loadout.get(slot).getType() == Material.LEATHER_CHESTPLATE)) {
+					ItemStack stack = loadout.get(slot);
+					LeatherArmorMeta met = (LeatherArmorMeta) stack.getItemMeta();
+					met.setColor(Color.fromRGB(this.getRGB(team.getKind().getColor())));
+					playerInv.setChestplate(War.war.copyStack(stack));
+				} else {
+				    playerInv.setChestplate(War.war.copyStack(loadout.get(slot)));
+				}
 			} else if (slot == 103) {
-				playerInv.setHelmet(War.war.copyStack(loadout.get(slot)));
+				if(this.getWarzoneConfig().getBoolean(WarzoneConfig.COLOREDARMOR) && (loadout.get(slot).getType() == Material.LEATHER_HELMET)) {
+					ItemStack stack = loadout.get(slot);
+					LeatherArmorMeta met = (LeatherArmorMeta) stack.getItemMeta();
+					met.setColor(Color.fromRGB(this.getRGB(team.getKind().getColor())));
+					playerInv.setHelmet(War.war.copyStack(stack));
+				} else {
+				    playerInv.setHelmet(War.war.copyStack(loadout.get(slot)));
+				}
 				helmetIsInLoadout = true;
 			} else {
 				ItemStack item = loadout.get(slot);
@@ -442,16 +556,23 @@ public class Warzone {
 			playerInv.setHelmet(new ItemStack(team.getKind().getMaterial(), 1, (short) 1, new Byte(team.getKind().getData())));
 		} else {
 			if (!helmetIsInLoadout) {
-				if (team.getKind() == TeamKind.GOLD) {
-					playerInv.setHelmet(new ItemStack(Material.GOLD_HELMET));
-				} else if (team.getKind() == TeamKind.DIAMOND) {
-					playerInv.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-				} else if (team.getKind() == TeamKind.IRON) {
-					playerInv.setHelmet(new ItemStack(Material.IRON_HELMET));
-				} else {
-					playerInv.setHelmet(new ItemStack(Material.LEATHER_HELMET));
-				}
+				ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
+				LeatherArmorMeta meta = (LeatherArmorMeta) helmet.getItemMeta();
+				meta.setColor(team.getKind().getBukkitColor());
+				helmet.setItemMeta(meta);
+				playerInv.setHelmet(helmet);
 			}
+		}
+	}
+	
+	private int getRGB(ChatColor color) {
+		int utfCode = (int) color.getChar();
+		 //if our code is less than digit 9 in unicode then we can assume its 0 - 9 because color code is an enum
+		if(utfCode <= 0x39) { 
+			return rgbLookupTable[utfCode - 48];
+		} else {
+			//must be unicode a - f so normalize to lookup table
+			return rgbLookupTable[utfCode - 87];
 		}
 	}
 
@@ -527,6 +648,7 @@ public class Warzone {
 		if (originalState != null) {
 			this.playerInvFromInventoryStash(playerInv, originalState);
 			player.setGameMode(originalState.getGamemode());
+			player.resetMaxHealth();
 			player.setHealth(originalState.getHealth());
 			player.setExhaustion(originalState.getExhaustion());
 			player.setSaturation(originalState.getSaturation());
@@ -830,7 +952,9 @@ public class Warzone {
 		Team lowestNoOfPlayers = null;
 		for (Team t : this.teams) {
 			if (lowestNoOfPlayers == null || (lowestNoOfPlayers != null && lowestNoOfPlayers.getPlayers().size() > t.getPlayers().size())) {
-				lowestNoOfPlayers = t;
+                                if (War.war.canPlayWar(player, t)) {
+                                        lowestNoOfPlayers = t;
+                                }
 			}
 		}
 		if (lowestNoOfPlayers != null) {
@@ -859,6 +983,7 @@ public class Warzone {
 
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 
+		PlayerStatTracker.getStats(player).incDeaths();
 		// Make sure the player that died is still part of a team, game may have ended while waiting.
 		// Ignore dying players that essentially just got tp'ed to lobby and got their state restored.
 		// Gotta take care of restoring ReallyDeadFighters' game-end state when in onRespawn as well.
@@ -1076,12 +1201,16 @@ public class Warzone {
 			if (War.war.isSpoutServer()) {
 				War.war.getSpoutDisplayer().updateStats(player);
 			}
+			player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 			
 			War.war.msg(player, "Your inventory is being restored.");
 			if (War.war.getWarHub() != null) {
 				War.war.getWarHub().resetZoneSign(this);
 			}
-
+			
+            this.lastDamagers.remove(player); //will prevent a memory leak!
+            playerTeam.removeFromTeamchat(player);
+            
 			boolean zoneEmpty = true;
 			for (Team team : this.getTeams()) {
 				if (team.getPlayers().size() > 0) {
@@ -1331,28 +1460,34 @@ public class Warzone {
 			// - repawn timer + this method is why inventories were getting wiped as players exited the warzone. 
 			HashMap<String, HashMap<Integer, ItemStack>> loadouts = playerTeam.getInventories().resolveLoadouts();
 			List<String> sortedNames = LoadoutYmlMapper.sortNames(loadouts);
+			if (sortedNames.contains("first")) {
+				sortedNames.remove("first");
+			}
 			
 			int currentIndex = selection.getSelectedIndex();
 			int i = 0;
 			Iterator<String> it = sortedNames.iterator();
-		    while (it.hasNext()) {
-		        String name = (String)it.next();
-		        if (i == currentIndex) {
-		        	if (playerTeam.getTeamConfig().resolveBoolean(TeamConfig.PLAYERLOADOUTASDEFAULT) && name.equals("default")) {
-		        		// Use player's own inventory as loadout
-		        		this.resetInventory(playerTeam, player, this.getPlayerInventoryFromSavedState(player));
-		        	} else {
-		        		// Use the loadout from the list in the settings
-		        		this.resetInventory(playerTeam, player, loadouts.get(name));
-		        	}
+			while (it.hasNext()) {
+				String name = (String) it.next();
+				if (i == currentIndex) {
+					if (playerTeam.getTeamConfig().resolveBoolean(TeamConfig.PLAYERLOADOUTASDEFAULT) && name.equals("default")) {
+						// Use player's own inventory as loadout
+						this.resetInventory(playerTeam, player, this.getPlayerInventoryFromSavedState(player));
+					} else if (isFirstRespawn && loadouts.containsKey("first") && name.equals("default")) {
+						// Get the loadout for the first spawn
+						this.resetInventory(playerTeam, player, loadouts.get("first"));
+					} else {
+						// Use the loadout from the list in the settings
+						this.resetInventory(playerTeam, player, loadouts.get(name));
+					}
 					if (isFirstRespawn && playerTeam.getInventories().resolveLoadouts().keySet().size() > 1) {
 						War.war.msg(player, "Equipped " + name + " loadout (sneak to switch).");
 					} else if (isToggle) {
 						War.war.msg(player, "Equipped " + name + " loadout.");
 					}
-		        }
-		        i++;
-		    }
+				}
+				i++;
+			}
 		}
 	}
 
@@ -1462,5 +1597,33 @@ public class Warzone {
 
 	public WarzoneMaterials getWarzoneMaterials() {
 		return warzoneMaterials;
+	}
+	
+	public void updateLastDamager(Player defender, Player attacker) {
+		this.lastDamagers.put(defender, attacker);
+	}
+	
+	public Player getLastDamager(Player defender) {
+		return this.lastDamagers.get(defender);
+	}
+	
+	public Scoreboard getScoreboard() {
+		return scoreboard;
+	}
+	
+	public ScoreboardType getScoreboardType() {
+		return this.getWarzoneConfig().getScoreboardType(WarzoneConfig.SCOREBOARD);
+	}
+}
+
+final class RGBColor {
+	private final int rgb;
+	
+	RGBColor(int r, int g, int b) {
+		this.rgb = (r << 16) | (g << 8) | b;
+    }
+	
+	int get() {
+		return this.rgb;
 	}
 }

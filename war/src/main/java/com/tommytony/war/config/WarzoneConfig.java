@@ -19,7 +19,10 @@ public enum WarzoneConfig {
 	RESETONCONFIGCHANGE (Boolean.class),
 	RESETONLOAD (Boolean.class),
 	RESETONUNLOAD (Boolean.class),
-	UNBREAKABLE (Boolean.class);
+	UNBREAKABLE (Boolean.class), 
+	COLOREDARMOR (Boolean.class),
+	KILLSTREAKS (Boolean.class),
+	SCOREBOARD (ScoreboardType.class);
 	
 	
 	private final Class<?> configType;

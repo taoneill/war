@@ -14,6 +14,9 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -35,6 +38,7 @@ import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.job.CantReEnterSpawnJob;
+import com.tommytony.war.mapper.PlayerStatsMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
@@ -42,9 +46,10 @@ import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.utility.PlayerStatTracker;
 
 /**
- * @author tommytony, Tim Düsterhus
+ * @author tommytony, Tim Düsterhus, grinning
  * @package bukkit.tommytony.war
  */
 public class WarPlayerListener implements Listener {
@@ -64,7 +69,9 @@ public class WarPlayerListener implements Listener {
 			if (zone != null) {
 				zone.handlePlayerLeave(player, zone.getTeleport(), true);
 			}
-
+			//serialize your stats, removes you from the stat tracking in memory, preventing a long term leak
+			PlayerStatTracker.serialize(player);
+			
 			if (War.war.isWandBearer(player)) {
 				War.war.removeWandBearer(player);
 			}
@@ -230,6 +237,23 @@ public class WarPlayerListener implements Listener {
 					
 					War.war.badMsg(player, "Can't use items while still in spawn.");
 				}
+			} else if(zone != null && zone.getLoadoutSelections().containsKey(player.getName())) {
+				Team t = zone.getPlayerTeam(player.getName());
+				if((t != null) && (t.hasSevenKillStreak(player))) {
+					if((player.getItemInHand().getType() == Material.RAW_BEEF) && 
+							((event.getAction() == Action.LEFT_CLICK_AIR) || (event.getAction() == Action.LEFT_CLICK_BLOCK)
+							|| (event.getAction() == Action.RIGHT_CLICK_AIR) || (event.getAction() == Action.RIGHT_CLICK_BLOCK))) {
+						t.removeSevenKillStreak(player);
+						player.getItemInHand().setType(Material.AIR);
+						t.teamcast(t.getKind().getColor() + player.getDisplayName() + ChatColor.WHITE +
+								" called in dogs!");
+						War.war.getEntityListener().spawnDogs(player, t);
+					}
+				}
+			}
+			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST) {
+				event.setCancelled(true);
+				War.war.badMsg(player, "Can't use ender chests while playing in a warzone!");
 			}
 		}
 	}
@@ -238,6 +262,10 @@ public class WarPlayerListener implements Listener {
 	public void onPlayerMove(final PlayerMoveEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
+		}
+		
+		if(PlayerStatTracker.getStats(event.getPlayer()) == null) {
+			new PlayerStatTracker(event.getPlayer());
 		}
 		
 		Player player = event.getPlayer();
@@ -257,7 +285,6 @@ public class WarPlayerListener implements Listener {
 		Warzone locZone = Warzone.getZoneByLocation(playerLoc);
 		ZoneLobby locLobby = ZoneLobby.getLobbyByLocation(playerLoc);
 
-		boolean canPlay = War.war.canPlayWar(player);
 		boolean isMaker = War.war.isZoneMaker(player);
 
 		// Zone walls
@@ -288,7 +315,7 @@ public class WarPlayerListener implements Listener {
 			Warzone zone = locLobby.getZone();
 			Team oldTeam = Team.getTeamByPlayerName(player.getName());
 			boolean isAutoAssignGate = false;
-			if (oldTeam == null && canPlay) { // trying to counter spammy player move
+			if (oldTeam == null) { // trying to counter spammy player move
 				isAutoAssignGate = zone.getLobby().isAutoAssignGate(playerLoc);
 				if (isAutoAssignGate) {
 					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
@@ -303,9 +330,13 @@ public class WarPlayerListener implements Listener {
 						}
 						
 						if (noOfPlayers < totalCap) {
-							zone.autoAssign(player);
+							boolean assigned = zone.autoAssign(player) != null ? true : false;
+                                                        if (!assigned) {
+                                                                event.setTo(zone.getTeleport());
+                                                                War.war.badMsg(player, "You don't have permission for any of the available teams in this warzone");
+                                                        }
 
-							if (War.war.getWarHub() != null) {
+							if (War.war.getWarHub() != null && assigned) {
 								War.war.getWarHub().resetZoneSign(zone);
 							}
 						} else {
@@ -323,7 +354,8 @@ public class WarPlayerListener implements Listener {
 						this.dropFromOldTeamIfAny(player);
 						if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 							this.handleDisabledZone(event, player, zone);
-						} else if (team.getPlayers().size() < team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)) {
+						} else if (team.getPlayers().size() < team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)
+                                                        && War.war.canPlayWar(player, team)) {
 							team.addPlayer(player);
 							team.resetSign();
 							if (War.war.getWarHub() != null) {
@@ -335,6 +367,9 @@ public class WarPlayerListener implements Listener {
 							for (Team t : zone.getTeams()) {
 								t.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
 							}
+                                                } else if (!War.war.canPlayWar(player, team)) {
+							event.setTo(zone.getTeleport());
+							War.war.badMsg(player, "You don't have permission to join team " + team.getName());
 						} else {
 							event.setTo(zone.getTeleport());
 							War.war.badMsg(player, "Team " + team.getName() + " is full.");
@@ -514,7 +549,7 @@ public class WarPlayerListener implements Listener {
 					&& this.random.nextInt(7) == 3) { // one chance out of many of getting healed
 				int currentHp = player.getHealth();
 				int newHp = Math.min(20, currentHp + locZone.getWarzoneConfig().getInt(WarzoneConfig.MONUMENTHEAL));
-
+				
 				player.setHealth(newHp);
 				String isS = "s";
 				String heartNum = ""; // since (newHp-currentHp)/2 won't give the right amount
@@ -816,7 +851,8 @@ public class WarPlayerListener implements Listener {
 				if (playerWarzone.getLoadoutSelections().keySet().contains(event.getPlayer().getName())
 						&& playerWarzone.getLoadoutSelections().get(event.getPlayer().getName()).isStillInSpawn()) {
 					LoadoutSelection selection = playerWarzone.getLoadoutSelections().get(event.getPlayer().getName());
-					int currentIndex = (selection.getSelectedIndex() + 1) % (playerTeam.getInventories().resolveLoadouts().keySet().size());
+					boolean hasFirstLoadout = playerTeam.getInventories().resolveLoadouts().containsKey("first");
+					int currentIndex = (selection.getSelectedIndex() + 1) % (playerTeam.getInventories().resolveLoadouts().keySet().size() - (hasFirstLoadout ? 1 : 0));
 					selection.setSelectedIndex(currentIndex);
 					
 					playerWarzone.equipPlayerLoadoutSelection(event.getPlayer(), playerTeam, false, true);
@@ -874,5 +910,34 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onPlayerChat(final AsyncPlayerChatEvent event) {
+		final Player player = event.getPlayer();
+		Warzone zone = Warzone.getZoneByLocation(player);
+		//not in a zone, we dont need to worry about this then
+		if(zone == null) {
+			return;
+		}
+		Team team = Team.getTeamByPlayerName(player.getDisplayName());
+		//not on a team, we don't need to worry about this then...
+		if(team == null) {
+			return;
+		}
+		//check if we have team-only chat on for this person
+		if(!team.inTeamChat(player)) { //this is a concurrently safe list, so we are good
+			return;
+		}
+		//we are in team chat!
+		team.teamcast(team.getKind().getColor() + player.getDisplayName() + ": " + ChatColor.WHITE + event.getMessage());
+		event.setCancelled(true); //will come up in normal chat if we let it
+	}
+	
+	@EventHandler
+	public void onPlayerLogin(final AsyncPlayerPreLoginEvent event) {
+		//we are going to be totaly async because we are just checking OUR database
+		if(War.war.getStatMapper().load(event.getName(), PlayerStatsMapper.KILL) == -1) {
+			War.war.getStatMapper().save(event.getName(), null, true); //this is the only reason we fire the event...
+		}
+	}
 	
 }

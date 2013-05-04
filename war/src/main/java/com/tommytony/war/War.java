@@ -3,6 +3,7 @@ package com.tommytony.war;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.tommytony.war.command.WarCommandHandler;
 import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.InventoryBag;
+import com.tommytony.war.config.ScoreboardType;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.config.TeamKind;
@@ -41,6 +46,10 @@ import com.tommytony.war.event.WarPlayerListener;
 import com.tommytony.war.event.WarServerListener;
 import com.tommytony.war.job.HelmetProtectionTask;
 import com.tommytony.war.job.SpoutFadeOutMessageJob;
+import com.tommytony.war.mapper.PlayerStatsMapper;
+import com.tommytony.war.mapper.PlayerStatsMySqlMapper;
+import com.tommytony.war.mapper.PlayerStatsSqliteMapper;
+import com.tommytony.war.mapper.PlayerStatsYmlMapper;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
@@ -50,6 +59,7 @@ import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.SizeCounter;
 import com.tommytony.war.utility.WarLogFormatter;
@@ -86,8 +96,29 @@ public class War extends JavaPlugin {
 	private HashMap<String, PlayerState> disconnected = new HashMap<String, PlayerState>();
 	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
 
-	private final List<String> deadlyAdjectives = new ArrayList<String>();
-	private final List<String> killerVerbs = new ArrayList<String>();
+	private final List<String> deadlyAdjectives = new ArrayList<String>() {{
+        clear();
+		add("");
+		add("");
+		add("mighty ");
+		add("deadly ");
+		add("fine ");
+		add("precise ");
+		add("brutal ");
+		add("powerful ");	
+	}};
+	
+	private final List<String> killerVerbs = new ArrayList<String>() {{
+		clear();
+		add("killed");
+		add("killed");
+		add("killed");
+		add("finished");
+		add("annihilated");
+		add("murdered");
+		add("obliterated");
+		add("exterminated");
+	}};
 
 	private final InventoryBag defaultInventories = new InventoryBag();
 
@@ -95,6 +126,11 @@ public class War extends JavaPlugin {
 	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
 	private SpoutDisplayer spoutMessenger = null;
+	
+	private File storageConfigFile = new File("plugins/War/storagecfg.yml");
+	private FileConfiguration storageConfiguration = null;
+	
+	private PlayerStatsMapper statMapper = null;
 
 	private Logger warLogger;
 
@@ -172,6 +208,9 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.RESETONUNLOAD, false);
 		warzoneDefaultConfig.put(WarzoneConfig.UNBREAKABLE, false);
 		warzoneDefaultConfig.put(WarzoneConfig.DEATHMESSAGES, true);
+		warzoneDefaultConfig.put(WarzoneConfig.COLOREDARMOR, true);
+		warzoneDefaultConfig.put(WarzoneConfig.KILLSTREAKS, true);
+		warzoneDefaultConfig.put(WarzoneConfig.SCOREBOARD, ScoreboardType.NONE);
 		
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);
 		teamDefaultConfig.put(TeamConfig.FLAGPOINTSONLY, false);
@@ -184,8 +223,9 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.SATURATION, 10);
 		teamDefaultConfig.put(TeamConfig.SPAWNSTYLE, TeamSpawnStyle.SMALL);
 		teamDefaultConfig.put(TeamConfig.TEAMSIZE, 10);
+		teamDefaultConfig.put(TeamConfig.PERMISSION, "war.player");
 		
-		this.getDefaultInventories().getLoadouts().clear();
+		this.getDefaultInventories().clearLoadouts();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
 		
 		ItemStack stoneSword = new ItemStack(Material.STONE_SWORD, 1, (byte) 8);
@@ -217,26 +257,6 @@ public class War extends JavaPlugin {
 		this.getZoneMakerNames().add("tommytony");
 		
 		// Add constants
-		this.getDeadlyAdjectives().clear();
-		this.getDeadlyAdjectives().add("");
-		this.getDeadlyAdjectives().add("");
-		this.getDeadlyAdjectives().add("mighty ");
-		this.getDeadlyAdjectives().add("deadly ");
-		this.getDeadlyAdjectives().add("fine ");
-		this.getDeadlyAdjectives().add("precise ");
-		this.getDeadlyAdjectives().add("brutal ");
-		this.getDeadlyAdjectives().add("powerful ");
-		
-		this.getKillerVerbs().clear();
-		this.getKillerVerbs().add("killed");
-		this.getKillerVerbs().add("killed");
-		this.getKillerVerbs().add("killed");
-		this.getKillerVerbs().add("finished");
-		this.getKillerVerbs().add("annihilated");
-		this.getKillerVerbs().add("murdered");
-		this.getKillerVerbs().add("obliterated");
-		this.getKillerVerbs().add("exterminated");
-		
 		// Load files
 		WarYmlMapper.load();
 		
@@ -247,6 +267,25 @@ public class War extends JavaPlugin {
 		if (this.isSpoutServer) {
 			SpoutFadeOutMessageJob fadeOutMessagesTask = new SpoutFadeOutMessageJob();
 			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, fadeOutMessagesTask, 100, 100);
+		}
+		
+		try {
+			this.storageConfigFile.createNewFile();
+			FileConfiguration storageYmlFile = this.getStorageConfig();
+			if(storageYmlFile.getBoolean("flatfile")) { //use a flatfile
+				this.statMapper = new PlayerStatsYmlMapper();
+			} else {
+				if(storageYmlFile.getString("database.sql.database").trim().contains("sqlite")) {
+					this.statMapper = new PlayerStatsSqliteMapper();
+				} else if(storageYmlFile.getString("database.sql.database").contains("mysql")) { //if we are not sqlite we will use mysql 
+					this.statMapper = new PlayerStatsMySqlMapper();
+				} else {
+					this.statMapper = new PlayerStatsYmlMapper();
+				}
+			}
+			this.statMapper.init();
+		} catch(IOException e) {
+			this.getLogger().log(Level.WARNING, "Failed to open storage configuration file");
 		}
 		
 		// Get own log file
@@ -291,6 +330,7 @@ public class War extends JavaPlugin {
 
 		this.getServer().getScheduler().cancelTasks(this);
 		this.playerListener.purgeLatestPositions();
+		this.statMapper.close();
 
 		this.log("War v" + this.desc.getVersion() + " is off.", Level.INFO);
 		this.setLoaded(false);
@@ -338,6 +378,7 @@ public class War extends JavaPlugin {
 	public ItemStack copyStack(ItemStack originalStack) {
 		ItemStack copiedStack = new ItemStack(originalStack.getType(), originalStack.getAmount(), originalStack.getDurability(), new Byte(originalStack.getData().getData()));
 		copiedStack.setDurability(originalStack.getDurability());
+                copiedStack.setItemMeta(originalStack.getItemMeta());
 		copyEnchantments(originalStack, copiedStack);	
 		
 		return copiedStack;
@@ -391,15 +432,15 @@ public class War extends JavaPlugin {
 				Player player = (Player) commandSender;
 				if (namedParams.containsKey("loadout")) {
 					String loadoutName = namedParams.get("loadout");
-					HashMap<Integer, ItemStack> loadout = team.getInventories().getLoadouts().get(loadoutName);
+					HashMap<Integer, ItemStack> loadout = team.getInventories().getLoadout(loadoutName);
 					if (loadout == null) {
 						// Check if any loadouts exist, if not gotta use the default inventories then add the newly created one
-						if(team.getInventories().getLoadouts().isEmpty()) {
+						if(!team.getInventories().hasLoadouts()) {
 							Warzone warzone = Warzone.getZoneByTeam(team);
 							for (String key : warzone.getDefaultInventories().resolveLoadouts().keySet()) {
 								HashMap<Integer, ItemStack> transferredLoadout = warzone.getDefaultInventories().resolveLoadouts().get(key);
 								if (transferredLoadout != null) {
-									team.getInventories().getLoadouts().put(key, transferredLoadout);
+									team.getInventories().setLoadout(key, transferredLoadout);
 								} else {
 									War.war.log("Failed to transfer loadout " + key + " down to team " + team.getName() + " in warzone " + warzone.getName(), Level.WARNING);
 								}
@@ -407,7 +448,7 @@ public class War extends JavaPlugin {
 						}
 						
 						loadout = new HashMap<Integer, ItemStack>();
-						team.getInventories().getLoadouts().put(loadoutName, loadout);
+						team.getInventories().setLoadout(loadoutName, loadout);
 						returnMessage.append(loadoutName + " respawn loadout added.");
 					} else {
 						returnMessage.append(loadoutName + " respawn loadout updated.");
@@ -416,7 +457,7 @@ public class War extends JavaPlugin {
 				} 
 				if (namedParams.containsKey("deleteloadout")) {
 					String loadoutName = namedParams.get("deleteloadout");
-					if (team.getInventories().getLoadouts().keySet().contains(loadoutName)) {
+					if (team.getInventories().containsLoadout(loadoutName)) {
 						team.getInventories().removeLoadout(loadoutName);
 						returnMessage.append(" " + loadoutName + " loadout removed.");
 					} else {
@@ -472,23 +513,23 @@ public class War extends JavaPlugin {
 				Player player = (Player) commandSender;
 				if (namedParams.containsKey("loadout")) {
 					String loadoutName = namedParams.get("loadout");
-					HashMap<Integer, ItemStack> loadout = warzone.getDefaultInventories().getLoadouts().get(loadoutName);
+					HashMap<Integer, ItemStack> loadout = warzone.getDefaultInventories().getLoadout(loadoutName);
 					if (loadout == null) {
 						loadout = new HashMap<Integer, ItemStack>();
 
 						// Check if any loadouts exist, if not gotta use the default inventories then add the newly created one
-						if(warzone.getDefaultInventories().getLoadouts().isEmpty()) {
+						if(!warzone.getDefaultInventories().hasLoadouts()) {
 							for (String key : warzone.getDefaultInventories().resolveLoadouts().keySet()) {
 								HashMap<Integer, ItemStack> transferredLoadout = warzone.getDefaultInventories().resolveLoadouts().get(key);
 								if (transferredLoadout != null) {
-									warzone.getDefaultInventories().getLoadouts().put(key, transferredLoadout);
+									warzone.getDefaultInventories().setLoadout(key, transferredLoadout);
 								} else {
 									War.war.log("Failed to transfer loadout " + key + " down to warzone " + warzone.getName(), Level.WARNING);
 								}
 							}
 						}
 						
-						warzone.getDefaultInventories().getLoadouts().put(loadoutName, loadout);
+						warzone.getDefaultInventories().setLoadout(loadoutName, loadout);
 						returnMessage.append(loadoutName + " respawn loadout added.");
 					} else {
 						returnMessage.append(loadoutName + " respawn loadout updated.");
@@ -497,7 +538,7 @@ public class War extends JavaPlugin {
 				} 
 				if (namedParams.containsKey("deleteloadout")) {
 					String loadoutName = namedParams.get("deleteloadout");
-					if (warzone.getDefaultInventories().getLoadouts().keySet().contains(loadoutName)) {
+					if (warzone.getDefaultInventories().containsLoadout(loadoutName)) {
 						warzone.getDefaultInventories().removeLoadout(loadoutName);
 						returnMessage.append(" " + loadoutName + " loadout removed.");
 					} else {
@@ -636,7 +677,7 @@ public class War extends JavaPlugin {
 				Player player = (Player) commandSender;
 				if (namedParams.containsKey("loadout")) {
 					String loadoutName = namedParams.get("loadout");
-					HashMap<Integer, ItemStack> loadout = this.getDefaultInventories().getLoadouts().get(loadoutName);
+					HashMap<Integer, ItemStack> loadout = this.getDefaultInventories().getLoadout(loadoutName);
 					if (loadout == null) {
 						loadout = new HashMap<Integer, ItemStack>();
 						this.getDefaultInventories().addLoadout(loadoutName, loadout);
@@ -648,8 +689,8 @@ public class War extends JavaPlugin {
 				} 
 				if (namedParams.containsKey("deleteloadout")) {
 					String loadoutName = namedParams.get("deleteloadout");
-					if (this.getDefaultInventories().getLoadouts().keySet().contains(loadoutName)) {
-						if (this.getDefaultInventories().getLoadouts().keySet().size() > 1) {
+					if (this.getDefaultInventories().containsLoadout(loadoutName)) {
+						if (this.getDefaultInventories().getNewLoadouts().size() > 1) {
 							this.getDefaultInventories().removeLoadout(loadoutName);
 							returnMessage.append(" " + loadoutName + " loadout removed.");
 						} else {
@@ -937,15 +978,16 @@ public class War extends JavaPlugin {
 		}
 		return null;
 	}
-
+        
 	/**
-	 * Checks whether the given player is allowed to play war.
+	 * Checks whether the given player is allowed to play in a certain team
 	 *
 	 * @param 	player	Player to check
-	 * @return		true if the player may play war
+         * @param         team  Team to check  
+	 * @return		true if the player may play in the team
 	 */
-	public boolean canPlayWar(Player player) {
-		return player.hasPermission("war.player");
+	public boolean canPlayWar(Player player, Team team) {
+		return player.hasPermission(team.getTeamConfig().resolveString(TeamConfig.PERMISSION));
 	}
 
 	/**
@@ -1163,5 +1205,50 @@ public class War extends JavaPlugin {
 	
 	public HubLobbyMaterials getWarhubMaterials() {
 		return this.warhubMaterials;
+	}
+	
+	public WarEntityListener getEntityListener() {
+		return this.entityListener;
+	}
+	
+	public FileConfiguration getStorageConfig() {
+		if(this.storageConfiguration == null) {
+			this.reloadStorageConfig();
+		}
+		return this.storageConfiguration;
+	}
+	
+	private void reloadStorageConfig() {
+		this.storageConfiguration = YamlConfiguration.loadConfiguration(this.storageConfigFile);
+		//defaults for storage config
+		Map<String, Object> storageDefaults = new HashMap<String, Object>(6) {{
+			put("flatfile", false);
+			put("database.sql.host", "localhost");
+			put("database.sql.user", "root");
+			put("database.sql.databaselocation", "$WAR/War.db");
+			put("database.sql.password", "12345");
+			put("database.sql.database", "sqlite"); //mysql or sqllite
+			put("database.sql.databasename", "bukkit");
+		}};
+		this.storageConfiguration.addDefaults(storageDefaults);
+		if(this.storageConfigFile.lastModified() < 50) {
+	        for(Map.Entry<String, Object> entry : storageDefaults.entrySet()) {
+	    	    this.storageConfiguration.set(entry.getKey(), entry.getValue());
+	        }
+		}
+		try {
+			this.storageConfiguration.save(this.storageConfigFile);
+		} catch (IOException e) {
+			War.war.log("Failed to save Storage Configuration File", Level.WARNING);
+		}
+	}
+	
+	public PlayerStatsMapper getStatMapper() {
+		return this.statMapper;
+	}
+	
+	public void setStatMapper(PlayerStatsMapper map) {
+		this.statMapper = map;
+		this.statMapper.init();
 	}
 }

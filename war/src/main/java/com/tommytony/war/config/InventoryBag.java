@@ -7,10 +7,13 @@ import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.utility.Loadout;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InventoryBag {
 
-	private HashMap<String, HashMap<Integer, ItemStack>> loadouts = new HashMap<String, HashMap<Integer,ItemStack>>();
+	private List<Loadout> loadouts = new ArrayList();
 	private HashMap<Integer, ItemStack> reward = null;
 	
 	private Warzone warzone;
@@ -24,11 +27,23 @@ public class InventoryBag {
 	}
 
 	public void addLoadout(String name, HashMap<Integer, ItemStack> loadout) {
-		this.loadouts.put(name, loadout);
+		this.loadouts.add(new Loadout(name, loadout, null));
+	}
+
+	public void addLoadout(Loadout loadout) {
+		this.loadouts.add(loadout);
 	}
 	
 	public void removeLoadout(String name) {
-		this.loadouts.remove(name);
+		for (Loadout ldt : loadouts) {
+			if (ldt.getName().equals(name)) {
+				this.loadouts.remove(ldt);
+			}
+		}
+	}
+
+	public void removeLoadout(Loadout ldt) {
+		this.loadouts.remove(ldt);
 	}
 	
 	public boolean hasLoadouts() {
@@ -36,18 +51,38 @@ public class InventoryBag {
 	}
 	
 	public HashMap<String, HashMap<Integer, ItemStack>> getLoadouts() {
-		return this.loadouts;
+		return Loadout.toLegacyFormat(loadouts);
+	}
+
+	public List<Loadout> getNewLoadouts() {
+		return loadouts;
+	}
+
+	public void setLoadouts(List<Loadout> loadouts) {
+		this.loadouts = loadouts;
 	}
 	
 	public HashMap<String, HashMap<Integer, ItemStack>> resolveLoadouts() {
 		if (this.hasLoadouts()) {
-			return loadouts;
+			return this.getLoadouts();
 		} else if (warzone != null && warzone.getDefaultInventories().hasLoadouts()) {
 			return warzone.getDefaultInventories().resolveLoadouts();
 		} else if (War.war.getDefaultInventories().hasLoadouts()) {
 			return War.war.getDefaultInventories().resolveLoadouts();
 		} else {
 			return new HashMap<String, HashMap<Integer, ItemStack>>();
+		}
+	}
+
+	public List<Loadout> resolveNewLoadouts() {
+		if (this.hasLoadouts()) {
+			return this.getNewLoadouts();
+		} else if (warzone != null && warzone.getDefaultInventories().hasLoadouts()) {
+			return warzone.getDefaultInventories().resolveNewLoadouts();
+		} else if (War.war.getDefaultInventories().hasLoadouts()) {
+			return War.war.getDefaultInventories().resolveNewLoadouts();
+		} else {
+			return new ArrayList();
 		}
 	}
 	
@@ -75,5 +110,37 @@ public class InventoryBag {
 	
 	public void clearLoadouts() {
 		this.loadouts.clear();
+	}
+
+	public HashMap<Integer, ItemStack> getLoadout(String loadoutName) {
+		for (Loadout ldt : loadouts) {
+			if (ldt.getName().equals(loadoutName)) {
+				return ldt.getContents();
+			}
+		}
+		return null;
+	}
+
+	public Loadout getNewLoadout(String loadoutName) {
+		for (Loadout ldt : loadouts) {
+			if (ldt.getName().equals(loadoutName)) {
+				return ldt;
+			}
+		}
+		return null;
+	}
+
+	public void setLoadout(String name, HashMap<Integer, ItemStack> contents) {
+		for (Loadout ldt : loadouts) {
+			if (ldt.getName().equals(name)) {
+				ldt.setContents(contents);
+				return;
+			}
+		}
+		loadouts.add(new Loadout(name, contents, null));
+	}
+
+	public boolean containsLoadout(String name) {
+		return this.getNewLoadout(name) != null;
 	}
 }

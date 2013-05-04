@@ -1,5 +1,5 @@
 name: War
-version: 1.7.4 (Doolittle)
+version: 1.8.1 (Lee)
 description: Minecraft PVP arenas (called warzones) for a fast-paced and structured PVP experience with TDM, CTF & more!
 author: tommytony
 website: http://war.tommytony.com
@@ -84,6 +84,13 @@ commands:
     description: War> Team chat.
     usage: Team chat.
         Ex - /team <message>
+  wstats:
+    description: War> Prints the stats in War for a player.
+    usage: Lists the stats of a player.
+        Ex - /wstats <player>
+    aliases: 
+        - warstats
+        - wstat
 # Warzone maker commands (must have the 'war.zonemaker' permission or be added as a zone-maker in /plugins/War/war.txt)
 # Battle-related commands
   nextbattle:

@@ -2,7 +2,10 @@ package com.tommytony.war;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -11,11 +14,13 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 
 import com.tommytony.war.config.InventoryBag;
+import com.tommytony.war.config.ScoreboardType;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.config.TeamKind;
@@ -23,17 +28,27 @@ import com.tommytony.war.config.TeamSpawnStyle;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.utility.Direction;
+import com.tommytony.war.utility.PlayerStatTracker;
 import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 
 /**
  *
- * @author tommytony
+ * @author tommytony, grinning
  *
  */
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
+	private Map<Player, Integer> kills = new HashMap<Player, Integer>(6); //keeps track of kills per life
+	private List<Player> fiveKillStreak = new ArrayList<Player>(4); //keeps track of who has a five killstreak (airstrike)
+	private List<Player> sevenKillStreak = new ArrayList<Player>(4); //keeps track of who has a seven killstrea (dogs)
+	private List<Player> inTeamChat = new CopyOnWriteArrayList<Player>(); //keeps track of who is in teamchat
+	private List<BukkitTask> doggieManagers = new ArrayList<BukkitTask>(); //keeps track of doggie's and keeping them in the fight!
 	private Location teamSpawn = null;
 	private Location teamFlag = null;
 	private String name;
@@ -46,6 +61,7 @@ public class Team {
 
 	private TeamConfigBag teamConfig;
 	private InventoryBag inventories;
+	private boolean spectator; //Zacraft feature request, setting grounds for it
 
 	public Team(String name, TeamKind kind, Location teamSpawn, Warzone warzone) {
 		this.warzone = warzone;
@@ -56,6 +72,7 @@ public class Team {
 		this.setSpawnVolume(new Volume(name, warzone.getWorld()));
 		this.kind = kind;
 		this.setFlagVolume(null); // no flag at the start
+		this.spectator = false;
 	}
 
 	public static Team getTeamByPlayerName(String playerName) {
@@ -376,6 +393,10 @@ public class Team {
 
 	public void addPlayer(Player player) {
 		this.players.add(player);
+		this.kills.put(player, 0);
+		if (this.warzone.getScoreboardType() != ScoreboardType.NONE) {
+			player.setScoreboard(this.warzone.getScoreboard());
+		}
 	}
 
 	public List<Player> getPlayers() {
@@ -420,6 +441,21 @@ public class Team {
 		}
 		if (thePlayer != null) {
 			this.players.remove(thePlayer);
+			this.kills.remove(thePlayer);
+			thePlayer.resetMaxHealth(); //take away three killstreak if any
+			
+			//prevent memory leaks!
+			if(this.hasFiveKillStreak(thePlayer)) {
+				this.removeFiveKillStreak(thePlayer);
+			}
+			
+			if(this.hasSevenKillStreak(thePlayer)) {
+				this.removeSevenKillStreak(thePlayer);
+			}
+			
+			if(this.isSpectate()) {
+				thePlayer.setCanPickupItems(true); //spectators cant pick up anything
+			}
 			
 			if (this.warzone.isFlagThief(thePlayer.getName())) {
 				Team victim = this.warzone.getVictimTeamForFlagThief(thePlayer.getName());
@@ -459,6 +495,12 @@ public class Team {
 
 	public void setRemainingLives(int remainingLives) {
 		this.remainingLives = remainingLives;
+		if (this.warzone.getScoreboard() != null && this.warzone.getScoreboardType() == ScoreboardType.LIFEPOOL) {
+			String teamName = kind.getColor() + name + ChatColor.RESET;
+			OfflinePlayer teamPlayer = Bukkit.getOfflinePlayer(teamName);
+			Objective obj = this.warzone.getScoreboard().getObjective("Lifepool");
+			obj.getScore(teamPlayer).setScore(remainingLives);
+		}
 	}
 
 	public int getRemainingLifes() {
@@ -477,6 +519,11 @@ public class Team {
 			this.points++;
 		} else if (!atLeastOnePlayerOnOtherTeam) {
 			this.teamcast("Can't score until at least one player joins another team.");
+		}
+		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS) {
+			String teamName = kind.getColor() + name + ChatColor.RESET;
+			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
+					.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(points);
 		}
 	}
 
@@ -504,6 +551,11 @@ public class Team {
 
 	public void resetPoints() {
 		this.points = 0;
+		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS) {
+			String teamName = kind.getColor() + name + ChatColor.RESET;
+			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
+					.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(points);
+		}
 	}
 
 	public void setFlagVolume(Volume flagVolume) {
@@ -683,5 +735,88 @@ public class Team {
 
 	public TeamConfigBag getTeamConfig() {
 		return this.teamConfig;
+	}
+	
+	public int getKills(Player p) {
+		Integer i = this.kills.get(p);
+		if(i == null) {
+			return 0; //if you dont exist, you must have 0 kills and our logic is bugged...
+		}
+		return i; //automatic compiler typing
+	}
+	
+	public void incKills(Player p) {
+		this.kills.put(p, this.getKills(p) + 1);
+		PlayerStatTracker.getStats(p).incKills(); //increment our kills
+	}
+	
+	public void zeroKills(Player p) {
+		this.kills.put(p, 0);
+	}
+	
+	public boolean hasFiveKillStreak(Player p) {
+		for(Player pl : this.fiveKillStreak) {
+			if(pl.equals(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addFiveKillStreak(Player p) {
+		this.fiveKillStreak.add(p);
+	}
+	
+	public void removeFiveKillStreak(Player p) {
+		this.fiveKillStreak.remove(p);
+	}
+	
+	public boolean hasSevenKillStreak(Player p) {
+		for(Player pl : this.sevenKillStreak) {
+			if(pl.equals(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addSevenKillStreak(Player p) {
+		this.sevenKillStreak.add(p);
+	}
+	
+	public void removeSevenKillStreak(Player p) {
+		this.sevenKillStreak.remove(p);
+	}
+	
+	public boolean inTeamChat(Player p) {
+		for(Player pl : this.inTeamChat) {
+			if(pl.equals(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addToTeamchat(Player p) {
+		this.inTeamChat.add(p);
+	}
+	
+	public void removeFromTeamchat(Player p) {
+		this.inTeamChat.remove(p);
+	}
+	
+	public void addDoggyManager(BukkitTask task) {
+		this.doggieManagers.add(task);
+	}
+	
+	public void clearDoggyManagers() {
+		for(BukkitTask y : this.doggieManagers) {
+			y.cancel();
+		}
+		this.doggieManagers.clear();
+	}
+	
+	public boolean isSpectate() {
+		return this.spectator;
 	}
 }
