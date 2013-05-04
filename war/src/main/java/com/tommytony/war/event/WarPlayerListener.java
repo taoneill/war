@@ -257,7 +257,6 @@ public class WarPlayerListener implements Listener {
 		Warzone locZone = Warzone.getZoneByLocation(playerLoc);
 		ZoneLobby locLobby = ZoneLobby.getLobbyByLocation(playerLoc);
 
-		boolean canPlay = War.war.canPlayWar(player);
 		boolean isMaker = War.war.isZoneMaker(player);
 
 		// Zone walls
@@ -288,7 +287,7 @@ public class WarPlayerListener implements Listener {
 			Warzone zone = locLobby.getZone();
 			Team oldTeam = Team.getTeamByPlayerName(player.getName());
 			boolean isAutoAssignGate = false;
-			if (oldTeam == null && canPlay) { // trying to counter spammy player move
+			if (oldTeam == null) { // trying to counter spammy player move
 				isAutoAssignGate = zone.getLobby().isAutoAssignGate(playerLoc);
 				if (isAutoAssignGate) {
 					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
@@ -303,9 +302,13 @@ public class WarPlayerListener implements Listener {
 						}
 						
 						if (noOfPlayers < totalCap) {
-							zone.autoAssign(player);
+							boolean assigned = zone.autoAssign(player) != null ? true : false;
+                                                        if (!assigned) {
+                                                                event.setTo(zone.getTeleport());
+                                                                War.war.badMsg(player, "You don't have permission for any of the available teams in this warzone");
+                                                        }
 
-							if (War.war.getWarHub() != null) {
+							if (War.war.getWarHub() != null && assigned) {
 								War.war.getWarHub().resetZoneSign(zone);
 							}
 						} else {
@@ -323,7 +326,8 @@ public class WarPlayerListener implements Listener {
 						this.dropFromOldTeamIfAny(player);
 						if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 							this.handleDisabledZone(event, player, zone);
-						} else if (team.getPlayers().size() < team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)) {
+						} else if (team.getPlayers().size() < team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)
+                                                        && War.war.canPlayWar(player, team)) {
 							team.addPlayer(player);
 							team.resetSign();
 							if (War.war.getWarHub() != null) {
@@ -335,6 +339,9 @@ public class WarPlayerListener implements Listener {
 							for (Team t : zone.getTeams()) {
 								t.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
 							}
+                                                } else if (!War.war.canPlayWar(player, team)) {
+							event.setTo(zone.getTeleport());
+							War.war.badMsg(player, "You don't have permission to join team " + team.getName());
 						} else {
 							event.setTo(zone.getTeleport());
 							War.war.badMsg(player, "Team " + team.getName() + " is full.");
