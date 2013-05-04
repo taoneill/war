@@ -92,6 +92,25 @@ public class TeamConfigBag {
 		}
 	}
 	
+	public String getString(TeamConfig config) {
+		if (this.contains(config)) {
+			return (String)this.bag.get(config);
+		}
+		return null;
+	}
+	
+	public String resolveString(TeamConfig config) {
+		if (this.contains(config)) {
+			return (String)this.bag.get(config); 
+		} else if (this.warzone != null && this.warzone.getTeamDefaultConfig().contains(config)){
+			// use Warzone default config
+			return this.warzone.getTeamDefaultConfig().resolveString(config);
+		} else {
+			// use War default config
+			return War.war.getTeamDefaultConfig().resolveString(config);
+		}
+	}
+	
 	public FlagReturn resolveFlagReturn() {
 		if (this.contains(TeamConfig.FLAGRETURN)) {
 			return (FlagReturn)this.bag.get(TeamConfig.FLAGRETURN); 
@@ -136,6 +155,8 @@ public class TeamConfigBag {
 					this.put(config, teamConfigSection.getInt(config.toString()));
 				} else if (config.getConfigType().equals(Boolean.class)) {
 					this.put(config, teamConfigSection.getBoolean(config.toString()));
+				} else if (config.getConfigType().equals(String.class)) {
+					this.put(config, teamConfigSection.getString(config.toString()));
 				} else if (config.getConfigType().equals(FlagReturn.class)) {
 					String flagReturnStr = teamConfigSection.getString(config.toString());
 					FlagReturn returnMode = FlagReturn.getFromString(flagReturnStr);
@@ -177,6 +198,9 @@ public class TeamConfigBag {
 				} else if (teamConfig.getConfigType().equals(Boolean.class)) {
 					String onOff = namedParams.get(namedParam);
 					this.bag.put(teamConfig, onOff.equals("on") || onOff.equals("true"));
+				} else if (teamConfig.getConfigType().equals(String.class)) {
+					String str = namedParams.get(namedParam);
+					this.bag.put(teamConfig, str);
 				} else if (teamConfig.getConfigType().equals(FlagReturn.class)) {
 					FlagReturn flagValue = FlagReturn.getFromString(namedParams.get(namedParam));
 					this.bag.put(teamConfig, flagValue);

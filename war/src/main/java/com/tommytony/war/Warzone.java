@@ -830,7 +830,9 @@ public class Warzone {
 		Team lowestNoOfPlayers = null;
 		for (Team t : this.teams) {
 			if (lowestNoOfPlayers == null || (lowestNoOfPlayers != null && lowestNoOfPlayers.getPlayers().size() > t.getPlayers().size())) {
-				lowestNoOfPlayers = t;
+                                if (War.war.canPlayWar(player, t)) {
+                                        lowestNoOfPlayers = t;
+                                }
 			}
 		}
 		if (lowestNoOfPlayers != null) {
