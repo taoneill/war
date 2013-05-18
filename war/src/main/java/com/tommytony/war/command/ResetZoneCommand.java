@@ -9,6 +9,7 @@ import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.structure.ZoneLobby;
+import java.util.Iterator;
 
 
 public class ResetZoneCommand extends AbstractZoneMakerCommand {
@@ -46,7 +47,9 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 		zone.clearThieves();
 		for (Team team : zone.getTeams()) {
 			team.teamcast("The war has ended. " + zone.getTeamInformation() + " Resetting warzone " + zone.getName() + " and teams...");
-			for (Player p : team.getPlayers()) {
+			for (Iterator<Player> it = team.getPlayers().iterator(); it.hasNext();) {
+				Player p = it.next();
+				it.remove();
 				zone.restorePlayerState(p);
 				p.teleport(zone.getTeleport());
 				War.war.msg(p, "You have left the warzone. Your inventory is being restored.");

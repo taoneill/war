@@ -832,12 +832,15 @@ public class Warzone {
 		Team lowestNoOfPlayers = null;
 		for (Team t : this.teams) {
 			if (lowestNoOfPlayers == null || (lowestNoOfPlayers != null && lowestNoOfPlayers.getPlayers().size() > t.getPlayers().size())) {
-                                if (War.war.canPlayWar(player, t)) {
-                                        lowestNoOfPlayers = t;
-                                }
+				if (War.war.canPlayWar(player, t)) {
+						lowestNoOfPlayers = t;
+				}
 			}
 		}
 		if (lowestNoOfPlayers != null) {
+			if (player.getWorld() != this.getWorld()) {
+				player.teleport(this.getWorld().getSpawnLocation());
+			}
 			lowestNoOfPlayers.addPlayer(player);
 			lowestNoOfPlayers.resetSign();
 			if (!this.hasPlayerState(player.getName())) {
