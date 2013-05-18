@@ -83,10 +83,13 @@ public class JoinCommand extends AbstractWarCommand {
 			boolean foundTeam = false;
 			for (Team team : teams) {
 				if (team.getName().startsWith(name) || team.getKind() == kind) {
-                                        if (!War.war.canPlayWar(player, team)) {
-                                                this.badMsg("You don't have permission to join this team.");
-                                                return true;
-                                        }
+					if (!War.war.canPlayWar(player, team)) {
+							this.badMsg("You don't have permission to join this team.");
+							return true;
+					}
+					if (player.getWorld() != zone.getWorld()) {
+						player.teleport(zone.getWorld().getSpawnLocation());
+					}
 					if (!zone.hasPlayerState(player.getName())) {
 						zone.keepPlayerState(player);
 						this.msg("Your inventory is in storage until you use '/war leave'.");
