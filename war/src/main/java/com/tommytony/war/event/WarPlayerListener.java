@@ -45,6 +45,7 @@ import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
 import java.util.ArrayList;
 import java.util.Iterator;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
  * @author tommytony, Tim Düsterhus
@@ -487,6 +488,10 @@ public class WarPlayerListener implements Listener {
 						team.teamcast(player.getName() + " dropped the " + bomb.getName() + " bomb!");
 					}		
 					return;
+				} else {
+					// Get player back to spawn
+					playerWarzone.respawnPlayer(event, playerTeam, player);
+					return;
 				}
 			}
 						
@@ -877,6 +882,68 @@ public class WarPlayerListener implements Listener {
 					}
 					
 					break;
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void onPlayerTeleport(final PlayerTeleportEvent event) {
+		if (War.war.isLoaded()) {
+			Warzone playerWarzone = Warzone.getZoneByPlayerName(event.getPlayer().getName());
+			Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
+			if (playerWarzone != null) {
+				if (!playerWarzone.getVolume().contains(event.getTo())) {
+					// Prevent teleporting out of the warzone
+					if (!playerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+						War.war.badMsg(event.getPlayer(), "Use /leave (or /war leave) to exit the zone.");
+					}
+					if (playerWarzone.isFlagThief(event.getPlayer().getName())) {
+						Team victimTeam = playerWarzone.getVictimTeamForFlagThief(event.getPlayer().getName());
+
+						// Get event.getPlayer() back to spawn
+						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
+						playerWarzone.removeFlagThief(event.getPlayer().getName());
+
+						// Bring back flag of victim team
+						victimTeam.getFlagVolume().resetBlocks();
+						victimTeam.initializeTeamFlag();
+
+						for (Team team : playerWarzone.getTeams()) {
+							team.teamcast(event.getPlayer().getName() + " dropped the " + victimTeam.getName() + " flag!");
+						}
+					} else if (playerWarzone.isCakeThief(event.getPlayer().getName())) {
+						Cake cake = playerWarzone.getCakeForThief(event.getPlayer().getName());
+
+						// Get event.getPlayer() back to spawn
+						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
+						playerWarzone.removeCakeThief(event.getPlayer().getName());
+
+						// Bring back cake
+						cake.getVolume().resetBlocks();
+						cake.addCakeBlocks();
+
+						for (Team team : playerWarzone.getTeams()) {
+							team.teamcast(event.getPlayer().getName() + " dropped the " + cake.getName() + " cake!");
+						}
+					} else if (playerWarzone.isBombThief(event.getPlayer().getName())) {
+						Bomb bomb = playerWarzone.getBombForThief(event.getPlayer().getName());
+
+						// Get event.getPlayer() back to spawn
+						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
+						playerWarzone.removeBombThief(event.getPlayer().getName());
+
+						// Bring back bomb
+						bomb.getVolume().resetBlocks();
+						bomb.addBombBlocks();
+
+						for (Team team : playerWarzone.getTeams()) {
+							team.teamcast(event.getPlayer().getName() + " dropped the " + bomb.getName() + " bomb!");
+						}
+					} else {
+						// Get event.getPlayer() back to spawn
+						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
+					}
 				}
 			}
 		}
