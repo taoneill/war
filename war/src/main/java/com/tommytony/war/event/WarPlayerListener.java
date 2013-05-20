@@ -45,6 +45,7 @@ import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
 import java.util.ArrayList;
 import java.util.Iterator;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
  * @author tommytony, Tim Düsterhus
@@ -310,10 +311,10 @@ public class WarPlayerListener implements Listener {
 						
 						if (noOfPlayers < totalCap) {
 							boolean assigned = zone.autoAssign(player) != null ? true : false;
-                                                        if (!assigned) {
-                                                                event.setTo(zone.getTeleport());
-                                                                War.war.badMsg(player, "You don't have permission for any of the available teams in this warzone");
-                                                        }
+							if (!assigned) {
+								event.setTo(zone.getTeleport());
+								War.war.badMsg(player, "You don't have permission for any of the available teams in this warzone");
+							}
 
 							if (War.war.getWarHub() != null && assigned) {
 								War.war.getWarHub().resetZoneSign(zone);
@@ -334,7 +335,10 @@ public class WarPlayerListener implements Listener {
 						if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 							this.handleDisabledZone(event, player, zone);
 						} else if (team.getPlayers().size() < team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)
-                                                        && War.war.canPlayWar(player, team)) {
+								&& War.war.canPlayWar(player, team)) {
+							if (player.getWorld() != zone.getWorld()) {
+								player.teleport(zone.getWorld().getSpawnLocation());
+							}
 							team.addPlayer(player);
 							team.resetSign();
 							if (War.war.getWarHub() != null) {
@@ -346,7 +350,7 @@ public class WarPlayerListener implements Listener {
 							for (Team t : zone.getTeams()) {
 								t.teamcast("" + player.getName() + " joined team " + team.getName() + ".");
 							}
-                                                } else if (!War.war.canPlayWar(player, team)) {
+						} else if (!War.war.canPlayWar(player, team)) {
 							event.setTo(zone.getTeleport());
 							War.war.badMsg(player, "You don't have permission to join team " + team.getName());
 						} else {
@@ -483,6 +487,10 @@ public class WarPlayerListener implements Listener {
 					for (Team team : playerWarzone.getTeams()) {
 						team.teamcast(player.getName() + " dropped the " + bomb.getName() + " bomb!");
 					}		
+					return;
+				} else {
+					// Get player back to spawn
+					playerWarzone.respawnPlayer(event, playerTeam, player);
 					return;
 				}
 			}
@@ -874,6 +882,68 @@ public class WarPlayerListener implements Listener {
 					}
 					
 					break;
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void onPlayerTeleport(final PlayerTeleportEvent event) {
+		if (War.war.isLoaded()) {
+			Warzone playerWarzone = Warzone.getZoneByPlayerName(event.getPlayer().getName());
+			Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
+			if (playerWarzone != null) {
+				if (!playerWarzone.getVolume().contains(event.getTo())) {
+					// Prevent teleporting out of the warzone
+					if (!playerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+						War.war.badMsg(event.getPlayer(), "Use /leave (or /war leave) to exit the zone.");
+					}
+					if (playerWarzone.isFlagThief(event.getPlayer().getName())) {
+						Team victimTeam = playerWarzone.getVictimTeamForFlagThief(event.getPlayer().getName());
+
+						// Get event.getPlayer() back to spawn
+						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
+						playerWarzone.removeFlagThief(event.getPlayer().getName());
+
+						// Bring back flag of victim team
+						victimTeam.getFlagVolume().resetBlocks();
+						victimTeam.initializeTeamFlag();
+
+						for (Team team : playerWarzone.getTeams()) {
+							team.teamcast(event.getPlayer().getName() + " dropped the " + victimTeam.getName() + " flag!");
+						}
+					} else if (playerWarzone.isCakeThief(event.getPlayer().getName())) {
+						Cake cake = playerWarzone.getCakeForThief(event.getPlayer().getName());
+
+						// Get event.getPlayer() back to spawn
+						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
+						playerWarzone.removeCakeThief(event.getPlayer().getName());
+
+						// Bring back cake
+						cake.getVolume().resetBlocks();
+						cake.addCakeBlocks();
+
+						for (Team team : playerWarzone.getTeams()) {
+							team.teamcast(event.getPlayer().getName() + " dropped the " + cake.getName() + " cake!");
+						}
+					} else if (playerWarzone.isBombThief(event.getPlayer().getName())) {
+						Bomb bomb = playerWarzone.getBombForThief(event.getPlayer().getName());
+
+						// Get event.getPlayer() back to spawn
+						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
+						playerWarzone.removeBombThief(event.getPlayer().getName());
+
+						// Bring back bomb
+						bomb.getVolume().resetBlocks();
+						bomb.addBombBlocks();
+
+						for (Team team : playerWarzone.getTeams()) {
+							team.teamcast(event.getPlayer().getName() + " dropped the " + bomb.getName() + " bomb!");
+						}
+					} else {
+						// Get event.getPlayer() back to spawn
+						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
+					}
 				}
 			}
 		}
