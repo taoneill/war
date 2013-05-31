@@ -12,6 +12,7 @@ import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.spout.SpoutDisplayer;
+import java.util.Iterator;
 
 public class ScoreCapReachedJob implements Runnable {
 
@@ -41,10 +42,10 @@ public class ScoreCapReachedJob implements Runnable {
 			String winnersStrAndExtra = "Score cap reached. Game is over! Winning team(s): " + this.winnersStr;
 			winnersStrAndExtra += ". Resetting warzone and your inventory...";
 			t.teamcast(winnersStrAndExtra);
-			for (Player tp : t.getPlayers()) {
-				// Send everyone to rally point (or zone lobby if not rally point)
+			for (Iterator<Player> it = t.getPlayers().iterator(); it.hasNext();) {
+				Player tp = it.next();
+				it.remove(); // Remove player from team first to prevent anti-tp
 				this.zone.gameEndTeleport(tp);
-				
 				if (this.winnersStr.contains(t.getName())) {
 					// give reward
 					for (Integer slot : t.getInventories().resolveReward().keySet()) {
