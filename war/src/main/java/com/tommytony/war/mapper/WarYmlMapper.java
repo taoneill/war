@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.KillstreakReward;
 import com.tommytony.war.job.RestoreYmlWarhubJob;
 import com.tommytony.war.job.RestoreYmlWarzonesJob;
 import com.tommytony.war.structure.WarHub;
@@ -98,6 +99,10 @@ public class WarYmlMapper {
 				War.war.log("Failed to schedule warhub-restore job. War hub was not loaded.", Level.WARNING);
 			}
 		}
+
+		// Killstreak config
+		ConfigurationSection killstreakSection = warRootSection.getConfigurationSection("war.killstreak");
+		War.war.setKillstreakReward(new KillstreakReward(killstreakSection));
 	}
 	
 	public static void save() {
@@ -188,6 +193,9 @@ public class WarYmlMapper {
 
 			VolumeMapper.save(hub.getVolume(), "");
 		}
+
+		ConfigurationSection killstreakSection = warRootSection.createSection("war.killstreak");
+		War.war.getKillstreakReward().saveTo(killstreakSection);
 
 		// Save to disk
 		File warConfigFile = new File(War.war.getDataFolder().getPath() + "/war.yml");
