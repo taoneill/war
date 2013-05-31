@@ -29,6 +29,7 @@ import com.tommytony.war.command.WarCommandHandler;
 import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.InventoryBag;
 import com.tommytony.war.config.ScoreboardType;
+import com.tommytony.war.config.KillstreakReward;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.config.TeamKind;
@@ -96,6 +97,7 @@ public class War extends JavaPlugin {
 	private final List<String> killerVerbs = new ArrayList<String>();
 
 	private final InventoryBag defaultInventories = new InventoryBag();
+	private KillstreakReward killstreakReward;
 
 	private final WarConfigBag warConfig = new WarConfigBag();
 	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
@@ -204,7 +206,9 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.SPAWNSTYLE, TeamSpawnStyle.SMALL);
 		teamDefaultConfig.put(TeamConfig.TEAMSIZE, 10);
 		teamDefaultConfig.put(TeamConfig.PERMISSION, "war.player");
-		
+		teamDefaultConfig.put(TeamConfig.XPKILLMETER, false);
+		teamDefaultConfig.put(TeamConfig.KILLSTREAK, false);
+
 		this.getDefaultInventories().clearLoadouts();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
 		
@@ -235,6 +239,7 @@ public class War extends JavaPlugin {
 		
 		this.getCommandWhitelist().add("who");
 		this.getZoneMakerNames().add("tommytony");
+		this.setKillstreakReward(new KillstreakReward());
 		
 		// Add constants
 		this.getDeadlyAdjectives().clear();
@@ -1231,5 +1236,13 @@ public class War extends JavaPlugin {
 
 	public boolean isTagServer() {
 		return tagServer;
+	}
+
+	public KillstreakReward getKillstreakReward() {
+		return killstreakReward;
+	}
+
+	public void setKillstreakReward(KillstreakReward killstreakReward) {
+		this.killstreakReward = killstreakReward;
 	}
 }

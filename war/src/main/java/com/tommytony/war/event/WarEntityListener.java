@@ -174,15 +174,14 @@ public class WarEntityListener implements Listener {
 //						}
 //					}
 					defenderWarzone.handleDeath(d);
-					defenderWarzone.addKillCount(a.getName(), 1);
-					if (attacker.getEntityId() != defender.getEntityId() && defenderWarzone.getKillCount(a.getName()) >= 5) {
-						for (Team team : defenderWarzone.getTeams()) {
-							team.teamcast(attackerTeam.getKind().getColor() + a.getName() + ChatColor.WHITE + " is on a " + ChatColor.RED + "killstreak"
-									+ ChatColor.WHITE + "! (" + defenderWarzone.getKillCount(a.getName()) + " kills)");
+					if (attacker.getEntityId() != defender.getEntityId()) {
+						defenderWarzone.addKillCount(a.getName(), 1);
+						if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+							a.setLevel(defenderWarzone.getKillCount(a.getName()));
 						}
-					}
-					if (attacker.getEntityId() != defender.getEntityId() && defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.XPKILLMETER)) {
-						a.setLevel(defenderWarzone.getKillCount(a.getName()));
+						if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.KILLSTREAK)) {
+							War.war.getKillstreakReward().rewardPlayer(a, defenderWarzone.getKillCount(a.getName()));
+						}
 					}
 					
 					if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {

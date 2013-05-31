@@ -234,14 +234,15 @@ public class WarPlayerListener implements Listener {
 				event.setCancelled(true);
 				War.war.badMsg(player, "Can't use ender chests while playing in a warzone!");
 			}
-			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENCHANTMENT_TABLE && zone.getWarzoneConfig().getBoolean(WarzoneConfig.XPKILLMETER)) {
+			Team team = Team.getTeamByPlayerName(player.getName());
+			if (team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENCHANTMENT_TABLE && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
 				event.setCancelled(true);
 				War.war.badMsg(player, "Can't use enchantment tables in this warzone!");
 				if (zone.getAuthors().contains(player.getName())) {
 					War.war.badMsg(player, "This is due to the xpkillmeter option being enabled.");
 				}
 			}
-			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ANVIL && zone.getWarzoneConfig().getBoolean(WarzoneConfig.XPKILLMETER)) {
+			if (team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ANVIL && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
 				event.setCancelled(true);
 				War.war.badMsg(player, "Can't use anvils in this warzone!");
 				if (zone.getAuthors().contains(player.getName())) {
@@ -1005,8 +1006,8 @@ public class WarPlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerExpChange(PlayerExpChangeEvent event) {
 		if (War.war.isLoaded()) {
-			Warzone zone = Warzone.getZoneByPlayerName(event.getPlayer().getName());
-			if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.XPKILLMETER)) {
+			Team team = Team.getTeamByPlayerName(event.getPlayer().getName());
+			if (team != null && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
 				event.setAmount(0);
 			}
 		}
