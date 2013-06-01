@@ -405,7 +405,9 @@ public class Warzone {
 		if (War.war.isSpoutServer()) {
 			SpoutManager.getPlayer(player).setTitle(team.getKind().getColor() + player.getName());
 		}
-		
+
+		War.war.getKillstreakReward().getAirstrikePlayers().remove(player.getName());
+
 		final LoadoutResetJob job = new LoadoutResetJob(this, team, player, isFirstRespawn, false);
 		if (team.getTeamConfig().resolveInt(TeamConfig.RESPAWNTIMER) == 0 || isFirstRespawn) {
 			job.run();
