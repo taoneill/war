@@ -44,6 +44,12 @@ import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.utility.DeferredBlockReset;
 import com.tommytony.war.utility.LoadoutSelection;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.Vector;
 
 /**
  * Handles Entity-Events
@@ -164,8 +170,24 @@ public class WarEntityListener implements Listener {
 							team.teamcast(killMessage);
 						}
 					}
-					
+					// this is just an idea for further discussion
+//					if (defenderWarzone.getKillCount(d.getName()) >= 5) {
+//						defenderTeam.addPoint();
+//						for (Team team : defenderWarzone.getTeams()) {
+//							team.teamcast(defenderTeam.getKind().getColor() + d.getName() + ChatColor.WHITE + " killed " + attackerTeam.getKind().getColor() + a.getName()
+//									+ ChatColor.WHITE + " and scored an extra point for their team.");
+//						}
+//					}
 					defenderWarzone.handleDeath(d);
+					if (attacker.getEntityId() != defender.getEntityId()) {
+						defenderWarzone.addKillCount(a.getName(), 1);
+						if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+							a.setLevel(defenderWarzone.getKillCount(a.getName()));
+						}
+						if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.KILLSTREAK)) {
+							War.war.getKillstreakReward().rewardPlayer(a, defenderWarzone.getKillCount(a.getName()));
+						}
+					}
 					
 					if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
 						// fast respawn, don't really die
@@ -595,6 +617,49 @@ public class WarEntityListener implements Listener {
 				// prevent the Bomb from exploding on its pedestral
 				event.setCancelled(true);
 				return;
+			}
+		}
+	}
+
+	@EventHandler
+	public void onProjectileHit(final ProjectileHitEvent event) {
+		if (!War.war.isLoaded()) {
+			return;
+		}
+		if (event.getEntityType() == EntityType.EGG) {
+			if (event.getEntity().hasMetadata("warAirstrike")) {
+				Location loc = event.getEntity().getLocation();
+				Warzone zone = Warzone.getZoneByLocation(loc);
+				if (zone == null) {
+					return;
+				}
+				Location tntPlace = new Location(loc.getWorld(), loc.getX(), Warzone.getZoneByLocation(loc).getVolume().getMaxY(), loc.getZ());
+				loc.getWorld().spawnEntity(tntPlace, EntityType.PRIMED_TNT);
+				loc.getWorld().spawnEntity(tntPlace.clone().add(new Vector(2, 0, 0)), EntityType.PRIMED_TNT);
+				loc.getWorld().spawnEntity(tntPlace.clone().add(new Vector(-2, 0, 0)), EntityType.PRIMED_TNT);
+				loc.getWorld().spawnEntity(tntPlace.clone().add(new Vector(0, 0, 2)), EntityType.PRIMED_TNT);
+				loc.getWorld().spawnEntity(tntPlace.clone().add(new Vector(0, 0, -2)), EntityType.PRIMED_TNT);
+			}
+		}
+	}
+
+	@EventHandler
+	public void onProjectileLaunch(final ProjectileLaunchEvent event) {
+		if (!War.war.isLoaded()) {
+			return;
+		}
+		if (event.getEntityType() == EntityType.EGG) {
+			LivingEntity shooter = event.getEntity().getShooter();
+			if (shooter instanceof Player) {
+				Player player = (Player) shooter;
+				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+				Team team = Team.getTeamByPlayerName(player.getName());
+				if (zone != null) {
+					if (War.war.getKillstreakReward().getAirstrikePlayers().remove(player.getName())) {
+						event.getEntity().setMetadata("warAirstrike", new FixedMetadataValue(War.war, true));
+						team.teamcast(String.format("%s called in an airstrike!", team.getKind().getColor() + player.getName() + ChatColor.WHITE));
+					}
+				}
 			}
 		}
 	}

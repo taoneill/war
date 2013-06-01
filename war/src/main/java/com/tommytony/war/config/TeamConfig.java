@@ -13,7 +13,9 @@ public enum TeamConfig {
 	SATURATION (Integer.class),
 	SPAWNSTYLE (TeamSpawnStyle.class),
 	TEAMSIZE (Integer.class),
-        PERMISSION (String.class);
+	PERMISSION (String.class),
+	XPKILLMETER (Boolean.class),
+	KILLSTREAK (Boolean.class);
 	
 	private final Class<?> configType;
 

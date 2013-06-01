@@ -78,6 +78,7 @@ public class Warzone {
 	private HashMap<String, Cake> cakeThieves = new HashMap<String, Cake>();
 	private HashMap<String, LoadoutSelection> loadoutSelections = new HashMap<String, LoadoutSelection>();
 	private HashMap<String, PlayerState> deadMenInventories = new HashMap<String, PlayerState>();
+	private HashMap<String, Integer> killCount = new HashMap<String, Integer>();
 	private final List<Player> respawn = new ArrayList<Player>();
 	private final List<String> reallyDeadFighters = new ArrayList<String>();
 	
@@ -374,9 +375,13 @@ public class Warzone {
 		player.setSaturation(team.getTeamConfig().resolveInt(TeamConfig.SATURATION));
 		player.setExhaustion(0);
 		player.setFireTicks(0);		//this works fine here, why put it in LoudoutResetJob...? I'll keep it over there though
-		
+		player.setLevel(0);
+		player.setExp(0);
+
 		player.getInventory().clear();
 		
+		this.setKillCount(player.getName(), 0);
+
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			// Players are always in survival mode in warzones
 			player.setGameMode(GameMode.SURVIVAL);
@@ -400,7 +405,9 @@ public class Warzone {
 		if (War.war.isSpoutServer()) {
 			SpoutManager.getPlayer(player).setTitle(team.getKind().getColor() + player.getName());
 		}
-		
+
+		War.war.getKillstreakReward().getAirstrikePlayers().remove(player.getName());
+
 		final LoadoutResetJob job = new LoadoutResetJob(this, team, player, isFirstRespawn, false);
 		if (team.getTeamConfig().resolveInt(TeamConfig.RESPAWNTIMER) == 0 || isFirstRespawn) {
 			job.run();
@@ -1487,5 +1494,27 @@ public class Warzone {
 
 	public WarzoneMaterials getWarzoneMaterials() {
 		return warzoneMaterials;
+	}
+
+	public boolean hasKillCount(String player) {
+		return killCount.containsKey(player);
+	}
+
+	public int getKillCount(String player) {
+		return killCount.get(player);
+	}
+
+	public void setKillCount(String player, int totalKills) {
+		if (totalKills < 0) {
+			throw new IllegalArgumentException("Amount of kills to set cannot be a negative number.");
+		}
+		killCount.put(player, totalKills);
+	}
+
+	public void addKillCount(String player, int amount) {
+		if (amount < 0) {
+			throw new IllegalArgumentException("Amount of kills to add cannot be a negative number.");
+		}
+		killCount.put(player, killCount.get(player) + amount);
 	}
 }

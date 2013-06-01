@@ -46,6 +46,7 @@ import com.tommytony.war.utility.LoadoutSelection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 
 /**
  * @author tommytony, Tim Düsterhus
@@ -238,6 +239,21 @@ public class WarPlayerListener implements Listener {
 			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST) {
 				event.setCancelled(true);
 				War.war.badMsg(player, "Can't use ender chests while playing in a warzone!");
+			}
+			Team team = Team.getTeamByPlayerName(player.getName());
+			if (team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENCHANTMENT_TABLE && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+				event.setCancelled(true);
+				War.war.badMsg(player, "Can't use enchantment tables in this warzone!");
+				if (zone.getAuthors().contains(player.getName())) {
+					War.war.badMsg(player, "This is due to the xpkillmeter option being enabled.");
+				}
+			}
+			if (team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ANVIL && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+				event.setCancelled(true);
+				War.war.badMsg(player, "Can't use anvils in this warzone!");
+				if (zone.getAuthors().contains(player.getName())) {
+					War.war.badMsg(player, "This is due to the xpkillmeter option being enabled.");
+				}
 			}
 		}
 	}
@@ -949,6 +965,16 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onPlayerExpChange(PlayerExpChangeEvent event) {
+		if (War.war.isLoaded()) {
+			Team team = Team.getTeamByPlayerName(event.getPlayer().getName());
+			if (team != null && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+				event.setAmount(0);
+			}
+		}
+	}
+
 	public void purgeLatestPositions() {
 		this.latestLocations.clear();	
 	}
