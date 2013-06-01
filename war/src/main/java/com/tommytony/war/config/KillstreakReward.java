@@ -1,16 +1,23 @@
 package com.tommytony.war.config;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * Manage rewards for certain killstreaks.
@@ -28,11 +35,19 @@ public class KillstreakReward {
 		section = new MemoryConfiguration();
 		section.set("3.privmsg", "You have been rewarded with some health for your kills.");
 		section.set("3.reward.health", 8);
+		section.set("4.reward.xp", 3);
 		section.set("5.message", "{0} is on a &ckillstreak&f! 5 kills this life.");
 		section.set("5.privmsg", "You have received some items for your kills.");
-		section.set("5.reward.item.id", 262);
-		section.set("5.reward.item.damage", (short) 0);
-		section.set("5.reward.item.amount", 15);
+		section.set("5.reward.points", 1);
+		section.set("5.reward.items", ImmutableList.of(new ItemStack(Material.ARROW, 15), new ItemStack(Material.EGG)));
+		ItemStack sword = new ItemStack(Material.WOOD_SWORD);
+		sword.addEnchantment(Enchantment.DAMAGE_ALL, 2);
+		sword.addEnchantment(Enchantment.KNOCKBACK, 1);
+		ItemMeta meta = sword.getItemMeta();
+		meta.setDisplayName("The Breaker");
+		meta.setLore(ImmutableList.of("Very slow speed"));
+		sword.setItemMeta(meta);
+		section.set("7.reward.items", ImmutableList.of(sword));
 	}
 
 	/**
@@ -54,8 +69,17 @@ public class KillstreakReward {
 	 * @param kills Amount of kills to reward for
 	 */
 	public void rewardPlayer(Player player, int kills) {
-		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
-		Team playerTeam = Team.getTeamByPlayerName(player.getName());
+		if (section == null) {
+			/*
+			 * Cancel the reward if there is no configuration for killstreaks.
+			 * This can occur if the server owner has an older War config with
+			 * no settings for killstreaks and have neglected to add any. Heck,
+			 * they shouldn't have enabled killstreaks in the warzone anyway.
+			 */
+			return;
+		}
+		final Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+		final Team playerTeam = Team.getTeamByPlayerName(player.getName());
 		Validate.notNull(zone, "Cannot reward player if they are not in a warzone");
 		Validate.notNull(playerTeam, "Cannot reward player if they are not in a team");
 		if (section.contains(Integer.toString(kills))) {
@@ -74,17 +98,35 @@ public class KillstreakReward {
 				double health = player.getHealth() + killSection.getInt("reward.health");
 				player.setHealth(health > 20 ? 20 : health); // Grant up to full health only
 			}
-			if (killSection.contains("reward.item")) {
-				player.getInventory().addItem(this.assembleItemStack(killSection.getConfigurationSection("reward.item")));
+			if (killSection.contains("reward.items")) {
+				for (Object obj : killSection.getList("reward.items")) {
+					if (obj instanceof ItemStack) {
+						player.getInventory().addItem((ItemStack) obj);
+					}
+				}
+			}
+			if (killSection.contains("reward.xp") && !playerTeam.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+				// Will not work if XPKILLMETER is enabled
+				player.setLevel(player.getLevel() + killSection.getInt("reward.xp"));
+			}
+			if (killSection.contains("reward.points")) {
+				for (int i = 0; i < killSection.getInt("reward.points"); i++) {
+					playerTeam.addPoint();
+				}
+				// Detect win conditions
+				if (playerTeam.getPoints() >= playerTeam.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
+					player.getServer().getScheduler().runTaskLater(War.war, new Runnable() {
+						public void run() {
+							zone.handleScoreCapReached(playerTeam.getName());
+						}
+					}, 1L);
+				} else {
+					// just added a point
+					playerTeam.resetSign();
+					zone.getLobby().resetTeamGateSign(playerTeam);
+				}
 			}
 		}
-	}
-
-	private ItemStack assembleItemStack(ConfigurationSection itemSection) {
-		int type = itemSection.getInt("id");
-		int amount = itemSection.getInt("amount");
-		short damage = (short) itemSection.getInt("damage");
-		return new ItemStack(type, amount, damage);
 	}
 
 	public void saveTo(ConfigurationSection section) {
