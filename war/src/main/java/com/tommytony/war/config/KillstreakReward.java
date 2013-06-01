@@ -1,14 +1,13 @@
 package com.tommytony.war.config;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,18 +26,20 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class KillstreakReward {
 
 	private ConfigurationSection section;
+	private Set<String> airstrikePlayers;
 
 	/**
 	 * Creates a new killstreak reward class with default options.
 	 */
 	public KillstreakReward() {
-		section = new MemoryConfiguration();
+		this(new MemoryConfiguration());
 		section.set("3.privmsg", "You have been rewarded with some health for your kills.");
 		section.set("3.reward.health", 8);
 		section.set("4.reward.xp", 3);
 		section.set("5.message", "{0} is on a &ckillstreak&f! 5 kills this life.");
 		section.set("5.privmsg", "You have received some items for your kills.");
 		section.set("5.reward.points", 1);
+		section.set("5.reward.airstrike", true);
 		section.set("5.reward.items", ImmutableList.of(new ItemStack(Material.ARROW, 15), new ItemStack(Material.EGG)));
 		ItemStack sword = new ItemStack(Material.WOOD_SWORD);
 		sword.addEnchantment(Enchantment.DAMAGE_ALL, 2);
@@ -59,6 +60,7 @@ public class KillstreakReward {
 	 */
 	public KillstreakReward(ConfigurationSection section) {
 		this.section = section;
+		this.airstrikePlayers = new HashSet();
 	}
 
 	/**
@@ -126,6 +128,9 @@ public class KillstreakReward {
 					zone.getLobby().resetTeamGateSign(playerTeam);
 				}
 			}
+			if (killSection.getBoolean("reward.airstrike")) {
+				this.airstrikePlayers.add(player.getName());
+			}
 		}
 	}
 
@@ -134,5 +139,9 @@ public class KillstreakReward {
 		for (Map.Entry<String, Object> entry : values.entrySet()) {
 			section.set(entry.getKey(), entry.getValue());
 		}
+	}
+
+	public Set<String> getAirstrikePlayers() {
+		return airstrikePlayers;
 	}
 }
