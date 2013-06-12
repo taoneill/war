@@ -1,6 +1,7 @@
 package com.tommytony.war.command;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -32,7 +33,7 @@ public class SetZoneCommand extends AbstractZoneMakerCommand {
 			if (War.war.getServer().getPluginManager().isPluginEnabled("WorldEdit")) {
 				WorldEditPlugin worldEdit = (WorldEditPlugin) War.war.getServer().getPluginManager().getPlugin("WorldEdit");
 				Selection selection = worldEdit.getSelection(player);
-				if (selection != null) {
+				if (selection != null && selection instanceof CuboidSelection) {
 					Location min = selection.getMinimumPoint();
 					Location max = selection.getMaximumPoint();
 					ZoneSetter setter = new ZoneSetter(player, this.args[0]);
