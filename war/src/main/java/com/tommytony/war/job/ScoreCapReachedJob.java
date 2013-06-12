@@ -13,6 +13,7 @@ import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.spout.SpoutDisplayer;
 import java.util.Iterator;
+import org.kitteh.tag.TagAPI;
 
 public class ScoreCapReachedJob implements Runnable {
 
@@ -45,6 +46,9 @@ public class ScoreCapReachedJob implements Runnable {
 			for (Iterator<Player> it = t.getPlayers().iterator(); it.hasNext();) {
 				Player tp = it.next();
 				it.remove(); // Remove player from team first to prevent anti-tp
+				if (War.war.isTagServer()) {
+					TagAPI.refreshPlayer(tp);
+				}
 				this.zone.gameEndTeleport(tp);
 				if (this.winnersStr.contains(t.getName())) {
 					// give reward
