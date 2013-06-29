@@ -249,6 +249,8 @@ public class War extends JavaPlugin {
 		this.getKillerVerbs().add("murdered");
 		this.getKillerVerbs().add("obliterated");
 		this.getKillerVerbs().add("exterminated");
+		this.getKillerVerbs().add("slayed");
+		this.getKillerVerbs().add("demolished");
 		
 		// Load files
 		WarYmlMapper.load();
