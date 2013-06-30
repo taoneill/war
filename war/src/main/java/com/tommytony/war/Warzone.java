@@ -1396,6 +1396,18 @@ public class Warzone {
 				}
 				invIndex++;
 			}
+			if (originalState.getFeet() != null) {
+				playerItems.put(100, originalState.getFeet());
+			}
+			if (originalState.getLegs() != null) {
+				playerItems.put(101, originalState.getLegs());
+			}
+			if (originalState.getChest() != null) {
+				playerItems.put(102, originalState.getChest());
+			}
+			if (originalState.getHelmet() != null) {
+				playerItems.put(103, originalState.getHelmet());
+			}
 			
 			if (War.war.isSpoutServer()) {
 				SpoutManager.getPlayer(player).setTitle(originalState.getPlayerTitle());
