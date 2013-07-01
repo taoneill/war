@@ -375,6 +375,7 @@ public class Warzone {
 		player.setExhaustion(0);
 		player.setFireTicks(0);		//this works fine here, why put it in LoudoutResetJob...? I'll keep it over there though
 		
+		player.getOpenInventory().close();
 		player.getInventory().clear();
 		
 		if (player.getGameMode() == GameMode.CREATIVE) {
@@ -527,6 +528,7 @@ public class Warzone {
 		PlayerState originalState = this.playerStates.remove(player.getName());
 		PlayerInventory playerInv = player.getInventory();
 		if (originalState != null) {
+			player.getOpenInventory().close();
 			this.playerInvFromInventoryStash(playerInv, originalState);
 			player.setGameMode(originalState.getGamemode());
 			player.setHealth(originalState.getHealth());
@@ -1393,6 +1395,18 @@ public class Warzone {
 					playerItems.put(invIndex, item);
 				}
 				invIndex++;
+			}
+			if (originalState.getFeet() != null) {
+				playerItems.put(100, originalState.getFeet());
+			}
+			if (originalState.getLegs() != null) {
+				playerItems.put(101, originalState.getLegs());
+			}
+			if (originalState.getChest() != null) {
+				playerItems.put(102, originalState.getChest());
+			}
+			if (originalState.getHelmet() != null) {
+				playerItems.put(103, originalState.getHelmet());
 			}
 			
 			if (War.war.isSpoutServer()) {

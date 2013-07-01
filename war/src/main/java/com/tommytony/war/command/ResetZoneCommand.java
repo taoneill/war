@@ -10,6 +10,7 @@ import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.structure.ZoneLobby;
 import java.util.Iterator;
+import org.kitteh.tag.TagAPI;
 
 
 public class ResetZoneCommand extends AbstractZoneMakerCommand {
@@ -50,6 +51,9 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 			for (Iterator<Player> it = team.getPlayers().iterator(); it.hasNext();) {
 				Player p = it.next();
 				it.remove();
+				if (War.war.isTagServer()) {
+					TagAPI.refreshPlayer(p);
+				}
 				zone.restorePlayerState(p);
 				p.teleport(zone.getTeleport());
 				War.war.msg(p, "You have left the warzone. Your inventory is being restored.");
