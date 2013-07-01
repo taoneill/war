@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
@@ -91,6 +93,25 @@ public class Warzone {
 	private boolean isEndOfGame = false;
 	private boolean isReinitializing = false;
 	//private final Object gameEndLock = new Object();
+	
+	private static final int[] rgbLookupTable = new int[] {
+		(new RGBColor(255, 255, 255)).get(),
+		(new RGBColor(255, 128, 0)).get(),
+		(new RGBColor(255, 128, 255)).get(),
+		(new RGBColor(0, 0, 255)).get(),
+		(new RGBColor(255, 215, 0)).get(),
+		(new RGBColor(0, 255, 0)).get(),
+		(new RGBColor(255, 128, 255)).get(),
+		(new RGBColor(100, 100, 100)).get(),
+		(new RGBColor(200, 200, 200)).get(),
+		(new RGBColor(128, 255, 255)).get(),
+		(new RGBColor(128, 0, 255)).get(),
+		(new RGBColor(0, 0, 128)).get(),
+		(new RGBColor(128, 0, 0)).get(),
+		(new RGBColor(0, 128, 0)).get(),
+		(new RGBColor(255, 0, 0)).get(),
+		(new RGBColor(0, 0, 0)).get()
+	};
 
 	public Warzone(World world, String name) {
 		this.world = world;
@@ -430,13 +451,41 @@ public class Warzone {
 		boolean helmetIsInLoadout = false;
 		for (Integer slot : loadout.keySet()) {
 			if (slot == 100) {
-				playerInv.setBoots(War.war.copyStack(loadout.get(slot)));
+				if(this.getWarzoneConfig().getBoolean(WarzoneConfig.COLOREDARMOR) && (loadout.get(slot).getType() == Material.LEATHER_BOOTS)) {
+					ItemStack stack = loadout.get(slot);
+					LeatherArmorMeta met = (LeatherArmorMeta) stack.getItemMeta();
+					met.setColor(Color.fromRGB(this.getRGB(team.getKind().getColor())));
+					playerInv.setBoots(War.war.copyStack(stack));
+				} else {
+					playerInv.setBoots(War.war.copyStack(loadout.get(slot)));
+				}
 			} else if (slot == 101) {
-				playerInv.setLeggings(War.war.copyStack(loadout.get(slot)));
+				if(this.getWarzoneConfig().getBoolean(WarzoneConfig.COLOREDARMOR) && (loadout.get(slot).getType() == Material.LEATHER_LEGGINGS)) {
+					ItemStack stack = loadout.get(slot);
+					LeatherArmorMeta met = (LeatherArmorMeta) stack.getItemMeta();
+					met.setColor(Color.fromRGB(this.getRGB(team.getKind().getColor())));
+					playerInv.setLeggings(War.war.copyStack(stack));
+				} else {
+				    playerInv.setLeggings(War.war.copyStack(loadout.get(slot)));
+				}
 			} else if (slot == 102) {
-				playerInv.setChestplate(War.war.copyStack(loadout.get(slot)));
+				if(this.getWarzoneConfig().getBoolean(WarzoneConfig.COLOREDARMOR) && (loadout.get(slot).getType() == Material.LEATHER_CHESTPLATE)) {
+					ItemStack stack = loadout.get(slot);
+					LeatherArmorMeta met = (LeatherArmorMeta) stack.getItemMeta();
+					met.setColor(Color.fromRGB(this.getRGB(team.getKind().getColor())));
+					playerInv.setChestplate(War.war.copyStack(stack));
+				} else {
+				    playerInv.setChestplate(War.war.copyStack(loadout.get(slot)));
+				}
 			} else if (slot == 103) {
-				playerInv.setHelmet(War.war.copyStack(loadout.get(slot)));
+				if(this.getWarzoneConfig().getBoolean(WarzoneConfig.COLOREDARMOR) && (loadout.get(slot).getType() == Material.LEATHER_HELMET)) {
+					ItemStack stack = loadout.get(slot);
+					LeatherArmorMeta met = (LeatherArmorMeta) stack.getItemMeta();
+					met.setColor(Color.fromRGB(this.getRGB(team.getKind().getColor())));
+					playerInv.setHelmet(War.war.copyStack(stack));
+				} else {
+				    playerInv.setHelmet(War.war.copyStack(loadout.get(slot)));
+				}
 				helmetIsInLoadout = true;
 			} else {
 				ItemStack item = loadout.get(slot);
@@ -455,6 +504,17 @@ public class Warzone {
 				helmet.setItemMeta(meta);
 				playerInv.setHelmet(helmet);
 			}
+		}
+	}
+	
+	private int getRGB(ChatColor color) {
+		int utfCode = (int) color.getChar();
+		 //if our code is less than digit 9 in unicode then we can assume its 0 - 9 because color code is an enum
+		if(utfCode <= 0x39) { 
+			return rgbLookupTable[utfCode - 48];
+		} else {
+			//must be unicode a - f so normalize to lookup table
+			return rgbLookupTable[utfCode - 87];
 		}
 	}
 
@@ -1501,5 +1561,17 @@ public class Warzone {
 
 	public WarzoneMaterials getWarzoneMaterials() {
 		return warzoneMaterials;
+	}
+}
+
+final class RGBColor {
+	private final int rgb;
+	
+	RGBColor(int r, int g, int b) {
+		this.rgb = (r << 16) | (g << 8) | b;
+    }
+	
+	int get() {
+		return this.rgb;
 	}
 }
