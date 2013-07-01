@@ -4,7 +4,7 @@ description: Minecraft PVP arenas (called warzones) for a fast-paced and structu
 author: tommytony
 website: http://war.tommytony.com
 main: com.tommytony.war.War
-softdepend: [Spout, TagAPI]
+softdepend: [Spout, TagAPI, WorldEdit]
 permissions:
   war.*:
     description: Full War permissions. Create and destroy warzones. Change War configuration.
@@ -99,6 +99,9 @@ commands:
         2) Left-click to select or move corner1,
         3) Right-click to select or move corner2.
         Turn off wand by dropping the wooden sword.
+        \\\\ WorldEdit Cuboid mode \\
+        1) Create a cuboid selection using WorldEdit
+        2) /setzone <zone-name>
         \\\\ Wandless Cuboid mode \\
         /setzone <zone-name> <corner1/corner2/c1/c2/pos1/pos2>
   savezone:
