@@ -240,6 +240,34 @@ public class WarPlayerListener implements Listener {
 				War.war.badMsg(player, "Can't use ender chests while playing in a warzone!");
 			}
 		}
+		     
+		//Soup-PvP Stuff - nicholasntp
+			if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
+				Player player = event.getPlayer();
+				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+			      if (zone != null && zone.soupHealing()) {    
+					ItemStack item = event.getItem();
+			           if ((item != null) && (item.getType() == Material.MUSHROOM_SOUP)) {
+			             
+			             if (player.getHealth() < 20) {
+			            	 int h = player.getHealth();
+			            	 if (h < 14) {
+			               player.setHealth((int) (h + 7));
+			            	 }
+			            	 else {
+			            		 player.setHealth(20);
+			            	 }
+			               
+			               item.setType(Material.BOWL);
+			             } 
+			             else if (player.getFoodLevel() < 20) {
+			               player.setFoodLevel(20);
+			               item.setType(Material.BOWL);
+			             }
+			           }
+			      }
+			}
+		
 	}
 
 	@EventHandler

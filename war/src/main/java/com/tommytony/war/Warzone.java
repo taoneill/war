@@ -685,7 +685,9 @@ public class Warzone {
 		}
 		return null;
 	}
-
+    public boolean soupHealing() {
+		return (this.getWarzoneConfig().getBoolean(WarzoneConfig.SOUPHEALING));   	
+    }
 	public boolean isNearWall(Location latestPlayerLocation) {
 		if (this.volume.hasTwoCorners()) {
 			if (Math.abs(this.volume.getSoutheastZ() - latestPlayerLocation.getBlockZ()) < this.minSafeDistanceFromWall && latestPlayerLocation.getBlockX() <= this.volume.getSoutheastX() && latestPlayerLocation.getBlockX() >= this.volume.getNorthwestX() && latestPlayerLocation.getBlockY() >= this.volume.getMinY() && latestPlayerLocation.getBlockY() <= this.volume.getMaxY()) {
