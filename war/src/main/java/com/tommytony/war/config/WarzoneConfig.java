@@ -19,7 +19,8 @@ public enum WarzoneConfig {
 	RESETONCONFIGCHANGE (Boolean.class),
 	RESETONLOAD (Boolean.class),
 	RESETONUNLOAD (Boolean.class),
-	UNBREAKABLE (Boolean.class);
+	UNBREAKABLE (Boolean.class),
+	SOUPHEALING (Boolean.class);
 	
 	
 	private final Class<?> configType;
