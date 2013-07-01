@@ -25,6 +25,10 @@
             <id>tagapi-repo</id>
             <url>http://repo.kitteh.org/content/repositories/public/</url>
         </repository>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>http://maven.sk89q.com/repo/</url>
+        </repository>
     </repositories>
   <issueManagement>
   	<system>Github issues</system>
@@ -91,6 +95,12 @@
     	<version>1.8.5</version>
     	<type>jar</type>
     	<scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sk89q</groupId>
+      <artifactId>worldedit</artifactId>
+      <version>5.5.6</version>
+      <type>jar</type>
     </dependency>
   </dependencies>
 </project>
