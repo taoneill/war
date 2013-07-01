@@ -271,7 +271,7 @@ commands:
         \\\\ Warzone defaults \\
         /warcfg autoassign:off blockheads:on deathmessages:on disabled:off friendlyfire:off glasswalls:on
                 instabreak:off minteams:1 minplayers:1 monumentheal:5 nocreatures:off nodrops:off pvpinzone:on
-                realdeaths:off resetonempty:off resetonconfigchange:off resetonload:off resetonunload:off unbreakable:off \\
+                realdeaths:off resetonempty:off resetonconfigchange:off resetonload:off resetonunload:off unbreakable:off souphealing:on\\
         /warcfg lobbymaterial:<floor/outline/gate/light> -> while holding block, change the look of the lobby (use air block to keep original floor). \\
         /warcfg material:<main/stand/light> -> while holding block, change the look of the monument, flag, cake and bomb. 
         \\\\ Team defaults \\

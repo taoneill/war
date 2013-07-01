@@ -23,8 +23,8 @@ public enum WarzoneConfig {
 	JOINMIDBATTLE (Boolean.class),
 	AUTOJOIN (Boolean.class),
 	SCOREBOARD (ScoreboardType.class),
-	XPKILLMETER (Boolean.class)
-	;
+	XPKILLMETER (Boolean.class),
+	SOUPHEALING (Boolean.class);
 	
 	
 	private final Class<?> configType;
