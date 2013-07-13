@@ -300,6 +300,9 @@ public class WarPlayerListener implements Listener {
 				if (isAutoAssignGate) {
 					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 						this.handleDisabledZone(event, player, zone);
+					} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
+						event.setTo(zone.getTeleport());
+						War.war.badMsg(player, "You cannot join a battle in progress in this warzone.");
 					} else {
 						this.dropFromOldTeamIfAny(player);
 						int noOfPlayers = 0;
@@ -334,6 +337,9 @@ public class WarPlayerListener implements Listener {
 						this.dropFromOldTeamIfAny(player);
 						if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 							this.handleDisabledZone(event, player, zone);
+						} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
+							event.setTo(zone.getTeleport());
+							War.war.badMsg(player, "You cannot join a battle in progress in this warzone.");
 						} else if (team.getPlayers().size() < team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)
 								&& War.war.canPlayWar(player, team)) {
 							if (player.getWorld() != zone.getWorld()) {
