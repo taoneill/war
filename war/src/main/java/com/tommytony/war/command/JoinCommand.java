@@ -78,6 +78,8 @@ public class JoinCommand extends AbstractWarCommand {
 		// join new team
 		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 			this.msg("This warzone is disabled.");
+		} else if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
+			this.msg("This warzone requires you to be automatically assigned to a team. Please enter the autoassign gate instead.");
 		} else {
 			List<Team> teams = zone.getTeams();
 			boolean foundTeam = false;
