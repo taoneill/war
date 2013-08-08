@@ -122,12 +122,7 @@ public class Team {
 		byte lightData = this.warzone.getWarzoneMaterials().getLightData();
 
 		TeamSpawnStyle style = this.getTeamConfig().resolveSpawnStyle();
-		if (style.equals(TeamSpawnStyle.INVISIBLE)) {
-			// nothing but glowstone
-			Block lightBlock = this.warzone.getWorld().getBlockAt(x, y - 1, z);
-			lightBlock.setType(light);
-			lightBlock.setData(lightData);
-		} else {
+		if (!style.equals(TeamSpawnStyle.INVISIBLE)) {
 			// first ring
 			this.setBlock(x + 1, y - 1, z + 1, this.kind);
 			this.setBlock(x + 1, y - 1, z, this.kind);
@@ -152,19 +147,7 @@ public class Team {
 		Block signBlock = null;
 		int signData = 0;
 
-		if (style.equals(TeamSpawnStyle.INVISIBLE)) {
-			// INVISIBLE style
-			signBlock = this.warzone.getWorld().getBlockAt(x, y, z);
-			if (yaw >= 0 && yaw < 90) {
-				signData = 10;
-			} else if (yaw >= 90 && yaw <= 180) {
-				signData = 14;
-			} else if (yaw >= 180 && yaw < 270) {
-				signData = 2;
-			} else if (yaw >= 270 && yaw <= 360) {
-				signData = 6;
-			}
-		} else if (style.equals(TeamSpawnStyle.SMALL)) {
+		if (style.equals(TeamSpawnStyle.SMALL)) {
 			// SMALL style
 			if (yaw >= 0 && yaw < 90) {
 				signData = 10;
@@ -179,7 +162,7 @@ public class Team {
 				signData = 6;
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.SOUTH()).getRelative(Direction.WEST());
 			}
-		} else {
+		} else if (!style.equals(TeamSpawnStyle.INVISIBLE)) {
 			// outer ring (FLAT or BIG)
 			this.setBlock(x + 2, y - 1, z + 2, this.kind);
 			this.setBlock(x + 2, y - 1, z + 1, this.kind);
