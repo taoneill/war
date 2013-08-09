@@ -30,6 +30,7 @@ import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
+import java.util.Map;
 
 public class WarzoneYmlMapper {
 
@@ -196,13 +197,34 @@ public class WarzoneYmlMapper {
 						// try lowercase instead - supports custom team names
 						teamInfoPrefix = "team." + teamName.toLowerCase() + ".info.";
 					}
-					int teamX = warzoneRootSection.getInt(teamInfoPrefix + "spawn.x");
-					int teamY = warzoneRootSection.getInt(teamInfoPrefix + "spawn.y");
-					int teamZ = warzoneRootSection.getInt(teamInfoPrefix + "spawn.z");
-					int teamYaw = warzoneRootSection.getInt(teamInfoPrefix + "spawn.yaw");
-					Location teamLocation = new Location(world, teamX, teamY, teamZ, teamYaw, 0);
+					List<Location> teamSpawns = new ArrayList();
+					if (warzoneRootSection.contains(teamInfoPrefix + "spawn")) {
+						int teamX = warzoneRootSection.getInt(teamInfoPrefix + "spawn.x");
+						int teamY = warzoneRootSection.getInt(teamInfoPrefix + "spawn.y");
+						int teamZ = warzoneRootSection.getInt(teamInfoPrefix + "spawn.z");
+						int teamYaw = warzoneRootSection.getInt(teamInfoPrefix + "spawn.yaw");
+						Location teamLocation = new Location(world, teamX, teamY, teamZ, teamYaw, 0);
+						teamSpawns.add(teamLocation);
+						File original = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/volume-" + teamName + ".dat");
+						File modified = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/volume-" + teamName + teamSpawns.indexOf(teamLocation) + ".dat");
+						try {
+							original.renameTo(modified);
+						} catch (Exception e) {
+							// Will be logged later
+						}
+					}
+					if (warzoneRootSection.contains(teamInfoPrefix + "spawns")) {
+						for (Map<?, ?> map : warzoneRootSection.getMapList(teamInfoPrefix + "spawns")) {
+							int teamX = (Integer) map.get("x");
+							int teamY = (Integer) map.get("y");
+							int teamZ = (Integer) map.get("z");
+							int teamYaw = (Integer) map.get("yaw");
+							Location teamLocation = new Location(world, teamX, teamY, teamZ, teamYaw, 0);
+							teamSpawns.add(teamLocation);
+						}
+					}
 	
-					Team team = new Team(teamName, TeamKind.teamKindFromString(teamName), teamLocation, warzone);
+					Team team = new Team(teamName, TeamKind.teamKindFromString(teamName), teamSpawns, warzone);
 					warzone.getTeams().add(team);
 					
 					if (warzoneRootSection.contains(teamInfoPrefix + "flag")) {
@@ -278,7 +300,9 @@ public class WarzoneYmlMapper {
 			
 			// team spawn blocks
 			for (Team team : warzone.getTeams()) {
-				team.setSpawnVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), world));
+				for (Location teamSpawn : team.getTeamSpawns()) {
+					team.setSpawnVolume(teamSpawn, VolumeMapper.loadVolume(team.getName() + team.getTeamSpawns().indexOf(teamSpawn), warzone.getName(), world));
+				}
 				if (team.getTeamFlag() != null) {
 					team.setFlagVolume(VolumeMapper.loadVolume(team.getName() + "flag", warzone.getName(), world));
 				}
@@ -570,12 +594,16 @@ public class WarzoneYmlMapper {
 
 			ConfigurationSection teamInfoSection = teamsSection.createSection(team.getName() + ".info");
 			
-			ConfigurationSection spawnSection = teamInfoSection.createSection("spawn");
-			Location spawn = team.getTeamSpawn();
-			spawnSection.set("x", spawn.getBlockX());
-			spawnSection.set("y", spawn.getBlockY());
-			spawnSection.set("z", spawn.getBlockZ());
-			spawnSection.set("yaw", toIntYaw(spawn.getYaw()));
+			List<Map<String, Object>> spawnSerilization = new ArrayList();
+			for (Location spawn : team.getTeamSpawns()) {
+				Map<String, Object> map = new HashMap();
+				map.put("x", spawn.getBlockX());
+				map.put("y", spawn.getBlockY());
+				map.put("z", spawn.getBlockZ());
+				map.put("yaw", toIntYaw(spawn.getYaw()));
+				spawnSerilization.add(map);
+			}
+			teamInfoSection.set("spawns", spawnSerilization);
 			
 			if (team.getTeamFlag() != null) {
 				ConfigurationSection flagSection = teamInfoSection.createSection("flag");
@@ -604,7 +632,9 @@ public class WarzoneYmlMapper {
 
 		// team spawn & flag blocks
 		for (Team team : teams) {
-			VolumeMapper.save(team.getSpawnVolume(), warzone.getName());
+			for (Volume volume : team.getSpawnVolumes().values()) {
+				VolumeMapper.save(volume, warzone.getName());
+			}
 			if (team.getFlagVolume() != null) {
 				VolumeMapper.save(team.getFlagVolume(), warzone.getName());
 			}

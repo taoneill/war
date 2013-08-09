@@ -24,6 +24,7 @@ import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
+import java.util.Arrays;
 
 /**
  *
@@ -301,7 +302,7 @@ public class WarzoneTxtMapper {
 							int yaw = Integer.parseInt(teamStrSplit[4]);
 							teamLocation.setYaw(yaw);
 						}
-						Team team = new Team(teamStrSplit[0], TeamKind.teamKindFromString(teamStrSplit[0]), teamLocation, warzone);
+						Team team = new Team(teamStrSplit[0], TeamKind.teamKindFromString(teamStrSplit[0]), Arrays.asList(teamLocation), warzone);
 						team.setRemainingLives(warzone.getTeamDefaultConfig().resolveInt(TeamConfig.LIFEPOOL));
 						warzone.getTeams().add(team);
 					}
@@ -348,7 +349,9 @@ public class WarzoneTxtMapper {
 
 			// team spawn blocks
 			for (Team team : warzone.getTeams()) {
-				team.setSpawnVolume(VolumeMapper.loadVolume(team.getName(), warzone.getName(), world));
+				for (Location spawnLocation : team.getTeamSpawns()) {
+					team.setSpawnVolume(spawnLocation, VolumeMapper.loadVolume(team.getName(), warzone.getName(), world));
+				}
 				if (team.getTeamFlag() != null) {
 					team.setFlagVolume(VolumeMapper.loadVolume(team.getName() + "flag", warzone.getName(), world));
 				}

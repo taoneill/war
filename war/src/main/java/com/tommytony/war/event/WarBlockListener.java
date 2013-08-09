@@ -277,7 +277,7 @@ public class WarBlockListener implements Listener {
 		// changes in parts of important areas
 		if (warzone != null && warzone.isImportantBlock(block) && (!isZoneMaker || (isZoneMaker && team != null))) {
 			// breakage of spawn
-			if (team != null && team.getSpawnVolume().contains(block)) {
+			if (team != null && team.isSpawnLocation(block.getLocation())) {
 				ItemStack teamKindBlock = new ItemStack(team.getKind().getMaterial(), team.getKind().getData());
 				// let team members loot one block the spawn for monument captures
 				if (player.getInventory().contains(teamKindBlock)) {

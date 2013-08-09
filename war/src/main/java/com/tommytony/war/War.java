@@ -55,6 +55,7 @@ import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.SizeCounter;
 import com.tommytony.war.utility.WarLogFormatter;
+import com.tommytony.war.volume.Volume;
 
 /**
  * Main class of War
@@ -639,8 +640,10 @@ public class War extends JavaPlugin {
 								bomb.addBombBlocks();
 							}
 							for (Team team : warzone.getTeams()) {
-								team.getSpawnVolume().resetBlocks();
-								team.initializeTeamSpawn();
+								for (Volume spawnVolume : team.getSpawnVolumes().values()) {
+									spawnVolume.resetBlocks();
+								}
+								team.initializeTeamSpawns();
 								if (team.getTeamFlag() != null) {
 									team.getFlagVolume().resetBlocks();
 									team.initializeTeamFlag();

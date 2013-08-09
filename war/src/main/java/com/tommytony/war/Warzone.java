@@ -225,7 +225,9 @@ public class Warzone {
 				this.zoneWallGuards.clear();
 
 				for (Team team : this.teams) {
-					team.getSpawnVolume().resetBlocks();
+					for (Volume teamVolume : team.getSpawnVolumes().values()) {
+						teamVolume.resetBlocks();
+					}
 					if (team.getTeamFlag() != null) {
 						team.getFlagVolume().resetBlocks();
 					}
@@ -270,7 +272,7 @@ public class Warzone {
 					}
 				}
 				team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
-				team.initializeTeamSpawn();
+				team.initializeTeamSpawns();
 				if (team.getTeamFlag() != null) {
 					team.setTeamFlag(team.getTeamFlag());
 				}
@@ -353,13 +355,13 @@ public class Warzone {
 	public void respawnPlayer(Team team, Player player) {
 		this.handleRespawn(team, player);
 		// Teleport the player back to spawn
-		player.teleport(team.getTeamSpawn());
+		player.teleport(team.getRandomSpawn());
 	}
 
 	public void respawnPlayer(PlayerMoveEvent event, Team team, Player player) {
 		this.handleRespawn(team, player);
 		// Teleport the player back to spawn
-		event.setTo(team.getTeamSpawn());
+		event.setTo(team.getRandomSpawn());
 	}
 	
 	public boolean isRespawning(Player p) {
@@ -647,9 +649,12 @@ public class Warzone {
 				}
 			}
 			for (Team t : this.teams) {
-				if (t.getSpawnVolume().contains(block)) {
-					return true;
-				} else if (t.getFlagVolume() != null && t.getFlagVolume().contains(block)) {
+				for (Volume tVolume : t.getSpawnVolumes().values()) {
+					if (tVolume.contains(block)) {
+						return true;
+					}
+				}
+				if (t.getFlagVolume() != null && t.getFlagVolume().contains(block)) {
 					return true;
 				}
 			}
@@ -1483,12 +1488,14 @@ public class Warzone {
 	public boolean isOpponentSpawnPeripheryBlock(Team team, Block block) {
 		for (Team maybeOpponent : this.getTeams()) {
 			if (maybeOpponent != team) {
-				Volume periphery = new Volume("periphery", this.getWorld());
-				periphery.setCornerOne(new BlockInfo(maybeOpponent.getSpawnVolume().getMinX()-1 , maybeOpponent.getSpawnVolume().getMinY()-1, maybeOpponent.getSpawnVolume().getMinZ()-1, 0, (byte)0));
-				periphery.setCornerTwo(new BlockInfo(maybeOpponent.getSpawnVolume().getMaxX()+1, maybeOpponent.getSpawnVolume().getMaxY()+1, maybeOpponent.getSpawnVolume().getMaxZ()+1, 0, (byte)0));
-				
-				if (periphery.contains(block)) {
-					return true;
+				for (Volume teamSpawnVolume : maybeOpponent.getSpawnVolumes().values()) {
+					Volume periphery = new Volume("periphery", this.getWorld());
+					periphery.setCornerOne(new BlockInfo(teamSpawnVolume.getMinX()-1 , teamSpawnVolume.getMinY()-1, teamSpawnVolume.getMinZ()-1, 0, (byte)0));
+					periphery.setCornerTwo(new BlockInfo(teamSpawnVolume.getMaxX()+1, teamSpawnVolume.getMaxY()+1, teamSpawnVolume.getMaxZ()+1, 0, (byte)0));
+
+					if (periphery.contains(block)) {
+						return true;
+					}
 				}
 			}
 		}

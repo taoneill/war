@@ -42,6 +42,7 @@ import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.volume.Volume;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -393,7 +394,7 @@ public class WarPlayerListener implements Listener {
 		if (isLeaving) { // already in a team and in warzone, leaving
 			// same as leave
 			if (playerTeam != null) {
-				boolean atSpawnAlready = playerTeam.getTeamSpawn().getBlockX() == player.getLocation().getBlockX() && playerTeam.getTeamSpawn().getBlockY() == player.getLocation().getBlockY() && playerTeam.getTeamSpawn().getBlockZ() == player.getLocation().getBlockZ();
+				boolean atSpawnAlready = playerTeam.isSpawnLocation(playerLoc);
 				if (!atSpawnAlready) {
 					playerWarzone.handlePlayerLeave(player, playerWarzone.getTeleport(), event, true);
 					return;
@@ -435,7 +436,7 @@ public class WarPlayerListener implements Listener {
 						upDownMove -= moveDistance;
 					} else if (nearestWalls.contains(BlockFace.DOWN)) {
 						// fell off the map, back to spawn
-						event.setTo(playerTeam.getTeamSpawn());
+						event.setTo(playerTeam.getRandomSpawn());
 						return;
 					}  
 					
@@ -502,13 +503,13 @@ public class WarPlayerListener implements Listener {
 						
 			LoadoutSelection loadoutSelectionState = playerWarzone.getLoadoutSelections().get(player.getName());
 			FlagReturn flagReturn = playerTeam.getTeamConfig().resolveFlagReturn();
-			if (!playerTeam.getSpawnVolume().contains(playerLoc)) {
+			if (!playerTeam.isSpawnLocation(playerLoc)) {
 				if (!playerWarzone.isEnoughPlayers() && loadoutSelectionState != null && loadoutSelectionState.isStillInSpawn()) {
 					// Be sure to keep only players that just respawned locked inside the spawn for minplayer/minteams restrictions - otherwise 
 					// this will conflict with the can't-renter-spawn bump just a few lines below  
 					War.war.badMsg(player, "Can't leave spawn until there's a minimum of " + playerWarzone.getWarzoneConfig().getInt(WarzoneConfig.MINPLAYERS)
 							+" player(s) on at least " + playerWarzone.getWarzoneConfig().getInt(WarzoneConfig.MINTEAMS) + " team(s).");
-					event.setTo(playerTeam.getTeamSpawn());
+					event.setTo(playerTeam.getRandomSpawn());
 					return;
 				}
 				if (playerWarzone.isRespawning(player)) {
@@ -518,7 +519,7 @@ public class WarPlayerListener implements Listener {
 						isS = "";
 					}
 					War.war.badMsg(player, "Can't leave spawn for " + rt + " second" + isS + " after spawning!");
-					event.setTo(playerTeam.getTeamSpawn());
+					event.setTo(playerTeam.getRandomSpawn());
 					return;
 				}
 			} else if (loadoutSelectionState != null && !loadoutSelectionState.isStillInSpawn()
@@ -567,7 +568,7 @@ public class WarPlayerListener implements Listener {
 				
 				// Make sure game ends can't occur simultaneously. 
 				// See Warzone.handleDeath() for details.
-				boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
+				boolean inSpawn = playerTeam.isSpawnLocation(player.getLocation());
 				boolean inFlag = (playerTeam.getFlagVolume() != null && playerTeam.getFlagVolume().contains(player.getLocation()));
 
 				if (playerTeam.getTeamConfig().resolveFlagReturn().equals(FlagReturn.BOTH)) {
@@ -662,7 +663,7 @@ public class WarPlayerListener implements Listener {
 				Team victim = null;
 				for (Team team : playerWarzone.getTeams()) {
 					if (team != playerTeam 
-							&& team.getSpawnVolume().contains(player.getLocation()) 
+							&& team.isSpawnLocation(player.getLocation()) 
 							&& team.getPlayers().size() > 0) {
 						inEnemySpawn = true;
 						victim = team;
@@ -718,8 +719,10 @@ public class WarPlayerListener implements Listener {
 							// just added a point
 							
 							// restore bombed team's spawn
-							victim.getSpawnVolume().resetBlocks(); 
-							victim.initializeTeamSpawn();
+							for (Volume spawnVolume : victim.getSpawnVolumes().values()) {
+								spawnVolume.resetBlocks();
+							}
+							victim.initializeTeamSpawns();
 							
 							// bring back tnt
 							bomb.getVolume().resetBlocks();
@@ -746,7 +749,7 @@ public class WarPlayerListener implements Listener {
 				
 				// Make sure game ends can't occur simultaneously. 
 				// Not thread safe. See Warzone.handleDeath() for details.
-				boolean inSpawn = playerTeam.getSpawnVolume().contains(player.getLocation());
+				boolean inSpawn = playerTeam.isSpawnLocation(player.getLocation());
 															
 				if (inSpawn && playerTeam.getPlayers().contains(player)) {
 					// Made sure player is still part of team, game may have ended while waiting.
@@ -819,7 +822,7 @@ public class WarPlayerListener implements Listener {
 			}
 			
 			// Class selection lock
-			if (!playerTeam.getSpawnVolume().contains(player.getLocation()) && 
+			if (!playerTeam.isSpawnLocation(player.getLocation()) && 
 					playerWarzone.getLoadoutSelections().keySet().contains(player.getName())
 					&& playerWarzone.getLoadoutSelections().get(player.getName()).isStillInSpawn()) {
 				playerWarzone.getLoadoutSelections().get(player.getName()).setStillInSpawn(false);
@@ -839,7 +842,7 @@ public class WarPlayerListener implements Listener {
 		if (War.war.isLoaded() && event.isSneaking()) {
 			Warzone playerWarzone = Warzone.getZoneByLocation(event.getPlayer());
 			Team playerTeam = Team.getTeamByPlayerName(event.getPlayer().getName());
-			if (playerWarzone != null && playerTeam != null && playerTeam.getInventories().resolveLoadouts().keySet().size() > 1 && playerTeam.getSpawnVolume().contains(event.getPlayer().getLocation())) {
+			if (playerWarzone != null && playerTeam != null && playerTeam.getInventories().resolveLoadouts().keySet().size() > 1 && playerTeam.isSpawnLocation(event.getPlayer().getLocation())) {
 				if (playerWarzone.getLoadoutSelections().keySet().contains(event.getPlayer().getName())
 						&& playerWarzone.getLoadoutSelections().get(event.getPlayer().getName()).isStillInSpawn()) {
 					LoadoutSelection selection = playerWarzone.getLoadoutSelections().get(event.getPlayer().getName());
@@ -875,7 +878,7 @@ public class WarPlayerListener implements Listener {
 					zone.getReallyDeadFighters().remove(event.getPlayer().getName());
 					for (Team team : zone.getTeams()) {
 						if (team.getPlayers().contains(event.getPlayer())) {
-							event.setRespawnLocation(team.getTeamSpawn());
+							event.setRespawnLocation(team.getRandomSpawn());
 							zone.respawnPlayer(team, event.getPlayer());
 							break;
 						}

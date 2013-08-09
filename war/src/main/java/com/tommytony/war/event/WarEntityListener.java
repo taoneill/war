@@ -431,7 +431,7 @@ public class WarEntityListener implements Listener {
 			
 			if (zone != null && team != null) {
 				LoadoutSelection playerLoadoutState = zone.getLoadoutSelections().get(player.getName()); 
-				if (team.getSpawnVolume().contains(player.getLocation())
+				if (team.isSpawnLocation(player.getLocation())
 						&& playerLoadoutState != null && playerLoadoutState.isStillInSpawn()) {
 					// don't let a player still in spawn get damaged
 					event.setCancelled(true);
@@ -475,6 +475,7 @@ public class WarEntityListener implements Listener {
 	}
 
 	@EventHandler
+	// TODO Remove due to deletion of cantreenterspawnjob
 	public void onEntityCombust(final EntityDamageEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
@@ -483,7 +484,7 @@ public class WarEntityListener implements Listener {
 		if (entity instanceof Player) {
 			Player player = (Player) entity;
 			Team team = Team.getTeamByPlayerName(player.getName());
-			if (team != null && team.getSpawnVolume().contains(player.getLocation())) {
+			if (team != null && team.isSpawnLocation(player.getLocation())) {
 				// smother out the fire that didn't burn out when you respawned
 				// Stop fire
 				player.setFireTicks(0);

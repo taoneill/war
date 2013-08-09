@@ -12,6 +12,7 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.volume.Volume;
 
 /**
  * Deletes a team.
@@ -59,7 +60,9 @@ public class DeleteTeamCommand extends AbstractZoneMakerCommand {
 			if (team.getFlagVolume() != null) {
 				team.getFlagVolume().resetBlocks();
 			}
-			team.getSpawnVolume().resetBlocks();
+			for (Volume spawnVolume : team.getSpawnVolumes().values()) {
+				spawnVolume.resetBlocks();
+			}
 			zone.getTeams().remove(team);
 			if (zone.getLobby() != null) {
 				zone.getLobby().setLocation(zone.getTeleport());

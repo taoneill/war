@@ -229,8 +229,8 @@ public class ZoneVolume extends Volume {
 	public boolean zoneStructuresAreOutside() {
 		// check team spawns & flags
 		for (Team team : this.zone.getTeams()) {
-			if (team.getTeamSpawn() != null) {
-				if (!this.isInside(team.getSpawnVolume().getCornerOne()) || !this.isInside(team.getSpawnVolume().getCornerTwo())) {
+			for (Volume spawnVolume : team.getSpawnVolumes().values()) {
+				if (!this.isInside(spawnVolume.getCornerOne()) || !this.isInside(spawnVolume.getCornerTwo())) {
 					return true;
 				}
 			}

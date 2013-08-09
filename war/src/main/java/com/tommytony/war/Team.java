@@ -26,6 +26,10 @@ import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 import org.kitteh.tag.TagAPI;
 
 /**
@@ -35,12 +39,12 @@ import org.kitteh.tag.TagAPI;
  */
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
-	private Location teamSpawn = null;
+	private List<Location> teamSpawns;
 	private Location teamFlag = null;
 	private String name;
 	private int remainingLives;
 	private int points = 0;
-	private Volume spawnVolume;
+	private Map<Location, Volume> spawnVolumes;
 	private Volume flagVolume;
 	private final Warzone warzone;
 	private TeamKind kind;
@@ -48,13 +52,16 @@ public class Team {
 	private TeamConfigBag teamConfig;
 	private InventoryBag inventories;
 
-	public Team(String name, TeamKind kind, Location teamSpawn, Warzone warzone) {
+	public Team(String name, TeamKind kind, List<Location> teamSpawn, Warzone warzone) {
 		this.warzone = warzone;
 		this.teamConfig = new TeamConfigBag(warzone);
 		this.inventories = new InventoryBag(warzone);	// important constructors for cascading configs
 		this.setName(name);
-		this.teamSpawn = teamSpawn;
-		this.setSpawnVolume(new Volume(name, warzone.getWorld()));
+		this.teamSpawns = new ArrayList(teamSpawn);
+		this.spawnVolumes = new HashMap();
+		for (Location spawn : teamSpawn) {
+			this.setSpawnVolume(spawn, new Volume(name + teamSpawns.indexOf(spawn), warzone.getWorld()));
+		}
 		this.kind = kind;
 		this.setFlagVolume(null); // no flag at the start
 	}
@@ -73,50 +80,39 @@ public class Team {
 		return this.kind;
 	}
 
-	private void setSpawnVolume() {
-		if (this.spawnVolume.isSaved()) {
-			this.spawnVolume.resetBlocks();
+	private void createSpawnVolume(Location teamSpawn) {
+		Volume spawnVolume = this.spawnVolumes.get(teamSpawn);
+		if (spawnVolume.isSaved()) {
+			spawnVolume.resetBlocks();
 		}
-		int x = this.teamSpawn.getBlockX();
-		int y = this.teamSpawn.getBlockY();
-		int z = this.teamSpawn.getBlockZ();
+		int x = teamSpawn.getBlockX();
+		int y = teamSpawn.getBlockY();
+		int z = teamSpawn.getBlockZ();
 
 		TeamSpawnStyle style = this.getTeamConfig().resolveSpawnStyle();
 		if (style.equals(TeamSpawnStyle.INVISIBLE)) {
-			this.spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x, y - 1, z));
-			this.spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x, y + 3, z));
+			spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x, y - 1, z));
+			spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x, y + 3, z));
 		} else if (style.equals(TeamSpawnStyle.SMALL)) {
-			this.spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1));
-			this.spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x + 1, y + 3, z + 1));
+			spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1));
+			spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x + 1, y + 3, z + 1));
 		} else {
 			// flat or big
-			this.spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x - 2, y - 1, z - 2));
-			this.spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x + 2, y + 3, z + 2));
+			spawnVolume.setCornerOne(this.warzone.getWorld().getBlockAt(x - 2, y - 1, z - 2));
+			spawnVolume.setCornerTwo(this.warzone.getWorld().getBlockAt(x + 2, y + 3, z + 2));
 		}
 	}
 
-	@SuppressWarnings("unused")
-	public void initializeTeamSpawn() {
-		// make air (old two-high above floor)
-		Volume airGap = new Volume("airgap", this.warzone.getWorld());
-		airGap.setCornerOne(new BlockInfo(
-				this.spawnVolume.getCornerOne().getX(), 
-				this.spawnVolume.getCornerOne().getY() + 1, 
-				this.spawnVolume.getCornerOne().getZ(),
-				0,
-				(byte)0));
-		airGap.setCornerTwo(new BlockInfo(
-				this.spawnVolume.getCornerTwo().getX(), 
-				this.spawnVolume.getCornerOne().getY() + 2, 
-				this.spawnVolume.getCornerTwo().getZ(),
-				0,
-				(byte)0));
-		airGap.setToMaterial(Material.AIR);
-
+	public void initializeTeamSpawns() {
+		for (Location teamSpawn : this.spawnVolumes.keySet()) {
+			initializeTeamSpawn(teamSpawn);
+		}
+	}
+	public void initializeTeamSpawn(Location teamSpawn) {
 		// Set the spawn
-		int x = this.teamSpawn.getBlockX();
-		int y = this.teamSpawn.getBlockY();
-		int z = this.teamSpawn.getBlockZ();
+		int x = teamSpawn.getBlockX();
+		int y = teamSpawn.getBlockY();
+		int z = teamSpawn.getBlockZ();
 		
 		Material light = Material.getMaterial(this.warzone.getWarzoneMaterials().getLightId());
 		byte lightData = this.warzone.getWarzoneMaterials().getLightData();
@@ -139,10 +135,10 @@ public class Team {
 
 		// Orientation
 		int yaw = 0;
-		if (this.teamSpawn.getYaw() >= 0) {
-			yaw = (int) (this.teamSpawn.getYaw() % 360);
+		if (teamSpawn.getYaw() >= 0) {
+			yaw = (int) (teamSpawn.getYaw() % 360);
 		} else {
-			yaw = (int) (360 + (this.teamSpawn.getYaw() % 360));
+			yaw = (int) (360 + (teamSpawn.getYaw() % 360));
 		}
 		Block signBlock = null;
 		int signData = 0;
@@ -344,18 +340,25 @@ public class Team {
 		block.setData(kind.getData());
 	}
 
-	public void setTeamSpawn(Location teamSpawn) {
-		this.teamSpawn = teamSpawn;
-
+	public void addTeamSpawn(Location teamSpawn) {
+		if (!this.teamSpawns.contains(teamSpawn)) {
+			this.teamSpawns.add(teamSpawn);
+		}
 		// this resets the block to old state
-		this.setSpawnVolume();
-		this.getSpawnVolume().saveBlocks();
+		this.setSpawnVolume(teamSpawn, new Volume(name + teamSpawns.indexOf(teamSpawn), warzone.getWorld()));
+		this.createSpawnVolume(teamSpawn);
+		this.spawnVolumes.get(teamSpawn).saveBlocks();
 
-		this.initializeTeamSpawn();
+		this.initializeTeamSpawn(teamSpawn);
 	}
 
-	public Location getTeamSpawn() {
-		return this.teamSpawn;
+	public List<Location> getTeamSpawns() {
+		return this.teamSpawns;
+	}
+
+	Random teamSpawnRandomizer = new Random();
+	public Location getRandomSpawn() {
+		return this.teamSpawns.get(teamSpawnRandomizer.nextInt(this.teamSpawns.size()));
 	}
 
 	public void addPlayer(Player player) {
@@ -473,22 +476,24 @@ public class Team {
 		return this.points;
 	}
 
-	public Volume getSpawnVolume() {
+	public Map<Location, Volume> getSpawnVolumes() {
 
-		return this.spawnVolume;
+		return this.spawnVolumes;
 	}
 
 	public void resetSign() {
-		this.getSpawnVolume().resetBlocks();
-		this.initializeTeamSpawn(); // reset everything instead of just sign
+		for (Entry<Location, Volume> spawnEntry : this.getSpawnVolumes().entrySet()) {
+			spawnEntry.getValue().resetBlocks();
+			this.initializeTeamSpawn(spawnEntry.getKey()); // reset everything instead of just sign
+		}
 
 		if (this.warzone.getLobby() != null) {
 			this.warzone.getLobby().resetTeamGateSign(this);
 		}
 	}
 
-	public void setSpawnVolume(Volume volume) {
-		this.spawnVolume = volume;
+	public void setSpawnVolume(Location spawnLocation, Volume volume) {
+		this.spawnVolumes.put(spawnLocation, volume);
 	}
 
 	public void resetPoints() {
@@ -672,5 +677,20 @@ public class Team {
 
 	public TeamConfigBag getTeamConfig() {
 		return this.teamConfig;
+	}
+
+	/**
+	 * Check if any team spawns contain a certain location.
+	 *
+	 * @param loc Location to check if contained by a spawn.
+	 * @return true if loc is part of a spawn volume, false otherwise.
+	 */
+	public boolean isSpawnLocation(Location loc) {
+		for (Volume spawnVolume : this.spawnVolumes.values()) {
+			if (spawnVolume.contains(loc)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -12,6 +12,8 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
+import java.util.Collections;
+import org.bukkit.Location;
 
 /**
  * Places a soawn
@@ -50,20 +52,20 @@ public class SetTeamCommand extends AbstractZoneMakerCommand {
 		} else {
 			Team existingTeam = zone.getTeamByKind(teamKind);
 			if (existingTeam != null) {
-				// relocate
-				existingTeam.setTeamSpawn(player.getLocation());
-				this.msg("Team " + existingTeam.getName() + " spawn relocated.");
+				// add additional spawn
+				existingTeam.addTeamSpawn(player.getLocation());
+				this.msg("Additional spawn added for team " + existingTeam.getName() + ". Use /deleteteam " + existingTeam.getName() + " to remove all spawns.");
 				War.war.log(this.getSender().getName() + " moved team " + existingTeam.getName() + " in warzone " + zone.getName(), Level.INFO);
 			} else {
 				// new team (use default TeamKind name for now)
-				Team newTeam = new Team(teamKind.toString(), teamKind, player.getLocation(), zone);
+				Team newTeam = new Team(teamKind.toString(), teamKind, Collections.<Location>emptyList(), zone);
 				newTeam.setRemainingLives(newTeam.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				zone.getTeams().add(newTeam);
 				if (zone.getLobby() != null) {
 					zone.getLobby().setLocation(zone.getTeleport());
 					zone.getLobby().initialize();
 				}
-				newTeam.setTeamSpawn(player.getLocation());
+				newTeam.addTeamSpawn(player.getLocation());
 				this.msg("Team " + newTeam.getName() + " created with spawn here.");
 				War.war.log(this.getSender().getName() + " created team " + newTeam.getName() + " in warzone " + zone.getName(), Level.INFO);
 			}
