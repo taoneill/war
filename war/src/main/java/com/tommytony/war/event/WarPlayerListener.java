@@ -34,7 +34,6 @@ import com.tommytony.war.command.ZoneSetter;
 import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.job.CantReEnterSpawnJob;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
@@ -530,10 +529,10 @@ public class WarPlayerListener implements Listener {
 				// player is in spawn, but has left already: he should NOT be let back in - kick him out gently
 				// if he sticks around too long.
 				// (also, be sure you aren't preventing the flag or cake from being captured)
-				if (!CantReEnterSpawnJob.getPlayersUnderSuspicion().contains(player.getName())) {
-					CantReEnterSpawnJob job = new CantReEnterSpawnJob(player, playerTeam);
-					War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job, 12);
-				}
+//				if (!CantReEnterSpawnJob.getPlayersUnderSuspicion().contains(player.getName())) {
+//					CantReEnterSpawnJob job = new CantReEnterSpawnJob(player, playerTeam);
+//					War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job, 12);
+//				}
 				return;
 			}
 
