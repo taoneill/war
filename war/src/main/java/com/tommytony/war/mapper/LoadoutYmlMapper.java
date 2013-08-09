@@ -53,6 +53,10 @@ public class LoadoutYmlMapper {
 	public static Loadout fromConfigToLoadout(ConfigurationSection config, HashMap<Integer, ItemStack> loadout, String loadoutName) {
 		List<Integer> slots = config.getIntegerList(loadoutName + ".slots");
 		for (Integer slot : slots) {
+			if (config.isItemStack(loadoutName + "." + Integer.toString(slot))) {
+				loadout.put(slot, config.getItemStack(loadoutName + "." + Integer.toString(slot)));
+				continue;
+			}
 			String prefix = loadoutName + "." + slot + ".";
 			int id = config.getInt(prefix + "id");
 			byte data = (byte)config.getInt(prefix + "data");
@@ -164,36 +168,8 @@ public class LoadoutYmlMapper {
 		if (loadoutSection != null) {
 			loadoutSection.set("slots", toIntList(loadout.keySet()));
 			for (Integer slot : loadout.keySet()) {
-				ConfigurationSection slotSection = loadoutSection.createSection(slot.toString());
 				ItemStack stack = loadout.get(slot);
-				
-				slotSection.set("id", stack.getTypeId());
-				slotSection.set("data", stack.getData().getData());
-				slotSection.set("amount", stack.getAmount());
-				slotSection.set("durability", stack.getDurability());
-	
-				if (stack.getEnchantments().keySet().size() > 0) {
-					List<String> enchantmentStringList = new ArrayList<String>();
-					for (Enchantment enchantment : stack.getEnchantments().keySet()) {
-						int level = stack.getEnchantments().get(enchantment);
-						enchantmentStringList.add(enchantment.getId() + "," + level);
-					}
-					slotSection.set("enchantments", enchantmentStringList);
-				}
-				if (stack.hasItemMeta() && stack.getItemMeta() instanceof LeatherArmorMeta 
-						&& ((LeatherArmorMeta)stack.getItemMeta()).getColor() != null) {
-					LeatherArmorMeta meta = (LeatherArmorMeta)stack.getItemMeta();
-					int rgb = meta.getColor().asRGB();
-					slotSection.set("armorcolor", rgb);
-				}
-				if (stack.hasItemMeta() && stack.getItemMeta().hasDisplayName()) {
-					ItemMeta meta = stack.getItemMeta();
-					slotSection.set("name", meta.getDisplayName());
-				}
-				if (stack.hasItemMeta() && stack.getItemMeta().hasLore()) {
-					ItemMeta meta = stack.getItemMeta();
-					slotSection.set("lore", meta.getLore());
-				}
+				loadoutSection.set(slot.toString(), stack);
 			}
 		}
 	}
