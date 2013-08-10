@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.KillstreakReward;
+import com.tommytony.war.config.MySQLConfig;
 import com.tommytony.war.job.RestoreYmlWarhubJob;
 import com.tommytony.war.job.RestoreYmlWarzonesJob;
 import com.tommytony.war.structure.WarHub;
@@ -101,8 +102,13 @@ public class WarYmlMapper {
 		}
 
 		// Killstreak config
-		ConfigurationSection killstreakSection = warRootSection.getConfigurationSection("war.killstreak");
-		War.war.setKillstreakReward(new KillstreakReward(killstreakSection));
+		if (warRootSection.isConfigurationSection("war.killstreak")) {
+			War.war.setKillstreakReward(new KillstreakReward(warRootSection.getConfigurationSection("war.killstreak")));
+		}
+
+		if (warRootSection.isConfigurationSection("war.mysql")) {
+			War.war.setMysqlConfig(new MySQLConfig(warRootSection.getConfigurationSection("war.mysql")));
+		}
 	}
 	
 	public static void save() {
@@ -196,6 +202,9 @@ public class WarYmlMapper {
 
 		ConfigurationSection killstreakSection = warRootSection.createSection("war.killstreak");
 		War.war.getKillstreakReward().saveTo(killstreakSection);
+
+		ConfigurationSection mysqlSection = warRootSection.createSection("war.mysql");
+		War.war.getMysqlConfig().saveTo(mysqlSection);
 
 		// Save to disk
 		File warConfigFile = new File(War.war.getDataFolder().getPath() + "/war.yml");

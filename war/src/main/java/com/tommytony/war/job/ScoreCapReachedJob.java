@@ -1,5 +1,6 @@
 package com.tommytony.war.job;
 
+import com.google.common.collect.ImmutableList;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -63,5 +64,10 @@ public class ScoreCapReachedJob implements Runnable {
 			t.resetPoints();
 			t.getPlayers().clear(); // empty the team
 		}
+		if (War.war.getMysqlConfig().isEnabled() && War.war.getMysqlConfig().isLoggingEnabled()) {
+			LogKillsDeathsJob logKillsDeathsJob = new LogKillsDeathsJob(ImmutableList.copyOf(zone.getKillsDeathsTracker()));
+			War.war.getServer().getScheduler().runTaskAsynchronously(War.war, logKillsDeathsJob);
+		}
+		zone.getKillsDeathsTracker().clear();
 	}
 }

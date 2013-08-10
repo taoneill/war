@@ -32,6 +32,8 @@ import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.config.WarzoneConfigBag;
 import com.tommytony.war.job.InitZoneJob;
 import com.tommytony.war.job.LoadoutResetJob;
+import com.tommytony.war.job.LogKillsDeathsJob;
+import com.tommytony.war.job.LogKillsDeathsJob.KillsDeathsRecord;
 import com.tommytony.war.job.ScoreCapReachedJob;
 import com.tommytony.war.mapper.LoadoutYmlMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
@@ -56,6 +58,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+import java.util.Map;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 /**
@@ -88,6 +92,8 @@ public class Warzone {
 	private HashMap<String, Integer> killCount = new HashMap<String, Integer>();
 	private final List<Player> respawn = new ArrayList<Player>();
 	private final List<String> reallyDeadFighters = new ArrayList<String>();
+
+	private List<LogKillsDeathsJob.KillsDeathsRecord> killsDeathsTracker = new ArrayList();
 	
 	private final WarzoneConfigBag warzoneConfig;
 	private final TeamConfigBag teamDefaultConfig;
@@ -1591,5 +1597,22 @@ public class Warzone {
 			throw new IllegalArgumentException("Amount of kills to add cannot be a negative number.");
 		}
 		killCount.put(player, killCount.get(player) + amount);
+	}
+
+	public void addKillDeathRecord(OfflinePlayer player, int kills, int deaths) {
+		for (Iterator<KillsDeathsRecord> it = this.killsDeathsTracker.iterator(); it.hasNext();) {
+			LogKillsDeathsJob.KillsDeathsRecord kdr = it.next();
+			if (kdr.getPlayer().equals(player)) {
+				kills += kdr.getKills();
+				deaths += kdr.getDeaths();
+				it.remove();
+			}
+		}
+		LogKillsDeathsJob.KillsDeathsRecord kdr = new LogKillsDeathsJob.KillsDeathsRecord(player, kills, deaths);
+		this.killsDeathsTracker.add(kdr);
+	}
+
+	public List<LogKillsDeathsJob.KillsDeathsRecord> getKillsDeathsTracker() {
+		return killsDeathsTracker;
 	}
 }

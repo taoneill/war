@@ -182,6 +182,8 @@ public class WarEntityListener implements Listener {
 					defenderWarzone.handleDeath(d);
 					if (attacker.getEntityId() != defender.getEntityId()) {
 						defenderWarzone.addKillCount(a.getName(), 1);
+						defenderWarzone.addKillDeathRecord(a, 1, 0);
+						defenderWarzone.addKillDeathRecord(d, 0, 1);
 						if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
 							a.setLevel(defenderWarzone.getKillCount(a.getName()));
 						}
