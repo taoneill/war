@@ -37,7 +37,7 @@ public class HelmetProtectionTask implements Runnable {
 						teamBlockMaterial = team.getKind().getMaterial();
 						// 1) Replace missing block head
 						if (playerInv.getHelmet() == null || playerInv.getHelmet().getType() != teamBlockMaterial) {
-							playerInv.setHelmet(this.createBlockHead(team));
+							playerInv.setHelmet(team.getKind().getBlockHead());
 						}
 						
 						// 2) Get rid of extra blocks in inventory: only keep one
@@ -56,7 +56,7 @@ public class HelmetProtectionTask implements Runnable {
 							
 							int firstEmpty = playerInv.firstEmpty();
 							if (firstEmpty > 0) {
-								playerInv.setItem(firstEmpty, this.createBlockHead(team));	
+								playerInv.setItem(firstEmpty, team.getKind().getBlockHead());
 							}
 							
 							if (removed > 1) {
@@ -69,7 +69,7 @@ public class HelmetProtectionTask implements Runnable {
 					if (zone.isFlagThief(player.getName())) {
 						Team victim = zone.getVictimTeamForFlagThief(player.getName());
 						player.setItemInHand(null);
-						player.getInventory().addItem(new ItemStack(victim.getKind().getMaterial(), 2240, victim.getKind().getData(), victim.getKind().getData()));
+						player.getInventory().addItem(victim.getKind().getBlockData().toItemStack(2240));
 					} else if (zone.isBombThief(player.getName())) {
 						player.setItemInHand(null);
 						player.getInventory().addItem(new ItemStack(Material.TNT, 2240));
@@ -80,9 +80,5 @@ public class HelmetProtectionTask implements Runnable {
 				}
 			}
 		}
-	}
-
-	public ItemStack createBlockHead(Team team) {
-		return new ItemStack(team.getKind().getMaterial(), 1, (short) 1, new Byte(team.getKind().getData()));
 	}
 }

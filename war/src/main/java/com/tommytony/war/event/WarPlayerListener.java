@@ -224,16 +224,8 @@ public class WarPlayerListener implements Listener {
 			if (zone != null && zone.getLoadoutSelections().containsKey(player.getName()) 
 					&& zone.getLoadoutSelections().get(player.getName()).isStillInSpawn()) {
 				event.setUseItemInHand(Result.DENY);
-				ItemStack inHand = event.getItem();
-				
-				if (inHand != null) {
-					ItemStack newItemInHand = War.war.copyStack(inHand);
-				
-					event.getPlayer().setItemInHand(newItemInHand);
-					event.setCancelled(true);
-					
-					War.war.badMsg(player, "Can't use items while still in spawn.");
-				}
+				event.setCancelled(true);
+				War.war.badMsg(player, "Can't use items while still in spawn.");
 			}
 			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST) {
 				event.setCancelled(true);
@@ -846,7 +838,7 @@ public class WarPlayerListener implements Listener {
 				if (playerWarzone.getLoadoutSelections().keySet().contains(event.getPlayer().getName())
 						&& playerWarzone.getLoadoutSelections().get(event.getPlayer().getName()).isStillInSpawn()) {
 					LoadoutSelection selection = playerWarzone.getLoadoutSelections().get(event.getPlayer().getName());
-					List<Loadout> loadouts = (List<Loadout>)new ArrayList(playerTeam.getInventories().resolveNewLoadouts()).clone();
+					List<Loadout> loadouts = new ArrayList<Loadout>(playerTeam.getInventories().resolveNewLoadouts());
 					for (Iterator<Loadout> it = loadouts.iterator(); it.hasNext();) {
 						Loadout ldt = it.next();
 						if ("first".equals(ldt.getName())) {

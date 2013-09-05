@@ -1,6 +1,5 @@
 package com.tommytony.war;
 
-import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
@@ -36,8 +36,8 @@ import com.tommytony.war.mapper.LoadoutYmlMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.HubLobbyMaterials;
+import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.WarzoneMaterials;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.structure.ZoneWallGuard;
@@ -49,7 +49,6 @@ import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 /**
  *
@@ -432,23 +431,23 @@ public class Warzone {
 		boolean helmetIsInLoadout = false;
 		for (Integer slot : loadout.keySet()) {
 			if (slot == 100) {
-				playerInv.setBoots(War.war.copyStack(loadout.get(slot)));
+				playerInv.setBoots(loadout.get(slot).clone());
 			} else if (slot == 101) {
-				playerInv.setLeggings(War.war.copyStack(loadout.get(slot)));
+				playerInv.setLeggings(loadout.get(slot).clone());
 			} else if (slot == 102) {
-				playerInv.setChestplate(War.war.copyStack(loadout.get(slot)));
+				playerInv.setChestplate(loadout.get(slot).clone());
 			} else if (slot == 103) {
-				playerInv.setHelmet(War.war.copyStack(loadout.get(slot)));
+				playerInv.setHelmet(loadout.get(slot).clone());
 				helmetIsInLoadout = true;
 			} else {
 				ItemStack item = loadout.get(slot);
 				if (item != null) {
-					playerInv.addItem(War.war.copyStack(item));
+					playerInv.addItem(item.clone());
 				}
 			}
 		}
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
-			playerInv.setHelmet(new ItemStack(team.getKind().getMaterial(), 1, (short) 1, new Byte(team.getKind().getData())));
+			playerInv.setHelmet(team.getKind().getBlockHead());
 		} else {
 			if (!helmetIsInLoadout) {
 				ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
@@ -900,12 +899,12 @@ public class Warzone {
 							for (Player p : t.getPlayers()) {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
 								if (sp.isSpoutCraftEnabled()) {
-					                sp.sendNotification(
-					                		SpoutDisplayer.cleanForNotification("Round over! " + playerTeam.getKind().getColor() + playerTeam.getName()),
-					                		SpoutDisplayer.cleanForNotification("ran out of lives."),
-					                		playerTeam.getKind().getMaterial(),
-					                		playerTeam.getKind().getData(),
-					                		10000);
+									sp.sendNotification(
+											SpoutDisplayer.cleanForNotification("Round over! " + playerTeam.getKind().getColor() + playerTeam.getName()),
+											SpoutDisplayer.cleanForNotification("ran out of lives."),
+											playerTeam.getKind().getMaterial(),
+											playerTeam.getKind().getDyeColor().getWoolData(),
+											10000);
 								}
 							}
 						}
@@ -966,12 +965,12 @@ public class Warzone {
 						for (Player p : victim.getPlayers()) {
 							SpoutPlayer sp = SpoutManager.getPlayer(p);
 							if (sp.isSpoutCraftEnabled()) {
-				                sp.sendNotification(
-			                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-			                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "your flag."),
-			                		playerTeam.getKind().getMaterial(),
-			                		playerTeam.getKind().getData(),
-			                		5000);
+								sp.sendNotification(
+										SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
+										SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "your flag."),
+										playerTeam.getKind().getMaterial(),
+										playerTeam.getKind().getDyeColor().getWoolData(),
+										5000);
 							}
 						}
 					}

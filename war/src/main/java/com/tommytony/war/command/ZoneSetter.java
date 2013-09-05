@@ -3,9 +3,7 @@ package com.tommytony.war.command;
 import java.util.logging.Level;
 
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;

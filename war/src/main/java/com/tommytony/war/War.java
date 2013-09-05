@@ -18,6 +18,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -307,6 +308,7 @@ public class War extends JavaPlugin {
 		this.getServer().getScheduler().cancelTasks(this);
 		this.playerListener.purgeLatestPositions();
 
+		HandlerList.unregisterAll(this);
 		this.log("War v" + this.desc.getVersion() + " is off.", Level.INFO);
 		this.setLoaded(false);
 	}
@@ -350,13 +352,9 @@ public class War extends JavaPlugin {
 		}
 	}
 	
+	@Deprecated
 	public ItemStack copyStack(ItemStack originalStack) {
-		ItemStack copiedStack = new ItemStack(originalStack.getType(), originalStack.getAmount(), originalStack.getDurability(), new Byte(originalStack.getData().getData()));
-		copiedStack.setDurability(originalStack.getDurability());
-                copiedStack.setItemMeta(originalStack.getItemMeta());
-		copyEnchantments(originalStack, copiedStack);	
-		
-		return copiedStack;
+		return originalStack.clone();
 	}
 	
 	public void copyEnchantments(ItemStack originalStack, ItemStack copiedStack) {
@@ -392,8 +390,8 @@ public class War extends JavaPlugin {
 	
 	public String updateTeamFromNamedParams(Team team, CommandSender commandSender, String[] arguments) {
 		try {
-			Map<String, String> namedParams = new HashMap();
-			Map<String, String> thirdParameter = new HashMap();
+			Map<String, String> namedParams = new HashMap<String, String>();
+			Map<String, String> thirdParameter = new HashMap<String, String>();
 			for (String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if (pairSplit.length == 2) {
@@ -468,8 +466,8 @@ public class War extends JavaPlugin {
 
 	public String updateZoneFromNamedParams(Warzone warzone, CommandSender commandSender, String[] arguments) {
 		try {
-			Map<String, String> namedParams = new HashMap();
-			Map<String, String> thirdParameter = new HashMap();
+			Map<String, String> namedParams = new HashMap<String, String>();
+			Map<String, String> thirdParameter = new HashMap<String, String>();
 			for (String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if (pairSplit.length == 2) {
@@ -662,8 +660,8 @@ public class War extends JavaPlugin {
 
 	public String updateFromNamedParams(CommandSender commandSender, String[] arguments) {
 		try {
-			Map<String, String> namedParams = new HashMap();
-			Map<String, String> thirdParameter = new HashMap();
+			Map<String, String> namedParams = new HashMap<String, String>();
+			Map<String, String> thirdParameter = new HashMap<String, String>();
 			for (String namedPair : arguments) {
 				String[] pairSplit = namedPair.split(":");
 				if (pairSplit.length == 2) {

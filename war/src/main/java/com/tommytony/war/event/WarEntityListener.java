@@ -1,6 +1,7 @@
 package com.tommytony.war.event;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -387,17 +388,7 @@ public class WarEntityListener implements Listener {
 	}
 
 	private List<ItemStack> copyItems(ItemStack[] contents) {
-		List<ItemStack> list = new ArrayList<ItemStack>();
-		for (ItemStack stack : contents) {
-			if (stack != null) {
-				if (stack.getData() != null) {
-					list.add(new ItemStack(stack.getType(), stack.getAmount(), stack.getDurability(), stack.getData().getData()));
-				} else {
-					list.add(new ItemStack(stack.getType(), stack.getAmount(), stack.getDurability()));
-				}
-			}
-		}
-		return list;
+		return Arrays.asList(contents);
 	}
 
 	/**

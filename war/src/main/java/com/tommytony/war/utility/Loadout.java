@@ -1,26 +1,21 @@
 package com.tommytony.war.utility;
 
-import com.tommytony.war.War;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.bukkit.Color;
+
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.material.MaterialData;
 
 /**
  * Represents a loadout of items
  *
  * @author cmastudios
  */
-public class Loadout implements Comparable, ConfigurationSerializable {
+public class Loadout implements Comparable<Loadout>, ConfigurationSerializable {
 
 	private String name;
 	private HashMap<Integer, ItemStack> contents;
@@ -36,12 +31,7 @@ public class Loadout implements Comparable, ConfigurationSerializable {
 		ConfigurationSerialization.registerClass(Loadout.class);
 	}
 
-	public int compareTo(Object o) {
-		if (!(o instanceof Loadout)) {
-			throw new ClassCastException(this.getClass().getCanonicalName()
-					+ " is not comparable to a " + o.getClass().getCanonicalName());
-		}
-		Loadout ldt = (Loadout) o;
+	public int compareTo(Loadout ldt) {
 		if ("default".equals(ldt.getName()) && !"default".equals(this.getName())) {
 			return -1;
 		} else if ("default".equals(this.getName()) && !"default".equals(ldt.getName())) {
@@ -88,7 +78,7 @@ public class Loadout implements Comparable, ConfigurationSerializable {
 	}
 
 	public static HashMap<String, HashMap<Integer, ItemStack>> toLegacyFormat(List<Loadout> loadouts) {
-		HashMap<String, HashMap<Integer, ItemStack>> oldLoadouts = new HashMap();
+		HashMap<String, HashMap<Integer, ItemStack>> oldLoadouts = new HashMap<String, HashMap<Integer, ItemStack>>();
 		for (Loadout ldt : loadouts) {
 			oldLoadouts.put(ldt.getName(), ldt.getContents());
 		}
@@ -106,88 +96,22 @@ public class Loadout implements Comparable, ConfigurationSerializable {
 
 	// For future use
 	public Map<String, Object> serialize() {
-		Map<String, Object> config = new HashMap();
+		Map<String, Object> config = new HashMap<String, Object>();
 		config.put("slots", this.toIntList(contents.keySet()));
 		for (Integer slot : contents.keySet()) {
-			Map<String, Object> slotConfig = new HashMap();
 			ItemStack stack = contents.get(slot);
-			slotConfig.put("id", stack.getTypeId());
-			slotConfig.put("data", stack.getData().getData());
-			slotConfig.put("amount", stack.getAmount());
-			slotConfig.put("durability", stack.getDurability());
-
-			if (stack.getEnchantments().keySet().size() > 0) {
-				List<String> enchantmentStringList = new ArrayList<String>();
-				for (Enchantment enchantment : stack.getEnchantments().keySet()) {
-					int level = stack.getEnchantments().get(enchantment);
-					enchantmentStringList.add(enchantment.getId() + "," + level);
-				}
-				slotConfig.put("enchantments", enchantmentStringList);
-			}
-			if (stack.hasItemMeta() && stack.getItemMeta() instanceof LeatherArmorMeta
-					&& ((LeatherArmorMeta) stack.getItemMeta()).getColor() != null) {
-				LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
-				int rgb = meta.getColor().asRGB();
-				slotConfig.put("armorcolor", rgb);
-			}
-			if (stack.hasItemMeta() && stack.getItemMeta().hasDisplayName()) {
-				ItemMeta meta = stack.getItemMeta();
-				slotConfig.put("name", meta.getDisplayName());
-			}
-			if (stack.hasItemMeta() && stack.getItemMeta().hasLore()) {
-				ItemMeta meta = stack.getItemMeta();
-				slotConfig.put("lore", meta.getLore());
-			}
-			config.put(slot.toString(), slotConfig);
+			config.put(slot.toString(), stack.serialize());
 		}
 		config.put("permission", permission);
 		return config;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Loadout deserialize(Map<String, Object> config) {
-		HashMap<Integer, ItemStack> contents = new HashMap();
+		HashMap<Integer, ItemStack> contents = new HashMap<Integer, ItemStack>();
 		List<Integer> slots = (List<Integer>) config.get("slots");
 		for (Integer slot : slots) {
-			Map<String, Object> slotConfig = (Map<String, Object>) config.get(slot.toString());
-			int id = (Integer) slotConfig.get("id");
-			byte data = (Byte) slotConfig.get("data");
-			int amount = (Integer) slotConfig.get("amount");
-			short durability = (Short) slotConfig.get("durability");
-
-			ItemStack stack = new ItemStack(id, amount, durability);
-			stack.setData(new MaterialData(id, data));
-
-			if (slotConfig.containsKey("enchantments")) {
-				List<String> enchantmentStringList = (List<String>) slotConfig.get("enchantments");
-				for (String enchantmentString : enchantmentStringList) {
-					String[] enchantmentStringSplit = enchantmentString.split(",");
-					if (enchantmentStringSplit.length == 2) {
-						int enchantId = Integer.parseInt(enchantmentStringSplit[0]);
-						int level = Integer.parseInt(enchantmentStringSplit[1]);
-						War.war.safelyEnchant(stack, Enchantment.getById(enchantId), level);
-					}
-				}
-			}
-			if (slotConfig.containsKey("armorcolor")) {
-				int rgb = (Integer) slotConfig.get("armorcolor");
-				Color clr = Color.fromRGB(rgb);
-				LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
-				meta.setColor(clr);
-				stack.setItemMeta(meta);
-			}
-			if (slotConfig.containsKey("name")) {
-				String itemName = (String) slotConfig.get("name");
-				ItemMeta meta = stack.getItemMeta();
-				meta.setDisplayName(itemName);
-				stack.setItemMeta(meta);
-			}
-			if (slotConfig.containsKey("lore")) {
-				List<String> itemLore = (List<String>) slotConfig.get("lore");
-				ItemMeta meta = stack.getItemMeta();
-				meta.setLore(itemLore);
-				stack.setItemMeta(meta);
-			}
-			contents.put(slot, stack);
+			contents.put(slot, ItemStack.deserialize((Map<String, Object>) config.get(slot.toString())));
 		}
 		String permission = "";
 		if (config.containsKey("permission")) {

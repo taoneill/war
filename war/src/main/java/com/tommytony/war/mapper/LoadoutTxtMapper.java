@@ -39,11 +39,11 @@ public class LoadoutTxtMapper {
 					item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]));
 				} else if (itemStrSplit.length == 5) {
 					short durability = Short.parseShort(itemStrSplit[3]);
-					item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]), durability, Byte.parseByte(itemStrSplit[4]));
+					item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]), durability);
 					item.setDurability(durability);
 				} else if (itemStrSplit.length == 6) {
 					short durability = Short.parseShort(itemStrSplit[3]);
-					item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]), durability, Byte.parseByte(itemStrSplit[4]));
+					item = new ItemStack(Integer.parseInt(itemStrSplit[0]), Integer.parseInt(itemStrSplit[1]), durability);
 					item.setDurability(durability);
 					
 					// enchantments

@@ -30,7 +30,7 @@ public class LoadoutYmlMapper {
 	public static List<Loadout> fromConfigToLoadouts(ConfigurationSection config, HashMap<String, HashMap<Integer, ItemStack>> loadouts) {
 		List<String> loadoutNames = config.getStringList("names");
 		loadouts.clear();
-		List<Loadout> ldts = new ArrayList();
+		List<Loadout> ldts = new ArrayList<Loadout>();
 		for (String name : loadoutNames) {
 			HashMap<Integer, ItemStack> newLoadout = new HashMap<Integer, ItemStack>();
 			Loadout ldt = fromConfigToLoadout(config, newLoadout, name);
@@ -59,11 +59,10 @@ public class LoadoutYmlMapper {
 			}
 			String prefix = loadoutName + "." + slot + ".";
 			int id = config.getInt(prefix + "id");
-			byte data = (byte)config.getInt(prefix + "data");
 			int amount = config.getInt(prefix + "amount");
 			short durability = (short)config.getInt(prefix + "durability");
 			
-			ItemStack stack = new ItemStack(id, amount, durability, data);
+			ItemStack stack = new ItemStack(id, amount, durability);
 			stack.setDurability(durability);
 			
 			if (config.contains(prefix + "enchantments")) {
@@ -118,7 +117,7 @@ public class LoadoutYmlMapper {
 	 */
 	public static void fromLoadoutsToConfig(List<Loadout> loadouts, ConfigurationSection section) {
 		Collections.sort(loadouts);
-		List<String> names = new ArrayList();
+		List<String> names = new ArrayList<String>();
 		for (Loadout ldt : loadouts) {
 			names.add(ldt.getName());
 			LoadoutYmlMapper.fromLoadoutToConfig(ldt, section);

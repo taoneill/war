@@ -168,8 +168,7 @@ public class WarBlockListener implements Listener {
 			// Just give the user his f&s back but almost broken (max durability is 8). 
 			newItemInHand = new ItemStack(Material.FLINT_AND_STEEL, 1, (short)1);
 		} else {
-			newItemInHand = new ItemStack(inHand.getType(), inHand.getAmount(), inHand.getDurability(), inHand.getData().getData());
-			newItemInHand.setDurability(inHand.getDurability());
+			newItemInHand = inHand.clone();
 		}
 		
 		event.getPlayer().setItemInHand(newItemInHand);
@@ -278,9 +277,8 @@ public class WarBlockListener implements Listener {
 		if (warzone != null && warzone.isImportantBlock(block) && (!isZoneMaker || (isZoneMaker && team != null))) {
 			// breakage of spawn
 			if (team != null && team.isSpawnLocation(block.getLocation())) {
-				ItemStack teamKindBlock = new ItemStack(team.getKind().getMaterial(), team.getKind().getData());
 				// let team members loot one block the spawn for monument captures
-				if (player.getInventory().contains(teamKindBlock)) {
+				if (player.getInventory().containsAtLeast(team.getKind().getBlockHead(), 1)) {
 					War.war.badMsg(player, "You already have a " + team.getName() + " block.");
 					event.setCancelled(true);
 					return;
@@ -300,7 +298,7 @@ public class WarBlockListener implements Listener {
 					Team lostFlagTeam = warzone.getTeamForFlagBlock(block);
 					if (lostFlagTeam.getPlayers().size() != 0) {
 						// player just broke the flag block of other team: cancel to avoid drop, give player the block, set block to air
-						ItemStack teamKindBlock = new ItemStack(lostFlagTeam.getKind().getMaterial(), 1, (short) 1, new Byte(lostFlagTeam.getKind().getData()));
+						ItemStack teamKindBlock = lostFlagTeam.getKind().getBlockHead();
 						player.getInventory().clear();
 						player.getInventory().addItem(teamKindBlock);
 						warzone.addFlagThief(lostFlagTeam, player.getName());
@@ -350,7 +348,7 @@ public class WarBlockListener implements Listener {
 				} else {
 					Bomb bomb = warzone.getBombForBlock(block);
 					// player just broke the bomb block: cancel to avoid drop, give player the block, set block to air
-					ItemStack tntBlock = new ItemStack(Material.TNT, 1, (short)8, (byte)8);
+					ItemStack tntBlock = new ItemStack(Material.TNT);
 					tntBlock.setDurability((short)8);
 					player.getInventory().clear();
 					player.getInventory().addItem(tntBlock);
@@ -393,7 +391,7 @@ public class WarBlockListener implements Listener {
 				} else {
 					Cake cake = warzone.getCakeForBlock(block);
 					// player just broke the cake block: cancel to avoid drop, give player the block, set block to air
-					ItemStack cakeBlock = new ItemStack(Material.CAKE, 1, (short)8, (byte)8);
+					ItemStack cakeBlock = new ItemStack(Material.CAKE);
 					cakeBlock.setDurability((short)8);
 					player.getInventory().clear();
 					player.getInventory().addItem(cakeBlock);

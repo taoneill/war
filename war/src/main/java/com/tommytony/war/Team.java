@@ -57,8 +57,8 @@ public class Team {
 		this.teamConfig = new TeamConfigBag(warzone);
 		this.inventories = new InventoryBag(warzone);	// important constructors for cascading configs
 		this.setName(name);
-		this.teamSpawns = new ArrayList(teamSpawn);
-		this.spawnVolumes = new HashMap();
+		this.teamSpawns = new ArrayList<Location>(teamSpawn);
+		this.spawnVolumes = new HashMap<Location, Volume>();
 		for (Location spawn : teamSpawn) {
 			this.setSpawnVolume(spawn, new Volume(name + teamSpawns.indexOf(spawn), warzone.getWorld()));
 		}
@@ -181,11 +181,7 @@ public class Team {
 			this.setBlock(x - 2, y - 1, z - 1, this.kind);
 			this.setBlock(x - 2, y - 1, z - 2, this.kind);
 
-			BlockFace facing = null;
-			BlockFace opposite = null;
 			if (yaw >= 0 && yaw < 90) {
-				facing = Direction.NORTH_WEST();
-				opposite = Direction.SOUTH_EAST();
 				signData = 10;
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.NORTH(), 2).getRelative(Direction.WEST(), 2);
 
@@ -217,8 +213,6 @@ public class Team {
 					this.setBlock(x + 2, y + 3, z - 2, this.kind);
 				}
 			} else if (yaw >= 90 && yaw <= 180) {
-				facing = Direction.NORTH_EAST();
-				opposite = Direction.SOUTH_WEST();
 				signData = 14;
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.NORTH(), 2).getRelative(Direction.EAST(), 2);
 				if (style.equals(TeamSpawnStyle.BIG)) {
@@ -249,8 +243,6 @@ public class Team {
 					this.setBlock(x + 2, y + 3, z + 2, this.kind);
 				}
 			} else if (yaw >= 180 && yaw < 270) {
-				facing = Direction.SOUTH_EAST();
-				opposite = Direction.NORTH_WEST();
 				signData = 2;
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.SOUTH(), 2).getRelative(Direction.EAST(), 2);
 				if (style.equals(TeamSpawnStyle.BIG)) {
@@ -281,8 +273,6 @@ public class Team {
 					this.setBlock(x - 2, y + 3, z + 2, this.kind);
 				}
 			} else if (yaw >= 270 && yaw <= 360) {
-				facing = Direction.SOUTH_WEST();
-				opposite = Direction.NORTH_EAST();
 				signData = 6;
 				signBlock = this.warzone.getWorld().getBlockAt(x, y, z).getRelative(Direction.SOUTH(), 2).getRelative(Direction.WEST(), 2);
 				if (style.equals(TeamSpawnStyle.BIG)) {

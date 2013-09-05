@@ -9,11 +9,12 @@ import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.utility.Loadout;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class InventoryBag {
 
-	private List<Loadout> loadouts = new ArrayList();
+	private List<Loadout> loadouts = new ArrayList<Loadout>();
 	private HashMap<Integer, ItemStack> reward = null;
 	
 	private Warzone warzone;
@@ -82,7 +83,7 @@ public class InventoryBag {
 		} else if (War.war.getDefaultInventories().hasLoadouts()) {
 			return War.war.getDefaultInventories().resolveNewLoadouts();
 		} else {
-			return new ArrayList();
+			return Collections.emptyList();
 		}
 	}
 	

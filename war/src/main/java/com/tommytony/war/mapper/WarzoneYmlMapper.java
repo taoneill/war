@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
@@ -13,7 +14,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
-
 
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
@@ -27,10 +27,8 @@ import com.tommytony.war.structure.Monument;
 import com.tommytony.war.structure.WarzoneMaterials;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
-import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
-import java.util.Map;
 
 public class WarzoneYmlMapper {
 
@@ -81,7 +79,7 @@ public class WarzoneYmlMapper {
 			// defaultLoadouts
 			if (warzoneRootSection.contains("team.default.loadout")) {
 				ConfigurationSection loadoutsSection = warzoneRootSection.getConfigurationSection("team.default.loadout");
-				warzone.getDefaultInventories().setLoadouts(LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, new HashMap()));
+				warzone.getDefaultInventories().setLoadouts(LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, new HashMap<String, HashMap<Integer, ItemStack>>()));
 			}
 
 			// defaultReward
@@ -197,7 +195,7 @@ public class WarzoneYmlMapper {
 						// try lowercase instead - supports custom team names
 						teamInfoPrefix = "team." + teamName.toLowerCase() + ".info.";
 					}
-					List<Location> teamSpawns = new ArrayList();
+					List<Location> teamSpawns = new ArrayList<Location>();
 					if (warzoneRootSection.contains(teamInfoPrefix + "spawn")) {
 						int teamX = warzoneRootSection.getInt(teamInfoPrefix + "spawn.x");
 						int teamY = warzoneRootSection.getInt(teamInfoPrefix + "spawn.y");
@@ -254,11 +252,11 @@ public class WarzoneYmlMapper {
 					if (warzoneRootSection.contains(teamLoadoutPrefix)) {
 						// team specific loadouts
 						ConfigurationSection loadoutsSection = warzoneRootSection.getConfigurationSection(teamLoadoutPrefix);
-						team.getInventories().setLoadouts(LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, new HashMap()));
+						team.getInventories().setLoadouts(LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, new HashMap<String, HashMap<Integer, ItemStack>>()));
 					} else if (warzoneRootSection.contains(teamLoadoutPrefix.toLowerCase())) {
 						// try lowercase instead
 						ConfigurationSection loadoutsSection = warzoneRootSection.getConfigurationSection(teamLoadoutPrefix.toLowerCase());
-						team.getInventories().setLoadouts(LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, new HashMap()));
+						team.getInventories().setLoadouts(LoadoutYmlMapper.fromConfigToLoadouts(loadoutsSection, new HashMap<String, HashMap<Integer, ItemStack>>()));
 					} 
 					
 					String teamRewardPrefix = "team." + teamName + ".reward";
@@ -594,9 +592,9 @@ public class WarzoneYmlMapper {
 
 			ConfigurationSection teamInfoSection = teamsSection.createSection(team.getName() + ".info");
 			
-			List<Map<String, Object>> spawnSerilization = new ArrayList();
+			List<Map<String, Object>> spawnSerilization = new ArrayList<Map<String, Object>>();
 			for (Location spawn : team.getTeamSpawns()) {
-				Map<String, Object> map = new HashMap();
+				Map<String, Object> map = new HashMap<String, Object>();
 				map.put("x", spawn.getBlockX());
 				map.put("y", spawn.getBlockY());
 				map.put("z", spawn.getBlockZ());

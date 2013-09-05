@@ -1,7 +1,6 @@
 package com.tommytony.war.job;
 
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.BlockInfo;
