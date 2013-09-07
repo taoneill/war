@@ -187,6 +187,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.UNBREAKABLE, false);
 		warzoneDefaultConfig.put(WarzoneConfig.DEATHMESSAGES, true);
 		warzoneDefaultConfig.put(WarzoneConfig.JOINMIDBATTLE, true);
+		warzoneDefaultConfig.put(WarzoneConfig.AUTOJOIN, false);
 		
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);
 		teamDefaultConfig.put(TeamConfig.FLAGPOINTSONLY, false);

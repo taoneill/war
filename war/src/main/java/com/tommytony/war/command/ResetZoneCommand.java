@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.structure.ZoneLobby;
 import java.util.Iterator;
 import org.kitteh.tag.TagAPI;
@@ -55,7 +56,8 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 					TagAPI.refreshPlayer(p);
 				}
 				zone.restorePlayerState(p);
-				p.teleport(zone.getTeleport());
+				p.teleport(zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOJOIN) ?
+						War.war.getWarHub().getLocation() : zone.getTeleport());
 				War.war.msg(p, "You have left the warzone. Your inventory is being restored.");
 			}
 			team.resetPoints();

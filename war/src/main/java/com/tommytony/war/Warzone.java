@@ -1448,6 +1448,8 @@ public class Warzone {
 	public void gameEndTeleport(Player tp) {
 		if (this.getRallyPoint() != null) {
 			tp.teleport(this.getRallyPoint());
+		} else if (this.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOJOIN)) {
+			tp.teleport(War.war.getWarHub().getLocation());
 		} else {
 			tp.teleport(this.getTeleport());
 		}
