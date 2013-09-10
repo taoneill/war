@@ -57,25 +57,8 @@ public class JoinCommand extends AbstractWarCommand {
 			return false;
 		}
 		
-		String name = this.args[0];
 		TeamKind kind = TeamKind.teamKindFromString(this.args[0]);
 
-		// drop from old team if any
-		Team previousTeam = Team.getTeamByPlayerName(player.getName());
-		if (previousTeam != null) {
-			if (previousTeam.getName().startsWith(name) || previousTeam.getKind() == kind) {
-				// trying to join own team
-				War.war.badMsg(player, "Can't join your own team.");
-				return true;
-			}
-			
-			if (!previousTeam.removePlayer(player.getName())) {
-				War.war.log("Could not remove player " + player.getName() + " from team " + previousTeam.getName(), java.util.logging.Level.WARNING);
-			}
-			previousTeam.resetSign();
-		}
-
-		// join new team
 		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 			this.badMsg("This warzone is disabled.");
 		} else if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
@@ -83,42 +66,43 @@ public class JoinCommand extends AbstractWarCommand {
 		} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
 			this.badMsg("You cannot join a battle in progress in this warzone.");
 		} else {
-			List<Team> teams = zone.getTeams();
-			boolean foundTeam = false;
-			for (Team team : teams) {
-				if (team.getName().startsWith(name) || team.getKind() == kind) {
-					if (!War.war.canPlayWar(player, team)) {
-							this.badMsg("You don't have permission to join this team.");
-							return true;
-					}
-					if (player.getWorld() != zone.getWorld()) {
-						player.teleport(zone.getWorld().getSpawnLocation());
-					}
-					if (!zone.hasPlayerState(player.getName())) {
-						zone.keepPlayerState(player);
-						this.msg("Your inventory is in storage until you use '/war leave'.");
-					}
-					if (team.getPlayers().size() < team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)) {
-						team.addPlayer(player);
-						team.resetSign();
-						zone.respawnPlayer(team, player);
-						if (War.war.getWarHub() != null) {
-							War.war.getWarHub().resetZoneSign(zone);
-						}
-						foundTeam = true;
-					} else {
-						this.msg("Team " + team.getName() + " is full.");
-						foundTeam = true;
-					}
-				}
-			}
-
-			if (foundTeam) {
-				for (Team team : teams) {
-					team.teamcast("" + player.getName() + " joined " + team.getName());
-				}
+			Team team = zone.getTeamByKind(kind);
+			if (kind == null) {
+				this.badMsg("There is no team kind called " + args[0] + ".");
+			} else if (team == null) {
+				this.badMsg("This warzone does not contain a team " + kind.toString() + ".");
+			} else if (!War.war.canPlayWar(player, team)) {
+				this.badMsg("You don't have permission to join this team.");
+			} else if (team.isFull()) {
+				this.badMsg("Team " + team.getName() + " is full.");
 			} else {
-				this.msg("No such team. Try /teams.");
+				Team previousTeam = Team.getTeamByPlayerName(player.getName());
+				if (previousTeam != null) {
+					if (previousTeam == team) {
+						War.war.badMsg(player, "You cannot join your own team.");
+						return true;
+					}
+					if (!previousTeam.removePlayer(player.getName())) {
+						War.war.log("Could not remove player " + player.getName() + " from team " + previousTeam.getName(), java.util.logging.Level.WARNING);
+					}
+					previousTeam.resetSign();
+				}
+				if (player.getWorld() != zone.getWorld()) {
+					player.teleport(zone.getWorld().getSpawnLocation());
+				}
+				if (!zone.hasPlayerState(player.getName())) {
+					zone.keepPlayerState(player);
+					this.msg("Your inventory is in storage until you use '/war leave'.");
+				}
+				team.addPlayer(player);
+				team.resetSign();
+				zone.respawnPlayer(team, player);
+				if (War.war.getWarHub() != null) {
+					War.war.getWarHub().resetZoneSign(zone);
+				}
+				for (Team localTeam : zone.getTeams()) {
+					localTeam.teamcast(String.format("%s joined team %s.", player.getName(), team.getName()));
+				}
 			}
 		}
 		return true;

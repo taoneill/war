@@ -706,4 +706,8 @@ public class Team {
 		}
 		return false;
 	}
+
+	public boolean isFull() {
+		return this.getPlayers().size() == this.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
+	}
 }
