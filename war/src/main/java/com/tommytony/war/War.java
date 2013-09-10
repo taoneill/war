@@ -28,6 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.tommytony.war.command.WarCommandHandler;
 import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.InventoryBag;
+import com.tommytony.war.config.ScoreboardType;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.config.TeamKind;
@@ -188,6 +189,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.DEATHMESSAGES, true);
 		warzoneDefaultConfig.put(WarzoneConfig.JOINMIDBATTLE, true);
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOJOIN, false);
+		warzoneDefaultConfig.put(WarzoneConfig.SCOREBOARD, ScoreboardType.NONE);
 		
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);
 		teamDefaultConfig.put(TeamConfig.FLAGPOINTSONLY, false);

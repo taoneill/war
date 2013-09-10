@@ -58,6 +58,15 @@ public class WarzoneConfigBag {
 		}
 	}
 
+	public ScoreboardType getScoreboardType(WarzoneConfig config) {
+		if (bag.containsKey(config)) {
+			return (ScoreboardType)bag.get(config);
+		} else {
+			// use War default config
+			return War.war.getWarzoneDefaultConfig().getScoreboardType(config);
+		}
+	}
+
 	public void loadFrom(ConfigurationSection warzoneConfigSection) {
 		for (WarzoneConfig config : WarzoneConfig.values()) {
 			if (warzoneConfigSection.contains(config.toString())) {
@@ -65,6 +74,8 @@ public class WarzoneConfigBag {
 					this.put(config, warzoneConfigSection.getInt(config.toString()));
 				} else if (config.getConfigType().equals(Boolean.class)) {
 					this.put(config, warzoneConfigSection.getBoolean(config.toString()));
+				} else if (config.getConfigType().equals(ScoreboardType.class)) {
+					this.put(config, ScoreboardType.getFromString(warzoneConfigSection.getString(config.toString())));
 				}
 			}
 		}
@@ -73,7 +84,12 @@ public class WarzoneConfigBag {
 	public void saveTo(ConfigurationSection warzoneConfigSection) {
 		for (WarzoneConfig config : WarzoneConfig.values()) {
 			if (this.bag.containsKey(config)) {
-				warzoneConfigSection.set(config.toString(), this.bag.get(config));
+				if (config.getConfigType().equals(Integer.class)
+						|| config.getConfigType().equals(Boolean.class)) {
+					warzoneConfigSection.set(config.toString(), this.bag.get(config));
+				} else {
+					warzoneConfigSection.set(config.toString(), this.bag.get(config).toString());
+				}
 			}
 		}
 	}
@@ -95,6 +111,9 @@ public class WarzoneConfigBag {
 						this.warzone.getLobby().setLocation(this.warzone.getTeleport());
 						this.warzone.getLobby().initialize();
 					}
+				} else if (warzoneConfig.getConfigType().equals(ScoreboardType.class)) {
+					String type = namedParams.get(namedParam);
+					this.bag.put(warzoneConfig, ScoreboardType.getFromString(type));
 				}
 				returnMessage += " " + warzoneConfig.toString() + " set to " + namedParams.get(namedParam); 
 			} else if (namedParam.equals("delete")) {

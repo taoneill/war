@@ -24,6 +24,7 @@ import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
 import com.tommytony.war.config.InventoryBag;
+import com.tommytony.war.config.ScoreboardType;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.config.TeamKind;
@@ -49,6 +50,13 @@ import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 /**
  *
@@ -83,6 +91,8 @@ public class Warzone {
 	private final WarzoneConfigBag warzoneConfig;
 	private final TeamConfigBag teamDefaultConfig;
 	private InventoryBag defaultInventories = new InventoryBag();
+
+	private Scoreboard scoreboard;
 	
 	private HubLobbyMaterials lobbyMaterials = null;
 	private WarzoneMaterials warzoneMaterials = new WarzoneMaterials(49, (byte)0, 85, (byte)0, 89, (byte)0);	// default main obsidian, stand ladder, light glowstone
@@ -261,6 +271,21 @@ public class Warzone {
 
 	public void initializeZone(Player respawnExempted) {
 		if (this.ready() && this.volume.isSaved()) {
+			if (this.scoreboard != null) {
+				for (OfflinePlayer opl : this.scoreboard.getPlayers()) {
+					this.scoreboard.resetScores(opl);
+				}
+				this.scoreboard.clearSlot(DisplaySlot.SIDEBAR);
+				for (Objective obj : this.scoreboard.getObjectives()) {
+					obj.unregister();
+				}
+				for (Player player : Bukkit.getOnlinePlayers()) {
+					if (player.getScoreboard() == this.scoreboard) {
+						player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+					}
+				}
+				this.scoreboard = null;
+			}
 			// everyone back to team spawn with full health
 			for (Team team : this.teams) {
 				for (Player player : team.getPlayers()) {
@@ -330,7 +355,26 @@ public class Warzone {
 		this.bombThieves.clear();
 		this.cakeThieves.clear();
 		this.reallyDeadFighters.clear();
-
+		if (this.getScoreboardType() != ScoreboardType.NONE) {
+			this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+			scoreboard.registerNewObjective(this.getScoreboardType().getDisplayName(), "dummy");
+			Objective obj = scoreboard.getObjective(this.getScoreboardType().getDisplayName());
+			Validate.isTrue(obj.isModifiable(), "Cannot modify players' scores on the " + this.name + " scoreboard.");
+			for (Team team : this.getTeams()) {
+				String teamName = team.getKind().getColor() + team.getName() + ChatColor.RESET;
+				if (this.getScoreboardType() == ScoreboardType.POINTS) {
+					obj.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(team.getPoints());
+				} else if (this.getScoreboardType() == ScoreboardType.LIFEPOOL) {
+					obj.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(team.getRemainingLifes());
+				}
+			}
+			obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+			for (Team team : this.getTeams()) {
+				for (Player player : team.getPlayers()) {
+					player.setScoreboard(scoreboard);
+				}
+			}
+		}
 		// nom drops
 		for(Entity entity : (this.getWorld().getEntities())) {
 			if (!(entity instanceof Item)) {
@@ -544,6 +588,7 @@ public class Warzone {
 				SpoutManager.getPlayer(player).setTitle(originalState.getPlayerTitle());
 			}
 		}
+		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 	}
 
 	private void playerInvFromInventoryStash(PlayerInventory playerInv, PlayerState originalContents) {
@@ -1509,5 +1554,13 @@ public class Warzone {
 
 	public WarzoneMaterials getWarzoneMaterials() {
 		return warzoneMaterials;
+	}
+
+	public Scoreboard getScoreboard() {
+		return scoreboard;
+	}
+
+	public ScoreboardType getScoreboardType() {
+		return this.getWarzoneConfig().getScoreboardType(WarzoneConfig.SCOREBOARD);
 	}
 }

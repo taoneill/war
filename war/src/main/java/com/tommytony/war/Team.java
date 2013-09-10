@@ -2,20 +2,29 @@ package com.tommytony.war;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
-
+import org.kitteh.tag.TagAPI;
 
 import com.tommytony.war.config.InventoryBag;
+import com.tommytony.war.config.ScoreboardType;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.config.TeamKind;
@@ -26,11 +35,6 @@ import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import org.kitteh.tag.TagAPI;
 
 /**
  *
@@ -356,6 +360,9 @@ public class Team {
 		if (War.war.isTagServer()) {
 			TagAPI.refreshPlayer(player);
 		}
+		if (this.warzone.getScoreboard() != null && this.warzone.getScoreboardType() != ScoreboardType.NONE) {
+			player.setScoreboard(this.warzone.getScoreboard());
+		}
 	}
 
 	public List<Player> getPlayers() {
@@ -441,6 +448,12 @@ public class Team {
 
 	public void setRemainingLives(int remainingLives) {
 		this.remainingLives = remainingLives;
+		if (this.warzone.getScoreboard() != null && this.warzone.getScoreboardType() == ScoreboardType.LIFEPOOL) {
+			String teamName = kind.getColor() + name + ChatColor.RESET;
+			OfflinePlayer teamPlayer = Bukkit.getOfflinePlayer(teamName);
+			Objective obj = this.warzone.getScoreboard().getObjective("Lifepool");
+			obj.getScore(teamPlayer).setScore(remainingLives);
+		}
 	}
 
 	public int getRemainingLifes() {
@@ -459,6 +472,11 @@ public class Team {
 			this.points++;
 		} else if (!atLeastOnePlayerOnOtherTeam) {
 			this.teamcast("Can't score until at least one player joins another team.");
+		}
+		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS) {
+			String teamName = kind.getColor() + name + ChatColor.RESET;
+			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
+					.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(points);
 		}
 	}
 
@@ -488,6 +506,11 @@ public class Team {
 
 	public void resetPoints() {
 		this.points = 0;
+		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS) {
+			String teamName = kind.getColor() + name + ChatColor.RESET;
+			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
+					.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(points);
+		}
 	}
 
 	public void setFlagVolume(Volume flagVolume) {

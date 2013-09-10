@@ -21,7 +21,9 @@ public enum WarzoneConfig {
 	RESETONUNLOAD (Boolean.class),
 	UNBREAKABLE (Boolean.class),
 	JOINMIDBATTLE (Boolean.class),
-	AUTOJOIN (Boolean.class);
+	AUTOJOIN (Boolean.class),
+	SCOREBOARD (ScoreboardType.class)
+	;
 	
 	
 	private final Class<?> configType;
