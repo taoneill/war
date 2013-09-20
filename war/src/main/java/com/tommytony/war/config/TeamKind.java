@@ -136,4 +136,13 @@ public enum TeamKind {
 	public MaterialData getBlockData() {
 		return new Wool(this.dyeColor);
 	}
+
+	public static TeamKind getTeam(String teamName) {
+		for (TeamKind team : TeamKind.values()) {
+			if (team.toString().equalsIgnoreCase(teamName)) {
+				return team;
+			}
+		}
+		return null;
+	}
 }

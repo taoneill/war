@@ -1,23 +1,24 @@
 package com.tommytony.war.event;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public class WarPlayerThiefEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
-	private String player;
-	private int type;
+	private Player player;
+	private StolenObject type;
 	
-	public WarPlayerThiefEvent(String thief, int stolen) {
+	public WarPlayerThiefEvent(Player thief, StolenObject stolen) {
 		this.player = thief;
 		this.type = stolen;
 	}
 	
-	public String getThief() {
+	public Player getThief() {
 		return player;
 	}
 	
-	public int getStolenObject() {
+	public StolenObject getStolenObject() {
 		return type;
 	}
 	
@@ -30,7 +31,9 @@ public class WarPlayerThiefEvent extends Event {
 		return handlers;
 	}
 	
-	public static final int STOLE_FLAG = 0;
-	public static final int STOLE_BOMB = 1;
-	public static final int STOLE_CAKE = 2;
+	public enum StolenObject {
+		FLAG,
+		BOMB,
+		CAKE
+	}
 }

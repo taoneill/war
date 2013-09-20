@@ -6,10 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -20,6 +23,9 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
@@ -30,12 +36,11 @@ import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.config.WarzoneConfigBag;
+import com.tommytony.war.event.WarBattleWinEvent;
 import com.tommytony.war.event.WarPlayerDeathEvent;
 import com.tommytony.war.event.WarPlayerLeaveEvent;
 import com.tommytony.war.event.WarPlayerThiefEvent;
 import com.tommytony.war.event.WarScoreCapEvent;
-import com.tommytony.war.event.WarTeamWinEvent;
-import com.tommytony.war.event.WarThiefDeathEvent;
 import com.tommytony.war.job.InitZoneJob;
 import com.tommytony.war.job.LoadoutResetJob;
 import com.tommytony.war.job.LogKillsDeathsJob;
@@ -58,15 +63,6 @@ import com.tommytony.war.utility.PotionEffectHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
-import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
-import java.util.Map;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 /**
  *
@@ -989,20 +985,15 @@ public class Warzone {
 					
 					// whoever didn't lose, reward them
 					//
+					List<Team> winningTeams = new ArrayList<Team>(teams.size());
 					for( Team t : teams ) {
 						if( !t.getPlayers().contains(player)) {
-							//War.war.getServer().getLogger().info("WAR: team " + t.getName() + " are winners!");
-							ArrayList<String> winnerNames = new ArrayList<String>();
-							for(Player name : t.getPlayers()) {
-								winnerNames.add(name.getName());
-								//War.war.getServer().getLogger().info("WAR: adding " + name.getName() + " to the list");
-							}
-							
-							WarTeamWinEvent event1 = new WarTeamWinEvent(winnerNames.toArray(new String[winnerNames.size()]));
-							War.war.getServer().getPluginManager().callEvent(event1);
+							winningTeams.add(t);
 						}
 					}
-					
+					WarBattleWinEvent event1 = new WarBattleWinEvent(this, winningTeams);
+					War.war.getServer().getPluginManager().callEvent(event1);
+
 					if (!scores.equals("")) {
 						for (Team t : teams) {
 							t.teamcast("New scores - " + scores);
@@ -1115,9 +1106,6 @@ public class Warzone {
 				
 				// Decrement lifepool
 				playerTeam.setRemainingLives(remaining - 1);
-
-				WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(player.getName());
-				War.war.getServer().getPluginManager().callEvent(event1);
 				
 				// Lifepool empty warning
 				if (remaining - 1 == 0) {
@@ -1269,7 +1257,7 @@ public class Warzone {
 	// Flags
 	public void addFlagThief(Team lostFlagTeam, String flagThief) {
 		this.flagThieves.put(flagThief, lostFlagTeam);
-		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(flagThief, WarPlayerThiefEvent.STOLE_FLAG);
+		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(Bukkit.getPlayerExact(flagThief), WarPlayerThiefEvent.StolenObject.FLAG);
 		War.war.getServer().getPluginManager().callEvent(event1);
 	}
 
@@ -1291,7 +1279,7 @@ public class Warzone {
 	// Bomb
 	public void addBombThief(Bomb bomb, String bombThief) {
 		this.bombThieves.put(bombThief, bomb);
-		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(bombThief, WarPlayerThiefEvent.STOLE_BOMB);
+		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(Bukkit.getPlayerExact(bombThief), WarPlayerThiefEvent.StolenObject.BOMB);
 		War.war.getServer().getPluginManager().callEvent(event1);
 	}
 
@@ -1314,7 +1302,7 @@ public class Warzone {
 	
 	public void addCakeThief(Cake cake, String cakeThief) {
 		this.cakeThieves.put(cakeThief, cake);
-		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(cakeThief, WarPlayerThiefEvent.STOLE_CAKE);
+		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(Bukkit.getPlayerExact(cakeThief), WarPlayerThiefEvent.StolenObject.CAKE);
 		War.war.getServer().getPluginManager().callEvent(event1);
 	}
 
@@ -1351,7 +1339,11 @@ public class Warzone {
 	public void handleScoreCapReached(String winnersStr) {
 		// Score cap reached. Reset everything.
 		this.isEndOfGame = true;
-		WarScoreCapEvent event1 = new WarScoreCapEvent(winnersStr.split(" "));
+		List<Team> winningTeams = new ArrayList<Team>(teams.size());
+		for (String team : winnersStr.split(" ")) {
+			winningTeams.add(this.getTeamByKind(TeamKind.getTeam(team)));
+		}
+		WarScoreCapEvent event1 = new WarScoreCapEvent(winningTeams);
 		War.war.getServer().getPluginManager().callEvent(event1);
 		
 		new ScoreCapReachedJob(this, winnersStr).run();	// run inventory and teleports immediately to avoid inv reset problems

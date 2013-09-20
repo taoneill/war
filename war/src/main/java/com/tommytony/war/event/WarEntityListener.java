@@ -182,6 +182,8 @@ public class WarEntityListener implements Listener {
 							War.war.getKillstreakReward().rewardPlayer(a, defenderWarzone.getKillCount(a.getName()));
 						}
 					}
+					WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(defenderWarzone, d, a, event.getCause());
+					War.war.getServer().getPluginManager().callEvent(event1);
 					defenderWarzone.handleDeath(d);
 					if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
 						// fast respawn, don't really die
@@ -194,6 +196,8 @@ public class WarEntityListener implements Listener {
 					Bomb bomb = defenderWarzone.getBombForThief(d.getName());
 										
 					// Kill the bomber 
+					WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(defenderWarzone, d, null, event.getCause());
+					War.war.getServer().getPluginManager().callEvent(event1);
 					defenderWarzone.handleDeath(d);
 					
 					if (defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
@@ -289,7 +293,8 @@ public class WarEntityListener implements Listener {
 						team.teamcast(deathMessage);
 					}
 				}
-				
+				WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(defenderWarzone, d, null, event.getCause());
+				War.war.getServer().getPluginManager().callEvent(event1);
 				defenderWarzone.handleDeath(d);
 				
 				if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
@@ -468,7 +473,8 @@ public class WarEntityListener implements Listener {
 							teamToMsg.teamcast(deathMessage);
 						}
 					}
-					
+					WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(zone, player, null, event.getCause());
+					War.war.getServer().getPluginManager().callEvent(event1);
 					zone.handleDeath(player);
 					
 					if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
