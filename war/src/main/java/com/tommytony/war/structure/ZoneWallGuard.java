@@ -7,12 +7,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.utility.Direction;
-import com.tommytony.war.volume.BlockInfo;
 
 
 /**
@@ -25,7 +25,20 @@ public class ZoneWallGuard {
 	private Warzone warzone;
 	private Location playerLocation;
 	private BlockFace wall;
-	private List<BlockInfo> glassified = new ArrayList<BlockInfo>();
+	private List<BlockState> glassified = new ArrayList<BlockState>();
+	public static final Material[] glassifyBlocks = {
+		Material.AIR,
+		Material.WATER,
+		Material.LONG_GRASS,
+		Material.VINE,
+		Material.WATER_LILY,
+		Material.YELLOW_FLOWER,
+		Material.RED_ROSE,
+		Material.RED_MUSHROOM,
+		Material.BROWN_MUSHROOM,
+		Material.DEAD_BUSH,
+		Material.SUGAR_CANE_BLOCK
+	};
 
 	public ZoneWallGuard(Player player, War war, Warzone warzone, BlockFace wall) {
 		this.player = player;
@@ -161,38 +174,49 @@ public class ZoneWallGuard {
 		}
 	}
 
+	public static boolean shouldGlassify(Material material) {
+		for (Material glassify : glassifyBlocks) {
+			if (glassify == material) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void glassify(Block block, BlockFace wall) {
 		// face here means which wall we are working on
 
-		if ((block.getTypeId() == Material.AIR.getId() || block.getTypeId() == Material.WATER.getId()) && (this.warzone.getLobby() == null || (this.warzone.getLobby() != null && !this.warzone.getLobby().blockIsAGateBlock(block, wall)))) {
+		if (shouldGlassify(block.getType())
+				&& (this.warzone.getLobby() == null || (this.warzone.getLobby() != null && !this.warzone
+						.getLobby().blockIsAGateBlock(block, wall)))) {
 			if (wall == Direction.NORTH()) {
 				if (this.warzone.getVolume().isNorthWallBlock(block)) {
-					this.glassified.add(new BlockInfo(block));
+					this.glassified.add(block.getState());
 					block.setType(Material.GLASS);
 				}
 			} else if (wall == Direction.SOUTH()) {
 				if (this.warzone.getVolume().isSouthWallBlock(block)) {
-					this.glassified.add(new BlockInfo(block));
+					this.glassified.add(block.getState());
 					block.setType(Material.GLASS);
 				}
 			} else if (wall == Direction.EAST()) {
 				if (this.warzone.getVolume().isEastWallBlock(block)) {
-					this.glassified.add(new BlockInfo(block));
+					this.glassified.add(block.getState());
 					block.setType(Material.GLASS);
 				}
 			} else if (wall == Direction.WEST()) {
 				if (this.warzone.getVolume().isWestWallBlock(block)) {
-					this.glassified.add(new BlockInfo(block));
+					this.glassified.add(block.getState());
 					block.setType(Material.GLASS);
 				}
 			} else if (wall == BlockFace.UP) {
 				if (this.warzone.getVolume().isUpWallBlock(block)) {
-					this.glassified.add(new BlockInfo(block));
+					this.glassified.add(block.getState());
 					block.setType(Material.GLASS);
 				}
 			} else if (wall == BlockFace.DOWN) {
 				if (this.warzone.getVolume().isDownWallBlock(block)) {
-					this.glassified.add(new BlockInfo(block));
+					this.glassified.add(block.getState());
 					block.setType(Material.GLASS);
 				}
 			}
@@ -208,11 +232,9 @@ public class ZoneWallGuard {
 	}
 
 	public void deactivate() {
-		for (BlockInfo oldBlock : this.glassified) {
+		for (BlockState oldBlock : this.glassified) {
 			// return to original
-			Block glassifiedBlock = this.warzone.getWorld().getBlockAt(oldBlock.getX(), oldBlock.getY(), oldBlock.getZ());
-			glassifiedBlock.setTypeId(oldBlock.getTypeId());
-			glassifiedBlock.setData(oldBlock.getData());
+			oldBlock.update(true);
 		}
 	}
 
