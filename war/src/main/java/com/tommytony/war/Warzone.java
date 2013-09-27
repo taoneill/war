@@ -37,7 +37,6 @@ import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.config.WarzoneConfigBag;
 import com.tommytony.war.event.WarBattleWinEvent;
-import com.tommytony.war.event.WarPlayerDeathEvent;
 import com.tommytony.war.event.WarPlayerLeaveEvent;
 import com.tommytony.war.event.WarPlayerThiefEvent;
 import com.tommytony.war.event.WarScoreCapEvent;
@@ -95,7 +94,7 @@ public class Warzone {
 	private final List<Player> respawn = new ArrayList<Player>();
 	private final List<String> reallyDeadFighters = new ArrayList<String>();
 
-	private List<LogKillsDeathsJob.KillsDeathsRecord> killsDeathsTracker = new ArrayList();
+	private List<LogKillsDeathsJob.KillsDeathsRecord> killsDeathsTracker = new ArrayList<KillsDeathsRecord>();
 	
 	private final WarzoneConfigBag warzoneConfig;
 	private final TeamConfigBag teamDefaultConfig;
@@ -104,7 +103,9 @@ public class Warzone {
 	private Scoreboard scoreboard;
 	
 	private HubLobbyMaterials lobbyMaterials = null;
-	private WarzoneMaterials warzoneMaterials = new WarzoneMaterials(49, (byte)0, 85, (byte)0, 89, (byte)0);	// default main obsidian, stand ladder, light glowstone
+	private WarzoneMaterials warzoneMaterials = new WarzoneMaterials(
+			new ItemStack(Material.OBSIDIAN), new ItemStack(Material.FENCE),
+			new ItemStack(Material.GLOWSTONE));
 	
 	private boolean isEndOfGame = false;
 	private boolean isReinitializing = false;
@@ -116,16 +117,7 @@ public class Warzone {
 		this.warzoneConfig = new WarzoneConfigBag(this);
 		this.teamDefaultConfig = new TeamConfigBag();	// don't use ctor with Warzone, as this changes config resolution
 		this.volume = new ZoneVolume(name, this.getWorld(), this);
-		this.lobbyMaterials = new HubLobbyMaterials(
-				War.war.getWarhubMaterials().getFloorId(),
-				War.war.getWarhubMaterials().getFloorData(),
-				War.war.getWarhubMaterials().getOutlineId(),
-				War.war.getWarhubMaterials().getOutlineData(),
-				War.war.getWarhubMaterials().getGateId(),
-				War.war.getWarhubMaterials().getGateData(),
-				War.war.getWarhubMaterials().getLightId(),
-				War.war.getWarhubMaterials().getLightData()
-			);
+		this.lobbyMaterials = War.war.getWarhubMaterials().clone();
 	}
 
 	public static Warzone getZoneByName(String name) {
@@ -617,7 +609,7 @@ public class Warzone {
 		
 		int invIndex = 0;
 		for (ItemStack item : originalContents.getContents()) {
-			if (item != null && item.getTypeId() != 0) {
+			if (item != null && item.getType() != Material.AIR) {
 				playerInv.setItem(invIndex, item);
 			}
 			invIndex++;
@@ -963,8 +955,7 @@ public class Warzone {
 									sp.sendNotification(
 											SpoutDisplayer.cleanForNotification("Round over! " + playerTeam.getKind().getColor() + playerTeam.getName()),
 											SpoutDisplayer.cleanForNotification("ran out of lives."),
-											playerTeam.getKind().getMaterial(),
-											playerTeam.getKind().getDyeColor().getWoolData(),
+											playerTeam.getKind().getBlockHead(),
 											10000);
 								}
 							}
@@ -1041,8 +1032,7 @@ public class Warzone {
 								sp.sendNotification(
 										SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
 										SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "your flag."),
-										playerTeam.getKind().getMaterial(),
-										playerTeam.getKind().getDyeColor().getWoolData(),
+										playerTeam.getKind().getBlockHead(),
 										5000);
 							}
 						}
@@ -1484,7 +1474,7 @@ public class Warzone {
 			int invIndex = 0;
 			playerItems = new HashMap<Integer, ItemStack>();
 			for (ItemStack item : originalState.getContents()) {
-				if (item != null && item.getTypeId() != 0) {
+				if (item != null && item.getType() != Material.AIR) {
 					playerItems.put(invIndex, item);
 				}
 				invIndex++;

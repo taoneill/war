@@ -1,5 +1,6 @@
 package com.tommytony.war.structure;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +10,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
-
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Sign;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
@@ -19,7 +22,6 @@ import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.utility.Direction;
-import com.tommytony.war.utility.SignHelper;
 import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
@@ -275,35 +277,22 @@ public class ZoneLobby {
 		// maybe the number of teams change, now reset the gate positions
 		if (this.lobbyMiddleWallBlock != null && this.volume != null) {
 			this.setGatePositions(BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock));
-			
-			// Add the floor and outline
-			Material floor = Material.getMaterial(warzone.getLobbyMaterials().getFloorId());
-			byte floorData = warzone.getLobbyMaterials().getFloorData();
-			Material outline = Material.getMaterial(warzone.getLobbyMaterials().getOutlineId());
-			byte outlineData = warzone.getLobbyMaterials().getOutlineData();
-			Material gate = Material.getMaterial(warzone.getLobbyMaterials().getGateId());
-			byte gateData = warzone.getLobbyMaterials().getGateData();
-			
-			if (!floor.equals(Material.AIR)) {
+			if (!warzone.getLobbyMaterials().getFloorBlock().getType().equals(Material.AIR)) {
 				// If air, leave original blocks.
-				this.volume.setFaceMaterial(BlockFace.DOWN, floor, floorData);
+				this.volume.setFaceMaterial(BlockFace.DOWN, warzone.getLobbyMaterials().getFloorBlock());
 			}
 			
-			if (!outline.equals(Material.AIR)) {
+			if (!warzone.getLobbyMaterials().getOutlineBlock().getType().equals(Material.AIR)) {
 				// If air, leave original blocks.
-				this.volume.setFloorOutlineMaterial(outline, outlineData);
+				this.volume.setFloorOutline(warzone.getLobbyMaterials().getOutlineBlock());
 			}
 
 			// add war hub link gate
 			if (War.war.getWarHub() != null) {
 				Block linkGateBlock = BlockInfo.getBlock(this.volume.getWorld(), this.warHubLinkGate);
-				this.placeWarhubLinkGate(linkGateBlock, gate, gateData);
+				this.placeWarhubLinkGate(linkGateBlock, warzone.getLobbyMaterials().getGateBlock());
 				// add warhub sign
-				String[] lines = new String[4];
-				lines[0] = "";
-				lines[1] = "To War hub";
-				lines[2] = "";
-				lines[3] = "";
+				String[] lines = "\nTo War hub\n\n ".split("\n");
 				this.resetGateSign(linkGateBlock, lines, false);
 			}
 
@@ -371,45 +360,40 @@ public class ZoneLobby {
 			
 			// set zone sign
 			Block zoneSignBlock = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(this.wall, 4);
-			byte data = 0;
-			if (this.wall == Direction.NORTH()) {
-				data = (byte) 4;
-			} else if (this.wall == Direction.EAST()) {
-				data = (byte) 8;
-			} else if (this.wall == Direction.SOUTH()) {
-				data = (byte) 12;
-			} else if (this.wall == Direction.WEST()) {
-				data = (byte) 0;
-			}
+			zoneSignBlock.setType(Material.SIGN_POST);
+			org.bukkit.block.Sign block = (org.bukkit.block.Sign) zoneSignBlock.getState();
+			org.bukkit.material.Sign data = (Sign) block.getData();
+			data.setFacingDirection(this.wall);
+			block.setData(data);
 			String[] lines = new String[4];
-			lines[0] = "Warzone";
-			lines[1] = this.warzone.getName();
 			if (this.autoAssignGate != null) {
-				lines[2] = "Enter the auto-";
-				lines[3] = "assign gate.";
+				lines = MessageFormat.format("Warzone\n{0}\nEnter the auto-\nassign gate.", warzone.getName()).split("\n");
 			} else {
-				lines[2] = "";
-				lines[3] = "Pick your team.";
+				lines = MessageFormat.format("Warzone\n{0}\n\nPick your team.", warzone.getName()).split("\n");
 			}
-			SignHelper.setToSign(War.war, zoneSignBlock, data, lines);
-
+			for (int i = 0; i < 4; i++) {
+				block.setLine(i, lines[i]);
+			}
+			block.update(true);
 			// lets get some light in here
-			Material light = Material.getMaterial(this.warzone.getLobbyMaterials().getLightId());
-			byte lightData = this.warzone.getLobbyMaterials().getLightData();
 			if (this.wall == Direction.NORTH() || this.wall == Direction.SOUTH()) {
-				Block one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.WEST(), this.lobbyHalfSide - 1).getRelative(this.wall, 9);
-				one.setType(light);
-				one.setData(lightData);
-				Block two = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.EAST(), this.lobbyHalfSide - 1).getRelative(this.wall, 9);
-				two.setType(light);
-				two.setData(lightData);
+				BlockState one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.WEST(), this.lobbyHalfSide - 1).getRelative(this.wall, 9).getState();
+				one.setType(warzone.getLobbyMaterials().getLightBlock().getType());
+				one.setData(warzone.getLobbyMaterials().getLightBlock().getData());
+				one.update(true);
+				one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.EAST(), this.lobbyHalfSide - 1).getRelative(this.wall, 9).getState();
+				one.setType(warzone.getLobbyMaterials().getLightBlock().getType());
+				one.setData(warzone.getLobbyMaterials().getLightBlock().getData());
+				one.update(true);
 			} else {
-				Block one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.NORTH(), this.lobbyHalfSide - 1).getRelative(this.wall, 9);
-				one.setType(light);
-				one.setData(lightData);
-				Block two = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.SOUTH(), this.lobbyHalfSide - 1).getRelative(this.wall, 9);
-				two.setType(light);
-				two.setData(lightData);
+				BlockState one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.NORTH(), this.lobbyHalfSide - 1).getRelative(this.wall, 9).getState();
+				one.setType(warzone.getLobbyMaterials().getLightBlock().getType());
+				one.setData(warzone.getLobbyMaterials().getLightBlock().getData());
+				one.update(true);
+				one = BlockInfo.getBlock(this.volume.getWorld(), this.lobbyMiddleWallBlock).getRelative(BlockFace.DOWN).getRelative(Direction.SOUTH(), this.lobbyHalfSide - 1).getRelative(this.wall, 9).getState();
+				one.setType(warzone.getLobbyMaterials().getLightBlock().getType());
+				one.setData(warzone.getLobbyMaterials().getLightBlock().getData());
+				one.update(true);
 			}
 		} else {
 			War.war.log("Failed to initalize zone lobby for zone " + this.warzone.getName(), java.util.logging.Level.WARNING);
@@ -486,8 +470,10 @@ public class ZoneLobby {
 			this.clearGatePath(block, front, leftSide, rightSide, true);
 			
 			// gate blocks
-			block.getRelative(BlockFace.DOWN).setType(Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()));
-			block.getRelative(BlockFace.DOWN).setData(this.warzone.getLobbyMaterials().getLightData());
+			BlockState lightBlock = block.getRelative(BlockFace.DOWN).getState();
+			lightBlock.setType(warzone.getLobbyMaterials().getLightBlock().getType());
+			lightBlock.setData(warzone.getLobbyMaterials().getLightBlock().getData());
+			lightBlock.update(true);
 			this.setBlock(block.getRelative(leftSide), teamKind);
 			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP), teamKind);
 			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), teamKind);
@@ -498,7 +484,7 @@ public class ZoneLobby {
 		}
 	}
 
-	private void placeWarhubLinkGate(Block block, Material material, byte data) {
+	private void placeWarhubLinkGate(Block block, ItemStack frame) {
 		if (block != null) {
 			BlockFace front = null;
 			BlockFace leftSide = null; // looking at the zone
@@ -534,26 +520,34 @@ public class ZoneLobby {
 			this.clearGatePath(block, front, leftSide, rightSide, false);
 
 			// gate blocks
-			block.getRelative(BlockFace.DOWN).setType(Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()));
-			block.getRelative(BlockFace.DOWN).setData(this.warzone.getLobbyMaterials().getLightData());
-			this.setBlock(block.getRelative(leftSide), material, data);
-			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP), material, data);
-			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), material, data);
-			this.setBlock(block.getRelative(rightSide), material, data);
-			this.setBlock(block.getRelative(leftSide).getRelative(BlockFace.UP), material, data);
-			this.setBlock(block.getRelative(rightSide).getRelative(BlockFace.UP).getRelative(BlockFace.UP), material, data);
-			this.setBlock(block.getRelative(BlockFace.UP).getRelative(BlockFace.UP), material, data);
+			BlockState lightBlock = block.getRelative(BlockFace.DOWN).getState();
+			lightBlock.setType(warzone.getLobbyMaterials().getLightBlock().getType());
+			lightBlock.setData(warzone.getLobbyMaterials().getLightBlock().getData());
+			lightBlock.update(true);
+			Block[] updateBlocks = {
+					block.getRelative(leftSide),
+					block.getRelative(rightSide).getRelative(BlockFace.UP),
+					block.getRelative(leftSide).getRelative(BlockFace.UP)
+							.getRelative(BlockFace.UP),
+					block.getRelative(rightSide),
+					block.getRelative(leftSide).getRelative(BlockFace.UP),
+					block.getRelative(rightSide).getRelative(BlockFace.UP)
+							.getRelative(BlockFace.UP),
+					block.getRelative(BlockFace.UP).getRelative(BlockFace.UP) };
+			for (Block update : updateBlocks) {
+				BlockState state = update.getState();
+				state.setType(frame.getType());
+				state.setData(frame.getData());
+				state.update(true);
+			}
 		}
 	}
 
 	private void setBlock(Block block, TeamKind kind) {
-		block.setType(kind.getMaterial());
-		block.setData(kind.getData());
-	}
-
-	private void setBlock(Block block, Material material, byte data) {
-		block.setType(material);
-		block.setData(data);
+		BlockState blockState = block.getState();
+		blockState.setType(kind.getBlockHead().getType());
+		blockState.setData(kind.getBlockHead().getData());
+		blockState.update(true);
 	}
 
 	private void placeAutoAssignGate() {
@@ -585,9 +579,10 @@ public class ZoneLobby {
 			this.clearGatePath(autoAssignGateBlock, front, leftSide, rightSide, false);
 			
 			// gate blocks
-			this.setBlock(autoAssignGateBlock.getRelative(BlockFace.DOWN), 
-					Material.getMaterial(this.warzone.getLobbyMaterials().getLightId()), 
-					this.warzone.getLobbyMaterials().getLightData());
+			BlockState lightBlock = autoAssignGateBlock.getRelative(BlockFace.DOWN).getState();
+			lightBlock.setType(warzone.getLobbyMaterials().getLightBlock().getType());
+			lightBlock.setData(warzone.getLobbyMaterials().getLightBlock().getData());
+			lightBlock.update(true);
 			int size = teams.size();
 			if (size > 0) {
 				TeamKind[] doorBlockKinds = new TeamKind[7];
@@ -702,14 +697,30 @@ public class ZoneLobby {
 
 	private void resetTeamGateSign(Team team, Block gate) {
 		if (gate != null) {
-			String[] lines = new String[4];
-			lines[0] = "Team " + team.getName();
-			lines[1] = team.getPlayers().size() + "/" + team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE) + " players";
-			lines[2] = team.getPoints() + "/" + team.getTeamConfig().resolveInt(TeamConfig.MAXSCORE) + " pts";
+			String[] lines;
 			if (team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL) == -1) {
-				lines[3] = "unlimited lives";
+				lines = MessageFormat
+						.format("Team {0}\n{1}/{2} players\n{3}/{4} pts\nunlimited lives",
+								team.getName(),
+								team.getPlayers().size(),
+								team.getTeamConfig().resolveInt(
+										TeamConfig.TEAMSIZE),
+								team.getPoints(),
+								team.getTeamConfig().resolveInt(
+										TeamConfig.MAXSCORE)).split("\n");
 			} else {
-				lines[3] = team.getRemainingLifes() + "/" + team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL) + " lives left";
+				lines = MessageFormat
+						.format("Team {0}\n{1}/{2} players\n{3}/{4} pts\n{5} lives left",
+								team.getName(),
+								team.getPlayers().size(),
+								team.getTeamConfig().resolveInt(
+										TeamConfig.TEAMSIZE),
+								team.getPoints(),
+								team.getTeamConfig().resolveInt(
+										TeamConfig.MAXSCORE),
+								team.getRemainingLifes(),
+								team.getTeamConfig().resolveInt(
+										TeamConfig.LIFEPOOL)).split("\n");
 			}
 			this.resetGateSign(gate, lines, true);
 		}
@@ -729,38 +740,25 @@ public class ZoneLobby {
 		} else if (this.wall == Direction.WEST()) {
 			direction = Direction.EAST();
 		}
-		byte data = 0;
 		if (this.wall == Direction.NORTH()) {
 			block = gate.getRelative(direction).getRelative(Direction.EAST());
-			if (awayFromWall) {
-				data = (byte) 4;
-			} else {
-				data = (byte) 12;
-			}
 		} else if (this.wall == Direction.EAST()) {
 			block = gate.getRelative(direction).getRelative(Direction.SOUTH());
-			if (awayFromWall) {
-				data = (byte) 8;
-			} else {
-				data = (byte) 0;
-			}
 		} else if (this.wall == Direction.SOUTH()) {
 			block = gate.getRelative(direction).getRelative(Direction.WEST());
-			if (awayFromWall) {
-				data = (byte) 12;
-			} else {
-				data = (byte) 4;
-			}
 		} else if (this.wall == Direction.WEST()) {
 			block = gate.getRelative(direction).getRelative(Direction.NORTH());
-			if (awayFromWall) {
-				data = (byte) 0;
-			} else {
-				data = (byte) 8;
-			}
 		}
 
-		SignHelper.setToSign(War.war, block, data, lines);
+		block.setType(Material.SIGN_POST);
+		org.bukkit.block.Sign state = (org.bukkit.block.Sign) block.getState();
+		org.bukkit.material.Sign data = (Sign) state.getData();
+		data.setFacingDirection(direction);
+		state.setData(data);
+		for (int i = 0; i < 4; i++) {
+			state.setLine(i, lines[i]);
+		}
+		state.update(true);
 	}
 
 	public boolean isLeavingZone(Location location) {

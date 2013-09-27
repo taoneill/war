@@ -53,6 +53,7 @@ public enum TeamKind {
 	 *
 	 * @return wool color data value
 	 */
+	@SuppressWarnings("deprecation")
 	public byte getData() {
 		return this.dyeColor.getWoolData();
 	}

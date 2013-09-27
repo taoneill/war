@@ -55,7 +55,10 @@ public class WarBlockListener implements Listener {
 		Team team = Team.getTeamByPlayerName(player.getName());
 		Warzone zone = Warzone.getZoneByLocation(player);
 		// Monument capturing
-		if (team != null && block != null && zone != null && zone.isMonumentCenterBlock(block) && block.getType() == team.getKind().getMaterial() && block.getData() == team.getKind().getData()) {
+		if (team != null && block != null && zone != null
+				&& zone.isMonumentCenterBlock(block)
+				&& block.getType() == team.getKind().getMaterial()
+				&& block.getState().getData() == team.getKind().getBlockData()) {
 			Monument monument = zone.getMonumentFromCenterBlock(block);
 			if (monument != null && !monument.hasOwner()) {
 				monument.capture(team);
@@ -122,7 +125,7 @@ public class WarBlockListener implements Listener {
 		}
 
 		// can't place a block of your team's color
-		if (team != null && block.getType() == team.getKind().getMaterial() && block.getData() == team.getKind().getData()) {
+		if (team != null && block.getType() == team.getKind().getMaterial() && block.getState().getData() == team.getKind().getBlockData()) {
 			War.war.badMsg(player, "You can only use your team's blocks to capture monuments.");
 			cancelAndKeepItem(event);
 			return;

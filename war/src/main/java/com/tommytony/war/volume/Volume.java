@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -40,6 +41,17 @@ public class Volume {
 	public Volume(String name, World world) {
 		this.name = name;
 		this.world = world;
+	}
+
+	public Volume(World world) {
+		this(null, world);
+	}
+
+	public Volume(Location corner1, Location corner2) {
+		this(corner1.getWorld());
+		Validate.isTrue(corner1.getWorld() == corner2.getWorld(), "Cross-world volume");
+		this.cornerOne = new BlockInfo(corner1.getBlock());
+		this.cornerTwo = new BlockInfo(corner2.getBlock());
 	}
 	
 	public void setName(String newName) {
@@ -294,7 +306,6 @@ public class Volume {
 	}
 
 	public byte[][][] getBlockDatas() {
-		// TODO Auto-generated method stub
 		return this.blockDatas;
 	}
 
@@ -427,136 +438,98 @@ public class Volume {
 	}
 
 	public void setToMaterial(Material material) {
-		try {
-			if (this.hasTwoCorners()) {
-				int x = this.getMinX();
-				for (int i = 0; i < this.getSizeX(); i++) {
-					int y = this.getMaxY();
-					for (int j = this.getSizeY(); j > 0; j--) {
-						int z = this.getMinZ();
-						for (int k = 0; k < this.getSizeZ(); k++) {
-							Block currentBlock = this.getWorld().getBlockAt(x, y, z);
-							currentBlock.setType(material);
-							z++;
-						}
-						y--;
-					}
-					x++;
+		Validate.notNull(material);
+		Validate.isTrue(this.hasTwoCorners(), "Incomplete volume");
+		for (int x = this.getMinX(); x <= this.getMaxX(); x++) {
+			for (int y = this.getMinY(); y <= this.getMaxY(); y++) {
+				for (int z = this.getMinZ(); z <= this.getMaxZ(); z++) {
+					this.getWorld().getBlockAt(x, y, z).setType(material);
 				}
 			}
-		} catch (Exception e) {
-			War.war.log("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
 
-	public void setFaceMaterial(BlockFace face, Material material, byte data) {
-		try {
-			if (this.hasTwoCorners() && this.isSaved()) {
-				int x = this.getMinX();
-				for (int i = 0; i < this.getSizeX(); i++) {
-					int y = this.getMinY();
-					for (int j = 0; j < this.getSizeY(); j++) {
-						int z = this.getMinZ();
-						for (int k = 0; k < this.getSizeZ(); k++) {
-							if ((face == BlockFace.DOWN && y == this.getMinY()) || (face == BlockFace.UP && y == this.getMaxY()) || (face == Direction.NORTH() && x == this.getMinX()) || (face == Direction.EAST() && z == this.getMinZ()) || (face == Direction.SOUTH() && x == this.getMaxX()) || (face == Direction.WEST() && z == this.getMaxZ())) {
-								Block currentBlock = this.getWorld().getBlockAt(x, y, z);
-								currentBlock.setType(material);
-								currentBlock.setData(data);
-							}
-							z++;
-						}
-						y++;
+	public void setFaceMaterial(BlockFace face, ItemStack faceBlock) {
+		Validate.isTrue(this.hasTwoCorners(), "Incomplete volume");
+		for (int x = this.getMinX(); x <= this.getMaxX(); x++) {
+			for (int y = this.getMinY(); y <= this.getMaxY(); y++) {
+				for (int z = this.getMinZ(); z <= this.getMaxZ(); z++) {
+					if ((face == BlockFace.DOWN && y == this.getMinY())
+							|| (face == BlockFace.UP && y == this.getMaxY())
+							|| (face == Direction.NORTH() && x == this.getMinX())
+							|| (face == Direction.EAST() && z == this.getMinZ())
+							|| (face == Direction.SOUTH() && x == this.getMaxX())
+							|| (face == Direction.WEST() && z == this.getMaxZ())) {
+						BlockState currentBlock = this.getWorld().getBlockAt(x, y, z).getState();
+						currentBlock.setType(faceBlock.getType());
+						currentBlock.setData(faceBlock.getData());
+						currentBlock.update(true);
 					}
-					x++;
 				}
 			}
-		} catch (Exception e) {
-			War.war.log("Failed to set block to " + material + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
 	
-	public void setFloorOutlineMaterial(Material outline, byte outlineData) {
-		try {
-			if (this.hasTwoCorners() && this.isSaved()) {
-				int x = this.getMinX();
-				for (int i = 0; i < this.getSizeX(); i++) {
-					int z = this.getMinZ();
-					for (int k = 0; k < this.getSizeZ(); k++) {
-						if (x == this.getMinX() || x == this.getMaxX() || z == this.getMinZ() || z == this.getMaxZ()) {
-							Block currentBlock = this.getWorld().getBlockAt(x, this.getMinY(), z);
-							currentBlock.setType(outline);
-							currentBlock.setData(outlineData);
-						}
-						z++;
-					}
-					x++;
+	public void setFloorOutline(ItemStack outlineBlock) {
+		Validate.isTrue(this.hasTwoCorners(), "Incomplete volume");
+		for (int x = this.getMinX(); x <= this.getMaxX(); x++) {
+			for (int z = this.getMinZ(); z <= this.getMaxZ(); z++) {
+				if (x == this.getMinX() || x == this.getMaxX() || z == this.getMinZ() || z == this.getMaxZ()) {
+					BlockState currentBlock = this.getWorld().getBlockAt(x, this.getMinY(), z).getState();
+					currentBlock.setType(outlineBlock.getType());
+					currentBlock.setData(outlineBlock.getData());
+					currentBlock.update(true);
 				}
 			}
-		} catch (Exception e) {
-			War.war.log("Failed to set floor ouline block to " + outline + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
 
-	private void switchMaterials(Material[] oldTypes, Material newType) {
-		try {
-			int i = 0, j = 0, k = 0;
-			int x, y, z;
-			Block currentBlock = null;
-			if (this.hasTwoCorners() && this.isSaved()) {
-				x = this.getMinX();
-				for (i = 0; i < this.getSizeX(); i++) {
-					y = this.getMaxY();
-					for (j = this.getSizeY(); j > 0; j--) {
-						z = this.getMinZ();
-						for (k = 0; k < this.getSizeZ(); k++) {
-							currentBlock = this.getWorld().getBlockAt(x, y, z);
-							for (Material oldType : oldTypes) {
-								if (currentBlock.getType().getId() == oldType.getId()) {
-									currentBlock.setType(newType);
-									// BlockState state = currentBlock.getState();
-									// if (state != null) {
-									// state.setType(newType);
-									// state.update(true);
-									// }
-								}
-							}
-							z++;
-						}
-						y--;
+	public void replaceMaterial(Material original, Material replacement) {
+		Validate.isTrue(this.hasTwoCorners(), "Incomplete volume");
+		for (int x = this.getMinX(); x <= this.getMaxX(); x++) {
+			for (int y = this.getMinY(); y <= this.getMaxY(); y++) {
+				for (int z = this.getMinZ(); z <= this.getMaxZ(); z++) {
+					if (this.getWorld().getBlockAt(x, y, z).getType() == original) {
+						this.getWorld().getBlockAt(x, y, z).setType(replacement);
 					}
-					x++;
 				}
 			}
-		} catch (Exception e) {
-			War.war.log("Failed to switch block to " + newType + "in volume " + this.name + "." + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 		}
 	}
+
+	public void replaceMaterials(Material[] materials, Material replacement) {
+		for (Material mat: materials) {
+			this.replaceMaterial(mat, replacement);
+		}
+	}
+
+	private static final Material[] nonFloatingBlocks = {
+		Material.SIGN_POST,
+		Material.WALL_SIGN,
+		Material.IRON_DOOR,
+		Material.WOOD_DOOR,
+		Material.LADDER,
+		Material.YELLOW_FLOWER,
+		Material.RED_ROSE,
+		Material.RED_MUSHROOM,
+		Material.BROWN_MUSHROOM,
+		Material.SAPLING,
+		Material.TORCH,
+		Material.RAILS,
+		Material.STONE_BUTTON,
+		Material.STONE_PLATE,
+		Material.WOOD_PLATE,
+		Material.LEVER,
+		Material.REDSTONE,
+		Material.REDSTONE_TORCH_ON,
+		Material.REDSTONE_TORCH_OFF,
+		Material.CACTUS,
+		Material.SNOW,
+		Material.ICE
+	};
 
 	public void clearBlocksThatDontFloat() {
-		Material[] toAirMaterials = new Material[22];
-		toAirMaterials[0] = Material.SIGN_POST;
-		toAirMaterials[1] = Material.WALL_SIGN;
-		toAirMaterials[2] = Material.IRON_DOOR;
-		toAirMaterials[3] = Material.WOOD_DOOR;
-		toAirMaterials[4] = Material.LADDER;
-		toAirMaterials[5] = Material.YELLOW_FLOWER;
-		toAirMaterials[6] = Material.RED_ROSE;
-		toAirMaterials[7] = Material.RED_MUSHROOM;
-		toAirMaterials[8] = Material.BROWN_MUSHROOM;
-		toAirMaterials[9] = Material.SAPLING;
-		toAirMaterials[10] = Material.TORCH;
-		toAirMaterials[11] = Material.RAILS;
-		toAirMaterials[12] = Material.STONE_BUTTON;
-		toAirMaterials[13] = Material.STONE_PLATE;
-		toAirMaterials[14] = Material.WOOD_PLATE;
-		toAirMaterials[15] = Material.LEVER;
-		toAirMaterials[16] = Material.REDSTONE;
-		toAirMaterials[17] = Material.REDSTONE_TORCH_ON;
-		toAirMaterials[18] = Material.REDSTONE_TORCH_OFF;
-		toAirMaterials[19] = Material.CACTUS;
-		toAirMaterials[20] = Material.SNOW;
-		toAirMaterials[21] = Material.ICE;
-		this.switchMaterials(toAirMaterials, Material.AIR);
+		this.replaceMaterials(nonFloatingBlocks, Material.AIR);
 	}
 
 	public void setSignLines(HashMap<String, String[]> signLines) {

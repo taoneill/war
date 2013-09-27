@@ -184,18 +184,10 @@ public class WarYmlMapper {
 			hubConfigSection.set("world", hub.getLocation().getWorld().getName());
 			hubConfigSection.set("orientation", orientationStr);
 			
-			ConfigurationSection floorSection = hubConfigSection.createSection("materials.floor");
-			floorSection.set("id", War.war.getWarhubMaterials().getFloorId());
-			floorSection.set("data", War.war.getWarhubMaterials().getFloorData());
-			ConfigurationSection outlineSection = hubConfigSection.createSection("materials.outline");
-			outlineSection.set("id", War.war.getWarhubMaterials().getOutlineId());
-			outlineSection.set("data", War.war.getWarhubMaterials().getOutlineData());
-			ConfigurationSection gateSection = hubConfigSection.createSection("materials.gate");
-			gateSection.set("id", War.war.getWarhubMaterials().getGateId());
-			gateSection.set("data", War.war.getWarhubMaterials().getGateData());
-			ConfigurationSection lightSection = hubConfigSection.createSection("materials.light");
-			lightSection.set("id", War.war.getWarhubMaterials().getLightId());
-			lightSection.set("data", War.war.getWarhubMaterials().getLightData());
+			hubConfigSection.set("materials.floor", War.war.getWarhubMaterials().getFloorBlock());
+			hubConfigSection.set("materials.outline", War.war.getWarhubMaterials().getOutlineBlock());
+			hubConfigSection.set("materials.gate", War.war.getWarhubMaterials().getGateBlock());
+			hubConfigSection.set("materials.light", War.war.getWarhubMaterials().getLightBlock());
 
 			VolumeMapper.save(hub.getVolume(), "");
 		}

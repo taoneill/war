@@ -47,7 +47,7 @@ public class HelmetProtectionTask implements Runnable {
 							int removed = 0;
 							for (ItemStack item : playerInv.getContents()) {
 								// remove only same colored wool
-								if (item != null && item.getType() == teamBlockMaterial && item.getData().getData() == team.getKind().getData()) {
+								if (item != null && item.getType() == teamBlockMaterial && item.getData() == team.getKind().getBlockData()) {
 									playerInv.clear(i);
 									removed++;
 								}

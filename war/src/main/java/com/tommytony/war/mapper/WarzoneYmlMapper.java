@@ -22,9 +22,7 @@ import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.structure.Monument;
-import com.tommytony.war.structure.WarzoneMaterials;
 import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
@@ -32,6 +30,7 @@ import com.tommytony.war.volume.ZoneVolume;
 
 public class WarzoneYmlMapper {
 
+	@SuppressWarnings("deprecation")
 	public static Warzone load(String name, boolean createNewVolume) {
 		File warzoneTxtFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		File warzoneYmlFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".yml");
@@ -323,39 +322,54 @@ public class WarzoneYmlMapper {
 			}
 			
 			// lobby materials
-			int floorId = War.war.getWarhubMaterials().getFloorId();	// default warhub
-			int floorData = War.war.getWarhubMaterials().getFloorData();	
-			ConfigurationSection floorMaterialSection = warzoneRootSection.getConfigurationSection(lobbyPrefix + "materials.floor");
-			if (floorMaterialSection != null) {
-				floorId = floorMaterialSection.getInt("id");
-				floorData = floorMaterialSection.getInt("data");
+			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.floor")) {
+				warzone.getLobbyMaterials().setFloorBlock(
+						warzoneRootSection.getItemStack(lobbyPrefix + "materials.floor"));
+			} else {
+				ConfigurationSection floorMaterialSection = warzoneRootSection
+						.getConfigurationSection(lobbyPrefix + "materials.floor");
+				if (floorMaterialSection != null) {
+					warzone.getLobbyMaterials().setFloorBlock(
+						new ItemStack(floorMaterialSection.getInt("id"), 1,
+							(short) floorMaterialSection.getInt("data")));
+				}
 			}
-			
-			int outlineId = War.war.getWarhubMaterials().getOutlineId();
-			int outlineData = War.war.getWarhubMaterials().getOutlineData();	
-			ConfigurationSection outlineMaterialSection = warzoneRootSection.getConfigurationSection(lobbyPrefix + "materials.outline");
-			if (outlineMaterialSection != null) {
-				outlineId = outlineMaterialSection.getInt("id");
-				outlineData = outlineMaterialSection.getInt("data");
+			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.outline")) {
+				warzone.getLobbyMaterials().setOutlineBlock(
+						warzoneRootSection.getItemStack(lobbyPrefix + "materials.outline"));
+			} else {
+				ConfigurationSection floorMaterialSection = warzoneRootSection
+						.getConfigurationSection(lobbyPrefix + "materials.outline");
+				if (floorMaterialSection != null) {
+					warzone.getLobbyMaterials().setOutlineBlock(
+						new ItemStack(floorMaterialSection.getInt("id"), 1,
+							(short) floorMaterialSection.getInt("data")));
+				}
 			}
-			
-			int gateId = War.war.getWarhubMaterials().getGateId();
-			int gateData = War.war.getWarhubMaterials().getGateData();;	
-			ConfigurationSection gateMaterialSection = warzoneRootSection.getConfigurationSection(lobbyPrefix + "materials.gate");
-			if (gateMaterialSection != null) {
-				gateId = gateMaterialSection.getInt("id");
-				gateData = gateMaterialSection.getInt("data");
+			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.gate")) {
+				warzone.getLobbyMaterials().setGateBlock(
+						warzoneRootSection.getItemStack(lobbyPrefix + "materials.gate"));
+			} else {
+				ConfigurationSection floorMaterialSection = warzoneRootSection
+						.getConfigurationSection(lobbyPrefix + "materials.gate");
+				if (floorMaterialSection != null) {
+					warzone.getLobbyMaterials().setGateBlock(
+						new ItemStack(floorMaterialSection.getInt("id"), 1,
+							(short) floorMaterialSection.getInt("data")));
+				}
 			}
-			
-			int lobbyLightId = War.war.getWarhubMaterials().getLightId();
-			int lobbyLightData = War.war.getWarhubMaterials().getLightData();	
-			ConfigurationSection lobbyLightMaterialSection = warzoneRootSection.getConfigurationSection(lobbyPrefix + "materials.light");
-			if (lobbyLightMaterialSection != null) {
-				lobbyLightId = lobbyLightMaterialSection.getInt("id");
-				lobbyLightData = lobbyLightMaterialSection.getInt("data");
+			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.light")) {
+				warzone.getLobbyMaterials().setLightBlock(
+						warzoneRootSection.getItemStack(lobbyPrefix + "materials.light"));
+			} else {
+				ConfigurationSection floorMaterialSection = warzoneRootSection
+						.getConfigurationSection(lobbyPrefix + "materials.light");
+				if (floorMaterialSection != null) {
+					warzone.getLobbyMaterials().setLightBlock(
+						new ItemStack(floorMaterialSection.getInt("id"), 1,
+							(short) floorMaterialSection.getInt("data")));
+				}
 			}
-			
-			warzone.setLobbyMaterials(new HubLobbyMaterials(floorId, (byte)floorData, outlineId, (byte)outlineData, gateId, (byte)gateData, lobbyLightId, (byte)lobbyLightData));
 			
 			// lobby world
 			String lobbyWorldName = warzoneRootSection.getString(lobbyPrefix + "world");
@@ -367,31 +381,42 @@ public class WarzoneYmlMapper {
 			warzone.setLobby(lobby);
 			
 			// warzone materials
-			int mainId = warzone.getWarzoneMaterials().getMainId();
-			int mainData = warzone.getWarzoneMaterials().getMainData();	
-			ConfigurationSection mainMaterialSection = warzoneRootSection.getConfigurationSection(zoneInfoPrefix + "materials.main");
-			if (mainMaterialSection != null) {
-				mainId = mainMaterialSection.getInt("id");
-				mainData = mainMaterialSection.getInt("data");
+			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.main")) {
+				warzone.getWarzoneMaterials().setMainBlock(
+						warzoneRootSection.getItemStack(zoneInfoPrefix + "materials.main"));
+			} else {
+				ConfigurationSection floorMaterialSection = warzoneRootSection
+						.getConfigurationSection(zoneInfoPrefix + "materials.main");
+				if (floorMaterialSection != null) {
+					warzone.getWarzoneMaterials().setMainBlock(
+						new ItemStack(floorMaterialSection.getInt("id"), 1,
+							(short) floorMaterialSection.getInt("data")));
+				}
 			}
-			
-			int standId = warzone.getWarzoneMaterials().getStandId();
-			int standData = warzone.getWarzoneMaterials().getStandData();	
-			ConfigurationSection standMaterialSection = warzoneRootSection.getConfigurationSection(zoneInfoPrefix + "materials.stand");
-			if (standMaterialSection != null) {
-				standId = standMaterialSection.getInt("id");
-				standData = standMaterialSection.getInt("data");
+			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.stand")) {
+				warzone.getWarzoneMaterials().setStandBlock(
+						warzoneRootSection.getItemStack(zoneInfoPrefix + "materials.stand"));
+			} else {
+				ConfigurationSection floorMaterialSection = warzoneRootSection
+						.getConfigurationSection(zoneInfoPrefix + "materials.stand");
+				if (floorMaterialSection != null) {
+					warzone.getWarzoneMaterials().setStandBlock(
+						new ItemStack(floorMaterialSection.getInt("id"), 1,
+							(short) floorMaterialSection.getInt("data")));
+				}
 			}
-			
-			int lightId = warzone.getWarzoneMaterials().getLightId();
-			int lightData = warzone.getWarzoneMaterials().getLightData();	
-			ConfigurationSection lightMaterialSection = warzoneRootSection.getConfigurationSection(zoneInfoPrefix + "materials.light");
-			if (lightMaterialSection != null) {
-				lightId = lightMaterialSection.getInt("id");
-				lightData = lightMaterialSection.getInt("data");
+			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.light")) {
+				warzone.getWarzoneMaterials().setLightBlock(
+						warzoneRootSection.getItemStack(zoneInfoPrefix + "materials.light"));
+			} else {
+				ConfigurationSection floorMaterialSection = warzoneRootSection
+						.getConfigurationSection(zoneInfoPrefix + "materials.light");
+				if (floorMaterialSection != null) {
+					warzone.getWarzoneMaterials().setLightBlock(
+						new ItemStack(floorMaterialSection.getInt("id"), 1,
+							(short) floorMaterialSection.getInt("data")));
+				}
 			}
-			
-			warzone.setWarzoneMaterials(new WarzoneMaterials(mainId, (byte)mainData, standId, (byte)standData, lightId, (byte)lightData));
 			
 			return warzone;
 		}
@@ -444,31 +469,17 @@ public class WarzoneYmlMapper {
 			lobbySection.set("orientation", lobbyOrientation);
 			lobbySection.set("world", warzone.getLobby().getVolume().getWorld().getName());
 			
-			ConfigurationSection floorSection = lobbySection.createSection("materials.floor");
-			floorSection.set("id", warzone.getLobbyMaterials().getFloorId());
-			floorSection.set("data", warzone.getLobbyMaterials().getFloorData());
-			ConfigurationSection outlineSection = lobbySection.createSection("materials.outline");
-			outlineSection.set("id", warzone.getLobbyMaterials().getOutlineId());
-			outlineSection.set("data", warzone.getLobbyMaterials().getOutlineData());
-			ConfigurationSection gateSection = lobbySection.createSection("materials.gate");
-			gateSection.set("id", warzone.getLobbyMaterials().getGateId());
-			gateSection.set("data", warzone.getLobbyMaterials().getGateData());
-			ConfigurationSection lightSection = lobbySection.createSection("materials.light");
-			lightSection.set("id", warzone.getLobbyMaterials().getLightId());
-			lightSection.set("data", warzone.getLobbyMaterials().getLightData());
+			lobbySection.set("materials.floor", warzone.getLobbyMaterials().getFloorBlock());
+			lobbySection.set("materials.outline", warzone.getLobbyMaterials().getOutlineBlock());
+			lobbySection.set("materials.gate", warzone.getLobbyMaterials().getGateBlock());
+			lobbySection.set("materials.light", warzone.getLobbyMaterials().getLightBlock());
 		}
 		
 		// materials
 		if (warzone.getLobby() != null) {
-			ConfigurationSection mainSection = warzoneInfoSection.createSection("materials.main");
-			mainSection.set("id", warzone.getWarzoneMaterials().getMainId());
-			mainSection.set("data", warzone.getWarzoneMaterials().getMainData());
-			ConfigurationSection standSection = warzoneInfoSection.createSection("materials.stand");
-			standSection.set("id", warzone.getWarzoneMaterials().getStandId());
-			standSection.set("data", warzone.getWarzoneMaterials().getStandData());
-			ConfigurationSection lightSection = warzoneInfoSection.createSection("materials.light");
-			lightSection.set("id", warzone.getWarzoneMaterials().getLightId());
-			lightSection.set("data", warzone.getWarzoneMaterials().getLightData());
+			warzoneInfoSection.set("materials.main", warzone.getWarzoneMaterials().getMainBlock());
+			warzoneInfoSection.set("materials.stand", warzone.getWarzoneMaterials().getStandBlock());
+			warzoneInfoSection.set("materials.light", warzone.getWarzoneMaterials().getLightBlock());
 		}
 
 		// rallyPoint

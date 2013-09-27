@@ -1,131 +1,70 @@
 package com.tommytony.war.structure;
 
-import java.util.logging.Level;
-
+import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
-import com.tommytony.war.War;
+public class HubLobbyMaterials implements Cloneable {
 
-public class HubLobbyMaterials {
-	private int floorId;
-	private byte floorData;
-	
-	private int outlineId;
-	private byte outlineData;
-	
-	private int gateId;
-	private byte gateData;
-	
-	private int lightId;
-	private byte lightData;
-	
-	public HubLobbyMaterials(int floorId, byte floorData, int outlineId, byte outlineData, int gateId, byte gateData, int lightId, byte lightData) {
-		// Make sure we are using legal blocks or AIR as material
-		if (isBlockOrAir(floorId)) {
-			this.setFloorId(floorId);
-			this.setFloorData(floorData);
-		} else {
-			this.setFloorId(20);	// default glass
-			this.setFloorData((byte)0);
+	private ItemStack floorBlock;
+	private ItemStack outlineBlock;
+	private ItemStack gateBlock;
+	private ItemStack lightBlock;
+
+	public HubLobbyMaterials(ItemStack floorBlock, ItemStack outlineBlock,
+			ItemStack gateBlock, ItemStack lightBlock) {
+		Validate.isTrue(floorBlock.getType().isBlock()
+				|| floorBlock.getType() == Material.AIR);
+		Validate.isTrue(outlineBlock.getType().isBlock()
+				|| outlineBlock.getType() == Material.AIR);
+		Validate.isTrue(gateBlock.getType().isBlock()
+				|| gateBlock.getType() == Material.AIR);
+		Validate.isTrue(lightBlock.getType().isBlock()
+				|| lightBlock.getType() == Material.AIR);
+		this.floorBlock = floorBlock;
+		this.outlineBlock = outlineBlock;
+		this.gateBlock = gateBlock;
+		this.lightBlock = lightBlock;
+	}
+
+	public ItemStack getFloorBlock() {
+		return floorBlock;
+	}
+
+	public void setFloorBlock(ItemStack floorBlock) {
+		this.floorBlock = floorBlock;
+	}
+
+	public ItemStack getOutlineBlock() {
+		return outlineBlock;
+	}
+
+	public void setOutlineBlock(ItemStack outlineBlock) {
+		this.outlineBlock = outlineBlock;
+	}
+
+	public ItemStack getGateBlock() {
+		return gateBlock;
+	}
+
+	public void setGateBlock(ItemStack gateBlock) {
+		this.gateBlock = gateBlock;
+	}
+
+	public ItemStack getLightBlock() {
+		return lightBlock;
+	}
+
+	public void setLightBlock(ItemStack lightBlock) {
+		this.lightBlock = lightBlock;
+	}
+
+	@Override
+	public HubLobbyMaterials clone() {
+		try {
+			return (HubLobbyMaterials) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new Error(e);
 		}
-		
-		if (isBlockOrAir(outlineId)) {
-			this.setOutlineId(outlineId);
-			this.setOutlineData(outlineData);
-		} else {
-			this.setOutlineId(5);	// default planks
-			this.setOutlineData((byte)0);
-		}
-		
-		if (isBlockOrAir(gateId)) {
-			this.setGateId(gateId);
-			this.setGateData(gateData);
-		} else {
-			this.setGateId(49);	// default obsidian
-			this.setGateData((byte)0);
-		}
-		
-		if (isBlockOrAir(lightId)) {
-			this.setLightId(lightId);
-			this.setLightData(lightData);
-		} else {
-			this.setLightId(89);	// default glowstone
-			this.setLightData((byte)0);
-		}
 	}
-
-	private boolean isBlockOrAir(int itemId) {
-		Material material = Material.getMaterial(itemId);
-		if (material.isBlock() || material.equals(Material.AIR)) {
-			return true;
-		} else {
-			War.war.log("Can't use item with id:" + itemId + " as lobby or warhub material.", Level.WARNING);
-			return false;
-		}
-	}
-
-	public int getFloorId() {
-		return floorId;
-	}
-
-	public byte getFloorData() {
-		return floorData;
-	}
-
-	public int getGateId() {
-		return gateId;
-	}
-
-	public byte getGateData() {
-		return gateData;
-	}
-
-	public int getLightId() {
-		return lightId;
-	}
-
-	public byte getLightData() {
-		return lightData;
-	}
-
-	public int getOutlineId() {
-		return outlineId;
-	}
-
-	public byte getOutlineData() {
-		return outlineData;
-	}
-
-	public void setFloorId(int floorId) {
-		this.floorId = floorId;
-	}
-
-	public void setFloorData(byte floorData) {
-		this.floorData = floorData;
-	}
-
-	public void setOutlineId(int outlineId) {
-		this.outlineId = outlineId;
-	}
-
-	public void setOutlineData(byte outlineData) {
-		this.outlineData = outlineData;
-	}
-
-	public void setGateId(int gateId) {
-		this.gateId = gateId;
-	}
-
-	public void setGateData(byte gateData) {
-		this.gateData = gateData;
-	}
-
-	public void setLightId(int lightId) {
-		this.lightId = lightId;
-	}
-
-	public void setLightData(byte lightData) {
-		this.lightData = lightData;
-	}
-	
 }

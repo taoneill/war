@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 import com.tommytony.war.Warzone;
@@ -53,55 +54,58 @@ public class Bomb {
 		int y = this.location.getBlockY();
 		int z = this.location.getBlockZ();
 		
-		Material main = Material.getMaterial(this.warzone.getWarzoneMaterials().getMainId());
-		byte mainData = this.warzone.getWarzoneMaterials().getMainData();
-		Material stand = Material.getMaterial(this.warzone.getWarzoneMaterials().getStandId());
-		byte standData = this.warzone.getWarzoneMaterials().getStandData();
-		Material light = Material.getMaterial(this.warzone.getWarzoneMaterials().getLightId());
-		byte lightData = this.warzone.getWarzoneMaterials().getLightData();
-
 		// center
-		Block current = this.warzone.getWorld().getBlockAt(x, y - 1, z);
-		current.setType(main);
-		current.setData(mainData);
+		BlockState current = this.warzone.getWorld().getBlockAt(x, y - 1, z).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getMainBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getMainBlock().getData());
+		current.update(true);
 
 		// inner ring
-		current = this.warzone.getWorld().getBlockAt(x + 1, y - 1, z + 1);
-		current.setType(light);
-		current.setData(lightData);
-		current = this.warzone.getWorld().getBlockAt(x + 1, y - 1, z);
-		current.setType(main);
-		current.setData(mainData);
-		current = this.warzone.getWorld().getBlockAt(x + 1, y - 1, z - 1);
-		current.setType(main);
-		current.setData(mainData);
+		current = this.warzone.getWorld().getBlockAt(x + 1, y - 1, z + 1).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getLightBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getLightBlock().getData());
+		current.update(true);
+		current = this.warzone.getWorld().getBlockAt(x + 1, y - 1, z).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getMainBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getMainBlock().getData());
+		current.update(true);
+		current = this.warzone.getWorld().getBlockAt(x + 1, y - 1, z - 1).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getMainBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getMainBlock().getData());
+		current.update(true);
 
-		current = this.warzone.getWorld().getBlockAt(x, y - 1, z + 1);
-		current.setType(main);
-		current.setData(mainData);
-		current = this.warzone.getWorld().getBlockAt(x, y - 1, z);
-		current.setType(light);
-		current.setData(lightData);
-		current = this.warzone.getWorld().getBlockAt(x, y - 1, z - 1);
-		current.setType(main);
-		current.setData(mainData);
+		current = this.warzone.getWorld().getBlockAt(x, y - 1, z + 1).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getMainBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getMainBlock().getData());
+		current.update(true);
+		current = this.warzone.getWorld().getBlockAt(x, y - 1, z).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getLightBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getLightBlock().getData());
+		current.update(true);
+		current = this.warzone.getWorld().getBlockAt(x, y - 1, z - 1).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getMainBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getMainBlock().getData());
+		current.update(true);
 
-		current = this.warzone.getWorld().getBlockAt(x - 1, y - 1, z + 1);
-		current.setType(main);
-		current.setData(mainData);
-		current = this.warzone.getWorld().getBlockAt(x - 1, y - 1, z);
-		current.setType(main);
-		current.setData(mainData);
-		current = this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1);
-		current.setType(light);
-		current.setData(lightData);
+		current = this.warzone.getWorld().getBlockAt(x - 1, y - 1, z + 1).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getMainBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getMainBlock().getData());
+		current.update(true);
+		current = this.warzone.getWorld().getBlockAt(x - 1, y - 1, z).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getMainBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getMainBlock().getData());
+		current.update(true);
+		current = this.warzone.getWorld().getBlockAt(x - 1, y - 1, z - 1).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getLightBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getLightBlock().getData());
+		current.update(true);
 
 		// block holder
-		current = this.warzone.getWorld().getBlockAt(x, y, z);
-		current.setType(stand);
-		current.setData(standData);
-		Block tntBlock = this.warzone.getWorld().getBlockAt(x, y + 1, z);
-		tntBlock.setType(Material.TNT);
+		current = this.warzone.getWorld().getBlockAt(x, y, z).getState();
+		current.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
+		current.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
+		current.update(true);
+		this.warzone.getWorld().getBlockAt(x, y + 1, z).setType(Material.TNT);
 	}
 
 	public boolean isBombBlock(Location otherLocation) {

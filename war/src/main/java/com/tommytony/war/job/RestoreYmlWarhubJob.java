@@ -5,12 +5,12 @@ import java.util.logging.Level;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.structure.WarHub;
-import com.tommytony.war.structure.HubLobbyMaterials;
 import com.tommytony.war.volume.Volume;
 
 public class RestoreYmlWarhubJob implements Runnable {
@@ -21,6 +21,7 @@ public class RestoreYmlWarhubJob implements Runnable {
 		this.warhubConfig = warhubConfig;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void run() {
 		int hubX = warhubConfig.getInt("x");
 		int hubY = warhubConfig.getInt("y");
@@ -30,40 +31,54 @@ public class RestoreYmlWarhubJob implements Runnable {
 		String hubOrientation = warhubConfig.getString("orientation");
 		
 		// materials
-		int floorId = 20;	// default glass
-		int floorData = 0;	
-		ConfigurationSection floorMaterialSection = warhubConfig.getConfigurationSection("materials.floor");
-		if (floorMaterialSection != null) {
-			floorId = floorMaterialSection.getInt("id");
-			floorData = floorMaterialSection.getInt("data");
+		if (warhubConfig.isItemStack("materials.floor")) {
+			War.war.getWarhubMaterials().setFloorBlock(
+					warhubConfig.getItemStack("materials.floor"));
+		} else {
+			ConfigurationSection floorMaterialSection = warhubConfig
+					.getConfigurationSection("materials.floor");
+			if (floorMaterialSection != null) {
+				War.war.getWarhubMaterials().setFloorBlock(
+					new ItemStack(floorMaterialSection.getInt("id"), 1,
+						(short) floorMaterialSection.getInt("data")));
+			}
 		}
-		
-		int outlineId = 5;	// default planks
-		int outlineData = 0;	
-		ConfigurationSection outlineMaterialSection = warhubConfig.getConfigurationSection("materials.outline");
-		if (outlineMaterialSection != null) {
-			outlineId = outlineMaterialSection.getInt("id");
-			outlineData = outlineMaterialSection.getInt("data");
+		if (warhubConfig.isItemStack("materials.outline")) {
+			War.war.getWarhubMaterials().setOutlineBlock(
+					warhubConfig.getItemStack("materials.outline"));
+		} else {
+			ConfigurationSection floorMaterialSection = warhubConfig
+					.getConfigurationSection("materials.outline");
+			if (floorMaterialSection != null) {
+				War.war.getWarhubMaterials().setOutlineBlock(
+					new ItemStack(floorMaterialSection.getInt("id"), 1,
+						(short) floorMaterialSection.getInt("data")));
+			}
 		}
-		
-		int gateId = 49;	// default obsidian
-		int gateData = 0;	
-		ConfigurationSection gateMaterialSection = warhubConfig.getConfigurationSection("materials.gate");
-		if (gateMaterialSection != null) {
-			gateId = gateMaterialSection.getInt("id");
-			gateData = gateMaterialSection.getInt("data");
+		if (warhubConfig.isItemStack("materials.gate")) {
+			War.war.getWarhubMaterials().setGateBlock(
+					warhubConfig.getItemStack("materials.gate"));
+		} else {
+			ConfigurationSection floorMaterialSection = warhubConfig
+					.getConfigurationSection("materials.gate");
+			if (floorMaterialSection != null) {
+				War.war.getWarhubMaterials().setGateBlock(
+					new ItemStack(floorMaterialSection.getInt("id"), 1,
+						(short) floorMaterialSection.getInt("data")));
+			}
 		}
-		
-		int lightId = 89;	// default glowstone
-		int lightData = 0;	
-		ConfigurationSection lightMaterialSection = warhubConfig.getConfigurationSection("materials.light");
-		if (lightMaterialSection != null) {
-			lightId = lightMaterialSection.getInt("id");
-			lightData = lightMaterialSection.getInt("data");
+		if (warhubConfig.isItemStack("materials.light")) {
+			War.war.getWarhubMaterials().setLightBlock(
+					warhubConfig.getItemStack("materials.light"));
+		} else {
+			ConfigurationSection floorMaterialSection = warhubConfig
+					.getConfigurationSection("materials.light");
+			if (floorMaterialSection != null) {
+				War.war.getWarhubMaterials().setLightBlock(
+					new ItemStack(floorMaterialSection.getInt("id"), 1,
+						(short) floorMaterialSection.getInt("data")));
+			}
 		}
-		
-		War.war.setWarhubMaterials(new HubLobbyMaterials(floorId, (byte)floorData, outlineId, (byte)outlineData, gateId, (byte)gateData, lightId, (byte)lightData));
-
 		World world = War.war.getServer().getWorld(worldName);
 		if (world != null) {
 			Location hubLocation = new Location(world, hubX, hubY, hubZ);

@@ -104,7 +104,7 @@ public class WarPlayerListener implements Listener {
 					Item item = event.getItemDrop();
 					if (item != null) {
 						ItemStack itemStack = item.getItemStack();
-						if (itemStack != null && itemStack.getType() == team.getKind().getMaterial() && itemStack.getData().getData() == team.getKind().getData()) {
+						if (itemStack != null && itemStack.getType() == team.getKind().getMaterial() && itemStack.getData() == team.getKind().getBlockData()) {
 							// Can't drop your team's kind block
 							War.war.badMsg(player, "Can't drop " + team.getName() + " blocks.");
 							event.setCancelled(true);

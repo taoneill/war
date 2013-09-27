@@ -60,7 +60,7 @@ public class KillstreakReward {
 	 */
 	public KillstreakReward(ConfigurationSection section) {
 		this.section = section;
-		this.airstrikePlayers = new HashSet();
+		this.airstrikePlayers = new HashSet<String>();
 	}
 
 	/**

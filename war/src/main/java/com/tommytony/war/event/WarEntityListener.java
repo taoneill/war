@@ -1,7 +1,6 @@
 package com.tommytony.war.event;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -9,8 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.NoteBlock;
-import org.bukkit.block.Sign;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -29,8 +27,6 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
@@ -43,7 +39,6 @@ import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.job.DeferredBlockResetsJob;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
-import com.tommytony.war.utility.DeferredBlockReset;
 import com.tommytony.war.utility.LoadoutSelection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -339,8 +334,10 @@ public class WarEntityListener implements Listener {
 						if (zone.isBombBlock(block)) {
 							// tnt doesn't get reset like normal blocks, gotta schedule a later reset just for the Bomb
 							// structure's tnt block
-							DeferredBlockResetsJob job = new DeferredBlockResetsJob(block.getWorld());
-							job.add(new DeferredBlockReset(block.getX(), block.getY(), block.getZ(), Material.TNT.getId(), (byte)0));
+							DeferredBlockResetsJob job = new DeferredBlockResetsJob();
+							BlockState tnt = block.getState();
+							tnt.setType(Material.TNT);
+							job.add(tnt);
 							War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job, 10);
 						}
 						inOneZone = true;
@@ -364,37 +361,9 @@ public class WarEntityListener implements Listener {
 		int dontExplodeSize = dontExplode.size();
 		if (dontExplode.size() > 0) {
 			// Reset the exploded blocks that shouldn't have exploded (some of these are zone artifacts, if rollbackexplosion some may be outside-of-zone blocks 
-			DeferredBlockResetsJob job = new DeferredBlockResetsJob(dontExplode.get(0).getWorld());
-			List<Block> doors = new ArrayList<Block>(); 
+			DeferredBlockResetsJob job = new DeferredBlockResetsJob();
 			for (Block dont : dontExplode) {
-				DeferredBlockReset deferred = null;
-				if (dont.getState() instanceof Sign) {
-					String[] lines = ((Sign)dont.getState()).getLines();
-					deferred = new DeferredBlockReset(dont.getX(), dont.getY(), dont.getZ(), dont.getTypeId(), dont.getData(), lines);
-				} else if (dont.getState() instanceof InventoryHolder) {
-					ItemStack[] contents = ((InventoryHolder)dont.getState()).getInventory().getContents();
-					Block worldBlock = dont.getWorld().getBlockAt(dont.getLocation());
-					if (worldBlock.getState() instanceof InventoryHolder) {
-						((InventoryHolder)worldBlock.getState()).getInventory().clear();
-					}
-					deferred = new DeferredBlockReset(dont.getX(), dont.getY(), dont.getZ(), dont.getTypeId(), dont.getData(), copyItems(contents));
-				} else if (dont.getTypeId() == Material.NOTE_BLOCK.getId()) {
-					Block worldBlock = dont.getWorld().getBlockAt(dont.getLocation());
-					if (worldBlock.getState() instanceof NoteBlock) {
-						NoteBlock noteBlock = ((NoteBlock)worldBlock.getState());
-						if (noteBlock != null) {
-							deferred = new DeferredBlockReset(dont.getX(), dont.getY(), dont.getZ(), dont.getTypeId(), dont.getData(), noteBlock.getRawNote());
-						}
-					}
-				} else if (dont.getTypeId() != Material.TNT.getId()) {				
-					deferred = new DeferredBlockReset(dont.getX(), dont.getY(), dont.getZ(), dont.getTypeId(), dont.getData());
-					if (dont.getTypeId() == Material.WOODEN_DOOR.getId() || dont.getTypeId() == Material.IRON_DOOR_BLOCK.getId()) {
-						doors.add(dont);
-					}
-				}
-				if (deferred != null) {
-					job.add(deferred);
-				}
+				job.add(dont.getState());
 			}
 			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
 			
@@ -405,10 +374,6 @@ public class WarEntityListener implements Listener {
 			
 			event.setYield(newYeild);
 		}
-	}
-
-	private List<ItemStack> copyItems(ItemStack[] contents) {
-		return Arrays.asList(contents);
 	}
 
 	/**

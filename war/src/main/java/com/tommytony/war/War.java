@@ -108,7 +108,9 @@ public class War extends JavaPlugin {
 
 	private Logger warLogger;
 
-	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(20, (byte)0, 5, (byte)0, 49, (byte)0, 89, (byte)0);	// default floor glass, outline planks, gate obsidian, light glowstone
+	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(
+			new ItemStack(Material.GLASS), new ItemStack(Material.WOOD),
+			new ItemStack(Material.OBSIDIAN), new ItemStack(Material.GLOWSTONE));
 
 	public War() {
 		super();
@@ -355,22 +357,21 @@ public class War extends JavaPlugin {
 		int i = 0;
 		for (ItemStack stack : inv.getContents()) {
 			if (stack != null && stack.getType() != Material.AIR) {
-				loadout.put(i, this.copyStack(stack));
+				loadout.put(i, stack.clone());
 				i++;
 			}
-
 		}
 		if (inv.getBoots() != null && inv.getBoots().getType() != Material.AIR) {
-			loadout.put(100, this.copyStack(inv.getBoots()));
+			loadout.put(100, inv.getBoots().clone());
 		}
 		if (inv.getLeggings() != null && inv.getLeggings().getType() != Material.AIR) {
-			loadout.put(101, this.copyStack(inv.getLeggings()));
+			loadout.put(101, inv.getLeggings().clone());
 		}
 		if (inv.getChestplate() != null && inv.getChestplate().getType() != Material.AIR) {
-			loadout.put(102, this.copyStack(inv.getChestplate()));
+			loadout.put(102, inv.getChestplate().clone());
 		}
 		if (inv.getHelmet() != null && inv.getHelmet().getType() != Material.AIR) {
-			loadout.put(103, this.copyStack(inv.getHelmet()));
+			loadout.put(103, inv.getHelmet().clone());
 		}
 	}
 	
@@ -379,22 +380,11 @@ public class War extends JavaPlugin {
 		return originalStack.clone();
 	}
 	
-	public void copyEnchantments(ItemStack originalStack, ItemStack copiedStack) {
-		for (Enchantment enchantment : originalStack.getEnchantments().keySet()) {
-			int level = originalStack.getEnchantments().get(enchantment);
-			safelyEnchant(copiedStack, enchantment, level);
-		}
-	}
-	
 	public void safelyEnchant(ItemStack target, Enchantment enchantment, int level) {
-		try {
-			if (level > enchantment.getMaxLevel()) {
-				target.addUnsafeEnchantment(Enchantment.getById(enchantment.getId()), level);
-			} else {
-				target.addEnchantment(Enchantment.getById(enchantment.getId()), level);
-			}
-		} catch (Exception e) {
-			War.war.log("Failed to apply enchantment id:" + enchantment.getId() + " level:" + level, Level.WARNING);
+		if (level > enchantment.getMaxLevel()) {
+			target.addUnsafeEnchantment(enchantment, level);
+		} else {
+			target.addEnchantment(enchantment, level);
 		}
 	}
 
@@ -577,34 +567,24 @@ public class War extends JavaPlugin {
 					ItemStack blockInHand = player.getItemInHand();
 					boolean updatedLobbyMaterials = false;
 					
-					int id = blockInHand.getTypeId();
-					byte data = (byte)0;
-					if (blockInHand.getData() != null) {
-						data = blockInHand.getData().getData();
-					}
-					
 					if (!blockInHand.getType().isBlock() && !blockInHand.getType().equals(Material.AIR)) {
 						this.badMsg(player, "Can only use blocks or air as lobby material.");
 					} else {
 						if (whichBlocks.equals("floor")) {
-							warzone.getLobbyMaterials().setFloorId(id);
-							warzone.getLobbyMaterials().setFloorData(data);
-							returnMessage.append(" lobby floor material set to id:" + id + " data:" + data + ".");
+							warzone.getLobbyMaterials().setFloorBlock(blockInHand);
+							returnMessage.append(" lobby floor material set to " + blockInHand.getType());
 							updatedLobbyMaterials = true;
 						} else if (whichBlocks.equals("outline")) {
-							warzone.getLobbyMaterials().setOutlineId(id);
-							warzone.getLobbyMaterials().setOutlineData(data);
-							returnMessage.append(" lobby outline material set to id:" + id + " data:" + data + ".");
+							warzone.getLobbyMaterials().setOutlineBlock(blockInHand);
+							returnMessage.append(" lobby outline material set to " + blockInHand.getType());
 							updatedLobbyMaterials = true;
 						} else if (whichBlocks.equals("gate")) {
-							warzone.getLobbyMaterials().setGateId(id);
-							warzone.getLobbyMaterials().setGateData(data);
-							returnMessage.append(" lobby gate material set to id:" + id + " data:" + data + ".");
+							warzone.getLobbyMaterials().setGateBlock(blockInHand);
+							returnMessage.append(" lobby gate material set to " + blockInHand.getType());
 							updatedLobbyMaterials = true;
 						} else if (whichBlocks.equals("light")) {
-							warzone.getLobbyMaterials().setLightId(id);
-							warzone.getLobbyMaterials().setLightData(data);
-							returnMessage.append(" lobby light material set to id:" + id + " data:" + data + ".");
+							warzone.getLobbyMaterials().setLightBlock(blockInHand);
+							returnMessage.append(" lobby light material set to " + blockInHand.getType());
 							updatedLobbyMaterials = true;
 						}
 						
@@ -619,29 +599,20 @@ public class War extends JavaPlugin {
 					ItemStack blockInHand = player.getItemInHand();
 					boolean updatedMaterials = false;
 					
-					int id = blockInHand.getTypeId();
-					byte data = (byte)0;
-					if (blockInHand.getData() != null) {
-						data = blockInHand.getData().getData();
-					}
-					
 					if (!blockInHand.getType().isBlock()) {
 						this.badMsg(player, "Can only use blocks as material.");
 					} else {
 						if (whichBlocks.equals("main")) {
-							warzone.getWarzoneMaterials().setMainId(id);
-							warzone.getWarzoneMaterials().setMainData(data);
-							returnMessage.append(" main material set to id:" + id + " data:" + data + ".");
+							warzone.getWarzoneMaterials().setMainBlock(blockInHand);
+							returnMessage.append(" main material set to " + blockInHand.getType());
 							updatedMaterials = true;
 						} else if (whichBlocks.equals("stand")) {
-							warzone.getWarzoneMaterials().setStandId(id);
-							warzone.getWarzoneMaterials().setStandData(data);
-							returnMessage.append(" stand material set to id:" + id + " data:" + data + ".");
+							warzone.getWarzoneMaterials().setStandBlock(blockInHand);
+							returnMessage.append(" stand material set to " + blockInHand.getType());
 							updatedMaterials = true;
 						} else if (whichBlocks.equals("light")) {
-							warzone.getWarzoneMaterials().setLightId(id);
-							warzone.getWarzoneMaterials().setLightData(data);
-							returnMessage.append(" light material set to id:" + id + " data:" + data + ".");
+							warzone.getWarzoneMaterials().setLightBlock(blockInHand);
+							returnMessage.append(" light material set to " + blockInHand.getType());
 							updatedMaterials = true;
 						}
 						
@@ -752,34 +723,24 @@ public class War extends JavaPlugin {
 					ItemStack blockInHand = player.getItemInHand();
 					boolean updatedWarhubMaterials = false;
 					
-					int id = blockInHand.getTypeId();
-					byte data = (byte)0;
-					if (blockInHand.getData() != null) {
-						data = blockInHand.getData().getData();
-					}
-					
 					if (!blockInHand.getType().isBlock() && !blockInHand.getType().equals(Material.AIR)) {
 						this.badMsg(player, "Can only use blocks or air as warhub material.");
 					} else {
 						if (whichBlocks.equals("floor")) {
-							War.war.getWarhubMaterials().setFloorId(id);
-							War.war.getWarhubMaterials().setFloorData(data);
-							returnMessage.append(" warhub floor material set to id:" + id + " data:" + data + ".");
+							this.warhubMaterials.setFloorBlock(blockInHand);
+							returnMessage.append(" warhub floor material set to " + blockInHand.getType());
 							updatedWarhubMaterials = true;
 						} else if (whichBlocks.equals("outline")) {
-							War.war.getWarhubMaterials().setOutlineId(id);
-							War.war.getWarhubMaterials().setOutlineData(data);
-							returnMessage.append(" warhub outline material set to id:" + id + " data:" + data + ".");
+							this.warhubMaterials.setOutlineBlock(blockInHand);
+							returnMessage.append(" warhub outline material set to " + blockInHand.getType());
 							updatedWarhubMaterials = true;
 						} else if (whichBlocks.equals("gate")) {
-							War.war.getWarhubMaterials().setGateId(id);
-							War.war.getWarhubMaterials().setGateData(data);
-							returnMessage.append(" warhub gate material set to id:" + id + " data:" + data + ".");
+							this.warhubMaterials.setGateBlock(blockInHand);
+							returnMessage.append(" warhub gate material set to " + blockInHand.getType());
 							updatedWarhubMaterials = true;
 						} else if (whichBlocks.equals("light")) {
-							War.war.getWarhubMaterials().setLightId(id);
-							War.war.getWarhubMaterials().setLightData(data);
-							returnMessage.append(" warhub light material set to id:" + id + " data:" + data + ".");
+							this.warhubMaterials.setLightBlock(blockInHand);
+							returnMessage.append(" warhub light material set to " + blockInHand.getType());
 							updatedWarhubMaterials = true;
 						}
 						

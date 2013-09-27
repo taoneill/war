@@ -50,6 +50,7 @@ public class LoadoutYmlMapper {
 	 * @param loadoutName The name of the loadout
 	 * @return new style loadout
 	 */
+	@SuppressWarnings("deprecation")
 	public static Loadout fromConfigToLoadout(ConfigurationSection config, HashMap<Integer, ItemStack> loadout, String loadoutName) {
 		List<Integer> slots = config.getIntegerList(loadoutName + ".slots");
 		for (Integer slot : slots) {
