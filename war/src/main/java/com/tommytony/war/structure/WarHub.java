@@ -216,7 +216,7 @@ public class WarHub {
 
 			// War hub sign
 			locationBlock.getRelative(front, 2).setType(Material.SIGN_POST);
-			String[] lines = "War hub\n(/warhub)\nPick your\nbattle!".split("\n");
+			String[] lines = War.war.getString("sign.warhub").split("\n");
 			org.bukkit.block.Sign locationBlockFront = (org.bukkit.block.Sign) locationBlock.getRelative(front, 2).getState();
 			for (int i = 0; i < 4; i++) {
 				locationBlockFront.setLine(i, lines[i]);
@@ -271,7 +271,7 @@ public class WarHub {
 				zoneCap += t.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
 			}
 			String[] lines = MessageFormat.format(
-					"Warzone\n{0}\n{1}/{2} players\n{3} teams",
+					War.war.getString("sign.warzone"),
 					zone.getName(), zonePlayers, zoneCap,
 					zone.getTeams().size()).split("\n");
 			for (int i = 0; i < 4; i++) {

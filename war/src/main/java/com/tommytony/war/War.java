@@ -2,10 +2,12 @@ package com.tommytony.war;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -107,6 +109,7 @@ public class War extends JavaPlugin {
 	private SpoutDisplayer spoutMessenger = null;
 
 	private Logger warLogger;
+	private static final ResourceBundle messages = ResourceBundle.getBundle("messages");
 
 	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(
 			new ItemStack(Material.GLASS), new ItemStack(Material.WOOD),
@@ -249,24 +252,13 @@ public class War extends JavaPlugin {
 		
 		// Add constants
 		this.getDeadlyAdjectives().clear();
-		this.getDeadlyAdjectives().add("");
-		this.getDeadlyAdjectives().add("");
-		this.getDeadlyAdjectives().add("mighty ");
-		this.getDeadlyAdjectives().add("deadly ");
-		this.getDeadlyAdjectives().add("fine ");
-		this.getDeadlyAdjectives().add("precise ");
-		this.getDeadlyAdjectives().add("brutal ");
-		this.getDeadlyAdjectives().add("powerful ");
-		
+		for (String adjective : this.getString("pvp.kill.adjectives").split(";")) {
+			this.getDeadlyAdjectives().add(adjective);
+		}
 		this.getKillerVerbs().clear();
-		this.getKillerVerbs().add("killed");
-		this.getKillerVerbs().add("killed");
-		this.getKillerVerbs().add("killed");
-		this.getKillerVerbs().add("finished");
-		this.getKillerVerbs().add("annihilated");
-		this.getKillerVerbs().add("murdered");
-		this.getKillerVerbs().add("obliterated");
-		this.getKillerVerbs().add("exterminated");
+		for (String verb : this.getString("pvp.kill.verbs").split(";")) {
+			this.getKillerVerbs().add(verb);
+		}
 		
 		// Load files
 		WarYmlMapper.load();
@@ -901,19 +893,85 @@ public class War extends JavaPlugin {
 
 	public void msg(CommandSender sender, String str) {
 		if (sender instanceof Player) {
-			String out = ChatColor.GRAY + "War> " + ChatColor.WHITE + this.colorKnownTokens(str, ChatColor.WHITE) + " ";
-			sender.sendMessage(out);
+			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
+					.append(this.getString("war.prefix")).append(
+							ChatColor.WHITE);
+			if (messages.containsKey(str)) {
+				output.append(this.colorKnownTokens(this.getString(str),
+						ChatColor.WHITE));
+			} else {
+				output.append(this.colorKnownTokens(str, ChatColor.WHITE));
+			}
+			sender.sendMessage(output.toString());
 		} else {
-			sender.sendMessage("War> " + str);
+			sender.sendMessage(this.getString("war.prefix")
+					+ (messages.containsKey(str) ? messages.getString(str)
+							: str));
 		}
 	}
 
 	public void badMsg(CommandSender sender, String str) {
 		if (sender instanceof Player) {
-			String out = ChatColor.GRAY + "War> " + ChatColor.RED + this.colorKnownTokens(str, ChatColor.RED) + " ";
-			sender.sendMessage(out);
+			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
+					.append(this.getString("war.prefix")).append(ChatColor.RED);
+			if (messages.containsKey(str)) {
+				output.append(this.colorKnownTokens(this.getString(str), ChatColor.RED));
+			} else {
+				output.append(this.colorKnownTokens(str, ChatColor.RED));
+			}
+			sender.sendMessage(output.toString());
 		} else {
-			sender.sendMessage("War> " + str);
+			sender.sendMessage(this.getString("war.prefix")
+					+ (messages.containsKey(str) ? messages.getString(str)
+							: str));
+		}
+	}
+
+	public void msg(CommandSender sender, String str, Object... obj) {
+		if (sender instanceof Player) {
+			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
+					.append(this.getString("war.prefix")).append(ChatColor.WHITE);
+			if (messages.containsKey(str)) {
+				output.append(MessageFormat.format(this.colorKnownTokens(
+						this.getString(str), ChatColor.WHITE), obj));
+			} else {
+				output.append(MessageFormat.format(
+						this.colorKnownTokens(str, ChatColor.WHITE), obj));
+			}
+			sender.sendMessage(output.toString());
+		} else {
+			StringBuilder output = new StringBuilder(
+					this.getString("war.prefix"));
+			if (messages.containsKey(str)) {
+				output.append(MessageFormat.format(this.getString(str), obj));
+			} else {
+				output.append(MessageFormat.format(str, obj));
+			}
+			sender.sendMessage(output.toString());
+		}
+	}
+
+	public void badMsg(CommandSender sender, String str, Object... obj) {
+		if (sender instanceof Player) {
+			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
+					.append(this.getString("war.prefix")).append(ChatColor.RED);
+			if (messages.containsKey(str)) {
+				output.append(MessageFormat.format(this.colorKnownTokens(
+						this.getString(str), ChatColor.RED), obj));
+			} else {
+				output.append(MessageFormat.format(
+						this.colorKnownTokens(str, ChatColor.RED), obj));
+			}
+			sender.sendMessage(output.toString());
+		} else {
+			StringBuilder output = new StringBuilder(
+					this.getString("war.prefix"));
+			if (messages.containsKey(str)) {
+				output.append(MessageFormat.format(this.getString(str), obj));
+			} else {
+				output.append(MessageFormat.format(str, obj));
+			}
+			sender.sendMessage(output.toString());
 		}
 	}
 
@@ -1226,5 +1284,9 @@ public class War extends JavaPlugin {
 
 	public void setMysqlConfig(MySQLConfig mysqlConfig) {
 		this.mysqlConfig = mysqlConfig;
+	}
+
+	public String getString(String key) {
+		return messages.getString(key);
 	}
 }

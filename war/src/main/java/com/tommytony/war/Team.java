@@ -316,7 +316,7 @@ public class Team {
 			String[] lines;
 			if (this.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL) == -1) {
 				lines = MessageFormat
-						.format("Team {0}\n{1}/{2} players\n{3}/{4} pts\nunlimited lives",
+						.format(War.war.getString("sign.team.unlimited"),
 								this.name,
 								this.players.size(),
 								this.getTeamConfig().resolveInt(
@@ -326,7 +326,7 @@ public class Team {
 										TeamConfig.MAXSCORE)).split("\n");
 			} else {
 				lines = MessageFormat
-						.format("Team {0}\n{1}/{2} players\n{3}/{4} pts\n{5} lives left",
+						.format(War.war.getString("sign.team.limited"),
 								this.name,
 								this.players.size(),
 								this.getTeamConfig().resolveInt(
@@ -418,6 +418,27 @@ public class Team {
 		}
 	}
 
+	public void teamcast(String message, Object... args) {
+		// by default a teamcast is a notification
+		teamcast(message, true, args);
+	}
+
+	public void teamcast(String message, boolean isNotification, Object... args) {
+		for (Player player : this.players) {
+			if (War.war.isSpoutServer()) {
+				SpoutPlayer sp = SpoutManager.getPlayer(player);
+				if (sp.isSpoutCraftEnabled() && isNotification) {
+					// team notifications go to the top left for Spout players to lessen War spam in chat box
+					War.war.getSpoutDisplayer().msg(sp, MessageFormat.format(message, args));
+				} else {
+					War.war.msg(player, message, args);
+				}
+			} else {
+				War.war.msg(player, message, args);
+			}
+		}
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -441,9 +462,7 @@ public class Team {
 				victim.getFlagVolume().resetBlocks();
 				victim.initializeTeamFlag();
 				this.warzone.removeFlagThief(thePlayer.getName());
-				for (Team t : this.warzone.getTeams()) {
-					t.teamcast("Team " + ChatColor.GREEN + victim.getName() + ChatColor.WHITE + " flag was returned.");
-				}
+				this.warzone.broadcast("drop.flag.broadcast", thePlayer.getName(), ChatColor.GREEN + victim.getName() + ChatColor.WHITE);
 			}
 			
 			if (this.warzone.isBombThief(thePlayer.getName())) {
@@ -451,9 +470,7 @@ public class Team {
 				bomb.getVolume().resetBlocks();
 				bomb.addBombBlocks();
 				this.warzone.removeBombThief(thePlayer.getName());
-				for (Team t : this.warzone.getTeams()) {
-					t.teamcast("Bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.WHITE  + " was returned.");
-				}
+				this.warzone.broadcast("drop.bomb.broadcast", thePlayer.getName(), ChatColor.GREEN + bomb.getName() + ChatColor.WHITE);
 			}
 			
 			if (this.warzone.isCakeThief(thePlayer.getName())) {
@@ -461,9 +478,7 @@ public class Team {
 				cake.getVolume().resetBlocks();
 				cake.addCakeBlocks();
 				this.warzone.removeCakeThief(thePlayer.getName());
-				for (Team t : this.warzone.getTeams()) {
-					t.teamcast("Cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE  + " was returned.");
-				}
+				this.warzone.broadcast("drop.cake.broadcast", thePlayer.getName(), ChatColor.GREEN + cake.getName() + ChatColor.WHITE);
 			}
 			if (War.war.isTagServer()) {
 				TagAPI.refreshPlayer(thePlayer);
@@ -499,7 +514,7 @@ public class Team {
 		if (atLeastOnePlayerOnTeam && atLeastOnePlayerOnOtherTeam) {
 			this.points++;
 		} else if (!atLeastOnePlayerOnOtherTeam) {
-			this.teamcast("Can't score until at least one player joins another team.");
+			this.teamcast("zone.score.empty");
 		}
 		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS) {
 			String teamName = kind.getColor() + name + ChatColor.RESET;
@@ -738,5 +753,18 @@ public class Team {
 
 	public boolean isFull() {
 		return this.getPlayers().size() == this.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
+	}
+
+	/**
+	 * Get an array of player usernames for players on this team.
+	 *
+	 * @return array of usernames.
+	 */
+	public String[] getPlayerNames() {
+		String[] ret = new String[this.players.size()];
+		for (int i = 0; i < this.players.size(); i++) {
+			ret[i] = this.players.get(i).getName();
+		}
+		return ret;
 	}
 }

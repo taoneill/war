@@ -1,7 +1,5 @@
 package com.tommytony.war.event;
 
-import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,7 +20,6 @@ import org.getspout.spoutapi.player.SpoutPlayer;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.spout.SpoutDisplayer;
@@ -57,13 +54,10 @@ public class WarBlockListener implements Listener {
 		// Monument capturing
 		if (team != null && block != null && zone != null
 				&& zone.isMonumentCenterBlock(block)
-				&& block.getType() == team.getKind().getMaterial()
-				&& block.getState().getData() == team.getKind().getBlockData()) {
+				&& team.getKind().isTeamBlock(block.getState())) {
 			Monument monument = zone.getMonumentFromCenterBlock(block);
 			if (monument != null && !monument.hasOwner()) {
 				monument.capture(team);
-				List<Team> teams = zone.getTeams();
-				
 				if (War.war.isSpoutServer()) {
 					for (Player p : team.getPlayers()) {
 						SpoutPlayer sp = SpoutManager.getPlayer(p);
@@ -77,13 +71,11 @@ public class WarBlockListener implements Listener {
 						}
 					}
 				}
-				for (Team t : teams) {
-					t.teamcast("Monument " + monument.getName() + " has been captured by team " + team.getName() + ".");
-				}
+				zone.broadcast("zone.monument.capture", monument.getName(), team.getName());
 				event.setCancelled(false);
 				return; // important otherwise cancelled down a few line by isImportantblock
 			} else {
-				War.war.badMsg(player, "You must capture a monument with a block of your team's wool color. Get one from your team spawn.");
+				War.war.badMsg(player, "zone.monument.badblock");
 				cancelAndKeepItem(event);
 				return;
 			}
@@ -94,7 +86,7 @@ public class WarBlockListener implements Listener {
 		if (zone != null 
 				&& (zone.isImportantBlock(block) || zone.isOpponentSpawnPeripheryBlock(team, block)) 
 				&& (!isZoneMaker || (isZoneMaker && team != null))) {
-			War.war.badMsg(player, "Can't build here.");
+			War.war.badMsg(player, "build.denied.location");
 			cancelAndKeepItem(event);
 			return;
 		}
@@ -102,7 +94,7 @@ public class WarBlockListener implements Listener {
 		// protect warzone lobbies
 		for (Warzone wz : War.war.getWarzones()) {
 			if (wz.getLobby() != null && wz.getLobby().getVolume() != null && wz.getLobby().getVolume().contains(block)) {
-				War.war.badMsg(player, "Can't build here.");
+				War.war.badMsg(player, "build.denied.location");
 				cancelAndKeepItem(event);
 				return;
 			}
@@ -110,7 +102,7 @@ public class WarBlockListener implements Listener {
 
 		// protect the hub
 		if (War.war.getWarHub() != null && War.war.getWarHub().getVolume().contains(block)) {
-			War.war.badMsg(player, "Can't build here.");
+			War.war.badMsg(player, "build.denied.location");
 			cancelAndKeepItem(event);
 			return;
 		}
@@ -118,7 +110,7 @@ public class WarBlockListener implements Listener {
 		// buildInZonesOnly
 		if (zone == null && War.war.getWarConfig().getBoolean(WarConfig.BUILDINZONESONLY) && !War.war.canBuildOutsideZone(player)) {
 			if (!War.war.getWarConfig().getBoolean(WarConfig.DISABLEBUILDMESSAGE)) {
-				War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
+				War.war.badMsg(player, "build.denied.outside");
 			}
 			cancelAndKeepItem(event);
 			return;
@@ -126,28 +118,28 @@ public class WarBlockListener implements Listener {
 
 		// can't place a block of your team's color
 		if (team != null && block.getType() == team.getKind().getMaterial() && block.getState().getData() == team.getKind().getBlockData()) {
-			War.war.badMsg(player, "You can only use your team's blocks to capture monuments.");
+			War.war.badMsg(player, "build.denied.teamblock");
 			cancelAndKeepItem(event);
 			return;
 		}
 
 		// a flag thief can't drop his flag
 		if (team != null && zone != null && zone.isFlagThief(player.getName())) {
-			War.war.badMsg(player, "Can't drop the flag. What are you doing? Run!");
+			War.war.badMsg(player, "drop.flag.disabled");
 			cancelAndKeepItem(event);
 			return;
 		}
 		
 		// a bomb thief can't drop his bomb
 		if (team != null && zone != null && zone.isBombThief(player.getName())) {
-			War.war.badMsg(player, "Can't drop the bomb. What are you doing? Run for your enemy's spawn!");
+			War.war.badMsg(player, "drop.bomb.disabled");
 			cancelAndKeepItem(event);
 			return;
 		}
 		
 		// a cake thief can't drop his cake
 		if (team != null && zone != null && zone.isCakeThief(player.getName())) {
-			War.war.badMsg(player, "Can't drop the cake. What are you doing? Run to your spawn!");
+			War.war.badMsg(player, "drop.cake.disabled");
 			cancelAndKeepItem(event);
 			return;
 		}
@@ -155,7 +147,7 @@ public class WarBlockListener implements Listener {
 		// unbreakableZoneBlocks
 		if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE) && (!isZoneMaker || (isZoneMaker && team != null))) {
 			// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks)
-			War.war.badMsg(player, "The blocks in this zone are unbreakable - this also means you can't build!");
+			War.war.badMsg(player, "build.denied.zone.place");
 			cancelAndKeepItem(event);
 			return;
 		}
@@ -245,7 +237,7 @@ public class WarBlockListener implements Listener {
 
 		if (warzone != null && team == null && !isZoneMaker) {
 			// can't actually destroy blocks in a warzone if not part of a team
-			War.war.badMsg(player, "Can't destroy part of a warzone if you're not in a team.");
+			War.war.badMsg(player, "build.denied.zone.outside");
 			event.setCancelled(true);
 			return;
 		}
@@ -253,7 +245,6 @@ public class WarBlockListener implements Listener {
 		if (team != null && block != null && warzone != null && warzone.isMonumentCenterBlock(block)) {
 			Monument monument = warzone.getMonumentFromCenterBlock(block);
 			if (monument.hasOwner()) {
-				List<Team> teams = warzone.getTeams();
 				Team ownerTeam = monument.getOwnerTeam();
 				if (War.war.isSpoutServer()) {
 					for (Player p : team.getPlayers()) {
@@ -268,9 +259,7 @@ public class WarBlockListener implements Listener {
 						}
 					}
 				}
-				for (Team t : teams) {
-					t.teamcast("Team " + ownerTeam.getName() + " loses control of monument " + monument.getName());
-				}
+				warzone.broadcast("zone.monument.lose", ownerTeam.getName(), monument.getName());
 				monument.uncapture();
 			}
 			event.setCancelled(false);
@@ -282,7 +271,7 @@ public class WarBlockListener implements Listener {
 			if (team != null && team.isSpawnLocation(block.getLocation())) {
 				// let team members loot one block the spawn for monument captures
 				if (player.getInventory().containsAtLeast(team.getKind().getBlockHead(), 1)) {
-					War.war.badMsg(player, "You already have a " + team.getName() + " block.");
+					War.war.badMsg(player, "build.denied.zone.multteam", team.getName());
 					event.setCancelled(true);
 					return;
 				} else {
@@ -294,9 +283,9 @@ public class WarBlockListener implements Listener {
 			if (team != null && warzone.isEnemyTeamFlagBlock(team, block)) {
 				if (warzone.isFlagThief(player.getName())) {
 					// detect audacious thieves
-					War.war.badMsg(player, "You can only steal one flag at a time!");
+					War.war.badMsg(player, "zone.stealextra.flag");
 				} else if (warzone.isBombThief(player.getName()) || warzone.isCakeThief(player.getName())) {
-					War.war.badMsg(player, "You can only steal one thing at a time!");
+					War.war.badMsg(player, "zone.stealextra.other");
 				} else {
 					Team lostFlagTeam = warzone.getTeamForFlagBlock(block);
 					if (lostFlagTeam.getPlayers().size() != 0) {
@@ -306,15 +295,8 @@ public class WarBlockListener implements Listener {
 						player.getInventory().addItem(teamKindBlock);
 						warzone.addFlagThief(lostFlagTeam, player.getName());
 						block.setType(Material.AIR);
-
-						String spawnOrFlag = "spawn or flag";
-						if (team.getTeamConfig().resolveFlagReturn().equals(FlagReturn.FLAG) 
-								|| team.getTeamConfig().resolveFlagReturn() == FlagReturn.SPAWN) {
-							spawnOrFlag = team.getTeamConfig().resolveFlagReturn().toString();
-						}
-
 						for (Team t : warzone.getTeams()) {
-							t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " stole team " + lostFlagTeam.getName() + "'s flag.");
+							t.teamcast("zone.steal.flag.broadcast", team.getKind().getColor() + player.getName() + ChatColor.WHITE, lostFlagTeam.getName());
 							if (t.getName().equals(lostFlagTeam.getName())) {
 								if (War.war.isSpoutServer()) {
 									for (Player p : t.getPlayers()) {
@@ -329,15 +311,12 @@ public class WarBlockListener implements Listener {
 										}
 									}
 								}
-								t.teamcast("Prevent " + team.getKind().getColor() + player.getName() + ChatColor.WHITE
-										+ " from reaching team " + team.getName() + "'s " + spawnOrFlag + ".");
+								t.teamcast("zone.steal.flag.prevent", team.getKind().getColor() + player.getName() + ChatColor.WHITE, team.getName());
 							}
 						}
-
-
-						War.war.msg(player, "You have team " + lostFlagTeam.getName() + "'s flag. Reach your team " + spawnOrFlag + " to capture it!");
+						War.war.msg(player, "zone.steal.flag.notice", lostFlagTeam.getName());
 					} else {
-						War.war.msg(player, "You can't steal team " + lostFlagTeam.getName() + "'s flag since no players are on that team.");
+						War.war.msg(player, "zone.steal.flag.empty", lostFlagTeam.getName());
 					}
 				}
 				event.setCancelled(true);
@@ -345,9 +324,9 @@ public class WarBlockListener implements Listener {
 			} else if (team != null && warzone.isBombBlock(block)) {
 				if (warzone.isBombThief(player.getName())) {
 					// detect audacious thieves
-					War.war.badMsg(player, "You can only steal one bomb at a time!");
+					War.war.badMsg(player, "zone.stealextra.bomb");
 				} else if (warzone.isFlagThief(player.getName()) || warzone.isCakeThief(player.getName())) {
-					War.war.badMsg(player, "You can only steal one thing at a time!");
+					War.war.badMsg(player, "zone.stealextra.other");
 				} else {
 					Bomb bomb = warzone.getBombForBlock(block);
 					// player just broke the bomb block: cancel to avoid drop, give player the block, set block to air
@@ -357,10 +336,8 @@ public class WarBlockListener implements Listener {
 					player.getInventory().addItem(tntBlock);
 					warzone.addBombThief(bomb, player.getName());
 					block.setType(Material.AIR);
-
 					for (Team t : warzone.getTeams()) {
-						t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " has bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.WHITE + ".");
-						
+						t.teamcast("zone.steal.bomb.broadcast", team.getKind().getColor() + player.getName() + ChatColor.WHITE, ChatColor.GREEN + bomb.getName() + ChatColor.WHITE);
 						if (War.war.isSpoutServer()) {
 							for (Player p : t.getPlayers()) {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
@@ -374,23 +351,18 @@ public class WarBlockListener implements Listener {
 								}
 							}
 						}
-						
-						t.teamcast("Prevent " + team.getKind().getColor() + player.getName() + ChatColor.WHITE
-								+ " from reaching your spawn with the bomb!");
+						t.teamcast("zone.steal.bomb.prevent", team.getKind().getColor() + player.getName() + ChatColor.WHITE);
 					}
-
-
-					War.war.msg(player, "You have bomb " + bomb.getName() + ". Reach another team's spawn to score. Don't get touched by anyone or you'll blow up!");
+					War.war.msg(player, "zone.steal.bomb.notice", bomb.getName());
 				}
-				
 				event.setCancelled(true);
 				return;
 			} else if (team != null && warzone.isCakeBlock(block)) {
 				if (warzone.isCakeThief(player.getName())) {
 					// detect audacious thieves
-					War.war.badMsg(player, "You can only steal one cake at a time!");
+					War.war.badMsg(player, "zone.stealextra.cake");
 				} else if (warzone.isFlagThief(player.getName()) || warzone.isBombThief(player.getName())) {
-					War.war.badMsg(player, "You can only steal one thing at a time!");
+					War.war.badMsg(player, "zone.stealextra.other");
 				} else {
 					Cake cake = warzone.getCakeForBlock(block);
 					// player just broke the cake block: cancel to avoid drop, give player the block, set block to air
@@ -400,10 +372,8 @@ public class WarBlockListener implements Listener {
 					player.getInventory().addItem(cakeBlock);
 					warzone.addCakeThief(cake, player.getName());
 					block.setType(Material.AIR);
-
 					for (Team t : warzone.getTeams()) {
-						t.teamcast(team.getKind().getColor() + player.getName() + ChatColor.WHITE + " has cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE + ".");
-						
+						t.teamcast("zone.steal.cake.broadcast", team.getKind().getColor() + player.getName() + ChatColor.WHITE, ChatColor.GREEN + cake.getName() + ChatColor.WHITE);
 						if (War.war.isSpoutServer()) {
 							for (Player p : t.getPlayers()) {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
@@ -417,19 +387,14 @@ public class WarBlockListener implements Listener {
 								}
 							}
 						}
-						
-						t.teamcast("Prevent " + team.getKind().getColor() + player.getName() + ChatColor.WHITE
-								+ " from reaching their spawn with the cake!");
+						t.teamcast("zone.steal.cake.prevent", team.getKind().getColor() + player.getName() + ChatColor.WHITE);
 					}
-
-
-					War.war.msg(player, "You have cake " + cake.getName() + ". Reach your team's spawn to score and replenish your lifepool.");
+					War.war.msg(player, "zone.steal.cake.notice", cake.getName());
 				}
-				
 				event.setCancelled(true);
 				return;
 			} else if (!warzone.isMonumentCenterBlock(block)) {
-				War.war.badMsg(player, "Can't destroy this.");
+				War.war.badMsg(player, "build.denied.location");
 				event.setCancelled(true);
 				return;
 			}
@@ -439,7 +404,7 @@ public class WarBlockListener implements Listener {
 		if (block != null) {
 			for (Warzone zone : War.war.getWarzones()) {
 				if (zone.getLobby() != null && zone.getLobby().getVolume() != null && zone.getLobby().getVolume().contains(block)) {
-					War.war.badMsg(player, "Can't destroy this.");
+					War.war.badMsg(player, "build.denied.location");
 					event.setCancelled(true);
 					return;
 				}
@@ -448,7 +413,7 @@ public class WarBlockListener implements Listener {
 
 		// protect the hub
 		if (War.war.getWarHub() != null && War.war.getWarHub().getVolume().contains(block)) {
-			War.war.badMsg(player, "Can't destroy this.");
+			War.war.badMsg(player, "build.denied.location");
 			event.setCancelled(true);
 			return;
 		}
@@ -457,7 +422,7 @@ public class WarBlockListener implements Listener {
 		Warzone blockZone = Warzone.getZoneByLocation(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ()));
 		if (blockZone == null && War.war.getWarConfig().getBoolean(WarConfig.BUILDINZONESONLY) && !War.war.canBuildOutsideZone(player)) {
 			if (!War.war.getWarConfig().getBoolean(WarConfig.DISABLEBUILDMESSAGE)) {
-				War.war.badMsg(player, "You can only build inside warzones. Ask for the 'war.build' permission to build outside.");
+				War.war.badMsg(player, "build.denied.outside");
 			}
 			event.setCancelled(true);
 			return;
@@ -466,7 +431,7 @@ public class WarBlockListener implements Listener {
 		// unbreakableZoneBlocks
 		if (blockZone != null && blockZone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE) && (!isZoneMaker || (isZoneMaker && team != null))) {
 			// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks
-			War.war.badMsg(player, "The blocks in this zone are unbreakable!");
+			War.war.badMsg(player, "build.denied.zone.break");
 			event.setCancelled(true);
 			return;
 		}

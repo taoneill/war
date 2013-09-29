@@ -86,25 +86,25 @@ public class WarEntityListener implements Listener {
 				
 				LoadoutSelection defenderLoadoutState = defenderWarzone.getLoadoutSelections().get(d.getName());
 				if (defenderLoadoutState != null && defenderLoadoutState.isStillInSpawn()) {
-					War.war.badMsg(a, "The target is still in spawn!");
+					War.war.badMsg(a, "pvp.target.spawn");
 					event.setCancelled(true);
 					return;
 				}
 				
 				LoadoutSelection attackerLoadoutState = attackerWarzone.getLoadoutSelections().get(a.getName());
 				if (attackerLoadoutState != null && attackerLoadoutState.isStillInSpawn()) {
-					War.war.badMsg(a, "You can't attack while still in spawn!");
+					War.war.badMsg(a, "pvp.self.spawn");
 					event.setCancelled(true);
 					return;
 				}
 				
 				// Make sure none of them are locked in by respawn timer
 				if (defenderWarzone.isRespawning(d)) {
-					War.war.badMsg(a, "The target is currently respawning!");
+					War.war.badMsg(a, "pvp.target.respawn");
 					event.setCancelled(true);
 					return;
 				} else if (attackerWarzone.isRespawning(a)) {
-					War.war.badMsg(a, "You can't attack while respawning!");
+					War.war.badMsg(a, "pvp.self.respawn");
 					event.setCancelled(true);
 					return;
 				}
@@ -113,10 +113,6 @@ public class WarEntityListener implements Listener {
 					// spleef-like, non-pvp, zone
 					event.setCancelled(true);
 					return;
-				}
-				
-				if (attackerTeam != null && defenderTeam != null && attacker.getEntityId() == defender.getEntityId()) {
-					War.war.badMsg(a, "You hit yourself!");
 				}
 
 				// Detect death, prevent it and respawn the player
@@ -130,40 +126,32 @@ public class WarEntityListener implements Listener {
 					}
 					
 					if (attackerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
-						String killMessage = "";
 						String attackerString = attackerTeam.getKind().getColor() + a.getName();
 						String defenderString = defenderTeam.getKind().getColor() + d.getName();
-						
 						if (attacker.getEntityId() != defender.getEntityId()) {
 							Material killerWeapon = a.getItemInHand().getType();
 							String weaponString = killerWeapon.toString();
+							if (a.getItemInHand().hasItemMeta() && a.getItemInHand().getItemMeta().hasDisplayName()) {
+								weaponString = a.getItemInHand().getItemMeta().getDisplayName();
+							}
 							if (killerWeapon == Material.AIR) {
-								weaponString = "hand";
+								weaponString = War.war.getString("pvp.kill.weapon.hand");
 							} else if (killerWeapon == Material.BOW || event.getDamager() instanceof Arrow) {
 								int rand = killSeed.nextInt(3);
 								if (rand == 0) {
-									weaponString = "arrow";
-								} else if (rand == 1) {
-									weaponString = "bow";
+									weaponString = War.war.getString("pvp.kill.weapon.bow");
 								} else {
-									weaponString = "aim";
+									weaponString = War.war.getString("pvp.kill.weapon.aim");
 								}
-								
 							} else if (event.getDamager() instanceof Projectile) {
-								weaponString = "aim";
+								weaponString = War.war.getString("pvp.kill.weapon.aim");
 							}
-							
 							String adjectiveString = War.war.getDeadlyAdjectives().get(this.killSeed.nextInt(War.war.getDeadlyAdjectives().size()));
 							String verbString = War.war.getKillerVerbs().get(this.killSeed.nextInt(War.war.getKillerVerbs().size()));
-							
-							killMessage = attackerString + ChatColor.WHITE + "'s " + adjectiveString + weaponString.toLowerCase().replace('_', ' ') 
-													+ " " + verbString + " " + defenderString;
+							defenderWarzone.broadcast("pvp.kill.format", attackerString + ChatColor.WHITE, adjectiveString,
+									weaponString.toLowerCase().replace('_', ' '), verbString, defenderString);
 						} else {
-							killMessage = defenderString + ChatColor.WHITE + " committed accidental suicide";
-						}
-						
-						for (Team team : defenderWarzone.getTeams()) {
-							team.teamcast(killMessage);
+							defenderWarzone.broadcast("pvp.kill.self", defenderString + ChatColor.WHITE);
 						}
 					}
 					if (attacker.getEntityId() != defender.getEntityId()) {
@@ -226,38 +214,37 @@ public class WarEntityListener implements Listener {
 							}
 						}
 						
-						t.teamcast(attackerTeam.getKind().getColor() + a.getName() + ChatColor.WHITE
-								+ " made " + defenderTeam.getKind().getColor() + d.getName() + ChatColor.WHITE + " blow up!");
+						t.teamcast("pvp.kill.bomb", attackerTeam.getKind().getColor() + a.getName() + ChatColor.WHITE,
+								defenderTeam.getKind().getColor() + d.getName() + ChatColor.WHITE);
 					}
 					
 				}
 			} else if (attackerTeam != null && defenderTeam != null && attackerTeam == defenderTeam && attackerWarzone == defenderWarzone && attacker.getEntityId() != defender.getEntityId()) {
 				// same team, but not same person
 				if (attackerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.FRIENDLYFIRE)) {
-					War.war.badMsg(a, "Friendly fire is on! Please, don't hurt your teammates."); // if ff is on, let the attack go through
+					War.war.badMsg(a, "pvp.ff.enabled"); // if ff is on, let the attack go through
 				} else {
-					War.war.badMsg(a, "Your attack missed! Your target is on your team.");
+					War.war.badMsg(a, "pvp.ff.disabled");
 					event.setCancelled(true); // ff is off
 				}
 			} else if (attackerTeam == null && defenderTeam == null && War.war.canPvpOutsideZones(a)) {
 				// let normal PVP through is its not turned off or if you have perms
 			} else if (attackerTeam == null && defenderTeam == null && !War.war.canPvpOutsideZones(a)) {
 				if (!War.war.getWarConfig().getBoolean(WarConfig.DISABLEPVPMESSAGE)) {
-					War.war.badMsg(a, "You need the 'war.pvp' permission to attack players outside warzones.");
+					War.war.badMsg(a, "pvp.outside.permission");
 				}
 				event.setCancelled(true); // global pvp is off
 			} else {
-				War.war.badMsg(a, "Your attack missed!");
 				if (attackerTeam == null) {
-					War.war.badMsg(a, "You must join a team, then you'll be able to damage people " + "in the other teams in that warzone.");
+					War.war.badMsg(a, "pvp.self.notplaying");
 				} else if (defenderTeam == null) {
-					War.war.badMsg(a, "Your target is not in a team.");
+					War.war.badMsg(a, "pvp.target.notplaying");
 				} else if (attacker != null && defender != null && attacker.getEntityId() == defender.getEntityId()) {
 					// You just hit yourself, probably with a bouncing arrow
 				} else if (attackerTeam == defenderTeam) {
-					War.war.badMsg(a, "Your target is on your team.");
+					War.war.badMsg(a, "pvp.ff.disabled");
 				} else if (attackerWarzone != defenderWarzone) {
-					War.war.badMsg(a, "Your target is playing in another warzone.");
+					War.war.badMsg(a, "pvp.target.otherzone");
 				}
 				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 			}
@@ -276,16 +263,11 @@ public class WarEntityListener implements Listener {
 				}
 								
 				if (defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
-					String deathMessage = "";
 					String defenderString = Team.getTeamByPlayerName(d.getName()).getKind().getColor() + d.getName();
-					
 					if (event.getDamager() instanceof TNTPrimed) {
-						deathMessage = defenderString + ChatColor.WHITE + " exploded";
+						defenderWarzone.broadcast("pvp.death.explosion", defenderString + ChatColor.WHITE);
 					} else {
-						deathMessage = defenderString + ChatColor.WHITE + " died";
-					}
-					for (Team team : defenderWarzone.getTeams()) {
-						team.teamcast(deathMessage);
+						defenderWarzone.broadcast("pvp.death.other", defenderString + ChatColor.WHITE);
 					}
 				}
 				WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(defenderWarzone, d, null, event.getCause());
@@ -423,19 +405,16 @@ public class WarEntityListener implements Listener {
 					
 					// Detect death, prevent it and respawn the player
 					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
-						String deathMessage = "";
-						String cause = " died";
+						String playerName = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE;
 						if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK 
 								|| event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LIGHTNING) {
-							cause = " burned to a crisp";
+							zone.broadcast("pvp.death.fire", playerName);
 						} else if (event.getCause() == DamageCause.DROWNING) {
-							cause = " drowned";
+							zone.broadcast("pvp.death.drown", playerName);
 						} else if (event.getCause() == DamageCause.FALL) {
-							cause = " fell to an untimely death";
-						}
-						deathMessage = Team.getTeamByPlayerName(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE + cause;
-						for (Team teamToMsg : zone.getTeams()) {
-							teamToMsg.teamcast(deathMessage);
+							zone.broadcast("pvp.death.fall", playerName);
+						} else {
+							zone.broadcast("pvp.death.other", playerName);
 						}
 					}
 					WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(zone, player, null, event.getCause());
@@ -552,9 +531,7 @@ public class WarEntityListener implements Listener {
 				zone.handleDeath(player);
 				
 				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
-					for (Team team : zone.getTeams()) {
-						team.teamcast(player.getName() + " died");
-					}
+					zone.broadcast("pvp.death.other", player.getName());
 				}
 			}
 		}
@@ -613,7 +590,7 @@ public class WarEntityListener implements Listener {
 				if (zone != null) {
 					if (War.war.getKillstreakReward().getAirstrikePlayers().remove(player.getName())) {
 						event.getEntity().setMetadata("warAirstrike", new FixedMetadataValue(War.war, true));
-						team.teamcast(String.format("%s called in an airstrike!", team.getKind().getColor() + player.getName() + ChatColor.WHITE));
+						zone.broadcast("zone.airstrike", team.getKind().getColor() + player.getName() + ChatColor.WHITE);
 					}
 				}
 			}

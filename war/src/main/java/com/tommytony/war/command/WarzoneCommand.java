@@ -21,7 +21,7 @@ public class WarzoneCommand extends AbstractWarCommand {
 	@Override
 	public boolean handle() {
 		if (!(this.getSender() instanceof Player)) {
-			this.badMsg("You can't do this if you are not in-game.");
+			this.badMsg("command.console");
 			return true;
 		}
 		Player player = (Player) this.getSender();
@@ -36,10 +36,10 @@ public class WarzoneCommand extends AbstractWarCommand {
 						player.teleport(warzone.getTeleport());
 					}
 				} else {
-					this.badMsg("Warzone " + args[0] + " could not be found.");
+					this.badMsg("zone.zone404");
 				}
 			} else {
-				this.badMsg("You do not have permission to teleport to the warzone.");
+				this.badMsg("zone.warp.permission");
 			}
 			return true;
 		} else if (args.length == 2 && (args[1].equalsIgnoreCase("sb")
@@ -54,10 +54,10 @@ public class WarzoneCommand extends AbstractWarCommand {
 						player.setScoreboard(warzone.getScoreboard());
 					}
 				} else {
-					this.badMsg("Warzone " + args[0] + " has not enabled a scoreboard.");
+					this.badMsg("zone.score.board404");
 				}
 			} else {
-				this.badMsg("Warzone " + args[0] + " could not be found.");
+				this.badMsg("zone.zone404");
 			}
 			return true;
 		} else {

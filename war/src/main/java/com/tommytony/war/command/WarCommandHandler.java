@@ -121,9 +121,9 @@ public class WarCommandHandler {
 			}
 			// we are not responsible for any other command
 		} catch (NotWarAdminException e) {
-			War.war.badMsg(sender, "You can't do this if you are not a War admin (permission war.admin).");
+			War.war.badMsg(sender, "war.notadmin");
 		} catch (NotZoneMakerException e) {
-			War.war.badMsg(sender, "You can't do this if you are not a warzone maker (permission war.zonemaker).");
+			War.war.badMsg(sender, "war.notzm");
 		} catch (Exception e) {
 			War.war.log("An error occured while handling command " + cmd.getName() + ". Exception:" + e.getClass().toString() + " " + e.getMessage(), Level.WARNING);
 			e.printStackTrace();

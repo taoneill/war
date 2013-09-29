@@ -292,7 +292,7 @@ public class ZoneLobby {
 				Block linkGateBlock = BlockInfo.getBlock(this.volume.getWorld(), this.warHubLinkGate);
 				this.placeWarhubLinkGate(linkGateBlock, warzone.getLobbyMaterials().getGateBlock());
 				// add warhub sign
-				String[] lines = "\nTo War hub\n\n ".split("\n");
+				String[] lines = War.war.getString("sign.lobby.warhub").split("\n");
 				this.resetGateSign(linkGateBlock, lines, false);
 			}
 
@@ -367,9 +367,9 @@ public class ZoneLobby {
 			block.setData(data);
 			String[] lines = new String[4];
 			if (this.autoAssignGate != null) {
-				lines = MessageFormat.format("Warzone\n{0}\nEnter the auto-\nassign gate.", warzone.getName()).split("\n");
+				lines = MessageFormat.format(War.war.getString("sign.lobby.autoassign"), warzone.getName()).split("\n");
 			} else {
-				lines = MessageFormat.format("Warzone\n{0}\n\nPick your team.", warzone.getName()).split("\n");
+				lines = MessageFormat.format(War.war.getString("sign.lobby.pick"), warzone.getName()).split("\n");
 			}
 			for (int i = 0; i < 4; i++) {
 				block.setLine(i, lines[i]);
@@ -700,7 +700,7 @@ public class ZoneLobby {
 			String[] lines;
 			if (team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL) == -1) {
 				lines = MessageFormat
-						.format("Team {0}\n{1}/{2} players\n{3}/{4} pts\nunlimited lives",
+						.format(War.war.getString("sign.team.unlimited"),
 								team.getName(),
 								team.getPlayers().size(),
 								team.getTeamConfig().resolveInt(
@@ -710,7 +710,7 @@ public class ZoneLobby {
 										TeamConfig.MAXSCORE)).split("\n");
 			} else {
 				lines = MessageFormat
-						.format("Team {0}\n{1}/{2} players\n{3}/{4} pts\n{5} lives left",
+						.format(War.war.getString("sign.team.limited"),
 								team.getName(),
 								team.getPlayers().size(),
 								team.getTeamConfig().resolveInt(

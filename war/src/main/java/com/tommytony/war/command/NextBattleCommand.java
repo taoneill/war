@@ -5,7 +5,6 @@ import java.util.logging.Level;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.structure.ZoneLobby;
@@ -42,9 +41,7 @@ public class NextBattleCommand extends AbstractZoneMakerCommand {
 		}
 
 		zone.clearThieves();
-		for (Team team : zone.getTeams()) {
-			team.teamcast("The battle was interrupted. " + zone.getTeamInformation() + " Resetting warzone " + zone.getName() + " and life pools...");
-		}
+		zone.broadcast("zone.battle.next", zone.getName());
 		zone.reinitialize();
 		
 		War.war.log(this.getSender().getName() + " used nextbattle in warzone " + zone.getName(), Level.INFO);

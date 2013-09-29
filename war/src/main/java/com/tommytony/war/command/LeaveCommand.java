@@ -21,7 +21,7 @@ public class LeaveCommand extends AbstractWarCommand {
 	@Override
 	public boolean handle() {
 		if (!(this.getSender() instanceof Player)) {
-			this.badMsg("You can't do this if you are not in-game.");
+			this.badMsg("command.console");
 			return true;
 		}
 

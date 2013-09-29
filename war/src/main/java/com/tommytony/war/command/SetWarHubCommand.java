@@ -24,7 +24,7 @@ public class SetWarHubCommand extends AbstractWarAdminCommand {
 	@Override
 	public boolean handle() {
 		if (!(this.getSender() instanceof Player)) {
-			this.badMsg("You can't do this if you are not in-game.");
+			this.badMsg("command.console");
 			return true;
 		}
 

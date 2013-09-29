@@ -65,6 +65,24 @@ public abstract class AbstractWarCommand {
 	}
 
 	/**
+	 * Sends a success message.
+	 * @param message Message or key to translate
+	 * @param args Arguments for the formatter
+	 */
+	public void msg(String message, Object... args) {
+		War.war.msg(this.getSender(), message, args);
+	}
+
+	/**
+	 * Sends a failure message.
+	 * @param message Message or key to translate
+	 * @param args Arguments for the formatter
+	 */
+	public void badMsg(String message, Object... args) {
+		War.war.badMsg(this.getSender(), message, args);
+	}
+
+	/**
 	 * Changes the command-sender
 	 *
 	 * @param 	sender	new sender

@@ -3,6 +3,7 @@ package com.tommytony.war.config;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.block.BlockState;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
@@ -145,5 +146,33 @@ public enum TeamKind {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Check if a block is this team's color block.
+	 *
+	 * @param block Wool block to check.
+	 * @return true if block is this team's color.
+	 */
+	public boolean isTeamBlock(BlockState block) {
+		if (block.getType() != Material.WOOL || !(block.getData() instanceof Wool)) {
+			return false;
+		}
+		Wool wool = (Wool) block.getData();
+		return wool.getColor() == dyeColor;
+	}
+
+	/**
+	 * Check if an item is this team's color block.
+	 *
+	 * @param item Wool item to check.
+	 * @return true if item is this team's color.
+	 */
+	public boolean isTeamItem(ItemStack item) {
+		if (item.getType() != Material.WOOL || !(item.getData() instanceof Wool)) {
+			return false;
+		}
+		Wool wool = (Wool) item.getData();
+		return wool.getColor() == dyeColor;
 	}
 }

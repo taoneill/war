@@ -1,11 +1,13 @@
 package com.tommytony.war;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -192,20 +194,18 @@ public class Warzone {
 	}
 
 	public String getTeamInformation() {
-		String teamsMessage = "Teams: ";
+		StringBuilder teamsMessage = new StringBuilder(War.war.getString("zone.teaminfo.prefix"));
 		if (this.getTeams().isEmpty()) {
-			teamsMessage += "none.";
+			teamsMessage.append(War.war.getString("zone.teaminfo.none"));
 		} else {
 			for (Team team : this.getTeams()) {
-				teamsMessage += team.getName() + " (" + team.getPoints() + " points, " + team.getRemainingLifes() + "/" 
-					+ team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL) + " lives left. ";
-				for (Player member : team.getPlayers()) {
-					teamsMessage += member.getName() + " ";
-				}
-				teamsMessage += ")  ";
+				teamsMessage.append('\n');
+				teamsMessage.append(MessageFormat.format(War.war.getString("zone.teaminfo.format"),
+						team.getName(), team.getPoints(), team.getRemainingLifes(),
+						team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL), StringUtils.join(team.getPlayerNames())));
 			}
 		}
-		return teamsMessage;
+		return teamsMessage.toString();
 	}
 
 	public String getName() {
@@ -905,11 +905,9 @@ public class Warzone {
 			if (!this.hasPlayerState(player.getName())) {
 				this.keepPlayerState(player);
 			}
-			War.war.msg(player, "Your inventory is in storage until you use '/war leave'.");
+			War.war.msg(player, "join.inventorystored");
 			this.respawnPlayer(lowestNoOfPlayers, player);
-			for (Team team : this.teams) {
-				team.teamcast("" + player.getName() + " joined team " + lowestNoOfPlayers.getName() + ".");
-			}
+			this.broadcast("join.broadcast", player.getName(), lowestNoOfPlayers.getName());
 		}
 		return lowestNoOfPlayers;
 	}
@@ -961,7 +959,7 @@ public class Warzone {
 							}
 						}
 						
-						t.teamcast("The battle is over. Team " + playerTeam.getName() + " lost: " + player.getName() + " died and there were no lives left in their life pool.");
+						t.teamcast("zone.battle.end", playerTeam.getName(), player.getName());
 	
 						if (t.getPlayers().size() != 0 && !t.getTeamConfig().resolveBoolean(TeamConfig.FLAGPOINTSONLY)) {
 							if (!t.getName().equals(playerTeam.getName())) {
@@ -969,7 +967,7 @@ public class Warzone {
 								t.addPoint();
 								t.resetSign();
 							}
-							scores += t.getName() + "(" + t.getPoints() + "/" + t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE) + ") ";
+							scores += '\n' + t.getName() + "(" + t.getPoints() + "/" + t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE) + ") ";
 							
 						}
 					}
@@ -986,11 +984,8 @@ public class Warzone {
 					War.war.getServer().getPluginManager().callEvent(event1);
 
 					if (!scores.equals("")) {
-						for (Team t : teams) {
-							t.teamcast("New scores - " + scores);
-						}
+						this.broadcast("zone.battle.newscores", scores);
 					}
-					
 					// detect score cap
 					List<Team> scoreCapTeams = new ArrayList<Team>();
 					for (Team t : teams) {
@@ -1005,14 +1000,10 @@ public class Warzone {
 								winnersStr += winner.getName() + " ";
 							}
 						}
-	
 						this.handleScoreCapReached(winnersStr);
 					} else {
 						// A new battle starts. Reset the zone but not the teams.
-						for (Team t : teams) {
-							t.teamcast("A new battle begins. Resetting warzone...");
-						}
-						
+						this.broadcast("zone.battle.reset");
 						this.reinitialize();
 					}
 				}
@@ -1038,9 +1029,7 @@ public class Warzone {
 						}
 					}
 					
-					for (Team t : this.getTeams()) {
-						t.teamcast(player.getName() + " died and dropped team " + victim.getName() + "'s flag.");
-					}
+					this.broadcast("drop.flag.broadcast", player.getName(), victim.getName());
 				}
 				
 				// Bomb thieves
@@ -1052,7 +1041,7 @@ public class Warzone {
 					this.removeBombThief(player.getName());
 					
 					for (Team t : this.getTeams()) {
-						t.teamcast(player.getName() + " died and dropped bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.WHITE + ".");
+						t.teamcast("drop.bomb.broadcast", player.getName(), ChatColor.GREEN + bomb.getName() + ChatColor.WHITE);
 						if (War.war.isSpoutServer()) {
 							for (Player p : t.getPlayers()) {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
@@ -1077,7 +1066,7 @@ public class Warzone {
 					this.removeCakeThief(player.getName());
 					
 					for (Team t : this.getTeams()) {
-						t.teamcast(player.getName() + " died and dropped cake " + ChatColor.GREEN + cake.getName() + ChatColor.WHITE + ".");
+						t.teamcast("drop.cake.broadcast", player.getName(), ChatColor.GREEN + cake.getName() + ChatColor.WHITE);
 						if (War.war.isSpoutServer()) {
 							for (Player p : t.getPlayers()) {
 								SpoutPlayer sp = SpoutManager.getPlayer(p);
@@ -1099,9 +1088,7 @@ public class Warzone {
 				
 				// Lifepool empty warning
 				if (remaining - 1 == 0) {
-					for (Team t : this.getTeams()) {
-						t.teamcast("Team " + playerTeam.getName() + "'s life pool is empty. One more death and they lose the battle!");
-					}
+					this.broadcast("zone.lifepool.empty", playerTeam.getName());
 				}
 			}
 			playerTeam.resetSign();
@@ -1130,9 +1117,7 @@ public class Warzone {
 			if (removeFromTeam) {
 				playerTeam.removePlayer(player.getName());
 			}
-			for (Team t : this.getTeams()) {
-				t.teamcast(playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE + " left the zone.");
-			}
+			this.broadcast("leave.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE);
 			playerTeam.resetSign();
 			
 			if (this.getLobby() != null) {
@@ -1153,7 +1138,7 @@ public class Warzone {
 				War.war.getSpoutDisplayer().updateStats(player);
 			}
 			
-			War.war.msg(player, "Your inventory is being restored.");
+			War.war.msg(player, "leave.inventoryrestore");
 			if (War.war.getWarHub() != null) {
 				War.war.getWarHub().resetZoneSign(this);
 			}
@@ -1455,10 +1440,8 @@ public class Warzone {
 						// Use the loadout from the list in the settings
 						this.resetInventory(playerTeam, player, Loadout.getLoadout(loadouts, name).getContents());
 					}
-					if (isFirstRespawn && playerTeam.getInventories().resolveLoadouts().keySet().size() > 1) {
-						War.war.msg(player, "Equipped " + name + " loadout (sneak to switch).");
-					} else if (isToggle) {
-						War.war.msg(player, "Equipped " + name + " loadout.");
+					if (isFirstRespawn && playerTeam.getInventories().resolveLoadouts().keySet().size() > 1 || isToggle) {
+						War.war.msg(player, "zone.loadout.equip", name);
 					}
 				}
 				i++;
@@ -1634,5 +1617,42 @@ public class Warzone {
 
 	public List<LogKillsDeathsJob.KillsDeathsRecord> getKillsDeathsTracker() {
 		return killsDeathsTracker;
+	}
+
+	/**
+	 * Send a message to all teams.
+	 * @param message Message or key to translate.
+	 */
+	public void broadcast(String message) {
+		for (Team team : this.teams) {
+			team.teamcast(message);
+		}
+	}
+
+	/**
+	 * Send a message to all teams.
+	 * @param message Message or key to translate.
+	 * @param args Arguments for the formatter.
+	 */
+	public void broadcast(String message, Object... args) {
+		for (Team team : this.teams) {
+			team.teamcast(message, args);
+		}
+	}
+
+	public List<Player> getPlayers() {
+		List<Player> players = new ArrayList<Player>();
+		for (Team team : this.teams) {
+			players.addAll(team.getPlayers());
+		}
+		return players;
+	}
+
+	public int getPlayerCount() {
+		int count = 0;
+		for (Team team : this.teams) {
+			count += team.getPlayers().size();
+		}
+		return count;
 	}
 }

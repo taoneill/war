@@ -23,7 +23,7 @@ public class JoinCommand extends AbstractWarCommand {
 	@Override
 	public boolean handle() {
 		if (!(this.getSender() instanceof Player)) {
-			this.badMsg("You can't do this if you are not in-game.");
+			this.badMsg("command.console");
 			return true;
 		}
 
@@ -56,26 +56,24 @@ public class JoinCommand extends AbstractWarCommand {
 		TeamKind kind = TeamKind.teamKindFromString(this.args[0]);
 
 		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
-			this.badMsg("This warzone is disabled.");
+			this.badMsg("join.disabled");
 		} else if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
-			this.badMsg("This warzone requires you to be automatically assigned to a team. Please enter the autoassign gate instead.");
+			this.badMsg("join.aarequired");
 		} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
-			this.badMsg("You cannot join a battle in progress in this warzone.");
+			this.badMsg("join.progress");
 		} else {
 			Team team = zone.getTeamByKind(kind);
-			if (kind == null) {
-				this.badMsg("There is no team kind called " + args[0] + ".");
-			} else if (team == null) {
-				this.badMsg("This warzone does not contain a team " + kind.toString() + ".");
+			if (kind == null || team == null) {
+				this.badMsg("join.team404");
 			} else if (!War.war.canPlayWar(player, team)) {
-				this.badMsg("You don't have permission to join this team.");
+				this.badMsg("join.permission.single");
 			} else if (team.isFull()) {
-				this.badMsg("Team " + team.getName() + " is full.");
+				this.badMsg("join.full.single", team.getName());
 			} else {
 				Team previousTeam = Team.getTeamByPlayerName(player.getName());
 				if (previousTeam != null) {
 					if (previousTeam == team) {
-						War.war.badMsg(player, "You cannot join your own team.");
+						this.badMsg("join.selfteam");
 						return true;
 					}
 					if (!previousTeam.removePlayer(player.getName())) {
@@ -88,7 +86,7 @@ public class JoinCommand extends AbstractWarCommand {
 				}
 				if (!zone.hasPlayerState(player.getName())) {
 					zone.keepPlayerState(player);
-					this.msg("Your inventory is in storage until you use '/war leave'.");
+					this.msg("join.inventorystored");
 				}
 				team.addPlayer(player);
 				team.resetSign();
@@ -96,9 +94,7 @@ public class JoinCommand extends AbstractWarCommand {
 				if (War.war.getWarHub() != null) {
 					War.war.getWarHub().resetZoneSign(zone);
 				}
-				for (Team localTeam : zone.getTeams()) {
-					localTeam.teamcast(String.format("%s joined team %s.", player.getName(), team.getName()));
-				}
+				zone.broadcast("join.broadcast", player.getName(), team.getName());
 			}
 		}
 		return true;
