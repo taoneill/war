@@ -165,10 +165,10 @@ public class ZoneVolumeMapper {
 												Chest chest = (Chest) state;
 												if (items != null) {
 													int ii = 0;
-													chest.getInventory().clear();
+													chest.getBlockInventory().clear();
 													for (ItemStack item : items) {
 														if (item != null) {
-															chest.getInventory().setItem(ii, item);
+															chest.getBlockInventory().setItem(ii, item);
 															ii++;
 														}
 													}
@@ -351,7 +351,7 @@ public class ZoneVolumeMapper {
 								} else if (state instanceof Chest) {
 									// Chests
 									Chest chest = (Chest) state;
-									Inventory inv = chest.getInventory();
+									Inventory inv = chest.getBlockInventory();
 									List<ItemStack> items = VolumeMapper.getItemListFromInv(inv);
 									invsWriter.write(VolumeMapper.buildInventoryStringFromItemList(items));
 									invsWriter.newLine();
