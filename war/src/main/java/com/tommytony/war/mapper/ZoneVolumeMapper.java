@@ -153,7 +153,7 @@ public class ZoneVolumeMapper {
 													}
 												}
 											}
-										} else if (diskBlockType == Material.CHEST.getId()) {
+										} else if (diskBlockType == Material.CHEST.getId() || diskBlockType == Material.TRAPPED_CHEST.getId()) {
 											// Chests read
 											List<ItemStack> items = VolumeMapper.readInventoryString(invsReader.readLine());
 
