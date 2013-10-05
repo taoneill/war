@@ -152,19 +152,19 @@ public class VolumeMapper {
 
 				out.write("corner1");
 				out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getX()));
+				out.write(Integer.toString(volume.getCornerOne().getBlockX()));
 				out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getY()));
+				out.write(Integer.toString(volume.getCornerOne().getBlockY()));
 				out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getZ()));
+				out.write(Integer.toString(volume.getCornerOne().getBlockZ()));
 				out.newLine();
 				out.write("corner2");
 				out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getX()));
+				out.write(Integer.toString(volume.getCornerTwo().getBlockX()));
 				out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getY()));
+				out.write(Integer.toString(volume.getCornerTwo().getBlockY()));
 				out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getZ()));
+				out.write(Integer.toString(volume.getCornerTwo().getBlockZ()));
 				out.newLine();
 				int blockWrites = 0;
 				for (int i = 0; i < volume.getSizeX(); i++) {

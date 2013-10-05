@@ -39,6 +39,9 @@
   	<url>http://ci.tommytony.com</url>
   </ciManagement>
   <scm>
+        <connection>scm:git:git://github.com/taoneill/war.git</connection>
+	<developerConnection>scm:git:git@github.com:taoneill/war.git</developerConnection>
+	<tag>HEAD</tag>
   	<url>https://github.com/taoneill/war</url>
   </scm>
   <build>

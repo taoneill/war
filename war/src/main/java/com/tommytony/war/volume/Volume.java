@@ -31,12 +31,12 @@ import com.tommytony.war.utility.Direction;
 public class Volume {
 	private String name;
 	private World world;
-	private BlockInfo cornerOne;
-	private BlockInfo cornerTwo;
 	private int[][][] blockTypes = null;
 	private byte[][][] blockDatas = null;
 	private HashMap<String, String[]> signLines = new HashMap<String, String[]>();
 	private HashMap<String, List<ItemStack>> invBlockContents = new HashMap<String, List<ItemStack>>();
+	private Location cornerOne;
+	private Location cornerTwo;
 
 	public Volume(String name, World world) {
 		this.name = name;
@@ -50,8 +50,8 @@ public class Volume {
 	public Volume(Location corner1, Location corner2) {
 		this(corner1.getWorld());
 		Validate.isTrue(corner1.getWorld() == corner2.getWorld(), "Cross-world volume");
-		this.cornerOne = new BlockInfo(corner1.getBlock());
-		this.cornerTwo = new BlockInfo(corner2.getBlock());
+		this.cornerOne = corner1;
+		this.cornerTwo = corner2;
 	}
 	
 	public void setName(String newName) {
@@ -71,11 +71,11 @@ public class Volume {
 	}
 
 	public void setCornerOne(Block block) {
-		this.cornerOne = new BlockInfo(block);
+		this.cornerOne = block.getLocation();
 	}
 
-	public void setCornerOne(BlockInfo blockInfo) {
-		this.cornerOne = blockInfo;
+	public void setCornerOne(Location location) {
+		this.cornerOne = location;
 	}
 
 	public int saveBlocks() {
@@ -314,28 +314,28 @@ public class Volume {
 	}
 
 	public void setCornerTwo(Block block) {
-		this.cornerTwo = new BlockInfo(block);
+		this.cornerTwo = block.getLocation();
 	}
 
-	public void setCornerTwo(BlockInfo blockInfo) {
-		this.cornerTwo = blockInfo;
+	public void setCornerTwo(Location location) {
+		this.cornerTwo = location;
 	}
 
-	public BlockInfo getMinXBlock() {
+	public Location getMinXBlock() {
 		if (this.cornerOne.getX() < this.cornerTwo.getX()) {
 			return this.cornerOne;
 		}
 		return this.cornerTwo;
 	}
 
-	public BlockInfo getMinYBlock() {
+	public Location getMinYBlock() {
 		if (this.cornerOne.getY() < this.cornerTwo.getY()) {
 			return this.cornerOne;
 		}
 		return this.cornerTwo;
 	}
 
-	public BlockInfo getMinZBlock() {
+	public Location getMinZBlock() {
 		if (this.cornerOne.getZ() < this.cornerTwo.getZ()) {
 			return this.cornerOne;
 		}
@@ -343,32 +343,32 @@ public class Volume {
 	}
 
 	public int getMinX() {
-		return this.getMinXBlock().getX();
+		return this.getMinXBlock().getBlockX();
 	}
 
 	public int getMinY() {
-		return this.getMinYBlock().getY();
+		return this.getMinYBlock().getBlockY();
 	}
 
 	public int getMinZ() {
-		return this.getMinZBlock().getZ();
+		return this.getMinZBlock().getBlockZ();
 	}
 
-	public BlockInfo getMaxXBlock() {
+	public Location getMaxXBlock() {
 		if (this.cornerOne.getX() < this.cornerTwo.getX()) {
 			return this.cornerTwo;
 		}
 		return this.cornerOne;
 	}
 
-	public BlockInfo getMaxYBlock() {
+	public Location getMaxYBlock() {
 		if (this.cornerOne.getY() < this.cornerTwo.getY()) {
 			return this.cornerTwo;
 		}
 		return this.cornerOne;
 	}
 
-	public BlockInfo getMaxZBlock() {
+	public Location getMaxZBlock() {
 		if (this.cornerOne.getZ() < this.cornerTwo.getZ()) {
 			return this.cornerTwo;
 		}
@@ -376,15 +376,15 @@ public class Volume {
 	}
 
 	public int getMaxX() {
-		return this.getMaxXBlock().getX();
+		return this.getMaxXBlock().getBlockX();
 	}
 
 	public int getMaxY() {
-		return this.getMaxYBlock().getY();
+		return this.getMaxYBlock().getBlockY();
 	}
 
 	public int getMaxZ() {
-		return this.getMaxZBlock().getZ();
+		return this.getMaxZBlock().getBlockZ();
 	}
 
 	public int getSizeX() {
@@ -407,11 +407,11 @@ public class Volume {
 		return this.blockTypes;
 	}
 
-	public BlockInfo getCornerOne() {
+	public Location getCornerOne() {
 		return this.cornerOne;
 	}
 
-	public BlockInfo getCornerTwo() {
+	public Location getCornerTwo() {
 		return this.cornerTwo;
 	}
 
@@ -556,5 +556,9 @@ public class Volume {
 		this.signLines = null;
 		this.invBlockContents.clear();
 		this.invBlockContents = null;
+	}
+
+	public int size() {
+		return this.getSizeX() * this.getSizeY() * this.getSizeZ();
 	}
 }

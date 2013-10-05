@@ -61,7 +61,6 @@ import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.PotionEffectHelper;
-import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
 
@@ -252,11 +251,11 @@ public class Warzone {
 				}
 			}
 
-			int saved = this.volume.saveBlocks();
+			this.volume.saveBlocks();
 			if (clearArtifacts) {
 				this.initializeZone(); // bring back stuff
 			}
-			return saved;
+			return this.volume.size();
 		}
 		return 0;
 	}
@@ -1552,10 +1551,15 @@ public class Warzone {
 		for (Team maybeOpponent : this.getTeams()) {
 			if (maybeOpponent != team) {
 				for (Volume teamSpawnVolume : maybeOpponent.getSpawnVolumes().values()) {
-					Volume periphery = new Volume("periphery", this.getWorld());
-					periphery.setCornerOne(new BlockInfo(teamSpawnVolume.getMinX()-1 , teamSpawnVolume.getMinY()-1, teamSpawnVolume.getMinZ()-1, 0, (byte)0));
-					periphery.setCornerTwo(new BlockInfo(teamSpawnVolume.getMaxX()+1, teamSpawnVolume.getMaxY()+1, teamSpawnVolume.getMaxZ()+1, 0, (byte)0));
-
+					Volume periphery = new Volume(new Location(
+							teamSpawnVolume.getWorld(),
+							teamSpawnVolume.getMinX() - 1,
+							teamSpawnVolume.getMinY() - 1,
+							teamSpawnVolume.getMinZ() - 1), new Location(
+							teamSpawnVolume.getWorld(),
+							teamSpawnVolume.getMaxX() + 1,
+							teamSpawnVolume.getMaxY() + 1,
+							teamSpawnVolume.getMaxZ() + 1));
 					if (periphery.contains(block)) {
 						return true;
 					}

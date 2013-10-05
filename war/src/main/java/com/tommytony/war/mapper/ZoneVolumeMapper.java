@@ -299,19 +299,19 @@ public class ZoneVolumeMapper {
 
 				cornersWriter.write("corner1");
 				cornersWriter.newLine();
-				cornersWriter.write(Integer.toString(volume.getCornerOne().getX()));
+				cornersWriter.write(Integer.toString(volume.getCornerOne().getBlockX()));
 				cornersWriter.newLine();
-				cornersWriter.write(Integer.toString(volume.getCornerOne().getY()));
+				cornersWriter.write(Integer.toString(volume.getCornerOne().getBlockY()));
 				cornersWriter.newLine();
-				cornersWriter.write(Integer.toString(volume.getCornerOne().getZ()));
+				cornersWriter.write(Integer.toString(volume.getCornerOne().getBlockZ()));
 				cornersWriter.newLine();
 				cornersWriter.write("corner2");
 				cornersWriter.newLine();
-				cornersWriter.write(Integer.toString(volume.getCornerTwo().getX()));
+				cornersWriter.write(Integer.toString(volume.getCornerTwo().getBlockX()));
 				cornersWriter.newLine();
-				cornersWriter.write(Integer.toString(volume.getCornerTwo().getY()));
+				cornersWriter.write(Integer.toString(volume.getCornerTwo().getBlockY()));
 				cornersWriter.newLine();
-				cornersWriter.write(Integer.toString(volume.getCornerTwo().getZ()));
+				cornersWriter.write(Integer.toString(volume.getCornerTwo().getBlockZ()));
 				cornersWriter.newLine();
 
 				int x = 0;

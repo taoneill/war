@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.Warzone;
 import com.tommytony.war.utility.Direction;
-import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 
 /**
@@ -35,19 +34,12 @@ public class Bomb {
 
 	public void addBombBlocks() {
 		// make air (old two-high above floor)
-		Volume airGap = new Volume("airgap", this.warzone.getWorld());
-		airGap.setCornerOne(new BlockInfo(
-				this.volume.getCornerOne().getX(), 
-				this.volume.getCornerOne().getY() + 1, 
-				this.volume.getCornerOne().getZ(),
-				0,
-				(byte)0));
-		airGap.setCornerTwo(new BlockInfo(
-				this.volume.getCornerTwo().getX(), 
-				this.volume.getCornerOne().getY() + 3, 
-				this.volume.getCornerTwo().getZ(),
-				0,
-				(byte)0));
+		Volume airGap = new Volume(new Location(this.volume.getWorld(),
+				this.volume.getCornerOne().getX(), this.volume.getCornerOne()
+						.getY() + 1, this.volume.getCornerOne().getZ()),
+				new Location(this.volume.getWorld(), this.volume.getCornerTwo()
+						.getX(), this.volume.getCornerOne().getY() + 3,
+						this.volume.getCornerTwo().getZ()));
 		airGap.setToMaterial(Material.AIR);
 
 		int x = this.location.getBlockX();
