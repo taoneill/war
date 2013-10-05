@@ -2,6 +2,7 @@ package com.tommytony.war.mapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -189,7 +190,12 @@ public class WarYmlMapper {
 			hubConfigSection.set("materials.gate", War.war.getWarhubMaterials().getGateBlock());
 			hubConfigSection.set("materials.light", War.war.getWarhubMaterials().getLightBlock());
 
-			VolumeMapper.save(hub.getVolume(), "");
+			try {
+				VolumeMapper.save(hub.getVolume(), "");
+			} catch (SQLException e) {
+				// who really even cares
+				War.war.getLogger().log(Level.WARNING, "Failed to save warhub volume blocks", e);
+			}
 		}
 
 		ConfigurationSection killstreakSection = warRootSection.createSection("war.killstreak");

@@ -1,5 +1,6 @@
 package com.tommytony.war.job;
 
+import java.sql.SQLException;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
@@ -43,7 +44,12 @@ public class RestoreWarhubJob implements Runnable {
 			Location hubLocation = new Location(world, hubX, hubY, hubZ);
 			WarHub hub = new WarHub(hubLocation, hubOrientation);
 			War.war.setWarHub(hub);
-			Volume vol = VolumeMapper.loadVolume("warhub", "", world);
+			Volume vol;
+			try {
+				vol = VolumeMapper.loadVolume("warhub", "", world);
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
 			hub.setVolume(vol);
 			hub.getVolume().resetBlocks();
 			hub.initialize();

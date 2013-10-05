@@ -1,10 +1,8 @@
 package com.tommytony.war.mapper;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +15,12 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Sign;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
-
 
 import com.tommytony.war.War;
 import com.tommytony.war.job.DeferredBlockResetsJob;
 import com.tommytony.war.utility.DeferredBlockReset;
-import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
 
 /**
@@ -34,6 +29,7 @@ import com.tommytony.war.volume.ZoneVolume;
  * @author tommytony
  *
  */
+@SuppressWarnings("deprecation")
 public class PreDeGaulleZoneVolumeMapper {
 
 	private static List<ItemStack> readInventoryString(String invString) {
@@ -283,151 +279,4 @@ public class PreDeGaulleZoneVolumeMapper {
 		}
 		return noOfResetBlocks;
 	}
-
-	public static int save(Volume volume, String zoneName, War war) {
-		int noOfSavedBlocks = 0;
-		if (volume.hasTwoCorners()) {
-			BufferedWriter out = null;
-			try {
-				(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName)).mkdir();
-				if (zoneName.equals("")) {
-					out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
-				} else {
-					out = new BufferedWriter(new FileWriter(new File(war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
-				}
-
-				out.write("corner1");
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getBlockX()));
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getBlockY()));
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getBlockZ()));
-				out.newLine();
-				out.write("corner2");
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getBlockX()));
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getBlockY()));
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getBlockZ()));
-				out.newLine();
-
-				int x = 0;
-				int y = 0;
-				int z = 0;
-				Block block;
-				int typeId;
-				byte data;
-				BlockState state;
-
-				x = volume.getMinX();
-				for (int i = 0; i < volume.getSizeX(); i++) {
-					y = volume.getMinY();
-					for (int j = 0; j < volume.getSizeY(); j++) {
-						z = volume.getMinZ();
-						for (int k = 0; k < volume.getSizeZ(); k++) {
-							try {
-								block = volume.getWorld().getBlockAt(x, y, z);
-								typeId = block.getTypeId();
-								data = block.getData();
-								state = block.getState();
-
-								out.write(typeId + "," + data + ",");
-
-								if (state instanceof Sign) {
-									// Signs
-									String extra = "";
-									Sign sign = (Sign) state;
-									if (sign.getLines() != null) {
-										for (String line : sign.getLines()) {
-											extra += line + ";;";
-										}
-										out.write(extra);
-									}
-
-								} else if (state instanceof Chest) {
-									// Chests
-									Chest chest = (Chest) state;
-									Inventory inv = chest.getInventory();
-									int size = inv.getSize();
-									List<ItemStack> items = new ArrayList<ItemStack>();
-									for (int invIndex = 0; invIndex < size; invIndex++) {
-										ItemStack item = inv.getItem(invIndex);
-										if (item != null && item.getType().getId() != Material.AIR.getId()) {
-											items.add(item);
-										}
-									}
-									String extra = "";
-									if (items != null) {
-										for (ItemStack item : items) {
-											if (item != null) {
-												extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
-												if (item.getData() != null) {
-													extra += ";" + item.getData().getData();
-												}
-												extra += ";;";
-											}
-										}
-										out.write(extra);
-									}
-								} else if (state instanceof Dispenser) {
-									// Dispensers
-									Dispenser dispenser = (Dispenser) state;
-									Inventory inv = dispenser.getInventory();
-									int size = inv.getSize();
-									List<ItemStack> items = new ArrayList<ItemStack>();
-									for (int invIndex = 0; invIndex < size; invIndex++) {
-										ItemStack item = inv.getItem(invIndex);
-										if (item != null && item.getType().getId() != Material.AIR.getId()) {
-											items.add(item);
-										}
-									}
-									String extra = "";
-									if (items != null) {
-										for (ItemStack item : items) {
-											if (item != null) {
-												extra += item.getTypeId() + ";" + item.getAmount() + ";" + item.getDurability();
-												if (item.getData() != null) {
-													extra += ";" + item.getData().getData();
-												}
-												extra += ";;";
-											}
-										}
-										out.write(extra);
-									}
-								}
-								noOfSavedBlocks++;
-								out.newLine();
-							} catch (Exception e) {
-								war.log("Unexpected error while saving a block to " + " file for zone " + zoneName + ". Blocks saved so far: " + noOfSavedBlocks + "Position: x:" + x + " y:" + y + " z:" + z + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
-								e.printStackTrace();
-							} finally {
-								z++;
-							}
-						}
-						y++;
-					}
-					x++;
-				}
-			} catch (IOException e) {
-				war.log("Failed to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
-				e.printStackTrace();
-			} catch (Exception e) {
-				war.log("Unexpected error caused failure to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
-				e.printStackTrace();
-			} finally {
-				if (out != null) {
-					try {
-						out.close();
-					} catch (IOException e) {
-						war.log("Failed to close file writer for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		return noOfSavedBlocks;
-	}
-
 }

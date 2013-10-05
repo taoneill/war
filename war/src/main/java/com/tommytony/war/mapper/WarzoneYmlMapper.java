@@ -2,6 +2,7 @@ package com.tommytony.war.mapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -282,26 +283,46 @@ public class WarzoneYmlMapper {
 
 			// monument blocks
 			for (Monument monument : warzone.getMonuments()) {
-				monument.setVolume(VolumeMapper.loadVolume(monument.getName(), warzone.getName(), world));
+				try {
+					monument.setVolume(VolumeMapper.loadVolume(monument.getName(), warzone.getName(), world));
+				} catch (SQLException e) {
+					War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
+				}
 			}
 			
 			// bomb blocks
 			for (Bomb bomb : warzone.getBombs()) {
-				bomb.setVolume(VolumeMapper.loadVolume("bomb-" + bomb.getName(), warzone.getName(), world));
+				try {
+					bomb.setVolume(VolumeMapper.loadVolume("bomb-" + bomb.getName(), warzone.getName(), world));
+				} catch (SQLException e) {
+					War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
+				}
 			}
 			
 			// cake blocks
 			for (Cake cake : warzone.getCakes()) {
-				cake.setVolume(VolumeMapper.loadVolume("cake-" + cake.getName(), warzone.getName(), world));
+				try {
+					cake.setVolume(VolumeMapper.loadVolume("cake-" + cake.getName(), warzone.getName(), world));
+				} catch (SQLException e) {
+					War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
+				}
 			}
 			
 			// team spawn blocks
 			for (Team team : warzone.getTeams()) {
 				for (Location teamSpawn : team.getTeamSpawns()) {
-					team.setSpawnVolume(teamSpawn, VolumeMapper.loadVolume(team.getName() + team.getTeamSpawns().indexOf(teamSpawn), warzone.getName(), world));
+					try {
+						team.setSpawnVolume(teamSpawn, VolumeMapper.loadVolume(team.getName() + team.getTeamSpawns().indexOf(teamSpawn), warzone.getName(), world));
+					} catch (SQLException e) {
+						War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
+					}
 				}
 				if (team.getTeamFlag() != null) {
-					team.setFlagVolume(VolumeMapper.loadVolume(team.getName() + "flag", warzone.getName(), world));
+					try {
+						team.setFlagVolume(VolumeMapper.loadVolume(team.getName() + "flag", warzone.getName(), world));
+					} catch (SQLException e) {
+						War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
+					}
 				}
 			}
 
@@ -376,7 +397,12 @@ public class WarzoneYmlMapper {
 			World lobbyWorld = War.war.getServer().getWorld(lobbyWorldName);
 						
 			// create the lobby
-			Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), lobbyWorld);
+			Volume lobbyVolume = null;
+			try {
+				lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), lobbyWorld);
+			} catch (SQLException e) {
+				War.war.getLogger().log(Level.WARNING, "Failed to load warzone lobby", e);
+			}
 			ZoneLobby lobby = new ZoneLobby(warzone, lobbyFace, lobbyVolume);
 			warzone.setLobby(lobby);
 			
@@ -626,31 +652,55 @@ public class WarzoneYmlMapper {
 		
 		// monument blocks
 		for (Monument monument : warzone.getMonuments()) {
-			VolumeMapper.save(monument.getVolume(), warzone.getName());
+			try {
+				VolumeMapper.save(monument.getVolume(), warzone.getName());
+			} catch (SQLException e) {
+				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
+			}
 		}
 		
 		// bomb blocks
 		for (Bomb bomb : warzone.getBombs()) {
-			VolumeMapper.save(bomb.getVolume(), warzone.getName());
+			try {
+				VolumeMapper.save(bomb.getVolume(), warzone.getName());
+			} catch (SQLException e) {
+				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
+			}
 		}
 		
 		// cake blocks
 		for (Cake cake : warzone.getCakes()) {
-			VolumeMapper.save(cake.getVolume(), warzone.getName());
+			try {
+				VolumeMapper.save(cake.getVolume(), warzone.getName());
+			} catch (SQLException e) {
+				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
+			}
 		}
 
 		// team spawn & flag blocks
 		for (Team team : teams) {
 			for (Volume volume : team.getSpawnVolumes().values()) {
-				VolumeMapper.save(volume, warzone.getName());
+				try {
+					VolumeMapper.save(volume, warzone.getName());
+				} catch (SQLException e) {
+					War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
+				}
 			}
 			if (team.getFlagVolume() != null) {
-				VolumeMapper.save(team.getFlagVolume(), warzone.getName());
+				try {
+					VolumeMapper.save(team.getFlagVolume(), warzone.getName());
+				} catch (SQLException e) {
+					War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
+				}
 			}
 		}
 
 		if (warzone.getLobby() != null) {
-			VolumeMapper.save(warzone.getLobby().getVolume(), warzone.getName());
+			try {
+				VolumeMapper.save(warzone.getLobby().getVolume(), warzone.getName());
+			} catch (SQLException e) {
+				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
+			}
 		}
 		
 		// Save to disk

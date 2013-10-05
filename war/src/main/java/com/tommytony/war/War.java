@@ -151,6 +151,13 @@ public class War extends JavaPlugin {
 		} catch (ClassNotFoundException e) {
 			isSpoutServer = false;
 		}
+		try {
+			Class.forName("org.sqlite.JDBC").newInstance();
+		} catch (Exception e) {
+			this.log("SQLite3 driver not found!", Level.SEVERE);
+			this.getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
 
 		// Register events
 		PluginManager pm = this.getServer().getPluginManager();

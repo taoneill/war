@@ -1,9 +1,11 @@
 package com.tommytony.war.volume;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-
 
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
@@ -27,12 +29,17 @@ public class ZoneVolume extends Volume {
 	}
 
 	@Override
-	public int saveBlocks() {
+	public void saveBlocks() {
 		// Save blocks directly to disk (i.e. don't put everything in memory)
-		int saved = ZoneVolumeMapper.save(this, this.zone.getName());
+		int saved = 0;
+		try {
+			saved = ZoneVolumeMapper.save(this, this.zone.getName());
+		} catch (SQLException ex) {
+			War.war.log("Failed to save warzone " + zone.getName() + ": " + ex.getMessage(), Level.WARNING);
+			ex.printStackTrace();
+		}
 		War.war.log("Saved " + saved + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
 		this.isSaved = true;
-		return saved;
 	}
 
 	@Override
@@ -40,28 +47,23 @@ public class ZoneVolume extends Volume {
 		return this.isSaved;
 	}
 
-	public void loadCorners() {
+	public void loadCorners() throws SQLException {
 		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), true);
 		this.isSaved = true;
 	}
 
 	@Override
-	public int resetBlocks() {
+	public void resetBlocks() {
 		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
-		int reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false);
+		int reset = 0;
+		try {
+			reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false);
+		} catch (SQLException ex) {
+			War.war.log("Failed to load warzone " + zone.getName() + ": " + ex.getMessage(), Level.WARNING);
+			ex.printStackTrace();
+		}
 		War.war.log("Reset " + reset + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
 		this.isSaved = true;
-		return reset;
-	}
-
-	@Override
-	public void setBlockTypes(int[][][] blockTypes) {
-		return;
-	}
-
-	@Override
-	public void setBlockDatas(byte[][][] blockData) {
-		return;
 	}
 
 	public void setNorthwest(Location block) throws NotNorthwestException, TooSmallException, TooBigException {

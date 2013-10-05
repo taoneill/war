@@ -1,22 +1,30 @@
 package com.tommytony.war.mapper;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
-
 
 import com.tommytony.war.War;
 import com.tommytony.war.volume.Volume;
@@ -28,13 +36,72 @@ import com.tommytony.war.volume.Volume;
  */
 public class VolumeMapper {
 
-	public static Volume loadVolume(String volumeName, String zoneName, World world) {
+	public static Volume loadVolume(String volumeName, String zoneName, World world) throws SQLException {
 		Volume volume = new Volume(volumeName, world);
 		VolumeMapper.load(volume, zoneName, world);
 		return volume;
 	}
 
-	public static void load(Volume volume, String zoneName, World world) {
+	public static void load(Volume volume, String zoneName, World world) throws SQLException {
+		File databaseFile = new File(War.war.getDataFolder(), String.format(
+				"/dat/volume-%s.sl3", volume.getName()));
+		if (!zoneName.isEmpty()) {
+			databaseFile = new File(War.war.getDataFolder(),
+					String.format("/dat/warzone-%s/volume-%s.sl3", zoneName,
+							volume.getName()));
+		}
+		if (!databaseFile.exists()) {
+			legacyLoad(volume, zoneName, world);
+			save(volume, zoneName);
+			War.war.getLogger().info("Volume " + volume.getName() + " for warzone " + zoneName + " converted to nimitz format!");
+			return;
+		}
+		Connection databaseConnection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
+		Statement stmt = databaseConnection.createStatement();
+		ResultSet versionQuery = stmt.executeQuery("PRAGMA user_version");
+		int version = versionQuery.getInt("user_version");
+		versionQuery.close();
+		if (version > DATABASE_VERSION) {
+			try {
+				throw new IllegalStateException("Unsupported zone format " + version);
+			} finally {
+				stmt.close();
+				databaseConnection.close();
+			}
+		} else if (version < DATABASE_VERSION) {
+			switch (version) {
+				// Run some update SQL for each old version
+			}
+		}
+		ResultSet cornerQuery = stmt.executeQuery("SELECT * FROM corners");
+		cornerQuery.next();
+		final Block corner1 = world.getBlockAt(cornerQuery.getInt("x"), cornerQuery.getInt("y"), cornerQuery.getInt("z"));
+		cornerQuery.next();
+		final Block corner2 = world.getBlockAt(cornerQuery.getInt("x"), cornerQuery.getInt("y"), cornerQuery.getInt("z"));
+		cornerQuery.close();
+		volume.setCornerOne(corner1);
+		volume.setCornerTwo(corner2);
+		ResultSet query = stmt.executeQuery("SELECT * FROM blocks");
+		while (query.next()) {
+			int x = query.getInt("x"), y = query.getInt("y"), z = query.getInt("z");
+			BlockState modify = corner1.getRelative(x, y, z).getState();
+			modify.setType(Material.valueOf(query.getString("type")));
+			YamlConfiguration data = new YamlConfiguration();
+			try {
+				data.loadFromString(query.getString("data"));
+				modify.setData(data.getItemStack("data").getData());
+			} catch (InvalidConfigurationException e) {
+				War.war.getLogger().log(Level.WARNING, "Exception loading some material data", e);
+			}
+			volume.getBlocks().add(modify);
+		}
+		query.close();
+		stmt.close();
+		databaseConnection.close();
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void legacyLoad(Volume volume, String zoneName, World world) {
 		BufferedReader in = null;
 		try {
 			if (zoneName.equals("")) {
@@ -64,8 +131,6 @@ public class VolumeMapper {
 				volume.setCornerOne(world.getBlockAt(x1, y1, z1));
 				volume.setCornerTwo(world.getBlockAt(x2, y2, z2));
 
-				volume.setBlockTypes(new int[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
-				volume.setBlockDatas(new byte[volume.getSizeX()][volume.getSizeY()][volume.getSizeZ()]);
 				int blockReads = 0;
 				for (int i = 0; i < volume.getSizeX(); i++) {
 					for (int j = 0; j < volume.getSizeY(); j++) {
@@ -78,34 +143,10 @@ public class VolumeMapper {
 										int typeID = Integer.parseInt(blockSplit[0]);
 										byte data = Byte.parseByte(blockSplit[1]);
 
-										volume.getBlockTypes()[i][j][k] = typeID;
-										volume.getBlockDatas()[i][j][k] = data;
-
-										if (typeID == Material.WALL_SIGN.getId() || typeID == Material.SIGN_POST.getId()) {
-											// Signs
-											String linesStr = "";
-											if (blockSplit.length > 2) {
-												for (int o = 2; o < blockSplit.length; o++) {
-													linesStr += blockSplit[o];
-												}
-												String[] lines = linesStr.split(";;");
-												volume.getSignLines().put("sign-" + i + "-" + j + "-" + k, lines);
-											}
-										} else if (typeID == Material.CHEST.getId()) {
-											// Chests
-											List<ItemStack> items = new ArrayList<ItemStack>();
-											if (blockSplit.length > 2) {
-												items = readInventoryString(blockSplit[2]);
-											}
-											volume.getInvBlockContents().put("chest-" + i + "-" + j + "-" + k, items);
-										} else if (typeID == Material.DISPENSER.getId()) {
-											// Dispensers
-											List<ItemStack> items = new ArrayList<ItemStack>();
-											if (blockSplit.length > 2) {
-												items = readInventoryString(blockSplit[2]);
-											}
-											volume.getInvBlockContents().put("dispenser-" + i + "-" + j + "-" + k, items);
-										}
+										BlockState dummy = volume.getWorld().getBlockAt(x1 + i, y1 + j, z1 + k).getState();
+										dummy.setTypeId(typeID);
+										dummy.setRawData(data);
+										volume.getBlocks().add(dummy);
 									}
 									blockReads++;
 								}
@@ -140,90 +181,58 @@ public class VolumeMapper {
 		}
 	}
 
-	public static void save(Volume volume, String zoneName) {
-		if (volume.hasTwoCorners()) {
-			BufferedWriter out = null;
-			try {
-				if (zoneName.equals("")) {
-					out = new BufferedWriter(new FileWriter(new File(War.war.getDataFolder().getPath() + "/dat/volume-" + volume.getName() + ".dat")));
-				} else {
-					out = new BufferedWriter(new FileWriter(new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + zoneName + "/volume-" + volume.getName() + ".dat")));
-				}
-
-				out.write("corner1");
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getBlockX()));
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getBlockY()));
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerOne().getBlockZ()));
-				out.newLine();
-				out.write("corner2");
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getBlockX()));
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getBlockY()));
-				out.newLine();
-				out.write(Integer.toString(volume.getCornerTwo().getBlockZ()));
-				out.newLine();
-				int blockWrites = 0;
-				for (int i = 0; i < volume.getSizeX(); i++) {
-					for (int j = 0; j < volume.getSizeY(); j++) {
-						for (int k = 0; k < volume.getSizeZ(); k++) {
-							try {
-								int typeId = volume.getBlockTypes()[i][j][k];
-								byte data = volume.getBlockDatas()[i][j][k];
-								out.write(typeId + "," + data + ",");
-								if (typeId == Material.WALL_SIGN.getId() || typeId == Material.SIGN_POST.getId()) {
-									// Signs
-									String extra = "";
-									String[] lines = volume.getSignLines().get("sign-" + i + "-" + j + "-" + k);
-									if (lines != null) {
-										for (String line : lines) {
-											extra += line + ";;";
-										}
-										out.write(extra);
-									}
-								} else if (typeId == Material.CHEST.getId()) {
-									// Chests
-									String extra = "";
-									List<ItemStack> contents = volume.getInvBlockContents().get("chest-" + i + "-" + j + "-" + k);
-									if (contents != null) {
-										out.write(buildInventoryStringFromItemList(contents));
-										out.write(extra);
-									}
-								} else if (typeId == Material.DISPENSER.getId()) {
-									// Dispensers
-									List<ItemStack> contents = volume.getInvBlockContents().get("dispenser-" + i + "-" + j + "-" + k);
-									if (contents != null) {
-										out.write(buildInventoryStringFromItemList(contents));
-									}
-								}
-								out.newLine();
-							} catch (Exception e) {
-								War.war.log("Unexpected error while writing block into volume " + volume.getName() + " file for zone " + zoneName + ". Blocks written so far: " + blockWrites + "Position: x:" + i + " y:" + j + " z:" + k + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
-								e.printStackTrace();
-							}
-						}
-					}
-				}
-			} catch (IOException e) {
-				War.war.log("Failed to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
-				e.printStackTrace();
-			} catch (Exception e) {
-				War.war.log("Unexpected error caused failure to write volume file " + zoneName + " for warzone " + volume.getName() + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
-				e.printStackTrace();
-			} finally {
-				if (out != null) {
-					try {
-						out.close();
-					} catch (IOException e) {
-						War.war.log("Failed to close file writer for volume " + volume.getName() + " for warzone " + zoneName + ". " + e.getClass().getName() + " " + e.getMessage(), Level.WARNING);
-						e.printStackTrace();
-					}
-				}
+	public static final int DATABASE_VERSION = 1;
+	public static void save(Volume volume, String zoneName) throws SQLException {
+		File databaseFile = new File(War.war.getDataFolder(), String.format(
+				"/dat/volume-%s.sl3", volume.getName()));
+		if (!zoneName.isEmpty()) {
+			databaseFile = new File(War.war.getDataFolder(),
+					String.format("/dat/warzone-%s/volume-%s.sl3", zoneName,
+							volume.getName()));
+		}
+		Connection databaseConnection = DriverManager
+				.getConnection("jdbc:sqlite:" + databaseFile.getPath());
+		Statement stmt = databaseConnection.createStatement();
+		stmt.executeUpdate("PRAGMA user_version = " + DATABASE_VERSION);
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS blocks (x BIGINT, y BIGINT, z BIGINT, type TEXT, data BLOB)");
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS corners (pos INTEGER PRIMARY KEY NOT NULL UNIQUE, x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL)");
+		stmt.executeUpdate("DELETE FROM blocks");
+		stmt.executeUpdate("DELETE FROM corners");
+		stmt.close();
+		PreparedStatement cornerStmt = databaseConnection
+				.prepareStatement("INSERT INTO corners SELECT 1 AS pos, ? AS x, ? AS y, ? AS z UNION SELECT 2, ?, ?, ?");
+		cornerStmt.setInt(1, volume.getCornerOne().getBlockX());
+		cornerStmt.setInt(2, volume.getCornerOne().getBlockY());
+		cornerStmt.setInt(3, volume.getCornerOne().getBlockZ());
+		cornerStmt.setInt(4, volume.getCornerTwo().getBlockX());
+		cornerStmt.setInt(5, volume.getCornerTwo().getBlockY());
+		cornerStmt.setInt(6, volume.getCornerTwo().getBlockZ());
+		cornerStmt.executeUpdate();
+		cornerStmt.close();
+		PreparedStatement dataStmt = databaseConnection
+				.prepareStatement("INSERT INTO blocks VALUES (?, ?, ?, ?, ?)");
+		databaseConnection.setAutoCommit(false);
+		final int batchSize = 1000;
+		int changed = 0;
+		for (BlockState block : volume.getBlocks()) {
+			final Location relLoc = ZoneVolumeMapper.rebase(
+					volume.getCornerOne(), block.getLocation());
+			dataStmt.setInt(1, relLoc.getBlockX());
+			dataStmt.setInt(2, relLoc.getBlockY());
+			dataStmt.setInt(3, relLoc.getBlockZ());
+			dataStmt.setString(4, block.getType().toString());
+			YamlConfiguration data = new YamlConfiguration();
+			data.set("data", block.getData().toItemStack());
+			dataStmt.setString(5, data.saveToString());
+			dataStmt.addBatch();
+			if (++changed % batchSize == 0) {
+				dataStmt.executeBatch();
 			}
 		}
+		dataStmt.executeBatch(); // insert remaining records
+		databaseConnection.commit();
+		dataStmt.close();
+		databaseConnection.close();
 	}
 	
 	/**
@@ -233,6 +242,7 @@ public class VolumeMapper {
 	 *                invString string to parse
 	 * @return List<ItemStack> Parsed items
 	 */
+	@Deprecated
 	public static List<ItemStack> readInventoryString(String invString) {
 		List<ItemStack> items = new ArrayList<ItemStack>();
 		if (invString != null && !invString.equals("")) {
@@ -282,6 +292,7 @@ public class VolumeMapper {
 	 * @param items	The list of items
 	 * @return		The list as a string
 	 */
+	@Deprecated
 	public static String buildInventoryStringFromItemList(List<ItemStack> items) {
 		String extra = "";
 		for (ItemStack item : items) {
@@ -310,6 +321,7 @@ public class VolumeMapper {
 	 * @param inv	The inventory
 	 * @return		The inventory as a list
 	 */
+	@Deprecated
 	public static List<ItemStack> getItemListFromInv(Inventory inv) {
 		int size = inv.getSize();
 		List<ItemStack> items = new ArrayList<ItemStack>();

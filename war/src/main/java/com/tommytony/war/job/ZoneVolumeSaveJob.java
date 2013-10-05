@@ -1,9 +1,15 @@
 package com.tommytony.war.job;
 
+import com.tommytony.war.War;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
 import com.tommytony.war.volume.Volume;
 
-public class ZoneVolumeSaveJob extends Thread {
+import java.sql.SQLException;
+import java.util.logging.Level;
+
+import org.bukkit.scheduler.BukkitRunnable;
+
+public class ZoneVolumeSaveJob extends BukkitRunnable {
 	private final Volume volume;
 	private final String zoneName;
 
@@ -14,6 +20,10 @@ public class ZoneVolumeSaveJob extends Thread {
 
 	@Override
 	public void run() {
-		ZoneVolumeMapper.save(this.volume, this.zoneName);
+		try {
+			ZoneVolumeMapper.save(this.volume, this.zoneName);
+		} catch (SQLException ex) {
+			War.war.log(ex.getMessage(), Level.SEVERE);
+		}
 	}
 }
