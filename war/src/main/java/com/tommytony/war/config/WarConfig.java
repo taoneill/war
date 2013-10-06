@@ -8,7 +8,8 @@ public enum WarConfig {
 	KEEPOLDZONEVERSIONS (Boolean.class),
 	MAXZONES (Integer.class),
 	PVPINZONESONLY (Boolean.class),
-	TNTINZONESONLY (Boolean.class);
+	TNTINZONESONLY (Boolean.class),
+	RESETSPEED (Integer.class);
 	
 	private final Class<?> configType;
 

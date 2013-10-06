@@ -183,6 +183,7 @@ public class War extends JavaPlugin {
 		warConfig.put(WarConfig.MAXZONES, 12);
 		warConfig.put(WarConfig.PVPINZONESONLY, false);
 		warConfig.put(WarConfig.TNTINZONESONLY, false);
+		warConfig.put(WarConfig.RESETSPEED, 5000);
 		
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOASSIGN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.BLOCKHEADS, true);

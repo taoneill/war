@@ -10,6 +10,8 @@ import org.bukkit.block.Block;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.job.PartialZoneResetJob;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
 import com.tommytony.war.structure.Monument;
 
@@ -48,7 +50,7 @@ public class ZoneVolume extends Volume {
 	}
 
 	public void loadCorners() throws SQLException {
-		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), true);
+		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), true, 0, 0);
 		this.isSaved = true;
 	}
 
@@ -57,13 +59,37 @@ public class ZoneVolume extends Volume {
 		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
 		int reset = 0;
 		try {
-			reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false);
+			reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false, 0, Integer.MAX_VALUE);
 		} catch (SQLException ex) {
 			War.war.log("Failed to load warzone " + zone.getName() + ": " + ex.getMessage(), Level.WARNING);
 			ex.printStackTrace();
 		}
 		War.war.log("Reset " + reset + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
 		this.isSaved = true;
+	}
+
+	/**
+	 * Reset a section of blocks in the warzone.
+	 * 
+	 * @param start
+	 *            Starting position for reset.
+	 * @param total
+	 *            Amount of blocks to reset.
+	 * @throws SQLException
+	 */
+	public void resetSection(int start, int total) throws SQLException {
+		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false, start, total);
+	}
+
+	@Override
+	/**
+	 * Reset the blocks in this warzone at the speed defined in WarConfig#RESETSPEED.
+	 * The job will automatically spawn new instances of itself to run every tick until it is done resetting all blocks.
+	 */
+	public void resetBlocksAsJob() {
+		PartialZoneResetJob job = new PartialZoneResetJob(zone, War.war
+				.getWarConfig().getInt(WarConfig.RESETSPEED));
+		War.war.getServer().getScheduler().runTask(War.war, job);
 	}
 
 	public void setNorthwest(Location block) throws NotNorthwestException, TooSmallException, TooBigException {

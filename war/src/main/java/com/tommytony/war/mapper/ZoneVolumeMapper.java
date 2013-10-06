@@ -56,10 +56,12 @@ public class ZoneVolumeMapper {
 	 * @param String zoneName Zone to load the volume from
 	 * @param World world The world the zone is located
 	 * @param boolean onlyLoadCorners Should only the corners be loaded
+	 * @param start Starting position to load blocks at
+	 * @param total Amount of blocks to read
 	 * @return integer Changed blocks
 	 * @throws SQLException Error communicating with SQLite3 database
 	 */
-	public static int load(ZoneVolume volume, String zoneName, World world, boolean onlyLoadCorners) throws SQLException {
+	public static int load(ZoneVolume volume, String zoneName, World world, boolean onlyLoadCorners, int start, int total) throws SQLException {
 		int changed = 0;
 		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
 		if (!databaseFile.exists()) {
@@ -99,7 +101,7 @@ public class ZoneVolumeMapper {
 			databaseConnection.close();
 			return 0;
 		}
-		ResultSet query = stmt.executeQuery("SELECT * FROM blocks");
+		ResultSet query = stmt.executeQuery("SELECT * FROM blocks ORDER BY rowid LIMIT " + start + ", " + total);
 		while (query.next()) {
 			int x = query.getInt("x"), y = query.getInt("y"), z = query.getInt("z");
 			BlockState modify = corner1.getRelative(x, y, z).getState();
