@@ -69,6 +69,7 @@ public class Volume {
 	}
 
 	public void saveBlocks() {
+		this.blocks.clear();
 		for (int x = this.getMinX(); x <= this.getMaxX(); x++) {
 			for (int y = this.getMinY(); y <= this.getMaxY(); y++) {
 				for (int z = this.getMinZ(); z <= this.getMaxZ(); z++) {
