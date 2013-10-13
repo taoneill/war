@@ -105,14 +105,9 @@ public class ZoneVolumeMapper {
 		while (query.next()) {
 			int x = query.getInt("x"), y = query.getInt("y"), z = query.getInt("z");
 			BlockState modify = corner1.getRelative(x, y, z).getState();
-			modify.setType(Material.valueOf(query.getString("type")));
-			YamlConfiguration data = new YamlConfiguration();
-			try {
-				data.loadFromString(query.getString("data"));
-				modify.setData(data.getItemStack("data").getData());
-			} catch (InvalidConfigurationException e) {
-				War.war.getLogger().log(Level.WARNING, "Exception loading some material data", e);
-			}
+			ItemStack data = new ItemStack(Material.valueOf(query.getString("type")), 0, query.getShort("data"));
+			modify.setType(data.getType());
+			modify.setData(data.getData());
 			modify.update(true, false); // No-physics update, preventing the need for deferring blocks
 			modify = corner1.getRelative(x, y, z).getState(); // Grab a new instance
 			try {
@@ -182,7 +177,7 @@ public class ZoneVolumeMapper {
 		Connection databaseConnection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
 		Statement stmt = databaseConnection.createStatement();
 		stmt.executeUpdate("PRAGMA user_version = " + DATABASE_VERSION);
-		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS blocks (x BIGINT, y BIGINT, z BIGINT, type TEXT, data BLOB, sign TEXT, container BLOB, note INT, record TEXT, skull TEXT, command TEXT, mobid TEXT)");
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS blocks (x BIGINT, y BIGINT, z BIGINT, type TEXT, data SMALLINT, sign TEXT, container BLOB, note INT, record TEXT, skull TEXT, command TEXT, mobid TEXT)");
 		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS corners (pos INTEGER PRIMARY KEY  NOT NULL  UNIQUE, x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL)");
 		stmt.executeUpdate("DELETE FROM blocks");
 		stmt.executeUpdate("DELETE FROM corners");
@@ -208,9 +203,7 @@ public class ZoneVolumeMapper {
 					dataStmt.setInt(2, relLoc.getBlockY());
 					dataStmt.setInt(3, relLoc.getBlockZ());
 					dataStmt.setString(4, block.getType().toString());
-					YamlConfiguration data = new YamlConfiguration();
-					data.set("data", block.getState().getData().toItemStack());
-					dataStmt.setString(5, data.saveToString());
+					dataStmt.setShort(5, block.getState().getData().toItemStack().getDurability());
 					if (block.getState() instanceof Sign) {
 						final String signText = StringUtils.join(((Sign) block.getState()).getLines(), "\n");
 						dataStmt.setString(6, signText);

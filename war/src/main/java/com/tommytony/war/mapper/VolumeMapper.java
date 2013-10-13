@@ -85,14 +85,9 @@ public class VolumeMapper {
 		while (query.next()) {
 			int x = query.getInt("x"), y = query.getInt("y"), z = query.getInt("z");
 			BlockState modify = corner1.getRelative(x, y, z).getState();
-			modify.setType(Material.valueOf(query.getString("type")));
-			YamlConfiguration data = new YamlConfiguration();
-			try {
-				data.loadFromString(query.getString("data"));
-				modify.setData(data.getItemStack("data").getData());
-			} catch (InvalidConfigurationException e) {
-				War.war.getLogger().log(Level.WARNING, "Exception loading some material data", e);
-			}
+			ItemStack data = new ItemStack(Material.valueOf(query.getString("type")), 0, query.getShort("data"));
+			modify.setType(data.getType());
+			modify.setData(data.getData());
 			volume.getBlocks().add(modify);
 		}
 		query.close();
@@ -194,7 +189,7 @@ public class VolumeMapper {
 				.getConnection("jdbc:sqlite:" + databaseFile.getPath());
 		Statement stmt = databaseConnection.createStatement();
 		stmt.executeUpdate("PRAGMA user_version = " + DATABASE_VERSION);
-		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS blocks (x BIGINT, y BIGINT, z BIGINT, type TEXT, data BLOB)");
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS blocks (x BIGINT, y BIGINT, z BIGINT, type TEXT, data SMALLINT)");
 		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS corners (pos INTEGER PRIMARY KEY NOT NULL UNIQUE, x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL)");
 		stmt.executeUpdate("DELETE FROM blocks");
 		stmt.executeUpdate("DELETE FROM corners");
@@ -221,9 +216,7 @@ public class VolumeMapper {
 			dataStmt.setInt(2, relLoc.getBlockY());
 			dataStmt.setInt(3, relLoc.getBlockZ());
 			dataStmt.setString(4, block.getType().toString());
-			YamlConfiguration data = new YamlConfiguration();
-			data.set("data", block.getData().toItemStack());
-			dataStmt.setString(5, data.saveToString());
+			dataStmt.setShort(5, block.getData().toItemStack().getDurability());
 			dataStmt.addBatch();
 			if (++changed % batchSize == 0) {
 				dataStmt.executeBatch();
@@ -335,7 +328,8 @@ public class VolumeMapper {
 	}
 
 	public static void delete(Volume volume) {
-		File volFile = new File("War/dat/volume-" + volume.getName());
+		File volFile = new File(War.war.getDataFolder(), String.format(
+				"/dat/volume-%s.sl3", volume.getName()));
 		boolean deletedData = volFile.delete();
 		if (!deletedData) {
 			War.war.log("Failed to delete file " + volFile.getName(), Level.WARNING);
