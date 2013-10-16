@@ -549,7 +549,8 @@ public class Team {
 
 	public void resetPoints() {
 		this.points = 0;
-		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS) {
+		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS
+				&& this.warzone.getScoreboard() != null) {
 			String teamName = kind.getColor() + name + ChatColor.RESET;
 			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
 					.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(points);
@@ -766,5 +767,24 @@ public class Team {
 			ret[i] = this.players.get(i).getName();
 		}
 		return ret;
+	}
+
+	/**
+	 * Check if a player on this team can modify a certain type of block defined in the block whitelist.
+	 *
+	 * @param type Type of block to check.
+	 * @return true if this block can be modified, false otherwise.
+	 */
+	public boolean canModify(Material type) {
+		for (String whitelistedBlock : this.getTeamConfig()
+				.resolveString(TeamConfig.BLOCKWHITELIST).split(",")) {
+			if (whitelistedBlock.equalsIgnoreCase("all")) {
+				return true;
+			}
+			if (type.toString().equalsIgnoreCase(whitelistedBlock)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

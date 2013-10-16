@@ -15,7 +15,9 @@ public enum TeamConfig {
 	TEAMSIZE (Integer.class),
 	PERMISSION (String.class),
 	XPKILLMETER (Boolean.class),
-	KILLSTREAK (Boolean.class);
+	KILLSTREAK (Boolean.class),
+	BLOCKWHITELIST (String.class),
+	PLACEBLOCK (Boolean.class);
 	
 	private final Class<?> configType;
 

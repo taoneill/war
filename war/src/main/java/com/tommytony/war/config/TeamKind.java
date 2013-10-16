@@ -85,7 +85,7 @@ public enum TeamKind {
 	public Color getSpoutColor() {
 		return new org.getspout.spoutapi.gui.Color(
 				dyeColor.getColor().getRed(), dyeColor.getColor().getGreen(),
-				dyeColor.getColor().getRed());
+				dyeColor.getColor().getBlue());
 	}
 
 	/**

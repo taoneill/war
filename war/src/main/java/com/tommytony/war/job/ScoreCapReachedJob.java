@@ -1,20 +1,19 @@
 package com.tommytony.war.job;
 
-import com.google.common.collect.ImmutableList;
+import java.util.Iterator;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
-
+import org.kitteh.tag.TagAPI;
 
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.spout.SpoutDisplayer;
-import java.util.Iterator;
-import org.kitteh.tag.TagAPI;
 
 public class ScoreCapReachedJob implements Runnable {
 
@@ -64,10 +63,5 @@ public class ScoreCapReachedJob implements Runnable {
 			t.resetPoints();
 			t.getPlayers().clear(); // empty the team
 		}
-		if (War.war.getMysqlConfig().isEnabled() && War.war.getMysqlConfig().isLoggingEnabled()) {
-			LogKillsDeathsJob logKillsDeathsJob = new LogKillsDeathsJob(ImmutableList.copyOf(zone.getKillsDeathsTracker()));
-			War.war.getServer().getScheduler().runTaskAsynchronously(War.war, logKillsDeathsJob);
-		}
-		zone.getKillsDeathsTracker().clear();
 	}
 }

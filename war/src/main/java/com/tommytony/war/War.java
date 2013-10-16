@@ -216,6 +216,8 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.PERMISSION, "war.player");
 		teamDefaultConfig.put(TeamConfig.XPKILLMETER, false);
 		teamDefaultConfig.put(TeamConfig.KILLSTREAK, false);
+		teamDefaultConfig.put(TeamConfig.BLOCKWHITELIST, "all");
+		teamDefaultConfig.put(TeamConfig.PLACEBLOCK, true);
 
 		this.getDefaultInventories().clearLoadouts();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();

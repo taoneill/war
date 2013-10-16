@@ -31,6 +31,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 
+import com.google.common.collect.ImmutableList;
 import com.tommytony.war.config.InventoryBag;
 import com.tommytony.war.config.ScoreboardType;
 import com.tommytony.war.config.TeamConfig;
@@ -424,12 +425,14 @@ public class Warzone {
 		player.getOpenInventory().close();
 		player.setLevel(0);
 		player.setExp(0);
+		player.setAllowFlight(false);
+		player.setFlying(false);
 
 		player.getInventory().clear();
 		
 		this.setKillCount(player.getName(), 0);
 
-		if (player.getGameMode() == GameMode.CREATIVE) {
+		if (player.getGameMode() != GameMode.SURVIVAL) {
 			// Players are always in survival mode in warzones
 			player.setGameMode(GameMode.SURVIVAL);
 		}
@@ -561,20 +564,15 @@ public class Warzone {
 			playerTitle = SpoutManager.getPlayer(player).getTitle();
 		}
 		
-		this.playerStates.put(player.getName(), new PlayerState(player.getGameMode(), 
-																contents, 
-																inventory.getHelmet(), 
-																inventory.getChestplate(), 
-																inventory.getLeggings(), 
-																inventory.getBoots(), 
-																player.getHealth(), 
-																player.getExhaustion(), 
-																player.getSaturation(), 
-																player.getFoodLevel(), 
-																player.getActivePotionEffects(),
-																playerTitle,
-																player.getLevel(),
-																player.getExp()));
+		this.playerStates.put(
+				player.getName(),
+				new PlayerState(player.getGameMode(), contents, inventory
+						.getHelmet(), inventory.getChestplate(), inventory
+						.getLeggings(), inventory.getBoots(), player
+						.getHealth(), player.getExhaustion(), player
+						.getSaturation(), player.getFoodLevel(), player
+						.getActivePotionEffects(), playerTitle, player
+						.getLevel(), player.getExp(), player.getAllowFlight()));
 	}
 
 	public void restorePlayerState(Player player) {
@@ -591,6 +589,7 @@ public class Warzone {
 			PotionEffectHelper.restorePotionEffects(player, originalState.getPotionEffects());
 			player.setLevel(originalState.getLevel());
 			player.setExp(originalState.getExp());
+			player.setAllowFlight(originalState.canFly());
 			
 			if (War.war.isSpoutServer()) {
 				SpoutManager.getPlayer(player).setTitle(originalState.getPlayerTitle());
@@ -986,6 +985,11 @@ public class Warzone {
 					if (!scores.equals("")) {
 						this.broadcast("zone.battle.newscores", scores);
 					}
+					if (War.war.getMysqlConfig().isEnabled() && War.war.getMysqlConfig().isLoggingEnabled()) {
+						LogKillsDeathsJob logKillsDeathsJob = new LogKillsDeathsJob(ImmutableList.copyOf(this.getKillsDeathsTracker()));
+						War.war.getServer().getScheduler().runTaskAsynchronously(War.war, logKillsDeathsJob);
+					}
+					this.getKillsDeathsTracker().clear();
 					// detect score cap
 					List<Team> scoreCapTeams = new ArrayList<Team>();
 					for (Team t : teams) {

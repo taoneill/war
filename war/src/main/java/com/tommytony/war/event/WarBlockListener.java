@@ -20,6 +20,7 @@ import org.getspout.spoutapi.player.SpoutPlayer;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.spout.SpoutDisplayer;
@@ -145,9 +146,17 @@ public class WarBlockListener implements Listener {
 		}
 
 		// unbreakableZoneBlocks
-		if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE) && (!isZoneMaker || (isZoneMaker && team != null))) {
+		if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE) 
+				|| (team != null && !team.getTeamConfig().resolveBoolean(TeamConfig.PLACEBLOCK))
+				&& (!isZoneMaker || (isZoneMaker && team != null))) {
 			// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks)
 			War.war.badMsg(player, "build.denied.zone.place");
+			cancelAndKeepItem(event);
+			return;
+		}
+
+		if (team != null && !team.canModify(block.getType())) {
+			War.war.badMsg(player, "build.denied.zone.type");
 			cancelAndKeepItem(event);
 			return;
 		}
@@ -224,7 +233,7 @@ public class WarBlockListener implements Listener {
 		Warzone playerZone = Warzone.getZoneByLocation(player);
 		if (player != null && block != null && playerZone != null && playerZone.getWarzoneConfig().getBoolean(WarzoneConfig.INSTABREAK)) {
 			Warzone blockZone = Warzone.getZoneByLocation(new Location(block.getWorld(), block.getX(), block.getY(), block.getZ()));
-			if (blockZone != null && blockZone == playerZone) {
+			if (blockZone != null && blockZone == playerZone && block.getType() != Material.BEDROCK) {
 				event.setInstaBreak(true);
 			}
 		}
@@ -432,6 +441,12 @@ public class WarBlockListener implements Listener {
 		if (blockZone != null && blockZone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE) && (!isZoneMaker || (isZoneMaker && team != null))) {
 			// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks
 			War.war.badMsg(player, "build.denied.zone.break");
+			event.setCancelled(true);
+			return;
+		}
+
+		if (team != null && !team.canModify(block.getType())) {
+			War.war.badMsg(player, "build.denied.zone.type");
 			event.setCancelled(true);
 			return;
 		}
