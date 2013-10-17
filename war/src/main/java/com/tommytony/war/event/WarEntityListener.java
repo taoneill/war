@@ -306,6 +306,9 @@ public class WarEntityListener implements Listener {
 		}
 		
 		for (Block block : explodedBlocks) {
+			if (block.getType() == Material.TNT) {
+				continue; // don't restore TNT (failed to track down regression cause)
+			}
 			if (War.war.getWarHub() != null && War.war.getWarHub().getVolume().contains(block)) {
 				dontExplode.add(block);
 			} else {
