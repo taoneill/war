@@ -2,6 +2,7 @@ package com.tommytony.war.mapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.logging.Level;
 
@@ -344,16 +345,28 @@ public class WarzoneTxtMapper {
 
 			// monument blocks
 			for (Monument monument : warzone.getMonuments()) {
-				monument.setVolume(VolumeMapper.loadVolume(monument.getName(), warzone.getName(), world));
+				try {
+					monument.setVolume(VolumeMapper.loadVolume(monument.getName(), warzone.getName(), world));
+				} catch (SQLException e) {
+					War.war.getLogger().log(Level.WARNING, "Failed to load some ambiguous old volume", e);
+				}
 			}
 
 			// team spawn blocks
 			for (Team team : warzone.getTeams()) {
 				for (Location spawnLocation : team.getTeamSpawns()) {
-					team.setSpawnVolume(spawnLocation, VolumeMapper.loadVolume(team.getName(), warzone.getName(), world));
+					try {
+						team.setSpawnVolume(spawnLocation, VolumeMapper.loadVolume(team.getName(), warzone.getName(), world));
+					} catch (SQLException e) {
+						War.war.getLogger().log(Level.WARNING, "Failed to load some ambiguous old volume", e);
+					}
 				}
 				if (team.getTeamFlag() != null) {
-					team.setFlagVolume(VolumeMapper.loadVolume(team.getName() + "flag", warzone.getName(), world));
+					try {
+						team.setFlagVolume(VolumeMapper.loadVolume(team.getName() + "flag", warzone.getName(), world));
+					} catch (SQLException e) {
+						War.war.getLogger().log(Level.WARNING, "Failed to load some ambiguous old volume", e);
+					}
 				}
 			}
 
@@ -383,7 +396,13 @@ public class WarzoneTxtMapper {
 					}
 					
 					// create the lobby
-					Volume lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), lobbyWorld);
+					Volume lobbyVolume = null;
+					try {
+						lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), lobbyWorld);
+					} catch (SQLException e) {
+						// if the zone is this old is there any reason the lobby should be nimitz format
+						War.war.getLogger().log(Level.WARNING, "Failed to load lobby for a really old warzone", e);
+					}
 					ZoneLobby lobby = new ZoneLobby(warzone, lobbyFace, lobbyVolume);
 					warzone.setLobby(lobby);
 				}

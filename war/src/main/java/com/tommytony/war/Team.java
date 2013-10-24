@@ -36,7 +36,6 @@ import com.tommytony.war.config.TeamSpawnStyle;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.utility.Direction;
-import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 
 /**
@@ -581,19 +580,13 @@ public class Team {
 
 	public void initializeTeamFlag() {
 		// make air (old two-high above floor)
-		Volume airGap = new Volume("airgap", this.warzone.getWorld());
-		airGap.setCornerOne(new BlockInfo(
-				this.flagVolume.getCornerOne().getX(), 
-				this.flagVolume.getCornerOne().getY() + 1, 
-				this.flagVolume.getCornerOne().getZ(),
-				0,
-				(byte)0));
-		airGap.setCornerTwo(new BlockInfo(
-				this.flagVolume.getCornerTwo().getX(), 
-				this.flagVolume.getCornerOne().getY() + 2, 
-				this.flagVolume.getCornerTwo().getZ(),
-				0,
-				(byte)0));
+		Volume airGap = new Volume(new Location(this.flagVolume.getWorld(),
+				this.flagVolume.getCornerOne().getX(), this.flagVolume
+						.getCornerOne().getY() + 1, this.flagVolume
+						.getCornerOne().getZ()), new Location(
+				this.flagVolume.getWorld(), this.flagVolume.getCornerTwo()
+						.getX(), this.flagVolume.getCornerOne().getY() + 2,
+				this.flagVolume.getCornerTwo().getZ()));
 		airGap.setToMaterial(Material.AIR);
 
 		// Set the flag blocks

@@ -1,12 +1,17 @@
 package com.tommytony.war.volume;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
+
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-
 
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.job.PartialZoneResetJob;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
 import com.tommytony.war.structure.Monument;
 
@@ -26,12 +31,17 @@ public class ZoneVolume extends Volume {
 	}
 
 	@Override
-	public int saveBlocks() {
+	public void saveBlocks() {
 		// Save blocks directly to disk (i.e. don't put everything in memory)
-		int saved = ZoneVolumeMapper.save(this, this.zone.getName());
+		int saved = 0;
+		try {
+			saved = ZoneVolumeMapper.save(this, this.zone.getName());
+		} catch (SQLException ex) {
+			War.war.log("Failed to save warzone " + zone.getName() + ": " + ex.getMessage(), Level.WARNING);
+			ex.printStackTrace();
+		}
 		War.war.log("Saved " + saved + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
 		this.isSaved = true;
-		return saved;
 	}
 
 	@Override
@@ -39,35 +49,54 @@ public class ZoneVolume extends Volume {
 		return this.isSaved;
 	}
 
-	public void loadCorners() {
-		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), true);
+	public void loadCorners() throws SQLException {
+		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), true, 0, 0);
 		this.isSaved = true;
 	}
 
 	@Override
-	public int resetBlocks() {
+	public void resetBlocks() {
 		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
-		int reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false);
+		int reset = 0;
+		try {
+			reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false, 0, Integer.MAX_VALUE);
+		} catch (SQLException ex) {
+			War.war.log("Failed to load warzone " + zone.getName() + ": " + ex.getMessage(), Level.WARNING);
+			ex.printStackTrace();
+		}
 		War.war.log("Reset " + reset + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
 		this.isSaved = true;
-		return reset;
+	}
+
+	/**
+	 * Reset a section of blocks in the warzone.
+	 * 
+	 * @param start
+	 *            Starting position for reset.
+	 * @param total
+	 *            Amount of blocks to reset.
+	 * @throws SQLException
+	 */
+	public void resetSection(int start, int total) throws SQLException {
+		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false, start, total);
 	}
 
 	@Override
-	public void setBlockTypes(int[][][] blockTypes) {
-		return;
+	/**
+	 * Reset the blocks in this warzone at the speed defined in WarConfig#RESETSPEED.
+	 * The job will automatically spawn new instances of itself to run every tick until it is done resetting all blocks.
+	 */
+	public void resetBlocksAsJob() {
+		PartialZoneResetJob job = new PartialZoneResetJob(zone, War.war
+				.getWarConfig().getInt(WarConfig.RESETSPEED));
+		War.war.getServer().getScheduler().runTask(War.war, job);
 	}
 
-	@Override
-	public void setBlockDatas(byte[][][] blockData) {
-		return;
-	}
-
-	public void setNorthwest(Block block) throws NotNorthwestException, TooSmallException, TooBigException {
+	public void setNorthwest(Location block) throws NotNorthwestException, TooSmallException, TooBigException {
 		// northwest defaults to top block
-		BlockInfo topBlock = new BlockInfo(block.getX(), 127, block.getZ(), block.getTypeId(), block.getData());
-		BlockInfo oldCornerOne = this.getCornerOne();
-		BlockInfo oldCornerTwo = this.getCornerTwo();
+		Location topBlock = new Location(block.getWorld(), block.getX(), block.getWorld().getMaxHeight(), block.getZ());
+		Location oldCornerOne = this.getCornerOne();
+		Location oldCornerTwo = this.getCornerTwo();
 		if (this.getCornerOne() == null) {
 			if (this.getCornerTwo() == null) {
 				// northwest defaults to corner 1
@@ -89,10 +118,8 @@ public class ZoneVolume extends Volume {
 			if (this.getSoutheastX() <= block.getX() || this.getSoutheastZ() >= block.getZ()) {
 				throw new NotNorthwestException();
 			}
-			BlockInfo minXBlock = this.getMinXBlock(); // north means min X
-			minXBlock.setX(block.getX()); // mutating, argh!
-			BlockInfo maxZBlock = this.getMaxZBlock(); // west means max Z
-			maxZBlock.setZ(block.getZ());
+			this.getMinXBlock().setX(block.getX()); // north means min X
+			this.getMaxZBlock().setZ(block.getZ()); // west means max Z
 		}
 		if (this.tooSmall() || this.zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
@@ -121,11 +148,11 @@ public class ZoneVolume extends Volume {
 		}
 	}
 
-	public void setSoutheast(Block block) throws NotSoutheastException, TooSmallException, TooBigException {
+	public void setSoutheast(Location block) throws NotSoutheastException, TooSmallException, TooBigException {
 		// southeast defaults to bottom block
-		BlockInfo bottomBlock = new BlockInfo(block.getX(), 0, block.getZ(), block.getTypeId(), block.getData());
-		BlockInfo oldCornerOne = this.getCornerOne();
-		BlockInfo oldCornerTwo = this.getCornerTwo();
+		Location bottomBlock = new Location(block.getWorld(), block.getX(), 0, block.getZ());
+		Location oldCornerOne = this.getCornerOne();
+		Location oldCornerTwo = this.getCornerTwo();
 		if (this.getCornerTwo() == null) {
 			if (this.getCornerOne() == null) {
 				// southeast defaults to corner 2
@@ -147,10 +174,8 @@ public class ZoneVolume extends Volume {
 			if (this.getNorthwestX() >= block.getX() || this.getNorthwestZ() <= block.getZ()) {
 				throw new NotSoutheastException();
 			}
-			BlockInfo maxXBlock = this.getMaxXBlock(); // south means max X
-			maxXBlock.setX(block.getX()); // mutating, argh!
-			BlockInfo minZBlock = this.getMinZBlock(); // east means min Z
-			minZBlock.setZ(block.getZ());
+			this.getMaxXBlock().setX(block.getX()); // south means max X
+			this.getMinZBlock().setZ(block.getZ()); // east means min Z
 		}
 		if (this.tooSmall() || this.zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
@@ -189,7 +214,7 @@ public class ZoneVolume extends Volume {
 	}
 
 	public void setZoneCornerOne(Block block) throws TooSmallException, TooBigException {
-		BlockInfo oldCornerOne = this.getCornerOne();
+		Location oldCornerOne = this.getCornerOne();
 		super.setCornerOne(block);
 		if (this.tooSmall() || this.zoneStructuresAreOutside()) {
 			super.setCornerOne(oldCornerOne);
@@ -201,7 +226,7 @@ public class ZoneVolume extends Volume {
 	}
 
 	public void setZoneCornerTwo(Block block) throws TooSmallException, TooBigException {
-		BlockInfo oldCornerTwo = this.getCornerTwo();
+		Location oldCornerTwo = this.getCornerTwo();
 		super.setCornerTwo(block);
 		if (this.tooSmall() || this.zoneStructuresAreOutside()) {
 			super.setCornerTwo(oldCornerTwo);
@@ -251,8 +276,8 @@ public class ZoneVolume extends Volume {
 		return false;
 	}
 
-	private boolean isInside(BlockInfo info) {
-		if (info.getX() <= this.getMaxX() && info.getX() >= this.getMinX() && info.getY() <= this.getMaxY() && info.getY() >= this.getMinY() && info.getZ() <= this.getMaxZ() && info.getZ() >= this.getMinZ()) {
+	private boolean isInside(Location location) {
+		if (location.getX() <= this.getMaxX() && location.getX() >= this.getMinX() && location.getY() <= this.getMaxY() && location.getY() >= this.getMinY() && location.getZ() <= this.getMaxZ() && location.getZ() >= this.getMinZ()) {
 			return true;
 		}
 		return false;

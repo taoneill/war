@@ -1,6 +1,7 @@
 package com.tommytony.war.command;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.logging.Level;
 
 import org.bukkit.command.CommandSender;
@@ -79,9 +80,18 @@ public class RenameZoneCommand extends AbstractZoneMakerCommand {
 		War.war.log("Loading zone " + newName + "...", Level.INFO);
 		Warzone newZone = WarzoneYmlMapper.load(newName, false);
 		War.war.getWarzones().add(newZone);
-		newZone.getVolume().loadCorners();
-		
-		zone.getVolume().loadCorners();
+		try {
+			newZone.getVolume().loadCorners();
+		} catch (SQLException ex) {
+			War.war.log("Failed to load warzone " + newZone.getName() + ": " + ex.getMessage(), Level.WARNING);
+			throw new RuntimeException(ex);
+		}
+		try {
+			zone.getVolume().loadCorners();
+		} catch (SQLException ex) {
+			War.war.log("Failed to load warzone " + zone.getName() + ": " + ex.getMessage(), Level.WARNING);
+			throw new RuntimeException(ex);
+		}
 		if (zone.getLobby() != null) {
 			zone.getLobby().getVolume().resetBlocks();
 		}

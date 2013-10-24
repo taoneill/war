@@ -7,26 +7,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.tommytony.war.War;
 
+@SuppressWarnings("deprecation")
 public class LoadoutTxtMapper {
-	
-	public static String fromLoadoutToString(HashMap<Integer, ItemStack> loadout) {
-		String loadoutString = "";
-		for (Integer slot : loadout.keySet()) {
-			ItemStack item = loadout.get(slot);
-			if (item != null) {
-				loadoutString += item.getTypeId() + "," + item.getAmount() + "," + slot + "," + item.getDurability() + "," + item.getData().getData();
-				if (item.getEnchantments().keySet().size() > 0) {
-					String enchantmentsStr = "";
-					for (Enchantment enchantment : item.getEnchantments().keySet()) {
-						enchantmentsStr += enchantment.getId() + ":" + item.getEnchantments().get(enchantment) + "::";
-					}
-					loadoutString += "," + enchantmentsStr;
-				}
-			}
-			loadoutString += ";";
-		}
-		return loadoutString;
-	}
 	
 	public static void fromStringToLoadout(String loadoutString, HashMap<Integer, ItemStack> destinationLoadout) {
 		String[] rewardStrSplit = loadoutString.split(";");

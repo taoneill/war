@@ -151,6 +151,13 @@ public class War extends JavaPlugin {
 		} catch (ClassNotFoundException e) {
 			isSpoutServer = false;
 		}
+		try {
+			Class.forName("org.sqlite.JDBC").newInstance();
+		} catch (Exception e) {
+			this.log("SQLite3 driver not found!", Level.SEVERE);
+			this.getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
 
 		// Register events
 		PluginManager pm = this.getServer().getPluginManager();
@@ -176,6 +183,7 @@ public class War extends JavaPlugin {
 		warConfig.put(WarConfig.MAXZONES, 12);
 		warConfig.put(WarConfig.PVPINZONESONLY, false);
 		warConfig.put(WarConfig.TNTINZONESONLY, false);
+		warConfig.put(WarConfig.RESETSPEED, 5000);
 		
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOASSIGN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.BLOCKHEADS, true);

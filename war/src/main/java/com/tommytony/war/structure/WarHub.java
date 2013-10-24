@@ -18,7 +18,6 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.utility.Direction;
-import com.tommytony.war.volume.BlockInfo;
 import com.tommytony.war.volume.Volume;
 
 /**
@@ -171,7 +170,7 @@ public class WarHub {
 			warhubTpVolume.setToMaterial(Material.AIR);
 		
 			// draw gates
-			Block currentGateBlock = BlockInfo.getBlock(this.location.getWorld(), this.volume.getCornerOne()).getRelative(BlockFace.UP).getRelative(front, hubDepth).getRelative(right, 2);
+			Block currentGateBlock = this.volume.getCornerOne().getBlock().getRelative(BlockFace.UP).getRelative(front, hubDepth).getRelative(right, 2);
 
 			for (Warzone zone : War.war.getWarzones()) { // gonna use the index to find it again
 				if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {

@@ -1,7 +1,7 @@
 package com.tommytony.war.job;
 
+import java.sql.SQLException;
 import java.util.logging.Level;
-
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
@@ -32,7 +32,12 @@ public class RestoreWarzonesJob implements Runnable {
 				Warzone zone = WarzoneTxtMapper.load(warzoneName, !this.newWarInstall);
 				if (zone != null) { // could have failed, would've been logged already
 					War.war.getWarzones().add(zone);
-					zone.getVolume().loadCorners();
+					try {
+						zone.getVolume().loadCorners();
+					} catch (SQLException ex) {
+						War.war.log("Failed to load warzone " + warzoneName + ": " + ex.getMessage(), Level.WARNING);
+						throw new RuntimeException(ex);
+					}
 					
 					if (zone.getLobby() != null) {
 						zone.getLobby().getVolume().resetBlocks();

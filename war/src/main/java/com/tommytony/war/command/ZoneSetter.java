@@ -41,7 +41,7 @@ public class ZoneSetter {
 				warzone = new Warzone(this.player.getLocation().getWorld(), this.zoneName);
 				warzone.addAuthor(player.getName());
 				War.war.getIncompleteZones().add(warzone);
-				warzone.getVolume().setNorthwest(northwestBlock);
+				warzone.getVolume().setNorthwest(northwestBlock.getLocation());
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Northwesternmost point set to x:" + warzone.getVolume().getNorthwestX() + " z:" + warzone.getVolume().getNorthwestZ() + ". ");
 				War.war.log(player.getName() + " created warzone " + zoneName + " by setting its nw corner", Level.INFO);
 			} else if (!this.isPlayerAuthorOfZoneOrAdmin(warzone)) {
@@ -49,7 +49,7 @@ public class ZoneSetter {
 			} else {
 				// change existing warzone
 				this.resetWarzone(warzone, msgString);
-				warzone.getVolume().setNorthwest(northwestBlock);
+				warzone.getVolume().setNorthwest(northwestBlock.getLocation());
 				msgString.append("Warzone " + warzone.getName() + " modified. Northwesternmost point set to x:" + warzone.getVolume().getNorthwestX() + " z:" + warzone.getVolume().getNorthwestZ() + ". ");
 				War.war.log(player.getName() + " updated warzone " + zoneName + " by setting its nw corner", Level.INFO);
 			}
@@ -86,7 +86,7 @@ public class ZoneSetter {
 				warzone = new Warzone(this.player.getLocation().getWorld(), this.zoneName);
 				warzone.addAuthor(player.getName());
 				War.war.getIncompleteZones().add(warzone);
-				warzone.getVolume().setSoutheast(southeastBlock);
+				warzone.getVolume().setSoutheast(southeastBlock.getLocation());
 				War.war.msg(this.player, "Warzone " + warzone.getName() + " created. Southeasternmost point set to x:" + warzone.getVolume().getSoutheastX() + " z:" + warzone.getVolume().getSoutheastZ() + ". ");
 				War.war.log(player.getName() + " created warzone " + zoneName + " by setting its se corner", Level.INFO);
 			} else if (!this.isPlayerAuthorOfZoneOrAdmin(warzone)) {
@@ -94,7 +94,7 @@ public class ZoneSetter {
 			} else {
 				// change existing warzone
 				this.resetWarzone(warzone, msgString);
-				warzone.getVolume().setSoutheast(southeastBlock);
+				warzone.getVolume().setSoutheast(southeastBlock.getLocation());
 				msgString.append("Warzone " + warzone.getName() + " modified. Southeasternmost point set to x:" + warzone.getVolume().getSoutheastX() + " z:" + warzone.getVolume().getSoutheastZ() + ". ");
 				War.war.log(player.getName() + " updated warzone " + zoneName + " by setting its se corner", Level.INFO);
 			}
@@ -220,8 +220,8 @@ public class ZoneSetter {
 			if (warzone.getLobby() != null && warzone.getLobby().getVolume() != null) {
 				warzone.getLobby().getVolume().resetBlocks();
 			}
-			int reset = warzone.getVolume().resetBlocks();
-			msgString.append(reset + " blocks reset. ");
+			warzone.getVolume().resetBlocks();
+			msgString.append(warzone.getVolume().size() + " blocks reset. ");
 		}
 	}
 
