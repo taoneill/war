@@ -273,12 +273,28 @@ public class Volume {
 			}
 		}
 	}
-
-	public void replaceMaterials(Material[] materials, Material replacement) {
-		for (Material mat: materials) {
-			this.replaceMaterial(mat, replacement);
+	
+	public void replaceMaterials(Material replacement) {
+		Validate.isTrue(this.hasTwoCorners(), "Incomplete volume");
+		for(int x = this.getMinX(); x <= this.getMaxX(); x++) {
+			for(int y = this.getMinY(); y <= this.getMaxY(); y++) {
+				for(int z = this.getMinZ(); z <= this.getMaxZ(); z++) {
+					Material type = this.getWorld().getBlockAt(x, y, z).getType();
+					Block block = this.getWorld().getBlockAt(x, y, z);
+					switch(type) {
+					    case SIGN_POST: case WALL_SIGN: case IRON_DOOR: case WOOD_DOOR:
+					    case LADDER: case YELLOW_FLOWER: case RED_ROSE: 
+					    case RED_MUSHROOM: case BROWN_MUSHROOM: case SAPLING: case TORCH:
+					    case RAILS: case STONE_BUTTON: case STONE_PLATE: case WOOD_PLATE:
+					    case LEVER: case REDSTONE: case REDSTONE_TORCH_ON: case REDSTONE_TORCH_OFF:
+					    case CACTUS: case SNOW: case ICE:
+					    	block.setType(replacement);
+					}
+				}
+			}
 		}
 	}
+	
 
 	private static final Material[] nonFloatingBlocks = {
 		Material.SIGN_POST,
@@ -306,7 +322,7 @@ public class Volume {
 	};
 
 	public void clearBlocksThatDontFloat() {
-		this.replaceMaterials(nonFloatingBlocks, Material.AIR);
+		this.replaceMaterials(Material.AIR);
 	}
 
 	@Override
