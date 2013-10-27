@@ -581,7 +581,7 @@ public class Warzone {
 			player.getOpenInventory().close();
 			this.playerInvFromInventoryStash(playerInv, originalState);
 			player.setGameMode(originalState.getGamemode());
-			player.setHealth(originalState.getHealth());
+			player.setHealth(Math.max(Math.min(originalState.getHealth(), 20.0D), 0.0D));
 			player.setExhaustion(originalState.getExhaustion());
 			player.setSaturation(originalState.getSaturation());
 			player.setFoodLevel(originalState.getFoodLevel());
