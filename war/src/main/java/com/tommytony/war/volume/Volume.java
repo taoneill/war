@@ -280,33 +280,42 @@ public class Volume {
 		}
 	}
 
-	private static final Material[] nonFloatingBlocks = {
-		Material.SIGN_POST,
-		Material.WALL_SIGN,
-		Material.IRON_DOOR,
-		Material.WOOD_DOOR,
-		Material.LADDER,
-		Material.YELLOW_FLOWER,
-		Material.RED_ROSE,
-		Material.RED_MUSHROOM,
-		Material.BROWN_MUSHROOM,
-		Material.SAPLING,
-		Material.TORCH,
-		Material.RAILS,
-		Material.STONE_BUTTON,
-		Material.STONE_PLATE,
-		Material.WOOD_PLATE,
-		Material.LEVER,
-		Material.REDSTONE,
-		Material.REDSTONE_TORCH_ON,
-		Material.REDSTONE_TORCH_OFF,
-		Material.CACTUS,
-		Material.SNOW,
-		Material.ICE
-	};
-
 	public void clearBlocksThatDontFloat() {
-		this.replaceMaterials(nonFloatingBlocks, Material.AIR);
+		Validate.isTrue(this.hasTwoCorners(), "Incomplete volume");
+		for (int x = this.getMinX(); x <= this.getMaxX(); x++) {
+			for (int y = this.getMinY(); y <= this.getMaxY(); y++) {
+				for (int z = this.getMinZ(); z <= this.getMaxZ(); z++) {
+					switch (this.getWorld().getBlockAt(x, y, z).getType()) {
+					case SIGN_POST:
+					case WALL_SIGN:
+					case IRON_DOOR:
+					case WOOD_DOOR:
+					case LADDER:
+					case YELLOW_FLOWER:
+					case RED_ROSE:
+					case RED_MUSHROOM:
+					case BROWN_MUSHROOM:
+					case SAPLING:
+					case TORCH:
+					case RAILS:
+					case STONE_BUTTON:
+					case STONE_PLATE:
+					case WOOD_PLATE:
+					case LEVER:
+					case REDSTONE:
+					case REDSTONE_TORCH_ON:
+					case REDSTONE_TORCH_OFF:
+					case CACTUS:
+					case SNOW:
+					case ICE:
+						this.getWorld().getBlockAt(x, y, z)
+								.setType(Material.AIR);
+					default:
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	@Override
