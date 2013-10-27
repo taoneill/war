@@ -132,7 +132,7 @@ public class WarEntityListener implements Listener {
 							Material killerWeapon = a.getItemInHand().getType();
 							String weaponString = killerWeapon.toString();
 							if (a.getItemInHand().hasItemMeta() && a.getItemInHand().getItemMeta().hasDisplayName()) {
-								weaponString = a.getItemInHand().getItemMeta().getDisplayName();
+								weaponString = a.getItemInHand().getItemMeta().getDisplayName() + ChatColor.WHITE;
 							}
 							if (killerWeapon == Material.AIR) {
 								weaponString = War.war.getString("pvp.kill.weapon.hand");
