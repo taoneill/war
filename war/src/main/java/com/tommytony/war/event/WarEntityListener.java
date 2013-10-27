@@ -254,6 +254,11 @@ public class WarEntityListener implements Listener {
 			Player d = (Player) defender;
 			Warzone defenderWarzone = Warzone.getZoneByPlayerName(d.getName());
 			if (d != null && defenderWarzone != null && event.getDamage() >= d.getHealth()) {
+				LoadoutSelection defenderLoadoutState = defenderWarzone.getLoadoutSelections().get(d.getName());
+				if (defenderLoadoutState != null && defenderLoadoutState.isStillInSpawn()) {
+					event.setCancelled(true);
+					return;
+				}
 				if (defenderWarzone.getReallyDeadFighters().contains(d.getName())) {
 					// don't re-kill a dead person 
 					if (d.getHealth() != 0) {
