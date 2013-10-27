@@ -9,6 +9,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -236,6 +237,14 @@ public class WarBlockListener implements Listener {
 			if (blockZone != null && blockZone == playerZone && block.getType() != Material.BEDROCK) {
 				event.setInstaBreak(true);
 			}
+		}
+	}
+
+	@EventHandler
+	public void onBlockBurn(final BlockBurnEvent event) {
+		Warzone zone = Warzone.getZoneByLocation(event.getBlock().getLocation());
+		if (zone != null && zone.isImportantBlock(event.getBlock())) {
+			event.setCancelled(true);
 		}
 	}
 
