@@ -8,6 +8,7 @@ import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
@@ -291,7 +292,19 @@ public class WarPlayerListener implements Listener {
 			return;
 		}
 		latestLocations.put(player.getName(), playerLoc);
-		
+		if (playerLoc.getBlock().getType() == Material.SIGN_POST) {
+			Sign sign = (Sign) playerLoc.getBlock().getState();
+			if (sign.getLine(0).equals("[zone]")) {
+				Warzone indicated = Warzone.getZoneByName(sign.getLine(1));
+				if (indicated != null) {
+					player.teleport(indicated.getTeleport());
+				} else if (sign.getLine(1).equalsIgnoreCase("$random")) {
+					int zone = random.nextInt(War.war.getWarzones().size());
+					Warzone random = War.war.getWarzones().get(zone);
+					player.teleport(random.getTeleport());
+				}
+			}
+		}
 		Warzone locZone = Warzone.getZoneByLocation(playerLoc);
 		ZoneLobby locLobby = ZoneLobby.getLobbyByLocation(playerLoc);
 
