@@ -30,13 +30,11 @@ public class JoinCommand extends AbstractWarCommand {
 		Player player = (Player) this.getSender();
 
 		Warzone zone;
-		if (this.args.length == 0) {
-			return false;
-		} else if (this.args.length == 2) {
+		TeamKind kind;
+		if (this.args.length == 2) {
 			// zone by name
 			zone = Warzone.getZoneByName(this.args[0]);
-			// move the team-name to first place :)
-			this.args[0] = this.args[1];
+			kind = TeamKind.teamKindFromString(this.args[1]);
 		} else if (this.args.length == 1) {
 			zone = Warzone.getZoneByLocation((Player) this.getSender());
 			if (zone == null) {
@@ -46,15 +44,13 @@ public class JoinCommand extends AbstractWarCommand {
 				}
 				zone = lobby.getZone();
 			}
+			kind = TeamKind.teamKindFromString(this.args[0]);
 		} else {
 			return false;
 		}
 		if (zone == null) {
 			return false;
 		}
-		
-		TeamKind kind = TeamKind.teamKindFromString(this.args[0]);
-
 		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 			this.badMsg("join.disabled");
 		} else if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
@@ -76,25 +72,10 @@ public class JoinCommand extends AbstractWarCommand {
 						this.badMsg("join.selfteam");
 						return true;
 					}
-					if (!previousTeam.removePlayer(player.getName())) {
-						War.war.log("Could not remove player " + player.getName() + " from team " + previousTeam.getName(), java.util.logging.Level.WARNING);
-					}
+					previousTeam.removePlayer(player);
 					previousTeam.resetSign();
 				}
-				if (player.getWorld() != zone.getWorld()) {
-					player.teleport(zone.getWorld().getSpawnLocation());
-				}
-				if (!zone.hasPlayerState(player.getName())) {
-					zone.keepPlayerState(player);
-					this.msg("join.inventorystored");
-				}
-				team.addPlayer(player);
-				team.resetSign();
-				zone.respawnPlayer(team, player);
-				if (War.war.getWarHub() != null) {
-					War.war.getWarHub().resetZoneSign(zone);
-				}
-				zone.broadcast("join.broadcast", player.getName(), team.getName());
+				zone.assign(player, team);
 			}
 		}
 		return true;

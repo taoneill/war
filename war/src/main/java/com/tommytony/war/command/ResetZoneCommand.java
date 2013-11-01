@@ -1,5 +1,6 @@
 package com.tommytony.war.command;
 
+import java.util.Iterator;
 import java.util.logging.Level;
 
 import org.bukkit.command.CommandSender;
@@ -8,10 +9,8 @@ import org.bukkit.entity.Player;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.Warzone.LeaveCause;
 import com.tommytony.war.structure.ZoneLobby;
-import java.util.Iterator;
-import org.kitteh.tag.TagAPI;
 
 
 public class ResetZoneCommand extends AbstractZoneMakerCommand {
@@ -52,13 +51,8 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 			for (Iterator<Player> it = team.getPlayers().iterator(); it.hasNext();) {
 				Player p = it.next();
 				it.remove();
-				if (War.war.isTagServer()) {
-					TagAPI.refreshPlayer(p);
-				}
-				zone.restorePlayerState(p);
-				p.teleport(zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOJOIN) ?
-						War.war.getWarHub().getLocation() : zone.getTeleport());
-				War.war.msg(p, "You have left the warzone. Your inventory is being restored.");
+				team.removePlayer(p);
+				p.teleport(zone.getEndTeleport(LeaveCause.RESET));
 			}
 			team.resetPoints();
 			team.getPlayers().clear();

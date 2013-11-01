@@ -7,12 +7,14 @@ import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -31,6 +33,7 @@ import org.getspout.spoutapi.player.SpoutPlayer;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.Warzone.LeaveCause;
 import com.tommytony.war.command.ZoneSetter;
 import com.tommytony.war.config.FlagReturn;
 import com.tommytony.war.config.TeamConfig;
@@ -46,6 +49,8 @@ import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.volume.Volume;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 
@@ -68,8 +73,7 @@ public class WarPlayerListener implements Listener {
 			Player player = event.getPlayer();
 			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 			if (zone != null) {
-				zone.handlePlayerLeave(player, zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOJOIN) ?
-						War.war.getWarHub().getLocation() : zone.getTeleport(), true);
+				zone.handlePlayerLeave(player, zone.getEndTeleport(LeaveCause.DISCONNECT), true);
 			}
 
 			if (War.war.isWandBearer(player)) {
@@ -105,7 +109,7 @@ public class WarPlayerListener implements Listener {
 					Item item = event.getItemDrop();
 					if (item != null) {
 						ItemStack itemStack = item.getItemStack();
-						if (itemStack != null && itemStack.getType() == team.getKind().getMaterial() && itemStack.getData() == team.getKind().getBlockData()) {
+						if (itemStack != null && team.getKind().isTeamItem(itemStack)) {
 							// Can't drop your team's kind block
 							War.war.badMsg(player, "drop.team", team.getName());
 							event.setCancelled(true);
@@ -140,6 +144,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
+	private static final int MINIMUM_TEAM_BLOCKS = 1;
 	@EventHandler
 	public void onPlayerPickupItem(final PlayerPickupItemEvent event) {
 		if (War.war.isLoaded()) {
@@ -155,7 +160,8 @@ public class WarPlayerListener implements Listener {
 					Item item = event.getItem();
 					if (item != null) {
 						ItemStack itemStack = item.getItemStack();
-						if (itemStack != null && itemStack.getType() == team.getKind().getMaterial() && player.getInventory().contains(new ItemStack(team.getKind().getMaterial(), team.getKind().getData()))) {
+						if (itemStack != null && team.getKind().isTeamItem(itemStack) &&
+								player.getInventory().containsAtLeast(team.getKind().getBlockHead(), MINIMUM_TEAM_BLOCKS)) {
 							// Can't pick up a second precious block
 							event.setCancelled(true);
 							return;
@@ -200,8 +206,7 @@ public class WarPlayerListener implements Listener {
 			
 			if (warzone != null) {
 				// kick player from warzone as well
-				warzone.handlePlayerLeave(player, warzone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOJOIN) ?
-						War.war.getWarHub().getLocation() : warzone.getTeleport(), true);
+				warzone.handlePlayerLeave(player, warzone.getEndTeleport(LeaveCause.DISCONNECT), true);
 			}
 		}
 	}
@@ -229,7 +234,11 @@ public class WarPlayerListener implements Listener {
 					&& zone.getLoadoutSelections().get(player.getName()).isStillInSpawn()) {
 				event.setUseItemInHand(Result.DENY);
 				event.setCancelled(true);
-				War.war.badMsg(player, "use.item.spawn");
+				// Replace message with sound to reduce spamminess.
+				// Whenever a player dies in the middle of conflict they will
+				// likely respawn still trying to use their items to attack
+				// another player.
+				player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 0);
 			}
 			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST) {
 				event.setCancelled(true);
@@ -334,88 +343,39 @@ public class WarPlayerListener implements Listener {
 		}
 
 		// Warzone lobby gates
-		if (locLobby != null) {
+		if (locLobby != null && currentTeam == null && locLobby.isInAnyGate(playerLoc)) {
 			Warzone zone = locLobby.getZone();
-			Team oldTeam = Team.getTeamByPlayerName(player.getName());
-			boolean isAutoAssignGate = false;
-			if (oldTeam == null) { // trying to counter spammy player move
-				isAutoAssignGate = zone.getLobby().isAutoAssignGate(playerLoc);
-				if (isAutoAssignGate) {
-					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
-						this.handleDisabledZone(event, player, zone);
-					} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
-						event.setTo(zone.getTeleport());
-						War.war.badMsg(player, "join.progress");
-					} else {
-						this.dropFromOldTeamIfAny(player);
-						int noOfPlayers = 0;
-						int totalCap = 0;
-						for (Team t : zone.getTeams()) {
-							noOfPlayers += t.getPlayers().size();
-							totalCap += t.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
-						}
-						
-						if (noOfPlayers < totalCap) {
-							boolean assigned = zone.autoAssign(player) != null ? true : false;
-							if (!assigned) {
-								event.setTo(zone.getTeleport());
-								War.war.badMsg(player, "join.permission.all");
-							}
-
-							if (War.war.getWarHub() != null && assigned) {
-								War.war.getWarHub().resetZoneSign(zone);
-							}
-						} else {
-							event.setTo(zone.getTeleport());
-							War.war.badMsg(player, "join.full.all");
-						}
-					}
-					return;
-				}
-
-				// go through all the team gates
-				for (Team team : zone.getTeams()) {
-					if (zone.getLobby().isInTeamGate(team, playerLoc)) {
-						this.dropFromOldTeamIfAny(player);
-						if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
-							this.handleDisabledZone(event, player, zone);
-						} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
-							event.setTo(zone.getTeleport());
-							War.war.badMsg(player, "join.progress");
-						} else if (team.getPlayers().size() < team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)
-								&& War.war.canPlayWar(player, team)) {
-							if (player.getWorld() != zone.getWorld()) {
-								player.teleport(zone.getWorld().getSpawnLocation());
-							}
-							team.addPlayer(player);
-							team.resetSign();
-							if (War.war.getWarHub() != null) {
-								War.war.getWarHub().resetZoneSign(zone);
-							}
-							zone.keepPlayerState(player);
-							War.war.msg(player, "join.inventorystored");
-							zone.respawnPlayer(event, team, player);
-							zone.broadcast("join.broadcast", player.getName(), team.getName());
-						} else if (!War.war.canPlayWar(player, team)) {
-							event.setTo(zone.getTeleport());
-							War.war.badMsg(player, "join.permission.single", team.getName());
-						} else {
-							event.setTo(zone.getTeleport());
-							War.war.badMsg(player, "join.full.single", team.getName());
-						}
-						return;
-					}
-				}
-
-				if (War.war.getWarHub() != null && zone.getLobby().isInWarHubLinkGate(playerLoc) && !War.war.getWarHub().getVolume().contains(player.getLocation())) {
-					this.dropFromOldTeamIfAny(player);
-					event.setTo(War.war.getWarHub().getLocation());
-					// player.teleport(war.getWarHub().getLocation());
-					War.war.msg(player, "warhub.teleport");
-					return;
-				}
+			Team locTeamGate = locLobby.getTeamGate(playerLoc);
+			if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
+				War.war.badMsg(player, "join.disabled");
+				event.setTo(zone.getTeleport());
+			} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
+				War.war.badMsg(player, "join.progress");
+				event.setTo(zone.getTeleport());
+			} else if (zone.isFull()) {
+				War.war.badMsg(player, "join.full.all");
+				event.setTo(zone.getTeleport());
+			} else if (zone.isFull(player)) {
+				War.war.badMsg(player, "join.permission.all");
+				event.setTo(zone.getTeleport());
+			} else if (locTeamGate != null && locTeamGate.isFull()) {
+				War.war.badMsg(player, "join.full.single", locTeamGate.getName());
+				event.setTo(zone.getTeleport());
+			} else if (locTeamGate != null && !War.war.canPlayWar(player, locTeamGate)) {
+				War.war.badMsg(player, "join.permission.single", locTeamGate.getName());
+				event.setTo(zone.getTeleport());
+			} else if (zone.getLobby().isAutoAssignGate(playerLoc)) {
+				zone.autoAssign(player);
+			} else if (locTeamGate != null) {
+				zone.assign(player, locTeamGate);
 			}
-
+			return;
+		} else if (locLobby != null && currentTeam == null
+				&& locLobby.isInWarHubLinkGate(playerLoc)
+				&& War.war.getWarHub() != null) {
+			War.war.msg(player, "warhub.teleport");
+			event.setTo(War.war.getWarHub().getLocation());
+			return;
 		}
 
 		// Warhub zone gates
@@ -424,37 +384,21 @@ public class WarPlayerListener implements Listener {
 			Warzone zone = hub.getDestinationWarzoneForLocation(playerLoc);
 			if (zone != null && zone.getTeleport() != null) {
 				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOJOIN)
-						&& zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)
-						&& zone.getTeams().size() >= 1) {
+						&& zone.getTeams().size() >= 1 && currentTeam == null) {
 					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
-						event.setTo(hub.getLocation());
 						War.war.badMsg(player, "join.disabled");
-					} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
 						event.setTo(hub.getLocation());
+					} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
 						War.war.badMsg(player, "join.progress");
+						event.setTo(hub.getLocation());
+					} else if (zone.isFull()) {
+						War.war.badMsg(player, "join.full.all");
+						event.setTo(hub.getLocation());
+					} else if (zone.isFull(player)) {
+						War.war.badMsg(player, "join.permission.all");
+						event.setTo(hub.getLocation());
 					} else {
-						this.dropFromOldTeamIfAny(player);
-						int noOfPlayers = 0;
-						int totalCap = 0;
-						for (Team t : zone.getTeams()) {
-							noOfPlayers += t.getPlayers().size();
-							totalCap += t.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
-						}
-						
-						if (noOfPlayers < totalCap) {
-							boolean assigned = zone.autoAssign(player) != null ? true : false;
-							if (!assigned) {
-								event.setTo(hub.getLocation());
-								War.war.badMsg(player, "join.permission.all");
-							}
-
-							if (War.war.getWarHub() != null && assigned) {
-								War.war.getWarHub().resetZoneSign(zone);
-							}
-						} else {
-							event.setTo(hub.getLocation());
-							War.war.badMsg(player, "join.full.all");
-						}
+						zone.autoAssign(player);
 					}
 					return;
 				}
@@ -511,8 +455,9 @@ public class WarPlayerListener implements Listener {
 					if (nearestWalls.contains(BlockFace.UP)) {
 						upDownMove -= moveDistance;
 					} else if (nearestWalls.contains(BlockFace.DOWN)) {
-						// fell off the map, back to spawn
-						event.setTo(playerTeam.getRandomSpawn());
+						// fell off the map, back to spawn (still need to drop objects)
+						playerWarzone.dropAllStolenObjects(event.getPlayer(), false);
+						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
 						return;
 					}  
 					
@@ -525,47 +470,9 @@ public class WarPlayerListener implements Listener {
 					return;
 					
 					// Otherwise, send him to spawn (first make sure he drops his flag/cake/bomb to prevent auto-cap and as punishment)
-				} else if (playerWarzone.isFlagThief(player.getName())) {
-					Team victimTeam = playerWarzone.getVictimTeamForFlagThief(player.getName());
-
-					// Get player back to spawn
-					playerWarzone.respawnPlayer(event, playerTeam, player);
-					playerWarzone.removeFlagThief(player.getName());
-					
-					// Bring back flag of victim team
-					victimTeam.getFlagVolume().resetBlocks();
-					victimTeam.initializeTeamFlag();
-					playerWarzone.broadcast("drop.flag.broadcast", player.getName(), victimTeam.getName());
-					return;
-				} else if (playerWarzone.isCakeThief(player.getName())) {
-					Cake cake = playerWarzone.getCakeForThief(player.getName());
-					
-					// Get player back to spawn
-					playerWarzone.respawnPlayer(event, playerTeam, player);
-					playerWarzone.removeCakeThief(player.getName());
-					
-					// Bring back cake
-					cake.getVolume().resetBlocks();
-					cake.addCakeBlocks();
-					
-					playerWarzone.broadcast("drop.cake.broadcast", player.getName(), cake.getName());		
-					return;
-				} else if (playerWarzone.isBombThief(player.getName())) {
-					Bomb bomb = playerWarzone.getBombForThief(player.getName());
-					
-					// Get player back to spawn
-					playerWarzone.respawnPlayer(event, playerTeam, player);
-					playerWarzone.removeBombThief(player.getName());
-					
-					// Bring back bomb
-					bomb.getVolume().resetBlocks();
-					bomb.addBombBlocks();
-
-					playerWarzone.broadcast("drop.bomb.broadcast", player.getName(), bomb.getName());		
-					return;
 				} else {
-					// Get player back to spawn
-					playerWarzone.respawnPlayer(event, playerTeam, player);
+					playerWarzone.dropAllStolenObjects(event.getPlayer(), false);
+					playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
 					return;
 				}
 			}
@@ -924,7 +831,7 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		if (War.war.isLoaded()) {
 			// Anyone who died in warzones needs to go back there pronto!
@@ -941,9 +848,8 @@ public class WarPlayerListener implements Listener {
 					
 					if (zone.hasPlayerState(event.getPlayer().getName())) {
 						// If not member of a team and zone has your state, then game ended while you were dead
-						zone.gameEndTeleport(event.getPlayer());
+						War.war.log("Failed to restore game state to dead player.", Level.WARNING);
 					}
-					
 					break;
 				}
 			}
@@ -961,46 +867,8 @@ public class WarPlayerListener implements Listener {
 					if (!playerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
 						War.war.badMsg(event.getPlayer(), "Use /leave (or /war leave) to exit the zone.");
 					}
-					if (playerWarzone.isFlagThief(event.getPlayer().getName())) {
-						Team victimTeam = playerWarzone.getVictimTeamForFlagThief(event.getPlayer().getName());
-
-						// Get event.getPlayer() back to spawn
-						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
-						playerWarzone.removeFlagThief(event.getPlayer().getName());
-
-						// Bring back flag of victim team
-						victimTeam.getFlagVolume().resetBlocks();
-						victimTeam.initializeTeamFlag();
-
-						playerWarzone.broadcast("drop.flag.broadcast", event.getPlayer().getName(), victimTeam.getName());
-					} else if (playerWarzone.isCakeThief(event.getPlayer().getName())) {
-						Cake cake = playerWarzone.getCakeForThief(event.getPlayer().getName());
-
-						// Get event.getPlayer() back to spawn
-						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
-						playerWarzone.removeCakeThief(event.getPlayer().getName());
-
-						// Bring back cake
-						cake.getVolume().resetBlocks();
-						cake.addCakeBlocks();
-
-						playerWarzone.broadcast("drop.cake.broadcast", event.getPlayer().getName(), cake.getName());
-					} else if (playerWarzone.isBombThief(event.getPlayer().getName())) {
-						Bomb bomb = playerWarzone.getBombForThief(event.getPlayer().getName());
-
-						// Get event.getPlayer() back to spawn
-						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
-						playerWarzone.removeBombThief(event.getPlayer().getName());
-
-						// Bring back bomb
-						bomb.getVolume().resetBlocks();
-						bomb.addBombBlocks();
-
-						playerWarzone.broadcast("drop.bomb.broadcast", event.getPlayer().getName(), bomb.getName());
-					} else {
-						// Get event.getPlayer() back to spawn
-						playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
-					}
+					playerWarzone.dropAllStolenObjects(event.getPlayer(), false);
+					playerWarzone.respawnPlayer(event, playerTeam, event.getPlayer());
 				}
 			}
 		}
@@ -1019,23 +887,4 @@ public class WarPlayerListener implements Listener {
 	public void purgeLatestPositions() {
 		this.latestLocations.clear();	
 	}
-
-	private void handleDisabledZone(PlayerMoveEvent event, Player player, Warzone zone) {
-		if (zone.getLobby() != null) {
-			War.war.badMsg(player, "join.disabled");
-			event.setTo(zone.getTeleport());
-		}
-	}
-
-	private void dropFromOldTeamIfAny(Player player) {
-		// drop from old team if any
-		Team previousTeam = Team.getTeamByPlayerName(player.getName());
-		if (previousTeam != null) {
-			if (!previousTeam.removePlayer(player.getName())) {
-				War.war.log("Could not remove player " + player.getName() + " from team " + previousTeam.getName(), java.util.logging.Level.WARNING);
-			}
-		}
-	}
-	
-	
 }

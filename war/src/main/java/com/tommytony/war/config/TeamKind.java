@@ -175,4 +175,14 @@ public enum TeamKind {
 		Wool wool = (Wool) item.getData();
 		return wool.getColor() == dyeColor;
 	}
+
+	/**
+	 * Check if a block data is this team's block data.
+	 *
+	 * @param data Wool block data.
+	 * @return true if data is this team's data.
+	 */
+	public boolean isTeamBlock(MaterialData data) {
+		return data instanceof Wool && ((Wool)data).getColor() == this.dyeColor;
+	}
 }

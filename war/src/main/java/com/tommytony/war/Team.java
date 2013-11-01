@@ -33,8 +33,6 @@ import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.TeamSpawnStyle;
-import com.tommytony.war.structure.Bomb;
-import com.tommytony.war.structure.Cake;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
 
@@ -446,46 +444,19 @@ public class Team {
 		return this.name;
 	}
 
-	public boolean removePlayer(String name) {
-		Player thePlayer = null;
-		for (Player player : this.players) {
-			if (player.getName().equals(name)) {
-				thePlayer = player;
-			}
+	public void removePlayer(Player thePlayer) {
+		this.players.remove(thePlayer);
+		this.warzone.dropAllStolenObjects(thePlayer, false);
+		if (War.war.isTagServer()) {
+			TagAPI.refreshPlayer(thePlayer);
 		}
-		if (thePlayer != null) {
-			this.players.remove(thePlayer);
-			
-			if (this.warzone.isFlagThief(thePlayer.getName())) {
-				Team victim = this.warzone.getVictimTeamForFlagThief(thePlayer.getName());
-				victim.getFlagVolume().resetBlocks();
-				victim.initializeTeamFlag();
-				this.warzone.removeFlagThief(thePlayer.getName());
-				this.warzone.broadcast("drop.flag.broadcast", thePlayer.getName(), ChatColor.GREEN + victim.getName() + ChatColor.WHITE);
-			}
-			
-			if (this.warzone.isBombThief(thePlayer.getName())) {
-				Bomb bomb = this.warzone.getBombForThief(thePlayer.getName());
-				bomb.getVolume().resetBlocks();
-				bomb.addBombBlocks();
-				this.warzone.removeBombThief(thePlayer.getName());
-				this.warzone.broadcast("drop.bomb.broadcast", thePlayer.getName(), ChatColor.GREEN + bomb.getName() + ChatColor.WHITE);
-			}
-			
-			if (this.warzone.isCakeThief(thePlayer.getName())) {
-				Cake cake = this.warzone.getCakeForThief(thePlayer.getName());
-				cake.getVolume().resetBlocks();
-				cake.addCakeBlocks();
-				this.warzone.removeCakeThief(thePlayer.getName());
-				this.warzone.broadcast("drop.cake.broadcast", thePlayer.getName(), ChatColor.GREEN + cake.getName() + ChatColor.WHITE);
-			}
-			if (War.war.isTagServer()) {
-				TagAPI.refreshPlayer(thePlayer);
-			}
-			return true;
-		}	
-		
-		return false;
+		if (War.war.isSpoutServer()) {
+			War.war.getSpoutDisplayer().updateStats(thePlayer);
+		}
+		thePlayer.setFireTicks(0);
+		thePlayer.setRemainingAir(300);
+		this.warzone.restorePlayerState(thePlayer);
+		this.warzone.getLoadoutSelections().remove(thePlayer);
 	}
 
 	public void setRemainingLives(int remainingLives) {
@@ -536,9 +507,11 @@ public class Team {
 			spawnEntry.getValue().resetBlocks();
 			this.initializeTeamSpawn(spawnEntry.getKey()); // reset everything instead of just sign
 		}
-
 		if (this.warzone.getLobby() != null) {
 			this.warzone.getLobby().resetTeamGateSign(this);
+		}
+		if (War.war.getWarHub() != null) {
+			War.war.getWarHub().resetZoneSign(warzone);
 		}
 	}
 

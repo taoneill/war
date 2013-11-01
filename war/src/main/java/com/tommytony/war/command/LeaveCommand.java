@@ -3,10 +3,8 @@ package com.tommytony.war.command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
-import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.Warzone.LeaveCause;
 
 /**
  * Leaves a game.
@@ -35,8 +33,7 @@ public class LeaveCommand extends AbstractWarCommand {
 			return false;
 		}
 
-		zone.handlePlayerLeave(player, zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOJOIN) ?
-				War.war.getWarHub().getLocation() : zone.getTeleport(), true);
+		zone.handlePlayerLeave(player, zone.getEndTeleport(LeaveCause.COMMAND), true);
 		return true;
 	}
 }

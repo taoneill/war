@@ -613,12 +613,24 @@ public class ZoneLobby {
 	public boolean isAutoAssignGate(Location location) {
 		if (this.autoAssignGate != null 
 				&& (location.getBlockX() == this.autoAssignGate.getX() 
-						&& location.getBlockY() == this.autoAssignGate.getY() 
-						&& location.getBlockZ() == this.autoAssignGate.getZ())) {
+				&& location.getBlockY() == this.autoAssignGate.getY() 
+				&& location.getBlockZ() == this.autoAssignGate.getZ())) {
 			return true;
 		}
-		
 		return false;
+	}
+
+	public Team getTeamGate(Location location) {
+		for (Team team : this.warzone.getTeams()) {
+			if (this.isInTeamGate(team, location)) {
+				return team;
+			}	
+		}
+		return null;
+	}
+
+	public boolean isInAnyGate(Location location) {
+		return this.isAutoAssignGate(location) || this.getTeamGate(location) != null;
 	}
 
 	public Volume getVolume() {

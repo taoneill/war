@@ -2,9 +2,12 @@ package com.tommytony.war;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +28,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.permissions.Permissible;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -47,7 +51,6 @@ import com.tommytony.war.job.InitZoneJob;
 import com.tommytony.war.job.LoadoutResetJob;
 import com.tommytony.war.job.LogKillsDeathsJob;
 import com.tommytony.war.job.LogKillsDeathsJob.KillsDeathsRecord;
-import com.tommytony.war.job.ScoreCapReachedJob;
 import com.tommytony.war.mapper.LoadoutYmlMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
@@ -71,6 +74,13 @@ import com.tommytony.war.volume.ZoneVolume;
  * @package com.tommytony.war
  */
 public class Warzone {
+	public enum LeaveCause {
+		COMMAND, DISCONNECT, SCORECAP, RESET;
+		public boolean useRallyPoint() {
+			return this == SCORECAP ? true : false;
+		}
+	}
+
 	private String name;
 	private ZoneVolume volume;
 	private World world;
@@ -474,7 +484,7 @@ public class Warzone {
 		}
 	}
 
-	public void resetInventory(Team team, Player player, HashMap<Integer, ItemStack> loadout) {
+	public void resetInventory(Team team, Player player, Map<Integer, ItemStack> loadout) {
 		// Reset inventory to loadout
 		PlayerInventory playerInv = player.getInventory();
 		playerInv.clear();
@@ -502,14 +512,12 @@ public class Warzone {
 		}
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
 			playerInv.setHelmet(team.getKind().getBlockHead());
-		} else {
-			if (!helmetIsInLoadout) {
-				ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
-				LeatherArmorMeta meta = (LeatherArmorMeta) helmet.getItemMeta();
-				meta.setColor(team.getKind().getBukkitColor());
-				helmet.setItemMeta(meta);
-				playerInv.setHelmet(helmet);
-			}
+		} else if (!helmetIsInLoadout) {
+			ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
+			LeatherArmorMeta meta = (LeatherArmorMeta) helmet.getItemMeta();
+			meta.setColor(team.getKind().getBukkitColor());
+			helmet.setItemMeta(meta);
+			playerInv.setHelmet(helmet);
 		}
 	}
 
@@ -885,29 +893,54 @@ public class Warzone {
 		return this.lobby;
 	}
 
+	static final Comparator<Team> LEAST_PLAYER_COUNT_ORDER = new Comparator<Team>() {
+		@Override
+		public int compare(Team arg0, Team arg1) {
+			return arg0.getPlayers().size() - arg1.getPlayers().size();
+		}
+	};
+
 	public Team autoAssign(Player player) {
+		Collections.sort(teams, LEAST_PLAYER_COUNT_ORDER);
 		Team lowestNoOfPlayers = null;
-		for (Team t : this.teams) {
-			if (lowestNoOfPlayers == null || (lowestNoOfPlayers != null && lowestNoOfPlayers.getPlayers().size() > t.getPlayers().size())) {
-				if (War.war.canPlayWar(player, t)) {
-						lowestNoOfPlayers = t;
-				}
+		for (Team team : this.teams) {
+			if (War.war.canPlayWar(player, team)) {
+				lowestNoOfPlayers = team;
+				break;
 			}
 		}
 		if (lowestNoOfPlayers != null) {
-			if (player.getWorld() != this.getWorld()) {
-				player.teleport(this.getWorld().getSpawnLocation());
-			}
-			lowestNoOfPlayers.addPlayer(player);
-			lowestNoOfPlayers.resetSign();
-			if (!this.hasPlayerState(player.getName())) {
-				this.keepPlayerState(player);
-			}
-			War.war.msg(player, "join.inventorystored");
-			this.respawnPlayer(lowestNoOfPlayers, player);
-			this.broadcast("join.broadcast", player.getName(), lowestNoOfPlayers.getName());
+			this.assign(player, lowestNoOfPlayers);
 		}
 		return lowestNoOfPlayers;
+	}
+
+	/**
+	 * Assign a player to a specific team.
+	 * 
+	 * @param player
+	 *            Player to assign to team.
+	 * @param team
+	 *            Team to add the player to.
+	 * @return false if player does not have permission to join this team.
+	 */
+	public boolean assign(Player player, Team team) {
+		if (!War.war.canPlayWar(player, team)) {
+			War.war.badMsg(player, "join.permission.single");
+			return false;
+		}
+		if (player.getWorld() != this.getWorld()) {
+			player.teleport(this.getWorld().getSpawnLocation());
+		}
+		team.addPlayer(player);
+		team.resetSign();
+		if (!this.hasPlayerState(player.getName())) {
+			this.keepPlayerState(player);
+			War.war.msg(player, "join.inventorystored");
+		}
+		this.respawnPlayer(team, player);
+		this.broadcast("join.broadcast", player.getName(), player.getName());
+		return true;
 	}
 
 	public void handleDeath(Player player) {
@@ -1104,55 +1137,22 @@ public class Warzone {
 	}
 
 	public void handlePlayerLeave(Player player, Location destination, PlayerMoveEvent event, boolean removeFromTeam) {
-		this.handlePlayerLeave(player, removeFromTeam);
+		this.handlePlayerLeave(player);
 		event.setTo(destination);
 	}
 
 	public void handlePlayerLeave(Player player, Location destination, boolean removeFromTeam) {
-		this.handlePlayerLeave(player, removeFromTeam);
+		this.handlePlayerLeave(player);
 		player.teleport(destination);
 	}
 
-	private void handlePlayerLeave(Player player, boolean removeFromTeam) {
+	private void handlePlayerLeave(Player player) {
 		Team playerTeam = Team.getTeamByPlayerName(player.getName());
 		if (playerTeam != null) {
-			if (removeFromTeam) {
-				playerTeam.removePlayer(player.getName());
-			}
+			playerTeam.removePlayer(player);
 			this.broadcast("leave.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE);
 			playerTeam.resetSign();
-			
-			if (this.getLobby() != null) {
-				this.getLobby().resetTeamGateSign(playerTeam);
-			}
-			if (this.hasPlayerState(player.getName())) {
-				this.restorePlayerState(player);
-			}
-			if (this.getLoadoutSelections().containsKey(player.getName())) {
-				// clear inventory selection
-				this.getLoadoutSelections().remove(player.getName());
-			}
-			player.setFireTicks(0);
-			player.setRemainingAir(300);
-			
-			// To hide stats
-			if (War.war.isSpoutServer()) {
-				War.war.getSpoutDisplayer().updateStats(player);
-			}
-			
-			War.war.msg(player, "leave.inventoryrestore");
-			if (War.war.getWarHub() != null) {
-				War.war.getWarHub().resetZoneSign(this);
-			}
-
-			boolean zoneEmpty = true;
-			for (Team team : this.getTeams()) {
-				if (team.getPlayers().size() > 0) {
-					zoneEmpty = false;
-					break;
-				}
-			}
-			if (zoneEmpty && this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONEMPTY)) {
+			if (this.getPlayerCount() == 0 && this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONEMPTY)) {
 				// reset the zone for a new game when the last player leaves
 				for (Team team : this.getTeams()) {
 					team.resetPoints();
@@ -1323,8 +1323,47 @@ public class Warzone {
 		WarScoreCapEvent event1 = new WarScoreCapEvent(winningTeams);
 		War.war.getServer().getPluginManager().callEvent(event1);
 		
-		new ScoreCapReachedJob(this, winnersStr).run();	// run inventory and teleports immediately to avoid inv reset problems
+		for (Team t : this.getTeams()) {
+			if (War.war.isSpoutServer()) {
+				for (Player p : t.getPlayers()) {
+					SpoutPlayer sp = SpoutManager.getPlayer(p);
+					if (sp.isSpoutCraftEnabled()) {
+		                sp.sendNotification(
+		                		SpoutDisplayer.cleanForNotification("Match won! " + ChatColor.WHITE + "Winners:"),
+		                		SpoutDisplayer.cleanForNotification(SpoutDisplayer.addMissingColor(winnersStr, this)),
+		                		Material.CAKE,
+		                		(short)0,
+		                		10000);
+					}
+				}
+			}
+			String winnersStrAndExtra = "Score cap reached. Game is over! Winning team(s): " + winnersStr;
+			winnersStrAndExtra += ". Resetting warzone and your inventory...";
+			t.teamcast(winnersStrAndExtra);
+			for (Iterator<Player> it = t.getPlayers().iterator(); it.hasNext();) {
+				Player tp = it.next();
+				it.remove(); // Remove player from team first to prevent anti-tp
+				t.removePlayer(tp);
+				tp.teleport(this.getEndTeleport(LeaveCause.SCORECAP));
+				if (winnersStr.contains(t.getName())) {
+					// give reward
+					rewardPlayer(tp, t.getInventories().resolveReward());
+				}
+			}
+			t.resetPoints();
+			t.getPlayers().clear(); // empty the team
+			t.resetSign();
+		}
 		this.reinitialize();
+	}
+
+	public void rewardPlayer(Player player, Map<Integer, ItemStack> reward) {
+		for (Integer slot : reward.keySet()) {
+			ItemStack item = reward.get(slot);
+			if (item != null) {
+				player.getInventory().addItem(item);
+			}
+		}
 	}
 
 	public boolean isDeadMan(String playerName) {
@@ -1352,10 +1391,12 @@ public class Warzone {
 	public void unload() {
 		War.war.log("Unloading zone " + this.getName() + "...", Level.INFO);
 		for (Team team : this.getTeams()) {
-			for (Player player : team.getPlayers()) {
-				this.handlePlayerLeave(player, this.getTeleport(), false);
+			for (Iterator<Player> it = team.getPlayers().iterator(); it.hasNext(); ) {
+				final Player player = it.next();
+				it.remove();
+				team.removePlayer(player);
+				player.teleport(this.getTeleport());
 			}
-			team.getPlayers().clear();
 		}
 		if (this.getLobby() != null) {
 			this.getLobby().getVolume().resetBlocks();
@@ -1420,8 +1461,8 @@ public class Warzone {
 			}
 			if (sortedNames.isEmpty()) {
 				// Fix for zones that mistakenly only specify a `first' loadout, but do not add any others.
-				this.handlePlayerLeave(player, this.getTeleport(), true);
-				War.war.badMsg(player, "We couldn't find a loadout for you! Please alert the warzone maker to add a `default' loadout to this warzone.");
+				this.resetInventory(playerTeam, player, Collections.<Integer, ItemStack>emptyMap());
+				War.war.msg(player, "404 No loadouts found");
 				return;
 			}
 			int currentIndex = selection.getSelectedIndex();
@@ -1507,22 +1548,6 @@ public class Warzone {
 
 	public List<String> getReallyDeadFighters() {
 		return this.reallyDeadFighters ;
-	}
-
-	public void gameEndTeleport(Player tp) {
-		if (this.getRallyPoint() != null) {
-			tp.teleport(this.getRallyPoint());
-		} else if (this.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOJOIN)) {
-			tp.teleport(War.war.getWarHub().getLocation());
-		} else {
-			tp.teleport(this.getTeleport());
-		}
-		tp.setFireTicks(0);
-		tp.setRemainingAir(300);
-		
-		if (this.hasPlayerState(tp.getName())) {
-			this.restorePlayerState(tp);
-		}		
 	}
 
 	public boolean isEndOfGame() {
@@ -1647,6 +1672,12 @@ public class Warzone {
 		}
 	}
 
+	/**
+	 * Get a list of all players in the warzone. The list is immutable. If you
+	 * need to modify the player list, you must use the per-team lists
+	 * 
+	 * @return list containing all team players.
+	 */
 	public List<Player> getPlayers() {
 		List<Player> players = new ArrayList<Player>();
 		for (Team team : this.teams) {
@@ -1655,11 +1686,156 @@ public class Warzone {
 		return players;
 	}
 
+	/**
+	 * Get the amount of players in all teams in this warzone.
+	 * 
+	 * @return total player count
+	 */
 	public int getPlayerCount() {
 		int count = 0;
 		for (Team team : this.teams) {
 			count += team.getPlayers().size();
 		}
 		return count;
+	}
+
+	/**
+	 * Get the amount of players in all teams in this warzone. Same as
+	 * {@link #getPlayerCount()}, except only checks teams that the specified
+	 * player has permission to join.
+	 * 
+	 * @param target
+	 *            Player to check for permissions.
+	 * @return total player count in teams the player has access to.
+	 */
+	public int getPlayerCount(Permissible target) {
+		int playerCount = 0;
+		for (Team team : this.teams) {
+			if (target.hasPermission(team.getTeamConfig().resolveString(
+					TeamConfig.PERMISSION))) {
+				playerCount += team.getPlayers().size();
+			}
+		}
+		return playerCount;
+	}
+
+	/**
+	 * Get the total capacity of all teams in this zone. This should be
+	 * preferred over {@link TeamConfig#TEAMSIZE} as that can differ per team.
+	 * 
+	 * @return capacity of all teams in this zone
+	 */
+	public int getTotalCapacity() {
+		int capacity = 0;
+		for (Team team : this.teams) {
+			capacity += team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
+		}
+		return capacity;
+	}
+
+	/**
+	 * Get the total capacity of all teams in this zone. Same as
+	 * {@link #getTotalCapacity()}, except only checks teams that the specified
+	 * player has permission to join.
+	 * 
+	 * @param target
+	 *            Player to check for permissions.
+	 * @return capacity of teams the player has access to.
+	 */
+	public int getTotalCapacity(Permissible target) {
+		int capacity = 0;
+		for (Team team : this.teams) {
+			if (target.hasPermission(team.getTeamConfig().resolveString(
+					TeamConfig.PERMISSION))) {
+				capacity += team.getTeamConfig()
+						.resolveInt(TeamConfig.TEAMSIZE);
+			}
+		}
+		return capacity;
+	}
+
+	/**
+	 * Check if all teams are full.
+	 * 
+	 * @return true if all teams are full, false otherwise.
+	 */
+	public boolean isFull() {
+		return this.getPlayerCount() == this.getTotalCapacity();
+	}
+
+	/**
+	 * Check if all teams are full. Same as {@link #isFull()}, except only
+	 * checks teams that the specified player has permission to join.
+	 * 
+	 * @param target
+	 *            Player to check for permissions.
+	 * @return true if all teams are full, false otherwise.
+	 */
+	public boolean isFull(Permissible target) {
+		return this.getPlayerCount(target) == this.getTotalCapacity(target);
+	}
+
+	public void dropAllStolenObjects(Player player, boolean quiet) {
+		if (this.isFlagThief(player.getName())) {
+			Team victimTeam = this.getVictimTeamForFlagThief(player.getName());
+
+			this.removeFlagThief(player.getName());
+
+			// Bring back flag of victim team
+			victimTeam.getFlagVolume().resetBlocks();
+			victimTeam.initializeTeamFlag();
+
+			if (!quiet) {
+				this.broadcast("drop.flag.broadcast", player.getName(), ChatColor.GREEN + victimTeam.getName() + ChatColor.WHITE);
+			}
+		} else if (this.isCakeThief(player.getName())) {
+			Cake cake = this.getCakeForThief(player.getName());
+
+			this.removeCakeThief(player.getName());
+
+			// Bring back cake
+			cake.getVolume().resetBlocks();
+			cake.addCakeBlocks();
+
+			if (!quiet) {
+				this.broadcast("drop.cake.broadcast", player.getName(), ChatColor.GREEN + cake.getName() + ChatColor.WHITE);
+			}
+		} else if (this.isBombThief(player.getName())) {
+			Bomb bomb = this.getBombForThief(player.getName());
+
+			this.removeBombThief(player.getName());
+
+			// Bring back bomb
+			bomb.getVolume().resetBlocks();
+			bomb.addBombBlocks();
+
+			if (!quiet) {
+				this.broadcast("drop.bomb.broadcast", player.getName(), ChatColor.GREEN + bomb.getName() + ChatColor.WHITE);
+			}
+		}
+	}
+
+	/**
+	 * Get the proper ending teleport location for players leaving the warzone.
+	 * <p>
+	 * Specifically, it gets teleports in this order:
+	 * <ul>
+	 * <li>Rally point (if scorecap)
+	 * <li>Warhub (if autojoin)
+	 * <li>Lobby
+	 * </ul>
+	 * </p>
+	 * @param reason Reason for leaving zone
+	 * @return
+	 */
+	public Location getEndTeleport(LeaveCause reason) {
+		if (reason.useRallyPoint() && this.getRallyPoint() != null) {
+			return this.getRallyPoint();
+		}
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOJOIN)
+				&& War.war.getWarHub() != null) {
+			return War.war.getWarHub().getLocation();
+		}
+		return this.getTeleport();
 	}
 }
