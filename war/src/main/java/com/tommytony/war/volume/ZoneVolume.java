@@ -237,18 +237,24 @@ public class ZoneVolume extends Volume {
 		}
 	}
 
+	private static final int MIN_SIZE = 10;
 	public boolean tooSmall() {
-		if (this.hasTwoCorners() && ((this.getMaxX() - this.getMinX() < 10) || (this.getMaxY() - this.getMinY() < 10) || (this.getMaxZ() - this.getMinZ() < 10))) {
-			return true;
+		if (!this.hasTwoCorners()) {
+			return false;
 		}
-		return false;
+		return this.getSizeX() < MIN_SIZE || this.getSizeY() < MIN_SIZE || this.getSizeZ() < MIN_SIZE;
 	}
 
+	private static final int MAX_SIZE_DEFAULT = 750;
 	public boolean tooBig() {
-		if (this.hasTwoCorners() && ((this.getMaxX() - this.getMinX() > 750) || (this.getMaxY() - this.getMinY() > 750) || (this.getMaxZ() - this.getMinZ() > 750))) {
-			return true;
+		if (!this.hasTwoCorners()) {
+			return false;
 		}
-		return false;
+		int MAX_SIZE = MAX_SIZE_DEFAULT;
+		if (War.war != null && War.war.getWarConfig() != null) {
+			MAX_SIZE = War.war.getWarConfig().getInt(WarConfig.MAXSIZE);
+		}
+		return this.getSizeX() > MAX_SIZE || this.getSizeY() > MAX_SIZE || this.getSizeZ() > MAX_SIZE;
 	}
 
 	public boolean zoneStructuresAreOutside() {
