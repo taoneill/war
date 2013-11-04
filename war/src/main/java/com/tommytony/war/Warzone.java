@@ -939,7 +939,7 @@ public class Warzone {
 			War.war.msg(player, "join.inventorystored");
 		}
 		this.respawnPlayer(team, player);
-		this.broadcast("join.broadcast", player.getName(), player.getName());
+		this.broadcast("join.broadcast", player.getName(), team.getKind().getFormattedName());
 		return true;
 	}
 

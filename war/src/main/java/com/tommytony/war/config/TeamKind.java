@@ -185,4 +185,8 @@ public enum TeamKind {
 	public boolean isTeamBlock(MaterialData data) {
 		return data instanceof Wool && ((Wool)data).getColor() == this.dyeColor;
 	}
+
+	public String getFormattedName() {
+		return this.getColor() + this.name().toLowerCase() + ChatColor.WHITE;
+	}
 }

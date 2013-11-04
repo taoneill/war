@@ -371,7 +371,7 @@ public class WarEntityListener implements Listener {
 	 *
 	 * @see EntityListener.onEntityDamage()
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onEntityDamage(final EntityDamageEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
@@ -524,7 +524,7 @@ public class WarEntityListener implements Listener {
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onEntityDeath(final EntityDeathEvent event) {
 		if (!War.war.isLoaded() || !(event.getEntity() instanceof Player)) {
 			return;
@@ -537,9 +537,9 @@ public class WarEntityListener implements Listener {
 			if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
 				// catch the odd death that gets away from us when usually intercepting and preventing deaths
 				zone.handleDeath(player);
-				
+				Team team = Team.getTeamByPlayerName(player.getName());
 				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
-					zone.broadcast("pvp.death.other", player.getName());
+					zone.broadcast("pvp.death.other", team.getKind().getColor() + player.getName());
 				}
 			}
 		}
