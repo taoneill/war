@@ -66,7 +66,7 @@ public class MySQLConfig {
 	 * @return deletion WHERE clause or empty string.
 	 */
 	public String getLoggingDeleteClause() {
-		return section.getString("logging.autoclear");
+		return section.getString("logging.autoclear", "");
 	}
 
 	private String getJDBCUrl() {
