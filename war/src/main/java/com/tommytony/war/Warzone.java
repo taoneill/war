@@ -169,18 +169,6 @@ public class Warzone {
 		return null;
 	}
 
-	public static Warzone getZoneByTeam(Team team) {
-		for (Warzone warzone : War.war.getWarzones()) {
-			for (Team teamToCheck : warzone.getTeams()) {
-				if (teamToCheck.getName().equals(team.getName())) {
-					return warzone;
-				}				
-			}
-
-		}
-		return null;
-	}
-
 	public boolean ready() {
 		if (this.volume.hasTwoCorners() && !this.volume.tooSmall() && !this.volume.tooBig()) {
 			return true;

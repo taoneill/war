@@ -428,7 +428,7 @@ public class War extends JavaPlugin {
 					if (loadout == null) {
 						// Check if any loadouts exist, if not gotta use the default inventories then add the newly created one
 						if(!team.getInventories().hasLoadouts()) {
-							Warzone warzone = Warzone.getZoneByTeam(team);
+							Warzone warzone = team.getZone();
 							for (String key : warzone.getDefaultInventories().resolveLoadouts().keySet()) {
 								HashMap<Integer, ItemStack> transferredLoadout = warzone.getDefaultInventories().resolveLoadouts().get(key);
 								if (transferredLoadout != null) {

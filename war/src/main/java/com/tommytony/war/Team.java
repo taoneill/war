@@ -79,6 +79,10 @@ public class Team {
 		}
 		return null;
 	}
+	
+	public Warzone getZone() {
+		return this.warzone;
+	}
 
 	public TeamKind getKind() {
 		return this.kind;
