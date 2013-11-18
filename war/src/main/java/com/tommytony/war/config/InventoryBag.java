@@ -36,10 +36,16 @@ public class InventoryBag {
 	}
 	
 	public void removeLoadout(String name) {
+		ArrayList<Loadout> loadoutsToRemove = new ArrayList<Loadout>(); 
 		for (Loadout ldt : loadouts) {
 			if (ldt.getName().equals(name)) {
-				this.loadouts.remove(ldt);
+				loadoutsToRemove.add(ldt);
 			}
+		}
+		
+		// avoid concurrent modif exceptions
+		for (Loadout loadoutToRemove : loadoutsToRemove) {
+			this.removeLoadout(loadoutToRemove);
 		}
 	}
 
