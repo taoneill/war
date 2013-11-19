@@ -17,15 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
@@ -50,9 +42,6 @@ import com.tommytony.war.volume.Volume;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
-
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.player.PlayerExpChangeEvent;
 
 /**
  * @author tommytony, Tim Düsterhus
@@ -883,6 +872,15 @@ public class WarPlayerListener implements Listener {
 			}
 		}
 	}
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onPlayerChat(final AsyncPlayerChatEvent event) {
+        Team team = Team.getTeamByPlayerName(event.getPlayer().getName());
+        if (team != null && team.isInTeamChat(event.getPlayer())) {
+            event.setCancelled(true);
+            team.sendTeamChatMessage(event.getPlayer(), event.getMessage());
+        }
+    }
 
 	public void purgeLatestPositions() {
 		this.latestLocations.clear();	

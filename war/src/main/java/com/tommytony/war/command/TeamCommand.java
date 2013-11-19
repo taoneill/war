@@ -30,13 +30,22 @@ public class TeamCommand extends AbstractWarCommand {
 			return false;
 		}
 
-		ChatColor color = playerTeam.getKind().getColor();
-		String teamMessage = color + player.getName() + ": " + ChatColor.WHITE;
-		for (String part : this.args) {
-			teamMessage += part + " ";
-		}
-		playerTeam.teamcast(teamMessage, false);
+        if (this.args.length < 1) {
+            if (playerTeam.isInTeamChat(player)) {
+                playerTeam.removeTeamChatPlayer(player);
+                this.msg("team.chat.disable");
+            } else {
+                playerTeam.addTeamChatPlayer(player);
+                this.msg("team.chat.enable");
+            }
+            return true;
+        }
 
+		StringBuilder teamMessage = new StringBuilder();
+		for (String part : this.args) {
+			teamMessage.append(part).append(' ');
+		}
+        playerTeam.sendTeamChatMessage(player, teamMessage.toString());
 		return true;
 	}
 }

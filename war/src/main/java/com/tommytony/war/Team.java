@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -43,6 +44,7 @@ import com.tommytony.war.volume.Volume;
  */
 public class Team {
 	private List<Player> players = new ArrayList<Player>();
+    private List<Player> teamChatPlayers = new ArrayList<Player>();
 	private List<Location> teamSpawns;
 	private Location teamFlag = null;
 	private String name;
@@ -450,6 +452,9 @@ public class Team {
 
 	public void removePlayer(Player thePlayer) {
 		this.players.remove(thePlayer);
+        synchronized (teamChatPlayers) {
+            this.teamChatPlayers.remove(thePlayer);
+        }
 		this.warzone.dropAllStolenObjects(thePlayer, false);
 		if (War.war.isTagServer()) {
 			TagAPI.refreshPlayer(thePlayer);
@@ -757,4 +762,52 @@ public class Team {
 		}
 		return false;
 	}
+
+    /**
+     * Send a team chat message with proper formatting.
+     *
+     * @param sender Player sending the message
+     * @param message Message to send
+     */
+    public void sendTeamChatMessage(OfflinePlayer sender, String message) {
+        String player = this.getKind().getColor() + ChatColor.stripColor(sender.getName()) + ChatColor.WHITE;
+        String output = String.format("%s: %s", player, message);
+        teamcast(output, false);
+        War.war.getLogger().info("[TeamChat] " + output);
+    }
+
+    /**
+     * Check if a player on this team has toggled on team chat. Thread safe.
+     *
+     * @param player Player to check
+     * @return true if the player has toggled on team chat
+     */
+    public boolean isInTeamChat(Player player) {
+        synchronized (teamChatPlayers) {
+            return this.teamChatPlayers.contains(player);
+        }
+    }
+
+    /**
+     * Add a player to team chat. Thread safe.
+     * @param player Player to add
+     * @throws IllegalArgumentException Player is already in team chat
+     */
+    public void addTeamChatPlayer(Player player) {
+        Validate.isTrue(!isInTeamChat(player), "Player is already in team chat");
+        synchronized (teamChatPlayers) {
+            this.teamChatPlayers.add(player);
+        }
+    }
+
+    /**
+     * Remove a player from team chat. Thread safe.
+     *
+     * @param player Player to remove
+     */
+    public void removeTeamChatPlayer(Player player) {
+        synchronized (teamChatPlayers) {
+            this.teamChatPlayers.remove(player);
+        }
+    }
 }
