@@ -3,6 +3,7 @@ package com.tommytony.war.config;
 import java.util.EnumMap;
 import java.util.Map;
 
+import com.tommytony.war.War;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class WarConfigBag {
@@ -37,6 +38,15 @@ public class WarConfigBag {
 		}
 	}
 
+	public String getString(WarConfig config) {
+		if (this.bag.containsKey(config)) {
+			return (String)this.bag.get(config);
+		} else {
+			return null;
+		}
+	}
+
+
 	public void loadFrom(ConfigurationSection warConfigSection) {
 		for (WarConfig config : WarConfig.values()) {
 			if (warConfigSection.contains(config.toString())) {
@@ -44,6 +54,8 @@ public class WarConfigBag {
 					this.put(config, warConfigSection.getInt(config.toString()));
 				} else if (config.getConfigType().equals(Boolean.class)) {
 					this.put(config, warConfigSection.getBoolean(config.toString()));
+				} else if (config.getConfigType().equals(String.class)) {
+					this.put(config, warConfigSection.getString(config.toString()));
 				}
 			}
 		}
@@ -68,6 +80,12 @@ public class WarConfigBag {
 				} else if (warConfig.getConfigType().equals(Boolean.class)) {
 					String onOff = namedParams.get(namedParam);
 					this.bag.put(warConfig, onOff.equals("on") || onOff.equals("true"));
+				} else if (warConfig.getConfigType().equals(String.class)) {
+					String str = namedParams.get(namedParam);
+					this.bag.put(warConfig, str);
+				}
+				if (warConfig == WarConfig.LANGUAGE) {
+					War.reloadLanguage();
 				}
 				returnMessage += warConfig.toString() + " set to " + namedParams.get(namedParam); 
 			}

@@ -50,7 +50,6 @@ public class ZoneLobby {
 	/**
 	 * Use this constructor with /setzonelobby <n/s/e/w>
 	 *
-	 * @param war
 	 * @param warzone
 	 * @param wall
 	 *                On which wall of the warzone will the lobby be stuck to at mid-weight
@@ -68,10 +67,8 @@ public class ZoneLobby {
 	/**
 	 * Use this constructor with /setzonelobby <zonename>. Makes sure the lobby is not sticking inside the zone.
 	 *
-	 * @param war
 	 * @param warzone
-	 * @param wall
-	 *                On which wall of the warzone will the lobby be stuck to at mid-weight
+	 * @param playerLocation Player moving lobby location
 	 */
 	public ZoneLobby(Warzone warzone, Location playerLocation) {
 		this.warzone = warzone;
@@ -291,7 +288,7 @@ public class ZoneLobby {
 				Block linkGateBlock = this.warHubLinkGate.getBlock();
 				this.placeWarhubLinkGate(linkGateBlock, warzone.getLobbyMaterials().getGateBlock());
 				// add warhub sign
-				String[] lines = War.war.getString("sign.lobby.warhub").split("\n");
+				String[] lines = (War.war.getString("sign.lobby.warhub") + ' ').split("\n");
 				this.resetGateSign(linkGateBlock, lines, false);
 			}
 

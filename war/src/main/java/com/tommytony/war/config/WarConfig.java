@@ -10,7 +10,8 @@ public enum WarConfig {
 	PVPINZONESONLY (Boolean.class),
 	TNTINZONESONLY (Boolean.class),
 	RESETSPEED (Integer.class),
-	MAXSIZE (Integer.class);
+	MAXSIZE (Integer.class),
+	LANGUAGE (String.class);
 	
 	private final Class<?> configType;
 

@@ -3,11 +3,7 @@ package com.tommytony.war;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -108,8 +104,7 @@ public class War extends JavaPlugin {
 	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
 	private SpoutDisplayer spoutMessenger = null;
 
-	private Logger warLogger;
-	private static final ResourceBundle messages = ResourceBundle.getBundle("messages");
+	private static ResourceBundle messages = ResourceBundle.getBundle("messages");
 
 	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(
 			new ItemStack(Material.GLASS), new ItemStack(Material.WOOD),
@@ -185,7 +180,8 @@ public class War extends JavaPlugin {
 		warConfig.put(WarConfig.TNTINZONESONLY, false);
 		warConfig.put(WarConfig.RESETSPEED, 5000);
 		warConfig.put(WarConfig.MAXSIZE, 750);
-		
+		warConfig.put(WarConfig.LANGUAGE, Locale.getDefault().getLanguage());
+
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOASSIGN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.BLOCKHEADS, true);
 		warzoneDefaultConfig.put(WarzoneConfig.DISABLED, false);
@@ -290,19 +286,18 @@ public class War extends JavaPlugin {
 				this.getServer().getPluginManager().disablePlugin(this);
 			}
 		}
-		
+
+		War.reloadLanguage();
+
 		// Get own log file
 		try {
-		    // Create an appending file handler
+			// Create an appending file handler
 			new File(this.getDataFolder() + "/temp/").mkdir();
-		    FileHandler handler = new FileHandler(this.getDataFolder() + "/temp/war.log", true);
+			FileHandler handler = new FileHandler(this.getDataFolder() + "/temp/war.log", true);
 
-		    // Add to War-specific logger
-		    this.warLogger = Logger.getLogger("com.tommytony.War.log");
-		    this.warLogger.setUseParentHandlers(false);
-		    Formatter formatter = new WarLogFormatter();
-	        handler.setFormatter(formatter);   
-		    this.warLogger.addHandler(handler);
+			// Add to War-specific logger
+			Formatter formatter = new WarLogFormatter();
+			handler.setFormatter(formatter);
 			this.getLogger().addHandler(handler);
 		} catch (IOException e) {
 			this.getLogger().log(Level.WARNING, "Failed to create War log file");
@@ -317,6 +312,11 @@ public class War extends JavaPlugin {
 		}
 				
 		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
+	}
+
+	public static void reloadLanguage() {
+		Locale lang = new Locale(War.war.getWarConfig().getString(WarConfig.LANGUAGE));
+		War.messages = ResourceBundle.getBundle("messages", lang);
 	}
 
 	/**
@@ -905,8 +905,7 @@ public class War extends JavaPlugin {
 	public void msg(CommandSender sender, String str) {
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
-					.append(this.getString("war.prefix")).append(
-							ChatColor.WHITE);
+					.append(this.getString("war.prefix")).append(ChatColor.WHITE).append(' ');
 			if (messages.containsKey(str)) {
 				output.append(this.colorKnownTokens(this.getString(str),
 						ChatColor.WHITE));
@@ -915,16 +914,14 @@ public class War extends JavaPlugin {
 			}
 			sender.sendMessage(output.toString());
 		} else {
-			sender.sendMessage(this.getString("war.prefix")
-					+ (messages.containsKey(str) ? messages.getString(str)
-							: str));
+			sender.sendMessage(messages.containsKey(str) ? messages.getString(str) : str);
 		}
 	}
 
 	public void badMsg(CommandSender sender, String str) {
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
-					.append(this.getString("war.prefix")).append(ChatColor.RED);
+					.append(this.getString("war.prefix")).append(ChatColor.RED).append(' ');
 			if (messages.containsKey(str)) {
 				output.append(this.colorKnownTokens(this.getString(str), ChatColor.RED));
 			} else {
@@ -932,16 +929,14 @@ public class War extends JavaPlugin {
 			}
 			sender.sendMessage(output.toString());
 		} else {
-			sender.sendMessage(this.getString("war.prefix")
-					+ (messages.containsKey(str) ? messages.getString(str)
-							: str));
+			sender.sendMessage(messages.containsKey(str) ? messages.getString(str) : str);
 		}
 	}
 
 	public void msg(CommandSender sender, String str, Object... obj) {
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
-					.append(this.getString("war.prefix")).append(ChatColor.WHITE);
+					.append(this.getString("war.prefix")).append(ChatColor.WHITE).append(' ');
 			if (messages.containsKey(str)) {
 				output.append(MessageFormat.format(this.colorKnownTokens(
 						this.getString(str), ChatColor.WHITE), obj));
@@ -951,8 +946,7 @@ public class War extends JavaPlugin {
 			}
 			sender.sendMessage(output.toString());
 		} else {
-			StringBuilder output = new StringBuilder(
-					this.getString("war.prefix"));
+			StringBuilder output = new StringBuilder();
 			if (messages.containsKey(str)) {
 				output.append(MessageFormat.format(this.getString(str), obj));
 			} else {
@@ -965,7 +959,7 @@ public class War extends JavaPlugin {
 	public void badMsg(CommandSender sender, String str, Object... obj) {
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
-					.append(this.getString("war.prefix")).append(ChatColor.RED);
+					.append(this.getString("war.prefix")).append(ChatColor.RED).append(' ');
 			if (messages.containsKey(str)) {
 				output.append(MessageFormat.format(this.colorKnownTokens(
 						this.getString(str), ChatColor.RED), obj));
@@ -975,8 +969,7 @@ public class War extends JavaPlugin {
 			}
 			sender.sendMessage(output.toString());
 		} else {
-			StringBuilder output = new StringBuilder(
-					this.getString("war.prefix"));
+			StringBuilder output = new StringBuilder();
 			if (messages.containsKey(str)) {
 				output.append(MessageFormat.format(this.getString(str), obj));
 			} else {
