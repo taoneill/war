@@ -873,14 +873,14 @@ public class WarPlayerListener implements Listener {
 		}
 	}
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onPlayerChat(final AsyncPlayerChatEvent event) {
-        Team team = Team.getTeamByPlayerName(event.getPlayer().getName());
-        if (team != null && team.isInTeamChat(event.getPlayer())) {
-            event.setCancelled(true);
-            team.sendTeamChatMessage(event.getPlayer(), event.getMessage());
-        }
-    }
+	@EventHandler(priority = EventPriority.LOW)
+	public void onPlayerChat(final AsyncPlayerChatEvent event) {
+		Team team = Team.getTeamByPlayerName(event.getPlayer().getName());
+		if (team != null && team.isInTeamChat(event.getPlayer())) {
+			event.setCancelled(true);
+			team.sendTeamChatMessage(event.getPlayer(), event.getMessage());
+		}
+	}
 
 	public void purgeLatestPositions() {
 		this.latestLocations.clear();	
