@@ -81,8 +81,9 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 	private void sendMessageToAllWarzonePlayers(String message) {
 		for (Player player : War.war.getServer().getOnlinePlayers()) {
 			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
-			if (zone.getPlayers().contains(player)
-					|| (lobby != null && lobby.getZone() == zone)) {
+			if (player != PartialZoneResetJob.senderToNotify
+					&& (zone.getPlayers().contains(player)
+						|| (lobby != null && lobby.getZone() == zone))) {
 				War.war.msg(player, message);
 			}
 		}
