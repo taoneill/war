@@ -10,6 +10,7 @@ import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.Warzone.LeaveCause;
+import com.tommytony.war.job.PartialZoneResetJob;
 import com.tommytony.war.structure.ZoneLobby;
 
 
@@ -59,7 +60,9 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 		}
 
 		this.msg("Reloading warzone " + zone.getName() + ".");
-			
+		
+		PartialZoneResetJob.setSenderToNotify(this.getSender());	
+		
 		zone.reinitialize();
 		
 		War.war.log(this.getSender().getName() + " reset warzone " + zone.getName(), Level.INFO);

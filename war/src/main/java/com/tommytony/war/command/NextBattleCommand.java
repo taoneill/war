@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.job.PartialZoneResetJob;
 import com.tommytony.war.structure.ZoneLobby;
 
 
@@ -42,6 +43,9 @@ public class NextBattleCommand extends AbstractZoneMakerCommand {
 
 		zone.clearThieves();
 		zone.broadcast("zone.battle.next", zone.getName());
+		
+		PartialZoneResetJob.setSenderToNotify(this.getSender());
+		
 		zone.reinitialize();
 		
 		War.war.log(this.getSender().getName() + " used nextbattle in warzone " + zone.getName(), Level.INFO);
