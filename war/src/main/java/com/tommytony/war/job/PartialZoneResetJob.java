@@ -2,8 +2,9 @@ package com.tommytony.war.job;
 
 import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.command.CommandSender;
@@ -17,7 +18,9 @@ import com.tommytony.war.volume.ZoneVolume;
 
 public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 	
-	private static CommandSender senderToNotify = null;
+	// Watch out, this command sender's map is shared between all concurrent reset jobs on different warzones
+	// - gotta make sure to notify the correct player that sent the command
+	private static Map<Warzone, CommandSender> sendersToNotify = Collections.synchronizedMap(new HashMap<Warzone, CommandSender>());
 	
 	private final Warzone zone;
 	private final ZoneVolume volume;
@@ -67,7 +70,7 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 				String message = MessageFormat.format(
 						War.war.getString("zone.battle.resetcomplete"), seconds);
 				this.sendMessageToAllWarzonePlayers(message);
-				PartialZoneResetJob.setSenderToNotify(null);	// stop notifying
+				PartialZoneResetJob.setSenderToNotify(zone, null);	// stop notifying for this zone
 				zone.initializeZone();
 				War.war.getLogger().info(
 						"Finished reset cycle for warzone " + volume.getName() + " (took " + seconds + " seconds)");
@@ -81,15 +84,15 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 	private void sendMessageToAllWarzonePlayers(String message) {
 		for (Player player : War.war.getServer().getOnlinePlayers()) {
 			ZoneLobby lobby = ZoneLobby.getLobbyByLocation(player);
-			if (player != PartialZoneResetJob.senderToNotify
+			if (player != PartialZoneResetJob.sendersToNotify.get(zone)
 					&& (zone.getPlayers().contains(player)
 						|| (lobby != null && lobby.getZone() == zone))) {
 				War.war.msg(player, message);
 			}
 		}
 		
-		if (PartialZoneResetJob.senderToNotify != null) {
-			War.war.msg(senderToNotify, message);
+		if (PartialZoneResetJob.sendersToNotify.get(zone) != null) {
+			War.war.msg(PartialZoneResetJob.sendersToNotify.get(zone), message);
 		}
 	}
 
@@ -102,7 +105,7 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 		}
 	}
 
-	public static void setSenderToNotify(CommandSender sender) {
-		PartialZoneResetJob.senderToNotify = sender;
+	public static void setSenderToNotify(Warzone warzone, CommandSender sender) {
+		PartialZoneResetJob.sendersToNotify.put(warzone, sender);
 	}
 }

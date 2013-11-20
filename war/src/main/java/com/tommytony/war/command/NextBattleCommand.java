@@ -44,7 +44,7 @@ public class NextBattleCommand extends AbstractZoneMakerCommand {
 		zone.clearThieves();
 		zone.broadcast("zone.battle.next", zone.getName());
 		
-		PartialZoneResetJob.setSenderToNotify(this.getSender());
+		PartialZoneResetJob.setSenderToNotify(zone, this.getSender());
 		
 		zone.reinitialize();
 		

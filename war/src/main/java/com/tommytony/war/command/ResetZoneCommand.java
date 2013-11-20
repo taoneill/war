@@ -61,7 +61,7 @@ public class ResetZoneCommand extends AbstractZoneMakerCommand {
 
 		this.msg("Reloading warzone " + zone.getName() + ".");
 		
-		PartialZoneResetJob.setSenderToNotify(this.getSender());	
+		PartialZoneResetJob.setSenderToNotify(zone, this.getSender());	
 		
 		zone.reinitialize();
 		
