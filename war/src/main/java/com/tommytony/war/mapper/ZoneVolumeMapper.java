@@ -105,10 +105,13 @@ public class ZoneVolumeMapper {
 			int x = query.getInt("x"), y = query.getInt("y"), z = query.getInt("z");
 			BlockState modify = corner1.getRelative(x, y, z).getState();
 			ItemStack data = new ItemStack(Material.valueOf(query.getString("type")), 0, query.getShort("data"));
-			modify.setType(data.getType());
-			modify.setData(data.getData());
-			modify.update(true, false); // No-physics update, preventing the need for deferring blocks
-			modify = corner1.getRelative(x, y, z).getState(); // Grab a new instance
+			if (modify.getType() != data.getType() || !modify.getData().equals(data.getData())) {
+				// Update the type & data if it has changed
+				modify.setType(data.getType());
+				modify.setData(data.getData());
+				modify.update(true, false); // No-physics update, preventing the need for deferring blocks
+				modify = corner1.getRelative(x, y, z).getState(); // Grab a new instance
+			}
 			try {
 				if (modify instanceof Sign && query.getString("sign") != null) {
 					final String[] lines = query.getString("sign").split("\n");
