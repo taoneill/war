@@ -51,13 +51,13 @@ public class ZoneVolumeMapper {
 	/**
 	 * Loads the given volume
 	 *
-	 * @param ZoneVolume volume Volume to load
-	 * @param String zoneName Zone to load the volume from
-	 * @param World world The world the zone is located
-	 * @param boolean onlyLoadCorners Should only the corners be loaded
+	 * @param volume Volume to load
+	 * @param zoneName Zone to load the volume from
+	 * @param world The world the zone is located
+	 * @param onlyLoadCorners Should only the corners be loaded
 	 * @param start Starting position to load blocks at
 	 * @param total Amount of blocks to read
-	 * @return integer Changed blocks
+	 * @return Changed blocks
 	 * @throws SQLException Error communicating with SQLite3 database
 	 */
 	public static int load(ZoneVolume volume, String zoneName, World world, boolean onlyLoadCorners, int start, int total) throws SQLException {
@@ -110,11 +110,12 @@ public class ZoneVolumeMapper {
 			modify.update(true, false); // No-physics update, preventing the need for deferring blocks
 			modify = corner1.getRelative(x, y, z).getState(); // Grab a new instance
 			try {
-				if (modify instanceof Sign) {
+				if (modify instanceof Sign && query.getString("sign") != null) {
 					final String[] lines = query.getString("sign").split("\n");
 					for (int i = 0; i < lines.length; i++) {
 						((Sign) modify).setLine(i, lines[i]);
 					}
+					modify.update(true, false);
 				}
 				if (modify instanceof InventoryHolder && query.getString("container") != null) {
 					YamlConfiguration config = new YamlConfiguration();
@@ -125,33 +126,38 @@ public class ZoneVolumeMapper {
 							((InventoryHolder) modify).getInventory().addItem((ItemStack) obj);
 						}
 					}
+					modify.update(true, false);
 				}
-				if (modify instanceof NoteBlock) {
+				if (modify instanceof NoteBlock && query.getString("note") != null) {
 					String[] split = query.getString("note").split("\n");
 					Note note = new Note(Integer.parseInt(split[1]), Tone.valueOf(split[0]), Boolean.parseBoolean(split[2]));
 					((NoteBlock) modify).setNote(note);
+					modify.update(true, false);
 				}
-				if (modify instanceof Jukebox) {
+				if (modify instanceof Jukebox && query.getString("record") != null) {
 					((Jukebox) modify).setPlaying(Material.valueOf(query.getString("record")));
+					modify.update(true, false);
 				}
 				if (modify instanceof Skull && query.getString("skull") != null) {
 					String[] opts = query.getString("skull").split("\n");
 					((Skull) modify).setOwner(opts[0]);
 					((Skull) modify).setSkullType(SkullType.valueOf(opts[1]));
 					((Skull) modify).setRotation(BlockFace.valueOf(opts[2]));
+					modify.update(true, false);
 				}
 				if (modify instanceof CommandBlock && query.getString("command") != null) {
 					final String[] commandArray = query.getString("command").split("\n");
 					((CommandBlock) modify).setName(commandArray[0]);
 					((CommandBlock) modify).setCommand(commandArray[1]);
+					modify.update(true, false);
 				}
-				if (modify instanceof CreatureSpawner) {
+				if (modify instanceof CreatureSpawner && query.getString("mobid") != null) {
 					((CreatureSpawner) modify).setSpawnedType(EntityType.valueOf(query.getString("mobid")));
+					modify.update(true, false);
 				}
 			} catch (Exception ex) {
 				War.war.getLogger().log(Level.WARNING, "Exception loading some tile data", ex);
 			}
-			modify.update(true, false);
 			changed++;
 		}
 		query.close();
@@ -171,7 +177,9 @@ public class ZoneVolumeMapper {
 	public static int save(Volume volume, String zoneName) throws SQLException {
 		int changed = 0;
 		File warzoneDir = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + zoneName);
-		warzoneDir.mkdirs();
+		if (!warzoneDir.mkdirs()) {
+			throw new RuntimeException("Failed to create warzone storage directory.");
+		}
 		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
 		Connection databaseConnection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
 		Statement stmt = databaseConnection.createStatement();
