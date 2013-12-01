@@ -46,7 +46,7 @@ import com.tommytony.war.volume.ZoneVolume;
  */
 public class ZoneVolumeMapper {
 
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 2;
 
 	/**
 	 * Loads the given volume
@@ -76,16 +76,32 @@ public class ZoneVolumeMapper {
 		int version = versionQuery.getInt("user_version");
 		versionQuery.close();
 		if (version > DATABASE_VERSION) {
-			try {
-				throw new IllegalStateException("Unsupported zone format " + version);
-			} finally {
-				stmt.close();
-				databaseConnection.close();
-			}
+			stmt.close();
+			databaseConnection.close();
+			
+			// Can't load this too-recent format
+			throw new IllegalStateException("Unsupported zone format (was already converted to version: " 
+					+ version + ", current format: " + DATABASE_VERSION + ")");
 		} else if (version < DATABASE_VERSION) {
+			stmt.close();
+			
+			// We need to migrate to newest schema
 			switch (version) {
 				// Run some update SQL for each old version
+				case 1:
+					// Run update from 1 to 2
+					updateFromVersionOneToTwo(zoneName, databaseConnection);
+					
+// How to continue this pattern:
+//					// Run update from 2 to 3 (to handle jump from v1 to v3
+//					updateFromVersionTwoToTree(zoneName, databaseConnection);
+//				case 2:
+//					// Run update from 2 to 3
+//					updateFromVersionTwoToTree(zoneName, databaseConnection);
 			}
+			
+			// create a new statement to take into account new schema changes
+			stmt = databaseConnection.createStatement();
 		}
 		ResultSet cornerQuery = stmt.executeQuery("SELECT * FROM corners");
 		cornerQuery.next();
@@ -111,47 +127,65 @@ public class ZoneVolumeMapper {
 			modify = corner1.getRelative(x, y, z).getState(); // Grab a new instance
 			try {
 				if (modify instanceof Sign) {
-					final String[] lines = query.getString("sign").split("\n");
+					final String[] lines = query.getString("metadata").split("\n");
 					for (int i = 0; i < lines.length; i++) {
 						((Sign) modify).setLine(i, lines[i]);
 					}
+					modify.update(true, false);
 				}
-				if (modify instanceof InventoryHolder && query.getString("container") != null) {
+				
+				// Containers
+				if (modify instanceof InventoryHolder && query.getString("metadata") != null) {
 					YamlConfiguration config = new YamlConfiguration();
-					config.loadFromString(query.getString("container"));
+					config.loadFromString(query.getString("metadata"));
 					((InventoryHolder) modify).getInventory().clear();
 					for (Object obj : config.getList("items")) {
 						if (obj instanceof ItemStack) {
 							((InventoryHolder) modify).getInventory().addItem((ItemStack) obj);
 						}
 					}
+					modify.update(true, false);
 				}
+				
+				// Notes
 				if (modify instanceof NoteBlock) {
-					String[] split = query.getString("note").split("\n");
+					String[] split = query.getString("metadata").split("\n");
 					Note note = new Note(Integer.parseInt(split[1]), Tone.valueOf(split[0]), Boolean.parseBoolean(split[2]));
 					((NoteBlock) modify).setNote(note);
+					modify.update(true, false);
 				}
+				
+				// Records
 				if (modify instanceof Jukebox) {
-					((Jukebox) modify).setPlaying(Material.valueOf(query.getString("record")));
+					((Jukebox) modify).setPlaying(Material.valueOf(query.getString("metadata")));
+					modify.update(true, false);
 				}
-				if (modify instanceof Skull && query.getString("skull") != null) {
-					String[] opts = query.getString("skull").split("\n");
+				
+				// Skulls
+				if (modify instanceof Skull && query.getString("metadata") != null) {
+					String[] opts = query.getString("metadata").split("\n");
 					((Skull) modify).setOwner(opts[0]);
 					((Skull) modify).setSkullType(SkullType.valueOf(opts[1]));
 					((Skull) modify).setRotation(BlockFace.valueOf(opts[2]));
+					modify.update(true, false);
 				}
-				if (modify instanceof CommandBlock && query.getString("command") != null) {
-					final String[] commandArray = query.getString("command").split("\n");
+				
+				// Command blocks
+				if (modify instanceof CommandBlock && query.getString("metadata") != null) {
+					final String[] commandArray = query.getString("metadata").split("\n");
 					((CommandBlock) modify).setName(commandArray[0]);
 					((CommandBlock) modify).setCommand(commandArray[1]);
+					modify.update(true, false);
 				}
+				
+				// Creature spawner
 				if (modify instanceof CreatureSpawner) {
-					((CreatureSpawner) modify).setSpawnedType(EntityType.valueOf(query.getString("mobid")));
+					((CreatureSpawner) modify).setSpawnedType(EntityType.valueOf(query.getString("metadata")));
+					modify.update(true, false);
 				}
 			} catch (Exception ex) {
-				War.war.getLogger().log(Level.WARNING, "Exception loading some tile data", ex);
+				War.war.getLogger().log(Level.WARNING, "Exception loading some tile data. x:" + x + " y:" + y + " z:" + z + " type:" + modify.getType().toString() + " data:" + modify.getData().toString(), ex);
 			}
-			modify.update(true, false);
 			changed++;
 		}
 		query.close();
@@ -176,7 +210,7 @@ public class ZoneVolumeMapper {
 		Connection databaseConnection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
 		Statement stmt = databaseConnection.createStatement();
 		stmt.executeUpdate("PRAGMA user_version = " + DATABASE_VERSION);
-		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS blocks (x BIGINT, y BIGINT, z BIGINT, type TEXT, data SMALLINT, sign TEXT, container BLOB, note INT, record TEXT, skull TEXT, command TEXT, mobid TEXT)");
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS blocks (x BIGINT, y BIGINT, z BIGINT, type TEXT, data SMALLINT, metadata BLOB)");
 		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS corners (pos INTEGER PRIMARY KEY  NOT NULL  UNIQUE, x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL)");
 		stmt.executeUpdate("DELETE FROM blocks");
 		stmt.executeUpdate("DELETE FROM corners");
@@ -190,65 +224,85 @@ public class ZoneVolumeMapper {
 		cornerStmt.setInt(6, volume.getCornerTwo().getBlockZ());
 		cornerStmt.executeUpdate();
 		cornerStmt.close();
-		PreparedStatement dataStmt = databaseConnection.prepareStatement("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		//x, y, z, type, data, sign, container, note, record, skull, command, mobid 
+		//x, y, z, type, data, metadata
+		PreparedStatement dataStmt = databaseConnection.prepareStatement("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?)");
 		databaseConnection.setAutoCommit(false);
 		final int batchSize = 1000;
 		for (int i = 0, x = volume.getMinX(); i < volume.getSizeX(); i++, x++) {
 			for (int j = 0, y = volume.getMinY(); j < volume.getSizeY(); j++, y++) {
 				for (int k = 0, z = volume.getMinZ(); k < volume.getSizeZ(); k++, z++) {
+					// Make sure we are using zone volume-relative coords
 					final Block block = volume.getWorld().getBlockAt(x, y, z);
 					final Location relLoc = rebase(volume.getCornerOne(), block.getLocation());
+					
 					dataStmt.setInt(1, relLoc.getBlockX());
 					dataStmt.setInt(2, relLoc.getBlockY());
 					dataStmt.setInt(3, relLoc.getBlockZ());
 					dataStmt.setString(4, block.getType().toString());
 					dataStmt.setShort(5, block.getState().getData().toItemStack().getDurability());
+					
+					// Signs
 					if (block.getState() instanceof Sign) {
 						final String signText = StringUtils.join(((Sign) block.getState()).getLines(), "\n");
 						dataStmt.setString(6, signText);
 					} else {
 						dataStmt.setNull(6, Types.VARCHAR);
 					}
+					
+					// Containers
 					if (block.getState() instanceof InventoryHolder) {
 						List<ItemStack> items = Arrays.asList(((InventoryHolder) block.getState()).getInventory().getContents());
 						YamlConfiguration config = new YamlConfiguration();
 						// Serialize to config, then store config in database
 						config.set("items", items);
-						dataStmt.setString(7, config.saveToString());
+						dataStmt.setString(6, config.saveToString());
 					} else {
-						dataStmt.setNull(7, Types.BLOB);
+						dataStmt.setNull(6, Types.BLOB);
 					}
+					
+					// Notes
 					if (block.getState() instanceof NoteBlock) {
 						Note note = ((NoteBlock) block.getState()).getNote();
-						dataStmt.setString(8, note.getTone().toString() + '\n' + note.getOctave() + '\n' + note.isSharped());
+						dataStmt.setString(6, note.getTone().toString() + '\n' + note.getOctave() + '\n' + note.isSharped());
 					} else {
-						dataStmt.setNull(8, Types.VARCHAR);
+						dataStmt.setNull(6, Types.VARCHAR);
 					}
+					
+					// Records
 					if (block.getState() instanceof Jukebox) {
-						dataStmt.setString(9, ((Jukebox) block.getState()).getPlaying().toString());
+						dataStmt.setString(6, ((Jukebox) block.getState()).getPlaying().toString());
 					} else {
-						dataStmt.setNull(9, Types.VARCHAR);
+						dataStmt.setNull(6, Types.VARCHAR);
 					}
+					
+					// Skulls
 					if (block.getState() instanceof Skull) {
-						dataStmt.setString(10, String.format("%s\n%s\n%s",
+						dataStmt.setString(6, String.format("%s\n%s\n%s",
 								((Skull) block.getState()).getOwner(),
 								((Skull) block.getState()).getSkullType().toString(),
 								((Skull) block.getState()).getRotation().toString()));
 					} else {
-						dataStmt.setNull(10, Types.VARCHAR);
+						dataStmt.setNull(6, Types.VARCHAR);
 					}
+					
+					// Command blocks
 					if (block.getState() instanceof CommandBlock) {
-						dataStmt.setString(11, ((CommandBlock) block.getState()).getName()
+						dataStmt.setString(6, ((CommandBlock) block.getState()).getName()
 								+ "\n" + ((CommandBlock) block.getState()).getCommand());
 					} else {
-						dataStmt.setNull(11, Types.VARCHAR);
+						dataStmt.setNull(6, Types.VARCHAR);
 					}
+					
+					// Creature spawners
 					if (block.getState() instanceof CreatureSpawner) {
-						dataStmt.setString(12, ((CreatureSpawner) block.getState()).getSpawnedType().toString());
+						dataStmt.setString(6, ((CreatureSpawner) block.getState()).getSpawnedType().toString());
 					} else {
-						dataStmt.setNull(12, Types.VARCHAR);
+						dataStmt.setNull(6, Types.VARCHAR);
 					}
+					
 					dataStmt.addBatch();
+					
 					if (++changed % batchSize == 0) {
 						dataStmt.executeBatch();
 					}
@@ -269,5 +323,39 @@ public class ZoneVolumeMapper {
 				exact.getBlockX() - base.getBlockX(),
 				exact.getBlockY() - base.getBlockY(),
 				exact.getBlockZ() - base.getBlockZ());
+	}
+
+	private static void updateFromVersionOneToTwo(String zoneName, Connection connection) throws SQLException {
+		War.war.log("Migrating warzone " + zoneName + " from v1 to v2 of schema...", Level.INFO);
+		
+		// We want to do this in a transaction
+		connection.setAutoCommit(false);
+		
+		Statement stmt = connection.createStatement();
+		
+		// We want to combine all extra columns into a single metadata BLOB one. To delete some columns we need to drop the table so we use a temp one.
+		stmt.executeUpdate("CREATE TEMPORARY TABLE blocks_backup(x BIGINT, y BIGINT, z BIGINT, type TEXT, data SMALLINT, sign TEXT, container BLOB, note INT, record TEXT, skull TEXT, command TEXT, mobid TEXT)");
+		stmt.executeUpdate("INSERT INTO blocks_backup SELECT x, y, z, type, data, sign, container, note, record, skull, command, mobid FROM blocks");
+		stmt.executeUpdate("DROP TABLE blocks");
+		stmt.executeUpdate("CREATE TABLE blocks(x BIGINT, y BIGINT, z BIGINT, type TEXT, data SMALLINT, metadata BLOB)");
+		stmt.executeUpdate("INSERT INTO blocks SELECT x, y, z, type, data, coalesce(container, sign, note, record, skull, command, mobid) FROM blocks_backup");
+		stmt.executeUpdate("DROP TABLE blocks_backup");	
+		stmt.executeUpdate("PRAGMA user_version = 2");
+		stmt.close();
+		
+		// Commit transaction
+		connection.commit();
+		
+		connection.setAutoCommit(true);
+		
+		War.war.log("Warzone " + zoneName + " converted! Compacting database...", Level.INFO);
+		
+		// Pack the database otherwise we won't get any space savings.
+		// This rebuilds the database completely and takes some time.
+		stmt = connection.createStatement();
+		stmt.execute("VACUUM");
+		stmt.close();
+		
+		War.war.log("Migration of warzone " + zoneName + " to v2 of schema finished.", Level.INFO);
 	}
 }

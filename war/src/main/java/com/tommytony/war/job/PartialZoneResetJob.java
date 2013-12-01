@@ -1,7 +1,9 @@
 package com.tommytony.war.job;
 
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,27 +55,29 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 		try {
 			volume.resetSection(completed, speed);
 			completed += speed;
+			NumberFormat formatter = new DecimalFormat("#0.00");
+			String secondsAsText = formatter.format(((double)(System.currentTimeMillis() - startTime)) / 1000);
 			if (completed < total) {
 				if (System.currentTimeMillis() - messageCounter > MESSAGE_INTERVAL) {
 					messageCounter = System.currentTimeMillis();
 					int percent = (int) (((double) completed / (double) total) * 100);
-					long seconds = (System.currentTimeMillis() - startTime) / 1000;
+					float seconds = (System.currentTimeMillis() - startTime) / 1000;
 					String message = MessageFormat.format(
 							War.war.getString("zone.battle.resetprogress"),
-							percent, seconds);
+							percent, secondsAsText);
 					this.sendMessageToAllWarzonePlayers(message);
 				}
 				War.war.getServer().getScheduler()
 						.runTaskLater(War.war, this.clone(), JOB_INTERVAL);
 			} else {
-				long seconds = (System.currentTimeMillis() - startTime) / 1000;
+				float seconds = (System.currentTimeMillis() - startTime) / 1000;
 				String message = MessageFormat.format(
-						War.war.getString("zone.battle.resetcomplete"), seconds);
+						War.war.getString("zone.battle.resetcomplete"), secondsAsText);
 				this.sendMessageToAllWarzonePlayers(message);
 				PartialZoneResetJob.setSenderToNotify(zone, null);	// stop notifying for this zone
 				zone.initializeZone();
 				War.war.getLogger().info(
-						"Finished reset cycle for warzone " + volume.getName() + " (took " + seconds + " seconds)");
+						"Finished reset cycle for warzone " + volume.getName() + " (took " + secondsAsText + " seconds)");
 			}
 		} catch (SQLException e) {
 			War.war.getLogger().log(Level.WARNING,
