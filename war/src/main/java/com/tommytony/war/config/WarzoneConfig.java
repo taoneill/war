@@ -24,7 +24,8 @@ public enum WarzoneConfig {
 	AUTOJOIN (Boolean.class),
 	SCOREBOARD (ScoreboardType.class),
 	XPKILLMETER (Boolean.class),
-	SOUPHEALING (Boolean.class);
+	SOUPHEALING (Boolean.class),
+	ALLOWENDER (Boolean.class);
 	
 	
 	private final Class<?> configType;
