@@ -7,13 +7,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Note;
@@ -51,15 +49,15 @@ public class ZoneVolumeMapper {
 	/**
 	 * Loads the given volume
 	 *
-	 * @param ZoneVolume volume Volume to load
-	 * @param String zoneName Zone to load the volume from
-	 * @param World world The world the zone is located
-	 * @param boolean onlyLoadCorners Should only the corners be loaded
+	 * @param volume Volume to load
+	 * @param zoneName Zone to load the volume from
+	 * @param world The world the zone is located
+	 * @param onlyLoadCorners Should only the corners be loaded
 	 * @param start Starting position to load blocks at
 	 * @param total Amount of blocks to read
 	 * @return integer Changed blocks
 	 * @throws SQLException Error communicating with SQLite3 database
-	 */
+	 */                      
 	public static int load(ZoneVolume volume, String zoneName, World world, boolean onlyLoadCorners, int start, int total) throws SQLException {
 		int changed = 0;
 		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
@@ -205,7 +203,9 @@ public class ZoneVolumeMapper {
 	public static int save(Volume volume, String zoneName) throws SQLException {
 		int changed = 0;
 		File warzoneDir = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + zoneName);
-		warzoneDir.mkdirs();
+		if (!warzoneDir.mkdirs()) {
+			throw new RuntimeException("Failed to create warzone data directory");
+		}
 		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
 		Connection databaseConnection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
 		Statement stmt = databaseConnection.createStatement();
@@ -228,77 +228,42 @@ public class ZoneVolumeMapper {
 		//x, y, z, type, data, metadata
 		PreparedStatement dataStmt = databaseConnection.prepareStatement("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?)");
 		databaseConnection.setAutoCommit(false);
-		final int batchSize = 1000;
+		final int batchSize = 10000;
 		for (int i = 0, x = volume.getMinX(); i < volume.getSizeX(); i++, x++) {
 			for (int j = 0, y = volume.getMinY(); j < volume.getSizeY(); j++, y++) {
 				for (int k = 0, z = volume.getMinZ(); k < volume.getSizeZ(); k++, z++) {
 					// Make sure we are using zone volume-relative coords
 					final Block block = volume.getWorld().getBlockAt(x, y, z);
-					final Location relLoc = rebase(volume.getCornerOne(), block.getLocation());
-					
-					dataStmt.setInt(1, relLoc.getBlockX());
-					dataStmt.setInt(2, relLoc.getBlockY());
-					dataStmt.setInt(3, relLoc.getBlockZ());
-					dataStmt.setString(4, block.getType().toString());
-					dataStmt.setShort(5, block.getState().getData().toItemStack().getDurability());
-					
-					// Signs
-					if (block.getState() instanceof Sign) {
+					final BlockState state = block.getState();
+					dataStmt.setInt(1, block.getX() - volume.getCornerOne().getBlockX());
+					dataStmt.setInt(2, block.getY() - volume.getCornerOne().getBlockY());
+					dataStmt.setInt(3, block.getZ() - volume.getCornerOne().getBlockZ());
+					dataStmt.setString(4, block.getType().name());
+					dataStmt.setShort(5, state.getData().toItemStack().getDurability());
+					if (state instanceof Sign) {
 						final String signText = StringUtils.join(((Sign) block.getState()).getLines(), "\n");
 						dataStmt.setString(6, signText);
-					} else {
-						dataStmt.setNull(6, Types.VARCHAR);
-					}
-					
-					// Containers
-					if (block.getState() instanceof InventoryHolder) {
+					} else if (state instanceof InventoryHolder) {
 						List<ItemStack> items = Arrays.asList(((InventoryHolder) block.getState()).getInventory().getContents());
 						YamlConfiguration config = new YamlConfiguration();
 						// Serialize to config, then store config in database
 						config.set("items", items);
 						dataStmt.setString(6, config.saveToString());
-					} else {
-						dataStmt.setNull(6, Types.BLOB);
-					}
-					
-					// Notes
-					if (block.getState() instanceof NoteBlock) {
+					} else if (state instanceof NoteBlock) {
 						Note note = ((NoteBlock) block.getState()).getNote();
 						dataStmt.setString(6, note.getTone().toString() + '\n' + note.getOctave() + '\n' + note.isSharped());
-					} else {
-						dataStmt.setNull(6, Types.VARCHAR);
-					}
-					
-					// Records
-					if (block.getState() instanceof Jukebox) {
+					} else if (state instanceof Jukebox) {
 						dataStmt.setString(6, ((Jukebox) block.getState()).getPlaying().toString());
-					} else {
-						dataStmt.setNull(6, Types.VARCHAR);
-					}
-					
-					// Skulls
-					if (block.getState() instanceof Skull) {
+					} else if (state instanceof Skull) {
 						dataStmt.setString(6, String.format("%s\n%s\n%s",
 								((Skull) block.getState()).getOwner(),
 								((Skull) block.getState()).getSkullType().toString(),
 								((Skull) block.getState()).getRotation().toString()));
-					} else {
-						dataStmt.setNull(6, Types.VARCHAR);
-					}
-					
-					// Command blocks
-					if (block.getState() instanceof CommandBlock) {
+					} else if (state instanceof CommandBlock) {
 						dataStmt.setString(6, ((CommandBlock) block.getState()).getName()
 								+ "\n" + ((CommandBlock) block.getState()).getCommand());
-					} else {
-						dataStmt.setNull(6, Types.VARCHAR);
-					}
-					
-					// Creature spawners
-					if (block.getState() instanceof CreatureSpawner) {
+					} else if (state instanceof CreatureSpawner) {
 						dataStmt.setString(6, ((CreatureSpawner) block.getState()).getSpawnedType().toString());
-					} else {
-						dataStmt.setNull(6, Types.VARCHAR);
 					}
 					
 					dataStmt.addBatch();
@@ -317,8 +282,6 @@ public class ZoneVolumeMapper {
 	}
 
 	public static Location rebase(final Location base, final Location exact) {
-		Validate.isTrue(base.getWorld().equals(exact.getWorld()),
-				"Locations must be in the same world");
 		return new Location(base.getWorld(),
 				exact.getBlockX() - base.getBlockX(),
 				exact.getBlockY() - base.getBlockY(),
