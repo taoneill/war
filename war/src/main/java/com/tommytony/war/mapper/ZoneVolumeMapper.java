@@ -55,7 +55,7 @@ public class ZoneVolumeMapper {
 	 * @param onlyLoadCorners Should only the corners be loaded
 	 * @param start Starting position to load blocks at
 	 * @param total Amount of blocks to read
-	 * @return integer Changed blocks
+	 * @return Changed blocks
 	 * @throws SQLException Error communicating with SQLite3 database
 	 */                      
 	public static int load(ZoneVolume volume, String zoneName, World world, boolean onlyLoadCorners, int start, int total) throws SQLException {
@@ -119,10 +119,17 @@ public class ZoneVolumeMapper {
 			int x = query.getInt("x"), y = query.getInt("y"), z = query.getInt("z");
 			BlockState modify = corner1.getRelative(x, y, z).getState();
 			ItemStack data = new ItemStack(Material.valueOf(query.getString("type")), 0, query.getShort("data"));
-			modify.setType(data.getType());
-			modify.setData(data.getData());
-			modify.update(true, false); // No-physics update, preventing the need for deferring blocks
-			modify = corner1.getRelative(x, y, z).getState(); // Grab a new instance
+			if (modify.getType() != data.getType() || !modify.getData().equals(data.getData())) {
+				// Update the type & data if it has changed
+				modify.setType(data.getType());
+				modify.setData(data.getData());
+				modify.update(true, false); // No-physics update, preventing the need for deferring blocks
+				modify = corner1.getRelative(x, y, z).getState(); // Grab a new instance
+			}
+			changed++;
+			if (query.getString("metadata") == null || query.getString("metadata").isEmpty()) {
+				continue;
+			}
 			try {
 				if (modify instanceof Sign) {
 					final String[] lines = query.getString("metadata").split("\n");
@@ -144,7 +151,7 @@ public class ZoneVolumeMapper {
 					}
 					modify.update(true, false);
 				}
-				
+
 				// Notes
 				if (modify instanceof NoteBlock) {
 					String[] split = query.getString("metadata").split("\n");
@@ -152,7 +159,7 @@ public class ZoneVolumeMapper {
 					((NoteBlock) modify).setNote(note);
 					modify.update(true, false);
 				}
-				
+
 				// Records
 				if (modify instanceof Jukebox) {
 					((Jukebox) modify).setPlaying(Material.valueOf(query.getString("metadata")));
@@ -175,7 +182,7 @@ public class ZoneVolumeMapper {
 					((CommandBlock) modify).setCommand(commandArray[1]);
 					modify.update(true, false);
 				}
-				
+
 				// Creature spawner
 				if (modify instanceof CreatureSpawner) {
 					((CreatureSpawner) modify).setSpawnedType(EntityType.valueOf(query.getString("metadata")));
@@ -184,7 +191,6 @@ public class ZoneVolumeMapper {
 			} catch (Exception ex) {
 				War.war.getLogger().log(Level.WARNING, "Exception loading some tile data. x:" + x + " y:" + y + " z:" + z + " type:" + modify.getType().toString() + " data:" + modify.getData().toString(), ex);
 			}
-			changed++;
 		}
 		query.close();
 		stmt.close();
