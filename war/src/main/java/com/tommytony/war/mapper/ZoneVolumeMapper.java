@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -57,16 +58,15 @@ public class ZoneVolumeMapper {
 	 * @param total Amount of blocks to read
 	 * @return Changed blocks
 	 * @throws SQLException Error communicating with SQLite3 database
-	 */                      
-	public static int load(ZoneVolume volume, String zoneName, World world, boolean onlyLoadCorners, int start, int total) throws SQLException {
-		int changed = 0;
+	 */
+	public static int load(ZoneVolume volume, String zoneName, World world, boolean onlyLoadCorners, int start, int total, boolean[][][] changes) throws SQLException {
 		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
 		if (!databaseFile.exists()) {
 			// Convert warzone to nimitz file format.
-			changed = PreNimitzZoneVolumeMapper.load(volume, zoneName, world, onlyLoadCorners);
+			PreNimitzZoneVolumeMapper.load(volume, zoneName, world, onlyLoadCorners);
 			ZoneVolumeMapper.save(volume, zoneName);
 			War.war.log("Warzone " + zoneName + " converted to nimitz format!", Level.INFO);
-			return changed;
+			return volume.size();
 		}
 		Connection databaseConnection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
 		Statement stmt = databaseConnection.createStatement();
@@ -114,10 +114,18 @@ public class ZoneVolumeMapper {
 			databaseConnection.close();
 			return 0;
 		}
+		int minX = volume.getMinX(), minY = volume.getMinY(), minZ = volume.getMinZ();
+		int changed = 0;
 		ResultSet query = stmt.executeQuery("SELECT * FROM blocks ORDER BY rowid LIMIT " + start + ", " + total);
 		while (query.next()) {
 			int x = query.getInt("x"), y = query.getInt("y"), z = query.getInt("z");
-			BlockState modify = corner1.getRelative(x, y, z).getState();
+			changed++;
+			Block relative = corner1.getRelative(x, y, z);
+			int xi = relative.getX() - minX, yi = relative.getY() - minY, zi = relative.getZ() - minZ;
+			if (changes != null) {
+				changes[xi][yi][zi] = true;
+			}
+			BlockState modify = relative.getState();
 			ItemStack data = new ItemStack(Material.valueOf(query.getString("type")), 0, query.getShort("data"));
 			if (modify.getType() != data.getType() || !modify.getData().equals(data.getData())) {
 				// Update the type & data if it has changed
@@ -126,7 +134,6 @@ public class ZoneVolumeMapper {
 				modify.update(true, false); // No-physics update, preventing the need for deferring blocks
 				modify = corner1.getRelative(x, y, z).getState(); // Grab a new instance
 			}
-			changed++;
 			if (query.getString("metadata") == null || query.getString("metadata").isEmpty()) {
 				continue;
 			}
@@ -140,7 +147,7 @@ public class ZoneVolumeMapper {
 				}
 				
 				// Containers
-				if (modify instanceof InventoryHolder && query.getString("metadata") != null) {
+				if (modify instanceof InventoryHolder) {
 					YamlConfiguration config = new YamlConfiguration();
 					config.loadFromString(query.getString("metadata"));
 					((InventoryHolder) modify).getInventory().clear();
@@ -167,7 +174,7 @@ public class ZoneVolumeMapper {
 				}
 				
 				// Skulls
-				if (modify instanceof Skull && query.getString("metadata") != null) {
+				if (modify instanceof Skull) {
 					String[] opts = query.getString("metadata").split("\n");
 					((Skull) modify).setOwner(opts[0]);
 					((Skull) modify).setSkullType(SkullType.valueOf(opts[1]));
@@ -176,7 +183,7 @@ public class ZoneVolumeMapper {
 				}
 				
 				// Command blocks
-				if (modify instanceof CommandBlock && query.getString("metadata") != null) {
+				if (modify instanceof CommandBlock) {
 					final String[] commandArray = query.getString("metadata").split("\n");
 					((CommandBlock) modify).setName(commandArray[0]);
 					((CommandBlock) modify).setCommand(commandArray[1]);
@@ -199,6 +206,25 @@ public class ZoneVolumeMapper {
 	}
 
 	/**
+	 * Get total saved blocks for a warzone. This should only be called on nimitz-format warzones.
+	 * @param volume Warzone volume
+	 * @param zoneName Name of zone file
+	 * @return Total saved blocks
+	 * @throws SQLException
+	 */
+	public static int getTotalSavedBlocks(ZoneVolume volume, String zoneName) throws SQLException {
+		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
+		Connection databaseConnection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
+		Statement stmt = databaseConnection.createStatement();
+		ResultSet sizeQuery = stmt.executeQuery("SELECT COUNT(*) AS total FROM blocks");
+		int size = sizeQuery.getInt("total");
+		sizeQuery.close();
+		stmt.close();
+		databaseConnection.close();
+		return size;
+	}
+
+	/**
 	 * Save all war zone blocks to a SQLite3 database file.
 	 *
 	 * @param volume Volume to save (takes corner data and loads from world).
@@ -207,9 +233,10 @@ public class ZoneVolumeMapper {
 	 * @throws SQLException
 	 */
 	public static int save(Volume volume, String zoneName) throws SQLException {
+		long startTime = System.currentTimeMillis();
 		int changed = 0;
 		File warzoneDir = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + zoneName);
-		if (!warzoneDir.mkdirs()) {
+		if (!warzoneDir.exists() && !warzoneDir.mkdirs()) {
 			throw new RuntimeException("Failed to create warzone data directory");
 		}
 		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
@@ -230,9 +257,7 @@ public class ZoneVolumeMapper {
 		cornerStmt.setInt(6, volume.getCornerTwo().getBlockZ());
 		cornerStmt.executeUpdate();
 		cornerStmt.close();
-		//x, y, z, type, data, sign, container, note, record, skull, command, mobid 
-		//x, y, z, type, data, metadata
-		PreparedStatement dataStmt = databaseConnection.prepareStatement("INSERT INTO blocks VALUES (?, ?, ?, ?, ?, ?)");
+		PreparedStatement dataStmt = databaseConnection.prepareStatement("INSERT INTO blocks (x, y, z, type, data, metadata) VALUES (?, ?, ?, ?, ?, ?)");
 		databaseConnection.setAutoCommit(false);
 		final int batchSize = 10000;
 		for (int i = 0, x = volume.getMinX(); i < volume.getSizeX(); i++, x++) {
@@ -240,6 +265,9 @@ public class ZoneVolumeMapper {
 				for (int k = 0, z = volume.getMinZ(); k < volume.getSizeZ(); k++, z++) {
 					// Make sure we are using zone volume-relative coords
 					final Block block = volume.getWorld().getBlockAt(x, y, z);
+					if (block.getType() == Material.AIR) {
+						continue; // Do not save air blocks to the file anymore.
+					}
 					final BlockState state = block.getState();
 					dataStmt.setInt(1, block.getX() - volume.getCornerOne().getBlockX());
 					dataStmt.setInt(2, block.getY() - volume.getCornerOne().getBlockY());
@@ -276,6 +304,10 @@ public class ZoneVolumeMapper {
 					
 					if (++changed % batchSize == 0) {
 						dataStmt.executeBatch();
+						if ((System.currentTimeMillis() - startTime) >= 5000L) {
+							String seconds = new DecimalFormat("#0.00").format((double) (System.currentTimeMillis() - startTime) / 1000.0D);
+							War.war.getLogger().log(Level.FINE, "Still saving warzone {0} , {1} seconds elapsed.", new Object[] {zoneName, seconds});
+						}
 					}
 				}
 			}
@@ -284,6 +316,8 @@ public class ZoneVolumeMapper {
 		databaseConnection.commit();
 		dataStmt.close();
 		databaseConnection.close();
+		String seconds = new DecimalFormat("#0.00").format((double) (System.currentTimeMillis() - startTime) / 1000.0D);
+		War.war.getLogger().log(Level.INFO, "Saved warzone {0} in {1} seconds.", new Object[] {zoneName, seconds});
 		return changed;
 	}
 
