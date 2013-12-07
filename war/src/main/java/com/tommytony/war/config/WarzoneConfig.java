@@ -25,7 +25,8 @@ public enum WarzoneConfig {
 	SCOREBOARD (ScoreboardType.class),
 	XPKILLMETER (Boolean.class),
 	SOUPHEALING (Boolean.class),
-	ALLOWENDER (Boolean.class);
+	ALLOWENDER (Boolean.class),
+	RESETBLOCKS (Boolean.class);
 	
 	
 	private final Class<?> configType;

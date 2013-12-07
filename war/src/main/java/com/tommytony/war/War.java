@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -116,16 +115,16 @@ public class War extends JavaPlugin {
 	}
 
 	/**
-	 * @see JavaPlugin.onEnable()
-	 * @see War.loadWar()
+	 * @see JavaPlugin#onEnable()
+	 * @see War#loadWar()
 	 */
 	public void onEnable() {
 		this.loadWar();
 	}
 
 	/**
-	 * @see JavaPlugin.onDisable()
-	 * @see War.unloadWar()
+	 * @see JavaPlugin#onDisable()
+	 * @see War#unloadWar()
 	 */
 	public void onDisable() {
 		this.unloadWar();
@@ -207,6 +206,7 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.XPKILLMETER, false);
 		warzoneDefaultConfig.put(WarzoneConfig.SOUPHEALING, false);
 		warzoneDefaultConfig.put(WarzoneConfig.ALLOWENDER, true);
+		warzoneDefaultConfig.put(WarzoneConfig.RESETBLOCKS, true);
 
 		teamDefaultConfig.put(TeamConfig.FLAGMUSTBEHOME, true);
 		teamDefaultConfig.put(TeamConfig.FLAGPOINTSONLY, false);
@@ -342,7 +342,7 @@ public class War extends JavaPlugin {
 	}
 
 	/**
-	 * @see JavaPlugin.onCommand()
+	 * @see org.bukkit.command.CommandExecutor#onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command, String, String[])
 	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		return this.commandHandler.handle(sender, cmd, args);
@@ -378,12 +378,7 @@ public class War extends JavaPlugin {
 			loadout.put(103, inv.getHelmet().clone());
 		}
 	}
-	
-	@Deprecated
-	public ItemStack copyStack(ItemStack originalStack) {
-		return originalStack.clone();
-	}
-	
+
 	public void safelyEnchant(ItemStack target, Enchantment enchantment, int level) {
 		if (level > enchantment.getMaxLevel()) {
 			target.addUnsafeEnchantment(enchantment, level);
@@ -983,10 +978,8 @@ public class War extends JavaPlugin {
 	/**
 	 * Colors the teams and examples in messages
 	 *
-	 * @param String
-	 *                str message-string
-	 * @param String
-	 *                msgColor current message-color
+	 * @param str message-string
+	 * @param msgColor current message-color
 	 * @return String Message with colored teams
 	 */
 	private String colorKnownTokens(String str, ChatColor msgColor) {
@@ -1014,18 +1007,11 @@ public class War extends JavaPlugin {
 	/**
 	 * Logs a specified message with a specified level
 	 *
-	 * @param String
-	 *                str message to log
-	 * @param Level
-	 *                lvl level to use
+	 * @param str message to log
+	 * @param lvl level to use
 	 */
 	public void log(String str, Level lvl) {
-		// Log to Bukkit console 
 		this.getLogger().log(lvl, str);
-		
-//		if (this.warLogger != null) {
-//			this.warLogger.log(lvl, str);
-//		}
 	}
 
 	// the only way to find a zone that has only one corner

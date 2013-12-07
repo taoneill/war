@@ -1028,7 +1028,11 @@ public class Warzone {
 					} else {
 						// A new battle starts. Reset the zone but not the teams.
 						this.broadcast("zone.battle.reset");
-						this.reinitialize();
+						if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS)) {
+							this.reinitialize();
+						} else {
+							this.initializeZone();
+						}
 					}
 				}
 			} else {
@@ -1342,7 +1346,11 @@ public class Warzone {
 			t.getPlayers().clear(); // empty the team
 			t.resetSign();
 		}
-		this.reinitialize();
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS)) {
+			this.reinitialize();
+		} else {
+			this.initializeZone();
+		}
 	}
 
 	public void rewardPlayer(Player player, Map<Integer, ItemStack> reward) {
