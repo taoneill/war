@@ -18,6 +18,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
@@ -45,7 +46,6 @@ import java.util.logging.Level;
 
 /**
  * @author tommytony, Tim Düsterhus
- * @package bukkit.tommytony.war
  */
 public class WarPlayerListener implements Listener {
 	private java.util.Random random = new java.util.Random();
@@ -54,7 +54,7 @@ public class WarPlayerListener implements Listener {
 	/**
 	 * Correctly removes quitting players from warzones
 	 *
-	 * @see PlayerListener.onPlayerQuit()
+	 * @see PlayerQuitEvent
 	 */
 	@EventHandler
 	public void onPlayerQuit(final PlayerQuitEvent event) {
@@ -153,7 +153,6 @@ public class WarPlayerListener implements Listener {
 								player.getInventory().containsAtLeast(team.getKind().getBlockHead(), MINIMUM_TEAM_BLOCKS)) {
 							// Can't pick up a second precious block
 							event.setCancelled(true);
-							return;
 						}
 					}
 				}
@@ -234,19 +233,25 @@ public class WarPlayerListener implements Listener {
 				War.war.badMsg(player, "use.ender");
 			}
 			Team team = Team.getTeamByPlayerName(player.getName());
-			if (team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENCHANTMENT_TABLE && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+			if (zone != null && team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENCHANTMENT_TABLE && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
 				event.setCancelled(true);
 				War.war.badMsg(player, "use.enchant");
 				if (zone.getAuthors().contains(player.getName())) {
 					War.war.badMsg(player, "use.xpkillmeter");
 				}
 			}
-			if (team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ANVIL && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+			if (zone != null && team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ANVIL && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
 				event.setCancelled(true);
 				War.war.badMsg(player, "use.anvil");
 				if (zone.getAuthors().contains(player.getName())) {
 					War.war.badMsg(player, "use.xpkillmeter");
 				}
+			}
+			if (zone != null && team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK
+					&& event.getClickedBlock().getState() instanceof InventoryHolder
+					&& zone.isFlagThief(player.getName())) {
+				event.setCancelled(true);
+				War.war.badMsg(player, "drop.flag.disabled");
 			}
 		}
 		     
@@ -784,7 +789,6 @@ public class WarPlayerListener implements Listener {
 			Warzone zone = Warzone.getZoneByLocation(playerLoc);
 			event.setTo(zone.getTeleport());
 			War.war.badMsg(player, "zone.noteamnotice");
-			return;
 		}
 	}
 	
@@ -800,18 +804,14 @@ public class WarPlayerListener implements Listener {
 					List<Loadout> loadouts = new ArrayList<Loadout>(playerTeam.getInventories().resolveNewLoadouts());
 					for (Iterator<Loadout> it = loadouts.iterator(); it.hasNext();) {
 						Loadout ldt = it.next();
-						if ("first".equals(ldt.getName())) {
+						if (ldt.getName().equals("first") ||
+								(ldt.requiresPermission() && !event.getPlayer().hasPermission(ldt.getPermission()))) {
 							it.remove();
-							continue;
-						}
-						if (ldt.requiresPermission() && !event.getPlayer().hasPermission(ldt.getPermission())) {
-							it.remove();
-							continue;
 						}
 					}
 					int currentIndex = (selection.getSelectedIndex() + 1) % loadouts.size();
 					selection.setSelectedIndex(currentIndex);
-					
+
 					playerWarzone.equipPlayerLoadoutSelection(event.getPlayer(), playerTeam, false, true);
 				} else {
 					War.war.badMsg(event.getPlayer(), "zone.loadout.reenter");
