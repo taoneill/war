@@ -12,11 +12,9 @@ import com.tommytony.war.mapper.WarzoneYmlMapper;
 public class RestoreYmlWarzonesJob implements Runnable {
 
 	private final List<String> warzones;
-	private final boolean newWarInstall;
 
-	public RestoreYmlWarzonesJob(List<String> warzones, boolean newWarInstall) {
+	public RestoreYmlWarzonesJob(List<String> warzones) {
 		this.warzones = warzones;
-		this.newWarInstall = newWarInstall;
 	}
 
 	public void run() {
@@ -25,7 +23,7 @@ public class RestoreYmlWarzonesJob implements Runnable {
 			for (String warzoneName : this.warzones) {
 				if (warzoneName != null && !warzoneName.equals("")) {
 					War.war.log("Loading zone " + warzoneName + "...", Level.INFO);
-					Warzone zone = WarzoneYmlMapper.load(warzoneName, !this.newWarInstall);
+					Warzone zone = WarzoneYmlMapper.load(warzoneName);
 					if (zone != null) { // could have failed, would've been logged already
 						War.war.getWarzones().add(zone);
 						try {

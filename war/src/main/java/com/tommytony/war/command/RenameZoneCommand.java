@@ -78,7 +78,7 @@ public class RenameZoneCommand extends AbstractZoneMakerCommand {
 
 		// Load new warzone
 		War.war.log("Loading zone " + newName + "...", Level.INFO);
-		Warzone newZone = WarzoneYmlMapper.load(newName, false);
+		Warzone newZone = WarzoneYmlMapper.load(newName);
 		War.war.getWarzones().add(newZone);
 		try {
 			newZone.getVolume().loadCorners();

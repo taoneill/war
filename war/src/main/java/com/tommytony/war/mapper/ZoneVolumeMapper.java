@@ -47,6 +47,15 @@ import com.tommytony.war.volume.ZoneVolume;
 public class ZoneVolumeMapper {
 
 	public static final int DATABASE_VERSION = 2;
+
+	/**
+	 * Get a connection to the warzone database, converting blocks if not found.
+	 * @param volume zone volume to load
+	 * @param zoneName warzone to load
+	 * @param world world containing this warzone
+	 * @return an open connection to the sqlite file
+	 * @throws SQLException
+	 */
 	public static Connection getZoneConnection(ZoneVolume volume, String zoneName, World world) throws SQLException {
 		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
 		if (!databaseFile.exists()) {
@@ -65,8 +74,7 @@ public class ZoneVolumeMapper {
 			databaseConnection.close();
 
 			// Can't load this too-recent format
-			throw new IllegalStateException("Unsupported zone format (was already converted to version: "
-					+ version + ", current format: " + DATABASE_VERSION + ")");
+			throw new IllegalStateException(String.format("Unsupported zone format (was already converted to version: %d, current format: %d)", version, DATABASE_VERSION));
 		} else if (version < DATABASE_VERSION) {
 			stmt.close();
 
@@ -202,6 +210,79 @@ public class ZoneVolumeMapper {
 		query.close();
 		stmt.close();
 		return changed;
+	}
+
+	public static int saveStructure(Volume volume, Connection databaseConnection) throws SQLException {
+		Statement stmt = databaseConnection.createStatement();
+		stmt.executeUpdate("PRAGMA user_version = " + DATABASE_VERSION);
+		// Storing zonemaker-inputted name could result in injection or undesirable behavior.
+		String prefix = String.format("structure_%d", volume.getName().hashCode() & Integer.MAX_VALUE);
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + prefix +
+				"_blocks (x BIGINT, y BIGINT, z BIGINT, type TEXT, data SMALLINT)");
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + prefix +
+				"_corners (pos INTEGER PRIMARY KEY NOT NULL UNIQUE, x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL)");
+		stmt.executeUpdate("DELETE FROM " + prefix + "_blocks");
+		stmt.executeUpdate("DELETE FROM " + prefix + "_corners");
+		stmt.close();
+		PreparedStatement cornerStmt = databaseConnection
+				.prepareStatement("INSERT INTO " + prefix + "_corners SELECT 1 AS pos, ? AS x, ? AS y, ? AS z UNION SELECT 2, ?, ?, ?");
+		cornerStmt.setInt(1, volume.getCornerOne().getBlockX());
+		cornerStmt.setInt(2, volume.getCornerOne().getBlockY());
+		cornerStmt.setInt(3, volume.getCornerOne().getBlockZ());
+		cornerStmt.setInt(4, volume.getCornerTwo().getBlockX());
+		cornerStmt.setInt(5, volume.getCornerTwo().getBlockY());
+		cornerStmt.setInt(6, volume.getCornerTwo().getBlockZ());
+		cornerStmt.executeUpdate();
+		cornerStmt.close();
+		PreparedStatement dataStmt = databaseConnection
+				.prepareStatement("INSERT INTO " + prefix + "_blocks VALUES (?, ?, ?, ?, ?)");
+		databaseConnection.setAutoCommit(false);
+		final int batchSize = 1000;
+		int changed = 0;
+		for (BlockState block : volume.getBlocks()) {
+			final Location relLoc = ZoneVolumeMapper.rebase(
+					volume.getCornerOne(), block.getLocation());
+			dataStmt.setInt(1, relLoc.getBlockX());
+			dataStmt.setInt(2, relLoc.getBlockY());
+			dataStmt.setInt(3, relLoc.getBlockZ());
+			dataStmt.setString(4, block.getType().toString());
+			dataStmt.setShort(5, block.getData().toItemStack().getDurability());
+			dataStmt.addBatch();
+			if (++changed % batchSize == 0) {
+				dataStmt.executeBatch();
+			}
+		}
+		dataStmt.executeBatch(); // insert remaining records
+		databaseConnection.commit();
+		databaseConnection.setAutoCommit(true);
+		dataStmt.close();
+		return changed;
+	}
+
+	public static void loadStructure(Volume volume, Connection databaseConnection) throws SQLException {
+		String prefix = String.format("structure_%d", volume.getName().hashCode() & Integer.MAX_VALUE);
+		World world = volume.getWorld();
+		Statement stmt = databaseConnection.createStatement();
+		ResultSet cornerQuery = stmt.executeQuery("SELECT * FROM " + prefix + "_corners");
+		cornerQuery.next();
+		final Block corner1 = world.getBlockAt(cornerQuery.getInt("x"), cornerQuery.getInt("y"), cornerQuery.getInt("z"));
+		cornerQuery.next();
+		final Block corner2 = world.getBlockAt(cornerQuery.getInt("x"), cornerQuery.getInt("y"), cornerQuery.getInt("z"));
+		cornerQuery.close();
+		volume.setCornerOne(corner1);
+		volume.setCornerTwo(corner2);
+		volume.getBlocks().clear();
+		ResultSet query = stmt.executeQuery("SELECT * FROM " + prefix + "_blocks");
+		while (query.next()) {
+			int x = query.getInt("x"), y = query.getInt("y"), z = query.getInt("z");
+			BlockState modify = corner1.getRelative(x, y, z).getState();
+			ItemStack data = new ItemStack(Material.valueOf(query.getString("type")), 0, query.getShort("data"));
+			modify.setType(data.getType());
+			modify.setData(data.getData());
+			volume.getBlocks().add(modify);
+		}
+		query.close();
+		stmt.close();
 	}
 
 	/**

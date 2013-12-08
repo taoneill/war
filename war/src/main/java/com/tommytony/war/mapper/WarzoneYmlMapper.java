@@ -2,6 +2,7 @@ package com.tommytony.war.mapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ import com.tommytony.war.volume.ZoneVolume;
 public class WarzoneYmlMapper {
 
 	@SuppressWarnings("deprecation")
-	public static Warzone load(String name, boolean createNewVolume) {
+	public static Warzone load(String name) { // removed createNewVolume, as it did nothing
 		File warzoneTxtFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		File warzoneYmlFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".yml");
 		
@@ -275,16 +276,16 @@ public class WarzoneYmlMapper {
 					} 
 				}
 			}
-
-			if (createNewVolume) {
-				ZoneVolume zoneVolume = new ZoneVolume(warzone.getName(), world, warzone);
-				warzone.setVolume(zoneVolume);
+			Connection connection = null;
+			try {
+				connection = ZoneVolumeMapper.getZoneConnection(warzone.getVolume(), warzone.getName(), warzone.getWorld());
+			} catch (SQLException e) {
+				War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 			}
-
 			// monument blocks
 			for (Monument monument : warzone.getMonuments()) {
 				try {
-					monument.setVolume(VolumeMapper.loadVolume(monument.getName(), warzone.getName(), world));
+					monument.setVolume(warzone.loadStructure(monument.getName(), connection));
 				} catch (SQLException e) {
 					War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 				}
@@ -293,7 +294,7 @@ public class WarzoneYmlMapper {
 			// bomb blocks
 			for (Bomb bomb : warzone.getBombs()) {
 				try {
-					bomb.setVolume(VolumeMapper.loadVolume("bomb-" + bomb.getName(), warzone.getName(), world));
+					bomb.setVolume(warzone.loadStructure("bomb-" + bomb.getName(), connection));
 				} catch (SQLException e) {
 					War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 				}
@@ -302,7 +303,7 @@ public class WarzoneYmlMapper {
 			// cake blocks
 			for (Cake cake : warzone.getCakes()) {
 				try {
-					cake.setVolume(VolumeMapper.loadVolume("cake-" + cake.getName(), warzone.getName(), world));
+					cake.setVolume(warzone.loadStructure("cake-" + cake.getName(), connection));
 				} catch (SQLException e) {
 					War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 				}
@@ -312,14 +313,14 @@ public class WarzoneYmlMapper {
 			for (Team team : warzone.getTeams()) {
 				for (Location teamSpawn : team.getTeamSpawns()) {
 					try {
-						team.setSpawnVolume(teamSpawn, VolumeMapper.loadVolume(team.getName() + team.getTeamSpawns().indexOf(teamSpawn), warzone.getName(), world));
+						team.setSpawnVolume(teamSpawn, warzone.loadStructure(team.getName() + team.getTeamSpawns().indexOf(teamSpawn), connection));
 					} catch (SQLException e) {
 						War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 					}
 				}
 				if (team.getTeamFlag() != null) {
 					try {
-						team.setFlagVolume(VolumeMapper.loadVolume(team.getName() + "flag", warzone.getName(), world));
+						team.setFlagVolume(warzone.loadStructure(team.getName() + "flag", connection));
 					} catch (SQLException e) {
 						War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 					}
@@ -399,7 +400,7 @@ public class WarzoneYmlMapper {
 			// create the lobby
 			Volume lobbyVolume = null;
 			try {
-				lobbyVolume = VolumeMapper.loadVolume("lobby", warzone.getName(), lobbyWorld);
+				lobbyVolume = warzone.loadStructure("lobby", lobbyWorld, connection);
 			} catch (SQLException e) {
 				War.war.getLogger().log(Level.WARNING, "Failed to load warzone lobby", e);
 			}
@@ -443,7 +444,11 @@ public class WarzoneYmlMapper {
 							(short) floorMaterialSection.getInt("data")));
 				}
 			}
-			
+			try {
+				connection.close();
+			} catch (SQLException ignored) {
+			}
+
 			return warzone;
 		}
 		
@@ -649,11 +654,16 @@ public class WarzoneYmlMapper {
 				flagSection.set("yaw", toIntYaw(teamFlag.getYaw()));
 			}
 		}
-		
+		Connection connection = null;
+		try {
+			connection = ZoneVolumeMapper.getZoneConnection(warzone.getVolume(), warzone.getName(), warzone.getWorld());
+		} catch (SQLException e) {
+			War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
+		}
 		// monument blocks
 		for (Monument monument : warzone.getMonuments()) {
 			try {
-				VolumeMapper.save(monument.getVolume(), warzone.getName());
+				ZoneVolumeMapper.saveStructure(monument.getVolume(), connection);
 			} catch (SQLException e) {
 				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
 			}
@@ -662,7 +672,7 @@ public class WarzoneYmlMapper {
 		// bomb blocks
 		for (Bomb bomb : warzone.getBombs()) {
 			try {
-				VolumeMapper.save(bomb.getVolume(), warzone.getName());
+				ZoneVolumeMapper.saveStructure(bomb.getVolume(), connection);
 			} catch (SQLException e) {
 				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
 			}
@@ -671,7 +681,7 @@ public class WarzoneYmlMapper {
 		// cake blocks
 		for (Cake cake : warzone.getCakes()) {
 			try {
-				VolumeMapper.save(cake.getVolume(), warzone.getName());
+				ZoneVolumeMapper.saveStructure(cake.getVolume(), connection);
 			} catch (SQLException e) {
 				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
 			}
@@ -681,14 +691,14 @@ public class WarzoneYmlMapper {
 		for (Team team : teams) {
 			for (Volume volume : team.getSpawnVolumes().values()) {
 				try {
-					VolumeMapper.save(volume, warzone.getName());
+					ZoneVolumeMapper.saveStructure(volume, connection);
 				} catch (SQLException e) {
 					War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
 				}
 			}
 			if (team.getFlagVolume() != null) {
 				try {
-					VolumeMapper.save(team.getFlagVolume(), warzone.getName());
+					ZoneVolumeMapper.saveStructure(team.getFlagVolume(), connection);
 				} catch (SQLException e) {
 					War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
 				}
@@ -697,12 +707,16 @@ public class WarzoneYmlMapper {
 
 		if (warzone.getLobby() != null) {
 			try {
-				VolumeMapper.save(warzone.getLobby().getVolume(), warzone.getName());
+				ZoneVolumeMapper.saveStructure(warzone.getLobby().getVolume(), connection);
 			} catch (SQLException e) {
 				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
 			}
 		}
-		
+		try {
+			connection.close();
+		} catch (SQLException ignored) {
+		}
+
 		// Save to disk
 		try {
 			File warzoneConfigFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + warzone.getName() + ".yml");
