@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Note;
@@ -46,27 +47,13 @@ import com.tommytony.war.volume.ZoneVolume;
 public class ZoneVolumeMapper {
 
 	public static final int DATABASE_VERSION = 2;
-
-	/**
-	 * Loads the given volume
-	 *
-	 * @param volume Volume to load
-	 * @param zoneName Zone to load the volume from
-	 * @param world The world the zone is located
-	 * @param onlyLoadCorners Should only the corners be loaded
-	 * @param start Starting position to load blocks at
-	 * @param total Amount of blocks to read
-	 * @return Changed blocks
-	 * @throws SQLException Error communicating with SQLite3 database
-	 */
-	public static int load(ZoneVolume volume, String zoneName, World world, boolean onlyLoadCorners, int start, int total, boolean[][][] changes) throws SQLException {
+	public static Connection getZoneConnection(ZoneVolume volume, String zoneName, World world) throws SQLException {
 		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
 		if (!databaseFile.exists()) {
 			// Convert warzone to nimitz file format.
-			PreNimitzZoneVolumeMapper.load(volume, zoneName, world, onlyLoadCorners);
+			PreNimitzZoneVolumeMapper.load(volume, zoneName, world, false);
 			ZoneVolumeMapper.save(volume, zoneName);
 			War.war.log("Warzone " + zoneName + " converted to nimitz format!", Level.INFO);
-			return volume.size();
 		}
 		Connection databaseConnection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
 		Statement stmt = databaseConnection.createStatement();
@@ -76,31 +63,45 @@ public class ZoneVolumeMapper {
 		if (version > DATABASE_VERSION) {
 			stmt.close();
 			databaseConnection.close();
-			
+
 			// Can't load this too-recent format
-			throw new IllegalStateException("Unsupported zone format (was already converted to version: " 
+			throw new IllegalStateException("Unsupported zone format (was already converted to version: "
 					+ version + ", current format: " + DATABASE_VERSION + ")");
 		} else if (version < DATABASE_VERSION) {
 			stmt.close();
-			
+
 			// We need to migrate to newest schema
 			switch (version) {
 				// Run some update SQL for each old version
 				case 1:
 					// Run update from 1 to 2
 					updateFromVersionOneToTwo(zoneName, databaseConnection);
-					
-// How to continue this pattern:
-//					// Run update from 2 to 3 (to handle jump from v1 to v3
-//					updateFromVersionTwoToTree(zoneName, databaseConnection);
+
+// How to continue this pattern: (@tommytony multiple in one shouldn't be needed, just don't put a break in the switch)
 //				case 2:
 //					// Run update from 2 to 3
 //					updateFromVersionTwoToTree(zoneName, databaseConnection);
 			}
-			
-			// create a new statement to take into account new schema changes
-			stmt = databaseConnection.createStatement();
+
 		}
+		return databaseConnection;
+	}
+
+	/**
+	 * Loads the given volume
+	 *
+	 * @param databaseConnection Open connection to zone database
+	 * @param volume Volume to load
+	 * @param world The world the zone is located
+	 * @param onlyLoadCorners Should only the corners be loaded
+	 * @param start Starting position to load blocks at
+	 * @param total Amount of blocks to read
+	 * @return Changed blocks
+	 * @throws SQLException Error communicating with SQLite3 database
+	 */
+	public static int load(Connection databaseConnection, ZoneVolume volume, World world, boolean onlyLoadCorners, int start, int total, boolean[][][] changes) throws SQLException {
+		Validate.isTrue(!databaseConnection.isClosed());
+		Statement stmt = databaseConnection.createStatement();
 		ResultSet cornerQuery = stmt.executeQuery("SELECT * FROM corners");
 		cornerQuery.next();
 		final Block corner1 = world.getBlockAt(cornerQuery.getInt("x"), cornerQuery.getInt("y"), cornerQuery.getInt("z"));
@@ -111,7 +112,6 @@ public class ZoneVolumeMapper {
 		volume.setCornerTwo(corner2);
 		if (onlyLoadCorners) {
 			stmt.close();
-			databaseConnection.close();
 			return 0;
 		}
 		int minX = volume.getMinX(), minY = volume.getMinY(), minZ = volume.getMinZ();
@@ -201,7 +201,6 @@ public class ZoneVolumeMapper {
 		}
 		query.close();
 		stmt.close();
-		databaseConnection.close();
 		return changed;
 	}
 

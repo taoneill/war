@@ -1,5 +1,6 @@
 package com.tommytony.war.volume;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
@@ -50,7 +51,8 @@ public class ZoneVolume extends Volume {
 	}
 
 	public void loadCorners() throws SQLException {
-		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), true, 0, 0, null);
+		Connection conn = ZoneVolumeMapper.getZoneConnection(this, this.zone.getName(), this.getWorld());
+		ZoneVolumeMapper.load(conn, this, this.getWorld(), true, 0, 0, null);
 		this.isSaved = true;
 	}
 
@@ -58,7 +60,8 @@ public class ZoneVolume extends Volume {
 	public void resetBlocks() {
 		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
 		try {
-			ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false, 0, Integer.MAX_VALUE, null);
+			Connection conn = ZoneVolumeMapper.getZoneConnection(this, this.zone.getName(), this.getWorld());
+			ZoneVolumeMapper.load(conn, this, this.getWorld(), false, 0, Integer.MAX_VALUE, null);
 		} catch (SQLException ex) {
 			War.war.log("Failed to load warzone " + zone.getName() + ": " + ex.getMessage(), Level.WARNING);
 			ex.printStackTrace();
@@ -69,7 +72,8 @@ public class ZoneVolume extends Volume {
 
 	/**
 	 * Reset a section of blocks in the warzone.
-	 * 
+	 *
+	 * @param conn Open connection to warzone database file.
 	 * @param start
 	 *            Starting position for reset.
 	 * @param total
@@ -77,8 +81,8 @@ public class ZoneVolume extends Volume {
 	 * @return Changed block count.
 	 * @throws SQLException
 	 */
-	public int resetSection(int start, int total, boolean[][][] changes) throws SQLException {
-		return ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false, start, total, changes);
+	public int resetSection(Connection conn, int start, int total, boolean[][][] changes) throws SQLException {
+		return ZoneVolumeMapper.load(conn, this, this.getWorld(), false, start, total, changes);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package com.tommytony.war.job;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
@@ -7,6 +8,7 @@ import java.text.NumberFormat;
 import java.util.*;
 import java.util.logging.Level;
 
+import com.tommytony.war.mapper.ZoneVolumeMapper;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
@@ -37,6 +39,7 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 	public static final int JOB_INTERVAL = 1;
 	private int totalChanges = 0;
 	private NumberFormat formatter = new DecimalFormat("#0.00");
+	private Connection conn;
 
 	/**
 	 * Reset a warzone's blocks at a certain speed.
@@ -57,6 +60,9 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 	@Override
 	public void run() {
 		try {
+			if (conn == null || conn.isClosed()) {
+				conn = ZoneVolumeMapper.getZoneConnection(volume, zone.getName(), volume.getWorld());
+			}
 			if (completed >= total) {
 				int airChanges = 0;
 				int minX = volume.getMinX(), minY = volume.getMinY(), minZ = volume.getMinZ();
@@ -90,11 +96,12 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 					zone.initializeZone();
 					War.war.getLogger().log(Level.INFO, "Finished reset cycle for warzone {0} (took {1} seconds)",
 							new Object[]{volume.getName(), secondsAsText});
+					conn.close();
 				} else {
 					War.war.getServer().getScheduler().runTaskLater(War.war, this.clone(), JOB_INTERVAL);
 				}
 			} else {
-				int solidChanges = volume.resetSection(completed, speed, changes);
+				int solidChanges = volume.resetSection(conn, completed, speed, changes);
 				completed += solidChanges;
 				totalChanges += solidChanges;
 				this.displayStatusMessage();
