@@ -1150,9 +1150,10 @@ public class Warzone {
 					team.resetPoints();
 					team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				}
-				this.getVolume().resetBlocksAsJob();
-				this.initializeZoneAsJob();
-				War.war.log("Last player left warzone " + this.getName() + ". Warzone blocks resetting automatically...", Level.INFO);
+				if (!this.isReinitializing()) {
+					this.reinitialize();
+					War.war.getLogger().log(Level.INFO, "Last player left warzone {0}. Warzone blocks resetting automatically...", new Object[] {this.getName()});
+				}
 			}
 			
 			WarPlayerLeaveEvent event1 = new WarPlayerLeaveEvent(player.getName());

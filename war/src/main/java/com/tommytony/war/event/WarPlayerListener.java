@@ -335,7 +335,7 @@ public class WarPlayerListener implements Listener {
 		if (locLobby != null && currentTeam == null && locLobby.isInAnyGate(playerLoc)) {
 			Warzone zone = locLobby.getZone();
 			Team locTeamGate = locLobby.getTeamGate(playerLoc);
-			if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
+			if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED) || zone.isReinitializing()) {
 				War.war.badMsg(player, "join.disabled");
 				event.setTo(zone.getTeleport());
 			} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
@@ -374,7 +374,7 @@ public class WarPlayerListener implements Listener {
 			if (zone != null && zone.getTeleport() != null) {
 				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOJOIN)
 						&& zone.getTeams().size() >= 1 && currentTeam == null) {
-					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
+					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED) || zone.isReinitializing()) {
 						War.war.badMsg(player, "join.disabled");
 						event.setTo(hub.getLocation());
 					} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {
