@@ -17,6 +17,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
@@ -879,6 +881,26 @@ public class WarPlayerListener implements Listener {
 		if (team != null && team.isInTeamChat(event.getPlayer())) {
 			event.setCancelled(true);
 			team.sendTeamChatMessage(event.getPlayer(), event.getMessage());
+		}
+	}
+
+	@EventHandler
+	public void onInventoryClick(final InventoryClickEvent event) {
+		if (!(event.getWhoClicked() instanceof Player)) {
+			return;
+		}
+		Player player = (Player) event.getWhoClicked();
+		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+		if (zone == null) {
+			return;
+		}
+		// Prevent thieves from taking their bomb/wool/cake into a chest, etc.
+		if (zone.isThief(player.getName())
+				// Prevent player from grabbing their block helmet
+				|| event.getSlotType() == InventoryType.SlotType.ARMOR && event.getSlot() == 39
+				&& zone.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
+			event.setCancelled(true);
+			player.playSound(player.getLocation(), Sound.FIZZ, 10, 10);
 		}
 	}
 
