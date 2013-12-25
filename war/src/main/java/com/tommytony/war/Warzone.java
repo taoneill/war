@@ -1874,4 +1874,13 @@ public class Warzone {
 			stmt.close();
 		}
 	}
+
+	/**
+	 * Check if a player has stolen from a warzone flag, bomb, or cake.
+	 * @param suspect Player to check.
+	 * @return true if suspect has stolen a structure.
+	 */
+	public boolean isThief(String suspect) {
+		return this.isFlagThief(suspect) || this.isBombThief(suspect) || this.isCakeThief(suspect);
+	}
 }

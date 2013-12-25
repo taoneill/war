@@ -147,8 +147,8 @@ public class WarBlockListener implements Listener {
 		}
 
 		// unbreakableZoneBlocks
-		if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE) 
-				|| (team != null && !team.getTeamConfig().resolveBoolean(TeamConfig.PLACEBLOCK))
+		if (zone != null && (zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)
+				|| (team != null && !team.getTeamConfig().resolveBoolean(TeamConfig.PLACEBLOCK)))
 				&& (!isZoneMaker || (isZoneMaker && team != null))) {
 			// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks)
 			War.war.badMsg(player, "build.denied.zone.place");
