@@ -1,5 +1,6 @@
 package com.tommytony.war.volume;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
@@ -50,35 +51,47 @@ public class ZoneVolume extends Volume {
 	}
 
 	public void loadCorners() throws SQLException {
-		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), true, 0, 0);
+		Connection conn = ZoneVolumeMapper.getZoneConnection(this, this.zone.getName(), this.getWorld());
+		ZoneVolumeMapper.load(conn, this, this.getWorld(), true, 0, 0, null);
 		this.isSaved = true;
 	}
 
 	@Override
 	public void resetBlocks() {
 		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
-		int reset = 0;
 		try {
-			reset = ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false, 0, Integer.MAX_VALUE);
+			Connection conn = ZoneVolumeMapper.getZoneConnection(this, this.zone.getName(), this.getWorld());
+			ZoneVolumeMapper.load(conn, this, this.getWorld(), false, 0, Integer.MAX_VALUE, null);
 		} catch (SQLException ex) {
 			War.war.log("Failed to load warzone " + zone.getName() + ": " + ex.getMessage(), Level.WARNING);
 			ex.printStackTrace();
 		}
-		War.war.log("Reset " + reset + " blocks in warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
+		War.war.log("Reset warzone " + this.zone.getName() + ".", java.util.logging.Level.INFO);
 		this.isSaved = true;
 	}
 
 	/**
 	 * Reset a section of blocks in the warzone.
-	 * 
+	 *
+	 * @param conn Open connection to warzone database file.
 	 * @param start
 	 *            Starting position for reset.
 	 * @param total
 	 *            Amount of blocks to reset.
+	 * @return Changed block count.
 	 * @throws SQLException
 	 */
-	public void resetSection(int start, int total) throws SQLException {
-		ZoneVolumeMapper.load(this, this.zone.getName(), this.getWorld(), false, start, total);
+	public int resetSection(Connection conn, int start, int total, boolean[][][] changes) throws SQLException {
+		return ZoneVolumeMapper.load(conn, this, this.getWorld(), false, start, total, changes);
+	}
+
+	/**
+	 * Get total saved blocks for this warzone. This should only be called on nimitz-format warzones.
+	 * @return Total saved blocks
+	 * @throws SQLException
+	 */
+	public int getTotalSavedBlocks() throws SQLException {
+		return ZoneVolumeMapper.getTotalSavedBlocks(this, this.zone.getName());
 	}
 
 	@Override
@@ -87,9 +100,12 @@ public class ZoneVolume extends Volume {
 	 * The job will automatically spawn new instances of itself to run every tick until it is done resetting all blocks.
 	 */
 	public void resetBlocksAsJob() {
-		PartialZoneResetJob job = new PartialZoneResetJob(zone, War.war
-				.getWarConfig().getInt(WarConfig.RESETSPEED));
-		War.war.getServer().getScheduler().runTask(War.war, job);
+		try {
+			PartialZoneResetJob job = new PartialZoneResetJob(zone, War.war.getWarConfig().getInt(WarConfig.RESETSPEED));
+			War.war.getServer().getScheduler().runTask(War.war, job);
+		} catch (SQLException e) {
+			War.war.getLogger().log(Level.WARNING, "Failed to reset warzone - cannot get count of saved blocks", e);
+		}
 	}
 
 	public void setNorthwest(Location block) throws NotNorthwestException, TooSmallException, TooBigException {
@@ -239,10 +255,7 @@ public class ZoneVolume extends Volume {
 
 	private static final int MIN_SIZE = 10;
 	public boolean tooSmall() {
-		if (!this.hasTwoCorners()) {
-			return false;
-		}
-		return this.getSizeX() < MIN_SIZE || this.getSizeY() < MIN_SIZE || this.getSizeZ() < MIN_SIZE;
+		return this.hasTwoCorners() && (this.getSizeX() < MIN_SIZE || this.getSizeY() < MIN_SIZE || this.getSizeZ() < MIN_SIZE);
 	}
 
 	private static final int MAX_SIZE_DEFAULT = 750;

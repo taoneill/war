@@ -1,5 +1,9 @@
 package com.tommytony.war;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.tommytony.war.mapper.VolumeMapper;
+import com.tommytony.war.mapper.ZoneVolumeMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -1028,7 +1034,11 @@ public class Warzone {
 					} else {
 						// A new battle starts. Reset the zone but not the teams.
 						this.broadcast("zone.battle.reset");
-						this.reinitialize();
+						if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS)) {
+							this.reinitialize();
+						} else {
+							this.initializeZone();
+						}
 					}
 				}
 			} else {
@@ -1146,9 +1156,10 @@ public class Warzone {
 					team.resetPoints();
 					team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				}
-				this.getVolume().resetBlocksAsJob();
-				this.initializeZoneAsJob();
-				War.war.log("Last player left warzone " + this.getName() + ". Warzone blocks resetting automatically...", Level.INFO);
+				if (!this.isReinitializing()) {
+					this.reinitialize();
+					War.war.getLogger().log(Level.INFO, "Last player left warzone {0}. Warzone blocks resetting automatically...", new Object[] {this.getName()});
+				}
 			}
 			
 			WarPlayerLeaveEvent event1 = new WarPlayerLeaveEvent(player.getName());
@@ -1342,7 +1353,11 @@ public class Warzone {
 			t.getPlayers().clear(); // empty the team
 			t.resetSign();
 		}
-		this.reinitialize();
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS)) {
+			this.reinitialize();
+		} else {
+			this.initializeZone();
+		}
 	}
 
 	public void rewardPlayer(Player player, Map<Integer, ItemStack> reward) {
@@ -1825,6 +1840,39 @@ public class Warzone {
 			return War.war.getWarHub().getLocation();
 		}
 		return this.getTeleport();
+	}
+
+	public Volume loadStructure(String volName, World world) throws SQLException {
+		return loadStructure(volName, world, ZoneVolumeMapper.getZoneConnection(volume, name, world));
+	}
+
+	public Volume loadStructure(String volName, Connection zoneConnection) throws SQLException {
+		return loadStructure(volName, world, zoneConnection);
+	}
+
+	public Volume loadStructure(String volName, World world, Connection zoneConnection) throws SQLException {
+		Volume volume = new Volume(volName, world);
+		if (!containsTable(String.format("structure_%d_corners", volName.hashCode() & Integer.MAX_VALUE), zoneConnection)) {
+			volume = VolumeMapper.loadVolume(volName, name, world);
+			ZoneVolumeMapper.saveStructure(volume, zoneConnection);
+			War.war.getLogger().log(Level.INFO, "Stuffed structure {0} into database for warzone {1}", new Object[] {volName, name});
+			return volume;
+		}
+		ZoneVolumeMapper.loadStructure(volume, zoneConnection);
+		return volume;
+	}
+
+	private boolean containsTable(String table, Connection connection) throws SQLException {
+		PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) AS ct FROM sqlite_master WHERE type = ? AND name = ?");
+		stmt.setString(1, "table");
+		stmt.setString(2, table);
+		ResultSet resultSet = stmt.executeQuery();
+		try {
+			return resultSet.next() && resultSet.getInt("ct") > 0;
+		} finally {
+			resultSet.close();
+			stmt.close();
+		}
 	}
 
 	/**

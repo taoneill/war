@@ -53,6 +53,8 @@ public class JoinCommand extends AbstractWarCommand {
 		}
 		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED)) {
 			this.badMsg("join.disabled");
+		} else if (zone.isReinitializing()) {
+			this.badMsg("join.disabled");
 		} else if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
 			this.badMsg("join.aarequired");
 		} else if (!zone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && zone.isEnoughPlayers()) {

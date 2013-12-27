@@ -48,7 +48,7 @@ public class WarYmlMapper {
 		
 		// warzones
 		List<String> warzones = warRootSection.getStringList("war.info.warzones");
-		RestoreYmlWarzonesJob restoreWarzones = new RestoreYmlWarzonesJob(warzones, newWar);	// during conversion, this should execute just after the RestoreTxtWarzonesJob
+		RestoreYmlWarzonesJob restoreWarzones = new RestoreYmlWarzonesJob(warzones);	// during conversion, this should execute just after the RestoreTxtWarzonesJob
 		if (War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, restoreWarzones) == -1) {
 			War.war.log("Failed to schedule warzone-restore job. No warzone was loaded.", Level.WARNING);
 		}

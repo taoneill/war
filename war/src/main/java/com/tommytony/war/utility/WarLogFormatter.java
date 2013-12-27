@@ -15,7 +15,7 @@ public class WarLogFormatter extends Formatter {
         b.append(" [");
         b.append(arg0.getLevel());
         b.append("] ");
-        b.append(arg0.getMessage());
+        b.append(formatMessage(arg0));
         b.append(System.getProperty("line.separator"));
         return b.toString();
     }
