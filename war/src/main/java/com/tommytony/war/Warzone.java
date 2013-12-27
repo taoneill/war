@@ -486,7 +486,6 @@ public class Warzone {
 		playerInv.clear(playerInv.getSize() + 1);
 		playerInv.clear(playerInv.getSize() + 2);
 		playerInv.clear(playerInv.getSize() + 3); // helmet/blockHead
-		boolean helmetIsInLoadout = false;
 		for (Integer slot : loadout.keySet()) {
 			if (slot == 100) {
 				playerInv.setBoots(loadout.get(slot).clone());
@@ -496,7 +495,6 @@ public class Warzone {
 				playerInv.setChestplate(loadout.get(slot).clone());
 			} else if (slot == 103) {
 				playerInv.setHelmet(loadout.get(slot).clone());
-				helmetIsInLoadout = true;
 			} else {
 				ItemStack item = loadout.get(slot);
 				if (item != null) {
@@ -505,8 +503,6 @@ public class Warzone {
 			}
 		}
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
-			playerInv.setHelmet(team.getKind().getBlockHead());
-		} else if (!helmetIsInLoadout) {
 			ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
 			LeatherArmorMeta meta = (LeatherArmorMeta) helmet.getItemMeta();
 			meta.setColor(team.getKind().getBukkitColor());
