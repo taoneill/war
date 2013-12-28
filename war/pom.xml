@@ -1,67 +1,96 @@
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>com.tommytony</groupId>
   <artifactId>war</artifactId>
   <version>1.8-PREVIEW</version>
   <packaging>jar</packaging>
-
   <name>War</name>
   <url>http://war.tommytony.com</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-
   <repositories>
-        <repository>
-            <id>bukkit-repo</id>
-            <url>http://repo.bukkit.org/content/groups/public</url>
-        </repository>
-        <repository>
-            <id>cma-repo</id>
-            <url>http://maven.cmastudios.me/archiva/repository/internal</url>
-        </repository>
-        <repository>
-            <id>tagapi-repo</id>
-            <url>http://repo.kitteh.org/content/repositories/public/</url>
-        </repository>
-        <repository>
-            <id>sk89q-repo</id>
-            <url>http://maven.sk89q.com/repo/</url>
-        </repository>
-    </repositories>
+    <repository>
+      <id>bukkit-repo</id>
+      <url>http://repo.bukkit.org/content/groups/public</url>
+    </repository>
+    <repository>
+      <id>cma-repo</id>
+      <url>http://maven.cmastudios.me/archiva/repository/internal</url>
+    </repository>
+    <repository>
+      <id>tagapi-repo</id>
+      <url>http://repo.kitteh.org/content/repositories/public/</url>
+    </repository>
+    <repository>
+      <id>sk89q-repo</id>
+      <url>http://maven.sk89q.com/repo/</url>
+    </repository>
+    <repository>
+      <id>mcstats.releases</id>
+      <url>http://repo.mcstats.org/content/repositories/releases/</url>
+    </repository>
+  </repositories>
   <issueManagement>
-  	<system>Github issues</system>
-  	<url>https://github.com/taoneill/war/issues</url>
+    <system>Github issues</system>
+    <url>https://github.com/taoneill/war/issues</url>
   </issueManagement>
   <ciManagement>
-  	<system>Jenkins</system>
-  	<url>http://ci.tommytony.com</url>
+    <system>Jenkins</system>
+    <url>http://ci.tommytony.com</url>
   </ciManagement>
   <scm>
-        <connection>scm:git:git://github.com/taoneill/war.git</connection>
-	<developerConnection>scm:git:git@github.com:taoneill/war.git</developerConnection>
-	<tag>HEAD</tag>
-  	<url>https://github.com/taoneill/war</url>
+    <connection>scm:git:git://github.com/taoneill/war.git</connection>
+    <developerConnection>scm:git:git@github.com:taoneill/war.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/taoneill/war</url>
   </scm>
   <build>
-      <plugins>
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <version>2.0.2</version>
-              <configuration>
-                  <source>1.6</source>
-                  <target>1.6</target>
-              </configuration>
-          </plugin>
-      </plugins>
-      <resources>
-        <resource>
-          <filtering>true</filtering>
-          <directory>${basedir}/src/main/resources/</directory>
-        </resource>    
-      </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>org.mcstats.bukkit:metrics</include>
+                </includes>
+              </artifactSet>
+              <minimizeJar>false</minimizeJar>
+              <relocations>
+                <relocation>
+                  <pattern>org.mcstats</pattern>
+                  <shadedPattern>com.tommytony.war.metrics</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <filtering>true</filtering>
+        <directory>${basedir}/src/main/resources/</directory>
+      </resource>
+    </resources>
   </build>
   <dependencies>
     <dependency>
@@ -72,34 +101,40 @@
       <type>jar</type>
     </dependency>
     <dependency>
-	<groupId>junit</groupId>
-	<artifactId>junit</artifactId>
-	<version>4.8.1</version>
-	<scope>test</scope>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.bukkit</groupId>
-    	<artifactId>bukkit</artifactId>
-	<version>1.6.2-R1.0</version>
+      <groupId>org.bukkit</groupId>
+      <artifactId>bukkit</artifactId>
+      <version>1.6.2-R1.0</version>
     </dependency>
     <dependency>
-	<groupId>org.kitteh</groupId>
-	<artifactId>tagapi</artifactId>
-	<version>2.0</version>
-	<scope>compile</scope>
+      <groupId>org.kitteh</groupId>
+      <artifactId>tagapi</artifactId>
+      <version>2.0</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
-    	<groupId>org.mockito</groupId>
-    	<artifactId>mockito-all</artifactId>
-    	<version>1.8.5</version>
-    	<type>jar</type>
-    	<scope>test</scope>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>1.8.5</version>
+      <type>jar</type>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>worldedit</artifactId>
       <version>5.5.6</version>
       <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.mcstats.bukkit</groupId>
+      <artifactId>metrics</artifactId>
+      <version>R7</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>

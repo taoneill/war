@@ -1280,4 +1280,8 @@ public class War extends JavaPlugin {
 	public String getString(String key) {
 		return messages.getString(key);
 	}
+
+	public Locale getLoadedLocale() {
+		return messages.getLocale();
+	}
 }
