@@ -309,6 +309,13 @@ public class WarPlayerListener implements Listener {
 					int zone = random.nextInt(warzones.size());
 					Warzone random = warzones.get(zone);
 					player.teleport(random.getTeleport());
+				} else if (sign.getLine(1).equalsIgnoreCase("$active")) {
+					List<Warzone> warzones = War.war.getActiveWarzones();
+					if (warzones.size() == 0) warzones = War.war.getEnabledWarzones();
+					if (warzones.size() == 0) return;
+					int zone = random.nextInt(warzones.size());
+					Warzone random = warzones.get(zone);
+					player.teleport(random.getTeleport());
 				}
 			}
 		}

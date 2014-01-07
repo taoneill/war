@@ -912,6 +912,21 @@ public class War extends JavaPlugin {
 		return enabledZones;
 	}
 
+	/**
+	 * Get a list of warzones that have players in them.
+	 * @return List of enabled warzones with players.
+	 */
+	public List<Warzone> getActiveWarzones() {
+		List<Warzone> activeZones = new ArrayList<Warzone>(this.warzones.size());
+		for (Warzone zone : this.warzones) {
+			if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED) == false
+				&& zone.getPlayerCount() > 0) {
+				activeZones.add(zone);
+			}
+		}
+		return activeZones;
+	}
+
 	public void msg(CommandSender sender, String str) {
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
