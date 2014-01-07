@@ -898,6 +898,20 @@ public class War extends JavaPlugin {
 		return this.warzones;
 	}
 
+	/**
+	 * Get a list of warzones that are not disabled.
+	 * @return List of enabled warzones.
+	 */
+	public List<Warzone> getEnabledWarzones() {
+		List<Warzone> enabledZones = new ArrayList<Warzone>(this.warzones.size());
+		for (Warzone zone : this.warzones) {
+			if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED) == false) {
+				enabledZones.add(zone);
+			}
+		}
+		return enabledZones;
+	}
+
 	public void msg(CommandSender sender, String str) {
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
