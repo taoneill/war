@@ -33,7 +33,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -503,11 +502,7 @@ public class Warzone {
 			}
 		}
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
-			ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
-			LeatherArmorMeta meta = (LeatherArmorMeta) helmet.getItemMeta();
-			meta.setColor(team.getKind().getBukkitColor());
-			helmet.setItemMeta(meta);
-			playerInv.setHelmet(helmet);
+			playerInv.setHelmet(team.getKind().getHat());
 		}
 	}
 
