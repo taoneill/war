@@ -736,10 +736,10 @@ public class Team {
 	 *
 	 * @return array of usernames.
 	 */
-	public String[] getPlayerNames() {
-		String[] ret = new String[this.players.size()];
-		for (int i = 0; i < this.players.size(); i++) {
-			ret[i] = this.players.get(i).getName();
+	public List<String> getPlayerNames() {
+		List<String> ret = new ArrayList<String>(this.players.size());
+		for (Player player : this.players) {
+			ret.add(player.getName());
 		}
 		return ret;
 	}

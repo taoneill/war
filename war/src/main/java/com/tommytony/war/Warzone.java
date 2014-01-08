@@ -206,7 +206,7 @@ public class Warzone {
 				teamsMessage.append('\n');
 				teamsMessage.append(MessageFormat.format(War.war.getString("zone.teaminfo.format"),
 						team.getName(), team.getPoints(), team.getRemainingLifes(),
-						team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL), StringUtils.join(team.getPlayerNames())));
+						team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL), StringUtils.join(team.getPlayerNames().iterator(), ", ")));
 			}
 		}
 		return teamsMessage.toString();
