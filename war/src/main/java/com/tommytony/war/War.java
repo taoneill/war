@@ -179,7 +179,7 @@ public class War extends JavaPlugin {
 		warConfig.put(WarConfig.TNTINZONESONLY, false);
 		warConfig.put(WarConfig.RESETSPEED, 5000);
 		warConfig.put(WarConfig.MAXSIZE, 750);
-		warConfig.put(WarConfig.LANGUAGE, Locale.getDefault().toLanguageTag());
+		warConfig.put(WarConfig.LANGUAGE, Locale.getDefault().toString());
 
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOASSIGN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.BLOCKHEADS, true);
@@ -316,7 +316,11 @@ public class War extends JavaPlugin {
 	}
 
 	public static void reloadLanguage() {
-		Locale lang = Locale.forLanguageTag(War.war.getWarConfig().getString(WarConfig.LANGUAGE).replace("_", "-"));
+		String[] parts = War.war.getWarConfig().getString(WarConfig.LANGUAGE).replace("-", "_").split("_");
+		Locale lang = new Locale(parts[0]);
+		if (parts.length >= 2) {
+			lang = new Locale(parts[0], parts[1]);
+		}
 		War.messages = ResourceBundle.getBundle("messages", lang);
 	}
 
