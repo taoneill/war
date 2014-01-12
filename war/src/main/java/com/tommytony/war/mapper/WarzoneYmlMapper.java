@@ -206,10 +206,15 @@ public class WarzoneYmlMapper {
 						teamSpawns.add(teamLocation);
 						File original = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/volume-" + teamName + ".dat");
 						File modified = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/volume-" + teamName + teamSpawns.indexOf(teamLocation) + ".dat");
+						File originalSql = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/volume-" + teamName + ".sl3");
+						File modifiedSql = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/volume-" + teamName + teamSpawns.indexOf(teamLocation) + ".sl3");
 						try {
 							original.renameTo(modified);
-						} catch (Exception e) {
-							// Will be logged later
+						} catch (Exception ignored) {
+						}
+						try {
+							originalSql.renameTo(modifiedSql);
+						} catch (Exception ignored) {
 						}
 					}
 					if (warzoneRootSection.contains(teamInfoPrefix + "spawns")) {
