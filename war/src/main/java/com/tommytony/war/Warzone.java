@@ -30,7 +30,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permissible;
@@ -423,8 +425,9 @@ public class Warzone {
 		player.setSaturation(team.getTeamConfig().resolveInt(TeamConfig.SATURATION));
 		player.setExhaustion(0);
 		player.setFireTicks(0);		//this works fine here, why put it in LoudoutResetJob...? I'll keep it over there though
+
+		this.preventItemHackingThroughOpenedInventory(player);
 		
-		player.getOpenInventory().close();
 		player.setLevel(0);
 		player.setExp(0);
 		player.setAllowFlight(false);
@@ -571,7 +574,9 @@ public class Warzone {
 		PlayerState originalState = this.playerStates.remove(player.getName());
 		PlayerInventory playerInv = player.getInventory();
 		if (originalState != null) {
-			player.getOpenInventory().close();
+			// prevent item hacking thru CRAFTING personal inventory slots
+			this.preventItemHackingThroughOpenedInventory(player);
+			
 			this.playerInvFromInventoryStash(playerInv, originalState);
 			player.setGameMode(originalState.getGamemode());
 			player.setHealth(Math.max(Math.min(originalState.getHealth(), 20.0D), 0.0D));
@@ -588,6 +593,18 @@ public class Warzone {
 			}
 		}
 		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+	}
+
+	private void preventItemHackingThroughOpenedInventory(Player player) {
+		InventoryView openedInv = player.getOpenInventory();
+		if (openedInv.getType() == InventoryType.CRAFTING) {
+			// prevent abuse of personal crafting slots (this behavior doesn't seem to happen 
+			// for containers like workbench and furnace - those get closed properly)
+			openedInv.getTopInventory().clear();
+		}
+		
+		// Prevent player from keeping items he was transferring in his inventory
+		openedInv.setCursor(null);
 	}
 
 	private void playerInvFromInventoryStash(PlayerInventory playerInv, PlayerState originalContents) {
