@@ -303,12 +303,12 @@ public class WarzoneTxtMapper {
 							int yaw = Integer.parseInt(teamStrSplit[4]);
 							teamLocation.setYaw(yaw);
 						}
-                                                File original = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/volume-" + teamStrSplit[0] + ".dat");
-                                                File modified = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/volume-" + teamStrSplit[0] + "0.dat");
-                                                try {
-                                                        original.renameTo(modified);
-                                                } catch (Exception ignored) {
-                                                }
+						File original = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/volume-" + teamStrSplit[0] + ".dat");
+						File modified = new File(War.war.getDataFolder().getPath() + "/dat/warzone-" + name + "/volume-" + teamStrSplit[0] + "0.dat");
+						try {
+							original.renameTo(modified);
+						} catch (Exception ignored) {
+						}
 
 						Team team = new Team(teamStrSplit[0], TeamKind.teamKindFromString(teamStrSplit[0]), Arrays.asList(teamLocation), warzone);
 						team.setRemainingLives(warzone.getTeamDefaultConfig().resolveInt(TeamConfig.LIFEPOOL));
