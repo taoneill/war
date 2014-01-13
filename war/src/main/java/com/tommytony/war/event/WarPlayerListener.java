@@ -500,6 +500,14 @@ public class WarPlayerListener implements Listener {
 					event.setTo(playerTeam.getRandomSpawn());
 					return;
 				}
+				if (playerWarzone.isReinitializing()) {
+					// don't let players wander about outside spawns during reset
+					// (they could mess up the blocks that have already been reset
+					// before the start of the new battle)
+					War.war.msg(player, "zone.battle.reset");
+					event.setTo(playerTeam.getRandomSpawn());
+					return;
+				}
 			} else if (loadoutSelectionState != null && !loadoutSelectionState.isStillInSpawn()
 					&& !playerWarzone.isCakeThief(player.getName())
 					&& (flagReturn.equals(FlagReturn.BOTH) || flagReturn.equals(FlagReturn.SPAWN)) 
