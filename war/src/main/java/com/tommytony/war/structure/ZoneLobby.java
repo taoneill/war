@@ -56,7 +56,11 @@ public class ZoneLobby {
 	 */
 	public ZoneLobby(Warzone warzone, BlockFace wall) {
 		this.warzone = warzone;
-		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
+		int noOfTeams = this.warzone.getTeams().size();
+		if (this.warzone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
+			noOfTeams = 1;
+		}
+		int lobbyWidth = noOfTeams * 4 + 5;
 		this.lobbyHalfSide = lobbyWidth / 2;
 		if (this.lobbyHalfSide < 7) {
 			this.lobbyHalfSide = 7;
@@ -72,7 +76,11 @@ public class ZoneLobby {
 	 */
 	public ZoneLobby(Warzone warzone, Location playerLocation) {
 		this.warzone = warzone;
-		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
+		int noOfTeams = this.warzone.getTeams().size();
+		if (this.warzone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
+			noOfTeams = 1;
+		}
+		int lobbyWidth = noOfTeams * 4 + 5;
 		this.lobbyHalfSide = lobbyWidth / 2;
 		if (this.lobbyHalfSide < 7) {
 			this.lobbyHalfSide = 7;
@@ -85,7 +93,11 @@ public class ZoneLobby {
 	 */
 	public ZoneLobby(Warzone warzone, BlockFace wall, Volume volume) {
 		this.warzone = warzone;
-		int lobbyWidth = warzone.getTeams().size() * 4 + 5;
+		int noOfTeams = this.warzone.getTeams().size();
+		if (this.warzone.getWarzoneConfig().getBoolean(WarzoneConfig.AUTOASSIGN)) {
+			noOfTeams = 1;
+		}
+		int lobbyWidth = noOfTeams * 4 + 5;
 		this.lobbyHalfSide = lobbyWidth / 2;
 		if (this.lobbyHalfSide < 7) {
 			this.lobbyHalfSide = 7;
