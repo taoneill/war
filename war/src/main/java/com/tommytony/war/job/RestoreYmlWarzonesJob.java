@@ -57,7 +57,11 @@ public class RestoreYmlWarzonesJob implements Runnable {
 					Graph warzoneCount = metrics.createGraph("Warzones");
 					warzoneCount.addPlotter(new FixedPlotter("Count", zones));
 					Graph language = metrics.createGraph("Language");
-					language.addPlotter(new PlotterEnabled(War.war.getLoadedLocale().getDisplayLanguage(Locale.ENGLISH)));
+					String langName = War.war.getLoadedLocale().getDisplayLanguage(Locale.ENGLISH);
+					if (langName.isEmpty()) {
+						langName = "English";
+					}
+					language.addPlotter(new PlotterEnabled(langName));
 					Graph plugins = metrics.createGraph("Extensions");
 					if (War.war.isSpoutServer()) {
 						plugins.addPlotter(new PlotterEnabled("Spout"));
