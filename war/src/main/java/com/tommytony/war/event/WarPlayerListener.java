@@ -229,7 +229,8 @@ public class WarPlayerListener implements Listener {
 				// likely respawn still trying to use their items to attack
 				// another player.
 				player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 0);
-			}
+			} 
+
 			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST && !zone.getWarzoneConfig().getBoolean(WarzoneConfig.ALLOWENDER)) {
 				event.setCancelled(true);
 				War.war.badMsg(player, "use.ender");
@@ -274,8 +275,7 @@ public class WarPlayerListener implements Listener {
 					}
 				}
 			}
-		}
-		
+		}		
 	}
 
 	@EventHandler

@@ -1,5 +1,7 @@
 package com.tommytony.war.utility;
 
+import com.tommytony.war.War;
+
 public class LoadoutSelection {
 
 	private boolean stillInSpawn;

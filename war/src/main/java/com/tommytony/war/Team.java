@@ -724,6 +724,7 @@ public class Team {
 				return true;
 			}
 		}
+		
 		return false;
 	}
 

@@ -3,6 +3,7 @@ package com.tommytony.war.event;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -18,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -122,6 +124,7 @@ public class WarEntityListener implements Listener {
 						if (d.getHealth() != 0) {
 							d.setHealth(0);
 						}
+						
 						return;
 					}
 					
@@ -233,6 +236,7 @@ public class WarEntityListener implements Listener {
 				if (!War.war.getWarConfig().getBoolean(WarConfig.DISABLEPVPMESSAGE)) {
 					War.war.badMsg(a, "pvp.outside.permission");
 				}
+				
 				event.setCancelled(true); // global pvp is off
 			} else {
 				if (attackerTeam == null) {
@@ -246,6 +250,7 @@ public class WarEntityListener implements Listener {
 				} else if (attackerWarzone != defenderWarzone) {
 					War.war.badMsg(a, "pvp.target.otherzone");
 				}
+
 				event.setCancelled(true); // can't attack someone inside a warzone if you're not in a team
 			}
 		} else if (defender instanceof Player) {
@@ -264,6 +269,7 @@ public class WarEntityListener implements Listener {
 					if (d.getHealth() != 0) {
 						d.setHealth(0);
 					}
+					
 					return;
 				}
 								
@@ -373,26 +379,29 @@ public class WarEntityListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onEntityDamage(final EntityDamageEvent event) {
-		if (!War.war.isLoaded()) {
+
+		
+		if (!War.war.isLoaded()) {			
 			return;
 		}
 
 		Entity entity = event.getEntity();
 		if (!(entity instanceof Player)) {
+			
 			return;
 		}
 		Player player = (Player) entity;
 
 		// prevent godmode
-		if (Warzone.getZoneByPlayerName(player.getName()) != null) {
+		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+		if (zone != null) {
 			event.setCancelled(false);
 		}
 
 		// pass pvp-damage
-		if (event instanceof EntityDamageByEntityEvent) {
+		if (event instanceof EntityDamageByEntityEvent) {			
 			this.handlerAttackDefend((EntityDamageByEntityEvent) event);
 		} else  {
-			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 			Team team = Team.getTeamByPlayerName(player.getName());
 			
 			if (zone != null && team != null) {
@@ -439,18 +448,29 @@ public class WarEntityListener implements Listener {
 	}
 
 	@EventHandler
-	// TODO Remove due to deletion of cantreenterspawnjob
-	public void onEntityCombust(final EntityDamageEvent event) {
+	public void onEntityCombust(final EntityCombustEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}
+		
 		Entity entity = event.getEntity();
 		if (entity instanceof Player) {
 			Player player = (Player) entity;
 			Team team = Team.getTeamByPlayerName(player.getName());
-			if (team != null && team.isSpawnLocation(player.getLocation())) {
+			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+			LoadoutSelection playerLoadoutState = null;
+			
+			if (zone != null) {
+				playerLoadoutState = zone.getLoadoutSelections().get(player.getName());
+			}
+			
+			if (team != null
+					&& zone != null
+					&& team.isSpawnLocation(player.getLocation()) 
+					&& playerLoadoutState != null
+					&& playerLoadoutState.isStillInSpawn()) {
 				// smother out the fire that didn't burn out when you respawned
-				// Stop fire
+				// Stop fire (but not if you came back to spawn after leaving it a first time)
 				player.setFireTicks(0);
 				event.setCancelled(true);
 			}
