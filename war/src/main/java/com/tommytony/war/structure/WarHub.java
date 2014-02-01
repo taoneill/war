@@ -258,8 +258,8 @@ public class WarHub {
 
 		Block zoneGate = this.zoneGateBlocks.get(zone.getName());
 		if (zoneGate != null) {
-			zoneGate.getRelative(left).getRelative(back, 1).setType(Material.SIGN_POST);
-			org.bukkit.block.Sign block = (org.bukkit.block.Sign) zoneGate.getRelative(left).getRelative(back, 1).getState();
+			zoneGate.getRelative(BlockFace.UP, 2).getRelative(back, 1).setType(Material.WALL_SIGN);
+			org.bukkit.block.Sign block = (org.bukkit.block.Sign) zoneGate.getRelative(BlockFace.UP, 2).getRelative(back, 1).getState();
 			org.bukkit.material.Sign data = (Sign) block.getData();
 			data.setFacingDirection(this.getOrientation().getOppositeFace());
 			block.setData(data);
@@ -277,6 +277,11 @@ public class WarHub {
 				block.setLine(i, lines[i]);
 			}
 			block.update(true);
+			
+			if (zonePlayers > 0) {
+				// add redstone torch to gate if there are players in it (to highlight active zones)
+				zoneGate.getRelative(BlockFace.UP, 1).getRelative(left).getRelative(back, 1).setType(Material.REDSTONE_TORCH_ON);
+			}
 		} else {
 			War.war.log("Failed to find warhub gate for " + zone.getName() + " warzone.", Level.WARNING);
 		}

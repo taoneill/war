@@ -760,17 +760,18 @@ public class ZoneLobby {
 		} else if (this.wall == Direction.WEST()) {
 			direction = Direction.EAST();
 		}
+
 		if (this.wall == Direction.NORTH()) {
-			block = gate.getRelative(direction).getRelative(Direction.EAST());
+			block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
 		} else if (this.wall == Direction.EAST()) {
-			block = gate.getRelative(direction).getRelative(Direction.SOUTH());
+			block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
 		} else if (this.wall == Direction.SOUTH()) {
-			block = gate.getRelative(direction).getRelative(Direction.WEST());
+			block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
 		} else if (this.wall == Direction.WEST()) {
-			block = gate.getRelative(direction).getRelative(Direction.NORTH());
+			block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
 		}
 
-		block.setType(Material.SIGN_POST);
+		block.setType(Material.WALL_SIGN);
 		org.bukkit.block.Sign state = (org.bukkit.block.Sign) block.getState();
 		org.bukkit.material.Sign data = (Sign) state.getData();
 		data.setFacingDirection(direction);

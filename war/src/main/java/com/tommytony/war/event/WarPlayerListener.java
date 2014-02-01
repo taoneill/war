@@ -297,6 +297,8 @@ public class WarPlayerListener implements Listener {
 			return;
 		}
 		latestLocations.put(player.getName(), playerLoc);
+		
+		// Signs can automatically teleport you to specific or random warzones
 		if (playerLoc.getBlock().getType() == Material.SIGN_POST) {
 			Sign sign = (Sign) playerLoc.getBlock().getState();
 			if (sign.getLine(0).equals("[zone]")) {
@@ -319,6 +321,7 @@ public class WarPlayerListener implements Listener {
 				}
 			}
 		}
+		
 		Warzone locZone = Warzone.getZoneByLocation(playerLoc);
 		ZoneLobby locLobby = ZoneLobby.getLobbyByLocation(playerLoc);
 
