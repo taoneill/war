@@ -279,8 +279,24 @@ public class WarHub {
 			block.update(true);
 			
 			if (zonePlayers > 0) {
-				// add redstone torch to gate if there are players in it (to highlight active zones)
-				zoneGate.getRelative(BlockFace.UP, 1).getRelative(left).getRelative(back, 1).setType(Material.REDSTONE_TORCH_ON);
+				// add redstone blocks and torches to gate if there are players in it (to highlight active zones)
+				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left).setType(Material.REDSTONE_BLOCK);
+				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left.getOppositeFace()).setType(Material.REDSTONE_BLOCK);
+				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left).getRelative(back, 1).setType(Material.TORCH);
+				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left.getOppositeFace()).getRelative(back, 1).setType(Material.TORCH);
+			} else {
+				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left).getRelative(back, 1).setType(Material.AIR);
+				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left.getOppositeFace()).getRelative(back, 1).setType(Material.AIR);
+				
+				BlockState topLeftGateBlock = zoneGate.getRelative(BlockFace.UP, 2).getRelative(left).getState();
+				topLeftGateBlock.setType(War.war.getWarhubMaterials().getGateBlock().getType());
+				topLeftGateBlock.setData(War.war.getWarhubMaterials().getGateBlock().getData());
+				topLeftGateBlock.update(true);
+				
+				BlockState topRightGateBlock = zoneGate.getRelative(BlockFace.UP, 2).getRelative(left.getOppositeFace()).getState();
+				topRightGateBlock.setType(War.war.getWarhubMaterials().getGateBlock().getType());
+				topRightGateBlock.setData(War.war.getWarhubMaterials().getGateBlock().getData());
+				topRightGateBlock.update(true);
 			}
 		} else {
 			War.war.log("Failed to find warhub gate for " + zone.getName() + " warzone.", Level.WARNING);
