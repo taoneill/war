@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.tommytony</groupId>
   <artifactId>war</artifactId>
-  <version>1.8-PREVIEW</version>
+  <version>1.8</version>
   <packaging>jar</packaging>
   <name>War</name>
   <url>http://war.tommytony.com</url>
