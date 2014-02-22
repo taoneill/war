@@ -3,10 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.tommytony</groupId>
   <artifactId>war</artifactId>
-  <version>1.8</version>
+  <version>1.9-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>War</name>
   <url>http://war.tommytony.com</url>
+  <description>Minecraft PVP arenas (called warzones) for a fast-paced and structured PVP experience with TDM, CTF and more!</description>
   <prerequisites>
     <maven>2.2.1</maven>
   </prerequisites>

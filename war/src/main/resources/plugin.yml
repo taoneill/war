@@ -1,8 +1,8 @@
-name: War
-version: 1.8 (Nimitz)
-description: Minecraft PVP arenas (called warzones) for a fast-paced and structured PVP experience with TDM, CTF & more!
+name: ${project.name}
+version: ${project.version}
+description: ${project.description}
 author: tommytony
-website: http://war.tommytony.com
+website: ${project.url}
 main: com.tommytony.war.War
 softdepend: [Spout, TagAPI, WorldEdit]
 permissions:
