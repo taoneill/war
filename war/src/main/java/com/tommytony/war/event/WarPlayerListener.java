@@ -3,6 +3,7 @@ package com.tommytony.war.event;
 import java.util.HashMap;
 import java.util.List;
 
+import com.tommytony.war.config.WarConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -69,6 +70,34 @@ public class WarPlayerListener implements Listener {
 
 			if (War.war.isWandBearer(player)) {
 				War.war.removeWandBearer(player);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onPlayerJoin(final PlayerJoinEvent event) {
+		String autojoinName = War.war.getWarConfig().getString(WarConfig.AUTOJOIN);
+		boolean autojoinEnabled = autojoinName.isEmpty();
+		if (autojoinEnabled) { // Won't be able to find warzone if unset
+			Warzone autojoinWarzone = Warzone.getZoneByNameExact(autojoinName);
+			if (autojoinWarzone == null) {
+				War.war.getLogger().log(Level.WARNING, "Failed to find autojoin warzone ''{0}''.", new Object[] {autojoinName});
+				return;
+			}
+			if (autojoinWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED) || autojoinWarzone.isReinitializing()) {
+				War.war.badMsg(event.getPlayer(), "join.disabled");
+				event.getPlayer().teleport(autojoinWarzone.getTeleport());
+			} else if (!autojoinWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && autojoinWarzone.isEnoughPlayers()) {
+				War.war.badMsg(event.getPlayer(), "join.progress");
+				event.getPlayer().teleport(autojoinWarzone.getTeleport());
+			} else if (autojoinWarzone.isFull()) {
+				War.war.badMsg(event.getPlayer(), "join.full.all");
+				event.getPlayer().teleport(autojoinWarzone.getTeleport());
+			} else if (autojoinWarzone.isFull(event.getPlayer())) {
+				War.war.badMsg(event.getPlayer(), "join.permission.all");
+				event.getPlayer().teleport(autojoinWarzone.getTeleport());
+			} else { // Player will only ever be autoassigned to a team
+				autojoinWarzone.autoAssign(event.getPlayer());
 			}
 		}
 	}

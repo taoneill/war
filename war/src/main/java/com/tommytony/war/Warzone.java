@@ -153,6 +153,13 @@ public class Warzone {
 		return bestGuess;
 	}
 
+	public static Warzone getZoneByNameExact(String name) {
+		for (Warzone zone : War.war.getWarzones()) {
+			if (zone.getName().equalsIgnoreCase(name)) return zone;
+		}
+		return null;
+	}
+
 	public static Warzone getZoneByLocation(Location location) {
 		for (Warzone warzone : War.war.getWarzones()) {
 			if (location.getWorld().getName().equals(warzone.getWorld().getName()) && warzone.getVolume() != null && warzone.getVolume().contains(location)) {
