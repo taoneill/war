@@ -12,7 +12,8 @@ public enum WarConfig {
 	RESETSPEED (Integer.class),
 	MAXSIZE (Integer.class),
 	LANGUAGE (String.class),
-	AUTOJOIN (String.class);
+	AUTOJOIN (String.class),
+	TPWARMUP(Integer.class);
 	
 	private final Class<?> configType;
 

@@ -183,6 +183,7 @@ public class War extends JavaPlugin {
 		warConfig.put(WarConfig.MAXSIZE, 750);
 		warConfig.put(WarConfig.LANGUAGE, Locale.getDefault().toString());
 		warConfig.put(WarConfig.AUTOJOIN, "");
+		warConfig.put(WarConfig.TPWARMUP, 0);
 
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOASSIGN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.BLOCKHEADS, true);

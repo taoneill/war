@@ -1,5 +1,7 @@
 package com.tommytony.war.command;
 
+import com.tommytony.war.config.WarConfig;
+import com.tommytony.war.job.TeleportPlayerJob;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -30,8 +32,14 @@ public class WarzoneCommand extends AbstractWarCommand {
 				Warzone warzone = Warzone.getZoneByName(args[0]);
 				if (warzone != null && warzone.getTeleport() != null) {
 					Warzone playerWarzone = Warzone.getZoneByPlayerName(player.getName());
+					int warmup = War.war.getWarConfig().getInt(WarConfig.TPWARMUP);
 					if (playerWarzone != null) {
 						playerWarzone.handlePlayerLeave(player, warzone.getTeleport(), true);
+					} else if (warmup > 0) {
+						final int TICKS_PER_SECOND = 20;
+						TeleportPlayerJob job = new TeleportPlayerJob(player, warzone.getTeleport());
+						job.runTaskLater(War.war, warmup);
+						this.msg("command.tp.init", warmup / TICKS_PER_SECOND);
 					} else {
 						player.teleport(warzone.getTeleport());
 					}
