@@ -36,6 +36,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -451,6 +452,13 @@ public class Warzone {
 		
 		// clear potion effects
 		PotionEffectHelper.clearPotionEffects(player);
+
+		if (!team.getTeamConfig().getString(TeamConfig.APPLYPOTION).isEmpty()) {
+			PotionEffect effect = War.war.getPotionEffect(team.getTeamConfig().getString(TeamConfig.APPLYPOTION));
+			if (effect != null) {
+				player.addPotionEffect(effect);
+			}
+		}
 		
 		boolean isFirstRespawn = false;
 		if (!this.getLoadoutSelections().keySet().contains(player.getName())) {

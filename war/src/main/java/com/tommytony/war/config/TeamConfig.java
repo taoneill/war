@@ -17,7 +17,8 @@ public enum TeamConfig {
 	XPKILLMETER (Boolean.class),
 	KILLSTREAK (Boolean.class),
 	BLOCKWHITELIST (String.class),
-	PLACEBLOCK (Boolean.class);
+	PLACEBLOCK (Boolean.class),
+	APPLYPOTION(String.class);
 	
 	private final Class<?> configType;
 

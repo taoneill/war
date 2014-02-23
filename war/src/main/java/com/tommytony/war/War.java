@@ -57,6 +57,8 @@ import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.SizeCounter;
 import com.tommytony.war.utility.WarLogFormatter;
 import com.tommytony.war.volume.Volume;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * Main class of War
@@ -225,6 +227,7 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.KILLSTREAK, false);
 		teamDefaultConfig.put(TeamConfig.BLOCKWHITELIST, "all");
 		teamDefaultConfig.put(TeamConfig.PLACEBLOCK, true);
+		teamDefaultConfig.put(TeamConfig.APPLYPOTION, "");
 
 		this.getDefaultInventories().clearLoadouts();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
@@ -1317,5 +1320,24 @@ public class War extends JavaPlugin {
 
 	public Locale getLoadedLocale() {
 		return messages.getLocale();
+	}
+
+	/**
+	 * Convert serialized effect to actual effect.
+	 * @param serializedEffect String stored in configuration.
+	 *                         Format: TYPE:DURATION:AMPLIFY
+	 * @return Potion effect or null otherwise
+	 */
+	public PotionEffect getPotionEffect(String serializedEffect) {
+		String[] arr = serializedEffect.split(":");
+		if (arr.length != 3) return null;
+		try {
+			PotionEffectType type = PotionEffectType.getByName(arr[0]);
+			int duration = Integer.parseInt(arr[1]);
+			int amplification = Integer.parseInt(arr[2]);
+			return new PotionEffect(type, duration, amplification);
+		} catch (RuntimeException ex) {
+			return null;
+		}
 	}
 }
