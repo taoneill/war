@@ -1326,11 +1326,11 @@ public class War extends JavaPlugin {
 	/**
 	 * Convert serialized effect to actual effect.
 	 * @param serializedEffect String stored in configuration.
-	 *                         Format: TYPE:DURATION:AMPLIFY
+	 *                         Format: TYPE;DURATION;AMPLIFY
 	 * @return Potion effect or null otherwise
 	 */
 	public PotionEffect getPotionEffect(String serializedEffect) {
-		String[] arr = serializedEffect.split(":");
+		String[] arr = serializedEffect.split(";");
 		if (arr.length != 3) return null;
 		try {
 			PotionEffectType type = PotionEffectType.getByName(arr[0]);

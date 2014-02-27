@@ -77,7 +77,7 @@ public class WarPlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onPlayerJoin(final PlayerJoinEvent event) {
 		String autojoinName = War.war.getWarConfig().getString(WarConfig.AUTOJOIN);
-		boolean autojoinEnabled = autojoinName.isEmpty();
+		boolean autojoinEnabled = !autojoinName.isEmpty();
 		if (autojoinEnabled) { // Won't be able to find warzone if unset
 			Warzone autojoinWarzone = Warzone.getZoneByNameExact(autojoinName);
 			if (autojoinWarzone == null) {

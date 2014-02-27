@@ -453,10 +453,15 @@ public class Warzone {
 		// clear potion effects
 		PotionEffectHelper.clearPotionEffects(player);
 
-		if (!team.getTeamConfig().getString(TeamConfig.APPLYPOTION).isEmpty()) {
-			PotionEffect effect = War.war.getPotionEffect(team.getTeamConfig().getString(TeamConfig.APPLYPOTION));
+		String potionEffect = team.getTeamConfig().resolveString(TeamConfig.APPLYPOTION);
+		if (!potionEffect.isEmpty()) {
+			PotionEffect effect = War.war.getPotionEffect(potionEffect);
 			if (effect != null) {
 				player.addPotionEffect(effect);
+			} else {
+				War.war.getLogger().log(Level.WARNING,
+					"Failed to apply potion effect {0} in warzone {1}.",
+					new Object[] {potionEffect, name});
 			}
 		}
 		
