@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import net.milkbowl.vault.economy.EconomyResponse;
+
 import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
 import org.apache.commons.lang.StringUtils;
@@ -1367,6 +1369,8 @@ public class Warzone {
 			String winnersStrAndExtra = "Score cap reached. Game is over! Winning team(s): " + winnersStr;
 			winnersStrAndExtra += ". Resetting warzone and your inventory...";
 			t.teamcast(winnersStrAndExtra);
+			double ecoReward = t.getTeamConfig().resolveDouble(TeamConfig.ECOREWARD); 
+			boolean doEcoReward = ecoReward != 0 && War.war.getEconomy() != null;
 			for (Iterator<Player> it = t.getPlayers().iterator(); it.hasNext();) {
 				Player tp = it.next();
 				it.remove(); // Remove player from team first to prevent anti-tp
@@ -1375,6 +1379,19 @@ public class Warzone {
 				if (winnersStr.contains(t.getName())) {
 					// give reward
 					rewardPlayer(tp, t.getInventories().resolveReward());
+					if (doEcoReward) {
+						EconomyResponse r;
+						if (ecoReward > 0) {
+							r = War.war.getEconomy().depositPlayer(tp.getName(), ecoReward);
+						} else {
+							r = War.war.getEconomy().withdrawPlayer(tp.getName(), ecoReward);
+						}
+						if (!r.transactionSuccess()) {
+							War.war.getLogger().log(Level.WARNING,
+								"Failed to reward player {0} ${1}. Error: {2}",
+								new Object[] {tp.getName(), ecoReward, r.errorMessage});
+						}
+					}
 				}
 			}
 			t.resetPoints();

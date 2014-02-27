@@ -54,6 +54,25 @@ public class TeamConfigBag {
 		}
 	}
 	
+	public Double getDouble(TeamConfig config) {
+		if (this.contains(config)) {
+			return (Double)this.bag.get(config);
+		}
+		return null;
+	}
+
+	public Double resolveDouble(TeamConfig config) {
+		if (this.contains(config)) {
+			return (Double)this.bag.get(config);
+		} else if (this.warzone != null && this.warzone.getTeamDefaultConfig().contains(config)){
+			// use Warzone default config
+			return this.warzone.getTeamDefaultConfig().resolveDouble(config);
+		} else {
+			// use War default config
+			return War.war.getTeamDefaultConfig().resolveDouble(config);
+		}
+	}
+
 	public Integer getInt(TeamConfig config) {
 		if (this.contains(config)) {
 			return (Integer)this.bag.get(config);
@@ -157,6 +176,8 @@ public class TeamConfigBag {
 					this.put(config, teamConfigSection.getBoolean(config.toString()));
 				} else if (config.getConfigType().equals(String.class)) {
 					this.put(config, teamConfigSection.getString(config.toString()));
+				} else if (config.getConfigType().equals(Double.class)) {
+					this.put(config, teamConfigSection.getDouble(config.toString()));
 				} else if (config.getConfigType().equals(FlagReturn.class)) {
 					String flagReturnStr = teamConfigSection.getString(config.toString());
 					FlagReturn returnMode = FlagReturn.getFromString(flagReturnStr);
@@ -178,7 +199,8 @@ public class TeamConfigBag {
 		for (TeamConfig config : TeamConfig.values()) {
 			if (this.contains(config)) {
 				if (config.getConfigType().equals(Integer.class) 
-						|| config.getConfigType().equals(Boolean.class)) {
+						|| config.getConfigType().equals(Boolean.class)
+						|| config.getConfigType().equals(Double.class)) {
 					teamConfigSection.set(config.toString(), this.bag.get(config));
 				} else {
 					teamConfigSection.set(config.toString(), this.bag.get(config).toString());
@@ -195,6 +217,9 @@ public class TeamConfigBag {
 				if (teamConfig.getConfigType().equals(Integer.class)) {
 					int intValue = Integer.parseInt(namedParams.get(namedParam));
 					this.bag.put(teamConfig, intValue);
+				} else if (teamConfig.getConfigType().equals(Double.class)) {
+					double doubleValue = Double.parseDouble(namedParams.get(namedParam));
+					this.bag.put(teamConfig, doubleValue);
 				} else if (teamConfig.getConfigType().equals(Boolean.class)) {
 					String onOff = namedParams.get(namedParam);
 					this.bag.put(teamConfig, onOff.equals("on") || onOff.equals("true"));

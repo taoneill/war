@@ -18,7 +18,8 @@ public enum TeamConfig {
 	KILLSTREAK (Boolean.class),
 	BLOCKWHITELIST (String.class),
 	PLACEBLOCK (Boolean.class),
-	APPLYPOTION(String.class);
+	APPLYPOTION(String.class),
+	ECOREWARD(Double.class);
 	
 	private final Class<?> configType;
 

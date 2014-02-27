@@ -8,6 +8,8 @@ import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,7 +22,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.tommytony.war.command.WarCommandHandler;
 import com.tommytony.war.config.FlagReturn;
@@ -57,8 +62,6 @@ import com.tommytony.war.utility.PlayerState;
 import com.tommytony.war.utility.SizeCounter;
 import com.tommytony.war.utility.WarLogFormatter;
 import com.tommytony.war.volume.Volume;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 /**
  * Main class of War
@@ -99,6 +102,7 @@ public class War extends JavaPlugin {
 	private final InventoryBag defaultInventories = new InventoryBag();
 	private KillstreakReward killstreakReward;
 	private MySQLConfig mysqlConfig;
+	private Economy econ = null;
 
 	private final WarConfigBag warConfig = new WarConfigBag();
 	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
@@ -229,6 +233,7 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.BLOCKWHITELIST, "all");
 		teamDefaultConfig.put(TeamConfig.PLACEBLOCK, true);
 		teamDefaultConfig.put(TeamConfig.APPLYPOTION, "");
+		teamDefaultConfig.put(TeamConfig.ECOREWARD, 0.0);
 
 		this.getDefaultInventories().clearLoadouts();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
@@ -290,6 +295,13 @@ public class War extends JavaPlugin {
 			} catch (Exception ex) {
 				this.log("MySQL driver not found!", Level.SEVERE);
 				this.getServer().getPluginManager().disablePlugin(this);
+			}
+		}
+		if (this.getServer().getPluginManager().isPluginEnabled("Vault")) {
+			RegisteredServiceProvider<Economy> rsp = this.getServer().getServicesManager()
+				.getRegistration(Economy.class);
+			if (rsp != null) {
+				this.econ = rsp.getProvider();
 			}
 		}
 
@@ -1340,5 +1352,9 @@ public class War extends JavaPlugin {
 		} catch (RuntimeException ex) {
 			return null;
 		}
+	}
+
+	public Economy getEconomy() {
+		return econ;
 	}
 }
