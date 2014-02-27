@@ -39,7 +39,7 @@ public class WarhubCommand extends AbstractWarCommand {
 				playerWarzone.handlePlayerLeave(player, War.war.getWarHub().getLocation(), true);
 			}
 			int warmup = War.war.getWarConfig().getInt(WarConfig.TPWARMUP);
-			if (warmup > 0) {
+			if (warmup > 0 && !player.hasPermission("war.warmupexempt")) {
 				final int TICKS_PER_SECOND = 20;
 				TeleportPlayerJob job = new TeleportPlayerJob(player, War.war.getWarHub().getLocation());
 				job.runTaskLater(War.war, warmup);
