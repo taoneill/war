@@ -948,79 +948,62 @@ public class War extends JavaPlugin {
 		return activeZones;
 	}
 
+	static final boolean HIDE_BLANK_MESSAGES = true;
+
 	public void msg(CommandSender sender, String str) {
+		if (messages.containsKey(str)) str = this.getString(str);
+		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
 					.append(this.getString("war.prefix")).append(ChatColor.WHITE).append(' ');
-			if (messages.containsKey(str)) {
-				output.append(this.colorKnownTokens(this.getString(str),
-						ChatColor.WHITE));
-			} else {
-				output.append(this.colorKnownTokens(str, ChatColor.WHITE));
-			}
+			output.append(this.colorKnownTokens(str, ChatColor.WHITE));
 			sender.sendMessage(output.toString());
 		} else {
-			sender.sendMessage(messages.containsKey(str) ? messages.getString(str) : str);
+			sender.sendMessage(str);
 		}
 	}
 
 	public void badMsg(CommandSender sender, String str) {
+		if (messages.containsKey(str)) str = this.getString(str);
+		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
 					.append(this.getString("war.prefix")).append(ChatColor.RED).append(' ');
-			if (messages.containsKey(str)) {
-				output.append(this.colorKnownTokens(this.getString(str), ChatColor.RED));
-			} else {
-				output.append(this.colorKnownTokens(str, ChatColor.RED));
-			}
+			output.append(this.colorKnownTokens(str, ChatColor.RED));
 			sender.sendMessage(output.toString());
 		} else {
-			sender.sendMessage(messages.containsKey(str) ? messages.getString(str) : str);
+			sender.sendMessage(str);
 		}
 	}
 
 	public void msg(CommandSender sender, String str, Object... obj) {
+		if (messages.containsKey(str)) str = this.getString(str);
+		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
 					.append(this.getString("war.prefix")).append(ChatColor.WHITE).append(' ');
-			if (messages.containsKey(str)) {
-				output.append(MessageFormat.format(this.colorKnownTokens(
-						this.getString(str), ChatColor.WHITE), obj));
-			} else {
-				output.append(MessageFormat.format(
+			output.append(MessageFormat.format(
 						this.colorKnownTokens(str, ChatColor.WHITE), obj));
-			}
 			sender.sendMessage(output.toString());
 		} else {
 			StringBuilder output = new StringBuilder();
-			if (messages.containsKey(str)) {
-				output.append(MessageFormat.format(this.getString(str), obj));
-			} else {
-				output.append(MessageFormat.format(str, obj));
-			}
+			output.append(MessageFormat.format(str, obj));
 			sender.sendMessage(output.toString());
 		}
 	}
 
 	public void badMsg(CommandSender sender, String str, Object... obj) {
+		if (messages.containsKey(str)) str = this.getString(str);
+		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
 					.append(this.getString("war.prefix")).append(ChatColor.RED).append(' ');
-			if (messages.containsKey(str)) {
-				output.append(MessageFormat.format(this.colorKnownTokens(
-						this.getString(str), ChatColor.RED), obj));
-			} else {
-				output.append(MessageFormat.format(
+			output.append(MessageFormat.format(
 						this.colorKnownTokens(str, ChatColor.RED), obj));
-			}
 			sender.sendMessage(output.toString());
 		} else {
 			StringBuilder output = new StringBuilder();
-			if (messages.containsKey(str)) {
-				output.append(MessageFormat.format(this.getString(str), obj));
-			} else {
-				output.append(MessageFormat.format(str, obj));
-			}
+			output.append(MessageFormat.format(str, obj));
 			sender.sendMessage(output.toString());
 		}
 	}
