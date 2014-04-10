@@ -435,6 +435,7 @@ public class Warzone {
 		player.setSaturation(team.getTeamConfig().resolveInt(TeamConfig.SATURATION));
 		player.setExhaustion(0);
 		player.setFireTicks(0);		//this works fine here, why put it in LoudoutResetJob...? I'll keep it over there though
+		player.setFallDistance(0);
 
 		this.preventItemHackingThroughOpenedInventory(player);
 		
