@@ -445,6 +445,10 @@ public class Warzone {
 		player.setFlying(false);
 
 		player.getInventory().clear();
+		player.getInventory().setHelmet(null);
+		player.getInventory().setChestplate(null);
+		player.getInventory().setLeggings(null);
+		player.getInventory().setBoots(null);
 		
 		this.setKillCount(player.getName(), 0);
 
