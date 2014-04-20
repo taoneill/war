@@ -883,7 +883,7 @@ public class WarPlayerListener implements Listener {
 						if (team.getPlayers().contains(event.getPlayer())) {
 							event.setRespawnLocation(team.getRandomSpawn());
 							zone.respawnPlayer(team, event.getPlayer());
-							break;
+							return;
 						}
 					}
 					
