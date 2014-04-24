@@ -961,4 +961,17 @@ public class WarPlayerListener implements Listener {
 	public void purgeLatestPositions() {
 		this.latestLocations.clear();	
 	}
+
+	@EventHandler
+	public void onBucketEmpty(PlayerBucketEmptyEvent event) {
+		Player player = (Player) event.getPlayer();
+		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+		if (zone == null) {
+			return;
+		}
+		if (zone.isImportantBlock(event.getBlockClicked())) {
+			event.setCancelled(true);
+			player.playSound(player.getLocation(), Sound.FIZZ, 10, 10);
+		}
+	}
 }
