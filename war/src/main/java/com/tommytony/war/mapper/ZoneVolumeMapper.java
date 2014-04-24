@@ -370,7 +370,7 @@ public class ZoneVolumeMapper {
 						dataStmt.setString(6, ((Jukebox) block.getState()).getPlaying().toString());
 					} else if (state instanceof Skull) {
 						dataStmt.setString(6, String.format("%s\n%s\n%s",
-								((Skull) block.getState()).getOwner(),
+								((Skull) block.getState()).hasOwner() ? ((Skull) block.getState()).getOwner() : "",
 								((Skull) block.getState()).getSkullType().toString(),
 								((Skull) block.getState()).getRotation().toString()));
 					} else if (state instanceof CommandBlock) {
