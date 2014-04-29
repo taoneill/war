@@ -262,6 +262,7 @@ public class ZoneVolumeMapper {
 	public static void loadStructure(Volume volume, Connection databaseConnection) throws SQLException {
 		String prefix = String.format("structure_%d", volume.getName().hashCode() & Integer.MAX_VALUE);
 		World world = volume.getWorld();
+		Validate.notNull(world, String.format("Cannot find the warzone for %s", prefix));
 		Statement stmt = databaseConnection.createStatement();
 		ResultSet cornerQuery = stmt.executeQuery("SELECT * FROM " + prefix + "_corners");
 		cornerQuery.next();
