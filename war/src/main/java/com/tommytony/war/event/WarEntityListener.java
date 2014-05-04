@@ -149,8 +149,8 @@ public class WarEntityListener implements Listener {
 							} else if (event.getDamager() instanceof Projectile) {
 								weaponString = War.war.getString("pvp.kill.weapon.aim");
 							}
-							String adjectiveString = War.war.getDeadlyAdjectives().get(this.killSeed.nextInt(War.war.getDeadlyAdjectives().size()));
-							String verbString = War.war.getKillerVerbs().get(this.killSeed.nextInt(War.war.getKillerVerbs().size()));
+							String adjectiveString = War.war.getDeadlyAdjectives().isEmpty() ? "" : War.war.getDeadlyAdjectives().get(this.killSeed.nextInt(War.war.getDeadlyAdjectives().size()));
+							String verbString = War.war.getKillerVerbs().isEmpty() ? "" : War.war.getKillerVerbs().get(this.killSeed.nextInt(War.war.getKillerVerbs().size()));
 							defenderWarzone.broadcast("pvp.kill.format", attackerString + ChatColor.WHITE, adjectiveString,
 									weaponString.toLowerCase().replace('_', ' '), verbString, defenderString);
 						} else {
