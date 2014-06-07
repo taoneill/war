@@ -4,12 +4,15 @@ import com.google.common.collect.ImmutableList;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
@@ -41,6 +44,7 @@ public class KillstreakReward {
 		section.set("5.reward.points", 1);
 		section.set("5.reward.airstrike", true);
 		section.set("5.reward.items", ImmutableList.of(new ItemStack(Material.ARROW, 15), new ItemStack(Material.EGG)));
+		section.set("5.reward.effect", Effect.GHAST_SHRIEK.name());
 		ItemStack sword = new ItemStack(Material.WOOD_SWORD);
 		sword.addEnchantment(Enchantment.DAMAGE_ALL, 2);
 		sword.addEnchantment(Enchantment.KNOCKBACK, 1);
@@ -130,6 +134,10 @@ public class KillstreakReward {
 			}
 			if (killSection.getBoolean("reward.airstrike")) {
 				this.airstrikePlayers.add(player.getName());
+			}
+			if (killSection.contains("reward.effect")) {
+				Effect effect = Effect.valueOf(killSection.getString("reward.effect"));
+				player.getWorld().playEffect(player.getLocation(), effect, null);
 			}
 		}
 	}
