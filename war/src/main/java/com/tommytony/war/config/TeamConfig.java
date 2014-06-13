@@ -19,7 +19,8 @@ public enum TeamConfig {
 	BLOCKWHITELIST (String.class),
 	PLACEBLOCK (Boolean.class),
 	APPLYPOTION(String.class),
-	ECOREWARD(Double.class);
+	ECOREWARD(Double.class),
+	INVENTORYDROP(Boolean.class);
 	
 	private final Class<?> configType;
 

@@ -32,6 +32,7 @@ import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.util.Vector;
@@ -59,6 +60,15 @@ import com.tommytony.war.utility.LoadoutSelection;
 public class WarEntityListener implements Listener {
 
 	private final Random killSeed = new Random();
+
+	private void dropItems(Location location, ItemStack[] items) {
+		for (ItemStack item : items) {
+			if (item == null || item.getType() == Material.AIR) {
+				continue;
+			}
+			location.getWorld().dropItem(location, item);
+		}
+	}
 			
 	/**
 	 * Handles PVP-Damage
@@ -172,6 +182,10 @@ public class WarEntityListener implements Listener {
 								defenderWarzone.getScoreboardType() == ScoreboardType.TOPKILLS) {
 							Objective obj = attackerWarzone.getScoreboard().getObjective("Top kills");
 							obj.getScore(a).setScore(defenderWarzone.getKillCount(a.getName()));
+						}
+						if (defenderTeam.getTeamConfig().resolveBoolean(TeamConfig.INVENTORYDROP)) {
+							dropItems(d.getLocation(), d.getInventory().getContents());
+							dropItems(d.getLocation(), d.getInventory().getArmorContents());
 						}
 					}
 					WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(defenderWarzone, d, a, event.getCause());
