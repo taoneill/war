@@ -184,7 +184,9 @@ public class ZoneVolumeMapper {
 				// Skulls
 				if (modify instanceof Skull) {
 					String[] opts = query.getString("metadata").split("\n");
-					((Skull) modify).setOwner(opts[0]);
+					if (!opts[0].isEmpty()) {
+						((Skull) modify).setOwner(opts[0]);
+					}
 					((Skull) modify).setSkullType(SkullType.valueOf(opts[1]));
 					((Skull) modify).setRotation(BlockFace.valueOf(opts[2]));
 					modify.update(true, false);
