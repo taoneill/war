@@ -186,6 +186,15 @@ public class Warzone {
 		return null;
 	}
 
+	public static Warzone getZoneForDeadPlayer(Player player) {
+		for (Warzone warzone : War.war.getWarzones()) {
+			if (warzone.getReallyDeadFighters().contains(player.getName())) {
+				return warzone;
+			}
+		}
+		return null;
+	}
+
 	public boolean ready() {
 		if (this.volume.hasTwoCorners() && !this.volume.tooSmall() && !this.volume.tooBig()) {
 			return true;
@@ -305,11 +314,13 @@ public class Warzone {
 			// everyone back to team spawn with full health
 			for (Team team : this.teams) {
 				for (Player player : team.getPlayers()) {
-					if (respawnExempted == null 
-							|| (respawnExempted != null
-									&& !player.getName().equals(respawnExempted.getName()))) {
-						this.respawnPlayer(team, player);
+					if (player.equals(respawnExempted)) {
+						continue;
 					}
+					if (this.getReallyDeadFighters().contains(player.getName())) {
+						continue;
+					}
+					this.respawnPlayer(team, player);
 				}
 				team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				team.initializeTeamSpawns();
@@ -370,7 +381,6 @@ public class Warzone {
 		this.flagThieves.clear();
 		this.bombThieves.clear();
 		this.cakeThieves.clear();
-		this.reallyDeadFighters.clear();
 		if (this.getScoreboardType() != ScoreboardType.NONE) {
 			this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 			scoreboard.registerNewObjective(this.getScoreboardType().getDisplayName(), "dummy");
@@ -959,10 +969,14 @@ public class Warzone {
 		}
 		team.addPlayer(player);
 		team.resetSign();
-		if (!this.hasPlayerState(player.getName())) {
-			this.keepPlayerState(player);
-			War.war.msg(player, "join.inventorystored");
+		if (this.hasPlayerState(player.getName())) {
+			War.war.getLogger().log(Level.WARNING, "Player {0} in warzone {1} already has a stored state - they may have lost items",
+					new Object[] {player.getName(), this.getName()});
+			this.playerStates.remove(player.getName());
 		}
+		this.getReallyDeadFighters().remove(player.getName());
+		this.keepPlayerState(player);
+		War.war.msg(player, "join.inventorystored");
 		this.respawnPlayer(team, player);
 		this.broadcast("join.broadcast", player.getName(), team.getKind().getFormattedName());
 		return true;

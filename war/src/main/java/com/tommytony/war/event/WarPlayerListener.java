@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.tommytony.war.config.WarConfig;
+
+import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -43,6 +45,7 @@ import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.volume.Volume;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -874,27 +877,30 @@ public class WarPlayerListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		if (War.war.isLoaded()) {
-			// Anyone who died in warzones needs to go back there pronto!
-			for (Warzone zone : War.war.getWarzones()) {
-				if (zone.getReallyDeadFighters().contains(event.getPlayer().getName())) {
-					zone.getReallyDeadFighters().remove(event.getPlayer().getName());
-					for (Team team : zone.getTeams()) {
-						if (team.getPlayers().contains(event.getPlayer())) {
-							event.setRespawnLocation(team.getRandomSpawn());
-							zone.respawnPlayer(team, event.getPlayer());
-							return;
-						}
-					}
-					
-					if (zone.hasPlayerState(event.getPlayer().getName())) {
-						// If not member of a team and zone has your state, then game ended while you were dead
-						War.war.log("Failed to restore game state to dead player.", Level.WARNING);
-					}
-					break;
-				}
+		Warzone playingZone = Warzone.getZoneByPlayerName(event.getPlayer().getName());
+		Warzone deadZone = Warzone.getZoneForDeadPlayer(event.getPlayer());
+		if (playingZone == null && deadZone != null) {
+			// Game ended while player was dead, so restore state
+			deadZone.getReallyDeadFighters().remove(event.getPlayer().getName());
+			if (deadZone.hasPlayerState(event.getPlayer().getName())) {
+				deadZone.restorePlayerState(event.getPlayer());
 			}
+			event.setRespawnLocation(deadZone.getEndTeleport(LeaveCause.DISCONNECT));
+			return;
+		} else if (playingZone == null) {
+			// Player not playing war
+			return;
+		} else if (deadZone == null) {
+			// Player is not a 'really' dead player, nothing to do here
+			return;
 		}
+		Team team = playingZone.getPlayerTeam(event.getPlayer().getName());
+		Validate.notNull(team, String.format(
+				"Failed to find a team for player %s in warzone %s on respawn.",
+				event.getPlayer().getName(), playingZone.getName()));
+		playingZone.getReallyDeadFighters().remove(event.getPlayer().getName());
+		event.setRespawnLocation(team.getRandomSpawn());
+		playingZone.respawnPlayer(team, event.getPlayer());
 	}
 
 	@EventHandler

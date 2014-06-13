@@ -464,7 +464,9 @@ public class Team {
 		}
 		thePlayer.setFireTicks(0);
 		thePlayer.setRemainingAir(300);
-		this.warzone.restorePlayerState(thePlayer);
+		if (!this.warzone.getReallyDeadFighters().contains(thePlayer.getName())) {
+			this.warzone.restorePlayerState(thePlayer);
+		}
 		this.warzone.getLoadoutSelections().remove(thePlayer);
 	}
 
