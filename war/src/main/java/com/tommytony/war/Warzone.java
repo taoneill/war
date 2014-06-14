@@ -12,12 +12,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 
-import com.tommytony.war.mapper.VolumeMapper;
-import com.tommytony.war.mapper.ZoneVolumeMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -29,9 +28,15 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.InventoryView;
@@ -62,6 +67,8 @@ import com.tommytony.war.job.LoadoutResetJob;
 import com.tommytony.war.job.LogKillsDeathsJob;
 import com.tommytony.war.job.LogKillsDeathsJob.KillsDeathsRecord;
 import com.tommytony.war.mapper.LoadoutYmlMapper;
+import com.tommytony.war.mapper.VolumeMapper;
+import com.tommytony.war.mapper.ZoneVolumeMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
@@ -981,6 +988,112 @@ public class Warzone {
 		this.broadcast("join.broadcast", player.getName(), team.getKind().getFormattedName());
 		return true;
 	}
+	
+	private void dropItems(Location location, ItemStack[] items) {
+		for (ItemStack item : items) {
+			if (item == null || item.getType() == Material.AIR) {
+				continue;
+			}
+			location.getWorld().dropItem(location, item);
+		}
+	}
+	
+	private Random killSeed = new Random();
+	
+	/**
+	 * Send death messages and process other records before passing off the
+	 * death to the {@link #handleDeath(Player)} method.
+	 * @param attacker Player who killed the defender
+	 * @param defender Player who was killed
+	 * @param damager Entity who caused the damage. Usually an arrow. Used for
+	 * specific death messages. Can be null.
+	 */
+	public void handleKill(Player attacker, Player defender, Entity damager) {
+		Team attackerTeam = this.getPlayerTeam(attacker.getName());
+		Team defenderTeam = this.getPlayerTeam(defender.getName());
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+			String attackerString = attackerTeam.getKind().getColor() + attacker.getName();
+			String defenderString = defenderTeam.getKind().getColor() + defender.getName();
+			Material killerWeapon = attacker.getItemInHand().getType();
+			String weaponString = killerWeapon.toString();
+			if (attacker.getItemInHand().hasItemMeta() && attacker.getItemInHand().getItemMeta().hasDisplayName()) {
+				weaponString = attacker.getItemInHand().getItemMeta().getDisplayName() + ChatColor.WHITE;
+			}
+			if (killerWeapon == Material.AIR) {
+				weaponString = War.war.getString("pvp.kill.weapon.hand");
+			} else if (killerWeapon == Material.BOW || damager instanceof Arrow) {
+				int rand = killSeed.nextInt(3);
+				if (rand == 0) {
+					weaponString = War.war.getString("pvp.kill.weapon.bow");
+				} else {
+					weaponString = War.war.getString("pvp.kill.weapon.aim");
+				}
+			} else if (damager instanceof Projectile) {
+				weaponString = War.war.getString("pvp.kill.weapon.aim");
+			}
+			String adjectiveString = War.war.getDeadlyAdjectives().isEmpty() ? "" : War.war.getDeadlyAdjectives().get(this.killSeed.nextInt(War.war.getDeadlyAdjectives().size()));
+			String verbString = War.war.getKillerVerbs().isEmpty() ? "" : War.war.getKillerVerbs().get(this.killSeed.nextInt(War.war.getKillerVerbs().size()));
+			this.broadcast("pvp.kill.format", attackerString + ChatColor.WHITE, adjectiveString,
+					weaponString.toLowerCase().replace('_', ' '), verbString, defenderString);
+		}
+		this.addKillCount(attacker.getName(), 1);
+		this.addKillDeathRecord(attacker, 1, 0);
+		this.addKillDeathRecord(defender, 0, 1);
+		if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+			attacker.setLevel(this.getKillCount(attacker.getName()));
+		}
+		if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.KILLSTREAK)) {
+			War.war.getKillstreakReward().rewardPlayer(attacker, this.getKillCount(attacker.getName()));
+		}
+		if (this.getScoreboard() != null && this.getScoreboardType() == ScoreboardType.TOPKILLS) {
+			Objective obj = this.getScoreboard().getObjective("Top kills");
+			obj.getScore(attacker).setScore(this.getKillCount(attacker.getName()));
+		}
+		if (defenderTeam.getTeamConfig().resolveBoolean(TeamConfig.INVENTORYDROP)) {
+			dropItems(defender.getLocation(), defender.getInventory().getContents());
+			dropItems(defender.getLocation(), defender.getInventory().getArmorContents());
+		}
+		this.handleDeath(defender);
+	}
+	
+	/**
+	 * Handle death messages before passing to {@link #handleDeath(Player)}
+	 * for post-processing. It's like
+	 * {@link #handleKill(Player, Player, Entity)}, but only for suicides.
+	 * @param player Player who killed himself
+	 */
+	public void handleSuicide(Player player) {
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+			String defenderString = this.getPlayerTeam(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE;
+			this.broadcast("pvp.kill.self", defenderString);
+		}
+		this.handleDeath(player);
+	}
+	
+	/**
+	 * Handle a player killed naturally (like by a dispenser or explosion).
+	 * @param player Player killed
+	 * @param event Event causing damage
+	 */
+	public void handleNaturalKill(Player player, EntityDamageEvent event) {
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+			String defenderString = this.getPlayerTeam(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE;
+			if (event instanceof EntityDamageByEntityEvent
+					&& ((EntityDamageByEntityEvent) event).getDamager() instanceof TNTPrimed) {
+				this.broadcast("pvp.death.explosion", defenderString + ChatColor.WHITE);
+			} else if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK 
+					|| event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LIGHTNING) {
+				this.broadcast("pvp.death.fire", defenderString);
+			} else if (event.getCause() == DamageCause.DROWNING) {
+				this.broadcast("pvp.death.drown", defenderString);
+			} else if (event.getCause() == DamageCause.FALL) {
+				this.broadcast("pvp.death.fall", defenderString);
+			} else {
+				this.broadcast("pvp.death.other", defenderString);
+			}
+		}
+		this.handleDeath(player);
+	}
 
 	/**
 	 * Cleanup after a player who has died. This decrements the team's
@@ -994,7 +1107,6 @@ public class Warzone {
 		Validate.notNull(playerTeam, "Can't find team for dead player " + player.getName());
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
 			this.getReallyDeadFighters().add(player.getName());
-			player.setHealth(0D);
 		} else {
 			this.respawnPlayer(playerTeam, player);
 		}
