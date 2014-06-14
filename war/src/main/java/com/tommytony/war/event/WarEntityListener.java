@@ -351,36 +351,6 @@ public class WarEntityListener implements Listener {
 		}
 	}
 
-	@EventHandler
-	public void onEntityCombust(final EntityCombustEvent event) {
-		if (!War.war.isLoaded()) {
-			return;
-		}
-		
-		Entity entity = event.getEntity();
-		if (entity instanceof Player) {
-			Player player = (Player) entity;
-			Team team = Team.getTeamByPlayerName(player.getName());
-			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
-			LoadoutSelection playerLoadoutState = null;
-			
-			if (zone != null) {
-				playerLoadoutState = zone.getLoadoutSelections().get(player.getName());
-			}
-			
-			if (team != null
-					&& zone != null
-					&& team.isSpawnLocation(player.getLocation()) 
-					&& playerLoadoutState != null
-					&& playerLoadoutState.isStillInSpawn()) {
-				// smother out the fire that didn't burn out when you respawned
-				// Stop fire (but not if you came back to spawn after leaving it a first time)
-				player.setFireTicks(0);
-				event.setCancelled(true);
-			}
-		}
-	}
-
 	/**
 	 * Prevents creatures from spawning in warzones if no creatures is active
 	 *

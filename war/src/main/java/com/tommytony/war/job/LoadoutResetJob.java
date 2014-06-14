@@ -23,9 +23,6 @@ public class LoadoutResetJob implements Runnable {
 	
 	public void run() {
 		this.zone.equipPlayerLoadoutSelection(player, team, isFirstRespawn, isToggle);
-		
-		// Stop fire here, since doing it in the same tick as death doesn't extinguish it
-		this.player.setFireTicks(0);
 	}
 
 }

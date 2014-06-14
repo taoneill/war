@@ -451,8 +451,16 @@ public class Warzone {
 		player.setFoodLevel(20);
 		player.setSaturation(team.getTeamConfig().resolveInt(TeamConfig.SATURATION));
 		player.setExhaustion(0);
-		player.setFireTicks(0);		//this works fine here, why put it in LoudoutResetJob...? I'll keep it over there though
 		player.setFallDistance(0);
+		War.war.getServer().getScheduler().runTaskLater(War.war, new Runnable() {
+
+			@Override
+			public void run() {
+				// Stop fire here, since doing it in the same tick as death doesn't extinguish it
+				player.setFireTicks(0);
+			}
+			
+		}, 1L);
 
 		this.preventItemHackingThroughOpenedInventory(player);
 		
