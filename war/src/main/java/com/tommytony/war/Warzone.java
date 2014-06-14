@@ -1857,7 +1857,7 @@ public class Warzone {
 			victimTeam.initializeTeamFlag();
 
 			if (!quiet) {
-				this.broadcast("drop.flag.broadcast", player.getName(), ChatColor.GREEN + victimTeam.getName() + ChatColor.WHITE);
+				this.broadcast("drop.flag.broadcast", player.getName(), victimTeam.getKind().getColor() + victimTeam.getName() + ChatColor.WHITE);
 			}
 		} else if (this.isCakeThief(player.getName())) {
 			Cake cake = this.getCakeForThief(player.getName());
