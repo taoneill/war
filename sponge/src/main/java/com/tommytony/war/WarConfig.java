@@ -1,6 +1,7 @@
 package com.tommytony.war;
 
 import com.google.common.collect.ImmutableList;
+import com.tommytony.war.zone.ZoneConfig;
 import org.spongepowered.api.entity.Player;
 
 import java.io.Closeable;
@@ -17,6 +18,7 @@ import java.util.UUID;
  */
 public class WarConfig implements Closeable {
     private final WarPlugin plugin;
+    private final ZoneConfig zoneDefaults;
     /**
      * Database configuration descriptor.
      */
@@ -39,6 +41,7 @@ public class WarConfig implements Closeable {
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS zones (name TEXT)");
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS zonemakers (uuid TEXT)");
         }
+        zoneDefaults = new ZoneConfig(conn, "zone_settings");
     }
 
     /**
@@ -55,10 +58,19 @@ public class WarConfig implements Closeable {
                 if (result.next()) {
                     return result.getInt(1);
                 } else {
-                    return (int) setting.defaultValue;
+                    return (Integer) setting.defaultValue;
                 }
             }
         }
+    }
+
+    /**
+     * Get access to zone default settings.
+     *
+     * @return controller of server zone defaults.
+     */
+    public ZoneConfig getZoneDefaults() {
+        return zoneDefaults;
     }
 
     /**

@@ -4,6 +4,7 @@ import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.event.SpongeEventHandler;
 import org.spongepowered.api.event.state.PreInitializationEvent;
+import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.event.state.ServerStartingEvent;
 import org.spongepowered.api.plugin.Plugin;
 
@@ -37,12 +38,21 @@ public class WarPlugin {
         config = new WarConfig(this, new File(dataDir, "war.sl3"));
     }
 
+    @SpongeEventHandler
+    public void onStart(ServerStartedEvent event) {
+        // register commands
+    }
+
     public Game getGame() {
         return game;
     }
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public File getDataDir() {
+        return dataDir;
     }
 
     public WarConfig getConfig() {
