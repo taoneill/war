@@ -1,5 +1,6 @@
 package com.tommytony.war.command;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.tommytony.war.WarConfig;
 import com.tommytony.war.WarPlugin;
@@ -53,16 +54,14 @@ public class WarConfigCommand implements CommandCallable {
     @Override
     public Description getDescription() {
         return new Description() {
-            @Nullable
             @Override
-            public String getShortDescription() {
-                return "View/modify war config";
+            public Optional<String> getShortDescription() {
+                return Optional.of("View/modify war config");
             }
 
-            @Nullable
             @Override
-            public String getHelp() {
-                return "Allows viewing of the war server config or changing various settings.";
+            public Optional<String> getHelp() {
+                return Optional.of("Allows viewing of the war server config or changing various settings.");
             }
 
             @Override

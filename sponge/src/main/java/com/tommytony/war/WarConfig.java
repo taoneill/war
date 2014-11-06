@@ -1,5 +1,6 @@
 package com.tommytony.war;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.tommytony.war.zone.ZoneConfig;
 import org.spongepowered.api.entity.Player;
@@ -104,10 +105,9 @@ public class WarConfig implements Closeable {
                 UUID playerId = UUID.fromString(result.getString(1));
                 if (playerId == null)
                     continue;
-                Player player = plugin.getGame().getPlayer(playerId);
-                if (player == null)
-                    continue;
-                makers.add(player);
+                Optional<Player> player = plugin.getGame().getPlayer(playerId);
+                if (player.isPresent())
+                    makers.add(player.get());
             }
         }
         return ImmutableList.copyOf(makers);
