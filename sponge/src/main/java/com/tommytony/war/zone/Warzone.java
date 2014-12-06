@@ -1,6 +1,9 @@
 package com.tommytony.war.zone;
 
+import com.google.common.base.Optional;
 import com.tommytony.war.WarPlugin;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.sql.SQLException;
 import java.util.regex.Matcher;
@@ -16,6 +19,7 @@ public class Warzone {
     private final String name;
     private final ZoneStorage db;
     private final ZoneConfig config;
+    private Location teleport;
 
     /**
      * Load or create a war zone from the war settings store.
@@ -50,5 +54,17 @@ public class Warzone {
 
     public String getName() {
         return name;
+    }
+
+    public Location getTeleport() {
+        try {
+            Optional<Location> lobby = db.getPosition("lobby", Optional.<World>absent());
+            if (lobby.isPresent())
+                return lobby.get();
+            else throw new RuntimeException("No teleport location found for zone " + name);
+        } catch (SQLException e) {
+            plugin.getLogger().error("Retrieving teleport", e);
+            throw new RuntimeException("Error in retrieving information from database");
+        }
     }
 }

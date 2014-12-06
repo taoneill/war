@@ -1,6 +1,10 @@
 package com.tommytony.war.zone;
 
+import com.google.common.base.Optional;
 import com.tommytony.war.WarPlugin;
+import org.spongepowered.api.math.Vectors;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.io.File;
 import java.sql.*;
@@ -53,6 +57,9 @@ public class ZoneStorage implements AutoCloseable {
                     version, DATABASE_VERSION));
         } else if (version == 0) {
             // brand new database file
+            Statement stmt = connection.createStatement();
+            stmt.executeUpdate("CREATE TABLE coordinates (name TEXT UNIQUE, x NUMERIC, y NUMERIC, z NUMERIC, world TEXT)");
+            stmt.executeUpdate(String.format("PRAGMA user_version = %d", DATABASE_VERSION));
         } else if (version < DATABASE_VERSION) {
             // upgrade
             switch (version) {
@@ -61,6 +68,57 @@ public class ZoneStorage implements AutoCloseable {
                     // some odd bug or people messing with their database
                     throw new IllegalStateException(String.format("Unsupported zone version: %d.", version));
             }
+        }
+    }
+
+    /**
+     * Look up a position in the coordinates table.
+     *
+     * @param name  Name of stored position.
+     * @param world World to assign to the new location.
+     * @return the location of the position, or absent if not found.
+     * @throws SQLException
+     */
+    public Optional<Location> getPosition(String name, Optional<World> world) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "SELECT x, y, z, world FROM coordinates WHERE name = ?")) {
+            stmt.setString(1, name);
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    World resultWorld;
+                    if (world.isPresent()) resultWorld = world.get();
+                    else resultWorld = plugin.getGame().getWorld(resultSet.getString("world"));
+                    return Optional.of(new Location(resultWorld, Vectors.create3d(
+                            resultSet.getDouble("x"), resultSet.getDouble("y"), resultSet.getDouble("z"))));
+                }
+            }
+        }
+        return Optional.absent();
+    }
+
+    /**
+     * Set a position in the coordinates table to a location.
+     *
+     * @param name     Name of position in storage.
+     * @param location Location to write to the storage.
+     * @throws SQLException
+     */
+    public void setPosition(String name, Location location) throws SQLException {
+        World world;
+        if (location.getExtent() instanceof World)
+            world = (World) location.getExtent();
+        else throw new IllegalArgumentException("Location must be in a world");
+        String sql;
+        if (this.getPosition(name, Optional.<World>absent()).isPresent())
+            sql = "UPDATE coordinates SET x = ?, y = ?, z = ?, world = ? WHERE name = ?";
+        else sql = "INSERT INTO coordinates (x, y, z, world, name) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setDouble(1, location.getPosition().getX());
+            stmt.setDouble(2, location.getPosition().getY());
+            stmt.setDouble(3, location.getPosition().getZ());
+            stmt.setString(4, world.getName());
+            stmt.setString(5, name);
+            stmt.execute();
         }
     }
 
