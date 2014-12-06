@@ -1,6 +1,6 @@
 package com.tommytony.war.struct;
 
-import org.spongepowered.api.block.Block;
+import org.spongepowered.api.block.BlockLoc;
 import org.spongepowered.api.math.Vector3d;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.extent.BlockVolume;
@@ -84,7 +84,7 @@ public class Region implements BlockVolume {
      * @return The block
      */
     @Override
-    public Block getBlock(Vector3d position) {
+    public BlockLoc getBlock(Vector3d position) {
         return first.getExtent().getBlock(position);
     }
 
@@ -97,7 +97,7 @@ public class Region implements BlockVolume {
      * @return The block
      */
     @Override
-    public Block getBlock(int x, int y, int z) {
+    public BlockLoc getBlock(int x, int y, int z) {
         return first.getExtent().getBlock(x, y, z);
     }
 }

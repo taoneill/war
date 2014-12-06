@@ -1,12 +1,12 @@
 package com.tommytony.war;
 
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.event.SpongeEventHandler;
 import org.spongepowered.api.event.state.PreInitializationEvent;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.event.state.ServerStartingEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.util.event.Subscribe;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,7 +19,7 @@ public class WarPlugin {
     private File dataDir;
     private WarConfig config;
 
-    @SpongeEventHandler
+    @Subscribe
     public void onConstruction(PreInitializationEvent event) throws InstantiationException {
         game = event.getGame();
         logger = event.getPluginLog();
@@ -31,14 +31,14 @@ public class WarPlugin {
         }
     }
 
-    @SpongeEventHandler
+    @Subscribe
     public void onStartUp(ServerStartingEvent event) throws FileNotFoundException, SQLException {
         if (!dataDir.exists() && !dataDir.mkdirs())
             throw new FileNotFoundException("Failed to make War data folder at " + dataDir.getPath());
         config = new WarConfig(this, new File(dataDir, "war.sl3"));
     }
 
-    @SpongeEventHandler
+    @Subscribe
     public void onStart(ServerStartedEvent event) {
         // register commands
     }

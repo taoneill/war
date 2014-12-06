@@ -3,7 +3,7 @@ package com.tommytony.war;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.tommytony.war.zone.ZoneConfig;
-import org.spongepowered.api.entity.Player;
+import org.spongepowered.api.entity.player.Player;
 
 import java.io.Closeable;
 import java.io.File;

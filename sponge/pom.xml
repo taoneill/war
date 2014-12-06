@@ -97,6 +97,10 @@
             <id>war-repo</id>
             <url>http://ci.tommytony.com/plugin/repository/everything/</url>
         </repository>
+        <repository>
+            <id>sponge-repo</id>
+            <url>http://repo.spongepowered.org/Sponge/maven/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -108,8 +112,8 @@
         </dependency>
         <dependency>
             <groupId>org.spongepowered</groupId>
-            <artifactId>SpongeAPI</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <artifactId>spongeapi</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.xerial</groupId>

@@ -1,17 +1,14 @@
 package com.tommytony.war.command;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import com.tommytony.war.WarConfig;
 import com.tommytony.war.WarPlugin;
-import org.spongepowered.api.entity.Player;
+import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.Description;
 
-import javax.annotation.Nullable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,36 +44,6 @@ public class WarConfigCommand implements CommandCallable {
     }
 
     /**
-     * Get a description of the command, detailing usage information.
-     *
-     * @return The command description
-     */
-    @Override
-    public Description getDescription() {
-        return new Description() {
-            @Override
-            public Optional<String> getShortDescription() {
-                return Optional.of("View/modify war config");
-            }
-
-            @Override
-            public Optional<String> getHelp() {
-                return Optional.of("Allows viewing of the war server config or changing various settings.");
-            }
-
-            @Override
-            public String getUsage() {
-                return "[-p] setting:value...";
-            }
-
-            @Override
-            public List<String> getPermissions() {
-                return ImmutableList.of("war.admin", "war.admin.config");
-            }
-        };
-    }
-
-    /**
      * Test whether this command can probably be executed by the given source.
      * <p/>
      * <p>If implementations are unsure if the command can be executed by
@@ -108,6 +75,39 @@ public class WarConfigCommand implements CommandCallable {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Get a short one-line description of this command.
+     *
+     * @return A description, if available
+     */
+    @Override
+    public Optional<String> getShortDescription() {
+        return Optional.of("View/modify war config");
+    }
+
+    /**
+     * Get a longer help text about this command.
+     *
+     * @return A help text, if available
+     */
+    @Override
+    public Optional<String> getHelp() {
+        return Optional.of("Allows viewing of the war server config or changing various settings.");
+    }
+
+    /**
+     * Get the usage string of this command.
+     * <p/>
+     * <p>A usage string may look like
+     * {@code [-w &lt;world&gt;] &lt;var1&gt; &lt;var2&gt;}.</p>
+     *
+     * @return A usage string
+     */
+    @Override
+    public String getUsage() {
+        return "[-p] setting:value...";
     }
 
     /**
