@@ -192,8 +192,8 @@ public enum TeamKind {
 	}
 
 	/**
-	 * Get a colored hat item for the team.
-	 * @return Hat item with the team's color.
+	 * Get a colored armor item for the team.
+	 * @return Armor item with the team's color.
 	 */
 	public ItemStack getHat() {
 		ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
@@ -201,5 +201,29 @@ public enum TeamKind {
 		meta.setColor(this.getBukkitColor());
 		helmet.setItemMeta(meta);
 		return helmet;
+	}
+
+	public ItemStack getChestplate() {
+		ItemStack armor = new ItemStack(Material.LEATHER_CHESTPLATE);
+		LeatherArmorMeta meta = (LeatherArmorMeta) armor.getItemMeta();
+		meta.setColor(this.getBukkitColor());
+		armor.setItemMeta(meta);
+		return armor;
+	}
+
+	public ItemStack getLeggings() {
+		ItemStack leggings = new ItemStack(Material.LEATHER_LEGGINGS);
+		LeatherArmorMeta meta = (LeatherArmorMeta) leggings.getItemMeta();
+		meta.setColor(this.getBukkitColor());
+		leggings.setItemMeta(meta);
+		return leggings;
+	}
+
+	public ItemStack getBoots() {
+		ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
+		LeatherArmorMeta meta = (LeatherArmorMeta) boots.getItemMeta();
+		meta.setColor(this.getBukkitColor());
+		boots.setItemMeta(meta);
+		return boots;
 	}
 }
