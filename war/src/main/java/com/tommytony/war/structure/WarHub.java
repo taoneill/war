@@ -282,8 +282,8 @@ public class WarHub {
 				// add redstone blocks and torches to gate if there are players in it (to highlight active zones)
 				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left).setType(Material.REDSTONE_BLOCK);
 				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left.getOppositeFace()).setType(Material.REDSTONE_BLOCK);
-				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left).getRelative(back, 1).setType(Material.TORCH);
-				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left.getOppositeFace()).getRelative(back, 1).setType(Material.TORCH);
+				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left).getRelative(back, 1).setType(Material.AIR);
+				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left.getOppositeFace()).getRelative(back, 1).setType(Material.AIR);
 			} else {
 				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left).getRelative(back, 1).setType(Material.AIR);
 				zoneGate.getRelative(BlockFace.UP, 2).getRelative(left.getOppositeFace()).getRelative(back, 1).setType(Material.AIR);
