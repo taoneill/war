@@ -2,8 +2,8 @@
 .*
 # except for .gitignore
 !.gitignore
-!.classpath
-!.project
+.classpath
+.project
 
 # Ignore all classfiles
 *.class
