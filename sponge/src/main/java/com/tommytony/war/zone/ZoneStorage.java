@@ -2,7 +2,6 @@ package com.tommytony.war.zone;
 
 import com.google.common.base.Optional;
 import com.tommytony.war.WarPlugin;
-import org.spongepowered.api.math.Vectors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -86,10 +85,18 @@ public class ZoneStorage implements AutoCloseable {
             try (ResultSet resultSet = stmt.executeQuery()) {
                 if (resultSet.next()) {
                     World resultWorld;
-                    if (world.isPresent()) resultWorld = world.get();
-                    else resultWorld = plugin.getGame().getWorld(resultSet.getString("world"));
-                    return Optional.of(new Location(resultWorld, Vectors.create3d(
-                            resultSet.getDouble("x"), resultSet.getDouble("y"), resultSet.getDouble("z"))));
+                    if (world.isPresent()) {
+                        resultWorld = world.get();
+                    } else {
+                        Optional<World> optwld = plugin.getGame().getServer().getWorld(resultSet.getString("world"));
+                        if (optwld.isPresent()) {
+                            resultWorld = optwld.get();
+                        } else {
+                            return Optional.absent();
+                        }
+                    }
+                    return Optional.of(new Location(resultWorld,
+                            resultSet.getDouble("x"), resultSet.getDouble("y"), resultSet.getDouble("z")));
                 }
             }
         }

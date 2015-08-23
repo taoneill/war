@@ -19,7 +19,7 @@ public class Warzone {
     private final String name;
     private final ZoneStorage db;
     private final ZoneConfig config;
-    private Location teleport;
+    private Location<World> teleport;
 
     /**
      * Load or create a war zone from the war settings store.
@@ -56,11 +56,11 @@ public class Warzone {
         return name;
     }
 
-    public Location getTeleport() {
+    public Location<World> getTeleport() {
         try {
             Optional<Location> lobby = db.getPosition("lobby", Optional.<World>absent());
             if (lobby.isPresent())
-                return lobby.get();
+                return lobby.<World>get();
             else throw new RuntimeException("No teleport location found for zone " + name);
         } catch (SQLException e) {
             plugin.getLogger().error("Retrieving teleport", e);

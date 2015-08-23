@@ -105,7 +105,7 @@ public class WarConfig implements Closeable {
                 UUID playerId = UUID.fromString(result.getString(1));
                 if (playerId == null)
                     continue;
-                Optional<Player> player = plugin.getGame().getPlayer(playerId);
+                Optional<Player> player = plugin.getGame().getServer().getPlayer(playerId);
                 if (player.isPresent())
                     makers.add(player.get());
             }
@@ -137,7 +137,7 @@ public class WarConfig implements Closeable {
         private final Class<?> dataType;
         private final Object defaultValue;
 
-        private WarSetting(Class<?> dataType, Object defaultValue) {
+        WarSetting(Class<?> dataType, Object defaultValue) {
             this.dataType = dataType;
             this.defaultValue = defaultValue;
         }
