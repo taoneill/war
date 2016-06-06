@@ -260,7 +260,7 @@ public class WarPlayerListener implements Listener {
 				// Whenever a player dies in the middle of conflict they will
 				// likely respawn still trying to use their items to attack
 				// another player.
-				player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 0);
+				player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 0);
 			} 
 
 			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST && !zone.getWarzoneConfig().getBoolean(WarzoneConfig.ALLOWENDER)) {
@@ -953,7 +953,7 @@ public class WarPlayerListener implements Listener {
 		// Prevent thieves from taking their bomb/wool/cake into a chest, etc.
 		if (zone.isThief(player.getName())) {
 			event.setCancelled(true);
-			player.playSound(player.getLocation(), Sound.FIZZ, 10, 10);
+			player.playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 10, 10);
 		} else // Magically give player a wool block when they click their helmet
 			if (event.getSlotType() == InventoryType.SlotType.ARMOR && event.getSlot() == 39
 				&& zone.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
@@ -977,7 +977,7 @@ public class WarPlayerListener implements Listener {
 		}
 		if (zone.isImportantBlock(event.getBlockClicked())) {
 			event.setCancelled(true);
-			player.playSound(player.getLocation(), Sound.FIZZ, 10, 10);
+			player.playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 10, 10);
 		}
 	}
 }

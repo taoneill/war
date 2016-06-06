@@ -16,12 +16,12 @@
   </properties>
   <repositories>
     <repository>
-      <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public</url>
+      <id>spigot-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
     </repository>
     <repository>
       <id>cma-repo</id>
-      <url>http://maven.cmastudios.me/archiva/repository/internal</url>
+      <url>http://ftp.cmastudios.me/maven/</url>
     </repository>
     <repository>
       <id>tagapi-repo</id>
@@ -117,7 +117,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.7.2-R0.2</version>
+      <version>1.9.4-R0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.kitteh</groupId>
