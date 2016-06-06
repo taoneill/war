@@ -31,6 +31,7 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 import com.tommytony.war.Team;
@@ -483,7 +484,7 @@ public class WarEntityListener implements Listener {
 			return;
 		}
 		if (event.getEntityType() == EntityType.EGG) {
-			LivingEntity shooter = event.getEntity().getShooter();
+			ProjectileSource shooter = event.getEntity().getShooter();
 			if (shooter instanceof Player) {
 				Player player = (Player) shooter;
 				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
