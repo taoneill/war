@@ -74,7 +74,7 @@ public class RestoreYmlWarzonesJob implements Runnable {
 					}
 					plugins.addPlotter(new PlotterEnabled("War")); // of course
 					metrics.start();
-				} catch (RuntimeException ignored) {
+				} catch (Exception ignored) {
 				}
 			}
 		}
