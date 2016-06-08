@@ -3,6 +3,7 @@ package com.tommytony.war.event;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.text.MessageFormat;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -61,7 +62,7 @@ public class WarEntityListener implements Listener {
 	private void handlerAttackDefend(EntityDamageByEntityEvent event) {
 		Entity attacker = event.getDamager();
 		Entity defender = event.getEntity();
-		
+
 		// Maybe an arrow was thrown
 		if (attacker != null && event.getDamager() instanceof Projectile && ((Projectile)event.getDamager()).getShooter() instanceof Player){
 			attacker = ((Player)((Projectile)event.getDamager()).getShooter());
@@ -75,24 +76,24 @@ public class WarEntityListener implements Listener {
 			Team attackerTeam = Team.getTeamByPlayerName(a.getName());
 			Warzone defenderWarzone = Warzone.getZoneByPlayerName(d.getName());
 			Team defenderTeam = Team.getTeamByPlayerName(d.getName());
-			
+
 			if ((attackerTeam != null && defenderTeam != null && attackerTeam != defenderTeam && attackerWarzone == defenderWarzone)
 					|| (attackerTeam != null && defenderTeam != null && attacker.getEntityId() == defender.getEntityId())) {
-				
+
 				LoadoutSelection defenderLoadoutState = defenderWarzone.getLoadoutSelections().get(d.getName());
 				if (defenderLoadoutState != null && defenderLoadoutState.isStillInSpawn()) {
 					War.war.badMsg(a, "pvp.target.spawn");
 					event.setCancelled(true);
 					return;
 				}
-				
+
 				LoadoutSelection attackerLoadoutState = attackerWarzone.getLoadoutSelections().get(a.getName());
 				if (attackerLoadoutState != null && attackerLoadoutState.isStillInSpawn()) {
 					War.war.badMsg(a, "pvp.self.spawn");
 					event.setCancelled(true);
 					return;
 				}
-				
+
 				// Make sure none of them are locked in by respawn timer
 				if (defenderWarzone.isRespawning(d)) {
 					War.war.badMsg(a, "pvp.target.respawn");
@@ -103,7 +104,7 @@ public class WarEntityListener implements Listener {
 					event.setCancelled(true);
 					return;
 				}
-				
+
 				if (!attackerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.PVPINZONE)) {
 					// spleef-like, non-pvp, zone
 					event.setCancelled(true);
@@ -113,7 +114,7 @@ public class WarEntityListener implements Listener {
 				// Detect death, prevent it and respawn the player
 				if (event.getDamage() >= d.getHealth()) {
 					if (defenderWarzone.getReallyDeadFighters().contains(d.getName())) {
-						// don't re-kill a dead person				
+						// don't re-kill a dead person
 						return;
 					}
 					WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(defenderWarzone, d, a, event.getCause());
@@ -128,20 +129,20 @@ public class WarEntityListener implements Listener {
 						defenderWarzone.handleKill(a, d, event.getDamager());
 					}
 				} else if (defenderWarzone.isBombThief(d.getName()) && d.getLocation().distance(a.getLocation()) < 2) {
-					// Close combat, close enough to detonate					
+					// Close combat, close enough to detonate
 					Bomb bomb = defenderWarzone.getBombForThief(d.getName());
-										
-					// Kill the bomber 
+
+					// Kill the bomber
 					WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(defenderWarzone, d, null, event.getCause());
 					War.war.getServer().getPluginManager().callEvent(event1);
 					defenderWarzone.handleDeath(d);
-					
+
 					if (defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
 						// and respawn him and remove from deadmen (cause realdeath + handleDeath means no respawn and getting queued up for onPlayerRespawn)
 						defenderWarzone.getReallyDeadFighters().remove(d.getName());
 						defenderWarzone.respawnPlayer(defenderTeam, d);
 					}
-					
+
 					// Blow up bomb
 					if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)) {
 						defenderWarzone.getWorld().createExplosion(a.getLocation(), 2F);
@@ -150,7 +151,7 @@ public class WarEntityListener implements Listener {
 					// bring back tnt
 					bomb.getVolume().resetBlocks();
 					bomb.addBombBlocks();
-					
+
 					// Notify everyone
 					for (Team t : defenderWarzone.getTeams()) {
 						t.sendAchievement(attackerTeam.getKind().getColor() + a.getName() + ChatColor.YELLOW + " made ",
@@ -173,7 +174,7 @@ public class WarEntityListener implements Listener {
 				if (!War.war.getWarConfig().getBoolean(WarConfig.DISABLEPVPMESSAGE)) {
 					War.war.badMsg(a, "pvp.outside.permission");
 				}
-				
+
 				event.setCancelled(true); // global pvp is off
 			} else {
 				if (attackerTeam == null) {
@@ -202,10 +203,10 @@ public class WarEntityListener implements Listener {
 					return;
 				}
 				if (defenderWarzone.getReallyDeadFighters().contains(d.getName())) {
-					// don't re-kill a dead person 
+					// don't re-kill a dead person
 					return;
 				}
-								
+
 				WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(defenderWarzone, d, null, event.getCause());
 				War.war.getServer().getPluginManager().callEvent(event1);
 				if (!defenderWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
@@ -230,15 +231,15 @@ public class WarEntityListener implements Listener {
 		// protect zones elements, lobbies and warhub from creepers and tnt
 		List<Block> explodedBlocks = event.blockList();
 		List<Block> dontExplode = new ArrayList<Block>();
-		
+
 		boolean explosionInAWarzone = event.getEntity() != null && Warzone.getZoneByLocation(event.getEntity().getLocation()) != null;
-		
+
 		if (!explosionInAWarzone && War.war.getWarConfig().getBoolean(WarConfig.TNTINZONESONLY) && event.getEntity() instanceof TNTPrimed) {
 			// if tntinzonesonly:true, no tnt blows up outside zones
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		for (Block block : explodedBlocks) {
 			if (block.getType() == Material.TNT) {
 				continue; // don't restore TNT (failed to track down regression cause)
@@ -269,28 +270,28 @@ public class WarEntityListener implements Listener {
 						inOneZone = true;
 					}
 				}
-				
+
 				if (!inOneZone && explosionInAWarzone) {
 					// if the explosion originated in warzone, always rollback
 					dontExplode.add(block);
 				}
 			}
 		}
-		
+
 		int dontExplodeSize = dontExplode.size();
 		if (dontExplode.size() > 0) {
-			// Reset the exploded blocks that shouldn't have exploded (some of these are zone artifacts, if rollbackexplosion some may be outside-of-zone blocks 
+			// Reset the exploded blocks that shouldn't have exploded (some of these are zone artifacts, if rollbackexplosion some may be outside-of-zone blocks
 			DeferredBlockResetsJob job = new DeferredBlockResetsJob();
 			for (Block dont : dontExplode) {
 				job.add(dont.getState());
 			}
 			War.war.getServer().getScheduler().scheduleSyncDelayedTask(War.war, job);
-			
-			// Changed explosion yield following proportion of explosion prevention (makes drops less buggy too) 
+
+			// Changed explosion yield following proportion of explosion prevention (makes drops less buggy too)
 			int explodedSize = explodedBlocks.size();
 			float middleYeild = (float)(explodedSize - dontExplodeSize) / (float)explodedSize;
 			float newYeild = middleYeild * event.getYield();
-			
+
 			event.setYield(newYeild);
 		}
 	}
@@ -303,14 +304,14 @@ public class WarEntityListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onEntityDamage(final EntityDamageEvent event) {
 
-		
-		if (!War.war.isLoaded()) {			
+
+		if (!War.war.isLoaded()) {
 			return;
 		}
 
 		Entity entity = event.getEntity();
 		if (!(entity instanceof Player)) {
-			
+
 			return;
 		}
 		Player player = (Player) entity;
@@ -322,13 +323,13 @@ public class WarEntityListener implements Listener {
 		}
 
 		// pass pvp-damage
-		if (event instanceof EntityDamageByEntityEvent) {			
+		if (event instanceof EntityDamageByEntityEvent) {
 			this.handlerAttackDefend((EntityDamageByEntityEvent) event);
 		} else  {
 			Team team = Team.getTeamByPlayerName(player.getName());
-			
+
 			if (zone != null && team != null) {
-				LoadoutSelection playerLoadoutState = zone.getLoadoutSelections().get(player.getName()); 
+				LoadoutSelection playerLoadoutState = zone.getLoadoutSelections().get(player.getName());
 				if (team.isSpawnLocation(player.getLocation())
 						&& playerLoadoutState != null && playerLoadoutState.isStillInSpawn()) {
 					// don't let a player still in spawn get damaged
@@ -338,7 +339,7 @@ public class WarEntityListener implements Listener {
 						// don't re-count the death points of an already dead person
 						return;
 					}
-					
+
 					// Detect death, prevent it and respawn the player
 					WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(zone, player, null, event.getCause());
 					War.war.getServer().getPluginManager().callEvent(event1);
@@ -377,10 +378,7 @@ public class WarEntityListener implements Listener {
 	 */
 	@EventHandler
 	public void onEntityRegainHealth(final EntityRegainHealthEvent event) {
-		if (!War.war.isLoaded() || 
-				(event.getRegainReason() != RegainReason.REGEN 
-						&& event.getRegainReason() != RegainReason.EATING 
-						&& event.getRegainReason() != RegainReason.SATIATED)) {
+		if (!War.war.isLoaded()) {
 			return;
 		}
 
@@ -393,8 +391,7 @@ public class WarEntityListener implements Listener {
 		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 		if (zone != null) {
 			Team team = Team.getTeamByPlayerName(player.getName());
-			if ((event.getRegainReason() == RegainReason.EATING 
-					|| event.getRegainReason() != RegainReason.SATIATED ) 
+			if (event.getRegainReason() == RegainReason.SATIATED
 				&& team.getTeamConfig().resolveBoolean(TeamConfig.NOHUNGER)) {
 				// noHunger setting means you can't auto-heal with full hunger bar (use saturation instead to control how fast you get hungry)
 				event.setCancelled(true);
@@ -404,13 +401,13 @@ public class WarEntityListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onFoodLevelChange(final FoodLevelChangeEvent event) {
 		if (!War.war.isLoaded() || !(event.getEntity() instanceof Player)) {
 			return;
 		}
-		
+
 		Player player = (Player) event.getEntity();
 		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 		Team team = Team.getTeamByPlayerName(player.getName());
@@ -418,7 +415,7 @@ public class WarEntityListener implements Listener {
 			event.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onPlayerDeath(final PlayerDeathEvent event) {
 		Player player = event.getEntity();
@@ -438,15 +435,15 @@ public class WarEntityListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
     public void onExplosionPrime(final ExplosionPrimeEvent event) {
 		if (!War.war.isLoaded()) {
 			return;
 		}
-		
+
 		Location eventLocation = event.getEntity().getLocation();
-		
+
 		for (Warzone zone : War.war.getWarzones()) {
 			if (zone.isBombBlock(eventLocation.getBlock())) {
 				// prevent the Bomb from exploding on its pedestral
