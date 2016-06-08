@@ -30,6 +30,8 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
@@ -496,4 +498,43 @@ public class WarEntityListener implements Listener {
 		}
 	}
 
+	@EventHandler
+	public void onPaintingBreakByEntity(final HangingBreakByEntityEvent event) {
+		if (!War.war.isLoaded()) {
+			return;
+		}
+		if (!(event.getRemover() instanceof Player)) {
+			return;
+		}
+		Player player = (Player) event.getRemover();
+		Warzone zone = Warzone.getZoneByLocation(event.getEntity().getLocation());
+		Team team = Team.getTeamByPlayerName(player.getName());
+		boolean isZoneMaker = War.war.isZoneMaker(player);
+		if (team == null && isZoneMaker) {
+			return;
+		}
+		if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)) {
+			event.setCancelled(true);
+			War.war.badMsg(player, "build.denied.zone.break");
+		}
+	}
+
+	@EventHandler
+	public void onPaintingPlaceByEntity(final HangingPlaceEvent event) {
+		if (!War.war.isLoaded()) {
+			return;
+		}
+		Player player = event.getPlayer();
+		Warzone zone = Warzone.getZoneByLocation(event.getBlock().getLocation());
+		Team team = Team.getTeamByPlayerName(player.getName());
+		boolean isZoneMaker = War.war.isZoneMaker(player);
+		if (team == null && isZoneMaker) {
+			return;
+		}
+		if (zone != null && (zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)
+			|| (team != null && !team.getTeamConfig().resolveBoolean(TeamConfig.PLACEBLOCK)))) {
+			event.setCancelled(true);
+			War.war.badMsg(player, "build.denied.zone.place");
+		}
+	}
 }
