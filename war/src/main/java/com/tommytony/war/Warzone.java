@@ -12,10 +12,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 
-import com.tommytony.war.mapper.VolumeMapper;
-import com.tommytony.war.mapper.ZoneVolumeMapper;
+import net.milkbowl.vault.economy.EconomyResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -27,15 +28,22 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -59,6 +67,8 @@ import com.tommytony.war.job.LoadoutResetJob;
 import com.tommytony.war.job.LogKillsDeathsJob;
 import com.tommytony.war.job.LogKillsDeathsJob.KillsDeathsRecord;
 import com.tommytony.war.mapper.LoadoutYmlMapper;
+import com.tommytony.war.mapper.VolumeMapper;
+import com.tommytony.war.mapper.ZoneVolumeMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
@@ -153,6 +163,13 @@ public class Warzone {
 		return bestGuess;
 	}
 
+	public static Warzone getZoneByNameExact(String name) {
+		for (Warzone zone : War.war.getWarzones()) {
+			if (zone.getName().equalsIgnoreCase(name)) return zone;
+		}
+		return null;
+	}
+
 	public static Warzone getZoneByLocation(Location location) {
 		for (Warzone warzone : War.war.getWarzones()) {
 			if (location.getWorld().getName().equals(warzone.getWorld().getName()) && warzone.getVolume() != null && warzone.getVolume().contains(location)) {
@@ -170,6 +187,15 @@ public class Warzone {
 		for (Warzone warzone : War.war.getWarzones()) {
 			Team team = warzone.getPlayerTeam(playerName);
 			if (team != null) {
+				return warzone;
+			}
+		}
+		return null;
+	}
+
+	public static Warzone getZoneForDeadPlayer(Player player) {
+		for (Warzone warzone : War.war.getWarzones()) {
+			if (warzone.getReallyDeadFighters().contains(player.getName())) {
 				return warzone;
 			}
 		}
@@ -295,11 +321,13 @@ public class Warzone {
 			// everyone back to team spawn with full health
 			for (Team team : this.teams) {
 				for (Player player : team.getPlayers()) {
-					if (respawnExempted == null 
-							|| (respawnExempted != null
-									&& !player.getName().equals(respawnExempted.getName()))) {
-						this.respawnPlayer(team, player);
+					if (player.equals(respawnExempted)) {
+						continue;
 					}
+					if (this.getReallyDeadFighters().contains(player.getName())) {
+						continue;
+					}
+					this.respawnPlayer(team, player);
 				}
 				team.setRemainingLives(team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				team.initializeTeamSpawns();
@@ -360,7 +388,6 @@ public class Warzone {
 		this.flagThieves.clear();
 		this.bombThieves.clear();
 		this.cakeThieves.clear();
-		this.reallyDeadFighters.clear();
 		if (this.getScoreboardType() != ScoreboardType.NONE) {
 			this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
 			scoreboard.registerNewObjective(this.getScoreboardType().getDisplayName(), "dummy");
@@ -419,12 +446,21 @@ public class Warzone {
 
 	private void handleRespawn(final Team team, final Player player) {
 		// Fill hp
-		player.setRemainingAir(300);
-		player.setHealth(20);
+		player.setRemainingAir(player.getMaximumAir());
+		player.setHealth(player.getMaxHealth());
 		player.setFoodLevel(20);
 		player.setSaturation(team.getTeamConfig().resolveInt(TeamConfig.SATURATION));
 		player.setExhaustion(0);
-		player.setFireTicks(0);		//this works fine here, why put it in LoudoutResetJob...? I'll keep it over there though
+		player.setFallDistance(0);
+		War.war.getServer().getScheduler().runTaskLater(War.war, new Runnable() {
+
+			@Override
+			public void run() {
+				// Stop fire here, since doing it in the same tick as death doesn't extinguish it
+				player.setFireTicks(0);
+			}
+			
+		}, 1L);
 
 		this.preventItemHackingThroughOpenedInventory(player);
 		
@@ -444,6 +480,18 @@ public class Warzone {
 		
 		// clear potion effects
 		PotionEffectHelper.clearPotionEffects(player);
+
+		String potionEffect = team.getTeamConfig().resolveString(TeamConfig.APPLYPOTION);
+		if (!potionEffect.isEmpty()) {
+			PotionEffect effect = War.war.getPotionEffect(potionEffect);
+			if (effect != null) {
+				player.addPotionEffect(effect);
+			} else {
+				War.war.getLogger().log(Level.WARNING,
+					"Failed to apply potion effect {0} in warzone {1}.",
+					new Object[] {potionEffect, name});
+			}
+		}
 		
 		boolean isFirstRespawn = false;
 		if (!this.getLoadoutSelections().keySet().contains(player.getName())) {
@@ -936,205 +984,202 @@ public class Warzone {
 		}
 		team.addPlayer(player);
 		team.resetSign();
-		if (!this.hasPlayerState(player.getName())) {
-			this.keepPlayerState(player);
-			War.war.msg(player, "join.inventorystored");
+		if (this.hasPlayerState(player.getName())) {
+			War.war.getLogger().log(Level.WARNING, "Player {0} in warzone {1} already has a stored state - they may have lost items",
+					new Object[] {player.getName(), this.getName()});
+			this.playerStates.remove(player.getName());
 		}
+		this.getReallyDeadFighters().remove(player.getName());
+		this.keepPlayerState(player);
+		War.war.msg(player, "join.inventorystored");
 		this.respawnPlayer(team, player);
 		this.broadcast("join.broadcast", player.getName(), team.getKind().getFormattedName());
 		return true;
 	}
-
-	public void handleDeath(Player player) {
-		// THIS ISN'T THREAD SAFE
-		// Every death and player movement should ideally occur in sequence because
-		// 1) a death can cause the end of the game by emptying a lifepool causing the max score to be reached
-		// 2) a player movement from one block to the next (getting a flag home or causing a bomb to go off perhaps) could win the game
-		//
-		// Concurrent execution of these events could cause the inventory reset of the last players to die to fail as
-		// they get tp'ed back to the lobby, or perhaps kills to bleed into the next round.
-
-		Team playerTeam = Team.getTeamByPlayerName(player.getName());
-
-		// Make sure the player that died is still part of a team, game may have ended while waiting.
-		// Ignore dying players that essentially just got tp'ed to lobby and got their state restored.
-		// Gotta take care of restoring ReallyDeadFighters' game-end state when in onRespawn as well.
-		if (playerTeam != null) {
-			// teleport to team spawn upon fast respawn death, but not for real deaths
-			if (!this.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
-				this.respawnPlayer(playerTeam, player);
-			} else {
-				// onPlayerRespawn takes care of real deaths
-				//player.setHealth(0);
-				this.getReallyDeadFighters().add(player.getName());
-			}
-			
-			int remaining = playerTeam.getRemainingLifes();
-			if (remaining == 0) { // your death caused your team to lose
-				if (this.isReinitializing()) {
-					// Prevent duplicate battle end. You died just after the battle ending death.
-					this.respawnPlayer(playerTeam, player);
-				} else {
-					// Handle team loss
-					List<Team> teams = this.getTeams();
-					String scores = "";
-					for (Team t : teams) {
-						if (War.war.isSpoutServer()) {
-							for (Player p : t.getPlayers()) {
-								SpoutPlayer sp = SpoutManager.getPlayer(p);
-								if (sp.isSpoutCraftEnabled()) {
-									sp.sendNotification(
-											SpoutDisplayer.cleanForNotification("Round over! " + playerTeam.getKind().getColor() + playerTeam.getName()),
-											SpoutDisplayer.cleanForNotification("ran out of lives."),
-											playerTeam.getKind().getBlockHead(),
-											10000);
-								}
-							}
-						}
-						
-						t.teamcast("zone.battle.end", playerTeam.getName(), player.getName());
 	
-						if (t.getPlayers().size() != 0 && !t.getTeamConfig().resolveBoolean(TeamConfig.FLAGPOINTSONLY)) {
-							if (!t.getName().equals(playerTeam.getName())) {
-								// all other teams get a point
-								t.addPoint();
-								t.resetSign();
-							}
-							scores += '\n' + t.getName() + "(" + t.getPoints() + "/" + t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE) + ") ";
-							
-						}
-					}
-					
-					// whoever didn't lose, reward them
-					//
-					List<Team> winningTeams = new ArrayList<Team>(teams.size());
-					for( Team t : teams ) {
-						if( !t.getPlayers().contains(player)) {
-							winningTeams.add(t);
-						}
-					}
-					WarBattleWinEvent event1 = new WarBattleWinEvent(this, winningTeams);
-					War.war.getServer().getPluginManager().callEvent(event1);
-
-					if (!scores.equals("")) {
-						this.broadcast("zone.battle.newscores", scores);
-					}
-					if (War.war.getMysqlConfig().isEnabled() && War.war.getMysqlConfig().isLoggingEnabled()) {
-						LogKillsDeathsJob logKillsDeathsJob = new LogKillsDeathsJob(ImmutableList.copyOf(this.getKillsDeathsTracker()));
-						War.war.getServer().getScheduler().runTaskAsynchronously(War.war, logKillsDeathsJob);
-					}
-					this.getKillsDeathsTracker().clear();
-					// detect score cap
-					List<Team> scoreCapTeams = new ArrayList<Team>();
-					for (Team t : teams) {
-						if (t.getPoints() == t.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
-							scoreCapTeams.add(t);
-						}
-					}
-					if (!scoreCapTeams.isEmpty()) {
-						String winnersStr = "";
-						for (Team winner : scoreCapTeams) {
-							if (winner.getPlayers().size() != 0) {
-								winnersStr += winner.getName() + " ";
-							}
-						}
-						this.handleScoreCapReached(winnersStr);
-					} else {
-						// A new battle starts. Reset the zone but not the teams.
-						this.broadcast("zone.battle.reset");
-						if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS)) {
-							this.reinitialize();
-						} else {
-							this.initializeZone();
-						}
-					}
-				}
-			} else {
-				// player died without causing his team's demise
-				if (this.isFlagThief(player.getName())) {
-					// died while carrying flag.. dropped it
-					Team victim = this.getVictimTeamForFlagThief(player.getName());
-					victim.getFlagVolume().resetBlocks();
-					victim.initializeTeamFlag();
-					this.removeFlagThief(player.getName());
-					
-					if (War.war.isSpoutServer()) {
-						for (Player p : victim.getPlayers()) {
-							SpoutPlayer sp = SpoutManager.getPlayer(p);
-							if (sp.isSpoutCraftEnabled()) {
-								sp.sendNotification(
-										SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-										SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "your flag."),
-										playerTeam.getKind().getBlockHead(),
-										5000);
-							}
-						}
-					}
-					
-					this.broadcast("drop.flag.broadcast", player.getName(), victim.getName());
-				}
-				
-				// Bomb thieves
-				if (this.isBombThief(player.getName())) {
-					// died while carrying bomb.. dropped it
-					Bomb bomb = this.getBombForThief(player.getName());
-					bomb.getVolume().resetBlocks();
-					bomb.addBombBlocks();
-					this.removeBombThief(player.getName());
-					
-					for (Team t : this.getTeams()) {
-						t.teamcast("drop.bomb.broadcast", player.getName(), ChatColor.GREEN + bomb.getName() + ChatColor.WHITE);
-						if (War.war.isSpoutServer()) {
-							for (Player p : t.getPlayers()) {
-								SpoutPlayer sp = SpoutManager.getPlayer(p);
-								if (sp.isSpoutCraftEnabled()) {
-					                sp.sendNotification(
-				                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-				                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "bomb " + ChatColor.GREEN + bomb.getName() + ChatColor.YELLOW + "."),
-				                		Material.TNT,
-				                		(short)0,
-				                		5000);
-								}
-							}
-						}
-					}
-				}
-				
-				if (this.isCakeThief(player.getName())) {
-					// died while carrying cake.. dropped it
-					Cake cake = this.getCakeForThief(player.getName());
-					cake.getVolume().resetBlocks();
-					cake.addCakeBlocks();
-					this.removeCakeThief(player.getName());
-					
-					for (Team t : this.getTeams()) {
-						t.teamcast("drop.cake.broadcast", player.getName(), ChatColor.GREEN + cake.getName() + ChatColor.WHITE);
-						if (War.war.isSpoutServer()) {
-							for (Player p : t.getPlayers()) {
-								SpoutPlayer sp = SpoutManager.getPlayer(p);
-								if (sp.isSpoutCraftEnabled()) {
-					                sp.sendNotification(
-				                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " dropped"),
-				                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "."),
-				                		Material.CAKE,
-				                		(short)0,
-				                		5000);
-								}
-							}
-						}
-					}
-				}
-				
-				// Decrement lifepool
-				playerTeam.setRemainingLives(remaining - 1);
-				
-				// Lifepool empty warning
-				if (remaining - 1 == 0) {
-					this.broadcast("zone.lifepool.empty", playerTeam.getName());
-				}
+	private void dropItems(Location location, ItemStack[] items) {
+		for (ItemStack item : items) {
+			if (item == null || item.getType() == Material.AIR) {
+				continue;
 			}
-			playerTeam.resetSign();
+			location.getWorld().dropItem(location, item);
 		}
+	}
+	
+	private Random killSeed = new Random();
+	
+	/**
+	 * Send death messages and process other records before passing off the
+	 * death to the {@link #handleDeath(Player)} method.
+	 * @param attacker Player who killed the defender
+	 * @param defender Player who was killed
+	 * @param damager Entity who caused the damage. Usually an arrow. Used for
+	 * specific death messages. Can be null.
+	 */
+	public void handleKill(Player attacker, Player defender, Entity damager) {
+		Team attackerTeam = this.getPlayerTeam(attacker.getName());
+		Team defenderTeam = this.getPlayerTeam(defender.getName());
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+			String attackerString = attackerTeam.getKind().getColor() + attacker.getName();
+			String defenderString = defenderTeam.getKind().getColor() + defender.getName();
+			Material killerWeapon = attacker.getItemInHand().getType();
+			String weaponString = killerWeapon.toString();
+			if (attacker.getItemInHand().hasItemMeta() && attacker.getItemInHand().getItemMeta().hasDisplayName()) {
+				weaponString = attacker.getItemInHand().getItemMeta().getDisplayName() + ChatColor.WHITE;
+			}
+			if (killerWeapon == Material.AIR) {
+				weaponString = War.war.getString("pvp.kill.weapon.hand");
+			} else if (killerWeapon == Material.BOW || damager instanceof Arrow) {
+				int rand = killSeed.nextInt(3);
+				if (rand == 0) {
+					weaponString = War.war.getString("pvp.kill.weapon.bow");
+				} else {
+					weaponString = War.war.getString("pvp.kill.weapon.aim");
+				}
+			} else if (damager instanceof Projectile) {
+				weaponString = War.war.getString("pvp.kill.weapon.aim");
+			}
+			String adjectiveString = War.war.getDeadlyAdjectives().isEmpty() ? "" : War.war.getDeadlyAdjectives().get(this.killSeed.nextInt(War.war.getDeadlyAdjectives().size()));
+			String verbString = War.war.getKillerVerbs().isEmpty() ? "" : War.war.getKillerVerbs().get(this.killSeed.nextInt(War.war.getKillerVerbs().size()));
+			this.broadcast("pvp.kill.format", attackerString + ChatColor.WHITE, adjectiveString,
+					weaponString.toLowerCase().replace('_', ' '), verbString, defenderString);
+		}
+		this.addKillCount(attacker.getName(), 1);
+		this.addKillDeathRecord(attacker, 1, 0);
+		this.addKillDeathRecord(defender, 0, 1);
+		if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+			attacker.setLevel(this.getKillCount(attacker.getName()));
+		}
+		if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.KILLSTREAK)) {
+			War.war.getKillstreakReward().rewardPlayer(attacker, this.getKillCount(attacker.getName()));
+		}
+		if (this.getScoreboard() != null && this.getScoreboardType() == ScoreboardType.TOPKILLS) {
+			Objective obj = this.getScoreboard().getObjective("Top kills");
+			obj.getScore(attacker).setScore(this.getKillCount(attacker.getName()));
+		}
+		if (defenderTeam.getTeamConfig().resolveBoolean(TeamConfig.INVENTORYDROP)) {
+			dropItems(defender.getLocation(), defender.getInventory().getContents());
+			dropItems(defender.getLocation(), defender.getInventory().getArmorContents());
+		}
+		this.handleDeath(defender);
+	}
+	
+	/**
+	 * Handle death messages before passing to {@link #handleDeath(Player)}
+	 * for post-processing. It's like
+	 * {@link #handleKill(Player, Player, Entity)}, but only for suicides.
+	 * @param player Player who killed himself
+	 */
+	public void handleSuicide(Player player) {
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+			String defenderString = this.getPlayerTeam(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE;
+			this.broadcast("pvp.kill.self", defenderString);
+		}
+		this.handleDeath(player);
+	}
+	
+	/**
+	 * Handle a player killed naturally (like by a dispenser or explosion).
+	 * @param player Player killed
+	 * @param event Event causing damage
+	 */
+	public void handleNaturalKill(Player player, EntityDamageEvent event) {
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
+			String defenderString = this.getPlayerTeam(player.getName()).getKind().getColor() + player.getName() + ChatColor.WHITE;
+			if (event instanceof EntityDamageByEntityEvent
+					&& ((EntityDamageByEntityEvent) event).getDamager() instanceof TNTPrimed) {
+				this.broadcast("pvp.death.explosion", defenderString + ChatColor.WHITE);
+			} else if (event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK 
+					|| event.getCause() == DamageCause.LAVA || event.getCause() == DamageCause.LIGHTNING) {
+				this.broadcast("pvp.death.fire", defenderString);
+			} else if (event.getCause() == DamageCause.DROWNING) {
+				this.broadcast("pvp.death.drown", defenderString);
+			} else if (event.getCause() == DamageCause.FALL) {
+				this.broadcast("pvp.death.fall", defenderString);
+			} else {
+				this.broadcast("pvp.death.other", defenderString);
+			}
+		}
+		this.handleDeath(player);
+	}
+
+	/**
+	 * Cleanup after a player who has died. This decrements the team's
+	 * remaining lifepool, drops stolen flags, and respawns the player.
+	 * It also handles team lose and score cap conditions.
+	 * This method is synchronized to prevent concurrent battle resets.
+	 * @param player Player who died
+	 */
+	public synchronized void handleDeath(Player player) {
+		Team playerTeam = this.getPlayerTeam(player.getName());
+		Validate.notNull(playerTeam, "Can't find team for dead player " + player.getName());
+		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.REALDEATHS)) {
+			this.getReallyDeadFighters().add(player.getName());
+		} else {
+			this.respawnPlayer(playerTeam, player);
+		}
+		if (playerTeam.getRemainingLifes() <= 0) {
+			handleTeamLoss(playerTeam, player);
+		} else {
+			this.dropAllStolenObjects(player, false);
+			playerTeam.setRemainingLives(playerTeam.getRemainingLifes() - 1);
+			// Lifepool empty warning
+			if (playerTeam.getRemainingLifes() == 0) {
+				this.broadcast("zone.lifepool.empty", playerTeam.getName());
+			}
+		}
+		playerTeam.resetSign();
+	}
+	
+	private void handleTeamLoss(Team losingTeam, Player player) {
+		StringBuilder teamScores = new StringBuilder();
+		List<Team> winningTeams = new ArrayList<Team>(teams.size());
+		for (Team team : this.teams) {
+			if (team.getPlayers().isEmpty())
+				continue;
+			if (team != losingTeam) {
+				team.addPoint();
+				team.resetSign();
+				winningTeams.add(team);
+			}
+			teamScores.append(String.format("\n%s (%d/%d) ", team.getName(), team.getPoints(), team.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)));
+			team.sendAchievement("Round over! " + losingTeam.getKind().getFormattedName(), "ran out of lives.", losingTeam.getKind().getBlockHead(), 10000);
+		}
+		this.broadcast("zone.battle.end", losingTeam.getName(), player.getName());
+		WarBattleWinEvent event1 = new WarBattleWinEvent(this, winningTeams);
+		War.war.getServer().getPluginManager().callEvent(event1);
+		if (!teamScores.toString().isEmpty()) {
+			this.broadcast("zone.battle.newscores", teamScores.toString());
+		}
+		if (War.war.getMysqlConfig().isEnabled() && War.war.getMysqlConfig().isLoggingEnabled()) {
+			LogKillsDeathsJob logKillsDeathsJob = new LogKillsDeathsJob(ImmutableList.copyOf(this.getKillsDeathsTracker()));
+			War.war.getServer().getScheduler().runTaskAsynchronously(War.war, logKillsDeathsJob);
+		}
+		this.getKillsDeathsTracker().clear();
+		if (!detectScoreCap()) {
+			this.broadcast("zone.battle.reset");
+			if (this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETBLOCKS)) {
+				this.reinitialize();
+			} else {
+				this.initializeZone();
+			}
+		}
+	}
+
+	/**
+	 * Check if a team has achieved max score "score cap".
+	 * @return true if team has achieved max score, false otherwise.
+	 */
+	public boolean detectScoreCap() {
+		StringBuilder winnersStr = new StringBuilder();
+		for (Team team : this.teams) {
+			if (team.getPoints() >= team.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)) {
+				winnersStr.append(team.getName()).append(' ');
+			}
+		}
+		if (!winnersStr.toString().isEmpty())
+			this.handleScoreCapReached(winnersStr.toString());
+		return !winnersStr.toString().isEmpty();
 	}
 
 	public void reinitialize() {
@@ -1347,6 +1392,8 @@ public class Warzone {
 			String winnersStrAndExtra = "Score cap reached. Game is over! Winning team(s): " + winnersStr;
 			winnersStrAndExtra += ". Resetting warzone and your inventory...";
 			t.teamcast(winnersStrAndExtra);
+			double ecoReward = t.getTeamConfig().resolveDouble(TeamConfig.ECOREWARD); 
+			boolean doEcoReward = ecoReward != 0 && War.war.getEconomy() != null;
 			for (Iterator<Player> it = t.getPlayers().iterator(); it.hasNext();) {
 				Player tp = it.next();
 				it.remove(); // Remove player from team first to prevent anti-tp
@@ -1355,6 +1402,19 @@ public class Warzone {
 				if (winnersStr.contains(t.getName())) {
 					// give reward
 					rewardPlayer(tp, t.getInventories().resolveReward());
+					if (doEcoReward) {
+						EconomyResponse r;
+						if (ecoReward > 0) {
+							r = War.war.getEconomy().depositPlayer(tp.getName(), ecoReward);
+						} else {
+							r = War.war.getEconomy().withdrawPlayer(tp.getName(), ecoReward);
+						}
+						if (!r.transactionSuccess()) {
+							War.war.getLogger().log(Level.WARNING,
+								"Failed to reward player {0} ${1}. Error: {2}",
+								new Object[] {tp.getName(), ecoReward, r.errorMessage});
+						}
+					}
 				}
 			}
 			t.resetPoints();
@@ -1797,7 +1857,7 @@ public class Warzone {
 			victimTeam.initializeTeamFlag();
 
 			if (!quiet) {
-				this.broadcast("drop.flag.broadcast", player.getName(), ChatColor.GREEN + victimTeam.getName() + ChatColor.WHITE);
+				this.broadcast("drop.flag.broadcast", player.getName(), victimTeam.getKind().getColor() + victimTeam.getName() + ChatColor.WHITE);
 			}
 		} else if (this.isCakeThief(player.getName())) {
 			Cake cake = this.getCakeForThief(player.getName());

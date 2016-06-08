@@ -4,9 +4,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
@@ -14,6 +16,7 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
@@ -458,6 +461,18 @@ public class WarBlockListener implements Listener {
 			War.war.badMsg(player, "build.denied.zone.type");
 			event.setCancelled(true);
 			return;
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onStructureGrowth(final StructureGrowEvent event) {
+		Warzone zone = Warzone.getZoneByLocation(event.getLocation());
+		if (zone != null) {
+			for (BlockState state : event.getBlocks()) {
+				if (!zone.getVolume().contains(state.getLocation())) {
+					state.setType(Material.AIR);
+				}
+			}
 		}
 	}
 }

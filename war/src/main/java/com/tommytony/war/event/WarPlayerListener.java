@@ -3,6 +3,9 @@ package com.tommytony.war.event;
 import java.util.HashMap;
 import java.util.List;
 
+import com.tommytony.war.config.WarConfig;
+
+import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -42,6 +45,7 @@ import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.volume.Volume;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -69,6 +73,34 @@ public class WarPlayerListener implements Listener {
 
 			if (War.war.isWandBearer(player)) {
 				War.war.removeWandBearer(player);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onPlayerJoin(final PlayerJoinEvent event) {
+		String autojoinName = War.war.getWarConfig().getString(WarConfig.AUTOJOIN);
+		boolean autojoinEnabled = !autojoinName.isEmpty();
+		if (autojoinEnabled) { // Won't be able to find warzone if unset
+			Warzone autojoinWarzone = Warzone.getZoneByNameExact(autojoinName);
+			if (autojoinWarzone == null) {
+				War.war.getLogger().log(Level.WARNING, "Failed to find autojoin warzone ''{0}''.", new Object[] {autojoinName});
+				return;
+			}
+			if (autojoinWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.DISABLED) || autojoinWarzone.isReinitializing()) {
+				War.war.badMsg(event.getPlayer(), "join.disabled");
+				event.getPlayer().teleport(autojoinWarzone.getTeleport());
+			} else if (!autojoinWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.JOINMIDBATTLE) && autojoinWarzone.isEnoughPlayers()) {
+				War.war.badMsg(event.getPlayer(), "join.progress");
+				event.getPlayer().teleport(autojoinWarzone.getTeleport());
+			} else if (autojoinWarzone.isFull()) {
+				War.war.badMsg(event.getPlayer(), "join.full.all");
+				event.getPlayer().teleport(autojoinWarzone.getTeleport());
+			} else if (autojoinWarzone.isFull(event.getPlayer())) {
+				War.war.badMsg(event.getPlayer(), "join.permission.all");
+				event.getPlayer().teleport(autojoinWarzone.getTeleport());
+			} else { // Player will only ever be autoassigned to a team
+				autojoinWarzone.autoAssign(event.getPlayer());
 			}
 		}
 	}
@@ -228,7 +260,7 @@ public class WarPlayerListener implements Listener {
 				// Whenever a player dies in the middle of conflict they will
 				// likely respawn still trying to use their items to attack
 				// another player.
-				player.playSound(player.getLocation(), Sound.ITEM_BREAK, 1, 0);
+				player.playSound(player.getLocation(), Sound.ENTITY_ITEM_BREAK, 1, 0);
 			} 
 
 			if (zone != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENDER_CHEST && !zone.getWarzoneConfig().getBoolean(WarzoneConfig.ALLOWENDER)) {
@@ -845,27 +877,30 @@ public class WarPlayerListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		if (War.war.isLoaded()) {
-			// Anyone who died in warzones needs to go back there pronto!
-			for (Warzone zone : War.war.getWarzones()) {
-				if (zone.getReallyDeadFighters().contains(event.getPlayer().getName())) {
-					zone.getReallyDeadFighters().remove(event.getPlayer().getName());
-					for (Team team : zone.getTeams()) {
-						if (team.getPlayers().contains(event.getPlayer())) {
-							event.setRespawnLocation(team.getRandomSpawn());
-							zone.respawnPlayer(team, event.getPlayer());
-							break;
-						}
-					}
-					
-					if (zone.hasPlayerState(event.getPlayer().getName())) {
-						// If not member of a team and zone has your state, then game ended while you were dead
-						War.war.log("Failed to restore game state to dead player.", Level.WARNING);
-					}
-					break;
-				}
+		Warzone playingZone = Warzone.getZoneByPlayerName(event.getPlayer().getName());
+		Warzone deadZone = Warzone.getZoneForDeadPlayer(event.getPlayer());
+		if (playingZone == null && deadZone != null) {
+			// Game ended while player was dead, so restore state
+			deadZone.getReallyDeadFighters().remove(event.getPlayer().getName());
+			if (deadZone.hasPlayerState(event.getPlayer().getName())) {
+				deadZone.restorePlayerState(event.getPlayer());
 			}
+			event.setRespawnLocation(deadZone.getEndTeleport(LeaveCause.DISCONNECT));
+			return;
+		} else if (playingZone == null) {
+			// Player not playing war
+			return;
+		} else if (deadZone == null) {
+			// Player is not a 'really' dead player, nothing to do here
+			return;
 		}
+		Team team = playingZone.getPlayerTeam(event.getPlayer().getName());
+		Validate.notNull(team, String.format(
+				"Failed to find a team for player %s in warzone %s on respawn.",
+				event.getPlayer().getName(), playingZone.getName()));
+		playingZone.getReallyDeadFighters().remove(event.getPlayer().getName());
+		event.setRespawnLocation(team.getRandomSpawn());
+		playingZone.respawnPlayer(team, event.getPlayer());
 	}
 
 	@EventHandler
@@ -918,7 +953,7 @@ public class WarPlayerListener implements Listener {
 		// Prevent thieves from taking their bomb/wool/cake into a chest, etc.
 		if (zone.isThief(player.getName())) {
 			event.setCancelled(true);
-			player.playSound(player.getLocation(), Sound.FIZZ, 10, 10);
+			player.playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 10, 10);
 		} else // Magically give player a wool block when they click their helmet
 			if (event.getSlotType() == InventoryType.SlotType.ARMOR && event.getSlot() == 39
 				&& zone.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
@@ -931,5 +966,18 @@ public class WarPlayerListener implements Listener {
 
 	public void purgeLatestPositions() {
 		this.latestLocations.clear();	
+	}
+
+	@EventHandler
+	public void onBucketEmpty(PlayerBucketEmptyEvent event) {
+		Player player = (Player) event.getPlayer();
+		Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+		if (zone == null) {
+			return;
+		}
+		if (zone.isImportantBlock(event.getBlockClicked())) {
+			event.setCancelled(true);
+			player.playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 10, 10);
+		}
 	}
 }

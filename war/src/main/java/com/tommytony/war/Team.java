@@ -34,6 +34,7 @@ import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.config.TeamKind;
 import com.tommytony.war.config.TeamSpawnStyle;
+import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
 
@@ -442,6 +443,27 @@ public class Team {
 		}
 	}
 
+	/**
+	 * Send an achievement to all players on the team.
+	 * Currently implemented using SpoutCraft.
+	 * @param line1 Achievement first line
+	 * @param line2 Achievement second line
+	 * @param icon Item to display in the achievement
+	 * @param ticks Duration the achievement should be displayed
+	 */
+	public void sendAchievement(String line1, String line2, ItemStack icon, int ticks) {
+		if (!War.war.isSpoutServer())
+			return;
+		line1 = SpoutDisplayer.cleanForNotification(line1);
+		line2 = SpoutDisplayer.cleanForNotification(line2);
+		for (Player player : this.players) {
+			SpoutPlayer spoutPlayer = SpoutManager.getPlayer(player);
+			if (!spoutPlayer.isSpoutCraftEnabled())
+				continue;
+			spoutPlayer.sendNotification(line1, line2, icon, ticks);
+		}
+	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -464,7 +486,9 @@ public class Team {
 		}
 		thePlayer.setFireTicks(0);
 		thePlayer.setRemainingAir(300);
-		this.warzone.restorePlayerState(thePlayer);
+		if (!this.warzone.getReallyDeadFighters().contains(thePlayer.getName())) {
+			this.warzone.restorePlayerState(thePlayer);
+		}
 		this.warzone.getLoadoutSelections().remove(thePlayer);
 	}
 

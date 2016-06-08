@@ -8,6 +8,8 @@ import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,7 +22,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.tommytony.war.command.WarCommandHandler;
 import com.tommytony.war.config.FlagReturn;
@@ -97,6 +102,7 @@ public class War extends JavaPlugin {
 	private final InventoryBag defaultInventories = new InventoryBag();
 	private KillstreakReward killstreakReward;
 	private MySQLConfig mysqlConfig;
+	private Economy econ = null;
 
 	private final WarConfigBag warConfig = new WarConfigBag();
 	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
@@ -180,6 +186,8 @@ public class War extends JavaPlugin {
 		warConfig.put(WarConfig.RESETSPEED, 5000);
 		warConfig.put(WarConfig.MAXSIZE, 750);
 		warConfig.put(WarConfig.LANGUAGE, Locale.getDefault().toString());
+		warConfig.put(WarConfig.AUTOJOIN, "");
+		warConfig.put(WarConfig.TPWARMUP, 0);
 
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOASSIGN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.BLOCKHEADS, true);
@@ -224,6 +232,9 @@ public class War extends JavaPlugin {
 		teamDefaultConfig.put(TeamConfig.KILLSTREAK, false);
 		teamDefaultConfig.put(TeamConfig.BLOCKWHITELIST, "all");
 		teamDefaultConfig.put(TeamConfig.PLACEBLOCK, true);
+		teamDefaultConfig.put(TeamConfig.APPLYPOTION, "");
+		teamDefaultConfig.put(TeamConfig.ECOREWARD, 0.0);
+		teamDefaultConfig.put(TeamConfig.INVENTORYDROP, false);
 
 		this.getDefaultInventories().clearLoadouts();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
@@ -285,6 +296,13 @@ public class War extends JavaPlugin {
 			} catch (Exception ex) {
 				this.log("MySQL driver not found!", Level.SEVERE);
 				this.getServer().getPluginManager().disablePlugin(this);
+			}
+		}
+		if (this.getServer().getPluginManager().isPluginEnabled("Vault")) {
+			RegisteredServiceProvider<Economy> rsp = this.getServer().getServicesManager()
+				.getRegistration(Economy.class);
+			if (rsp != null) {
+				this.econ = rsp.getProvider();
 			}
 		}
 
@@ -931,79 +949,62 @@ public class War extends JavaPlugin {
 		return activeZones;
 	}
 
+	static final boolean HIDE_BLANK_MESSAGES = true;
+
 	public void msg(CommandSender sender, String str) {
+		if (messages.containsKey(str)) str = this.getString(str);
+		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
 					.append(this.getString("war.prefix")).append(ChatColor.WHITE).append(' ');
-			if (messages.containsKey(str)) {
-				output.append(this.colorKnownTokens(this.getString(str),
-						ChatColor.WHITE));
-			} else {
-				output.append(this.colorKnownTokens(str, ChatColor.WHITE));
-			}
+			output.append(this.colorKnownTokens(str, ChatColor.WHITE));
 			sender.sendMessage(output.toString());
 		} else {
-			sender.sendMessage(messages.containsKey(str) ? messages.getString(str) : str);
+			sender.sendMessage(str);
 		}
 	}
 
 	public void badMsg(CommandSender sender, String str) {
+		if (messages.containsKey(str)) str = this.getString(str);
+		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
 					.append(this.getString("war.prefix")).append(ChatColor.RED).append(' ');
-			if (messages.containsKey(str)) {
-				output.append(this.colorKnownTokens(this.getString(str), ChatColor.RED));
-			} else {
-				output.append(this.colorKnownTokens(str, ChatColor.RED));
-			}
+			output.append(this.colorKnownTokens(str, ChatColor.RED));
 			sender.sendMessage(output.toString());
 		} else {
-			sender.sendMessage(messages.containsKey(str) ? messages.getString(str) : str);
+			sender.sendMessage(str);
 		}
 	}
 
 	public void msg(CommandSender sender, String str, Object... obj) {
+		if (messages.containsKey(str)) str = this.getString(str);
+		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
 					.append(this.getString("war.prefix")).append(ChatColor.WHITE).append(' ');
-			if (messages.containsKey(str)) {
-				output.append(MessageFormat.format(this.colorKnownTokens(
-						this.getString(str), ChatColor.WHITE), obj));
-			} else {
-				output.append(MessageFormat.format(
+			output.append(MessageFormat.format(
 						this.colorKnownTokens(str, ChatColor.WHITE), obj));
-			}
 			sender.sendMessage(output.toString());
 		} else {
 			StringBuilder output = new StringBuilder();
-			if (messages.containsKey(str)) {
-				output.append(MessageFormat.format(this.getString(str), obj));
-			} else {
-				output.append(MessageFormat.format(str, obj));
-			}
+			output.append(MessageFormat.format(str, obj));
 			sender.sendMessage(output.toString());
 		}
 	}
 
 	public void badMsg(CommandSender sender, String str, Object... obj) {
+		if (messages.containsKey(str)) str = this.getString(str);
+		if (HIDE_BLANK_MESSAGES && (str == null || str.isEmpty())) return;
 		if (sender instanceof Player) {
 			StringBuilder output = new StringBuilder(ChatColor.GRAY.toString())
 					.append(this.getString("war.prefix")).append(ChatColor.RED).append(' ');
-			if (messages.containsKey(str)) {
-				output.append(MessageFormat.format(this.colorKnownTokens(
-						this.getString(str), ChatColor.RED), obj));
-			} else {
-				output.append(MessageFormat.format(
+			output.append(MessageFormat.format(
 						this.colorKnownTokens(str, ChatColor.RED), obj));
-			}
 			sender.sendMessage(output.toString());
 		} else {
 			StringBuilder output = new StringBuilder();
-			if (messages.containsKey(str)) {
-				output.append(MessageFormat.format(this.getString(str), obj));
-			} else {
-				output.append(MessageFormat.format(str, obj));
-			}
+			output.append(MessageFormat.format(str, obj));
 			sender.sendMessage(output.toString());
 		}
 	}
@@ -1316,5 +1317,28 @@ public class War extends JavaPlugin {
 
 	public Locale getLoadedLocale() {
 		return messages.getLocale();
+	}
+
+	/**
+	 * Convert serialized effect to actual effect.
+	 * @param serializedEffect String stored in configuration.
+	 *                         Format: TYPE;DURATION;AMPLIFY
+	 * @return Potion effect or null otherwise
+	 */
+	public PotionEffect getPotionEffect(String serializedEffect) {
+		String[] arr = serializedEffect.split(";");
+		if (arr.length != 3) return null;
+		try {
+			PotionEffectType type = PotionEffectType.getByName(arr[0]);
+			int duration = Integer.parseInt(arr[1]);
+			int amplification = Integer.parseInt(arr[2]);
+			return new PotionEffect(type, duration, amplification);
+		} catch (RuntimeException ex) {
+			return null;
+		}
+	}
+
+	public Economy getEconomy() {
+		return econ;
 	}
 }

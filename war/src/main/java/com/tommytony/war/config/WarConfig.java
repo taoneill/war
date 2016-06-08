@@ -11,7 +11,9 @@ public enum WarConfig {
 	TNTINZONESONLY (Boolean.class),
 	RESETSPEED (Integer.class),
 	MAXSIZE (Integer.class),
-	LANGUAGE (String.class);
+	LANGUAGE (String.class),
+	AUTOJOIN (String.class),
+	TPWARMUP(Integer.class);
 	
 	private final Class<?> configType;
 

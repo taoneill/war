@@ -4,7 +4,8 @@ public enum ScoreboardType {
 
 	NONE(null),
 	POINTS("Points"),
-	LIFEPOOL("Lifepool");
+	LIFEPOOL("Lifepool"),
+	TOPKILLS("Top kills");
 	private final String displayName;
 
 	private ScoreboardType(String displayName) {

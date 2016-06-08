@@ -184,7 +184,9 @@ public class ZoneVolumeMapper {
 				// Skulls
 				if (modify instanceof Skull) {
 					String[] opts = query.getString("metadata").split("\n");
-					((Skull) modify).setOwner(opts[0]);
+					if (!opts[0].isEmpty()) {
+						((Skull) modify).setOwner(opts[0]);
+					}
 					((Skull) modify).setSkullType(SkullType.valueOf(opts[1]));
 					((Skull) modify).setRotation(BlockFace.valueOf(opts[2]));
 					modify.update(true, false);
@@ -262,6 +264,7 @@ public class ZoneVolumeMapper {
 	public static void loadStructure(Volume volume, Connection databaseConnection) throws SQLException {
 		String prefix = String.format("structure_%d", volume.getName().hashCode() & Integer.MAX_VALUE);
 		World world = volume.getWorld();
+		Validate.notNull(world, String.format("Cannot find the warzone for %s", prefix));
 		Statement stmt = databaseConnection.createStatement();
 		ResultSet cornerQuery = stmt.executeQuery("SELECT * FROM " + prefix + "_corners");
 		cornerQuery.next();
@@ -370,7 +373,7 @@ public class ZoneVolumeMapper {
 						dataStmt.setString(6, ((Jukebox) block.getState()).getPlaying().toString());
 					} else if (state instanceof Skull) {
 						dataStmt.setString(6, String.format("%s\n%s\n%s",
-								((Skull) block.getState()).getOwner(),
+								((Skull) block.getState()).hasOwner() ? ((Skull) block.getState()).getOwner() : "",
 								((Skull) block.getState()).getSkullType().toString(),
 								((Skull) block.getState()).getRotation().toString()));
 					} else if (state instanceof CommandBlock) {
