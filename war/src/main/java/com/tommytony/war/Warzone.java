@@ -1124,7 +1124,7 @@ public class Warzone {
 			this.dropAllStolenObjects(player, false);
 			playerTeam.setRemainingLives(playerTeam.getRemainingLifes() - 1);
 			// Lifepool empty warning
-			if (playerTeam.getRemainingLifes() - 1 == 0) {
+			if (playerTeam.getRemainingLifes() == 0) {
 				this.broadcast("zone.lifepool.empty", playerTeam.getName());
 			}
 		}
