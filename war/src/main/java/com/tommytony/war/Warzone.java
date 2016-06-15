@@ -447,6 +447,7 @@ public class Warzone {
 	private void handleRespawn(final Team team, final Player player) {
 		// Fill hp
 		player.setRemainingAir(player.getMaximumAir());
+		player.setMaxHealth(20);
 		player.setHealth(player.getMaxHealth());
 		player.setFoodLevel(20);
 		player.setSaturation(team.getTeamConfig().resolveInt(TeamConfig.SATURATION));
