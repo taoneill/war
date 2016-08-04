@@ -35,9 +35,18 @@ public class HelmetProtectionTask implements Runnable {
 					
 					if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
 						teamBlockMaterial = team.getKind().getMaterial();
-						// 1) Replace missing block head
+						// 1) Replace missing block armor
 						if (playerInv.getHelmet() == null || playerInv.getHelmet().getType() != Material.LEATHER_HELMET) {
 							playerInv.setHelmet(team.getKind().getHat());
+						}
+						if (playerInv.getChestplate() == null || playerInv.getChestplate().getType() != Material.LEATHER_CHESTPLATE) {
+							playerInv.setChestplate(team.getKind().getChestplate());
+						}
+						if (playerInv.getLeggings() == null || playerInv.getLeggings().getType() != Material.LEATHER_LEGGINGS) {
+							playerInv.setLeggings(team.getKind().getLeggings());
+						}
+						if (playerInv.getBoots() == null || playerInv.getBoots().getType() != Material.LEATHER_BOOTS) {
+							playerInv.setBoots(team.getKind().getBoots());
 						}
 						
 						// 2) Get rid of extra blocks in inventory: only keep one
