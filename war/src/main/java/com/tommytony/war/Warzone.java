@@ -26,6 +26,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Arrow;
@@ -445,14 +448,26 @@ public class Warzone {
 	}
 
 	private void handleRespawn(final Team team, final Player player) {
+		// first, wipe inventory to disable attribute modifications
+		this.preventItemHackingThroughOpenedInventory(player);
+		player.getInventory().clear();
+
+		// clear potion effects
+		PotionEffectHelper.clearPotionEffects(player);
+
 		// Fill hp
 		player.setRemainingAir(player.getMaximumAir());
-		player.setMaxHealth(20);
-		player.setHealth(player.getMaxHealth());
+		AttributeInstance ai = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+		for (AttributeModifier mod : ai.getModifiers()) {
+			ai.removeModifier(mod);
+		}
+		ai.setBaseValue(20.0);
+		player.setHealth(ai.getValue());
 		player.setFoodLevel(20);
 		player.setSaturation(team.getTeamConfig().resolveInt(TeamConfig.SATURATION));
 		player.setExhaustion(0);
 		player.setFallDistance(0);
+		player.setFireTicks(0);
 		War.war.getServer().getScheduler().runTaskLater(War.war, new Runnable() {
 
 			@Override
@@ -463,24 +478,20 @@ public class Warzone {
 			
 		}, 1L);
 
-		this.preventItemHackingThroughOpenedInventory(player);
-		
+
 		player.setLevel(0);
 		player.setExp(0);
 		player.setAllowFlight(false);
 		player.setFlying(false);
 
-		player.getInventory().clear();
-		
+
 		this.setKillCount(player.getName(), 0);
 
 		if (player.getGameMode() != GameMode.SURVIVAL) {
 			// Players are always in survival mode in warzones
 			player.setGameMode(GameMode.SURVIVAL);
 		}
-		
-		// clear potion effects
-		PotionEffectHelper.clearPotionEffects(player);
+
 
 		String potionEffect = team.getTeamConfig().resolveString(TeamConfig.APPLYPOTION);
 		if (!potionEffect.isEmpty()) {
@@ -628,7 +639,8 @@ public class Warzone {
 			
 			this.playerInvFromInventoryStash(playerInv, originalState);
 			player.setGameMode(originalState.getGamemode());
-			player.setHealth(Math.max(Math.min(originalState.getHealth(), 20.0D), 0.0D));
+			double maxH = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+			player.setHealth(Math.max(Math.min(originalState.getHealth(), maxH), 0.0D));
 			player.setExhaustion(originalState.getExhaustion());
 			player.setSaturation(originalState.getSaturation());
 			player.setFoodLevel(originalState.getFoodLevel());

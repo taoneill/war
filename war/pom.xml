@@ -54,6 +54,12 @@
     <tag>HEAD</tag>
     <url>https://github.com/taoneill/war</url>
   </scm>
+  <distributionManagement>
+    <repository>
+      <id>cma-repo</id>
+      <url>ftp://ftp.cmastudios.me/srv/ftp/maven</url>
+    </repository>
+  </distributionManagement>
   <build>
     <plugins>
       <plugin>
@@ -93,6 +99,12 @@
         </executions>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ftp</artifactId>
+      </extension>
+    </extensions>
     <resources>
       <resource>
         <filtering>true</filtering>
@@ -117,7 +129,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.9.4-R0.1-SNAPSHOT</version>
+      <version>1.12-R0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.kitteh</groupId>
