@@ -381,7 +381,7 @@ public class War extends JavaPlugin {
 	private void inventoryToLoadout(PlayerInventory inv, HashMap<Integer, ItemStack> loadout) {
 		loadout.clear();
 		int i = 0;
-		for (ItemStack stack : inv.getContents()) {
+		for (ItemStack stack : inv.getStorageContents()) {
 			if (stack != null && stack.getType() != Material.AIR) {
 				loadout.put(i, stack.clone());
 				i++;
@@ -553,9 +553,9 @@ public class War extends JavaPlugin {
 						}
 						
 						warzone.getDefaultInventories().setLoadout(loadoutName, loadout);
-						returnMessage.append(loadoutName + " respawn loadout added.");
+						returnMessage.append(loadoutName).append(" respawn loadout added.");
 					} else {
-						returnMessage.append(loadoutName + " respawn loadout updated.");
+						returnMessage.append(loadoutName).append(" respawn loadout updated.");
 					}
 					this.inventoryToLoadout(player, loadout);
 					Loadout ldt = warzone.getDefaultInventories().getNewLoadout(loadoutName);
