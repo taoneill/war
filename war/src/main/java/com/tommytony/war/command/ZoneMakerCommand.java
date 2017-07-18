@@ -49,6 +49,7 @@ public class ZoneMakerCommand extends AbstractWarCommand {
 					// kick
 					War.war.getZoneMakerNames().remove(this.args[0]);
 					this.msg(this.args[0] + " is not a zone maker anymore.");
+					// TODO store zone makers using UUIDs
 					Player kickedMaker = War.war.getServer().getPlayer(this.args[0]);
 					if (kickedMaker != null) {
 						War.war.msg(kickedMaker, player.getName() + " took away your warzone maker priviledges.");

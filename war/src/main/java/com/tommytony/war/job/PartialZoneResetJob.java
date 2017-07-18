@@ -98,14 +98,14 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 							new Object[]{volume.getName(), secondsAsText});
 					conn.close();
 				} else {
-					War.war.getServer().getScheduler().runTaskLater(War.war, this.clone(), JOB_INTERVAL);
+					this.runTaskLater(War.war, JOB_INTERVAL);
 				}
 			} else {
 				int solidChanges = volume.resetSection(conn, completed, speed, changes);
 				completed += solidChanges;
 				totalChanges += solidChanges;
 				this.displayStatusMessage();
-				War.war.getServer().getScheduler().runTaskLater(War.war, this.clone(), JOB_INTERVAL);
+				this.runTaskLater(War.war, JOB_INTERVAL);
 			}
 		} catch (SQLException e) {
 			War.war.getLogger().log(Level.WARNING, "Failed to load zone during reset loop", e);

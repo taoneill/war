@@ -496,9 +496,8 @@ public class Team {
 		this.remainingLives = remainingLives;
 		if (this.warzone.getScoreboard() != null && this.warzone.getScoreboardType() == ScoreboardType.LIFEPOOL) {
 			String teamName = kind.getColor() + name + ChatColor.RESET;
-			OfflinePlayer teamPlayer = Bukkit.getOfflinePlayer(teamName);
 			Objective obj = this.warzone.getScoreboard().getObjective("Lifepool");
-			obj.getScore(teamPlayer).setScore(remainingLives);
+			obj.getScore(teamName).setScore(remainingLives);
 		}
 	}
 
@@ -522,7 +521,7 @@ public class Team {
 		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS) {
 			String teamName = kind.getColor() + name + ChatColor.RESET;
 			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
-					.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(points);
+					.getScore(teamName).setScore(points);
 		}
 	}
 
@@ -558,7 +557,7 @@ public class Team {
 				&& this.warzone.getScoreboard() != null) {
 			String teamName = kind.getColor() + name + ChatColor.RESET;
 			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
-					.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(points);
+					.getScore(teamName).setScore(points);
 		}
 	}
 

@@ -70,15 +70,7 @@ public class SpoutDisplayer {
 			}
 		}
 	}
-	
-	public void remove(String playerName) {
-		Player player = War.war.getServer().getPlayer(playerName);
-		if (player != null && playerMessages.containsKey(playerName)) {
-			clear(SpoutManager.getPlayer(player));
-			playerMessages.remove(playerName);			
-		}
-	}
-	
+
 	private void clear(SpoutPlayer player) {
 		player.getMainScreen().removeWidgets(War.war);
 	}

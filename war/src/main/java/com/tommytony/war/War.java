@@ -585,7 +585,7 @@ public class War extends JavaPlugin {
 				}
 				if (namedParams.containsKey("lobbymaterial")) {
 					String whichBlocks = namedParams.get("lobbymaterial");
-					ItemStack blockInHand = player.getItemInHand();
+					ItemStack blockInHand = player.getInventory().getItemInMainHand();
 					boolean updatedLobbyMaterials = false;
 					
 					if (!blockInHand.getType().isBlock() && !blockInHand.getType().equals(Material.AIR)) {
@@ -593,19 +593,19 @@ public class War extends JavaPlugin {
 					} else {
 						if (whichBlocks.equals("floor")) {
 							warzone.getLobbyMaterials().setFloorBlock(blockInHand);
-							returnMessage.append(" lobby floor material set to " + blockInHand.getType());
+							returnMessage.append(" lobby floor material set to ").append(blockInHand.getType());
 							updatedLobbyMaterials = true;
 						} else if (whichBlocks.equals("outline")) {
 							warzone.getLobbyMaterials().setOutlineBlock(blockInHand);
-							returnMessage.append(" lobby outline material set to " + blockInHand.getType());
+							returnMessage.append(" lobby outline material set to ").append(blockInHand.getType());
 							updatedLobbyMaterials = true;
 						} else if (whichBlocks.equals("gate")) {
 							warzone.getLobbyMaterials().setGateBlock(blockInHand);
-							returnMessage.append(" lobby gate material set to " + blockInHand.getType());
+							returnMessage.append(" lobby gate material set to ").append(blockInHand.getType());
 							updatedLobbyMaterials = true;
 						} else if (whichBlocks.equals("light")) {
 							warzone.getLobbyMaterials().setLightBlock(blockInHand);
-							returnMessage.append(" lobby light material set to " + blockInHand.getType());
+							returnMessage.append(" lobby light material set to ").append(blockInHand.getType());
 							updatedLobbyMaterials = true;
 						}
 						
@@ -617,7 +617,7 @@ public class War extends JavaPlugin {
 				}
 				if (namedParams.containsKey("material")) {
 					String whichBlocks = namedParams.get("material");
-					ItemStack blockInHand = player.getItemInHand();
+					ItemStack blockInHand = player.getInventory().getItemInMainHand();
 					boolean updatedMaterials = false;
 					
 					if (!blockInHand.getType().isBlock()) {
@@ -625,15 +625,15 @@ public class War extends JavaPlugin {
 					} else {
 						if (whichBlocks.equals("main")) {
 							warzone.getWarzoneMaterials().setMainBlock(blockInHand);
-							returnMessage.append(" main material set to " + blockInHand.getType());
+							returnMessage.append(" main material set to ").append(blockInHand.getType());
 							updatedMaterials = true;
 						} else if (whichBlocks.equals("stand")) {
 							warzone.getWarzoneMaterials().setStandBlock(blockInHand);
-							returnMessage.append(" stand material set to " + blockInHand.getType());
+							returnMessage.append(" stand material set to ").append(blockInHand.getType());
 							updatedMaterials = true;
 						} else if (whichBlocks.equals("light")) {
 							warzone.getWarzoneMaterials().setLightBlock(blockInHand);
-							returnMessage.append(" light material set to " + blockInHand.getType());
+							returnMessage.append(" light material set to ").append(blockInHand.getType());
 							updatedMaterials = true;
 						}
 						
@@ -741,7 +741,7 @@ public class War extends JavaPlugin {
 				}
 				if (namedParams.containsKey("warhubmaterial")) {
 					String whichBlocks = namedParams.get("warhubmaterial");
-					ItemStack blockInHand = player.getItemInHand();
+					ItemStack blockInHand = player.getInventory().getItemInMainHand();
 					boolean updatedWarhubMaterials = false;
 					
 					if (!blockInHand.getType().isBlock() && !blockInHand.getType().equals(Material.AIR)) {

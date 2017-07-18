@@ -5,14 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
 
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -117,9 +110,9 @@ public class Warzone {
 	private final int minSafeDistanceFromWall = 6;
 	private List<ZoneWallGuard> zoneWallGuards = new ArrayList<ZoneWallGuard>();
 	private HashMap<String, PlayerState> playerStates = new HashMap<String, PlayerState>();
-	private HashMap<String, Team> flagThieves = new HashMap<String, Team>();
-	private HashMap<String, Bomb> bombThieves = new HashMap<String, Bomb>();
-	private HashMap<String, Cake> cakeThieves = new HashMap<String, Cake>();
+	private HashMap<UUID, Team> flagThieves = new HashMap<UUID, Team>();
+	private HashMap<UUID, Bomb> bombThieves = new HashMap<UUID, Bomb>();
+	private HashMap<UUID, Cake> cakeThieves = new HashMap<UUID, Cake>();
 	private HashMap<String, LoadoutSelection> loadoutSelections = new HashMap<String, LoadoutSelection>();
 	private HashMap<String, PlayerState> deadMenInventories = new HashMap<String, PlayerState>();
 	private HashMap<String, Integer> killCount = new HashMap<String, Integer>();
@@ -307,8 +300,8 @@ public class Warzone {
 	public void initializeZone(Player respawnExempted) {
 		if (this.ready() && this.volume.isSaved()) {
 			if (this.scoreboard != null) {
-				for (OfflinePlayer opl : this.scoreboard.getPlayers()) {
-					this.scoreboard.resetScores(opl);
+				for (String entry : this.scoreboard.getEntries()) {
+					this.scoreboard.resetScores(entry);
 				}
 				this.scoreboard.clearSlot(DisplaySlot.SIDEBAR);
 				for (Objective obj : this.scoreboard.getObjectives()) {
@@ -399,9 +392,9 @@ public class Warzone {
 			for (Team team : this.getTeams()) {
 				String teamName = team.getKind().getColor() + team.getName() + ChatColor.RESET;
 				if (this.getScoreboardType() == ScoreboardType.POINTS) {
-					obj.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(team.getPoints());
+					obj.getScore(teamName).setScore(team.getPoints());
 				} else if (this.getScoreboardType() == ScoreboardType.LIFEPOOL) {
-					obj.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(team.getRemainingLifes());
+					obj.getScore(teamName).setScore(team.getRemainingLifes());
 				}
 			}
 			obj.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -753,6 +746,9 @@ public class Warzone {
 	}
 
 	public boolean isImportantBlock(Block block) {
+		if (block == null) {
+			return false;
+		}
 		if (this.ready()) {
 			for (Monument m : this.monuments) {
 				if (m.getVolume().contains(block)) {
@@ -1035,10 +1031,11 @@ public class Warzone {
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.DEATHMESSAGES)) {
 			String attackerString = attackerTeam.getKind().getColor() + attacker.getName();
 			String defenderString = defenderTeam.getKind().getColor() + defender.getName();
-			Material killerWeapon = attacker.getItemInHand().getType();
+			ItemStack weapon = attacker.getInventory().getItemInMainHand(); // Not the right way to do this, as they could kill with their other hand, but whatever
+			Material killerWeapon = weapon.getType();
 			String weaponString = killerWeapon.toString();
-			if (attacker.getItemInHand().hasItemMeta() && attacker.getItemInHand().getItemMeta().hasDisplayName()) {
-				weaponString = attacker.getItemInHand().getItemMeta().getDisplayName() + ChatColor.WHITE;
+			if (weapon.hasItemMeta() && weapon.getItemMeta().hasDisplayName()) {
+				weaponString = weapon.getItemMeta().getDisplayName() + ChatColor.WHITE;
 			}
 			if (killerWeapon == Material.AIR) {
 				weaponString = War.war.getString("pvp.kill.weapon.hand");
@@ -1068,7 +1065,7 @@ public class Warzone {
 		}
 		if (this.getScoreboard() != null && this.getScoreboardType() == ScoreboardType.TOPKILLS) {
 			Objective obj = this.getScoreboard().getObjective("Top kills");
-			obj.getScore(attacker).setScore(this.getKillCount(attacker.getName()));
+			obj.getScore(attacker.getName()).setScore(this.getKillCount(attacker.getName()));
 		}
 		if (defenderTeam.getTeamConfig().resolveBoolean(TeamConfig.INVENTORYDROP)) {
 			dropItems(defender.getLocation(), defender.getInventory().getContents());
@@ -1166,7 +1163,7 @@ public class Warzone {
 		}
 		if (War.war.getMysqlConfig().isEnabled() && War.war.getMysqlConfig().isLoggingEnabled()) {
 			LogKillsDeathsJob logKillsDeathsJob = new LogKillsDeathsJob(ImmutableList.copyOf(this.getKillsDeathsTracker()));
-			War.war.getServer().getScheduler().runTaskAsynchronously(War.war, logKillsDeathsJob);
+			logKillsDeathsJob.runTaskAsynchronously(War.war);
 		}
 		this.getKillsDeathsTracker().clear();
 		if (!detectScoreCap()) {
@@ -1297,70 +1294,61 @@ public class Warzone {
 	}
 
 	// Flags
-	public void addFlagThief(Team lostFlagTeam, String flagThief) {
-		this.flagThieves.put(flagThief, lostFlagTeam);
-		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(Bukkit.getPlayerExact(flagThief), WarPlayerThiefEvent.StolenObject.FLAG);
+	public void addFlagThief(Team lostFlagTeam, Player flagThief) {
+		this.flagThieves.put(flagThief.getUniqueId(), lostFlagTeam);
+		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(flagThief, WarPlayerThiefEvent.StolenObject.FLAG);
 		War.war.getServer().getPluginManager().callEvent(event1);
 	}
 
-	public boolean isFlagThief(String suspect) {
-		if (this.flagThieves.containsKey(suspect)) {
-			return true;
-		}
-		return false;
+	public boolean isFlagThief(Player suspect) {
+		return this.flagThieves.containsKey(suspect.getUniqueId());
 	}
 
-	public Team getVictimTeamForFlagThief(String thief) {
-		return this.flagThieves.get(thief);
+	public Team getVictimTeamForFlagThief(Player thief) {
+		return this.flagThieves.get(thief.getUniqueId());
 	}
 
-	public void removeFlagThief(String thief) {
-		this.flagThieves.remove(thief);
+	public void removeFlagThief(Player thief) {
+		this.flagThieves.remove(thief.getUniqueId());
 	}
 
 	// Bomb
-	public void addBombThief(Bomb bomb, String bombThief) {
-		this.bombThieves.put(bombThief, bomb);
-		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(Bukkit.getPlayerExact(bombThief), WarPlayerThiefEvent.StolenObject.BOMB);
+	public void addBombThief(Bomb bomb, Player bombThief) {
+		this.bombThieves.put(bombThief.getUniqueId(), bomb);
+		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(bombThief, WarPlayerThiefEvent.StolenObject.BOMB);
 		War.war.getServer().getPluginManager().callEvent(event1);
 	}
 
-	public boolean isBombThief(String suspect) {
-		if (this.bombThieves.containsKey(suspect)) {
-			return true;
-		}
-		return false;
+	public boolean isBombThief(Player suspect) {
+		return this.bombThieves.containsKey(suspect.getUniqueId());
 	}
 
-	public Bomb getBombForThief(String thief) {
-		return this.bombThieves.get(thief);
+	public Bomb getBombForThief(Player thief) {
+		return this.bombThieves.get(thief.getUniqueId());
 	}
 
-	public void removeBombThief(String thief) {
-		this.bombThieves.remove(thief);
+	public void removeBombThief(Player thief) {
+		this.bombThieves.remove(thief.getUniqueId());
 	}
 	
 	// Cake
 	
-	public void addCakeThief(Cake cake, String cakeThief) {
-		this.cakeThieves.put(cakeThief, cake);
-		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(Bukkit.getPlayerExact(cakeThief), WarPlayerThiefEvent.StolenObject.CAKE);
+	public void addCakeThief(Cake cake, Player cakeThief) {
+		this.cakeThieves.put(cakeThief.getUniqueId(), cake);
+		WarPlayerThiefEvent event1 = new WarPlayerThiefEvent(cakeThief, WarPlayerThiefEvent.StolenObject.CAKE);
 		War.war.getServer().getPluginManager().callEvent(event1);
 	}
 
-	public boolean isCakeThief(String suspect) {
-		if (this.cakeThieves.containsKey(suspect)) {
-			return true;
-		}
-		return false;
+	public boolean isCakeThief(Player suspect) {
+		return this.cakeThieves.containsKey(suspect.getUniqueId());
 	}
 
-	public Cake getCakeForThief(String thief) {
-		return this.cakeThieves.get(thief);
+	public Cake getCakeForThief(Player thief) {
+		return this.cakeThieves.get(thief.getUniqueId());
 	}
 
-	public void removeCakeThief(String thief) {
-		this.cakeThieves.remove(thief);
+	public void removeCakeThief(Player thief) {
+		this.cakeThieves.remove(thief.getUniqueId());
 	}
 
 	public void clearThieves() {
@@ -1370,7 +1358,7 @@ public class Warzone {
 	}
 
 	public boolean isTeamFlagStolen(Team team) {
-		for (String playerKey : this.flagThieves.keySet()) {
+		for (UUID playerKey : this.flagThieves.keySet()) {
 			if (this.flagThieves.get(playerKey).getName().equals(team.getName())) {
 				return true;
 			}
@@ -1860,10 +1848,10 @@ public class Warzone {
 	}
 
 	public void dropAllStolenObjects(Player player, boolean quiet) {
-		if (this.isFlagThief(player.getName())) {
-			Team victimTeam = this.getVictimTeamForFlagThief(player.getName());
+		if (this.isFlagThief(player)) {
+			Team victimTeam = this.getVictimTeamForFlagThief(player);
 
-			this.removeFlagThief(player.getName());
+			this.removeFlagThief(player);
 
 			// Bring back flag of victim team
 			victimTeam.getFlagVolume().resetBlocks();
@@ -1872,10 +1860,10 @@ public class Warzone {
 			if (!quiet) {
 				this.broadcast("drop.flag.broadcast", player.getName(), victimTeam.getKind().getColor() + victimTeam.getName() + ChatColor.WHITE);
 			}
-		} else if (this.isCakeThief(player.getName())) {
-			Cake cake = this.getCakeForThief(player.getName());
+		} else if (this.isCakeThief(player)) {
+			Cake cake = this.getCakeForThief(player);
 
-			this.removeCakeThief(player.getName());
+			this.removeCakeThief(player);
 
 			// Bring back cake
 			cake.getVolume().resetBlocks();
@@ -1884,10 +1872,10 @@ public class Warzone {
 			if (!quiet) {
 				this.broadcast("drop.cake.broadcast", player.getName(), ChatColor.GREEN + cake.getName() + ChatColor.WHITE);
 			}
-		} else if (this.isBombThief(player.getName())) {
-			Bomb bomb = this.getBombForThief(player.getName());
+		} else if (this.isBombThief(player)) {
+			Bomb bomb = this.getBombForThief(player);
 
-			this.removeBombThief(player.getName());
+			this.removeBombThief(player);
 
 			// Bring back bomb
 			bomb.getVolume().resetBlocks();
@@ -1961,7 +1949,7 @@ public class Warzone {
 	 * @param suspect Player to check.
 	 * @return true if suspect has stolen a structure.
 	 */
-	public boolean isThief(String suspect) {
+	public boolean isThief(Player suspect) {
 		return this.isFlagThief(suspect) || this.isBombThief(suspect) || this.isCakeThief(suspect);
 	}
 }

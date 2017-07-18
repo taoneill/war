@@ -14,12 +14,8 @@ import java.util.logging.Level;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Note;
+import org.bukkit.*;
 import org.bukkit.Note.Tone;
-import org.bukkit.SkullType;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -185,7 +181,8 @@ public class ZoneVolumeMapper {
 				if (modify instanceof Skull) {
 					String[] opts = query.getString("metadata").split("\n");
 					if (!opts[0].isEmpty()) {
-						((Skull) modify).setOwner(opts[0]);
+						// TODO upgrade to store owning players by UUID
+						((Skull) modify).setOwningPlayer(Bukkit.getOfflinePlayer(opts[0]));
 					}
 					((Skull) modify).setSkullType(SkullType.valueOf(opts[1]));
 					((Skull) modify).setRotation(BlockFace.valueOf(opts[2]));
@@ -248,7 +245,7 @@ public class ZoneVolumeMapper {
 			dataStmt.setInt(2, relLoc.getBlockY());
 			dataStmt.setInt(3, relLoc.getBlockZ());
 			dataStmt.setString(4, block.getType().toString());
-			dataStmt.setShort(5, block.getData().toItemStack().getDurability());
+			dataStmt.setShort(5, block.getData().toItemStack(1).getDurability());
 			dataStmt.addBatch();
 			if (++changed % batchSize == 0) {
 				dataStmt.executeBatch();
@@ -356,7 +353,7 @@ public class ZoneVolumeMapper {
 					dataStmt.setInt(2, block.getY() - volume.getCornerOne().getBlockY());
 					dataStmt.setInt(3, block.getZ() - volume.getCornerOne().getBlockZ());
 					dataStmt.setString(4, block.getType().name());
-					dataStmt.setShort(5, state.getData().toItemStack().getDurability());
+					dataStmt.setShort(5, state.getData().toItemStack(1).getDurability());
 					if (state instanceof Sign) {
 						final String signText = StringUtils.join(((Sign) block.getState()).getLines(), "\n");
 						dataStmt.setString(6, signText);
@@ -372,8 +369,9 @@ public class ZoneVolumeMapper {
 					} else if (state instanceof Jukebox) {
 						dataStmt.setString(6, ((Jukebox) block.getState()).getPlaying().toString());
 					} else if (state instanceof Skull) {
+						// TODO upgrade to store owning player by UUID
 						dataStmt.setString(6, String.format("%s\n%s\n%s",
-								((Skull) block.getState()).hasOwner() ? ((Skull) block.getState()).getOwner() : "",
+								((Skull) block.getState()).hasOwner() ? ((Skull) block.getState()).getOwningPlayer().getName() : "",
 								((Skull) block.getState()).getSkullType().toString(),
 								((Skull) block.getState()).getRotation().toString()));
 					} else if (state instanceof CommandBlock) {

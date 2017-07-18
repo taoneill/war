@@ -130,9 +130,9 @@ public class WarEntityListener implements Listener {
 					} else {
 						defenderWarzone.handleKill(a, d, event.getDamager());
 					}
-				} else if (defenderWarzone.isBombThief(d.getName()) && d.getLocation().distance(a.getLocation()) < 2) {
+				} else if (defenderWarzone.isBombThief(d) && d.getLocation().distance(a.getLocation()) < 2) {
 					// Close combat, close enough to detonate
-					Bomb bomb = defenderWarzone.getBombForThief(d.getName());
+					Bomb bomb = defenderWarzone.getBombForThief(d);
 
 					// Kill the bomber
 					WarPlayerDeathEvent event1 = new WarPlayerDeathEvent(defenderWarzone, d, null, event.getCause());

@@ -102,7 +102,7 @@ public class ZoneVolume extends Volume {
 	public void resetBlocksAsJob() {
 		try {
 			PartialZoneResetJob job = new PartialZoneResetJob(zone, War.war.getWarConfig().getInt(WarConfig.RESETSPEED));
-			War.war.getServer().getScheduler().runTask(War.war, job);
+			job.runTask(War.war);
 		} catch (SQLException e) {
 			War.war.getLogger().log(Level.WARNING, "Failed to reset warzone - cannot get count of saved blocks", e);
 		}

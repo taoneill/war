@@ -20,9 +20,6 @@ import com.tommytony.war.config.WarzoneConfig;
  */
 public class HelmetProtectionTask implements Runnable {
 
-	/**
-	 * @see Runnable.run()
-	 */
 	public void run() {
 		if (!War.war.isLoaded()) {
 			return;
@@ -66,15 +63,21 @@ public class HelmetProtectionTask implements Runnable {
 					}
 					
 					// check for thieves without their treasure in their hands
-					if (zone.isFlagThief(player.getName())) {
-						Team victim = zone.getVictimTeamForFlagThief(player.getName());
-						player.setItemInHand(null);
+					if (zone.isFlagThief(player)) {
+						Team victim = zone.getVictimTeamForFlagThief(player);
+						player.getInventory().setItemInMainHand(null);
+						player.getInventory().setItemInOffHand(null);
+						player.getInventory().setHeldItemSlot(0);
 						player.getInventory().addItem(victim.getKind().getBlockData().toItemStack(2240));
-					} else if (zone.isBombThief(player.getName())) {
-						player.setItemInHand(null);
+					} else if (zone.isBombThief(player)) {
+						player.getInventory().setItemInMainHand(null);
+						player.getInventory().setItemInOffHand(null);
+						player.getInventory().setHeldItemSlot(0);
 						player.getInventory().addItem(new ItemStack(Material.TNT, 2240));
-					} else if (zone.isCakeThief(player.getName())) {
-						player.setItemInHand(null);
+					} else if (zone.isCakeThief(player)) {
+						player.getInventory().setItemInMainHand(null);
+						player.getInventory().setItemInOffHand(null);
+						player.getInventory().setHeldItemSlot(0);
 						player.getInventory().addItem(new ItemStack(Material.CAKE_BLOCK, 2240));
 					}
 				}

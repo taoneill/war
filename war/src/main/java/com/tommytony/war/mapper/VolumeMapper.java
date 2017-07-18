@@ -214,7 +214,7 @@ public class VolumeMapper {
 			dataStmt.setInt(2, relLoc.getBlockY());
 			dataStmt.setInt(3, relLoc.getBlockZ());
 			dataStmt.setString(4, block.getType().toString());
-			dataStmt.setShort(5, block.getData().toItemStack().getDurability());
+			dataStmt.setShort(5, block.getData().toItemStack(1).getDurability());
 			dataStmt.addBatch();
 			if (++changed % batchSize == 0) {
 				dataStmt.executeBatch();
