@@ -237,7 +237,7 @@ public class WarPlayerListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
-			if (event.getItem().getType() == Material.WOOD_SWORD && War.war.isWandBearer(player)) {
+			if (event.getItem() != null && event.getItem().getType() == Material.WOOD_SWORD && War.war.isWandBearer(player)) {
 				String zoneName = War.war.getWandBearerZone(player);
 				ZoneSetter setter = new ZoneSetter(player, zoneName);
 				if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_AIR) {
