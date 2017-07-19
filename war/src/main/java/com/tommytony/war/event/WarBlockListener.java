@@ -1,5 +1,8 @@
 package com.tommytony.war.event;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -466,10 +469,15 @@ public class WarBlockListener implements Listener {
 	public void onStructureGrowth(final StructureGrowEvent event) {
 		Warzone zone = Warzone.getZoneByLocation(event.getLocation());
 		if (zone != null) {
+			List<BlockState> canceledBlocks = new ArrayList<BlockState>();
 			for (BlockState state : event.getBlocks()) {
-				if (!zone.getVolume().contains(state.getLocation())) {
-					state.setType(Material.AIR);
+				if (!zone.getVolume().contains(state.getLocation())
+					|| zone.isImportantBlock(state.getBlock())) {
+					canceledBlocks.add(state);
 				}
+			}
+			for (BlockState state : canceledBlocks) {
+				event.getBlocks().remove(state);
 			}
 		}
 	}
