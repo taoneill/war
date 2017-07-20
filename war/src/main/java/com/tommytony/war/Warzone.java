@@ -39,6 +39,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -118,6 +119,7 @@ public class Warzone {
 	private HashMap<String, Integer> killCount = new HashMap<String, Integer>();
 	private final List<Player> respawn = new ArrayList<Player>();
 	private final List<String> reallyDeadFighters = new ArrayList<String>();
+	private HashMap<Player, PermissionAttachment> attachments = new HashMap<Player, PermissionAttachment>();
 
 	private List<LogKillsDeathsJob.KillsDeathsRecord> killsDeathsTracker = new ArrayList<KillsDeathsRecord>();
 	
@@ -991,6 +993,10 @@ public class Warzone {
 		if (player.getWorld() != this.getWorld()) {
 			player.teleport(this.getWorld().getSpawnLocation());
 		}
+		PermissionAttachment attachment = player.addAttachment(War.war);
+		this.attachments.put(player, attachment);
+		attachment.setPermission("war.playing", true);
+		attachment.setPermission("war.playing." + this.getName().toLowerCase(), true);
 		team.addPlayer(player);
 		team.resetSign();
 		if (this.hasPlayerState(player.getName())) {
@@ -1213,6 +1219,7 @@ public class Warzone {
 			playerTeam.removePlayer(player);
 			this.broadcast("leave.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE);
 			playerTeam.resetSign();
+			player.removeAttachment(this.attachments.remove(player));
 			if (this.getPlayerCount() == 0 && this.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONEMPTY)) {
 				// reset the zone for a new game when the last player leaves
 				for (Team team : this.getTeams()) {
