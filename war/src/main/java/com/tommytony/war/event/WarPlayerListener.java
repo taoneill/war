@@ -288,6 +288,14 @@ public class WarPlayerListener implements Listener {
 				event.setCancelled(true);
 				War.war.badMsg(player, "drop.flag.disabled");
 			}
+			if (zone == null && event.getAction() == Action.RIGHT_CLICK_BLOCK
+					&& (event.getClickedBlock().getType() == Material.CHEST || event.getClickedBlock().getType() == Material.TRAPPED_CHEST)
+					&& Warzone.getZoneByLocation(event.getClickedBlock().getLocation()) != null
+					&& !War.war.isZoneMaker(event.getPlayer())) {
+				// prevent opening chests inside a warzone if a player is not a zone maker
+				event.setCancelled(true);
+				player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 0);
+			}
 		}
 		     
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK
