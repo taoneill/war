@@ -19,17 +19,8 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
-import org.bukkit.event.entity.ExplosionPrimeEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.inventory.ItemStack;
@@ -535,6 +526,20 @@ public class WarEntityListener implements Listener {
 			|| (team != null && !team.getTeamConfig().resolveBoolean(TeamConfig.PLACEBLOCK)))) {
 			event.setCancelled(true);
 			War.war.badMsg(player, "build.denied.zone.place");
+		}
+	}
+
+	@EventHandler
+	public void onEntityTeleport(final EntityTeleportEvent event) {
+		if (!War.war.isLoaded()) {
+			return;
+		}
+		if (event.getEntityType() == EntityType.WOLF) {
+			if (Warzone.getZoneByLocation(event.getTo()) != null) {
+				// prevent wolves from teleporting to players in zones
+				event.setCancelled(true);
+				event.setTo(event.getFrom());
+			}
 		}
 	}
 }
