@@ -535,28 +535,41 @@ public class Warzone {
 		}
 	}
 
-	public void resetInventory(Team team, Player player, Map<Integer, ItemStack> loadout) {
+	private void resetInventory(Team team, Player player, Map<Integer, ItemStack> loadout) {
 		// Reset inventory to loadout
 		PlayerInventory playerInv = player.getInventory();
 		playerInv.clear();
-		playerInv.clear(playerInv.getSize() + 0);
+		playerInv.clear(playerInv.getSize());
 		playerInv.clear(playerInv.getSize() + 1);
 		playerInv.clear(playerInv.getSize() + 2);
 		playerInv.clear(playerInv.getSize() + 3); // helmet/blockHead
+
+		Loadout banned = Loadout.getLoadout(team.getInventories().resolveNewLoadouts(), "banned");
+		Set<Material> bannedMaterials = new HashSet<Material>();
+		if (banned != null) {
+			for (ItemStack bannedItem : banned.getContents().values()) {
+				bannedMaterials.add(bannedItem.getType());
+			}
+		}
+
 		for (Integer slot : loadout.keySet()) {
+			ItemStack item = loadout.get(slot);
+			if (item == null || item.getType() == Material.AIR) {
+				continue;
+			}
+			if (bannedMaterials.contains(item.getType())) {
+				continue;
+			}
 			if (slot == 100) {
-				playerInv.setBoots(loadout.get(slot).clone());
+				playerInv.setBoots(item.clone());
 			} else if (slot == 101) {
-				playerInv.setLeggings(loadout.get(slot).clone());
+				playerInv.setLeggings(item.clone());
 			} else if (slot == 102) {
-				playerInv.setChestplate(loadout.get(slot).clone());
+				playerInv.setChestplate(item.clone());
 			} else if (slot == 103) {
-				playerInv.setHelmet(loadout.get(slot).clone());
+				playerInv.setHelmet(item.clone());
 			} else {
-				ItemStack item = loadout.get(slot);
-				if (item != null) {
-					playerInv.addItem(item.clone());
-				}
+				playerInv.addItem(item.clone());
 			}
 		}
 		if (this.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
@@ -1531,9 +1544,14 @@ public class Warzone {
 			List<Loadout> loadouts = playerTeam.getInventories().resolveNewLoadouts();
 			List<String> sortedNames = LoadoutYmlMapper.sortNames(Loadout.toLegacyFormat(loadouts));
 			sortedNames.remove("first");
+			sortedNames.remove("banned");
 			for (Iterator<String> it = sortedNames.iterator(); it.hasNext();) {
 				String loadoutName = it.next();
 				Loadout ldt = Loadout.getLoadout(loadouts, loadoutName);
+				if (ldt == null) {
+					War.war.getLogger().warning("Failed to resolve loadout " + loadoutName);
+					it.remove();
+				}
 				if (ldt.requiresPermission() && !player.hasPermission(ldt.getPermission())) {
 					it.remove();
 				}
@@ -1555,9 +1573,9 @@ public class Warzone {
 						// Use player's own inventory as loadout
 						this.resetInventory(playerTeam, player, this.getPlayerInventoryFromSavedState(player));
 					} else if (isFirstRespawn && firstLoadout != null && name.equals("default")
-							&& (firstLoadout.requiresPermission() ? player.hasPermission(firstLoadout.getPermission()) : true)) {
+							&& (!firstLoadout.requiresPermission() || player.hasPermission(firstLoadout.getPermission()))) {
 						// Get the loadout for the first spawn
-						this.resetInventory(playerTeam, player, Loadout.getLoadout(loadouts, "first").getContents());
+						this.resetInventory(playerTeam, player, firstLoadout.getContents());
 					} else {
 						// Use the loadout from the list in the settings
 						this.resetInventory(playerTeam, player, Loadout.getLoadout(loadouts, name).getContents());
