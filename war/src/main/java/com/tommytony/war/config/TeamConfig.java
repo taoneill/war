@@ -20,7 +20,8 @@ public enum TeamConfig {
 	PLACEBLOCK (Boolean.class),
 	APPLYPOTION(String.class),
 	ECOREWARD(Double.class),
-	INVENTORYDROP(Boolean.class);
+	INVENTORYDROP(Boolean.class),
+	BORDERDROP(Boolean.class);
 	
 	private final Class<?> configType;
 

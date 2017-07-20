@@ -139,7 +139,8 @@ public class WarPlayerListener implements Listener {
 							return;
 						}
 
-						if (zone.isNearWall(player.getLocation()) && itemStack != null) {
+						if (zone.isNearWall(player.getLocation()) && itemStack != null
+								&& !team.getTeamConfig().resolveBoolean(TeamConfig.BORDERDROP)) {
 							War.war.badMsg(player, "drop.item.border");
 							event.setCancelled(true);
 							return;
