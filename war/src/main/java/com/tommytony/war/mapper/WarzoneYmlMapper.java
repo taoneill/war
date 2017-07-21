@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.tommytony.war.structure.*;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -22,10 +23,6 @@ import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamKind;
-import com.tommytony.war.structure.Bomb;
-import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.Monument;
-import com.tommytony.war.structure.ZoneLobby;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
 import com.tommytony.war.volume.ZoneVolume;
@@ -145,7 +142,33 @@ public class WarzoneYmlMapper {
 					}
 				}
 			}
-			
+
+			// capture points
+			if (warzoneRootSection.contains(zoneInfoPrefix + "capturepoint")) {
+				List<String> cpNames = warzoneRootSection.getStringList(zoneInfoPrefix + "capturepoint.names");
+				for (String cpName : cpNames) {
+					if (cpName != null && !cpName.equals("")) {
+						String cpPrefix = zoneInfoPrefix + "capturepoint." + cpName + ".";
+						if (!warzoneRootSection.contains(cpPrefix + "x")) {
+							// try lowercase instead
+							cpPrefix = zoneInfoPrefix + "capturepoint." + cpName.toLowerCase() + ".";
+						}
+						int cpX = warzoneRootSection.getInt(cpPrefix + "x");
+						int cpY = warzoneRootSection.getInt(cpPrefix + "y");
+						int cpZ = warzoneRootSection.getInt(cpPrefix + "z");
+						float cpYaw = (float) warzoneRootSection.getDouble(cpPrefix + "yaw");
+						TeamKind controller = null;
+						int strength = 0;
+						if (warzoneRootSection.contains(cpPrefix + "controller")) {
+							controller = TeamKind.teamKindFromString(warzoneRootSection.getString(cpPrefix + "controller"));
+							strength = 4;
+						}
+						CapturePoint cp = new CapturePoint(cpName, new Location(world, cpX, cpY, cpZ, cpYaw, 0), controller, strength, warzone);
+						warzone.getCapturePoints().add(cp);
+					}
+				}
+			}
+
 			// bombs
 			if (warzoneRootSection.contains(zoneInfoPrefix + "bomb")) {
 				List<String> bombNames = warzoneRootSection.getStringList(zoneInfoPrefix + "bomb.names");
@@ -295,7 +318,16 @@ public class WarzoneYmlMapper {
 					War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 				}
 			}
-			
+
+			// capture point blocks
+			for (CapturePoint cp : warzone.getCapturePoints()) {
+				try {
+					cp.setVolume(warzone.loadStructure("cp-" + cp.getName(), connection));
+				} catch (SQLException e) {
+					War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
+				}
+			}
+
 			// bomb blocks
 			for (Bomb bomb : warzone.getBombs()) {
 				try {
@@ -546,19 +578,42 @@ public class WarzoneYmlMapper {
 				monumentSection.set("yaw", toIntYaw(monument.getLocation().getYaw()));
 			}
 		}
-		
+
+		// capture points
+		if (warzone.getCapturePoints().size() > 0) {
+			ConfigurationSection cpsSection = warzoneInfoSection.createSection("capturepoint");
+
+			List<String> cpNames = new ArrayList<String>();
+			for (CapturePoint cp : warzone.getCapturePoints()) {
+				cpNames.add(cp.getName());
+			}
+			cpsSection.set("names", cpNames);
+
+			for (CapturePoint cp : warzone.getCapturePoints()) {
+
+				ConfigurationSection cpSection = cpsSection.createSection(cp.getName());
+				cpSection.set("x", cp.getLocation().getBlockX());
+				cpSection.set("y", cp.getLocation().getBlockY());
+				cpSection.set("z", cp.getLocation().getBlockZ());
+				cpSection.set("yaw", cp.getLocation().getYaw());
+				if (cp.getDefaultController() != null) {
+					cpSection.set("controller", cp.getDefaultController().name());
+				}
+			}
+		}
+
 		// bombs
 		if (warzone.getBombs().size() > 0) {
 			ConfigurationSection bombsSection = warzoneInfoSection.createSection("bomb");
-			
+
 			List<String> bombNames = new ArrayList<String>();
 			for (Bomb bomb : warzone.getBombs()) {
 				bombNames.add(bomb.getName());
 			}
 			bombsSection.set("names", bombNames);
-			
+
 			for (Bomb bomb : warzone.getBombs()) {
-				
+
 				ConfigurationSection bombSection = bombsSection.createSection(bomb.getName());
 				bombSection.set("x", bomb.getLocation().getBlockX());
 				bombSection.set("y", bomb.getLocation().getBlockY());
@@ -566,7 +621,7 @@ public class WarzoneYmlMapper {
 				bombSection.set("yaw", toIntYaw(bomb.getLocation().getYaw()));
 			}
 		}
-		
+
 		// cakes
 		if (warzone.getCakes().size() > 0) {
 			ConfigurationSection cakesSection = warzoneInfoSection.createSection("cake");
@@ -673,7 +728,16 @@ public class WarzoneYmlMapper {
 				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
 			}
 		}
-		
+
+		// capture point blocks
+		for (CapturePoint cp : warzone.getCapturePoints()) {
+			try {
+				ZoneVolumeMapper.saveStructure(cp.getVolume(), connection);
+			} catch (SQLException e) {
+				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
+			}
+		}
+
 		// bomb blocks
 		for (Bomb bomb : warzone.getBombs()) {
 			try {

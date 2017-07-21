@@ -8,6 +8,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 
+import com.tommytony.war.job.CapturePointTimer;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.ChatColor;
@@ -286,6 +287,9 @@ public class War extends JavaPlugin {
 		// Start tasks
 		HelmetProtectionTask helmetProtectionTask = new HelmetProtectionTask();
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, helmetProtectionTask, 250, 100);
+
+		CapturePointTimer cpt = new CapturePointTimer();
+		cpt.runTaskTimer(this, 100, 20);
 		
 		if (this.isSpoutServer) {
 			SpoutFadeOutMessageJob fadeOutMessagesTask = new SpoutFadeOutMessageJob();

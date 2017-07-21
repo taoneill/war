@@ -94,6 +94,10 @@ public class WarCommandHandler {
 				commandObj = new SetMonumentCommand(this, sender, arguments);
 			} else if (command.equals("deletemonument")) {
 				commandObj = new DeleteMonumentCommand(this, sender, arguments);
+			} else if (command.equals("setcapturepoint")) {
+				commandObj = new SetCapturePointCommand(this, sender, arguments);
+			} else if (command.equals("deletecapturepoint")) {
+				commandObj = new DeleteCapturePointCommand(this, sender, arguments);
 			} else if (command.equals("setbomb")) {
 				commandObj = new SetBombCommand(this, sender, arguments);
 			} else if (command.equals("deletebomb")) {

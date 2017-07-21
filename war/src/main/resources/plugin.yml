@@ -129,6 +129,12 @@ commands:
     usage: Creates or moves a monument. Monuments can be capture with wool from your team and give your health. Must be standing in warzone.
         Ex -
         /setmonument <monument-name>
+  setcapturepoint:
+    description: War> Creates or moves a capture point. Capture points build strength and award points.
+    aliases: [setcp]
+    usage: Creates or moves a capture point. Capture points build strength and award points. Must be standing in warzone.
+        Ex -
+        /setcapturepoint <capture point name>
   setteamflag:
     description: War> Creates/moves a team flag post for CTF.
     usage: Creates/moves a team flag post for CTF. Must be standing in warzone.
@@ -174,6 +180,12 @@ commands:
     usage: Deletes the monument. Provide a zone name if not standing in warzone or lobby.
         Ex -
         /deletemonument [zone-name] <monument-name>
+  deletecapturepoint:
+    description: War> Deletes the capture point.
+    aliases: [deletecp]
+    usage: Deletes the capture point. Provide a zone name if not standing in warzone or lobby.
+        Ex -
+        /deletecapturepoint [zone-name] <capture point name>
   deletebomb:
     description: War> Deletes the bomb.
     usage: Deletes the bomb. Provide a zone name if not standing in warzone or lobby.

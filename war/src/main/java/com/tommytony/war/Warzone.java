@@ -8,6 +8,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Level;
 
+import com.tommytony.war.structure.*;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 import org.apache.commons.lang.StringUtils;
@@ -67,13 +68,6 @@ import com.tommytony.war.mapper.LoadoutYmlMapper;
 import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
-import com.tommytony.war.structure.Bomb;
-import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.HubLobbyMaterials;
-import com.tommytony.war.structure.Monument;
-import com.tommytony.war.structure.WarzoneMaterials;
-import com.tommytony.war.structure.ZoneLobby;
-import com.tommytony.war.structure.ZoneWallGuard;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.utility.Loadout;
 import com.tommytony.war.utility.LoadoutSelection;
@@ -88,6 +82,8 @@ import com.tommytony.war.volume.ZoneVolume;
  * @package com.tommytony.war
  */
 public class Warzone {
+
+
 	public enum LeaveCause {
 		COMMAND, DISCONNECT, SCORECAP, RESET;
 		public boolean useRallyPoint() {
@@ -100,6 +96,7 @@ public class Warzone {
 	private World world;
 	private final List<Team> teams = new ArrayList<Team>();
 	private final List<Monument> monuments = new ArrayList<Monument>();
+	private final List<CapturePoint> capturePoints = new ArrayList<CapturePoint>();
 	private final List<Bomb> bombs = new ArrayList<Bomb>();
 	private final List<Cake> cakes = new ArrayList<Cake>();
 	private Location teleport;
@@ -276,6 +273,18 @@ public class Warzone {
 					monument.getVolume().resetBlocks();
 				}
 
+				for (CapturePoint cp : this.capturePoints) {
+					cp.getVolume().resetBlocks();
+				}
+
+				for (Bomb bomb : this.bombs) {
+					bomb.getVolume().resetBlocks();
+				}
+
+				for (Cake cake : this.cakes) {
+					cake.getVolume().resetBlocks();
+				}
+
 				if (this.lobby != null) {
 					this.lobby.getVolume().resetBlocks();
 				}
@@ -361,6 +370,12 @@ public class Warzone {
 		for (Monument monument : this.monuments) {
 			monument.getVolume().resetBlocks();
 			monument.addMonumentBlocks();
+		}
+
+		// reset capture points
+		for (CapturePoint cp : this.capturePoints) {
+			cp.getVolume().resetBlocks();
+			cp.reset();
 		}
 		
 		// reset bombs
@@ -723,6 +738,19 @@ public class Warzone {
 		}
 		return null;
 	}
+
+	public boolean hasCapturePoint(String capturePointName) {
+		return this.getCapturePoint(capturePointName) != null;
+	}
+
+	public CapturePoint getCapturePoint(String capturePointName) {
+		for (CapturePoint cp : this.capturePoints) {
+			if (cp.getName().startsWith(capturePointName)) {
+				return cp;
+			}
+		}
+		return null;
+	}
 	
 	public boolean hasBomb(String bombName) {
 		for (Bomb bomb : this.bombs) {
@@ -767,6 +795,11 @@ public class Warzone {
 		if (this.ready()) {
 			for (Monument m : this.monuments) {
 				if (m.getVolume().contains(block)) {
+					return true;
+				}
+			}
+			for (CapturePoint cp : this.capturePoints) {
+				if (cp.getVolume().contains(block)) {
 					return true;
 				}
 			}
@@ -1641,6 +1674,10 @@ public class Warzone {
 
 	public List<Cake> getCakes() {
 		return cakes;
+	}
+
+	public List<CapturePoint> getCapturePoints() {
+		return capturePoints;
 	}
 
 	public List<String> getReallyDeadFighters() {
