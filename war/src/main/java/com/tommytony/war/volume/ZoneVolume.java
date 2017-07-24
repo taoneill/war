@@ -86,6 +86,17 @@ public class ZoneVolume extends Volume {
 	}
 
 	/**
+	 * Reload all saved entities in the warzone. Consists of paintings, item frames, etc.
+	 *
+	 * @param connection Open connection to warzone database file.
+	 * @return Changed entity count.
+	 * @throws SQLException SQLite error
+	 */
+	public int resetEntities(Connection connection) throws SQLException {
+		return ZoneVolumeMapper.loadEntities(connection, this);
+	}
+
+	/**
 	 * Get total saved blocks for this warzone. This should only be called on nimitz-format warzones.
 	 * @return Total saved blocks
 	 * @throws SQLException

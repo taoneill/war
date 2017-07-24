@@ -88,6 +88,7 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 				}
 				totalChanges += airChanges;
 				if (this.doneAir()) {
+					volume.resetEntities(conn);
 					String secondsAsText = formatter.format(((double)(System.currentTimeMillis() - startTime)) / 1000);
 					String message = MessageFormat.format(
 							War.war.getString("zone.battle.resetcomplete"), secondsAsText);

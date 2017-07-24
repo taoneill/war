@@ -26,7 +26,7 @@ import org.bukkit.block.NoteBlock;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
@@ -42,7 +42,8 @@ import com.tommytony.war.volume.ZoneVolume;
  */
 public class ZoneVolumeMapper {
 
-	public static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 2;
+	private static final String delim = "-------mcwar iSdgraIyMvOanTEJjZgocczfuG------";
 
 	/**
 	 * Get a connection to the warzone database, converting blocks if not found.
@@ -211,6 +212,145 @@ public class ZoneVolumeMapper {
 		return changed;
 	}
 
+	/**
+	 * Load saved entities.
+	 *
+	 * @param connection Open connection to warzone DB file.
+	 * @param volume Volume for warzone.
+	 * @return number affected
+	 * @throws SQLException SQLite error
+	 */
+	public static int loadEntities(Connection connection, ZoneVolume volume) throws SQLException {
+		Validate.isTrue(!connection.isClosed());
+		// first, clear entities from the area
+		for (Entity e : volume.getWorld().getEntitiesByClass(Hanging.class)) {
+			if (volume.contains(e.getLocation())) {
+				e.remove();
+			}
+		}
+		int changed = 0;
+		Statement stmt = connection.createStatement();
+		ResultSet cornerQuery = stmt.executeQuery("SELECT * FROM corners");
+		cornerQuery.next();
+		final Block corner1 = volume.getWorld().getBlockAt(cornerQuery.getInt("x"), cornerQuery.getInt("y"), cornerQuery.getInt("z"));
+		cornerQuery.close();
+		Location test = new Location(volume.getWorld(), 0, 253, 0); // admins pls don't build stuff here kthx
+		// TODO move this to a migration step
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS entities (x NUMERIC, y NUMERIC, z NUMERIC, type SMALLINT, facing TEXT, metadata TEXT)");
+		ResultSet query = stmt.executeQuery("SELECT * FROM entities ORDER BY rowid");
+		while (query.next()) {
+			double x = query.getDouble("x"), y = query.getDouble("y"), z = query.getDouble("z");
+			changed++;
+			// translate from relative DB location to absolute
+			Location absolute = corner1.getLocation().clone().add(x, y, z);
+			int type = query.getInt("type");
+			String facing = query.getString("facing");
+			String metadata = query.getString("metadata");
+			BlockFace face = BlockFace.valueOf(facing);
+
+			// Spawn the paintings in the sky somewhere, works because I can only get them to spawn north/south
+			test.getBlock().setType(Material.AIR);
+			test.add(2, 0, 0).getBlock().setType(Material.STONE);
+
+			try {
+				if (type == 1) {
+					Painting p = (Painting) volume.getWorld().spawnEntity(test.clone().add(0, 0, 1), EntityType.PAINTING);
+					Art art = Art.valueOf(metadata);
+					p.teleport(calculatePainting(art, face, absolute));
+					p.setFacingDirection(face, true);
+					p.setArt(art, true);
+				} else if (type == 2) {
+					ItemFrame itemFrame = (ItemFrame) volume.getWorld().spawnEntity(test.clone().add(0, 0, 1), EntityType.ITEM_FRAME);
+					itemFrame.teleport(absolute);
+					itemFrame.setFacingDirection(face, true);
+					String[] args = metadata.split(delim);
+					itemFrame.setRotation(Rotation.valueOf(args[0]));
+					YamlConfiguration config = new YamlConfiguration();
+					config.loadFromString(args[1]);
+					itemFrame.setItem(config.getItemStack("item"));
+				}
+			} catch (Exception ex) {
+				War.war.getLogger().log(Level.WARNING, "Exception loading entity. x:" + x + " y:" + y + " z:" + z + " type:" + type, ex);
+			}
+		}
+		test.getBlock().setType(Material.AIR);
+		query.close();
+		stmt.close();
+		return changed;
+	}
+
+	/**
+	 * Finds the correct location to place a painting based on its characteristics.
+	 * Credit goes to whatever forum I got this from.
+	 *
+	 * @param art Painting type
+	 * @param facing Block face
+	 * @param loc Desired location
+	 * @return Corrected location
+	 */
+	private static Location calculatePainting(Art art, BlockFace facing, Location loc) {
+		switch(art) {
+
+			// 1x1
+			case ALBAN:
+			case AZTEC:
+			case AZTEC2:
+			case BOMB:
+			case KEBAB:
+			case PLANT:
+			case WASTELAND:
+				return loc; // No calculation needed.
+
+			// 1x2
+			case GRAHAM:
+			case WANDERER:
+				return loc.getBlock().getLocation().add(0, -1, 0);
+
+			// 2x1
+			case CREEBET:
+			case COURBET:
+			case POOL:
+			case SEA:
+			case SUNSET:    // Use same as 4x3
+
+				// 4x3
+			case DONKEYKONG:
+			case SKELETON:
+				if(facing == BlockFace.WEST)
+					return loc.getBlock().getLocation().add(0, 0, -1);
+				else if(facing == BlockFace.SOUTH)
+					return loc.getBlock().getLocation().add(-1, 0, 0);
+				else
+					return loc;
+
+				// 2x2
+			case BUST:
+			case MATCH:
+			case SKULL_AND_ROSES:
+			case STAGE:
+			case VOID:
+			case WITHER:    // Use same as 4x2
+
+				// 4x2
+			case FIGHTERS:  // Use same as 4x4
+
+				// 4x4
+			case BURNINGSKULL:
+			case PIGSCENE:
+			case POINTER:
+				if(facing == BlockFace.WEST)
+					return loc.getBlock().getLocation().add(0, -1, -1);
+				else if(facing == BlockFace.SOUTH)
+					return loc.getBlock().getLocation().add(-1, -1, 0);
+				else
+					return loc.add(0, -1, 0);
+
+				// Unsupported artwork
+			default:
+				return loc;
+		}
+	}
+
 	public static int saveStructure(Volume volume, Connection databaseConnection) throws SQLException {
 		Statement stmt = databaseConnection.createStatement();
 		stmt.executeUpdate("PRAGMA user_version = " + DATABASE_VERSION);
@@ -324,9 +464,11 @@ public class ZoneVolumeMapper {
 		Statement stmt = databaseConnection.createStatement();
 		stmt.executeUpdate("PRAGMA user_version = " + DATABASE_VERSION);
 		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS blocks (x BIGINT, y BIGINT, z BIGINT, type TEXT, data SMALLINT, metadata BLOB)");
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS entities (x NUMERIC, y NUMERIC, z NUMERIC, type SMALLINT, facing TEXT, metadata TEXT)");
 		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS corners (pos INTEGER PRIMARY KEY  NOT NULL  UNIQUE, x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL)");
 		stmt.executeUpdate("DELETE FROM blocks");
 		stmt.executeUpdate("DELETE FROM corners");
+		stmt.executeUpdate("DELETE FROM entities");
 		stmt.close();
 		PreparedStatement cornerStmt = databaseConnection.prepareStatement("INSERT INTO corners SELECT 1 AS pos, ? AS x, ? AS y, ? AS z UNION SELECT 2, ?, ?, ?");
 		cornerStmt.setInt(1, volume.getCornerOne().getBlockX());
@@ -337,6 +479,32 @@ public class ZoneVolumeMapper {
 		cornerStmt.setInt(6, volume.getCornerTwo().getBlockZ());
 		cornerStmt.executeUpdate();
 		cornerStmt.close();
+		PreparedStatement entityStmt = databaseConnection.prepareStatement("INSERT INTO entities (x, y, z, type, facing, metadata) VALUES (?, ?, ?, ?, ?, ?)");
+		for (Entity e : volume.getWorld().getEntities()) {
+			if (volume.contains(e.getLocation()) && e instanceof Hanging) {
+				entityStmt.setDouble(1, e.getLocation().getX() - volume.getCornerOne().getBlockX());
+				entityStmt.setDouble(2, e.getLocation().getY() - volume.getCornerOne().getBlockY());
+				entityStmt.setDouble(3, e.getLocation().getZ() - volume.getCornerOne().getBlockZ());
+				entityStmt.setString(5, ((Hanging) e).getFacing().name());
+				if (e instanceof Painting) {
+					Painting p = (Painting) e;
+					entityStmt.setInt(4, 1);
+					entityStmt.setString(6, p.getArt().name());
+				} else if (e instanceof ItemFrame) {
+					ItemFrame itemFrame = (ItemFrame) e;
+					YamlConfiguration config = new YamlConfiguration();
+					config.set("item", itemFrame.getItem());
+					entityStmt.setInt(4, 2);
+					entityStmt.setString(6, itemFrame.getRotation().name() + delim + config.saveToString());
+				} else {
+					entityStmt.setInt(4, 0);
+					entityStmt.setString(6, "");
+				}
+				entityStmt.addBatch();
+			}
+		}
+		entityStmt.executeBatch();
+		entityStmt.close();
 		PreparedStatement dataStmt = databaseConnection.prepareStatement("INSERT INTO blocks (x, y, z, type, data, metadata) VALUES (?, ?, ?, ?, ?, ?)");
 		databaseConnection.setAutoCommit(false);
 		final int batchSize = 10000;
@@ -396,13 +564,14 @@ public class ZoneVolumeMapper {
 		dataStmt.executeBatch(); // insert remaining records
 		databaseConnection.commit();
 		dataStmt.close();
+		databaseConnection.setAutoCommit(true);
 		databaseConnection.close();
 		String seconds = new DecimalFormat("#0.00").format((double) (System.currentTimeMillis() - startTime) / 1000.0D);
 		War.war.getLogger().log(Level.INFO, "Saved warzone {0} in {1} seconds.", new Object[] {zoneName, seconds});
 		return changed;
 	}
 
-	public static Location rebase(final Location base, final Location exact) {
+	static Location rebase(final Location base, final Location exact) {
 		return new Location(base.getWorld(),
 				exact.getBlockX() - base.getBlockX(),
 				exact.getBlockY() - base.getBlockY(),
@@ -411,35 +580,35 @@ public class ZoneVolumeMapper {
 
 	private static void updateFromVersionOneToTwo(String zoneName, Connection connection) throws SQLException {
 		War.war.log("Migrating warzone " + zoneName + " from v1 to v2 of schema...", Level.INFO);
-		
+
 		// We want to do this in a transaction
 		connection.setAutoCommit(false);
-		
+
 		Statement stmt = connection.createStatement();
-		
+
 		// We want to combine all extra columns into a single metadata BLOB one. To delete some columns we need to drop the table so we use a temp one.
 		stmt.executeUpdate("CREATE TEMPORARY TABLE blocks_backup(x BIGINT, y BIGINT, z BIGINT, type TEXT, data SMALLINT, sign TEXT, container BLOB, note INT, record TEXT, skull TEXT, command TEXT, mobid TEXT)");
 		stmt.executeUpdate("INSERT INTO blocks_backup SELECT x, y, z, type, data, sign, container, note, record, skull, command, mobid FROM blocks");
 		stmt.executeUpdate("DROP TABLE blocks");
 		stmt.executeUpdate("CREATE TABLE blocks(x BIGINT, y BIGINT, z BIGINT, type TEXT, data SMALLINT, metadata BLOB)");
 		stmt.executeUpdate("INSERT INTO blocks SELECT x, y, z, type, data, coalesce(container, sign, note, record, skull, command, mobid) FROM blocks_backup");
-		stmt.executeUpdate("DROP TABLE blocks_backup");	
+		stmt.executeUpdate("DROP TABLE blocks_backup");
 		stmt.executeUpdate("PRAGMA user_version = 2");
 		stmt.close();
-		
+
 		// Commit transaction
 		connection.commit();
-		
+
 		connection.setAutoCommit(true);
-		
+
 		War.war.log("Warzone " + zoneName + " converted! Compacting database...", Level.INFO);
-		
+
 		// Pack the database otherwise we won't get any space savings.
 		// This rebuilds the database completely and takes some time.
 		stmt = connection.createStatement();
 		stmt.execute("VACUUM");
 		stmt.close();
-		
+
 		War.war.log("Migration of warzone " + zoneName + " to v2 of schema finished.", Level.INFO);
 	}
 }
