@@ -31,10 +31,15 @@ public class JoinCommand extends AbstractWarCommand {
 
 		Warzone zone;
 		TeamKind kind;
+		boolean signup = false;
 		if (this.args.length == 2) {
 			// zone by name
 			zone = Warzone.getZoneByName(this.args[0]);
 			kind = TeamKind.teamKindFromString(this.args[1]);
+		} else if (this.args.length == 3 && args[0].equals("delayed")) {
+			signup = true;
+			zone = Warzone.getZoneByName(this.args[1]);
+			kind = TeamKind.teamKindFromString(this.args[2]);
 		} else if (this.args.length == 1) {
 			zone = Warzone.getZoneByLocation((Player) this.getSender());
 			if (zone == null) {
@@ -76,6 +81,11 @@ public class JoinCommand extends AbstractWarCommand {
 					}
 					previousTeam.removePlayer(player);
 					previousTeam.resetSign();
+				}
+				if (signup && !zone.testEnoughPlayers(kind, false)) {
+					// player wants to automatically join the zone when everyone else is ready
+					zone.signup(player, team);
+					return true;
 				}
 				zone.assign(player, team);
 			}

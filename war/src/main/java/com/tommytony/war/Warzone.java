@@ -117,6 +117,7 @@ public class Warzone {
 	private final List<Player> respawn = new ArrayList<Player>();
 	private final List<String> reallyDeadFighters = new ArrayList<String>();
 	private HashMap<Player, PermissionAttachment> attachments = new HashMap<Player, PermissionAttachment>();
+	private HashMap<Player, Team> delayedJoinPlayers = new HashMap<Player, Team>();
 
 	private List<LogKillsDeathsJob.KillsDeathsRecord> killsDeathsTracker = new ArrayList<KillsDeathsRecord>();
 	
@@ -1055,6 +1056,7 @@ public class Warzone {
 		War.war.msg(player, "join.inventorystored");
 		this.respawnPlayer(team, player);
 		this.broadcast("join.broadcast", player.getName(), team.getKind().getFormattedName());
+		this.tryCallDelayedPlayers();
 		return true;
 	}
 	
@@ -1543,6 +1545,65 @@ public class Warzone {
 		}
 		return false;
 	}
+
+	/**
+	 * Test whether there would be enough players with the addition of one more player
+	 *
+	 * @param plusOne Team to test
+	 * @return true if there would be enough players
+	 */
+	public boolean testEnoughPlayers(TeamKind plusOne, boolean testDelayedJoin) {
+		int teamsWithEnough = 0;
+		for (Team team : teams) {
+			int addl = 0;
+			if (team.getKind() == plusOne) {
+				addl = 1;
+			}
+			if (testDelayedJoin) {
+				for (Iterator<Map.Entry<Player, Team>> iterator = this.delayedJoinPlayers.entrySet().iterator(); iterator.hasNext(); ) {
+					Map.Entry<Player, Team> e = iterator.next();
+					if (!isDelayedPlayerStillValid(e.getKey())) {
+						iterator.remove();
+						continue;
+					}
+					if (e.getValue() == team) {
+						addl += 1;
+					}
+				}
+			}
+			if (team.getPlayers().size() + addl >= this.getWarzoneConfig().getInt(WarzoneConfig.MINPLAYERS)) {
+				teamsWithEnough++;
+			}
+		}
+		return teamsWithEnough >= this.getWarzoneConfig().getInt(WarzoneConfig.MINTEAMS);
+	}
+
+	public void signup(Player player, Team team) {
+		War.war.msg(player, "You will be automatically sent to warzone when minplayers is reached.");
+		this.delayedJoinPlayers.put(player, team);
+		tryCallDelayedPlayers();
+	}
+
+	// prevent tryCallDelayedPlayers from being recursively called by Warzone#assign
+	private boolean activeDelayedCall = false;
+	private void tryCallDelayedPlayers() {
+		if (activeDelayedCall || (!isEnoughPlayers() && !testEnoughPlayers(null, true))) {
+			return;
+		}
+		activeDelayedCall = true;
+		for (Map.Entry<Player, Team> e : delayedJoinPlayers.entrySet()) {
+			this.assign(e.getKey(), e.getValue());
+		}
+		delayedJoinPlayers.clear();
+		activeDelayedCall = false;
+	}
+
+	private boolean isDelayedPlayerStillValid(Player player) {
+		// Make sure they're online, they can play in this team, and they're not in another game
+		return player.isOnline() && War.war.canPlayWar(player, delayedJoinPlayers.get(player))
+				&& Warzone.getZoneByPlayerName(player.getName()) == null;
+	}
+
 
 	public HashMap<String, LoadoutSelection> getLoadoutSelections() {
 		return loadoutSelections;
