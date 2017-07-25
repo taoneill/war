@@ -42,6 +42,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -514,6 +515,14 @@ public class Warzone {
 					"Failed to apply potion effect {0} in warzone {1}.",
 					new Object[] {potionEffect, name});
 			}
+		}
+
+		int respawnTime = team.getTeamConfig().resolveInt(TeamConfig.RESPAWNTIMER) * 20;
+		if (respawnTime > 0) {
+			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, respawnTime, 255));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, respawnTime, 200));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, respawnTime, 255));
+			player.sendTitle("", ChatColor.RED + "Respawning in " + respawnTime / 20 + " seconds...", 1, respawnTime, 10);
 		}
 		
 		boolean isFirstRespawn = false;
