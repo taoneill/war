@@ -9,6 +9,7 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 
 import com.tommytony.war.job.CapturePointTimer;
+import com.tommytony.war.ui.UIManager;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.ChatColor;
@@ -115,6 +116,7 @@ public class War extends JavaPlugin {
 	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(
 			new ItemStack(Material.GLASS), new ItemStack(Material.WOOD),
 			new ItemStack(Material.OBSIDIAN), new ItemStack(Material.GLOWSTONE));
+	private UIManager UIManager;
 
 	public War() {
 		super();
@@ -159,6 +161,7 @@ public class War extends JavaPlugin {
 			this.getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
+		this.UIManager = new UIManager(this);
 
 		// Register events
 		PluginManager pm = this.getServer().getPluginManager();
@@ -166,6 +169,7 @@ public class War extends JavaPlugin {
 		pm.registerEvents(this.entityListener, this);
 		pm.registerEvents(this.blockListener, this);
 		pm.registerEvents(this.serverListener, this);
+		pm.registerEvents(this.UIManager, this);
 		if (pm.isPluginEnabled("TagAPI")) {
 			try {
 				Class.forName("org.kitteh.tag.TagAPI");
@@ -212,7 +216,6 @@ public class War extends JavaPlugin {
 		warzoneDefaultConfig.put(WarzoneConfig.JOINMIDBATTLE, true);
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOJOIN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.SCOREBOARD, ScoreboardType.NONE);
-		warzoneDefaultConfig.put(WarzoneConfig.XPKILLMETER, false);
 		warzoneDefaultConfig.put(WarzoneConfig.SOUPHEALING, false);
 		warzoneDefaultConfig.put(WarzoneConfig.ALLOWENDER, true);
 		warzoneDefaultConfig.put(WarzoneConfig.RESETBLOCKS, true);
@@ -1345,5 +1348,13 @@ public class War extends JavaPlugin {
 
 	public Economy getEconomy() {
 		return econ;
+	}
+
+	public UIManager getUIManager() {
+		return UIManager;
+	}
+
+	public void setUIManager(UIManager UIManager) {
+		this.UIManager = UIManager;
 	}
 }

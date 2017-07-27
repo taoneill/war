@@ -2,7 +2,11 @@ package com.tommytony.war.config;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.logging.Level;
 
+import com.tommytony.war.Team;
+import com.tommytony.war.mapper.WarzoneYmlMapper;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 
@@ -246,5 +250,29 @@ public class TeamConfigBag {
 			}
 		}
 		return returnMessage;
+	}
+
+	public static void afterUpdate(Team team, CommandSender sender, String namedParamReturn, boolean wantsToPrint) {
+		final Warzone zone = team.getZone();
+		WarzoneYmlMapper.save(zone);
+
+		String zoneReset = "Some changes may require a /resetzone. ";
+		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONCONFIGCHANGE)) {
+			zone.reinitialize(); // bring back team spawns etc
+			zoneReset = "Zone reset. ";
+		}
+
+		if (wantsToPrint) {
+			War.war.msg(sender, "Team config saved. " + zoneReset + namedParamReturn + " " + War.war.printConfig(team));
+		} else {
+			War.war.msg(sender, "Team config saved. " + zoneReset + namedParamReturn);
+		}
+
+		War.war.log(sender.getName() + " updated team " + team.getName() + " configuration in warzone " + zone.getName() + "." + namedParamReturn, Level.INFO);
+
+		if (War.war.getWarHub() != null) { // maybe the zone was disabled/enabled
+			War.war.getWarHub().getVolume().resetBlocks();
+			War.war.getWarHub().initialize();
+		}
 	}
 }

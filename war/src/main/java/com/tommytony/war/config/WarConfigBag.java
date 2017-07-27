@@ -2,8 +2,11 @@ package com.tommytony.war.config;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import com.tommytony.war.War;
+import com.tommytony.war.mapper.WarYmlMapper;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class WarConfigBag {
@@ -91,5 +94,16 @@ public class WarConfigBag {
 			}
 		}
 		return returnMessage;
+	}
+
+	public static void afterUpdate(CommandSender sender, String namedParamReturn, boolean wantsToPrint) {
+		WarYmlMapper.save();
+		if (wantsToPrint) {
+			String config = War.war.printConfig();
+			War.war.msg(sender, "War config saved. " + namedParamReturn + " " + config);
+		} else {
+			War.war.msg(sender, "War config saved. " + namedParamReturn);
+		}
+		War.war.log(sender.getName() + " updated War configuration. " + namedParamReturn, Level.INFO);
 	}
 }

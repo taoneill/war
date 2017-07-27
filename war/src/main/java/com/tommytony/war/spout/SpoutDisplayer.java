@@ -226,7 +226,7 @@ public class SpoutDisplayer {
 			// and finally, lives.
 			lineCounter = 1;
 			for (Team t : zone.getTeams()) {
-				line = new GenericLabel(t.getRemainingLifes() + "/" + t.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
+				line = new GenericLabel(t.getRemainingLives() + "/" + t.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL));
 				if (t.getPlayers().size() == 0) line.setTextColor(new Color(100, 100, 100));
 		        line.setAnchor(WidgetAnchor.TOP_LEFT)
 		        	.setX(3 + teamMax + 4 + scoreMax + 4)

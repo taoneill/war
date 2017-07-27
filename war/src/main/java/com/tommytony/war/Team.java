@@ -501,7 +501,7 @@ public class Team {
 		}
 	}
 
-	public int getRemainingLifes() {
+	public int getRemainingLives() {
 		return this.remainingLives;
 	}
 

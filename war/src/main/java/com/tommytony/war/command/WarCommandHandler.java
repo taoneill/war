@@ -2,10 +2,12 @@ package com.tommytony.war.command;
 
 import java.util.logging.Level;
 
+import com.tommytony.war.ui.WarUI;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import com.tommytony.war.War;
+import org.bukkit.entity.Player;
 
 
 /**
@@ -47,6 +49,9 @@ public class WarCommandHandler {
 		} else if (command.equals("war") || command.equals("War")) {
 			// show /war help
 			War.war.msg(sender, cmd.getUsage());
+			if (sender instanceof Player) {
+				War.war.getUIManager().assignUI((Player) sender, new WarUI());
+			}
 			return true;
 		} else {
 			arguments = args;

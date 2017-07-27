@@ -738,7 +738,7 @@ public class ZoneLobby {
 								team.getPoints(),
 								team.getTeamConfig().resolveInt(
 										TeamConfig.MAXSCORE),
-								team.getRemainingLifes(),
+								team.getRemainingLives(),
 								team.getTeamConfig().resolveInt(
 										TeamConfig.LIFEPOOL)).split("\n");
 			}

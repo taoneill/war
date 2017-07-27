@@ -2,11 +2,15 @@ package com.tommytony.war.config;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.logging.Level;
 
+import com.tommytony.war.mapper.WarzoneYmlMapper;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import org.bukkit.entity.Player;
 
 
 public class WarzoneConfigBag {
@@ -128,5 +132,28 @@ public class WarzoneConfigBag {
 			}
 		}
 		return returnMessage;
+	}
+
+	public static void afterUpdate(Warzone zone, CommandSender sender, String namedParamReturn, boolean wantsToPrint) {
+		WarzoneYmlMapper.save(zone);
+
+		String zoneReset = "Some changes may require a /resetzone. ";
+		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONCONFIGCHANGE)) {
+			zone.reinitialize(); // bring back team spawns etc
+			zoneReset = "Zone reset. ";
+		}
+
+		if (wantsToPrint) {
+			War.war.msg(sender, "Warzone config saved. " + zoneReset + namedParamReturn + " " + War.war.printConfig(zone));
+		} else {
+			War.war.msg(sender, "Warzone config saved. " + zoneReset + namedParamReturn);
+		}
+
+		War.war.log(sender.getName() + " updated warzone " + zone.getName() + " configuration." + namedParamReturn, Level.INFO);
+
+		if (War.war.getWarHub() != null) { // maybe the zone was disabled/enabled
+			War.war.getWarHub().getVolume().resetBlocks();
+			War.war.getWarHub().initialize();
+		}
 	}
 }

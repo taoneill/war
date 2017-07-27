@@ -229,7 +229,7 @@ public class Warzone {
 			for (Team team : this.getTeams()) {
 				teamsMessage.append('\n');
 				teamsMessage.append(MessageFormat.format(War.war.getString("zone.teaminfo.format"),
-						team.getName(), team.getPoints(), team.getRemainingLifes(),
+						team.getName(), team.getPoints(), team.getRemainingLives(),
 						team.getTeamConfig().resolveInt(TeamConfig.LIFEPOOL), StringUtils.join(team.getPlayerNames().iterator(), ", ")));
 			}
 		}
@@ -413,7 +413,7 @@ public class Warzone {
 				if (this.getScoreboardType() == ScoreboardType.POINTS) {
 					obj.getScore(teamName).setScore(team.getPoints());
 				} else if (this.getScoreboardType() == ScoreboardType.LIFEPOOL) {
-					obj.getScore(teamName).setScore(team.getRemainingLifes());
+					obj.getScore(teamName).setScore(team.getRemainingLives());
 				}
 			}
 			obj.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -1191,13 +1191,13 @@ public class Warzone {
 		} else {
 			this.respawnPlayer(playerTeam, player);
 		}
-		if (playerTeam.getRemainingLifes() <= 0) {
+		if (playerTeam.getRemainingLives() <= 0) {
 			handleTeamLoss(playerTeam, player);
 		} else {
 			this.dropAllStolenObjects(player, false);
-			playerTeam.setRemainingLives(playerTeam.getRemainingLifes() - 1);
+			playerTeam.setRemainingLives(playerTeam.getRemainingLives() - 1);
 			// Lifepool empty warning
-			if (playerTeam.getRemainingLifes() == 0) {
+			if (playerTeam.getRemainingLives() == 0) {
 				this.broadcast("zone.lifepool.empty", playerTeam.getName());
 			}
 		}
@@ -1902,6 +1902,15 @@ public class Warzone {
 		}
 		return count;
 	}
+
+	public int getMaxPlayers() {
+		int zoneCap = 0;
+		for (Team t : this.getTeams()) {
+			zoneCap += t.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE);
+		}
+		return zoneCap;
+	}
+
 
 	/**
 	 * Get the amount of players in all teams in this warzone. Same as
