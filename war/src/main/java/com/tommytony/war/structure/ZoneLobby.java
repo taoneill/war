@@ -776,7 +776,7 @@ public class ZoneLobby {
 		org.bukkit.material.Sign data = (Sign) state.getData();
 		data.setFacingDirection(direction);
 		state.setData(data);
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < lines.length; i++) {
 			state.setLine(i, lines[i]);
 		}
 		state.update(true);
