@@ -25,7 +25,8 @@ public enum WarzoneConfig {
 	SCOREBOARD (ScoreboardType.class, "Scoreboard type", "Type of scoreboard for this zone (none, points, lifepool, top kills)"),
 	SOUPHEALING (Boolean.class, "Soup healing", "If true, allow players to heal by consuming soup"),
 	ALLOWENDER (Boolean.class, "Allow ender chests", "Ender chests are usually blocked to prevent item duplication"),
-	RESETBLOCKS (Boolean.class, "Reset blocks", "If true, reset warzone blocks each battle");
+	RESETBLOCKS (Boolean.class, "Reset blocks", "If true, reset warzone blocks each battle"),
+	CAPTUREPOINTTIME (Integer.class, "Cap control time", "Time, in seconds, required to gain control of a capture point");
 	
 	
 	private final Class<?> configType;

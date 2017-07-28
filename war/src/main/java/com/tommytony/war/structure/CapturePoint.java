@@ -2,6 +2,7 @@ package com.tommytony.war.structure;
 
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.TeamKind;
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.volume.Volume;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
@@ -47,7 +48,7 @@ public class CapturePoint {
 	private Volume volume;
 	private Location location;
 	private TeamKind controller, defaultController;
-	private int strength;
+	private int strength, controlTime;
 	private Warzone warzone;
 
 	public CapturePoint(String name, Location location, TeamKind defaultController, int strength, Warzone warzone) {
@@ -55,6 +56,7 @@ public class CapturePoint {
 		this.defaultController = defaultController;
 		this.controller = defaultController;
 		this.strength = strength;
+		this.controlTime = 0;
 		this.warzone = warzone;
 		this.volume = new Volume("cp-" + name, warzone.getWorld());
 		this.setLocation(location);
@@ -64,7 +66,7 @@ public class CapturePoint {
 		return location.clone().subtract(1, 1, 1).getBlock().getLocation();
 	}
 
-	public void updateBlocks() {
+	private void updateBlocks() {
 		Validate.notNull(location);
 		// Set origin to back left corner
 		Location origin = this.getOrigin();
@@ -99,7 +101,8 @@ public class CapturePoint {
 		// Add flag block
 		if (strength > 0 && controller != null) {
 			// Make flag point direction of player when setting the capture point
-			Vector dir = new Vector(1 + -Math.round(Math.sin(Math.toRadians(location.getYaw()))), strength,
+			int flagHeight = (int) (strength / (getMaxStrength() / 4.0));
+			Vector dir = new Vector(1 + -Math.round(Math.sin(Math.toRadians(location.getYaw()))), flagHeight,
 					1 + Math.round(Math.cos(Math.toRadians(location.getYaw()))));
 			BlockState state = origin.clone().add(dir).getBlock().getState();
 			state.setType(controller.getMaterial());
@@ -145,8 +148,17 @@ public class CapturePoint {
 	}
 
 	public void setStrength(int strength) {
+		Validate.isTrue(strength <= getMaxStrength());
 		this.strength = strength;
 		this.updateBlocks();
+	}
+
+	public int getControlTime() {
+		return controlTime;
+	}
+
+	public void setControlTime(int controlTime) {
+		this.controlTime = controlTime;
 	}
 
 	public Volume getVolume() {
@@ -165,5 +177,19 @@ public class CapturePoint {
 			this.strength = 0;
 		}
 		this.updateBlocks();
+	}
+
+	private long lastMessage = 0;
+	public boolean antiChatSpam() {
+		long now = System.currentTimeMillis();
+		if (now - lastMessage > 3000) {
+			lastMessage = now;
+			return true;
+		}
+		return false;
+	}
+
+	public int getMaxStrength() {
+		return warzone.getWarzoneConfig().getInt(WarzoneConfig.CAPTUREPOINTTIME);
 	}
 }

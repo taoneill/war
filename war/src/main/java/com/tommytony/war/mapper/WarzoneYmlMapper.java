@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.structure.*;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -161,7 +162,7 @@ public class WarzoneYmlMapper {
 						int strength = 0;
 						if (warzoneRootSection.contains(cpPrefix + "controller")) {
 							controller = TeamKind.teamKindFromString(warzoneRootSection.getString(cpPrefix + "controller"));
-							strength = 4;
+							strength = warzone.getWarzoneConfig().getInt(WarzoneConfig.CAPTUREPOINTTIME);
 						}
 						CapturePoint cp = new CapturePoint(cpName, new Location(world, cpX, cpY, cpZ, cpYaw, 0), controller, strength, warzone);
 						warzone.getCapturePoints().add(cp);
