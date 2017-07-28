@@ -480,7 +480,8 @@ public class Warzone {
 		player.setExhaustion(0);
 		player.setFallDistance(0);
 		player.setFireTicks(0);
-		War.war.getServer().getScheduler().runTaskLater(War.war, new Runnable() {
+		player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 5, 255));
+		Runnable antiFireAction = new Runnable() {
 
 			@Override
 			public void run() {
@@ -488,7 +489,13 @@ public class Warzone {
 				player.setFireTicks(0);
 			}
 			
-		}, 1L);
+		};
+		// ughhhhh bukkit
+		War.war.getServer().getScheduler().runTaskLater(War.war, antiFireAction, 1L);
+		War.war.getServer().getScheduler().runTaskLater(War.war, antiFireAction, 2L);
+		War.war.getServer().getScheduler().runTaskLater(War.war, antiFireAction, 3L);
+		War.war.getServer().getScheduler().runTaskLater(War.war, antiFireAction, 4L);
+		War.war.getServer().getScheduler().runTaskLater(War.war, antiFireAction, 5L);
 
 
 		player.setLevel(0);
@@ -517,12 +524,13 @@ public class Warzone {
 			}
 		}
 
-		int respawnTime = team.getTeamConfig().resolveInt(TeamConfig.RESPAWNTIMER) * 20;
-		if (respawnTime > 0) {
-			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, respawnTime, 255));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, respawnTime, 200));
-			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, respawnTime, 255));
-			player.sendTitle("", ChatColor.RED + "Respawning in " + respawnTime / 20 + " seconds...", 1, respawnTime, 10);
+		int respawnTime = team.getTeamConfig().resolveInt(TeamConfig.RESPAWNTIMER);
+		int respawnTimeTicks = respawnTime * 20;
+		if (respawnTimeTicks > 0) {
+			player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, respawnTimeTicks, 255));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, respawnTimeTicks, 200));
+			player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, respawnTimeTicks, 255));
+			player.sendTitle("", ChatColor.RED + MessageFormat.format(War.war.getString("zone.spawn.timer.title"), respawnTime), 1, respawnTimeTicks, 10);
 		}
 		
 		boolean isFirstRespawn = false;
