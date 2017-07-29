@@ -1,17 +1,23 @@
 package com.tommytony.war;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Level;
-
+import com.tommytony.war.command.WarCommandHandler;
+import com.tommytony.war.config.*;
+import com.tommytony.war.event.*;
 import com.tommytony.war.job.CapturePointTimer;
+import com.tommytony.war.job.HelmetProtectionTask;
+import com.tommytony.war.job.ScoreboardSwitchTimer;
+import com.tommytony.war.job.SpoutFadeOutMessageJob;
+import com.tommytony.war.mapper.WarYmlMapper;
+import com.tommytony.war.mapper.WarzoneYmlMapper;
+import com.tommytony.war.spout.SpoutDisplayer;
+import com.tommytony.war.structure.*;
 import com.tommytony.war.ui.UIManager;
+import com.tommytony.war.utility.Loadout;
+import com.tommytony.war.utility.PlayerState;
+import com.tommytony.war.utility.SizeCounter;
+import com.tommytony.war.utility.WarLogFormatter;
+import com.tommytony.war.volume.Volume;
 import net.milkbowl.vault.economy.Economy;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,41 +35,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.tommytony.war.command.WarCommandHandler;
-import com.tommytony.war.config.FlagReturn;
-import com.tommytony.war.config.InventoryBag;
-import com.tommytony.war.config.ScoreboardType;
-import com.tommytony.war.config.KillstreakReward;
-import com.tommytony.war.config.MySQLConfig;
-import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.config.TeamConfigBag;
-import com.tommytony.war.config.TeamKind;
-import com.tommytony.war.config.TeamSpawnStyle;
-import com.tommytony.war.config.WarConfig;
-import com.tommytony.war.config.WarConfigBag;
-import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.config.WarzoneConfigBag;
-import com.tommytony.war.event.WarBlockListener;
-import com.tommytony.war.event.WarEntityListener;
-import com.tommytony.war.event.WarPlayerListener;
-import com.tommytony.war.event.WarServerListener;
-import com.tommytony.war.event.WarTagListener;
-import com.tommytony.war.job.HelmetProtectionTask;
-import com.tommytony.war.job.SpoutFadeOutMessageJob;
-import com.tommytony.war.mapper.WarYmlMapper;
-import com.tommytony.war.mapper.WarzoneYmlMapper;
-import com.tommytony.war.spout.SpoutDisplayer;
-import com.tommytony.war.structure.Bomb;
-import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.HubLobbyMaterials;
-import com.tommytony.war.structure.Monument;
-import com.tommytony.war.structure.WarHub;
-import com.tommytony.war.structure.ZoneLobby;
-import com.tommytony.war.utility.Loadout;
-import com.tommytony.war.utility.PlayerState;
-import com.tommytony.war.utility.SizeCounter;
-import com.tommytony.war.utility.WarLogFormatter;
-import com.tommytony.war.volume.Volume;
+import java.io.File;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
 
 /**
  * Main class of War
@@ -72,47 +50,38 @@ import com.tommytony.war.volume.Volume;
  * @package bukkit.tommytony.war
  */
 public class War extends JavaPlugin {
+	static final boolean HIDE_BLANK_MESSAGES = true;
 	public static War war;
-
+	private static ResourceBundle messages = ResourceBundle.getBundle("messages");
+	private final List<String> zoneMakerNames = new ArrayList<String>();
+	private final List<String> commandWhitelist = new ArrayList<String>();
+	private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
+	private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
+	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
+	private final List<String> deadlyAdjectives = new ArrayList<String>();
+	private final List<String> killerVerbs = new ArrayList<String>();
+	private final InventoryBag defaultInventories = new InventoryBag();
+	private final WarConfigBag warConfig = new WarConfigBag();
+	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
+	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
 	// general
 	private WarPlayerListener playerListener = new WarPlayerListener();
 	private WarEntityListener entityListener = new WarEntityListener();
 	private WarBlockListener blockListener = new WarBlockListener();
 	private WarServerListener serverListener = new WarServerListener();
-	
 	private WarCommandHandler commandHandler = new WarCommandHandler();
 	private PluginDescriptionFile desc = null;
 	private boolean loaded = false;
 	private boolean isSpoutServer = false;
 	private boolean tagServer = false;
-
 	// Zones and hub
 	private List<Warzone> warzones = new ArrayList<Warzone>();
 	private WarHub warHub;
-	
-	private final List<String> zoneMakerNames = new ArrayList<String>();
-	private final List<String> commandWhitelist = new ArrayList<String>();
-	
-	private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
-	private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
 	private HashMap<String, PlayerState> disconnected = new HashMap<String, PlayerState>();
-	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
-
-	private final List<String> deadlyAdjectives = new ArrayList<String>();
-	private final List<String> killerVerbs = new ArrayList<String>();
-
-	private final InventoryBag defaultInventories = new InventoryBag();
 	private KillstreakReward killstreakReward;
 	private MySQLConfig mysqlConfig;
 	private Economy econ = null;
-
-	private final WarConfigBag warConfig = new WarConfigBag();
-	private final WarzoneConfigBag warzoneDefaultConfig = new WarzoneConfigBag();
-	private final TeamConfigBag teamDefaultConfig = new TeamConfigBag();
 	private SpoutDisplayer spoutMessenger = null;
-
-	private static ResourceBundle messages = ResourceBundle.getBundle("messages");
-
 	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(
 			new ItemStack(Material.GLASS), new ItemStack(Material.WOOD),
 			new ItemStack(Material.OBSIDIAN), new ItemStack(Material.GLOWSTONE));
@@ -121,6 +90,15 @@ public class War extends JavaPlugin {
 	public War() {
 		super();
 		War.war = this;
+	}
+
+	public static void reloadLanguage() {
+		String[] parts = War.war.getWarConfig().getString(WarConfig.LANGUAGE).replace("-", "_").split("_");
+		Locale lang = new Locale(parts[0]);
+		if (parts.length >= 2) {
+			lang = new Locale(parts[0], parts[1]);
+		}
+		War.messages = ResourceBundle.getBundle("messages", lang);
 	}
 
 	/**
@@ -145,7 +123,7 @@ public class War extends JavaPlugin {
 	public void loadWar() {
 		this.setLoaded(true);
 		this.desc = this.getDescription();
-		
+
 		// Spout server detection
 		try {
 			Class.forName("org.getspout.spoutapi.player.SpoutPlayer");
@@ -245,37 +223,37 @@ public class War extends JavaPlugin {
 
 		this.getDefaultInventories().clearLoadouts();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
-		
+
 		ItemStack stoneSword = new ItemStack(Material.STONE_SWORD, 1, (byte) 8);
 		stoneSword.setDurability((short) 8);
 		defaultLoadout.put(0, stoneSword);
-		
+
 		ItemStack bow = new ItemStack(Material.BOW, 1, (byte) 8);
 		bow.setDurability((short) 8);
 		defaultLoadout.put(1, bow);
-		
+
 		ItemStack arrows = new ItemStack(Material.ARROW, 7);
 		defaultLoadout.put(2, arrows);
-		
+
 		ItemStack stonePick = new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8);
 		stonePick.setDurability((short) 8);
 		defaultLoadout.put(3, stonePick);
-		
+
 		ItemStack stoneSpade = new ItemStack(Material.STONE_SPADE, 1, (byte) 8);
 		stoneSword.setDurability((short) 8);
 		defaultLoadout.put(4, stoneSpade);
-				
+
 		this.getDefaultInventories().addLoadout("default", defaultLoadout);
-		
+
 		HashMap<Integer, ItemStack> reward = new HashMap<Integer, ItemStack>();
 		reward.put(0, new ItemStack(Material.CAKE, 1));
 		this.getDefaultInventories().setReward(reward);
-		
+
 		this.getCommandWhitelist().add("who");
 		this.getZoneMakerNames().add("tommytony");
 		this.setKillstreakReward(new KillstreakReward());
 		this.setMysqlConfig(new MySQLConfig());
-		
+
 		// Add constants
 		this.getDeadlyAdjectives().clear();
 		for (String adjective : this.getString("pvp.kill.adjectives").split(";")) {
@@ -285,17 +263,19 @@ public class War extends JavaPlugin {
 		for (String verb : this.getString("pvp.kill.verbs").split(";")) {
 			this.getKillerVerbs().add(verb);
 		}
-		
+
 		// Load files
 		WarYmlMapper.load();
-		
+
 		// Start tasks
 		HelmetProtectionTask helmetProtectionTask = new HelmetProtectionTask();
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, helmetProtectionTask, 250, 100);
 
 		CapturePointTimer cpt = new CapturePointTimer();
 		cpt.runTaskTimer(this, 100, 20);
-		
+		ScoreboardSwitchTimer sst = new ScoreboardSwitchTimer();
+		sst.runTaskTimer(this, 500, 20 * 60);
+
 		if (this.isSpoutServer) {
 			SpoutFadeOutMessageJob fadeOutMessagesTask = new SpoutFadeOutMessageJob();
 			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, fadeOutMessagesTask, 100, 100);
@@ -331,25 +311,16 @@ public class War extends JavaPlugin {
 		} catch (IOException e) {
 			this.getLogger().log(Level.WARNING, "Failed to create War log file");
 		}
-		
+
 		// Size check
 		long datSize = SizeCounter.getFileOrDirectorySize(new File(this.getDataFolder() + "/dat/")) / 1024 / 1024;
 		long tempSize = SizeCounter.getFileOrDirectorySize(new File(this.getDataFolder() + "/temp/")) / 1024 / 1024;
-		
+
 		if (datSize + tempSize > 100) {
 			this.log("War data files are taking " + datSize + "MB and its temp files " + tempSize + "MB. Consider permanently deleting old warzone versions and backups in /plugins/War/temp/.", Level.WARNING);
 		}
-				
-		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
-	}
 
-	public static void reloadLanguage() {
-		String[] parts = War.war.getWarConfig().getString(WarConfig.LANGUAGE).replace("-", "_").split("_");
-		Locale lang = new Locale(parts[0]);
-		if (parts.length >= 2) {
-			lang = new Locale(parts[0], parts[1]);
-		}
-		War.messages = ResourceBundle.getBundle("messages", lang);
+		this.log("War v" + this.desc.getVersion() + " is on.", Level.INFO);
 	}
 
 	/**
@@ -430,7 +401,7 @@ public class War extends JavaPlugin {
 	private void inventoryToLoadout(Player player, HashMap<Integer, ItemStack> loadout) {
 		this.inventoryToLoadout(player.getInventory(), loadout);
 	}
-	
+
 	public String updateTeamFromNamedParams(Team team, CommandSender commandSender, String[] arguments) {
 		try {
 			Map<String, String> namedParams = new HashMap<String, String>();
@@ -444,10 +415,10 @@ public class War extends JavaPlugin {
 					thirdParameter.put(pairSplit[0].toLowerCase(), pairSplit[2]);
 				}
 			}
-			
+
 			StringBuilder returnMessage = new StringBuilder();
 			returnMessage.append(team.getTeamConfig().updateFromNamedParams(namedParams));
-			
+
 			if (commandSender instanceof Player) {
 				Player player = (Player) commandSender;
 				if (namedParams.containsKey("loadout")) {
@@ -466,7 +437,7 @@ public class War extends JavaPlugin {
 								}
 							}
 						}
-						
+
 						loadout = new HashMap<Integer, ItemStack>();
 						team.getInventories().setLoadout(loadoutName, loadout);
 						returnMessage.append(loadoutName + " respawn loadout added.");
@@ -483,7 +454,7 @@ public class War extends JavaPlugin {
 						ldt.setPermission(null);
 						returnMessage.append(' ').append(loadoutName).append(" respawn loadout permission deleted.");
 					}
-				} 
+				}
 				if (namedParams.containsKey("deleteloadout")) {
 					String loadoutName = namedParams.get("deleteloadout");
 					if (team.getInventories().containsLoadout(loadoutName)) {
@@ -520,7 +491,7 @@ public class War extends JavaPlugin {
 					thirdParameter.put(pairSplit[0].toLowerCase(), pairSplit[2]);
 				}
 			}
-			
+
 			StringBuilder returnMessage = new StringBuilder();
 			if (namedParams.containsKey("author")) {
 				for(String author : namedParams.get("author").split(",")) {
@@ -538,7 +509,7 @@ public class War extends JavaPlugin {
 					}
 				}
 			}
-			
+
 			returnMessage.append(warzone.getWarzoneConfig().updateFromNamedParams(namedParams));
 			returnMessage.append(warzone.getTeamDefaultConfig().updateFromNamedParams(namedParams));
 
@@ -561,7 +532,7 @@ public class War extends JavaPlugin {
 								}
 							}
 						}
-						
+
 						warzone.getDefaultInventories().setLoadout(loadoutName, loadout);
 						returnMessage.append(loadoutName).append(" respawn loadout added.");
 					} else {
@@ -577,7 +548,7 @@ public class War extends JavaPlugin {
 						ldt.setPermission(null);
 						returnMessage.append(' ').append(loadoutName).append(" respawn loadout permission deleted.");
 					}
-				} 
+				}
 				if (namedParams.containsKey("deleteloadout")) {
 					String loadoutName = namedParams.get("deleteloadout");
 					if (warzone.getDefaultInventories().containsLoadout(loadoutName)) {
@@ -597,7 +568,7 @@ public class War extends JavaPlugin {
 					String whichBlocks = namedParams.get("lobbymaterial");
 					ItemStack blockInHand = player.getInventory().getItemInMainHand();
 					boolean updatedLobbyMaterials = false;
-					
+
 					if (!blockInHand.getType().isBlock() && !blockInHand.getType().equals(Material.AIR)) {
 						this.badMsg(player, "Can only use blocks or air as lobby material.");
 					} else {
@@ -618,7 +589,7 @@ public class War extends JavaPlugin {
 							returnMessage.append(" lobby light material set to ").append(blockInHand.getType());
 							updatedLobbyMaterials = true;
 						}
-						
+
 						if (updatedLobbyMaterials && warzone.getLobby() != null) {
 							warzone.getLobby().getVolume().resetBlocks();
 							warzone.getLobby().initialize();
@@ -629,7 +600,7 @@ public class War extends JavaPlugin {
 					String whichBlocks = namedParams.get("material");
 					ItemStack blockInHand = player.getInventory().getItemInMainHand();
 					boolean updatedMaterials = false;
-					
+
 					if (!blockInHand.getType().isBlock()) {
 						this.badMsg(player, "Can only use blocks as material.");
 					} else {
@@ -646,7 +617,7 @@ public class War extends JavaPlugin {
 							returnMessage.append(" light material set to ").append(blockInHand.getType());
 							updatedMaterials = true;
 						}
-						
+
 						if (updatedMaterials) {
 							// reset all structures
 							for (Monument monument : warzone.getMonuments()) {
@@ -695,13 +666,13 @@ public class War extends JavaPlugin {
 					thirdParameter.put(pairSplit[0].toLowerCase(), pairSplit[2]);
 				}
 			}
-			
+
 			StringBuilder returnMessage = new StringBuilder();
-			
+
 			returnMessage.append(this.getWarConfig().updateFromNamedParams(namedParams));
 			returnMessage.append(this.getWarzoneDefaultConfig().updateFromNamedParams(namedParams));
 			returnMessage.append(this.getTeamDefaultConfig().updateFromNamedParams(namedParams));
-	
+
 			if (commandSender instanceof Player) {
 				Player player = (Player) commandSender;
 				if (namedParams.containsKey("loadout")) {
@@ -724,7 +695,7 @@ public class War extends JavaPlugin {
 						ldt.setPermission(null);
 						returnMessage.append(' ').append(loadoutName).append(" respawn loadout permission deleted.");
 					}
-				} 
+				}
 				if (namedParams.containsKey("deleteloadout")) {
 					String loadoutName = namedParams.get("deleteloadout");
 					if (this.getDefaultInventories().containsLoadout(loadoutName)) {
@@ -753,7 +724,7 @@ public class War extends JavaPlugin {
 					String whichBlocks = namedParams.get("warhubmaterial");
 					ItemStack blockInHand = player.getInventory().getItemInMainHand();
 					boolean updatedWarhubMaterials = false;
-					
+
 					if (!blockInHand.getType().isBlock() && !blockInHand.getType().equals(Material.AIR)) {
 						this.badMsg(player, "Can only use blocks or air as warhub material.");
 					} else {
@@ -774,7 +745,7 @@ public class War extends JavaPlugin {
 							returnMessage.append(" warhub light material set to " + blockInHand.getType());
 							updatedWarhubMaterials = true;
 						}
-						
+
 						if (updatedWarhubMaterials && War.war.getWarHub() != null) {
 							War.war.getWarHub().getVolume().resetBlocks();
 							War.war.getWarHub().initialize();
@@ -788,24 +759,24 @@ public class War extends JavaPlugin {
 			return "PARSE-ERROR";
 		}
 	}
-	
+
 	public String printConfig(Team team) {
 		ChatColor teamColor = ChatColor.AQUA;
-		
+
 		ChatColor normalColor = ChatColor.WHITE;
-		
+
 		String teamConfigStr = "";
 		InventoryBag invs = team.getInventories();
 		teamConfigStr += getLoadoutsString(invs);
-		
+
 		for (TeamConfig teamConfig : TeamConfig.values()) {
 			Object value = team.getTeamConfig().getValue(teamConfig);
 			if (value != null) {
 				teamConfigStr += " " + teamConfig.toStringWithValue(value).replace(":", ":" + teamColor) + normalColor;
 			}
 		}
-		
-		return " ::" + teamColor + "Team " + team.getName() + teamColor +  " config" + normalColor + "::"  
+
+		return " ::" + teamColor + "Team " + team.getName() + teamColor + " config" + normalColor + "::"
 			+ ifEmptyInheritedForTeam(teamConfigStr);
 	}
 
@@ -813,7 +784,7 @@ public class War extends JavaPlugin {
 		StringBuilder loadoutsString = new StringBuilder();
 		ChatColor loadoutColor = ChatColor.GREEN;
 		ChatColor normalColor = ChatColor.WHITE;
-		
+
 		if (invs.hasLoadouts()) {
 			StringBuilder loadouts = new StringBuilder();
 			for (Loadout ldt : invs.getNewLoadouts()) {
@@ -825,11 +796,11 @@ public class War extends JavaPlugin {
 			}
 			loadoutsString.append(" loadout:").append(loadoutColor).append(loadouts.toString()).append(normalColor);
 		}
-		
+
 		if (invs.hasReward()) {
 			loadoutsString.append(" reward:").append(loadoutColor).append("default").append(normalColor);
 		}
-		
+
 		return loadoutsString.toString();
 	}
 
@@ -838,7 +809,7 @@ public class War extends JavaPlugin {
 		ChatColor zoneColor = ChatColor.DARK_AQUA;
 		ChatColor authorColor = ChatColor.GREEN;
 		ChatColor normalColor = ChatColor.WHITE;
-		
+
 		String warzoneConfigStr = "";
 		for (WarzoneConfig warzoneConfig : WarzoneConfig.values()) {
 			Object value = zone.getWarzoneConfig().getValue(warzoneConfig);
@@ -846,7 +817,7 @@ public class War extends JavaPlugin {
 				warzoneConfigStr += " " + warzoneConfig.toStringWithValue(value).replace(":", ":" + zoneColor) + normalColor;
 			}
 		}
-		
+
 		String teamDefaultsStr = "";
 		teamDefaultsStr += getLoadoutsString( zone.getDefaultInventories());
 		for (TeamConfig teamConfig : TeamConfig.values()) {
@@ -855,8 +826,8 @@ public class War extends JavaPlugin {
 				teamDefaultsStr += " " + teamConfig.toStringWithValue(value).replace(":", ":" + teamColor) + normalColor;
 			}
 		}
-		
-		return "::" + zoneColor + "Warzone " + authorColor + zone.getName() + zoneColor + " config" + normalColor + "::" 
+
+		return "::" + zoneColor + "Warzone " + authorColor + zone.getName() + zoneColor + " config" + normalColor + "::"
 		 + " author:" + authorColor + ifEmptyEveryone(zone.getAuthorsString()) + normalColor
 		 + ifEmptyInheritedForWarzone(warzoneConfigStr)
 		 + " ::" + teamColor + "Team defaults" + normalColor + "::"
@@ -869,10 +840,10 @@ public class War extends JavaPlugin {
 		}
 		return maybeEmpty;
 	}
-	
+
 	private String ifEmptyInheritedForTeam(String maybeEmpty) {
 		if (maybeEmpty.equals("")) {
-			maybeEmpty = " all values inherited (see " + ChatColor.GREEN + "/warcfg -p" + ChatColor.WHITE 
+			maybeEmpty = " all values inherited (see " + ChatColor.GREEN + "/warcfg -p" + ChatColor.WHITE
 				+ " and " + ChatColor.GREEN + "/zonecfg -p" + ChatColor.WHITE + ")";
 		}
 		return maybeEmpty;
@@ -890,26 +861,26 @@ public class War extends JavaPlugin {
 		ChatColor zoneColor = ChatColor.DARK_AQUA;
 		ChatColor globalColor = ChatColor.DARK_GREEN;
 		ChatColor normalColor = ChatColor.WHITE;
-		
+
 		String warConfigStr = "";
 		for (WarConfig warConfig : WarConfig.values()) {
 			warConfigStr += " " + warConfig.toStringWithValue(this.getWarConfig().getValue(warConfig)).replace(":", ":" + globalColor) + normalColor;
 		}
-		
+
 		String warzoneDefaultsStr = "";
 		for (WarzoneConfig warzoneConfig : WarzoneConfig.values()) {
 			warzoneDefaultsStr += " " + warzoneConfig.toStringWithValue(this.getWarzoneDefaultConfig().getValue(warzoneConfig)).replace(":", ":" + zoneColor) + normalColor;
 		}
-		
+
 		String teamDefaultsStr = "";
 		teamDefaultsStr += getLoadoutsString(this.getDefaultInventories());
 		for (TeamConfig teamConfig : TeamConfig.values()) {
 			teamDefaultsStr += " " + teamConfig.toStringWithValue(this.getTeamDefaultConfig().getValue(teamConfig)).replace(":", ":" + teamColor) + normalColor;
 		}
-		
-		return normalColor + "::" + globalColor + "War config" + normalColor + "::" + warConfigStr  
+
+		return normalColor + "::" + globalColor + "War config" + normalColor + "::" + warConfigStr
 			+ normalColor + " ::" + zoneColor + "Warzone defaults" + normalColor + "::" + warzoneDefaultsStr
-			+ normalColor + " ::" + teamColor + "Team defaults" + normalColor + "::" + teamDefaultsStr; 
+				+ normalColor + " ::" + teamColor + "Team defaults" + normalColor + "::" + teamDefaultsStr;
 	}
 
 	private void setZoneRallyPoint(String warzoneName, Player player) {
@@ -958,8 +929,6 @@ public class War extends JavaPlugin {
 		}
 		return activeZones;
 	}
-
-	static final boolean HIDE_BLANK_MESSAGES = true;
 
 	public void msg(CommandSender sender, String str) {
 		if (messages.containsKey(str)) str = this.getString(str);
@@ -1227,10 +1196,7 @@ public class War extends JavaPlugin {
 	}
 
 	public boolean inAnyWarzoneLobby(Location location) {
-		if (ZoneLobby.getLobbyByLocation(location) == null) {
-			return false;
-		}
-		return true;
+		return ZoneLobby.getLobbyByLocation(location) != null;
 	}
 
 	public List<String> getZoneMakersImpersonatingPlayers() {
@@ -1293,12 +1259,12 @@ public class War extends JavaPlugin {
 		return this.spoutMessenger ;
 	}
 
-	public void setWarhubMaterials(HubLobbyMaterials warhubMaterials) {
-		this.warhubMaterials = warhubMaterials;
-	}
-	
 	public HubLobbyMaterials getWarhubMaterials() {
 		return this.warhubMaterials;
+	}
+
+	public void setWarhubMaterials(HubLobbyMaterials warhubMaterials) {
+		this.warhubMaterials = warhubMaterials;
 	}
 
 	public boolean isTagServer() {

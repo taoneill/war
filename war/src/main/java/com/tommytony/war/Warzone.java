@@ -114,6 +114,7 @@ public class Warzone {
 	private Random killSeed = new Random();
 	// prevent tryCallDelayedPlayers from being recursively called by Warzone#assign
 	private boolean activeDelayedCall = false;
+	private ScoreboardType scoreboardType;
 
 	public Warzone(World world, String name) {
 		this.world = world;
@@ -123,6 +124,9 @@ public class Warzone {
 		this.volume = new ZoneVolume(name, this.getWorld(), this);
 		this.lobbyMaterials = War.war.getWarhubMaterials().clone();
 		this.pvpReady = true;
+		this.scoreboardType = this.getWarzoneConfig().getScoreboardType(WarzoneConfig.SCOREBOARD);
+		if (scoreboardType == ScoreboardType.SWITCHING)
+			scoreboardType = ScoreboardType.LIFEPOOL;
 	}
 
 	public static Warzone getZoneByName(String name) {
@@ -386,18 +390,7 @@ public class Warzone {
 		this.cakeThieves.clear();
 		if (this.getScoreboardType() != ScoreboardType.NONE) {
 			this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-			scoreboard.registerNewObjective(this.getScoreboardType().getDisplayName(), "dummy");
-			Objective obj = scoreboard.getObjective(this.getScoreboardType().getDisplayName());
-			Validate.isTrue(obj.isModifiable(), "Cannot modify players' scores on the " + this.name + " scoreboard.");
-			for (Team team : this.getTeams()) {
-				String teamName = team.getKind().getColor() + team.getName() + ChatColor.RESET;
-				if (this.getScoreboardType() == ScoreboardType.POINTS) {
-					obj.getScore(teamName).setScore(team.getPoints());
-				} else if (this.getScoreboardType() == ScoreboardType.LIFEPOOL) {
-					obj.getScore(teamName).setScore(team.getRemainingLives());
-				}
-			}
-			obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+			this.updateScoreboard();
 			for (Team team : this.getTeams()) {
 				for (Player player : team.getPlayers()) {
 					player.setScoreboard(scoreboard);
@@ -1117,15 +1110,59 @@ public class Warzone {
 		if (attackerTeam.getTeamConfig().resolveBoolean(TeamConfig.KILLSTREAK)) {
 			War.war.getKillstreakReward().rewardPlayer(attacker, this.getKillCount(attacker.getName()));
 		}
-		if (this.getScoreboard() != null && this.getScoreboardType() == ScoreboardType.TOPKILLS) {
-			Objective obj = this.getScoreboard().getObjective("Top kills");
-			obj.getScore(attacker.getName()).setScore(this.getKillCount(attacker.getName()));
-		}
+		this.updateScoreboard();
 		if (defenderTeam.getTeamConfig().resolveBoolean(TeamConfig.INVENTORYDROP)) {
 			dropItems(defender.getLocation(), defender.getInventory().getContents());
 			dropItems(defender.getLocation(), defender.getInventory().getArmorContents());
 		}
 		this.handleDeath(defender);
+	}
+
+	public void updateScoreboard() {
+		if (this.getScoreboardType() == ScoreboardType.NONE)
+			return;
+		if (this.getScoreboard() == null)
+			return;
+		if (this.scoreboard.getObjective(this.getScoreboardType().getDisplayName()) == null) {
+			for (String entry : this.scoreboard.getEntries()) {
+				this.scoreboard.resetScores(entry);
+			}
+			this.scoreboard.clearSlot(DisplaySlot.SIDEBAR);
+			for (Objective obj : this.scoreboard.getObjectives()) {
+				obj.unregister();
+			}
+			scoreboard.registerNewObjective(this.getScoreboardType().getDisplayName(), "dummy");
+			Objective obj = scoreboard.getObjective(this.getScoreboardType().getDisplayName());
+			Validate.isTrue(obj.isModifiable(), "Cannot modify players' scores on the " + this.name + " scoreboard.");
+			obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+		}
+		switch (this.getScoreboardType()) {
+			case POINTS:
+				for (Team team : this.getTeams()) {
+					String teamName = team.getKind().getColor() + team.getName() + ChatColor.RESET;
+					this.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(teamName).setScore(team.getPoints());
+				}
+				break;
+			case LIFEPOOL:
+				for (Team team : this.getTeams()) {
+					String teamName = team.getKind().getColor() + team.getName() + ChatColor.RESET;
+					this.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(teamName).setScore(team.getRemainingLives());
+				}
+				break;
+			case TOPKILLS:
+				for (Player player : this.getPlayers()) {
+					this.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(player.getName()).setScore(this.getKillCount(player.getName()));
+				}
+				break;
+			case PLAYERCOUNT:
+				for (Team team : this.getTeams()) {
+					String teamName = team.getKind().getColor() + team.getName() + ChatColor.RESET;
+					this.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getScore(teamName).setScore(team.getPlayers().size());
+				}
+				break;
+			default:
+				break;
+		}
 	}
 	
 	/**
@@ -1831,7 +1868,17 @@ public class Warzone {
 	}
 
 	public ScoreboardType getScoreboardType() {
-		return this.getWarzoneConfig().getScoreboardType(WarzoneConfig.SCOREBOARD);
+		return scoreboardType;
+	}
+
+	/**
+	 * Sets the TEMPORARY scoreboard type for use in this warzone.
+	 * This type will NOT be persisted in the Warzone config.
+	 *
+	 * @param scoreboardType temporary scoreboard type
+	 */
+	public void setScoreboardType(ScoreboardType scoreboardType) {
+		this.scoreboardType = scoreboardType;
 	}
 
 	public boolean hasKillCount(String player) {

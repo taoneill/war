@@ -5,16 +5,13 @@ public enum ScoreboardType {
 	NONE(null),
 	POINTS("Points"),
 	LIFEPOOL("Lifepool"),
-	TOPKILLS("Top kills");
+	TOPKILLS("Top kills"),
+	PLAYERCOUNT("Player count"),
+	SWITCHING("Switching");
 	private final String displayName;
 
-	private ScoreboardType(String displayName) {
+	ScoreboardType(String displayName) {
 		this.displayName = displayName;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString().toLowerCase();
 	}
 
 	public static ScoreboardType getFromString(String string) {
@@ -25,6 +22,11 @@ public enum ScoreboardType {
 		}
 
 		return ScoreboardType.NONE;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString().toLowerCase();
 	}
 
 	public String getDisplayName() {

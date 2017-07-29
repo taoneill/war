@@ -1,17 +1,10 @@
 package com.tommytony.war;
 
-import java.io.File;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.logging.Level;
-
+import com.tommytony.war.config.*;
+import com.tommytony.war.spout.SpoutDisplayer;
+import com.tommytony.war.utility.Direction;
+import com.tommytony.war.volume.Volume;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,21 +15,15 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
 import org.getspout.spoutapi.SpoutManager;
 import org.getspout.spoutapi.player.SpoutPlayer;
 import org.kitteh.tag.TagAPI;
 
-import com.tommytony.war.config.InventoryBag;
-import com.tommytony.war.config.ScoreboardType;
-import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.config.TeamConfigBag;
-import com.tommytony.war.config.TeamKind;
-import com.tommytony.war.config.TeamSpawnStyle;
-import com.tommytony.war.spout.SpoutDisplayer;
-import com.tommytony.war.utility.Direction;
-import com.tommytony.war.volume.Volume;
+import java.io.File;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 
 /**
  *
@@ -44,6 +31,8 @@ import com.tommytony.war.volume.Volume;
  *
  */
 public class Team {
+	private final Warzone warzone;
+	Random teamSpawnRandomizer = new Random();
 	private List<Player> players = new ArrayList<Player>();
 	private List<Player> teamChatPlayers = new ArrayList<Player>();
 	private List<Location> teamSpawns;
@@ -53,9 +42,7 @@ public class Team {
 	private int points = 0;
 	private Map<Location, Volume> spawnVolumes;
 	private Volume flagVolume;
-	private final Warzone warzone;
 	private TeamKind kind;
-
 	private TeamConfigBag teamConfig;
 	private InventoryBag inventories;
 
@@ -82,7 +69,7 @@ public class Team {
 		}
 		return null;
 	}
-	
+
 	public Warzone getZone() {
 		return this.warzone;
 	}
@@ -119,12 +106,13 @@ public class Team {
 			initializeTeamSpawn(teamSpawn);
 		}
 	}
+
 	public void initializeTeamSpawn(Location teamSpawn) {
 		// Set the spawn
 		int x = teamSpawn.getBlockX();
 		int y = teamSpawn.getBlockY();
 		int z = teamSpawn.getBlockZ();
-		
+
 		ItemStack light = this.warzone.getWarzoneMaterials().getLightBlock();
 
 		TeamSpawnStyle style = this.getTeamConfig().resolveSpawnStyle();
@@ -353,7 +341,7 @@ public class Team {
 			}
 			block.update(true);
 		}
-		
+
 		if (War.war.isSpoutServer()) {
 			War.war.getSpoutDisplayer().updateStats(this.warzone);
 		}
@@ -382,7 +370,6 @@ public class Team {
 		return this.teamSpawns;
 	}
 
-	Random teamSpawnRandomizer = new Random();
 	public Location getRandomSpawn() {
 		return this.teamSpawns.get(teamSpawnRandomizer.nextInt(this.teamSpawns.size()));
 	}
@@ -395,6 +382,7 @@ public class Team {
 		if (this.warzone.getScoreboard() != null && this.warzone.getScoreboardType() != ScoreboardType.NONE) {
 			player.setScoreboard(this.warzone.getScoreboard());
 		}
+		warzone.updateScoreboard();
 	}
 
 	public List<Player> getPlayers() {
@@ -464,12 +452,12 @@ public class Team {
 		}
 	}
 	
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getName() {
 		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void removePlayer(Player thePlayer) {
@@ -490,19 +478,16 @@ public class Team {
 			this.warzone.restorePlayerState(thePlayer);
 		}
 		this.warzone.getLoadoutSelections().remove(thePlayer);
-	}
-
-	public void setRemainingLives(int remainingLives) {
-		this.remainingLives = remainingLives;
-		if (this.warzone.getScoreboard() != null && this.warzone.getScoreboardType() == ScoreboardType.LIFEPOOL) {
-			String teamName = kind.getColor() + name + ChatColor.RESET;
-			Objective obj = this.warzone.getScoreboard().getObjective("Lifepool");
-			obj.getScore(teamName).setScore(remainingLives);
-		}
+		warzone.updateScoreboard();
 	}
 
 	public int getRemainingLives() {
 		return this.remainingLives;
+	}
+
+	public void setRemainingLives(int remainingLives) {
+		this.remainingLives = remainingLives;
+		warzone.updateScoreboard();
 	}
 
 	public void addPoint() {
@@ -518,11 +503,7 @@ public class Team {
 		} else if (!atLeastOnePlayerOnOtherTeam) {
 			this.teamcast("zone.score.empty");
 		}
-		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS) {
-			String teamName = kind.getColor() + name + ChatColor.RESET;
-			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
-					.getScore(teamName).setScore(points);
-		}
+		this.warzone.updateScoreboard();
 	}
 
 	public int getPoints() {
@@ -553,20 +534,15 @@ public class Team {
 
 	public void resetPoints() {
 		this.points = 0;
-		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS
-				&& this.warzone.getScoreboard() != null) {
-			String teamName = kind.getColor() + name + ChatColor.RESET;
-			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
-					.getScore(teamName).setScore(points);
-		}
-	}
-
-	public void setFlagVolume(Volume flagVolume) {
-		this.flagVolume = flagVolume;
+		warzone.updateScoreboard();
 	}
 
 	public Volume getFlagVolume() {
 		return this.flagVolume;
+	}
+
+	public void setFlagVolume(Volume flagVolume) {
+		this.flagVolume = flagVolume;
 	}
 
 	private void setFlagVolume() {
@@ -689,16 +665,6 @@ public class Team {
 		}
 	}
 
-	public void setTeamFlag(Location teamFlag) {
-		this.teamFlag = teamFlag;
-
-		// this resets the block to old state
-		this.setFlagVolume();
-		this.getFlagVolume().saveBlocks();
-
-		this.initializeTeamFlag();
-	}
-	
 	public boolean isTeamFlagBlock(Block block) {
 		if (this.teamFlag != null) {
 			int flagX = this.teamFlag.getBlockX();
@@ -713,6 +679,16 @@ public class Team {
 
 	public Location getTeamFlag() {
 		return this.teamFlag;
+	}
+
+	public void setTeamFlag(Location teamFlag) {
+		this.teamFlag = teamFlag;
+
+		// this resets the block to old state
+		this.setFlagVolume();
+		this.getFlagVolume().saveBlocks();
+
+		this.initializeTeamFlag();
 	}
 	
 	public void deleteTeamFlag() {
