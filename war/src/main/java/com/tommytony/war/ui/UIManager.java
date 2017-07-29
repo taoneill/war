@@ -59,11 +59,14 @@ public class UIManager implements Listener {
 		if (uiMap.containsKey(player)) {
 			ChestUI ui = uiMap.get(player);
 			if (inventory.getName().equals(ui.getTitle())) {
-				event.setCancelled(true);
-				ui.processClick(clicked);
-				player.closeInventory();
+				if (ui.processClick(clicked, inventory)) {
+					event.setCancelled(true);
+					player.closeInventory();
+					uiMap.remove(player);
+				}
+			} else {
+				uiMap.remove(player);
 			}
-			uiMap.remove(player);
 		}
 	}
 

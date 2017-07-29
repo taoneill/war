@@ -14,10 +14,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 /**
  * Created by Connor on 7/27/2017.
  */
-public class EditZoneUI extends ChestUI {
+class EditZoneUI extends ChestUI {
 	private final Warzone zone;
 
-	public EditZoneUI(Warzone zone) {
+	EditZoneUI(Warzone zone) {
 		super();
 		this.zone = zone;
 	}
@@ -50,6 +50,12 @@ public class EditZoneUI extends ChestUI {
 		meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.YELLOW + "Loadouts");
 		item.setItemMeta(meta);
+		this.addItem(inv, 2, item, new Runnable() {
+			@Override
+			public void run() {
+				War.war.getUIManager().assignUI(player, new EditLoadoutListUI(zone));
+			}
+		});
 		item = new ItemStack(Material.CHEST);
 		meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.YELLOW + "Structures");

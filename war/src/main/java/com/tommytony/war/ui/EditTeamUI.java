@@ -16,10 +16,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 /**
  * Created by Connor on 7/27/2017.
  */
-public class EditTeamUI extends ChestUI {
+class EditTeamUI extends ChestUI {
 	private final Team team;
 
-	public EditTeamUI(Team team) {
+	EditTeamUI(Team team) {
 		super();
 		this.team = team;
 	}
@@ -31,7 +31,7 @@ public class EditTeamUI extends ChestUI {
 		int i = 0;
 		item = new ItemStack(Material.GOLD_SPADE, 1);
 		meta = item.getItemMeta();
-		meta.setDisplayName("Add additional spawn");
+		meta.setDisplayName(ChatColor.GREEN + "Add additional spawn");
 		item.setItemMeta(meta);
 		this.addItem(inv, i++, item, new Runnable() {
 			@Override
@@ -42,6 +42,16 @@ public class EditTeamUI extends ChestUI {
 				} else {
 					player.sendTitle("", ChatColor.RED + "Can't add a spawn outside of the zone!", 10, 20, 10);
 				}
+			}
+		});
+		item = new ItemStack(Material.CHEST, 1);
+		meta = item.getItemMeta();
+		meta.setDisplayName(ChatColor.YELLOW + "Loadouts");
+		item.setItemMeta(meta);
+		this.addItem(inv, i++, item, new Runnable() {
+			@Override
+			public void run() {
+				War.war.getUIManager().assignUI(player, new EditLoadoutListUI(team));
 			}
 		});
 		item = new ItemStack(Material.TNT, 1);
