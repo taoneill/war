@@ -46,9 +46,9 @@ public class EditTeamUI extends ChestUI {
 		});
 		item = new ItemStack(Material.TNT, 1);
 		meta = item.getItemMeta();
-		meta.setDisplayName("Delete");
+		meta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Delete");
 		item.setItemMeta(meta);
-		this.addItem(inv, 9*3-1, item, new Runnable() {
+		this.addItem(inv, getSize() - 1, item, new Runnable() {
 			@Override
 			public void run() {
 				if (team.getFlagVolume() != null) {
@@ -65,6 +65,18 @@ public class EditTeamUI extends ChestUI {
 				}
 				WarzoneYmlMapper.save(zone);
 				War.war.msg(player, "Team " + team.getName() + " removed.");
+			}
+		});
+		item = new ItemStack(Material.SNOW_BALL);
+		meta = item.getItemMeta();
+		meta.setDisplayName(ChatColor.GRAY + "" + ChatColor.BOLD + "Restore Defaults");
+		item.setItemMeta(meta);
+		this.addItem(inv, getSize() - 2, item, new Runnable() {
+			@Override
+			public void run() {
+				team.getTeamConfig().reset();
+				TeamConfigBag.afterUpdate(team, player, "All options set to defaults in team " + team.getName() + " by " + player.getName(), false);
+				War.war.getUIManager().assignUI(player, new EditTeamUI(team));
 			}
 		});
 		final TeamConfigBag config = team.getTeamConfig();

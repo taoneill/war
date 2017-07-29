@@ -45,11 +45,11 @@ public class WarAdminUI extends ChestUI {
 
 	@Override
 	public String getTitle() {
-		return ChatColor.DARK_RED + "" + ChatColor.BOLD + "War Admin";
+		return ChatColor.DARK_RED + "" + ChatColor.BOLD + "War Admin Panel";
 	}
 
 	@Override
 	public int getSize() {
-		return 9*9;
+		return 9 * 7;
 	}
 }

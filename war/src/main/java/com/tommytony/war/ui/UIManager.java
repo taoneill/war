@@ -8,7 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
@@ -16,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 /**
  * Created by Connor on 7/25/2017.
@@ -42,15 +40,13 @@ public class UIManager implements Listener {
 
 	public void getPlayerMessage(Player player, String prompt, StringRunnable action) {
 		messageMap.put(player, action);
+		for (int i = 0; i < 10; i++) {
+			player.sendMessage("");
+		}
 		player.sendMessage("CHAT DISABLED WHILE WAITING FOR RESPONSE");
-		player.sendMessage("|");
-		player.sendMessage("|");
-		player.sendMessage("|");
-		player.sendMessage("|");
-		player.sendMessage("|");
-		player.sendMessage("|");
-		player.sendMessage("|");
-		player.sendMessage("|");
+		for (int i = 0; i < 8; i++) {
+			player.sendMessage("|");
+		}
 		player.sendMessage(prompt);
 	}
 

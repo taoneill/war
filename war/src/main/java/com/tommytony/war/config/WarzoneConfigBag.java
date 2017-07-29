@@ -96,6 +96,10 @@ public class WarzoneConfigBag {
 		return this.bag.containsKey(config);
 	}
 
+	public void reset() {
+		this.bag.clear();
+	}
+
 	public void loadFrom(ConfigurationSection warzoneConfigSection) {
 		for (WarzoneConfig config : WarzoneConfig.values()) {
 			if (warzoneConfigSection.contains(config.toString())) {

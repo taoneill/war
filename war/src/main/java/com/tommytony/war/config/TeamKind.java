@@ -33,7 +33,7 @@ public enum TeamKind {
 	private final Material material;
 	private final int potionEffectColor;
 
-	private TeamKind(DyeColor blockHeadColor, Material material, ChatColor color, int potionEffectColor) {
+	TeamKind(DyeColor blockHeadColor, Material material, ChatColor color, int potionEffectColor) {
 		this.dyeColor = blockHeadColor;
 		this.material = material;
 		this.chatColor = color;
@@ -45,6 +45,15 @@ public enum TeamKind {
 		for (TeamKind kind : TeamKind.values()) {
 			if (kind.toString().startsWith(lowered)) {
 				return kind;
+			}
+		}
+		return null;
+	}
+
+	public static TeamKind getTeam(String teamName) {
+		for (TeamKind team : TeamKind.values()) {
+			if (team.toString().equalsIgnoreCase(teamName)) {
+				return team;
 			}
 		}
 		return null;
@@ -140,15 +149,6 @@ public enum TeamKind {
 		return new Wool(this.dyeColor);
 	}
 
-	public static TeamKind getTeam(String teamName) {
-		for (TeamKind team : TeamKind.values()) {
-			if (team.toString().equalsIgnoreCase(teamName)) {
-				return team;
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Check if a block is this team's color block.
 	 *
@@ -189,6 +189,10 @@ public enum TeamKind {
 
 	public String getFormattedName() {
 		return this.getColor() + this.name().toLowerCase() + ChatColor.WHITE;
+	}
+
+	public String getCapsName() {
+		return String.valueOf(name().charAt(0)) + name().substring(1).toLowerCase();
 	}
 
 	/**

@@ -15,8 +15,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.text.MessageFormat;
-
 /**
  * Created by Connor on 7/27/2017.
  */
@@ -36,7 +34,8 @@ public class EditOrCreateZoneUI extends ChestUI {
 					player.sendTitle("", ChatColor.RED + "This feature requires WorldEdit.", 10, 20, 10);
 					return;
 				}
-				War.war.getUIManager().getPlayerMessage(player, "Select zone region using WorldEdit and then type a name:", new StringRunnable() {
+				player.getInventory().addItem(new ItemStack(Material.WOOD_AXE, 1));
+				War.war.getUIManager().getPlayerMessage(player, "Select region for zone using WorldEdit and then type a name:", new StringRunnable() {
 					@Override
 					public void run() {
 						WorldEditPlugin worldEdit = (WorldEditPlugin) War.war.getServer().getPluginManager().getPlugin("WorldEdit");
@@ -59,7 +58,7 @@ public class EditOrCreateZoneUI extends ChestUI {
 			item = new ItemStack(Material.BOOK_AND_QUILL);
 			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.YELLOW + "" + ChatColor.BOLD + zone.getName());
-			meta.setLore(ImmutableList.of(ChatColor.DARK_GRAY + "Click to edit"));
+			meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to edit"));
 			item.setItemMeta(meta);
 			this.addItem(inv, i++, item, new Runnable() {
 				@Override

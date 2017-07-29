@@ -2,6 +2,7 @@ package com.tommytony.war.ui;
 
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.config.WarzoneConfigBag;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -38,6 +39,19 @@ public class EditZoneConfigUI extends ChestUI {
 			}
 		});
 		UIConfigHelper.addTeamConfigOptions(this, player, inv, zone.getTeamDefaultConfig(), null, zone, i);
+		item = new ItemStack(Material.SNOW_BALL);
+		meta = item.getItemMeta();
+		meta.setDisplayName(ChatColor.GRAY + "" + ChatColor.BOLD + "Restore Defaults");
+		item.setItemMeta(meta);
+		this.addItem(inv, getSize() - 1, item, new Runnable() {
+			@Override
+			public void run() {
+				zone.getWarzoneConfig().reset();
+				zone.getTeamDefaultConfig().reset();
+				WarzoneConfigBag.afterUpdate(zone, player, "All options set to defaults in warzone " + zone.getName() + " by " + player.getName(), false);
+				War.war.getUIManager().assignUI(player, new EditZoneConfigUI(zone));
+			}
+		});
 	}
 
 	@Override

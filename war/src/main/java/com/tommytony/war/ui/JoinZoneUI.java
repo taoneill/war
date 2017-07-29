@@ -21,7 +21,7 @@ public class JoinZoneUI extends ChestUI {
 	public void build(final Player player, Inventory inv) {
 		ItemStack item = new ItemStack(Material.TNT, 1);
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.BOLD + "" + ChatColor.RED + "Warhub");
+		meta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "Warhub");
 		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Teleports you to the " + ChatColor.RED + "Warhub" + ChatColor.GRAY + " lobby",
 				ChatColor.DARK_GRAY + "Warzone doors located here"));
 		item.setItemMeta(meta);

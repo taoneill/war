@@ -49,8 +49,8 @@ public class WarUI extends ChestUI {
 	private ItemStack getCreateWarzoneItem() {
 		ItemStack item = new ItemStack(Material.WOOD_AXE, 1);
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.BOLD + "" + ChatColor.YELLOW + "Create Warzone");
-		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to create, or edit a " + ChatColor.AQUA + "Warzone"));
+		meta.setDisplayName(ChatColor.YELLOW + "" + ChatColor.BOLD + "Create Warzone");
+		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to create, or edit a " + ChatColor.AQUA + "Warzone" + ChatColor.GRAY + "."));
 		item.setItemMeta(meta);
 		return item;
 	}
@@ -58,8 +58,8 @@ public class WarUI extends ChestUI {
 	private ItemStack getJoinWarzoneItem() {
 		ItemStack item = new ItemStack(Material.IRON_SWORD, 1);
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.BOLD + "" + ChatColor.RED + "Join Warzone");
-		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to access " + ChatColor.AQUA + "Warzones",
+		meta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "Join Warzone");
+		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to access " + ChatColor.AQUA + "Warzones" + ChatColor.GRAY + ".",
 				ChatColor.DARK_GRAY + "Play in PVP areas, with multiple gamemodes here."));
 		item.setItemMeta(meta);
 		return item;
@@ -68,9 +68,9 @@ public class WarUI extends ChestUI {
 	private ItemStack getWarAdminItem() {
 		ItemStack item = new ItemStack(Material.EYE_OF_ENDER, 1);
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.BOLD + "" + ChatColor.DARK_RED + "Manage War");
+		meta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Manage War");
 		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to display " + ChatColor.DARK_RED + "Admin" + ChatColor.GRAY + " access panel",
-				ChatColor.DARK_GRAY + "Play in PVP areas, with multiple gamemodes here."));
+				ChatColor.GRAY + "Includes: " + ChatColor.DARK_GRAY + "Permissions, managing warzones, configs, etc."));
 		item.setItemMeta(meta);
 		return item;
 	}

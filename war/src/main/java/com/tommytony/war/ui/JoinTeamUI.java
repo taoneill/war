@@ -34,7 +34,7 @@ public class JoinTeamUI extends ChestUI {
 			Team team = warzone.getTeamByKind(kind);
 			ItemMeta meta = item.getItemMeta();
 			if (team != null) {
-				meta.setDisplayName(ChatColor.BOLD + "" + kind.getColor() + "Team " + kind.name().toLowerCase());
+				meta.setDisplayName(kind.getColor() + "Team " + kind.getCapsName());
 				meta.setLore(ImmutableList.of(MessageFormat.format(ChatColor.GRAY + "{0}/{1} players", team.getPlayers().size(), team.getTeamConfig().resolveInt(TeamConfig.TEAMSIZE)),
 						MessageFormat.format(ChatColor.GRAY + "{0}/{1} pts", team.getPoints(), team.getTeamConfig().resolveInt(TeamConfig.MAXSCORE)),
 						MessageFormat.format(ChatColor.GRAY + "{0} lives left", team.getRemainingLives()),
