@@ -1,21 +1,17 @@
 package com.tommytony.war.ui;
 
-import com.google.common.collect.ImmutableList;
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
-import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.TeamConfigBag;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.volume.Volume;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Wool;
 
 /**
  * Created by Connor on 7/27/2017.
@@ -71,39 +67,8 @@ public class EditTeamUI extends ChestUI {
 				War.war.msg(player, "Team " + team.getName() + " removed.");
 			}
 		});
-		for (final TeamConfig option : TeamConfig.values()) {
-			if (option.getTitle() == null) {
-				continue;
-			}
-			if (option.getConfigType() == Boolean.class) {
-				item = new Wool(team.getTeamConfig().resolveBoolean(option) ? DyeColor.LIME : DyeColor.RED).toItemStack(1);
-				meta = item.getItemMeta();
-				meta.setDisplayName(option.getTitle());
-				meta.setLore(ImmutableList.of(option.getDescription()));
-				item.setItemMeta(meta);
-				this.addItem(inv, i++, item, new Runnable() {
-					@Override
-					public void run() {
-						team.getTeamConfig().put(option, !team.getTeamConfig().resolveBoolean(option));
-						TeamConfigBag.afterUpdate(team, player, option.name() + " set to " + team.getTeamConfig().resolveBoolean(option), false);
-						War.war.getUIManager().assignUI(player, new EditTeamUI(team));
-					}
-				});
-			} else {
-				item = new ItemStack(Material.COMPASS, 1);
-				meta = item.getItemMeta();
-				meta.setDisplayName(option.getTitle());
-				meta.setLore(ImmutableList.of(option.getDescription()));
-				item.setItemMeta(meta);
-				this.addItem(inv, i++, item, new Runnable() {
-					@Override
-					public void run() {
-						player.sendTitle(option.getTitle(), team.getTeamConfig().resolveValue(option).toString(), 10, 70, 20);
-						War.war.getUIManager().assignUI(player, new EditTeamUI(team));
-					}
-				});
-			}
-		}
+		final TeamConfigBag config = team.getTeamConfig();
+		UIConfigHelper.addTeamConfigOptions(this, player, inv, config, team, team.getZone(), i);
 	}
 
 	@Override
