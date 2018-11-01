@@ -78,7 +78,7 @@ public class HelmetProtectionTask implements Runnable {
 						player.getInventory().setItemInMainHand(null);
 						player.getInventory().setItemInOffHand(null);
 						player.getInventory().setHeldItemSlot(0);
-						player.getInventory().addItem(new ItemStack(Material.CAKE_BLOCK, 2240));
+						player.getInventory().addItem(new ItemStack(Material.CAKE, 2240));
 					}
 				}
 			}

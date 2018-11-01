@@ -103,7 +103,7 @@ public class Warzone {
 	
 	private HubLobbyMaterials lobbyMaterials = null;
 	private WarzoneMaterials warzoneMaterials = new WarzoneMaterials(
-			new ItemStack(Material.OBSIDIAN), new ItemStack(Material.FENCE),
+			new ItemStack(Material.OBSIDIAN), new ItemStack(Material.OAK_FENCE),
 			new ItemStack(Material.GLOWSTONE));
 	
 	private boolean isEndOfGame = false;

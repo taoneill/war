@@ -28,7 +28,7 @@ public class EditZoneConfigUI extends ChestUI {
 		int i = 0;
 
 		i = UIConfigHelper.addWarzoneConfigOptions(this, player, inv, zone.getWarzoneConfig(), zone, i);
-		item = new ItemStack(Material.STAINED_GLASS_PANE);
+		item = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE);
 		meta = item.getItemMeta();
 		meta.setDisplayName(">>>> Team Default Config >>>>");
 		item.setItemMeta(meta);
@@ -39,7 +39,7 @@ public class EditZoneConfigUI extends ChestUI {
 			}
 		});
 		UIConfigHelper.addTeamConfigOptions(this, player, inv, zone.getTeamDefaultConfig(), null, zone, i);
-		item = new ItemStack(Material.SNOW_BALL);
+		item = new ItemStack(Material.SNOWBALL);
 		meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.GRAY + "" + ChatColor.BOLD + "Restore Defaults");
 		item.setItemMeta(meta);

@@ -286,25 +286,25 @@ public class Volume {
 			for (int y = this.getMinY(); y <= this.getMaxY(); y++) {
 				for (int z = this.getMinZ(); z <= this.getMaxZ(); z++) {
 					switch (this.getWorld().getBlockAt(x, y, z).getType()) {
-					case SIGN_POST:
+					case SIGN:
 					case WALL_SIGN:
 					case IRON_DOOR:
-					case WOOD_DOOR:
+					case LEGACY_SAPLING:
 					case LADDER:
-					case YELLOW_FLOWER:
-					case RED_ROSE:
+					case DANDELION_YELLOW:
+					case ROSE_RED:
 					case RED_MUSHROOM:
 					case BROWN_MUSHROOM:
-					case SAPLING:
+					case OAK_SAPLING:
 					case TORCH:
-					case RAILS:
+					case RAIL:
 					case STONE_BUTTON:
-					case STONE_PLATE:
-					case WOOD_PLATE:
+					case STONE_PRESSURE_PLATE:
+					case LEGACY_WOOD_PLATE:
 					case LEVER:
 					case REDSTONE:
-					case REDSTONE_TORCH_ON:
-					case REDSTONE_TORCH_OFF:
+					case LEGACY_REDSTONE_TORCH_ON:
+					case LEGACY_REDSTONE_TORCH_OFF:
 					case CACTUS:
 					case SNOW:
 					case ICE:

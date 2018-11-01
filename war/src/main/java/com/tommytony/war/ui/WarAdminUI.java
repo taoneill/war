@@ -19,7 +19,7 @@ public class WarAdminUI extends ChestUI {
 		int i = 0;
 
 		i = UIConfigHelper.addWarConfigOptions(this, player, inv, War.war.getWarConfig(), i);
-		item = new ItemStack(Material.STAINED_GLASS_PANE);
+		item = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE);
 		meta = item.getItemMeta();
 		meta.setDisplayName(">>>> Warzone Default Config >>>>");
 		item.setItemMeta(meta);
@@ -30,7 +30,7 @@ public class WarAdminUI extends ChestUI {
 			}
 		});
 		i = UIConfigHelper.addWarzoneConfigOptions(this, player, inv, War.war.getWarzoneDefaultConfig(), null, i);
-		item = new ItemStack(Material.STAINED_GLASS_PANE);
+		item = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE);
 		meta = item.getItemMeta();
 		meta.setDisplayName(">>>> Team Default Config >>>>");
 		item.setItemMeta(meta);

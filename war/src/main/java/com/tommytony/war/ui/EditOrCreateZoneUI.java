@@ -22,7 +22,7 @@ public class EditOrCreateZoneUI extends ChestUI {
 	@Override
 	public void build(final Player player, Inventory inv) {
 		int i = 0;
-		ItemStack item = new ItemStack(Material.WOOD_AXE, 1);
+		ItemStack item = new ItemStack(Material.WOODEN_AXE, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.BOLD + "" + ChatColor.YELLOW + "Create Warzone");
 		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to create a " + ChatColor.AQUA + "Warzone"));
@@ -34,7 +34,7 @@ public class EditOrCreateZoneUI extends ChestUI {
 					player.sendTitle("", ChatColor.RED + "This feature requires WorldEdit.", 10, 20, 10);
 					return;
 				}
-				player.getInventory().addItem(new ItemStack(Material.WOOD_AXE, 1));
+				player.getInventory().addItem(new ItemStack(Material.WOODEN_AXE, 1));
 				War.war.getUIManager().getPlayerMessage(player, "Select region for zone using WorldEdit and then type a name:", new StringRunnable() {
 					@Override
 					public void run() {
@@ -55,7 +55,7 @@ public class EditOrCreateZoneUI extends ChestUI {
 			if (!War.war.isWarAdmin(player) && !zone.isAuthor(player)) {
 				continue;
 			}
-			item = new ItemStack(Material.BOOK_AND_QUILL);
+			item = new ItemStack(Material.WRITABLE_BOOK);
 			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.YELLOW + "" + ChatColor.BOLD + zone.getName());
 			meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to edit"));
