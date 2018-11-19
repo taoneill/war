@@ -1,14 +1,11 @@
 package com.tommytony.war.ui;
 
 import com.google.common.collect.ImmutableList;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
-import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.command.ZoneSetter;
+import com.tommytony.war.utility.Compat;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -38,14 +35,13 @@ public class EditOrCreateZoneUI extends ChestUI {
 				War.war.getUIManager().getPlayerMessage(player, "Select region for zone using WorldEdit and then type a name:", new StringRunnable() {
 					@Override
 					public void run() {
-						WorldEditPlugin worldEdit = (WorldEditPlugin) War.war.getServer().getPluginManager().getPlugin("WorldEdit");
-						Selection selection = worldEdit.getSelection(player);
-						if (selection != null && selection instanceof CuboidSelection) {
-							Location min = selection.getMinimumPoint();
-							Location max = selection.getMaximumPoint();
+						Compat.BlockPair pair = Compat.getWorldEditSelection(player);
+						if (pair != null) {
 							ZoneSetter setter = new ZoneSetter(player, this.getValue());
-							setter.placeCorner1(min.getBlock());
-							setter.placeCorner2(max.getBlock());
+							setter.placeCorner1(pair.getBlock1());
+							setter.placeCorner2(pair.getBlock2());
+						} else {
+							War.war.badMsg(player, "Invalid selection. Creation cancelled.");
 						}
 					}
 				});

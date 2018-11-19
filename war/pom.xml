@@ -16,20 +16,16 @@
   </properties>
   <repositories>
     <repository>
+      <id>maven.cmastudios.me</id>
+      <url>https://maven.cmastudios.me/</url>
+    </repository>
+    <repository>
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
     </repository>
     <repository>
-      <id>cma-repo</id>
-      <url>http://ftp.cmastudios.me/maven/</url>
-    </repository>
-    <repository>
-      <id>tagapi-repo</id>
-      <url>http://repo.kitteh.org/content/repositories/public/</url>
-    </repository>
-    <repository>
       <id>sk89q-repo</id>
-      <url>http://maven.sk89q.com/repo/</url>
+      <url>https://maven.sk89q.com/repo/</url>
     </repository>
   </repositories>
   <issueManagement>
@@ -48,8 +44,8 @@
   </scm>
   <distributionManagement>
     <repository>
-      <id>cma-repo</id>
-      <url>ftp://ftp.cmastudios.me/srv/ftp/maven</url>
+      <id>maven.cmastudios.me</id>
+      <url>s3://maven.cmastudios.me/</url>
     </repository>
   </distributionManagement>
   <build>
@@ -93,8 +89,9 @@
     </plugins>
     <extensions>
       <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-         <artifactId>wagon-ftp</artifactId>
+        <groupId>org.kuali.maven.wagons</groupId>
+        <artifactId>maven-s3-wagon</artifactId>
+        <version>1.2.1</version>
       </extension>
     </extensions>
     <resources>
@@ -137,9 +134,15 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.sk89q</groupId>
-      <artifactId>worldedit</artifactId>
-      <version>5.5.8</version>
+      <groupId>com.sk89q.worldedit</groupId>
+      <artifactId>worldedit-bukkit</artifactId>
+      <version>7.0.0-20181118.055910-28</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>com.sk89q.worldedit</groupId>
+      <artifactId>worldedit-core</artifactId>
+      <version>7.0.0-20181118.055910-28</version>
       <type>jar</type>
     </dependency>
     <dependency>
