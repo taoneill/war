@@ -12,21 +12,21 @@ import org.getspout.spoutapi.gui.Color;
 
 public enum TeamKind {
 	WHITE (DyeColor.WHITE, Material.WHITE_WOOL, ChatColor.WHITE, 450),
-	ORANGE (DyeColor.ORANGE, Material.WHITE_WOOL, ChatColor.GOLD, 51),
-	MAGENTA (DyeColor.MAGENTA, Material.WHITE_WOOL, ChatColor.LIGHT_PURPLE, 353),
-	BLUE (DyeColor.LIGHT_BLUE, Material.WHITE_WOOL, ChatColor.BLUE, 23),
-	GOLD (DyeColor.YELLOW, Material.WHITE_WOOL, ChatColor.YELLOW, 403), // yellow = gold
-	GREEN (DyeColor.LIME, Material.WHITE_WOOL, ChatColor.GREEN, 612),
-	PINK (DyeColor.PINK, Material.WHITE_WOOL, ChatColor.LIGHT_PURPLE, 929),
-	GRAY (DyeColor.GRAY, Material.WHITE_WOOL, ChatColor.DARK_GRAY, 600),
-	IRON (DyeColor.GRAY, Material.WHITE_WOOL, ChatColor.GRAY, 154), // lightgrey = iron
-	DIAMOND (DyeColor.CYAN, Material.WHITE_WOOL, ChatColor.DARK_AQUA, 738), // cyan = diamond
-	PURPLE (DyeColor.PURPLE, Material.WHITE_WOOL, ChatColor.DARK_PURPLE, 153),
-	NAVY (DyeColor.BLUE, Material.WHITE_WOOL, ChatColor.DARK_BLUE, 939),
-	BROWN (DyeColor.BROWN, Material.WHITE_WOOL, ChatColor.DARK_RED, 908),
-	DARKGREEN (DyeColor.GREEN, Material.WHITE_WOOL, ChatColor.DARK_GREEN, 612),
-	RED (DyeColor.RED, Material.WHITE_WOOL, ChatColor.RED, 245),
-	BLACK (DyeColor.BLACK, Material.WHITE_WOOL, ChatColor.BLACK, 0);
+	ORANGE (DyeColor.ORANGE, Material.ORANGE_WOOL, ChatColor.GOLD, 51),
+	MAGENTA (DyeColor.MAGENTA, Material.MAGENTA_WOOL, ChatColor.LIGHT_PURPLE, 353),
+	BLUE (DyeColor.LIGHT_BLUE, Material.LIGHT_BLUE_WOOL, ChatColor.BLUE, 23),
+	GOLD (DyeColor.YELLOW, Material.YELLOW_WOOL, ChatColor.YELLOW, 403), // yellow = gold
+	GREEN (DyeColor.LIME, Material.LIME_WOOL, ChatColor.GREEN, 612),
+	PINK (DyeColor.PINK, Material.PINK_WOOL, ChatColor.LIGHT_PURPLE, 929),
+	GRAY (DyeColor.GRAY, Material.GRAY_WOOL, ChatColor.DARK_GRAY, 600),
+	IRON (DyeColor.GRAY, Material.GRAY_WOOL, ChatColor.GRAY, 154), // lightgrey = iron
+	DIAMOND (DyeColor.CYAN, Material.CYAN_WOOL, ChatColor.DARK_AQUA, 738), // cyan = diamond
+	PURPLE (DyeColor.PURPLE, Material.PURPLE_WOOL, ChatColor.DARK_PURPLE, 153),
+	NAVY (DyeColor.BLUE, Material.BLUE_WOOL, ChatColor.DARK_BLUE, 939),
+	BROWN (DyeColor.BROWN, Material.BROWN_WOOL, ChatColor.DARK_RED, 908),
+	DARKGREEN (DyeColor.GREEN, Material.GREEN_WOOL, ChatColor.DARK_GREEN, 612),
+	RED (DyeColor.RED, Material.RED_WOOL, ChatColor.RED, 245),
+	BLACK (DyeColor.BLACK, Material.BLACK_WOOL, ChatColor.BLACK, 0);
 
 	private final DyeColor dyeColor;
 	private final ChatColor chatColor;
@@ -61,21 +61,11 @@ public enum TeamKind {
 
 	/**
 	 * Get wool block data for the dye color.
-	 *
+	 * @deprecated TODO remove all spout craft support
 	 * @return wool color data value
 	 */
-	@SuppressWarnings("deprecation")
 	public byte getData() {
 		return this.dyeColor.getWoolData();
-	}
-
-	/**
-	 * Get the color of the wool head block.
-	 *
-	 * @return head wool color.
-	 */
-	public DyeColor getDyeColor() {
-		return this.dyeColor;
 	}
 
 	/**
@@ -108,7 +98,7 @@ public enum TeamKind {
 	}
 
 	/**
-	 * Get head block material. Should always be {@link Material#WOOL}.
+	 * Get head block material.
 	 *
 	 * @return team head block material.
 	 */
@@ -131,22 +121,12 @@ public enum TeamKind {
 	}
 
 	/**
-	 * Get a single item of this team's wool head block. Creates a single block
-	 * with data from {@link #getBlockData()}.
+	 * Get a single item of this team's wool head block.
 	 *
 	 * @return single block head item.
 	 */
 	public ItemStack getBlockHead() {
-		return new Wool(this.dyeColor).toItemStack(1);
-	}
-
-	/**
-	 * Get wool head block data (for creating blocks).
-	 *
-	 * @return wool head block data.
-	 */
-	public MaterialData getBlockData() {
-		return new Wool(this.dyeColor);
+		return new ItemStack(this.material, 1);
 	}
 
 	/**
@@ -156,11 +136,7 @@ public enum TeamKind {
 	 * @return true if block is this team's color.
 	 */
 	public boolean isTeamBlock(BlockState block) {
-		if (block.getType() != Material.WHITE_WOOL || !(block.getData() instanceof Wool)) {
-			return false;
-		}
-		Wool wool = (Wool) block.getData();
-		return wool.getColor() == dyeColor;
+		return block.getType() == material;
 	}
 
 	/**
@@ -170,21 +146,7 @@ public enum TeamKind {
 	 * @return true if item is this team's color.
 	 */
 	public boolean isTeamItem(ItemStack item) {
-		if (item.getType() != Material.WHITE_WOOL || !(item.getData() instanceof Wool)) {
-			return false;
-		}
-		Wool wool = (Wool) item.getData();
-		return wool.getColor() == dyeColor;
-	}
-
-	/**
-	 * Check if a block data is this team's block data.
-	 *
-	 * @param data Wool block data.
-	 * @return true if data is this team's data.
-	 */
-	public boolean isTeamBlock(MaterialData data) {
-		return data instanceof Wool && ((Wool)data).getColor() == this.dyeColor;
+		return item.getType() == material;
 	}
 
 	public String getFormattedName() {

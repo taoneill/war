@@ -538,6 +538,7 @@ public class ZoneVolumeMapper {
 						// TODO upgrade to store owning player by UUID
 						dataStmt.setString(6, String.format("%s\n%s\n%s",
 								((Skull) block.getState()).hasOwner() ? ((Skull) block.getState()).getOwningPlayer().getName() : "",
+								// TODO remove deprecation when Spigot updates their docs about the replacement
 								((Skull) block.getState()).getSkullType().toString(),
 								((Skull) block.getState()).getRotation().toString()));
 					} else if (state instanceof CommandBlock) {

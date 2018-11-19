@@ -1,30 +1,5 @@
 package com.tommytony.war.event;
 
-import java.util.List;
-import java.util.ArrayList;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.world.StructureGrowEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.getspout.spoutapi.SpoutManager;
-import org.getspout.spoutapi.player.SpoutPlayer;
-
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
@@ -35,6 +10,26 @@ import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.Bomb;
 import com.tommytony.war.structure.Cake;
 import com.tommytony.war.structure.Monument;
+import com.tommytony.war.utility.Compat;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.*;
+import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.getspout.spoutapi.SpoutManager;
+import org.getspout.spoutapi.player.SpoutPlayer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -58,9 +53,7 @@ public class WarBlockListener implements Listener {
 		Team team = Team.getTeamByPlayerName(player.getName());
 		Warzone zone = Warzone.getZoneByLocation(player);
 		// Monument capturing
-		if (team != null && block != null && zone != null
-				&& zone.isMonumentCenterBlock(block)
-				&& team.getKind().isTeamBlock(block.getState())) {
+		if (team != null && zone != null && zone.isMonumentCenterBlock(block) && team.getKind().isTeamBlock(block.getState())) {
 			Monument monument = zone.getMonumentFromCenterBlock(block);
 			if (monument != null && !monument.hasOwner()) {
 				monument.capture(team);
@@ -89,9 +82,7 @@ public class WarBlockListener implements Listener {
 
 		boolean isZoneMaker = War.war.isZoneMaker(player);
 		// prevent build in important parts
-		if (zone != null 
-				&& (zone.isImportantBlock(block) || zone.isOpponentSpawnPeripheryBlock(team, block)) 
-				&& (!isZoneMaker || (isZoneMaker && team != null))) {
+		if (zone != null && (zone.isImportantBlock(block) || zone.isOpponentSpawnPeripheryBlock(team, block)) && (!isZoneMaker || team != null)) {
 			War.war.badMsg(player, "build.denied.location");
 			cancelAndKeepItem(event);
 			return;
@@ -123,7 +114,7 @@ public class WarBlockListener implements Listener {
 		}
 
 		// can't place a block of your team's color
-		if (team != null && block.getType() == team.getKind().getMaterial() && block.getState().getData() == team.getKind().getBlockData()) {
+		if (team != null && block.getType() == team.getKind().getMaterial()) {
 			War.war.badMsg(player, "build.denied.teamblock");
 			cancelAndKeepItem(event);
 			return;
@@ -151,9 +142,7 @@ public class WarBlockListener implements Listener {
 		}
 
 		// unbreakableZoneBlocks
-		if (zone != null && (zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)
-				|| (team != null && !team.getTeamConfig().resolveBoolean(TeamConfig.PLACEBLOCK)))
-				&& (!isZoneMaker || (isZoneMaker && team != null))) {
+		if (zone != null && (zone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE) || team != null && !team.getTeamConfig().resolveBoolean(TeamConfig.PLACEBLOCK)) && (!isZoneMaker || team != null)) {
 			// if the zone is unbreakable, no one but zone makers can break blocks (even then, zone makers in a team can't break blocks)
 			War.war.badMsg(player, "build.denied.zone.place");
 			cancelAndKeepItem(event);
@@ -175,7 +164,7 @@ public class WarBlockListener implements Listener {
 		if (inHand.getType() == Material.FIRE) {
 			// Weird bukkit/mc behavior where item in hand is reported as fire while using flint & steel.
 			// Just give the user his f&s back but almost broken (max durability is 8). 
-			newItemInHand = new ItemStack(Material.FLINT_AND_STEEL, 1, (short)1);
+			newItemInHand = Compat.createDamagedIS(Material.FLINT_AND_STEEL, 1, 1);
 		} else {
 			newItemInHand = inHand.clone();
 		}

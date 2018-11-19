@@ -20,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
@@ -170,12 +171,15 @@ public class WarPlayerListener implements Listener {
 
 	private static final int MINIMUM_TEAM_BLOCKS = 1;
 	@EventHandler
-	public void onPlayerPickupItem(final PlayerPickupItemEvent event) {
+	public void onPlayerPickupItem(final EntityPickupItemEvent event) {
 		if (War.war.isLoaded()) {
-			Player player = event.getPlayer();
+			if (!(event.getEntity() instanceof Player)) {
+				return;
+			}
+			Player player = (Player) event.getEntity();
 			Team team = Team.getTeamByPlayerName(player.getName());
 			if (team != null) {
-				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+				Warzone zone = team.getZone();
 
 				if (zone.isFlagThief(player)) {
 					// a flag thief can't pick up anything

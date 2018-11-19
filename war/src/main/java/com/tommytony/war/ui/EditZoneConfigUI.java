@@ -28,7 +28,7 @@ public class EditZoneConfigUI extends ChestUI {
 		int i = 0;
 
 		i = UIConfigHelper.addWarzoneConfigOptions(this, player, inv, zone.getWarzoneConfig(), zone, i);
-		item = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE);
+		item = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
 		meta = item.getItemMeta();
 		meta.setDisplayName(">>>> Team Default Config >>>>");
 		item.setItemMeta(meta);

@@ -1123,7 +1123,7 @@ public class Warzone {
 			return;
 		if (this.getScoreboard() == null)
 			return;
-		if (this.scoreboard.getObjective(this.getScoreboardType().getDisplayName()) == null) {
+		if (this.scoreboard.getObjective(this.getScoreboardType().name()) == null) {
 			for (String entry : this.scoreboard.getEntries()) {
 				this.scoreboard.resetScores(entry);
 			}
@@ -1131,8 +1131,8 @@ public class Warzone {
 			for (Objective obj : this.scoreboard.getObjectives()) {
 				obj.unregister();
 			}
-			scoreboard.registerNewObjective(this.getScoreboardType().getDisplayName(), "dummy");
-			Objective obj = scoreboard.getObjective(this.getScoreboardType().getDisplayName());
+			scoreboard.registerNewObjective(this.getScoreboardType().name(), "dummy", this.getScoreboardType().getDisplayName());
+			Objective obj = scoreboard.getObjective(this.getScoreboardType().name());
 			Validate.isTrue(obj.isModifiable(), "Cannot modify players' scores on the " + this.name + " scoreboard.");
 			obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 		}

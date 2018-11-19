@@ -12,10 +12,7 @@ import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.*;
 import com.tommytony.war.ui.UIManager;
-import com.tommytony.war.utility.Loadout;
-import com.tommytony.war.utility.PlayerState;
-import com.tommytony.war.utility.SizeCounter;
-import com.tommytony.war.utility.WarLogFormatter;
+import com.tommytony.war.utility.*;
 import com.tommytony.war.volume.Volume;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
@@ -224,23 +221,19 @@ public class War extends JavaPlugin {
 		this.getDefaultInventories().clearLoadouts();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
 
-		ItemStack stoneSword = new ItemStack(Material.STONE_SWORD, 1, (byte) 8);
-		stoneSword.setDurability((short) 8);
+		ItemStack stoneSword = Compat.createDamagedIS(Material.STONE_SWORD, 1, (byte) 8);
 		defaultLoadout.put(0, stoneSword);
 
-		ItemStack bow = new ItemStack(Material.BOW, 1, (byte) 8);
-		bow.setDurability((short) 8);
+		ItemStack bow = Compat.createDamagedIS(Material.BOW, 1, (byte) 8);
 		defaultLoadout.put(1, bow);
 
 		ItemStack arrows = new ItemStack(Material.ARROW, 7);
 		defaultLoadout.put(2, arrows);
 
-		ItemStack stonePick = new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8);
-		stonePick.setDurability((short) 8);
+		ItemStack stonePick = Compat.createDamagedIS(Material.IRON_PICKAXE, 1, (byte) 8);
 		defaultLoadout.put(3, stonePick);
 
-		ItemStack stoneSpade = new ItemStack(Material.STONE_SHOVEL, 1, (byte) 8);
-		stoneSword.setDurability((short) 8);
+		ItemStack stoneSpade = Compat.createDamagedIS(Material.STONE_SHOVEL, 1, (byte) 8);
 		defaultLoadout.put(4, stoneSpade);
 
 		this.getDefaultInventories().addLoadout("default", defaultLoadout);
