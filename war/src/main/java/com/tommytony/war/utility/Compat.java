@@ -5,7 +5,6 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.tommytony.war.War;
@@ -55,11 +54,9 @@ public class Compat {
         try {
             Region selection = session.getSelection(wp.getWorld());
             if (selection instanceof CuboidRegion) {
-                BlockVector3 min = selection.getMinimumPoint();
-                BlockVector3 max = selection.getMaximumPoint();
                 return new BlockPair(
-                        player.getWorld().getBlockAt(min.getBlockX(), min.getBlockY(), min.getBlockZ()),
-                        player.getWorld().getBlockAt(max.getBlockX(), max.getBlockY(), max.getBlockZ())
+                        player.getWorld().getBlockAt(selection.getMinimumPoint().getBlockX(), selection.getMinimumPoint().getBlockY(), selection.getMinimumPoint().getBlockZ()),
+                        player.getWorld().getBlockAt(selection.getMaximumPoint().getBlockX(), selection.getMaximumPoint().getBlockY(), selection.getMaximumPoint().getBlockZ())
                 );
             }
             return null;
