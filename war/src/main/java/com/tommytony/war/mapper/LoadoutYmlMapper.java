@@ -50,65 +50,15 @@ public class LoadoutYmlMapper {
 	 * @param loadoutName The name of the loadout
 	 * @return new style loadout
 	 */
-	@SuppressWarnings("deprecation")
 	public static Loadout fromConfigToLoadout(ConfigurationSection config, HashMap<Integer, ItemStack> loadout, String loadoutName) {
 		List<Integer> slots = config.getIntegerList(loadoutName + ".slots");
 		for (Integer slot : slots) {
 			if (config.isItemStack(loadoutName + "." + Integer.toString(slot))) {
 				loadout.put(slot, config.getItemStack(loadoutName + "." + Integer.toString(slot)));
-				continue;
 			}
-			String prefix = loadoutName + "." + slot + ".";
-			int id = config.getInt(prefix + "id");
-			int amount = config.getInt(prefix + "amount");
-			short durability = (short)config.getInt(prefix + "durability");
-			
-			ItemStack stack = new ItemStack(id, amount, durability);
-			stack.setDurability(durability);
-			
-			if (config.contains(prefix + "enchantments")) {
-				List<String> enchantmentStringList = config.getStringList(prefix + "enchantments");
-				for (String enchantmentString : enchantmentStringList) {
-					String[] enchantmentStringSplit = enchantmentString.split(",");
-					if (enchantmentStringSplit.length == 2) {
-						int enchantId = Integer.parseInt(enchantmentStringSplit[0]);
-						int level = Integer.parseInt(enchantmentStringSplit[1]);
-						War.war.safelyEnchant(stack, Enchantment.getById(enchantId), level);
-					}
-				}
-			}
-			if (config.contains(prefix + "armorcolor")) {
-				int rgb = config.getInt(prefix + "armorcolor");
-				Color clr = Color.fromRGB(rgb);
-				LeatherArmorMeta meta = (LeatherArmorMeta) stack.getItemMeta();
-				meta.setColor(clr);
-				stack.setItemMeta(meta);
-			}
-			if (config.contains(prefix + "name")) {
-				String itemName = config.getString(prefix + "name");
-				ItemMeta meta = stack.getItemMeta();
-				meta.setDisplayName(itemName);
-				stack.setItemMeta(meta);
-			}
-			if (config.contains(prefix + "lore")) {
-				List<String> itemLore = config.getStringList(prefix + "lore");
-				ItemMeta meta = stack.getItemMeta();
-				meta.setLore(itemLore);
-				stack.setItemMeta(meta);
-			}
-			loadout.put(slot, stack);
 		}
 		String permission = config.getString(loadoutName + ".permission", "");
 		return new Loadout(loadoutName, loadout, permission);
-	}
-	
-	public static void fromLoadoutsToConfig(HashMap<String, HashMap<Integer, ItemStack>> loadouts, ConfigurationSection section) {
-		List<String> sortedNames = sortNames(loadouts);
-		
-		section.set("names", sortedNames);
-		for (String name : sortedNames) {
-			fromLoadoutToConfig(name, loadouts.get(name), section);
-		}
 	}
 
 	/**
@@ -144,11 +94,7 @@ public class LoadoutYmlMapper {
 	}
 
 	private static List<Integer> toIntList(Set<Integer> keySet) {
-		List<Integer> list = new ArrayList<Integer>();
-		for (Integer key : keySet) {
-			list.add(key);
-		}
-		return list;
+		return new ArrayList<Integer>(keySet);
 	}
 
 	/**

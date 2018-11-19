@@ -30,18 +30,15 @@ import com.tommytony.war.volume.ZoneVolume;
 
 public class WarzoneYmlMapper {
 
-	@SuppressWarnings("deprecation")
 	public static Warzone load(String name) { // removed createNewVolume, as it did nothing
 		File warzoneTxtFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		File warzoneYmlFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".yml");
 		
 		// Convert from TXT to YML if needed
 		if (warzoneTxtFile.exists() && !warzoneYmlFile.exists()) {
-			// Since we're converting, WarTxtMapper didn't load the warzones. 
-			// We need to load the old-text-format-Warzone into memory.
-			Warzone zoneToConvert = WarzoneTxtMapper.load(name, false);
-			WarzoneYmlMapper.save(zoneToConvert);
-			War.war.log("Converted warzone-" + name + ".txt to warzone-" + name + ".yml", Level.INFO);
+			// dropped nimitz compatibility with the MC 1.13 update
+			War.war.log("Failed to load Warzone " + name + " - backwards compatibility was dropped with MC 1.13. Please delete this zone to continue.", Level.WARNING);
+			return null;
 		}
 		
 		if (!warzoneYmlFile.exists()) {
@@ -385,50 +382,18 @@ public class WarzoneYmlMapper {
 			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.floor")) {
 				warzone.getLobbyMaterials().setFloorBlock(
 						warzoneRootSection.getItemStack(lobbyPrefix + "materials.floor"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(lobbyPrefix + "materials.floor");
-				if (floorMaterialSection != null) {
-					warzone.getLobbyMaterials().setFloorBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.outline")) {
 				warzone.getLobbyMaterials().setOutlineBlock(
 						warzoneRootSection.getItemStack(lobbyPrefix + "materials.outline"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(lobbyPrefix + "materials.outline");
-				if (floorMaterialSection != null) {
-					warzone.getLobbyMaterials().setOutlineBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.gate")) {
 				warzone.getLobbyMaterials().setGateBlock(
 						warzoneRootSection.getItemStack(lobbyPrefix + "materials.gate"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(lobbyPrefix + "materials.gate");
-				if (floorMaterialSection != null) {
-					warzone.getLobbyMaterials().setGateBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.light")) {
 				warzone.getLobbyMaterials().setLightBlock(
 						warzoneRootSection.getItemStack(lobbyPrefix + "materials.light"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(lobbyPrefix + "materials.light");
-				if (floorMaterialSection != null) {
-					warzone.getLobbyMaterials().setLightBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			
 			// lobby world
@@ -449,38 +414,14 @@ public class WarzoneYmlMapper {
 			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.main")) {
 				warzone.getWarzoneMaterials().setMainBlock(
 						warzoneRootSection.getItemStack(zoneInfoPrefix + "materials.main"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(zoneInfoPrefix + "materials.main");
-				if (floorMaterialSection != null) {
-					warzone.getWarzoneMaterials().setMainBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.stand")) {
 				warzone.getWarzoneMaterials().setStandBlock(
 						warzoneRootSection.getItemStack(zoneInfoPrefix + "materials.stand"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(zoneInfoPrefix + "materials.stand");
-				if (floorMaterialSection != null) {
-					warzone.getWarzoneMaterials().setStandBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.light")) {
 				warzone.getWarzoneMaterials().setLightBlock(
 						warzoneRootSection.getItemStack(zoneInfoPrefix + "materials.light"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(zoneInfoPrefix + "materials.light");
-				if (floorMaterialSection != null) {
-					warzone.getWarzoneMaterials().setLightBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			try {
 				connection.close();
