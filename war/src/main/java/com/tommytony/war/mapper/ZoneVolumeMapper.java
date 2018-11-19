@@ -546,7 +546,9 @@ public class ZoneVolumeMapper {
 								+ "\n" + ((CommandBlock) block.getState()).getCommand());
 					} else if (state instanceof CreatureSpawner) {
 						dataStmt.setString(6, ((CreatureSpawner) block.getState()).getSpawnedType().toString());
-					}
+					} else {
+					    dataStmt.setString(6, "");
+                    }
 					
 					dataStmt.addBatch();
 					
