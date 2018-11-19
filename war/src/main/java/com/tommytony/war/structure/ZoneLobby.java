@@ -552,10 +552,7 @@ public class ZoneLobby {
 	}
 
 	private void setBlock(Block block, TeamKind kind) {
-		BlockState blockState = block.getState();
-		blockState.setType(kind.getBlockHead().getType());
-		blockState.setData(kind.getBlockHead().getData());
-		blockState.update(true);
+		block.setType(kind.getMaterial());
 	}
 
 	private void placeAutoAssignGate() {
