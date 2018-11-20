@@ -5,7 +5,7 @@ description: ${project.description}
 author: tommytony
 website: ${project.url}
 main: com.tommytony.war.War
-softdepend: [Spout, TagAPI, WorldEdit, Vault]
+softdepend: [WorldEdit, Vault]
 permissions:
   war.*:
     description: Full War permissions. Create and destroy warzones. Change War configuration.

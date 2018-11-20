@@ -1,16 +1,24 @@
 package com.tommytony.war.event;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.tommytony.war.Team;
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.Warzone.LeaveCause;
+import com.tommytony.war.command.ZoneSetter;
+import com.tommytony.war.config.FlagReturn;
+import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarConfig;
-
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.WarHub;
+import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.Direction;
+import com.tommytony.war.utility.Loadout;
+import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.volume.Volume;
 import org.apache.commons.lang.Validate;
-import org.bukkit.ChatColor;
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Item;
@@ -26,29 +34,11 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.getspout.spoutapi.SpoutManager;
-import org.getspout.spoutapi.player.SpoutPlayer;
-
-import com.tommytony.war.Team;
-import com.tommytony.war.War;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.Warzone.LeaveCause;
-import com.tommytony.war.command.ZoneSetter;
-import com.tommytony.war.config.FlagReturn;
-import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.spout.SpoutDisplayer;
-import com.tommytony.war.structure.Bomb;
-import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.WarHub;
-import com.tommytony.war.structure.ZoneLobby;
-import com.tommytony.war.utility.Direction;
-import com.tommytony.war.utility.Loadout;
-import com.tommytony.war.utility.LoadoutSelection;
-import com.tommytony.war.volume.Volume;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -636,19 +626,6 @@ public class WarPlayerListener implements Listener {
 						
 						// Notify everyone
 						for (Team t : playerWarzone.getTeams()) {
-							if (War.war.isSpoutServer()) {
-								for (Player p : t.getPlayers()) {
-									SpoutPlayer sp = SpoutManager.getPlayer(p);
-									if (sp.isSpoutCraftEnabled()) {
-						                sp.sendNotification(
-						                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
-						                		SpoutDisplayer.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + " flag!"),
-						                		victim.getKind().getMaterial(),
-						                		victim.getKind().getData(),
-						                		10000);
-									}
-								}
-							}
 							t.teamcast("zone.flagcapture.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE,
 									victim.getName(), playerTeam.getName());
 						}
@@ -716,19 +693,6 @@ public class WarPlayerListener implements Listener {
 						
 						// Notify everyone
 						for (Team t : playerWarzone.getTeams()) {
-							if (War.war.isSpoutServer()) {
-								for (Player p : t.getPlayers()) {
-									SpoutPlayer sp = SpoutManager.getPlayer(p);
-									if (sp.isSpoutCraftEnabled()) {
-						                sp.sendNotification(
-						                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " blew up "),
-						                		SpoutDisplayer.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + "'s spawn!"),
-						                		victim.getKind().getMaterial(),
-						                		victim.getKind().getData(),
-						                		10000);
-									}
-								}
-							}
 							t.teamcast("zone.bomb.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE,
 									victim.getName(), playerTeam.getName());
 						}
@@ -801,19 +765,6 @@ public class WarPlayerListener implements Listener {
 							
 							// Notify everyone
 							for (Team t : playerWarzone.getTeams()) {
-								if (War.war.isSpoutServer()) {
-									for (Player p : t.getPlayers()) {
-										SpoutPlayer sp = SpoutManager.getPlayer(p);
-										if (sp.isSpoutCraftEnabled()) {
-							                sp.sendNotification(
-							                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
-							                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "!"),
-							                		playerTeam.getKind().getMaterial(),
-							                		playerTeam.getKind().getData(),
-							                		10000);
-										}
-									}
-								}
 								t.teamcast("zone.cake.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE,
 										ChatColor.GREEN + cake.getName() + ChatColor.WHITE, playerTeam.getName());
 							}

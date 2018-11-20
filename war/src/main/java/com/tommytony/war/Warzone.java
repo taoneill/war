@@ -14,7 +14,6 @@ import com.tommytony.war.job.ZoneTimeJob;
 import com.tommytony.war.mapper.LoadoutYmlMapper;
 import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
-import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.*;
 import com.tommytony.war.utility.*;
 import com.tommytony.war.volume.Volume;
@@ -44,8 +43,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
-import org.getspout.spoutapi.SpoutManager;
-import org.getspout.spoutapi.player.SpoutPlayer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -529,11 +526,6 @@ public class Warzone {
 			this.getLoadoutSelections().get(player.getName()).setStillInSpawn(true);
 		}
 
-		// Spout
-		if (War.war.isSpoutServer()) {
-			SpoutManager.getPlayer(player).setTitle(team.getKind().getColor() + player.getName());
-		}
-
 		War.war.getKillstreakReward().getAirstrikePlayers().remove(player.getName());
 
 		final LoadoutResetJob job = new LoadoutResetJob(this, team, player, isFirstRespawn, false);
@@ -641,9 +633,6 @@ public class Warzone {
 		ItemStack[] contents = inventory.getContents();
 
 		String playerTitle = player.getName();
-		if (War.war.isSpoutServer()) {
-			playerTitle = SpoutManager.getPlayer(player).getTitle();
-		}
 
 		this.playerStates.put(
 				player.getName(),
@@ -675,9 +664,6 @@ public class Warzone {
 			player.setExp(originalState.getExp());
 			player.setAllowFlight(originalState.canFly());
 
-			if (War.war.isSpoutServer()) {
-				SpoutManager.getPlayer(player).setTitle(originalState.getPlayerTitle());
-			}
 		}
 		player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
 	}
@@ -1508,19 +1494,6 @@ public class Warzone {
 		War.war.getServer().getPluginManager().callEvent(event1);
 
 		for (Team t : this.getTeams()) {
-			if (War.war.isSpoutServer()) {
-				for (Player p : t.getPlayers()) {
-					SpoutPlayer sp = SpoutManager.getPlayer(p);
-					if (sp.isSpoutCraftEnabled()) {
-		                sp.sendNotification(
-		                		SpoutDisplayer.cleanForNotification("Match won! " + ChatColor.WHITE + "Winners:"),
-		                		SpoutDisplayer.cleanForNotification(SpoutDisplayer.addMissingColor(winnersStr, this)),
-		                		Material.CAKE,
-		                		(short)0,
-		                		10000);
-					}
-				}
-			}
 			String winnersStrAndExtra = "Score cap reached. Game is over! Winning team(s): " + winnersStr;
 			winnersStrAndExtra += ". Resetting warzone and your inventory...";
 			t.teamcast(winnersStrAndExtra);
@@ -1777,9 +1750,6 @@ public class Warzone {
 				playerItems.put(103, originalState.getHelmet());
 			}
 			
-			if (War.war.isSpoutServer()) {
-				SpoutManager.getPlayer(player).setTitle(originalState.getPlayerTitle());
-			}
 		}
 		
 		return playerItems;

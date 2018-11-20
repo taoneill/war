@@ -17,7 +17,6 @@ Features
 - Other game types: capture points and explosive-based objectives
 - Up to 16 teams!
 - Tons of customizable game rules, item loadouts and options (see [Instructions](http://war.tommytony.com/instructions))
-- SpoutPlugin integration for an enriched UI experience during combat for Spoutcraft users (http://spout.org)
 
 Downloads
 ---------

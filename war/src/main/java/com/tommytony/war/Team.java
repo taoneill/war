@@ -1,7 +1,6 @@
 package com.tommytony.war;
 
 import com.tommytony.war.config.*;
-import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
 import org.apache.commons.lang.Validate;
@@ -15,9 +14,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
-import org.getspout.spoutapi.SpoutManager;
-import org.getspout.spoutapi.player.SpoutPlayer;
-import org.kitteh.tag.TagAPI;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -341,10 +337,6 @@ public class Team {
 			}
 			block.update(true);
 		}
-
-		if (War.war.isSpoutServer()) {
-			War.war.getSpoutDisplayer().updateStats(this.warzone);
-		}
 	}
 
 	private void setBlock(int x, int y, int z, TeamKind kind) {
@@ -375,9 +367,6 @@ public class Team {
 
 	public void addPlayer(Player player) {
 		this.players.add(player);
-		if (War.war.isTagServer()) {
-			TagAPI.refreshPlayer(player);
-		}
 		if (this.warzone.getScoreboard() != null && this.warzone.getScoreboardType() != ScoreboardType.NONE) {
 			player.setScoreboard(this.warzone.getScoreboard());
 		}
@@ -395,17 +384,7 @@ public class Team {
 
 	public void teamcast(String message, boolean isNotification) {
 		for (Player player : this.players) {
-			if (War.war.isSpoutServer()) {
-				SpoutPlayer sp = SpoutManager.getPlayer(player);
-				if (sp.isSpoutCraftEnabled() && isNotification) {
-					// team notifications go to the top left for Spout players to lessen War spam in chat box
-					War.war.getSpoutDisplayer().msg(sp, message);
-				} else {
-					War.war.msg(player, message);
-				}
-			} else {
-				War.war.msg(player, message);
-			}
+			War.war.msg(player, message);
 		}
 	}
 
@@ -416,17 +395,7 @@ public class Team {
 
 	public void teamcast(String message, boolean isNotification, Object... args) {
 		for (Player player : this.players) {
-			if (War.war.isSpoutServer()) {
-				SpoutPlayer sp = SpoutManager.getPlayer(player);
-				if (sp.isSpoutCraftEnabled() && isNotification) {
-					// team notifications go to the top left for Spout players to lessen War spam in chat box
-					War.war.getSpoutDisplayer().msg(sp, MessageFormat.format(message, args));
-				} else {
-					War.war.msg(player, message, args);
-				}
-			} else {
-				War.war.msg(player, message, args);
-			}
+			War.war.msg(player, message, args);
 		}
 	}
 
@@ -439,16 +408,6 @@ public class Team {
 	 * @param ticks Duration the achievement should be displayed
 	 */
 	public void sendAchievement(String line1, String line2, ItemStack icon, int ticks) {
-		if (!War.war.isSpoutServer())
-			return;
-		line1 = SpoutDisplayer.cleanForNotification(line1);
-		line2 = SpoutDisplayer.cleanForNotification(line2);
-		for (Player player : this.players) {
-			SpoutPlayer spoutPlayer = SpoutManager.getPlayer(player);
-			if (!spoutPlayer.isSpoutCraftEnabled())
-				continue;
-			spoutPlayer.sendNotification(line1, line2, icon, ticks);
-		}
 	}
 	
 	public String getName() {
@@ -465,12 +424,6 @@ public class Team {
 			this.teamChatPlayers.remove(thePlayer);
 		}
 		this.warzone.dropAllStolenObjects(thePlayer, false);
-		if (War.war.isTagServer()) {
-			TagAPI.refreshPlayer(thePlayer);
-		}
-		if (War.war.isSpoutServer()) {
-			War.war.getSpoutDisplayer().updateStats(thePlayer);
-		}
 		thePlayer.setFireTicks(0);
 		thePlayer.setRemainingAir(300);
 		if (!this.warzone.getReallyDeadFighters().contains(thePlayer.getName())) {
