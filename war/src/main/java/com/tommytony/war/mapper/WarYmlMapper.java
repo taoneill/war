@@ -8,6 +8,8 @@ import com.tommytony.war.job.RestoreYmlWarhubJob;
 import com.tommytony.war.job.RestoreYmlWarzonesJob;
 import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.utility.Direction;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class WarYmlMapper {
@@ -54,9 +57,14 @@ public class WarYmlMapper {
 		List<String> makers = warRootSection.getStringList("war.info.zonemakers");
 		War.war.getZoneMakerNames().clear();
 		for (String makerName : makers) {
-			if (makerName != null && !makerName.equals("")) {
-				War.war.getZoneMakerNames().add(makerName);
+			OfflinePlayer player;
+			try {
+				UUID id = UUID.fromString(makerName);
+				player = Bukkit.getOfflinePlayer(id);
+			} catch (IllegalArgumentException iae) {
+				player = Bukkit.getOfflinePlayer(makerName);
 			}
+			War.war.getZoneMakerNames().add(player);
 		}
 
 		// command whitelist
@@ -146,7 +154,11 @@ public class WarYmlMapper {
 		warInfoSection.set("warzones", warzones);
 		
 		// zone makers
-		warInfoSection.set("zonemakers", War.war.getZoneMakerNames());
+		List<String> zonemakers = new ArrayList<>();
+		for (OfflinePlayer zonemaker : War.war.getZoneMakerNames()) {
+			zonemakers.add(zonemaker.getUniqueId().toString());
+		}
+		warInfoSection.set("zonemakers", zonemakers);
 		
 		// whitelisted commands during a game
 		warInfoSection.set("commandwhitelist", War.war.getCommandWhitelist());

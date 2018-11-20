@@ -89,7 +89,7 @@ public class VolumeMapper {
 			BlockData bdata = null;
 			try {
 				if (data != null) {
-					bdata = mat.createBlockData(data);
+					bdata = Bukkit.createBlockData(data);
 				}
 			} catch (IllegalArgumentException iae) {
 				War.war.getLogger().log(Level.WARNING, "Exception loading some tile data. x:" + x + " y:" + y + " z:" + z + " type:" + type + " data:" + data, iae);
@@ -185,7 +185,7 @@ public class VolumeMapper {
 		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS "+prefix+"corners (pos INTEGER PRIMARY KEY  NOT NULL  UNIQUE, x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL)");
 		stmt.executeUpdate("DELETE FROM "+prefix+"corners");
 		stmt.close();
-		PreparedStatement cornerStmt = databaseConnection.prepareStatement("INSERT INTO corners SELECT 1 AS pos, ? AS x, ? AS y, ? AS z UNION SELECT 2, ?, ?, ?");
+		PreparedStatement cornerStmt = databaseConnection.prepareStatement("INSERT INTO " + prefix + "corners SELECT 1 AS pos, ? AS x, ? AS y, ? AS z UNION SELECT 2, ?, ?, ?");
 		cornerStmt.setInt(1, volume.getCornerOne().getBlockX());
 		cornerStmt.setInt(2, volume.getCornerOne().getBlockY());
 		cornerStmt.setInt(3, volume.getCornerOne().getBlockZ());
@@ -373,6 +373,9 @@ public class VolumeMapper {
 	protected static void convertSchema2_3(Connection databaseConnection, String prefix, boolean isSimple) throws SQLException {
 		Statement stmt = databaseConnection.createStatement();
 		stmt.executeUpdate("DROP TABLE " + prefix + "blocks");
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS "+prefix+"blocks (x BIGINT, y BIGINT, z BIGINT, type BIGINT, data BIGINT)");
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS "+prefix+"strings (id INTEGER PRIMARY KEY NOT NULL UNIQUE, type TEXT)");
+		stmt.executeUpdate("PRAGMA user_version = " + DATABASE_VERSION);
 		stmt.close();
 	}
 

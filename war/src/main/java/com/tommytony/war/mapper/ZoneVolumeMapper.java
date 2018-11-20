@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -37,10 +39,15 @@ public class ZoneVolumeMapper extends VolumeMapper {
 		Connection databaseConnection = getConnection(databaseFile);
 		int version = checkConvert(databaseConnection);
 		switch (version) {
+			case 0: // new file
+				break;
 			case 1:
 			case 2:
 				War.war.log(zoneName + " cannot be migrated from War 1.9 due to breaking MC1.13 changes - please resave.", Level.WARNING);
 				convertSchema2_3(databaseConnection, "", false);
+				for (String prefix : getStructures(databaseConnection)) {
+					convertSchema2_3(databaseConnection, prefix, false);
+				}
 				break;
 			case 3:
 				break;
@@ -48,6 +55,21 @@ public class ZoneVolumeMapper extends VolumeMapper {
 				throw new IllegalStateException(String.format("Unsupported volume format (was already converted to version: %d, current format: %d)", version, DATABASE_VERSION));
 		}
 		return databaseConnection;
+	}
+
+	private static List<String> getStructures(Connection databaseConnection) throws SQLException {
+		List<String> structures = new ArrayList<>();
+		Statement stmt = databaseConnection.createStatement();
+		ResultSet q = stmt.executeQuery("SELECT name FROM sqlite_master WHERE type='table'");
+		while (q.next()) {
+			String name = q.getString("name");
+			if (name.contains("structure") && name.contains("corners")) {
+				structures.add(name.replace("corners", ""));
+			}
+		}
+		q.close();
+		stmt.close();
+		return structures;
 	}
 
 	/**

@@ -18,6 +18,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -50,10 +51,10 @@ public class War extends JavaPlugin {
 	static final boolean HIDE_BLANK_MESSAGES = true;
 	public static War war;
 	private static ResourceBundle messages = ResourceBundle.getBundle("messages");
-	private final List<String> zoneMakerNames = new ArrayList<String>();
+	private final List<OfflinePlayer> zoneMakerNames = new ArrayList<>();
 	private final List<String> commandWhitelist = new ArrayList<String>();
 	private final List<Warzone> incompleteZones = new ArrayList<Warzone>();
-	private final List<String> zoneMakersImpersonatingPlayers = new ArrayList<String>();
+	private final List<OfflinePlayer> zoneMakersImpersonatingPlayers = new ArrayList<>();
 	private final HashMap<String, String> wandBearers = new HashMap<String, String>(); // playername to zonename
 	private final List<String> deadlyAdjectives = new ArrayList<String>();
 	private final List<String> killerVerbs = new ArrayList<String>();
@@ -221,7 +222,6 @@ public class War extends JavaPlugin {
 		this.getDefaultInventories().setReward(reward);
 
 		this.getCommandWhitelist().add("who");
-		this.getZoneMakerNames().add("tommytony");
 		this.setKillstreakReward(new KillstreakReward());
 		this.setMysqlConfig(new MySQLConfig());
 
@@ -1066,14 +1066,14 @@ public class War extends JavaPlugin {
 	 */
 	public boolean isZoneMaker(Player player) {
 		// sort out disguised first
-		for (String disguised : this.zoneMakersImpersonatingPlayers) {
-			if (disguised.equals(player.getName())) {
+		for (OfflinePlayer disguised : this.zoneMakersImpersonatingPlayers) {
+			if (disguised.isOnline() && disguised.getPlayer().equals(player)) {
 				return false;
 			}
 		}
 
-		for (String zoneMaker : this.zoneMakerNames) {
-			if (zoneMaker.equals(player.getName())) {
+		for (OfflinePlayer zoneMaker : this.zoneMakerNames) {
+			if (zoneMaker.isOnline() && zoneMaker.getPlayer().equals(player)) {
 				return true;
 			}
 		}
@@ -1107,7 +1107,7 @@ public class War extends JavaPlugin {
 				// lost his sword, or new warzone
 				if (zoneName.equals(alreadyHaveWand)) {
 					// same zone, give him a new sword
-					player.getInventory().addItem(new ItemStack(Material.WOODEN_SWORD, 1, (byte) 8));
+					player.getInventory().addItem(Compat.createDamagedIS(Material.WOODEN_SWORD, 1, 8));
 					this.msg(player, "Here's a new sword for zone " + zoneName + ".");
 				}
 			}
@@ -1116,8 +1116,7 @@ public class War extends JavaPlugin {
 				this.badMsg(player, "Your inventory is full. Please drop an item and try again.");
 			} else {
 				this.wandBearers.put(player.getName(), zoneName);
-				player.getInventory().addItem(new ItemStack(Material.WOODEN_SWORD, 1, (byte) 8));
-				// player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.WOOD_SWORD));
+				player.getInventory().addItem(Compat.createDamagedIS(Material.WOODEN_SWORD, 1, 8));
 				this.msg(player, "You now have a wand for zone " + zoneName + ". Left-click with wooden sword for corner 1. Right-click for corner 2.");
 				War.war.log(player.getName() + " now has a wand for warzone " + zoneName, Level.INFO);
 			}
@@ -1136,9 +1135,7 @@ public class War extends JavaPlugin {
 	}
 
 	public void removeWandBearer(Player player) {
-		if (this.wandBearers.containsKey(player.getName())) {
-			this.wandBearers.remove(player.getName());
-		}
+		this.wandBearers.remove(player.getName());
 	}
 
 	public Warzone zoneOfZoneWallAtProximity(Location location) {
@@ -1150,7 +1147,7 @@ public class War extends JavaPlugin {
 		return null;
 	}
 
-	public List<String> getZoneMakerNames() {
+	public List<OfflinePlayer> getZoneMakerNames() {
 		return this.zoneMakerNames;
 	}
 
@@ -1162,7 +1159,7 @@ public class War extends JavaPlugin {
 		return ZoneLobby.getLobbyByLocation(location) != null;
 	}
 
-	public List<String> getZoneMakersImpersonatingPlayers() {
+	public List<OfflinePlayer> getZoneMakersImpersonatingPlayers() {
 		return this.zoneMakersImpersonatingPlayers;
 	}
 
