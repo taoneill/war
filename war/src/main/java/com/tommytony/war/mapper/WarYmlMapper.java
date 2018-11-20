@@ -32,9 +32,8 @@ public class WarYmlMapper {
 		
 		boolean newWar = false;
 		if (warTxtFile.exists() && !warYmlFile.exists()) {
-			// Load both War and warzones (with delay) in old format, save War to new format immediatly
-			WarTxtMapper.load(true);
-			// Warzones are getting loaded by TxtMapper launched job. That job will in turn save the Warzones to their new format.
+			// dropped nimitz compatibility with the MC 1.13 update
+			War.war.log("Failed to load War config file from older version - backwards compatibility was dropped with MC 1.13. Please delete war.txt to continue.", Level.WARNING);
 			return;
 		} else if (!warTxtFile.exists() && !warYmlFile.exists()) {
 			// Save defaults to disk

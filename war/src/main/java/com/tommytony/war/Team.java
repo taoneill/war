@@ -330,7 +330,7 @@ public class Team {
 								this.getTeamConfig().resolveInt(
 										TeamConfig.LIFEPOOL)).split("\n");
 			}
-			signBlock.setType(Material.SIGN_POST);
+			signBlock.setType(Material.SIGN);
 			org.bukkit.block.Sign block = (org.bukkit.block.Sign) signBlock
 					.getState();
 			org.bukkit.material.Sign data = (Sign) block.getData();
@@ -350,7 +350,6 @@ public class Team {
 	private void setBlock(int x, int y, int z, TeamKind kind) {
 		BlockState block = this.warzone.getWorld().getBlockAt(x, y, z).getState();
 		block.setType(kind.getMaterial());
-		block.setData(kind.getBlockData());
 		block.update(true);
 	}
 
@@ -616,7 +615,6 @@ public class Team {
 		// flag
 		BlockState flagBlock = this.warzone.getWorld().getBlockAt(x, y + 1, z).getState();
 		flagBlock.setType(this.kind.getMaterial());
-		flagBlock.setData(this.kind.getBlockData());
 		flagBlock.update(true);
 
 		// Flag post using Orientation

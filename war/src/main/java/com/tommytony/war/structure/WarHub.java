@@ -214,7 +214,7 @@ public class WarHub {
 			}
 
 			// War hub sign
-			locationBlock.getRelative(front, 2).setType(Material.SIGN_POST);
+			locationBlock.getRelative(front, 2).setType(Material.SIGN);
 			String[] lines = War.war.getString("sign.warhub").split("\n");
 			org.bukkit.block.Sign locationBlockFront = (org.bukkit.block.Sign) locationBlock.getRelative(front, 2).getState();
 			for (int i = 0; i < 4; i++) {

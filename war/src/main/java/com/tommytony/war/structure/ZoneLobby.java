@@ -368,7 +368,7 @@ public class ZoneLobby {
 			
 			// set zone sign
 			Block zoneSignBlock = this.lobbyMiddleWallBlock.getBlock().getRelative(this.wall, 4);
-			zoneSignBlock.setType(Material.SIGN_POST);
+			zoneSignBlock.setType(Material.SIGN);
 			org.bukkit.block.Sign block = (org.bukkit.block.Sign) zoneSignBlock.getState();
 			org.bukkit.material.Sign data = (Sign) block.getData();
 			data.setFacingDirection(this.wall);
@@ -552,10 +552,7 @@ public class ZoneLobby {
 	}
 
 	private void setBlock(Block block, TeamKind kind) {
-		BlockState blockState = block.getState();
-		blockState.setType(kind.getBlockHead().getType());
-		blockState.setData(kind.getBlockHead().getData());
-		blockState.update(true);
+		block.setType(kind.getMaterial());
 	}
 
 	private void placeAutoAssignGate() {

@@ -45,7 +45,7 @@ public class KillstreakReward {
 		section.set("5.reward.airstrike", true);
 		section.set("5.reward.items", ImmutableList.of(new ItemStack(Material.ARROW, 15), new ItemStack(Material.EGG)));
 		section.set("5.reward.effect", Effect.GHAST_SHRIEK.name());
-		ItemStack sword = new ItemStack(Material.WOOD_SWORD);
+		ItemStack sword = new ItemStack(Material.WOODEN_SWORD);
 		sword.addEnchantment(Enchantment.DAMAGE_ALL, 2);
 		sword.addEnchantment(Enchantment.KNOCKBACK, 1);
 		ItemMeta meta = sword.getItemMeta();

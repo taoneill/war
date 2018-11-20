@@ -12,10 +12,7 @@ import com.tommytony.war.mapper.WarzoneYmlMapper;
 import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.*;
 import com.tommytony.war.ui.UIManager;
-import com.tommytony.war.utility.Loadout;
-import com.tommytony.war.utility.PlayerState;
-import com.tommytony.war.utility.SizeCounter;
-import com.tommytony.war.utility.WarLogFormatter;
+import com.tommytony.war.utility.*;
 import com.tommytony.war.volume.Volume;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
@@ -83,7 +80,7 @@ public class War extends JavaPlugin {
 	private Economy econ = null;
 	private SpoutDisplayer spoutMessenger = null;
 	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(
-			new ItemStack(Material.GLASS), new ItemStack(Material.WOOD),
+			new ItemStack(Material.GLASS), new ItemStack(Material.OAK_WOOD),
 			new ItemStack(Material.OBSIDIAN), new ItemStack(Material.GLOWSTONE));
 	private UIManager UIManager;
 
@@ -224,23 +221,19 @@ public class War extends JavaPlugin {
 		this.getDefaultInventories().clearLoadouts();
 		HashMap<Integer, ItemStack> defaultLoadout = new HashMap<Integer, ItemStack>();
 
-		ItemStack stoneSword = new ItemStack(Material.STONE_SWORD, 1, (byte) 8);
-		stoneSword.setDurability((short) 8);
+		ItemStack stoneSword = Compat.createDamagedIS(Material.STONE_SWORD, 1, (byte) 8);
 		defaultLoadout.put(0, stoneSword);
 
-		ItemStack bow = new ItemStack(Material.BOW, 1, (byte) 8);
-		bow.setDurability((short) 8);
+		ItemStack bow = Compat.createDamagedIS(Material.BOW, 1, (byte) 8);
 		defaultLoadout.put(1, bow);
 
 		ItemStack arrows = new ItemStack(Material.ARROW, 7);
 		defaultLoadout.put(2, arrows);
 
-		ItemStack stonePick = new ItemStack(Material.IRON_PICKAXE, 1, (byte) 8);
-		stonePick.setDurability((short) 8);
+		ItemStack stonePick = Compat.createDamagedIS(Material.IRON_PICKAXE, 1, (byte) 8);
 		defaultLoadout.put(3, stonePick);
 
-		ItemStack stoneSpade = new ItemStack(Material.STONE_SPADE, 1, (byte) 8);
-		stoneSword.setDurability((short) 8);
+		ItemStack stoneSpade = Compat.createDamagedIS(Material.STONE_SHOVEL, 1, (byte) 8);
 		defaultLoadout.put(4, stoneSpade);
 
 		this.getDefaultInventories().addLoadout("default", defaultLoadout);
@@ -1127,7 +1120,7 @@ public class War extends JavaPlugin {
 	public void addWandBearer(Player player, String zoneName) {
 		if (this.wandBearers.containsKey(player.getName())) {
 			String alreadyHaveWand = this.wandBearers.get(player.getName());
-			if (player.getInventory().first(Material.WOOD_SWORD) != -1) {
+			if (player.getInventory().first(Material.WOODEN_SWORD) != -1) {
 				if (zoneName.equals(alreadyHaveWand)) {
 					this.badMsg(player, "You already have a wand for zone " + alreadyHaveWand + ". Drop the wooden sword first.");
 				} else {
@@ -1140,7 +1133,7 @@ public class War extends JavaPlugin {
 				// lost his sword, or new warzone
 				if (zoneName.equals(alreadyHaveWand)) {
 					// same zone, give him a new sword
-					player.getInventory().addItem(new ItemStack(Material.WOOD_SWORD, 1, (byte) 8));
+					player.getInventory().addItem(new ItemStack(Material.WOODEN_SWORD, 1, (byte) 8));
 					this.msg(player, "Here's a new sword for zone " + zoneName + ".");
 				}
 			}
@@ -1149,7 +1142,7 @@ public class War extends JavaPlugin {
 				this.badMsg(player, "Your inventory is full. Please drop an item and try again.");
 			} else {
 				this.wandBearers.put(player.getName(), zoneName);
-				player.getInventory().addItem(new ItemStack(Material.WOOD_SWORD, 1, (byte) 8));
+				player.getInventory().addItem(new ItemStack(Material.WOODEN_SWORD, 1, (byte) 8));
 				// player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.WOOD_SWORD));
 				this.msg(player, "You now have a wand for zone " + zoneName + ". Left-click with wooden sword for corner 1. Right-click for corner 2.");
 				War.war.log(player.getName() + " now has a wand for warzone " + zoneName, Level.INFO);

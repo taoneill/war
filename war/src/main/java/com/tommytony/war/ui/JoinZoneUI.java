@@ -26,12 +26,14 @@ public class JoinZoneUI extends ChestUI {
 				ChatColor.DARK_GRAY + "Warzone doors located here"));
 		item.setItemMeta(meta);
 		int i = 0;
-		this.addItem(inv, i++, item, new Runnable() {
-			@Override
-			public void run() {
-				player.teleport(War.war.getWarHub().getLocation());
-			}
-		});
+		if (War.war.getWarHub() != null) {
+			this.addItem(inv, i++, item, new Runnable() {
+				@Override
+				public void run() {
+					player.teleport(War.war.getWarHub().getLocation());
+				}
+			});
+		}
 		for (final Warzone zone : War.war.getEnabledWarzones()) {
 			item = new ItemStack(Material.ENDER_PEARL);
 			meta = item.getItemMeta();

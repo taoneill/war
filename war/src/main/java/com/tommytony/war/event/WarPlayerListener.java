@@ -20,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
@@ -159,7 +160,7 @@ public class WarPlayerListener implements Listener {
 
 			if (War.war.isWandBearer(player)) {
 				Item item = event.getItemDrop();
-				if (item.getItemStack().getType() == Material.WOOD_SWORD) {
+				if (item.getItemStack().getType() == Material.WOODEN_SWORD) {
 					String zoneName = War.war.getWandBearerZone(player);
 					War.war.removeWandBearer(player);
 					War.war.msg(player, "drop.wand", zoneName);
@@ -170,12 +171,15 @@ public class WarPlayerListener implements Listener {
 
 	private static final int MINIMUM_TEAM_BLOCKS = 1;
 	@EventHandler
-	public void onPlayerPickupItem(final PlayerPickupItemEvent event) {
+	public void onPlayerPickupItem(final EntityPickupItemEvent event) {
 		if (War.war.isLoaded()) {
-			Player player = event.getPlayer();
+			if (!(event.getEntity() instanceof Player)) {
+				return;
+			}
+			Player player = (Player) event.getEntity();
 			Team team = Team.getTeamByPlayerName(player.getName());
 			if (team != null) {
-				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+				Warzone zone = team.getZone();
 
 				if (zone.isFlagThief(player)) {
 					// a flag thief can't pick up anything
@@ -238,7 +242,7 @@ public class WarPlayerListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
-			if (event.getItem() != null && event.getItem().getType() == Material.WOOD_SWORD && War.war.isWandBearer(player)) {
+			if (event.getItem() != null && event.getItem().getType() == Material.WOODEN_SWORD && War.war.isWandBearer(player)) {
 				String zoneName = War.war.getWandBearerZone(player);
 				ZoneSetter setter = new ZoneSetter(player, zoneName);
 				if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -269,7 +273,7 @@ public class WarPlayerListener implements Listener {
 				War.war.badMsg(player, "use.ender");
 			}
 			Team team = Team.getTeamByPlayerName(player.getName());
-			if (zone != null && team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENCHANTMENT_TABLE && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+			if (zone != null && team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENCHANTING_TABLE && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
 				event.setCancelled(true);
 				War.war.badMsg(player, "use.enchant");
 				if (zone.getAuthors().contains(player.getName())) {
@@ -305,7 +309,7 @@ public class WarPlayerListener implements Listener {
 			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 			if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.SOUPHEALING)) {
 				ItemStack item = event.getItem();
-				if ((item != null) && (item.getType() == Material.MUSHROOM_SOUP)) {
+				if ((item != null) && (item.getType() == Material.MUSHROOM_STEW)) {
 					if (player.getHealth() < 20) {
 						player.setHealth(Math.min(20, player.getHealth() + 7));
 						item.setType(Material.BOWL);
@@ -340,7 +344,7 @@ public class WarPlayerListener implements Listener {
 		latestLocations.put(player.getName(), playerLoc);
 		
 		// Signs can automatically teleport you to specific or random warzones
-		if (playerLoc.getBlock().getType() == Material.SIGN_POST) {
+		if (playerLoc.getBlock().getType() == Material.SIGN) {
 			Sign sign = (Sign) playerLoc.getBlock().getState();
 			if (sign.getLine(0).equals("[zone]")) {
 				Warzone indicated = Warzone.getZoneByName(sign.getLine(1));

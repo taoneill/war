@@ -47,7 +47,7 @@ class EditLoadoutListUI extends ChestUI {
 		ItemStack item;
 		ItemMeta meta;
 		int i = 0;
-		item = new ItemStack(Material.GOLD_SPADE, 1);
+		item = new ItemStack(Material.GOLDEN_SHOVEL, 1);
 		meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.GREEN + "Create new loadout");
 		item.setItemMeta(meta);

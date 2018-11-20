@@ -47,7 +47,7 @@ public class WarUI extends ChestUI {
 	}
 
 	private ItemStack getCreateWarzoneItem() {
-		ItemStack item = new ItemStack(Material.WOOD_AXE, 1);
+		ItemStack item = new ItemStack(Material.WOODEN_AXE, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.YELLOW + "" + ChatColor.BOLD + "Create Warzone");
 		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to create, or edit a " + ChatColor.AQUA + "Warzone" + ChatColor.GRAY + "."));
@@ -66,7 +66,7 @@ public class WarUI extends ChestUI {
 	}
 
 	private ItemStack getWarAdminItem() {
-		ItemStack item = new ItemStack(Material.EYE_OF_ENDER, 1);
+		ItemStack item = new ItemStack(Material.ENDER_EYE, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Manage War");
 		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to display " + ChatColor.DARK_RED + "Admin" + ChatColor.GRAY + " access panel",

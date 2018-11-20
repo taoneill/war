@@ -44,7 +44,7 @@ public class HelmetProtectionTask implements Runnable {
 							int removed = 0;
 							for (ItemStack item : playerInv.getContents()) {
 								// remove only same colored wool
-								if (item != null && item.getType() == teamBlockMaterial && item.getData() == team.getKind().getBlockData()) {
+								if (item != null && item.getType() == teamBlockMaterial) {
 									playerInv.clear(i);
 									removed++;
 								}
@@ -68,7 +68,7 @@ public class HelmetProtectionTask implements Runnable {
 						player.getInventory().setItemInMainHand(null);
 						player.getInventory().setItemInOffHand(null);
 						player.getInventory().setHeldItemSlot(0);
-						player.getInventory().addItem(victim.getKind().getBlockData().toItemStack(2240));
+						player.getInventory().addItem(new ItemStack(victim.getKind().getMaterial(), 2240));
 					} else if (zone.isBombThief(player)) {
 						player.getInventory().setItemInMainHand(null);
 						player.getInventory().setItemInOffHand(null);
@@ -78,7 +78,7 @@ public class HelmetProtectionTask implements Runnable {
 						player.getInventory().setItemInMainHand(null);
 						player.getInventory().setItemInOffHand(null);
 						player.getInventory().setHeldItemSlot(0);
-						player.getInventory().addItem(new ItemStack(Material.CAKE_BLOCK, 2240));
+						player.getInventory().addItem(new ItemStack(Material.CAKE, 2240));
 					}
 				}
 			}

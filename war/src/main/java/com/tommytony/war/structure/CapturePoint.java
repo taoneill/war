@@ -106,7 +106,6 @@ public class CapturePoint {
 					1 + Math.round(Math.cos(Math.toRadians(location.getYaw()))));
 			BlockState state = origin.clone().add(dir).getBlock().getState();
 			state.setType(controller.getMaterial());
-			state.setData(controller.getBlockData());
 			state.update(true);
 		}
 	}

@@ -56,10 +56,8 @@ public class ZoneVolumeMapper {
 	public static Connection getZoneConnection(ZoneVolume volume, String zoneName, World world) throws SQLException {
 		File databaseFile = new File(War.war.getDataFolder(), String.format("/dat/warzone-%s/volume-%s.sl3", zoneName, volume.getName()));
 		if (!databaseFile.exists()) {
-			// Convert warzone to nimitz file format.
-			PreNimitzZoneVolumeMapper.load(volume, zoneName, world, false);
-			ZoneVolumeMapper.save(volume, zoneName);
-			War.war.log("Warzone " + zoneName + " converted to nimitz format!", Level.INFO);
+			// dropped nimitz compatibility with the MC 1.13 update
+			War.war.log("Warzone " + zoneName + " not found - creating new file. Will not attempt converting legacy War version formats.", Level.WARNING);
 		}
 		Connection databaseConnection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getPath());
 		Statement stmt = databaseConnection.createStatement();
@@ -314,7 +312,7 @@ public class ZoneVolumeMapper {
 			case SUNSET:    // Use same as 4x3
 
 				// 4x3
-			case DONKEYKONG:
+			case DONKEY_KONG:
 			case SKELETON:
 				if(facing == BlockFace.WEST)
 					return loc.getBlock().getLocation().add(0, 0, -1);
@@ -335,7 +333,7 @@ public class ZoneVolumeMapper {
 			case FIGHTERS:  // Use same as 4x4
 
 				// 4x4
-			case BURNINGSKULL:
+			case BURNING_SKULL:
 			case PIGSCENE:
 			case POINTER:
 				if(facing == BlockFace.WEST)
@@ -540,6 +538,7 @@ public class ZoneVolumeMapper {
 						// TODO upgrade to store owning player by UUID
 						dataStmt.setString(6, String.format("%s\n%s\n%s",
 								((Skull) block.getState()).hasOwner() ? ((Skull) block.getState()).getOwningPlayer().getName() : "",
+								// TODO remove deprecation when Spigot updates their docs about the replacement
 								((Skull) block.getState()).getSkullType().toString(),
 								((Skull) block.getState()).getRotation().toString()));
 					} else if (state instanceof CommandBlock) {
@@ -547,7 +546,9 @@ public class ZoneVolumeMapper {
 								+ "\n" + ((CommandBlock) block.getState()).getCommand());
 					} else if (state instanceof CreatureSpawner) {
 						dataStmt.setString(6, ((CreatureSpawner) block.getState()).getSpawnedType().toString());
-					}
+					} else {
+					    dataStmt.setString(6, "");
+                    }
 					
 					dataStmt.addBatch();
 					

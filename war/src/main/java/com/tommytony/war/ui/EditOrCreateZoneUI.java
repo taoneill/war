@@ -1,14 +1,11 @@
 package com.tommytony.war.ui;
 
 import com.google.common.collect.ImmutableList;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.bukkit.selections.CuboidSelection;
-import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.command.ZoneSetter;
+import com.tommytony.war.utility.Compat;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -22,7 +19,7 @@ public class EditOrCreateZoneUI extends ChestUI {
 	@Override
 	public void build(final Player player, Inventory inv) {
 		int i = 0;
-		ItemStack item = new ItemStack(Material.WOOD_AXE, 1);
+		ItemStack item = new ItemStack(Material.WOODEN_AXE, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.BOLD + "" + ChatColor.YELLOW + "Create Warzone");
 		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to create a " + ChatColor.AQUA + "Warzone"));
@@ -34,18 +31,17 @@ public class EditOrCreateZoneUI extends ChestUI {
 					player.sendTitle("", ChatColor.RED + "This feature requires WorldEdit.", 10, 20, 10);
 					return;
 				}
-				player.getInventory().addItem(new ItemStack(Material.WOOD_AXE, 1));
+				player.getInventory().addItem(new ItemStack(Material.WOODEN_AXE, 1));
 				War.war.getUIManager().getPlayerMessage(player, "Select region for zone using WorldEdit and then type a name:", new StringRunnable() {
 					@Override
 					public void run() {
-						WorldEditPlugin worldEdit = (WorldEditPlugin) War.war.getServer().getPluginManager().getPlugin("WorldEdit");
-						Selection selection = worldEdit.getSelection(player);
-						if (selection != null && selection instanceof CuboidSelection) {
-							Location min = selection.getMinimumPoint();
-							Location max = selection.getMaximumPoint();
+						Compat.BlockPair pair = Compat.getWorldEditSelection(player);
+						if (pair != null) {
 							ZoneSetter setter = new ZoneSetter(player, this.getValue());
-							setter.placeCorner1(min.getBlock());
-							setter.placeCorner2(max.getBlock());
+							setter.placeCorner1(pair.getBlock1());
+							setter.placeCorner2(pair.getBlock2());
+						} else {
+							War.war.badMsg(player, "Invalid selection. Creation cancelled.");
 						}
 					}
 				});
@@ -55,7 +51,7 @@ public class EditOrCreateZoneUI extends ChestUI {
 			if (!War.war.isWarAdmin(player) && !zone.isAuthor(player)) {
 				continue;
 			}
-			item = new ItemStack(Material.BOOK_AND_QUILL);
+			item = new ItemStack(Material.WRITABLE_BOOK);
 			meta = item.getItemMeta();
 			meta.setDisplayName(ChatColor.YELLOW + "" + ChatColor.BOLD + zone.getName());
 			meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to edit"));
