@@ -12,7 +12,6 @@ import com.tommytony.war.job.LogKillsDeathsJob;
 import com.tommytony.war.job.LogKillsDeathsJob.KillsDeathsRecord;
 import com.tommytony.war.job.ZoneTimeJob;
 import com.tommytony.war.mapper.LoadoutYmlMapper;
-import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
 import com.tommytony.war.structure.*;
 import com.tommytony.war.utility.*;
@@ -2087,7 +2086,7 @@ public class Warzone {
 	}
 
 	public Volume loadStructure(String volName, World world) throws SQLException {
-		return loadStructure(volName, world, ZoneVolumeMapper.getZoneConnection(volume, name, world));
+		return loadStructure(volName, world, ZoneVolumeMapper.getZoneConnection(volume, name));
 	}
 
 	public Volume loadStructure(String volName, Connection zoneConnection) throws SQLException {
@@ -2096,12 +2095,6 @@ public class Warzone {
 
 	public Volume loadStructure(String volName, World world, Connection zoneConnection) throws SQLException {
 		Volume volume = new Volume(volName, world);
-		if (!containsTable(String.format("structure_%d_corners", volName.hashCode() & Integer.MAX_VALUE), zoneConnection)) {
-			volume = VolumeMapper.loadVolume(volName, name, world);
-			ZoneVolumeMapper.saveStructure(volume, zoneConnection);
-			War.war.getLogger().log(Level.INFO, "Stuffed structure {0} into database for warzone {1}", new Object[] {volName, name});
-			return volume;
-		}
 		ZoneVolumeMapper.loadStructure(volume, zoneConnection);
 		return volume;
 	}

@@ -1,15 +1,13 @@
 package com.tommytony.war.command;
 
-import java.util.logging.Level;
-
-import org.bukkit.command.CommandSender;
-
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.structure.WarHub;
+import org.bukkit.command.CommandSender;
+
+import java.util.logging.Level;
 
 /**
  * Deletes the warhub.
@@ -30,7 +28,7 @@ public class DeleteWarhubCommand extends AbstractWarAdminCommand {
 		if (War.war.getWarHub() != null) {
 			// reset existing hub
 			War.war.getWarHub().getVolume().resetBlocks();
-			VolumeMapper.delete(War.war.getWarHub().getVolume());
+			VolumeMapper.deleteSimpleVolume(War.war.getWarHub().getVolume());
 			War.war.setWarHub((WarHub) null);
 			for (Warzone zone : War.war.getWarzones()) {
 				if (zone.getLobby() != null) {

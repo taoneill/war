@@ -1,24 +1,25 @@
 package com.tommytony.war.job;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
-import java.util.*;
-import java.util.logging.Level;
-
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
+import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.volume.ZoneVolume;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.tommytony.war.War;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.structure.ZoneLobby;
-import com.tommytony.war.volume.ZoneVolume;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 	
@@ -61,7 +62,7 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 	public void run() {
 		try {
 			if (conn == null || conn.isClosed()) {
-				conn = ZoneVolumeMapper.getZoneConnection(volume, zone.getName(), volume.getWorld());
+				conn = ZoneVolumeMapper.getZoneConnection(volume, zone.getName());
 			}
 			if (completed >= total) {
 				int airChanges = 0;

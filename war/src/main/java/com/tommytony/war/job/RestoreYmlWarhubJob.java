@@ -1,18 +1,16 @@
 package com.tommytony.war.job;
 
-import java.sql.SQLException;
-import java.util.logging.Level;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.ItemStack;
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.volume.Volume;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
+
+import java.sql.SQLException;
+import java.util.logging.Level;
 
 public class RestoreYmlWarhubJob implements Runnable {
 
@@ -54,7 +52,7 @@ public class RestoreYmlWarhubJob implements Runnable {
 			War.war.setWarHub(hub);
 			Volume vol;
 			try {
-				vol = VolumeMapper.loadVolume("warhub", "", world);
+				vol = VolumeMapper.loadSimpleVolume("warhub", world);
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}

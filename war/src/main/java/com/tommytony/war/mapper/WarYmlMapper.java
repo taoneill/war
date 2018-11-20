@@ -1,18 +1,5 @@
 package com.tommytony.war.mapper;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.logging.Level;
-
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
-
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.KillstreakReward;
@@ -21,6 +8,17 @@ import com.tommytony.war.job.RestoreYmlWarhubJob;
 import com.tommytony.war.job.RestoreYmlWarzonesJob;
 import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.utility.Direction;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
 
 public class WarYmlMapper {
 
@@ -190,7 +188,7 @@ public class WarYmlMapper {
 			hubConfigSection.set("materials.light", War.war.getWarhubMaterials().getLightBlock());
 
 			try {
-				VolumeMapper.save(hub.getVolume(), "");
+				VolumeMapper.saveSimpleVolume(hub.getVolume());
 			} catch (SQLException e) {
 				// who really even cares
 				War.war.getLogger().log(Level.WARNING, "Failed to save warhub volume blocks", e);

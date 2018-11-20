@@ -1,17 +1,5 @@
 package com.tommytony.war.structure;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.material.Sign;
-
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
@@ -19,6 +7,17 @@ import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.material.Sign;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 /**
  *
@@ -236,8 +235,7 @@ public class WarHub {
 	/**
 	 * Resets the sign of the given warzone
 	 *
-	 * @param Warzone
-	 *                zone
+	 * @param zone
 	 */
 	public void resetZoneSign(Warzone zone) {
 		BlockFace left;
