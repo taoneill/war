@@ -32,10 +32,6 @@
     <system>Github issues</system>
     <url>https://github.com/taoneill/war/issues</url>
   </issueManagement>
-  <ciManagement>
-    <system>Jenkins</system>
-    <url>http://ci.tommytony.com</url>
-  </ciManagement>
   <scm>
     <connection>scm:git:git://github.com/taoneill/war.git</connection>
     <developerConnection>scm:git:git@github.com:taoneill/war.git</developerConnection>
@@ -55,8 +51,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.0.2</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
@@ -112,12 +108,6 @@
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
       <version>1.13-R0.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.kitteh</groupId>
-      <artifactId>tagapi</artifactId>
-      <version>2.7.1</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>

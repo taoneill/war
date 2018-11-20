@@ -60,9 +60,6 @@ public class RestoreYmlWarzonesJob implements Runnable {
 					}
 					language.addPlotter(new PlotterEnabled(langName));
 					Graph plugins = metrics.createGraph("Extensions");
-					if (War.war.isTagServer()) {
-						plugins.addPlotter(new PlotterEnabled("TagAPI"));
-					}
 					if (Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
 						plugins.addPlotter(new PlotterEnabled("WorldEdit"));
 					}

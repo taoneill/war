@@ -14,7 +14,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
-import org.kitteh.tag.TagAPI;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -368,9 +367,6 @@ public class Team {
 
 	public void addPlayer(Player player) {
 		this.players.add(player);
-		if (War.war.isTagServer()) {
-			TagAPI.refreshPlayer(player);
-		}
 		if (this.warzone.getScoreboard() != null && this.warzone.getScoreboardType() != ScoreboardType.NONE) {
 			player.setScoreboard(this.warzone.getScoreboard());
 		}
@@ -428,9 +424,6 @@ public class Team {
 			this.teamChatPlayers.remove(thePlayer);
 		}
 		this.warzone.dropAllStolenObjects(thePlayer, false);
-		if (War.war.isTagServer()) {
-			TagAPI.refreshPlayer(thePlayer);
-		}
 		thePlayer.setFireTicks(0);
 		thePlayer.setRemainingAir(300);
 		if (!this.warzone.getReallyDeadFighters().contains(thePlayer.getName())) {
