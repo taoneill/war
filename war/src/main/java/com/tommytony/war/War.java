@@ -2,14 +2,15 @@ package com.tommytony.war;
 
 import com.tommytony.war.command.WarCommandHandler;
 import com.tommytony.war.config.*;
-import com.tommytony.war.event.*;
+import com.tommytony.war.event.WarBlockListener;
+import com.tommytony.war.event.WarEntityListener;
+import com.tommytony.war.event.WarPlayerListener;
+import com.tommytony.war.event.WarTagListener;
 import com.tommytony.war.job.CapturePointTimer;
 import com.tommytony.war.job.HelmetProtectionTask;
 import com.tommytony.war.job.ScoreboardSwitchTimer;
-import com.tommytony.war.job.SpoutFadeOutMessageJob;
 import com.tommytony.war.mapper.WarYmlMapper;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
-import com.tommytony.war.spout.SpoutDisplayer;
 import com.tommytony.war.structure.*;
 import com.tommytony.war.ui.UIManager;
 import com.tommytony.war.utility.*;
@@ -65,11 +66,9 @@ public class War extends JavaPlugin {
 	private WarPlayerListener playerListener = new WarPlayerListener();
 	private WarEntityListener entityListener = new WarEntityListener();
 	private WarBlockListener blockListener = new WarBlockListener();
-	private WarServerListener serverListener = new WarServerListener();
 	private WarCommandHandler commandHandler = new WarCommandHandler();
 	private PluginDescriptionFile desc = null;
 	private boolean loaded = false;
-	private boolean isSpoutServer = false;
 	private boolean tagServer = false;
 	// Zones and hub
 	private List<Warzone> warzones = new ArrayList<Warzone>();
@@ -78,7 +77,6 @@ public class War extends JavaPlugin {
 	private KillstreakReward killstreakReward;
 	private MySQLConfig mysqlConfig;
 	private Economy econ = null;
-	private SpoutDisplayer spoutMessenger = null;
 	private HubLobbyMaterials warhubMaterials = new HubLobbyMaterials(
 			new ItemStack(Material.GLASS), new ItemStack(Material.OAK_WOOD),
 			new ItemStack(Material.OBSIDIAN), new ItemStack(Material.GLOWSTONE));
@@ -121,14 +119,6 @@ public class War extends JavaPlugin {
 		this.setLoaded(true);
 		this.desc = this.getDescription();
 
-		// Spout server detection
-		try {
-			Class.forName("org.getspout.spoutapi.player.SpoutPlayer");
-			isSpoutServer = true;
-			spoutMessenger = new SpoutDisplayer();
-		} catch (ClassNotFoundException e) {
-			isSpoutServer = false;
-		}
 		try {
 			Class.forName("org.sqlite.JDBC").newInstance();
 		} catch (Exception e) {
@@ -143,7 +133,6 @@ public class War extends JavaPlugin {
 		pm.registerEvents(this.playerListener, this);
 		pm.registerEvents(this.entityListener, this);
 		pm.registerEvents(this.blockListener, this);
-		pm.registerEvents(this.serverListener, this);
 		pm.registerEvents(this.UIManager, this);
 		if (pm.isPluginEnabled("TagAPI")) {
 			try {
@@ -269,10 +258,6 @@ public class War extends JavaPlugin {
 		ScoreboardSwitchTimer sst = new ScoreboardSwitchTimer();
 		sst.runTaskTimer(this, 500, 20 * 60);
 
-		if (this.isSpoutServer) {
-			SpoutFadeOutMessageJob fadeOutMessagesTask = new SpoutFadeOutMessageJob();
-			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, fadeOutMessagesTask, 100, 100);
-		}
 		if (this.mysqlConfig.isEnabled()) {
 			try {
 				Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -1166,10 +1151,6 @@ public class War extends JavaPlugin {
 			this.wandBearers.remove(player.getName());
 		}
 	}
-	
-	public boolean isSpoutServer() {
-		return this.isSpoutServer;
-	}
 
 	public Warzone zoneOfZoneWallAtProximity(Location location) {
 		for (Warzone zone : this.warzones) {
@@ -1246,10 +1227,6 @@ public class War extends JavaPlugin {
 	
 	public WarConfigBag getWarConfig() {
 		return this.warConfig;
-	}
-
-	public SpoutDisplayer getSpoutDisplayer() {
-		return this.spoutMessenger ;
 	}
 
 	public HubLobbyMaterials getWarhubMaterials() {

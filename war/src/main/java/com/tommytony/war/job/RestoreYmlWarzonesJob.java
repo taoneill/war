@@ -1,20 +1,17 @@
 package com.tommytony.war.job;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.Locale;
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
-
 import org.bukkit.Bukkit;
-
 import org.mcstats.Metrics;
 import org.mcstats.Metrics.Graph;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
 
 public class RestoreYmlWarzonesJob implements Runnable {
 
@@ -63,9 +60,6 @@ public class RestoreYmlWarzonesJob implements Runnable {
 					}
 					language.addPlotter(new PlotterEnabled(langName));
 					Graph plugins = metrics.createGraph("Extensions");
-					if (War.war.isSpoutServer()) {
-						plugins.addPlotter(new PlotterEnabled("Spout"));
-					}
 					if (War.war.isTagServer()) {
 						plugins.addPlotter(new PlotterEnabled("TagAPI"));
 					}

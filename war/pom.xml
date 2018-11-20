@@ -103,13 +103,6 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.spout</groupId>
-      <artifactId>spoutplugin</artifactId>
-      <version>1.5.2-R1.0</version>
-      <scope>compile</scope>
-      <type>jar</type>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
