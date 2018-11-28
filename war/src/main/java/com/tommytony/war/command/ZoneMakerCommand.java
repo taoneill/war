@@ -63,6 +63,7 @@ public class ZoneMakerCommand extends AbstractWarCommand {
 						War.war.log(player.getName() + " made " + other.getName() + " a zonemaker", Level.INFO);
 					}
 				}
+				WarYmlMapper.save();
 			} else {
 				return false;
 			}
