@@ -47,8 +47,7 @@ import java.util.logging.Level;
  */
 public class WarPlayerListener implements Listener {
 	private java.util.Random random = new java.util.Random();
-	private HashMap<String, Location> latestLocations = new HashMap<String, Location>(); 
-	private boolean cooldownDisabled = War.war.getWarConfig().getBoolean(WarConfig.DISABLECOOLDOWN);
+	private HashMap<String, Location> latestLocations = new HashMap<String, Location>();
 
 	/**
 	 * Correctly removes quitting players from warzones
@@ -68,11 +67,17 @@ public class WarPlayerListener implements Listener {
 				War.war.removeWandBearer(player);
 			}
 		}
+		event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onPlayerJoin(final PlayerJoinEvent event) {
-		event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(cooldownDisabled ? 1024 : 4);
+		boolean cooldownDisabled = War.war.getWarConfig().getBoolean(WarConfig.DISABLECOOLDOWN);
+		if(cooldownDisabled) {
+			event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1024.0);
+		} else {
+			event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
+		}
 		String autojoinName = War.war.getWarConfig().getString(WarConfig.AUTOJOIN);
 		boolean autojoinEnabled = !autojoinName.isEmpty();
 		if (autojoinEnabled) { // Won't be able to find warzone if unset
