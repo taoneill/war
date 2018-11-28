@@ -19,6 +19,7 @@ import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.volume.Volume;
 import org.apache.commons.lang.Validate;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Item;
@@ -47,6 +48,7 @@ import java.util.logging.Level;
 public class WarPlayerListener implements Listener {
 	private java.util.Random random = new java.util.Random();
 	private HashMap<String, Location> latestLocations = new HashMap<String, Location>(); 
+	private boolean cooldownDisabled = War.war.getWarConfig().getBoolean(WarConfig.DISABLECOOLDOWN);
 
 	/**
 	 * Correctly removes quitting players from warzones
@@ -70,6 +72,7 @@ public class WarPlayerListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onPlayerJoin(final PlayerJoinEvent event) {
+		event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(cooldownDisabled ? 1024 : 4);
 		String autojoinName = War.war.getWarConfig().getString(WarConfig.AUTOJOIN);
 		boolean autojoinEnabled = !autojoinName.isEmpty();
 		if (autojoinEnabled) { // Won't be able to find warzone if unset
