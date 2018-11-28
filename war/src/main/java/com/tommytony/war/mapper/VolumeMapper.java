@@ -2,20 +2,21 @@ package com.tommytony.war.mapper;
 
 import com.tommytony.war.War;
 import com.tommytony.war.volume.Volume;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
+import org.bukkit.block.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.sql.*;
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -27,6 +28,10 @@ public class VolumeMapper {
 
 	protected static final String delim = "-------mcwar iSdgraIyMvOanTEJjZgocczfuG------";
 	protected static final int DATABASE_VERSION = 3;
+
+	private static String getBlockDescriptor(Location loc, String type, String data, String metadata) {
+		return String.format("<%d,%d,%d> type: %s, data: %s, meta: %s", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), type, data, metadata);
+	}
 
 	public static void loadCorners(Connection databaseConnection, Volume volume, World world, String prefix) throws SQLException {
 		Validate.isTrue(!databaseConnection.isClosed());
@@ -78,38 +83,102 @@ public class VolumeMapper {
 				changes[xi][yi][zi] = true;
 			}
 			BlockState modify = relative.getState();
+			// Load information from database, or null if not set
 			String type = stringCache.get(query.getInt("type"));
 			String data = stringCache.get(query.getInt("data"));
+			String metadata = stringCache.get(query.getInt("metadata"));
 
+			// Try to look up the material. May fail due to mods or MC updates.
 			Material mat = Material.getMaterial(type);
 			if (mat == null) {
-				War.war.getLogger().log(Level.WARNING, "Failed to parse block type. x:" + x + " y:" + y + " z:" + z + " type:" + type + " data:" + data);
+				War.war.getLogger().log(Level.WARNING, "Failed to parse block type. " + getBlockDescriptor(modify.getLocation(), type, data, metadata));
 				continue;
 			}
+			// Try to get the block data (damage, non-tile information) using the 1.13 functions
 			BlockData bdata = null;
 			try {
 				if (data != null) {
 					bdata = Bukkit.createBlockData(data);
 				}
 			} catch (IllegalArgumentException iae) {
-				War.war.getLogger().log(Level.WARNING, "Exception loading some tile data. x:" + x + " y:" + y + " z:" + z + " type:" + type + " data:" + data, iae);
+				War.war.getLogger().log(Level.WARNING, "Exception loading some block data. " + getBlockDescriptor(modify.getLocation(), type, data, metadata), iae);
+			}
+			// Update the block type/data in memory if they have changed
+			boolean updatedType = false;
+			if (modify.getType() != mat) {
+				modify.setType(mat);
+				updatedType = true;
+			}
+			boolean updatedData = false;
+			if (bdata != null && !modify.getBlockData().equals(bdata)) {
+				modify.setBlockData(bdata);
+				updatedData = true;
+			}
+			if (!inMemory && (updatedType || updatedData)) {
+				// Update the type & data if it has changed, needed here for tile entity check
+				modify.update(true, false); // No-physics update, preventing the need for deferring blocks
+				relative = corner1.getRelative(x, y, z);
+				modify = relative.getState();
+			}
+			// Try to update the tile entity data
+			if (metadata != null) {
+				try {
+					if (modify instanceof Sign) {
+						final String[] lines = metadata.split("\n");
+						for (int i = 0; i < lines.length; i++) {
+							((Sign) modify).setLine(i, lines[i]);
+						}
+					}
+
+					// Containers
+					if (modify instanceof Container) {
+						YamlConfiguration config = new YamlConfiguration();
+						config.loadFromString(metadata);
+						Inventory inv = ((Container) modify).getSnapshotInventory();
+						inv.clear();
+						int slot = 0;
+						for (Object obj : config.getList("items")) {
+							if (obj instanceof ItemStack) {
+								inv.setItem(slot, (ItemStack) obj);
+							}
+							++slot;
+						}
+					}
+
+					// Records
+					if (modify instanceof Jukebox) {
+						((Jukebox) modify).setPlaying(Material.valueOf(metadata));
+					}
+
+					// Skulls
+					if (modify instanceof Skull) {
+						UUID playerId = UUID.fromString(metadata);
+						OfflinePlayer player = Bukkit.getOfflinePlayer(playerId);
+						((Skull) modify).setOwningPlayer(player);
+					}
+
+					// Command blocks
+					if (modify instanceof CommandBlock) {
+						final String[] commandArray = metadata.split("\n");
+						((CommandBlock) modify).setName(commandArray[0]);
+						((CommandBlock) modify).setCommand(commandArray[1]);
+					}
+
+					// Creature spawner
+					if (modify instanceof CreatureSpawner) {
+						((CreatureSpawner) modify).setSpawnedType(EntityType.valueOf(metadata));
+					}
+
+					if (!inMemory) {
+						modify.update(true, false);
+					}
+				} catch (Exception ex) {
+					War.war.getLogger().log(Level.WARNING, "Exception loading some tile entity data. " + getBlockDescriptor(modify.getLocation(), type, data, metadata), ex);
+				}
 			}
 
 			if (inMemory) {
-				modify.setType(mat);
-				if (bdata != null) {
-					modify.setBlockData(bdata);
-				}
 				volume.getBlocks().add(modify);
-			} else {
-				if (modify.getType() != mat || (bdata != null && !modify.getBlockData().equals(bdata))) {
-					// Update the type & data if it has changed
-					modify.setType(mat);
-					if (bdata != null) {
-						modify.setBlockData(bdata);
-					}
-					modify.update(true, false); // No-physics update, preventing the need for deferring blocks
-				}
 			}
 		}
 		query.close();
@@ -234,7 +303,7 @@ public class VolumeMapper {
 
 	public static int saveBlocks(Connection databaseConnection, Volume volume, String prefix) throws SQLException {
 		Statement stmt = databaseConnection.createStatement();
-		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS "+prefix+"blocks (x BIGINT, y BIGINT, z BIGINT, type BIGINT, data BIGINT)");
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS "+prefix+"blocks (x BIGINT, y BIGINT, z BIGINT, type BIGINT, data BIGINT, metadata BIGINT)");
 		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS "+prefix+"strings (id INTEGER PRIMARY KEY NOT NULL UNIQUE, type TEXT)");
 		stmt.executeUpdate("DELETE FROM "+prefix+"blocks");
 		stmt.executeUpdate("DELETE FROM "+prefix+"strings");
@@ -243,7 +312,7 @@ public class VolumeMapper {
 		int cachei = 1;
 		int changed = 0;
 		long startTime = System.currentTimeMillis();
-		PreparedStatement dataStmt = databaseConnection.prepareStatement("INSERT INTO "+prefix+"blocks (x, y, z, type, data) VALUES (?, ?, ?, ?, ?)");
+		PreparedStatement dataStmt = databaseConnection.prepareStatement("INSERT INTO "+prefix+"blocks (x, y, z, type, data, metadata) VALUES (?, ?, ?, ?, ?, ?)");
 		databaseConnection.setAutoCommit(false);
 		final int batchSize = 10000;
 		for (int i = 0, x = volume.getMinX(); i < volume.getSizeX(); i++, x++) {
@@ -254,7 +323,7 @@ public class VolumeMapper {
 					if (block.getType() == Material.AIR) {
 						continue; // Do not save air blocks to the file anymore.
 					}
-					int typeid, dataid;
+					int typeid, dataid, metaid;
 					// Save even more space by writing each string only once
 					if (stringCache.containsKey(block.getType().name())) {
 						typeid = stringCache.get(block.getType().name());
@@ -275,11 +344,42 @@ public class VolumeMapper {
 						dataid = 0;
 					}
 
+					// Save tile entities
+					BlockState state = block.getState();
+					String metadata = "";
+					if (state instanceof Sign) {
+						metadata = StringUtils.join(((Sign) state).getLines(), "\n");
+					} else if (state instanceof InventoryHolder) {
+						List<ItemStack> items = Arrays.asList(((InventoryHolder) state).getInventory().getContents());
+						YamlConfiguration config = new YamlConfiguration();
+						// Serialize to config, then store config in database
+						config.set("items", items);
+						metadata = config.saveToString();
+					} else if (state instanceof Jukebox) {
+						metadata = ((Jukebox) state).getPlaying().toString();
+					} else if (state instanceof Skull) {
+						OfflinePlayer player = ((Skull) state).getOwningPlayer();
+						metadata = player == null ? "" : player.getUniqueId().toString();
+					} else if (state instanceof CommandBlock) {
+						metadata = ((CommandBlock) state).getName() + "\n" + ((CommandBlock) state).getCommand();
+					} else if (state instanceof CreatureSpawner) {
+						metadata = ((CreatureSpawner) state).getSpawnedType().toString();
+					}
+					if (metadata.isEmpty()) {
+						metaid = 0;
+					} else if (stringCache.containsKey(metadata)) {
+						metaid = stringCache.get(metadata);
+					} else {
+						metaid = cachei;
+						stringCache.put(metadata, cachei++);
+					}
+
 					dataStmt.setInt(1, block.getX() - volume.getCornerOne().getBlockX());
 					dataStmt.setInt(2, block.getY() - volume.getCornerOne().getBlockY());
 					dataStmt.setInt(3, block.getZ() - volume.getCornerOne().getBlockZ());
 					dataStmt.setInt(4, typeid);
 					dataStmt.setInt(5, dataid);
+					dataStmt.setInt(6, metaid);
 
 					dataStmt.addBatch();
 
@@ -373,7 +473,7 @@ public class VolumeMapper {
 	protected static void convertSchema2_3(Connection databaseConnection, String prefix, boolean isSimple) throws SQLException {
 		Statement stmt = databaseConnection.createStatement();
 		stmt.executeUpdate("DROP TABLE " + prefix + "blocks");
-		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS "+prefix+"blocks (x BIGINT, y BIGINT, z BIGINT, type BIGINT, data BIGINT)");
+		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS "+prefix+"blocks (x BIGINT, y BIGINT, z BIGINT, type BIGINT, data BIGINT, metadata BIGINT)");
 		stmt.executeUpdate("CREATE TABLE IF NOT EXISTS "+prefix+"strings (id INTEGER PRIMARY KEY NOT NULL UNIQUE, type TEXT)");
 		stmt.executeUpdate("PRAGMA user_version = " + DATABASE_VERSION);
 		stmt.close();
