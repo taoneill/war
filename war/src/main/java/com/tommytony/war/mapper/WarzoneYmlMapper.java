@@ -1,5 +1,21 @@
 package com.tommytony.war.mapper;
 
+import com.tommytony.war.Team;
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.TeamKind;
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.structure.*;
+import com.tommytony.war.utility.Direction;
+import com.tommytony.war.volume.Volume;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -9,24 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-
-import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.structure.*;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
-
-import com.tommytony.war.Team;
-import com.tommytony.war.War;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.config.TeamKind;
-import com.tommytony.war.utility.Direction;
-import com.tommytony.war.volume.Volume;
-import com.tommytony.war.volume.ZoneVolume;
 
 public class WarzoneYmlMapper {
 
@@ -304,7 +302,7 @@ public class WarzoneYmlMapper {
 			}
 			Connection connection = null;
 			try {
-				connection = ZoneVolumeMapper.getZoneConnection(warzone.getVolume(), warzone.getName(), warzone.getWorld());
+				connection = ZoneVolumeMapper.getZoneConnection(warzone.getVolume(), warzone.getName());
 			} catch (SQLException e) {
 				War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 			}
@@ -658,7 +656,7 @@ public class WarzoneYmlMapper {
 		}
 		Connection connection = null;
 		try {
-			connection = ZoneVolumeMapper.getZoneConnection(warzone.getVolume(), warzone.getName(), warzone.getWorld());
+			connection = ZoneVolumeMapper.getZoneConnection(warzone.getVolume(), warzone.getName());
 		} catch (SQLException e) {
 			War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 		}
