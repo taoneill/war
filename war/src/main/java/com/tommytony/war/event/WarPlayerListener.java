@@ -19,7 +19,6 @@ import com.tommytony.war.utility.LoadoutSelection;
 import com.tommytony.war.volume.Volume;
 import org.apache.commons.lang.Validate;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Item;
@@ -67,17 +66,10 @@ public class WarPlayerListener implements Listener {
 				War.war.removeWandBearer(player);
 			}
 		}
-		event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onPlayerJoin(final PlayerJoinEvent event) {
-		boolean cooldownDisabled = War.war.getWarConfig().getBoolean(WarConfig.DISABLECOOLDOWN);
-		if(cooldownDisabled) {
-			event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1024.0);
-		} else {
-			event.getPlayer().getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
-		}
 		String autojoinName = War.war.getWarConfig().getString(WarConfig.AUTOJOIN);
 		boolean autojoinEnabled = !autojoinName.isEmpty();
 		if (autojoinEnabled) { // Won't be able to find warzone if unset
