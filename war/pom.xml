@@ -58,7 +58,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>1.7.1</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -68,13 +68,13 @@
             <configuration>
               <artifactSet>
                 <includes>
-                  <include>org.mcstats.bukkit:metrics</include>
+                  <include>org.bstats:bstats-bukkit</include>
                 </includes>
               </artifactSet>
               <minimizeJar>false</minimizeJar>
               <relocations>
                 <relocation>
-                  <pattern>org.mcstats</pattern>
+                  <pattern>org.bstats.bukkit</pattern>
                   <shadedPattern>com.tommytony.war.metrics</shadedPattern>
                 </relocation>
               </relocations>
@@ -126,6 +126,12 @@
       <groupId>net.milkbowl.vault</groupId>
       <artifactId>Vault</artifactId>
       <version>1.2.32</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bstats</groupId>
+      <artifactId>bstats-bukkit</artifactId>
+      <version>1.4</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>

@@ -4,11 +4,14 @@ import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 
 public class RestoreYmlWarzonesJob implements Runnable {
@@ -46,8 +49,31 @@ public class RestoreYmlWarzonesJob implements Runnable {
 			}
 			if (War.war.getWarzones().size() > 0) {
 				War.war.log("Warzones ready.", Level.INFO);
-				final int zones = War.war.getWarzones().size();
 			}
+		}
+		Metrics metrics = new Metrics(War.war);
+		metrics.addCustomChart(new Metrics.SimplePie("language", () -> {
+			String lang = War.war.getLoadedLocale().getDisplayLanguage(Locale.ENGLISH);
+			if (lang == null || lang.isEmpty()) {
+				lang = "English";
+			}
+			return lang;
+		}));
+		metrics.addCustomChart(new Metrics.SingleLineChart("warzones", War.war.getWarzones()::size));
+		metrics.addCustomChart(new Metrics.DrilldownPie("extensions", () -> {
+			Map<String, Map<String, Integer>> map = new HashMap<>();
+			getExtensionEntry("WorldEdit", map);
+			getExtensionEntry("Vault", map);
+			return map;
+		}));
+	}
+
+	private static void getExtensionEntry(String extension, Map<String, Map<String, Integer>> output) {
+		if (Bukkit.getPluginManager().isPluginEnabled(extension)) {
+			String version = Bukkit.getPluginManager().getPlugin(extension).getDescription().getVersion();
+			Map<String, Integer> entry = new HashMap<>();
+			entry.put(version, 1);
+			output.put(extension, entry);
 		}
 	}
 
