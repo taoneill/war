@@ -5,8 +5,6 @@ import com.tommytony.war.Warzone;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
 import org.bukkit.Bukkit;
-import org.mcstats.Metrics;
-import org.mcstats.Metrics.Graph;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -49,52 +47,8 @@ public class RestoreYmlWarzonesJob implements Runnable {
 			if (War.war.getWarzones().size() > 0) {
 				War.war.log("Warzones ready.", Level.INFO);
 				final int zones = War.war.getWarzones().size();
-				try {
-					Metrics metrics = new Metrics(War.war);
-					Graph warzoneCount = metrics.createGraph("Warzones");
-					warzoneCount.addPlotter(new FixedPlotter("Count", zones));
-					Graph language = metrics.createGraph("Language");
-					String langName = War.war.getLoadedLocale().getDisplayLanguage(Locale.ENGLISH);
-					if (langName.isEmpty()) {
-						langName = "English";
-					}
-					language.addPlotter(new PlotterEnabled(langName));
-					Graph plugins = metrics.createGraph("Extensions");
-					if (Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
-						plugins.addPlotter(new PlotterEnabled("WorldEdit"));
-					}
-					plugins.addPlotter(new PlotterEnabled("War")); // of course
-					metrics.start();
-				} catch (Exception ignored) {
-				}
 			}
 		}
 	}
 
-	private static class FixedPlotter extends Metrics.Plotter {
-
-		private final int value;
-
-		public FixedPlotter(final String name, final int value) {
-			super(name);
-			this.value = value;
-		}
-
-		@Override
-		public int getValue() {
-			return value;
-		}
-	}
-
-	private static class PlotterEnabled extends Metrics.Plotter {
-
-		public PlotterEnabled(final String name) {
-			super(name);
-		}
-
-		@Override
-		public int getValue() {
-			return 1;
-		}
-	}
 }
