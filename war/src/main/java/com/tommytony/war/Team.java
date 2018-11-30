@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -371,6 +372,12 @@ public class Team {
 			player.setScoreboard(this.warzone.getScoreboard());
 		}
 		warzone.updateScoreboard();
+		boolean cooldownEnabled = War.war.getWarConfig().getBoolean(WarConfig.DISABLECOOLDOWN);
+		if(cooldownEnabled) {
+			player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(1024.0);
+		} else {
+			player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
+		}
 	}
 
 	public List<Player> getPlayers() {
@@ -431,6 +438,7 @@ public class Team {
 		}
 		this.warzone.getLoadoutSelections().remove(thePlayer);
 		warzone.updateScoreboard();
+		thePlayer.getAttribute(Attribute.GENERIC_ATTACK_SPEED).setBaseValue(4.0);
 	}
 
 	public int getRemainingLives() {

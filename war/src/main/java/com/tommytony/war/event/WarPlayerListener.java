@@ -46,7 +46,7 @@ import java.util.logging.Level;
  */
 public class WarPlayerListener implements Listener {
 	private java.util.Random random = new java.util.Random();
-	private HashMap<String, Location> latestLocations = new HashMap<String, Location>(); 
+	private HashMap<String, Location> latestLocations = new HashMap<String, Location>();
 
 	/**
 	 * Correctly removes quitting players from warzones

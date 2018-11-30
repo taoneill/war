@@ -13,7 +13,8 @@ public enum WarConfig {
 	MAXSIZE (Integer.class, "Max size", "Maximum volume of a warzone"),
 	LANGUAGE (String.class, "Language", "Preferred server language"),
 	AUTOJOIN (String.class, "Auto-join", "Name of warzone to send players to upon join"),
-	TPWARMUP(Integer.class, "TP warmup", "Amount of seconds a player must wait after requesting a teleport");
+	TPWARMUP(Integer.class, "TP warmup", "Amount of seconds a player must wait after requesting a teleport"),
+	DISABLECOOLDOWN (Boolean.class, "Disable the 1.9 combat cooldown", "Disables the attack cooldown when swinging a weapon");
 	
 	private final Class<?> configType;
 	private final String title;

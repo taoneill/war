@@ -147,6 +147,7 @@ public class War extends JavaPlugin {
 		warConfig.put(WarConfig.LANGUAGE, Locale.getDefault().toString());
 		warConfig.put(WarConfig.AUTOJOIN, "");
 		warConfig.put(WarConfig.TPWARMUP, 0);
+		warConfig.put(WarConfig.DISABLECOOLDOWN, false);
 
 		warzoneDefaultConfig.put(WarzoneConfig.AUTOASSIGN, false);
 		warzoneDefaultConfig.put(WarzoneConfig.BLOCKHEADS, true);
