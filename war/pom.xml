@@ -119,7 +119,7 @@
     <dependency>
       <groupId>com.tommytony</groupId>
       <artifactId>worldedit-bukkit</artifactId>
-      <version>7.0.0-beta-01</version>
+      <version>7.0.0-beta-03</version>
       <type>jar</type>
     </dependency>
     <dependency>
