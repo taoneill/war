@@ -299,8 +299,7 @@ public class WarBlockListener implements Listener {
 				} else {
 					Bomb bomb = warzone.getBombForBlock(block);
 					// player just broke the bomb block: cancel to avoid drop, give player the block, set block to air
-					ItemStack tntBlock = new ItemStack(Material.TNT);
-					tntBlock.setDurability((short)8);
+					ItemStack tntBlock = new ItemStack(Material.TNT, 1);
 					player.getInventory().clear();
 					player.getInventory().addItem(tntBlock);
 					warzone.addBombThief(bomb, player);
@@ -323,7 +322,6 @@ public class WarBlockListener implements Listener {
 					Cake cake = warzone.getCakeForBlock(block);
 					// player just broke the cake block: cancel to avoid drop, give player the block, set block to air
 					ItemStack cakeBlock = new ItemStack(Material.CAKE);
-					cakeBlock.setDurability((short)8);
 					player.getInventory().clear();
 					player.getInventory().addItem(cakeBlock);
 					warzone.addCakeThief(cake, player);

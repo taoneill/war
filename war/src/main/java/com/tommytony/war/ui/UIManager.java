@@ -75,9 +75,8 @@ public class UIManager implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 		if (item != null && item.getType() == Material.TNT
-				&& (item.getDurability() == 7 ||
-					(item.hasItemMeta() && item.getItemMeta().hasDisplayName()
-							&& item.getItemMeta().getDisplayName().contains("War")))) {
+				&& item.hasItemMeta() && item.getItemMeta().hasDisplayName()
+				&& item.getItemMeta().getDisplayName().contains("War")) {
 			event.setCancelled(true);
 			this.assignUI(player, new WarUI());
 		}
