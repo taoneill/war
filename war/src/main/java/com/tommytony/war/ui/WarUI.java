@@ -35,9 +35,10 @@ public class WarUI extends ChestUI {
 		};
 
 		if (War.war.isWarAdmin(player)) {
-			this.addItem(inv, 2, getWarAdminItem(), warAdminAction);
-			this.addItem(inv, 4, getCreateWarzoneItem(), createZoneAction);
-			this.addItem(inv, 6, getJoinWarzoneItem(), joinZoneAction);
+			this.addItem(inv, 1, getWarTNT(), null);
+			this.addItem(inv, 3, getWarAdminItem(), warAdminAction);
+			this.addItem(inv, 5, getCreateWarzoneItem(), createZoneAction);
+			this.addItem(inv, 7, getJoinWarzoneItem(), joinZoneAction);
 		} else if (War.war.isZoneMaker(player)) {
 			this.addItem(inv, 2, getCreateWarzoneItem(), createZoneAction);
 			this.addItem(inv, 6, getJoinWarzoneItem(), joinZoneAction);
@@ -71,6 +72,15 @@ public class WarUI extends ChestUI {
 		meta.setDisplayName(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Manage War");
 		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Click to display " + ChatColor.DARK_RED + "Admin" + ChatColor.GRAY + " access panel",
 				ChatColor.GRAY + "Includes: " + ChatColor.DARK_GRAY + "Permissions, managing warzones, configs, etc."));
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	private ItemStack getWarTNT() {
+		ItemStack item = new ItemStack(Material.TNT, 1);
+		ItemMeta meta = item.getItemMeta();
+		meta.setDisplayName(ChatColor.RED + "War");
+		meta.setLore(ImmutableList.of(ChatColor.GRAY + "Use to easily open the War UI"));
 		item.setItemMeta(meta);
 		return item;
 	}

@@ -35,7 +35,7 @@ public abstract class ChestUI {
 	public abstract int getSize();
 
 	boolean processClick(ItemStack clicked, Inventory inventory) {
-		if (actions.containsKey(clicked)) {
+		if (actions.containsKey(clicked) && actions.get(clicked) != null) {
 			War.war.getServer().getScheduler().runTask(War.war, actions.get(clicked));
 			return true;
 		}
