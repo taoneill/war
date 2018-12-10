@@ -50,70 +50,76 @@ permissions:
 commands:
 # Player commands
   warzones:
-    description: War> Lists the warzones on the server. Each warzone is an independent arena.
-    usage: Lists the warzones on the server. Each warzone is an independent arena.
-        Ex - /warzones
-  zones:
-    description: War> Shortcut for /warzones.
-    usage: Lists the warzones on the server. Each warzone is an independent arena.
-        Ex - /zones
+    description: |
+      Lists the warzones on the server.
+      Each warzone is an independent arena.
+    aliases: [zones]
+    usage: |
+      /<command>
   warzone:
-    description: War> Teleports you to the specified warzone's lobby.
-    usage: Teleports you to the specified warzone's lobby.
-        Ex - /warzone <zone-name>
-  zone:
-    description: War> Shortcut for /warzone.
-    usage: Teleports you to the specified warzone's lobby.
-        Ex - /zone <zone-name>
+    description: Teleports you to the warzone's lobby.
+    aliases: [zone]
+    usage: /<command> <zone-name>
   warhub:
-    description: War> Teleports you to the warhub, if it exists. The warhub offers portals to reach each warzone on the server.
-    usage: Teleports you to the warhub, if it exists.
-        Ex - /warhub
+    description: Teleports you to the WarHub.
+    usage: /<command>
   teams:
-    description: War> Lists the teams in the warzone.
-    usage: Lists the teams in the warzone. Use zone name when outside warzone.
-        Ex - /teams [zone-name]
+    description: |
+      Lists the teams in the warzone.
+      Use zone name when outside warzone.
+    usage: /<command> [zone-name]
   join:
-    description: War> Use to change teams. Also used instead of walking in the team gate in the lobby.
-    usage: Use to change teams. Also used instead of walking in the team gate in the lobby. Must be standing in warzone or lobby.
-        Ex - /join <team-color>
+    description: |
+      Switch teams during a battle.
+      Also used instead of walking in the team gate in the lobby. Must be standing in warzone or lobby.
+    usage: /<command> <team-color>
   leave:
-    description: War> Use to leave a warzone. Teleports you back to the lobby.
-    usage: Use to leave a warzone. Teleports you back to the lobby. Must be in team already.
-        Ex - /leave
+    description: |
+      Leave a warzone battle.
+      Teleports you back to the lobby. Must be in team already.
+    usage: /<command>
   team:
-    description: War> Team chat.
-    usage: Team chat.
-        Ex - /team <message>
+    description: Chat with your team.
+    usage: |
+      /<command> [message]
+      Example: /<command> - enable team chat
+      Example: /<command> Good game guys - send this message to your team
 # Warzone maker commands (must have the 'war.zonemaker' permission or be added as a zone-maker in /plugins/War/war.txt)
 # Battle-related commands
   nextbattle:
-    description: War> Warzone blocks are restored, teams are respawned but score remains unaffected. All zone-makers can do this, even if they are not an author of the zone.
-    usage: Warzone blocks are restored, teams are respawned but score remains unaffected. All zone-makers can do this, even if they are not an author of the zone. Provide a zone name if not standing in warzone or lobby.
-        Ex - /nextbattle [zone-name]
+    description: |
+      Respawn all players and blocks.
+      Warzone blocks are restored, teams are respawned but score remains unaffected. All zone-makers can do this, even if they are not an author of the zone. Provide a zone name if not standing in warzone or lobby.
+    usage: /<command> [zone-name]
 # Warzone creation commands
   setzone:
-    description: War> Use to create a warzone. Lobby is created and blocks are saved when the second corner is set. You can only edit zones you create or those listing you as author (add authors with /setzoneconfig author:yourname).
-    usage: Use to create a warzone. Lobby is created and blocks are saved when the second corner is set. You can only edit zones you create or those listing you as author (add authors with /setzoneconfig author:yourname). Warzones must be at least 10 blocks wide in all directions.
-        \\\\ Wand Cuboid mode \\
-        1) /setzone <zone-name> to get wooden sword,
-        2) Left-click to select or move corner1,
-        3) Right-click to select or move corner2.
-        Turn off wand by dropping the wooden sword.
-        \\\\ WorldEdit Cuboid mode \\
-        1) Create a cuboid selection using WorldEdit
-        2) /setzone <zone-name>
-        \\\\ Wandless Cuboid mode \\
-        /setzone <zone-name> <corner1/corner2/c1/c2/pos1/pos2>
+    description: |
+      Create a warzone.
+      Lobby is created and blocks are saved when the second corner is set. You can only edit zones you create or those listing you as author (add authors with /setzoneconfig author:yourname). Warzones must be at least 10 blocks wide in all directions.
+    usage: |
+      /<command> <zone-name> [corner1/corner2]
+      \\\\ WorldEdit Cuboid mode \\
+      1) Create a cuboid selection using WorldEdit
+      2) /<command> <zone-name>
+      \\\\ Wand Cuboid mode \\
+      1) /<command> <zone-name> to get wooden sword,
+      2) Left-click to select or move corner1,
+      3) Right-click to select or move corner2.
+      Turn off wand by dropping the wooden sword.
+      \\\\ Wandless Cuboid mode \\
+      1) /<command> <zone-name> <corner1/corner2/c1/c2/pos1/pos2>
   savezone:
-    description: War> Persists changes made to the warzone since the last save. Config can be set with named parameters.
-    usage: Persists changes made to the warzone since the last save. Config can be set with named parameters. Provide a zone name if not standing in warzone or lobby.
-        Ex -
-        /savezone [zone-name] -> Basic save - name optional if standing inside. \\
-        /savezone [zone-name] lifepool:8 teamsize:5 ... -> set warzone configuration options as you save. See /warcfg and /zonecfg for details.
+    description: |
+      Save all blocks in a warzone.
+      Persists changes made to the warzone since the last save. Config can be set with named parameters. Provide a zone name if not standing in warzone or lobby.
+    usage: |
+        /<command> [zone-name]
+        Example: /<command> [zone-name] - Basic save - name optional if standing inside.
+        Example: /<command> [zone-name] lifepool:8 teamsize:5 ... - set warzone configuration options as you save. See /warcfg and /zonecfg for details.
   setzonelobby:
-    description: War> Creates or changes the position of the warzone lobby.
-    usage: Creates or changes the position of the warzone lobby.
+    description: Set the warzone lobby position.
+    usage: |
+        /<command> [zone-name/north/east/south/west]
         \\\\ Attached lobby \\
         Must be standing in warzone or lobby.
         /setzonelobby <north/east/south/west/n/e/s/w>
@@ -121,85 +127,88 @@ commands:
         Must be standing outside warzone or lobby.
         /setzonelobby <zone-name>
   setteam:
-    description: War> Creates or moves a team spawn. The lobby is updated.
-    usage: Creates or moves a team spawn. The lobby is updated. Must be standing in warzone.
-        Ex -
-        /setteam <diamond/iron/gold/white/orange/magenta/blue/green/pink/gray/purple/navy/brown/darkgreen/red/black/>
+    description: |
+      Create or move a team spawn point.
+      The lobby is updated. Must be standing in warzone.
+    usage: /<command> <diamond/iron/gold/white/orange/magenta/blue/green/pink/gray/purple/navy/brown/darkgreen/red/black>
   setmonument:
-    description: War> Creates or moves a monument. Monuments can be capture with wool from your team and give your health.
-    usage: Creates or moves a monument. Monuments can be capture with wool from your team and give your health. Must be standing in warzone.
-        Ex -
-        /setmonument <monument-name>
+    description: |
+      Create or move a monument.
+      Monuments can be capture with wool from your team and give your health. Must be standing in warzone.
+    usage: /<command> <monument-name>
   setcapturepoint:
-    description: War> Creates or moves a capture point. Capture points build strength and award points.
+    description: |
+      Create or move a capture point.
+      Capture points build strength and award points. Must be standing in warzone.
     aliases: [setcp]
-    usage: Creates or moves a capture point. Capture points build strength and award points. Must be standing in warzone.
-        Ex -
-        /setcapturepoint <capture point name>
+    usage: /<command> <capture-point-name>
   setteamflag:
-    description: War> Creates/moves a team flag post for CTF.
-    usage: Creates/moves a team flag post for CTF. Must be standing in warzone.
-        Ex -
-        /setteamflag <diamond/iron/gold/white/orange/magenta/blue/green/pink/gray/purple/navy/brown/darkgreen/red/black/>
+    description: |
+      Create or move a team's flag.
+      Used for CTF. Must be standing in warzone.
+    usage: /<command> <team-name>
   setbomb:
-    description: War> Creates or moves a bomb. Get the bomb to the other team's spawn. People from other teams can blow you up. 
-    usage: Creates or moves a bomb. Get the bomb to the other team's spawn. People from other teams can blow you up. Must be standing in warzone.
-        Ex -
-        /setbomb <bomb-name>
+    description: |
+      Create or move a bomb.
+      Get the bomb to the other team's spawn. People from other teams can blow you up. Must be standing in warzone.
+    usage: /<command> <bomb-name>
   setcake:
-    description: War> Creates or moves a cake. Get the cake to your spawn to score a replenish your lifepool. 
-    usage: Creates or moves a bomb. Get the cake to your spawn to score a replenish your lifepool. Must be standing in warzone.
-        Ex -
-        /setcake <cake-name>   
+    description: |
+      Create or move a cake.
+      Get the cake to your spawn to score a replenish your lifepool. Must be standing in warzone.
+    usage: /<command> <cake-name>
   resetzone:
-    description: War> Reloads zone blocks from disk. Everyone is teleported back to the lobby.
-    usage: Reloads zone blocks from disk. Everyone is teleported back to the lobby. Provide a zone name if not standing in warzone or lobby.
-        Ex -
-        /resetzone [zone-name]
+    description: |
+      Respawn zone blocks and kick players.
+      Reloads zone blocks from disk. Everyone is teleported back to the lobby. Provide a zone name if not standing in warzone or lobby.
+    usage: /<command> [zone-name]
   deletezone:
-    description: War> Deletes the zone, resets all blocks.
-    usage: Deletes the zone after resetting all blocks. Provide a zone name if not standing in warzone or lobby.
-        Ex -
-        /deletezone [zone-name]
+    description: |
+      Deletes the zone and resets all blocks.
+      Provide a zone name if not standing in warzone or lobby.
+    usage: /<command> [zone-name]
   renamezone:
-    description: War> Renames the zone
-    usage: Renames the zone. Provide a zone name if not standing in warzone or lobby.
-        Ex -
-        /renamezone [zone-name] <new-name>
+    description: |
+      Renames the zone.
+      Provide a zone name if not standing in warzone or lobby.
+    usage: /<command> [zone-name] <new-name>
   deleteteam:
-    description: War> Deletes the team. Team must exist.
-    usage: Deletes the team. Team must exist. Provide a zone name if not standing in warzone or lobby.
-        Ex -
-        /deleteteam [zone-name] <team-color>
+    description: |
+      Deletes the team.
+      Team must exist. Provide a zone name if not standing in warzone or lobby.
+    usage: /<command [zone-name] <team-color>
   deleteteamflag:
-    description: War> Deletes the specified team's flag. Team and flag must exist.
-    usage: Deletes the specified team's flag. Team and flag must exist. Provide a zone name if not standing in warzone or lobby.
-        Ex -
-        /deleteteamflag [zone-name] <team-color>
+    description: |
+      Deletes the team's flag.
+      Team and flag must exist. Provide a zone name if not standing in warzone or lobby.
+    usage: /<command> [zone-name] <team-color>
   deletemonument:
-    description: War> Deletes the monument.
-    usage: Deletes the monument. Provide a zone name if not standing in warzone or lobby.
-        Ex -
-        /deletemonument [zone-name] <monument-name>
+    description: |
+      Deletes the monument.
+      Provide a zone name if not standing in warzone or lobby.
+    usage: /<command> [zone-name] <monument-name>
   deletecapturepoint:
-    description: War> Deletes the capture point.
+    description: |
+      Deletes the capture point.
+      Provide a zone name if not standing in warzone or lobby.
     aliases: [deletecp]
-    usage: Deletes the capture point. Provide a zone name if not standing in warzone or lobby.
-        Ex -
-        /deletecapturepoint [zone-name] <capture point name>
+    usage: /<command> [zone-name] <capture point name>
   deletebomb:
-    description: War> Deletes the bomb.
-    usage: Deletes the bomb. Provide a zone name if not standing in warzone or lobby.
-        Ex -
-        /deletebomb [zone-name] <bomb-name>
+    description: |
+      Deletes the bomb.
+      Provide a zone name if not standing in warzone or lobby.
+    usage: /<command> [zone-name] <bomb-name>
   deletecake:
-    description: War> Deletes the cake.
-    usage: Deletes the cake. Provide a zone name if not standing in warzone or lobby.
-        Ex -
-        /deletecake [zone-name] <cake-name>
+    description: |
+      Deletes the cake.
+      Provide a zone name if not standing in warzone or lobby.
+    usage: /<command> [zone-name] <cake-name>
   zonecfg:
-    description: War> Use named parameters to change the configuration of the warzone. May require a /resetzone.
-    usage: Use named parameters to change the configuration of the warzone and default team settings. May require a /resetzone. Provide a zone name if not standing in warzone or lobby.
+    description: |
+      Change a warzone's configuration.
+      Use named parameters to change the configuration of the warzone and default team settings. May require a /resetzone. Provide a zone name if not standing in warzone or lobby.
+    usage: |
+        /zonecfg [zone-name] (-p) option:value
         \\\\ Warzone config \\
         /zonecfg [zone-name] disabled:off -> prevents players from joining. \\
         /zonecfg [zone-name] autoassign:off blockheads:on deathmessages:on friendlyfire:off glasswalls:on instabreak:off 
@@ -222,8 +231,11 @@ commands:
     aliases: 
         - setzoneconfig
   teamcfg:
-    description: War> Use named parameters to change team-specific settings. May require a /resetzone.
-    usage: Use named parameters to change the team-specific settings. May require a /resetzone. Provide a zone name if not standing in warzone or lobby.
+    description: |
+      Change a warzone team's configuration.
+      Use named parameters to change the team-specific settings. May require a /resetzone. Provide a zone name if not standing in warzone or lobby.
+    usage: |
+        /teamcfg [zone-name] <team-name> (-p) option:value
         \\\\ Team config \\
         /teamcfg [zone-name] <team-name> lifepool:7 -> each death consumes a life from the team's pool, an empty lifepool end the battle and gives a point to the other teams. \\ 
         /teamcfg <team-name> maxscore:10 -> once a team reaches this value, the game is ended. \\
@@ -238,43 +250,39 @@ commands:
     aliases: 
         - setteamconfig
   zonemaker:
-    description: War> Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player.
-    usage: Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player.
-        Ex -
-        /zonemaker
-        /zonemaker <new-or-kicked-zone-maker-name>
-  zm:
-    description: War> Alias for /zonemaker
-    usage: Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player.
-        Ex -
-        /zonemaker
-        /zonemaker <new-or-kicked-zone-maker-name>
+    description: |
+      Change zonemaker status.
+      Toggles between player mode and zone maker mode. Or gives/removes access to zonemaker commands for another player.
+    alises: [zm]
+    usage: |
+      /<command> [player-name]
+      Example: /<command> - impersonate regular player
+      Example: /<command> tommytony - give/revoke zonemaker access from tommytony (does not affect war.x permissions)
 # War admin commands (must have the 'war.*' permission or be an op)
 # War hub
   setwarhub:
-    description: War> Create or moves a wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
-    usage: Create or moves a wall of portals. One portal per warzone. Warzones get a portal back to the warhub.
-        Ex -
-        /setwarhub
+    description: |
+      Create or move a wall of portals to warzones.
+      One portal per warzone. Warzones get a portal back to the warhub.
+    usage: /<command>
   deletewarhub:
-    description: War> Deletes the warhub if it exists. Resets all warzone lobbies.
-    usage: Deletes the warhub if it exists. Resets all warzone lobbies.
-        Ex -
-        /deletewarhub
+    description: |
+      Deletes the WarHub.
+      Resets all warzone lobbies.
+    usage: /<command>
 # Defaults and server configuration
   unloadwar:
-    description: War> Disables the War plugin.
-    usage: Disables the War plugin.
-        Ex -
-        /unloadwar
+    description: Disables the War plugin.
+    usage: /<command>
   loadwar:
-    description: War> Enables the War plugin.
-    usage: Enables the War plugin.
-        Ex -
-        /loadwar
+    description: Enables the War plugin.
+    usage: /<command>
   warcfg:
-    description: War> Change gobal settings and the default warzone configuration values.
-    usage: Change global settings and the default warzone and team configuration values.
+    description: |
+      Change War global settings.
+      Change global settings and the default warzone and team configuration values.
+    usage: |
+        /warcfg (-p) option:value
         \\\\ War config \\
         /warcfg buildinzonesonly:on disablebuildmessage:off -> makes war.build permission required to build outside warzones. \\ 
         /warcfg pvpinzonesonly:on disablepvpmessage:off tntinzonesonly:off -> pvp and tnt denied outside zones (use war.pvp permission to allow pvp). \\
@@ -302,13 +310,14 @@ commands:
         - setwarconfig
 # Fallback
   war:
-    description: War> Short War help. Can also be used as a prefix for all War commands as a fallback if they conflict with other plugins.
-    usage: War is on. Please pick your battle. Try /warhub, /zones and /zone. Further instructions at war.tommytony.com/instructions.
-        The /war command can be used as a prefix to all other command as a fallback if they conflict with other plugins. Ex -
-        /war,
-        /war setzone <zone-name>,
-        /war warhub,
-        /war zone <zone-name>
-  War:
-    description: War> Same as /war. Used as fallback.
-    usage: See /war.
+    description: |
+      Open the War UI.
+      War is on. Please pick your battle. Try /warhub, /zones and /zone. Further instructions at https://github.com/taoneill/war/wiki
+      The /war command can be used as a prefix to all other command as a fallback if they conflict with other plugins.
+    aliases: [War]
+    usage: |
+      /<command>
+      The War UI can also be opened by left-clicking with a item of TNT that has been renamed to War.
+      Command fallback examples:
+      /<command> zone <zone-name> - teleport to a warzone
+      /<command> leave - leave a zone

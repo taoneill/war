@@ -2,6 +2,8 @@ package com.tommytony.war.command;
 
 import com.tommytony.war.War;
 import com.tommytony.war.ui.WarUI;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -139,8 +141,10 @@ public class WarCommandHandler {
 
 		if(commandObj != null) {
 			boolean handled = commandObj.handle();
-			if(!handled) {
-				War.war.badMsg(sender, cmd.getUsage());
+			if (!handled) {
+				String finalCommand = command;
+				War.war.getServer().getScheduler().runTaskLater(War.war, () -> sender.sendMessage(ChatColor.RED + "For more information, use" + ChatColor.YELLOW + " /help " + finalCommand + ChatColor.RED + " or visit" + ChatColor.GREEN + " https://github.com/taoneill/war/wiki/Commands"), 1);
+				return false;
 			}
 		}
 
