@@ -3,7 +3,9 @@ package com.tommytony.war.ui;
 import com.tommytony.war.War;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,10 @@ public abstract class ChestUI {
 	}
 
 	protected void addItem(Inventory inv, int slot, ItemStack item, Runnable action) {
+		ItemMeta iM = item.getItemMeta();
+		iM.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		item.setItemMeta(iM);
+
 		inv.setItem(slot, item);
 		actions.put(item, action);
 	}
