@@ -334,7 +334,7 @@ public class WarPlayerListener implements Listener {
 		latestLocations.put(player.getName(), playerLoc);
 		
 		// Signs can automatically teleport you to specific or random warzones
-		if (playerLoc.getBlock().getType() == Material.SIGN) {
+		if (playerLoc.getBlock().getType() == Material.OAK_SIGN) {
 			Sign sign = (Sign) playerLoc.getBlock().getState();
 			if (sign.getLine(0).equals("[zone]")) {
 				Warzone indicated = Warzone.getZoneByName(sign.getLine(1));

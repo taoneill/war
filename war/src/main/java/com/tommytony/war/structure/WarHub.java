@@ -213,7 +213,7 @@ public class WarHub {
 			}
 
 			// War hub sign
-			locationBlock.getRelative(front, 2).setType(Material.SIGN);
+			locationBlock.getRelative(front, 2).setType(Material.OAK_SIGN);
 			String[] lines = War.war.getString("sign.warhub").split("\n");
 			org.bukkit.block.Sign locationBlockFront = (org.bukkit.block.Sign) locationBlock.getRelative(front, 2).getState();
 			for (int i = 0; i < 4; i++) {
@@ -256,7 +256,7 @@ public class WarHub {
 
 		Block zoneGate = this.zoneGateBlocks.get(zone.getName());
 		if (zoneGate != null) {
-			zoneGate.getRelative(BlockFace.UP, 2).getRelative(back, 1).setType(Material.WALL_SIGN);
+			zoneGate.getRelative(BlockFace.UP, 2).getRelative(back, 1).setType(Material.OAK_WALL_SIGN);
 			org.bukkit.block.Sign block = (org.bukkit.block.Sign) zoneGate.getRelative(BlockFace.UP, 2).getRelative(back, 1).getState();
 			org.bukkit.material.Sign data = (Sign) block.getData();
 			data.setFacingDirection(this.getOrientation().getOppositeFace());
