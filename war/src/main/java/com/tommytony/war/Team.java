@@ -326,7 +326,7 @@ public class Team {
 								this.getTeamConfig().resolveInt(
 										TeamConfig.LIFEPOOL)).split("\n");
 			}
-			signBlock.setType(Material.SIGN);
+			signBlock.setType(Material.OAK_SIGN);
 			org.bukkit.block.Sign block = (org.bukkit.block.Sign) signBlock
 					.getState();
 			org.bukkit.material.Sign data = (Sign) block.getData();

@@ -368,7 +368,7 @@ public class ZoneLobby {
 			
 			// set zone sign
 			Block zoneSignBlock = this.lobbyMiddleWallBlock.getBlock().getRelative(this.wall, 4);
-			zoneSignBlock.setType(Material.SIGN);
+			zoneSignBlock.setType(Material.OAK_SIGN);
 			org.bukkit.block.Sign block = (org.bukkit.block.Sign) zoneSignBlock.getState();
 			org.bukkit.material.Sign data = (Sign) block.getData();
 			data.setFacingDirection(this.wall);
@@ -768,7 +768,7 @@ public class ZoneLobby {
 			block = gate.getRelative(direction).getRelative(BlockFace.UP, 2);
 		}
 
-		block.setType(Material.WALL_SIGN);
+		block.setType(Material.OAK_WALL_SIGN);
 		org.bukkit.block.Sign state = (org.bukkit.block.Sign) block.getState();
 		org.bukkit.material.Sign data = (Sign) state.getData();
 		data.setFacingDirection(direction);
