@@ -1,6 +1,6 @@
 name: ${project.name}
 version: ${project.version}
-api-version: 1.13
+api-version: 1.16
 description: ${project.description}
 author: tommytony
 website: ${project.url}
