@@ -1,17 +1,5 @@
 package com.tommytony.war.structure;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.material.Sign;
-
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
@@ -19,6 +7,17 @@ import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.utility.Direction;
 import com.tommytony.war.volume.Volume;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.material.Sign;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 /**
  *
@@ -214,7 +213,7 @@ public class WarHub {
 			}
 
 			// War hub sign
-			locationBlock.getRelative(front, 2).setType(Material.SIGN_POST);
+			locationBlock.getRelative(front, 2).setType(Material.OAK_SIGN);
 			String[] lines = War.war.getString("sign.warhub").split("\n");
 			org.bukkit.block.Sign locationBlockFront = (org.bukkit.block.Sign) locationBlock.getRelative(front, 2).getState();
 			for (int i = 0; i < 4; i++) {
@@ -236,8 +235,7 @@ public class WarHub {
 	/**
 	 * Resets the sign of the given warzone
 	 *
-	 * @param Warzone
-	 *                zone
+	 * @param zone
 	 */
 	public void resetZoneSign(Warzone zone) {
 		BlockFace left;
@@ -258,7 +256,7 @@ public class WarHub {
 
 		Block zoneGate = this.zoneGateBlocks.get(zone.getName());
 		if (zoneGate != null) {
-			zoneGate.getRelative(BlockFace.UP, 2).getRelative(back, 1).setType(Material.WALL_SIGN);
+			zoneGate.getRelative(BlockFace.UP, 2).getRelative(back, 1).setType(Material.OAK_WALL_SIGN);
 			org.bukkit.block.Sign block = (org.bukkit.block.Sign) zoneGate.getRelative(BlockFace.UP, 2).getRelative(back, 1).getState();
 			org.bukkit.material.Sign data = (Sign) block.getData();
 			data.setFacingDirection(this.getOrientation().getOppositeFace());

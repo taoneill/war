@@ -34,11 +34,12 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 			return false;
 		}
 		Player player = (Player) this.getSender();
+		ZoneLobby origLobby = null;
 		Warzone zone = Warzone.getZoneByLocation((Player) this.getSender());
 		if (zone == null) {
-			ZoneLobby lobby = ZoneLobby.getLobbyByLocation((Player) this.getSender());
-			if (lobby != null) {
-				zone = lobby.getZone();
+			origLobby = ZoneLobby.getLobbyByLocation((Player) this.getSender());
+			if (origLobby != null) {
+				zone = origLobby.getZone();
 			}
 		}
 
@@ -75,6 +76,12 @@ public class SetZoneLobbyCommand extends AbstractZoneMakerCommand {
 		} else {
 			// Inside a warzone: use the classic n/s/e/w mode
 			if (!this.args[0].equals("north") && !this.args[0].equals("n") && !this.args[0].equals("east") && !this.args[0].equals("e") && !this.args[0].equals("south") && !this.args[0].equals("s") && !this.args[0].equals("west") && !this.args[0].equals("w")) {
+				if (Warzone.getZoneByName(this.args[0]) == zone && origLobby != null) {
+					origLobby.setLocation(player.getLocation());
+					origLobby.initialize();
+					this.msg("Warzone lobby moved to your location.");
+					return true;
+				}
 				return false;
 			}
 			ZoneLobby lobby = zone.getLobby();

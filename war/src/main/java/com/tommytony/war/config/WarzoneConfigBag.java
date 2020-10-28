@@ -1,18 +1,20 @@
 package com.tommytony.war.config;
 
-import java.util.EnumMap;
-import java.util.Map;
-
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
+import com.tommytony.war.mapper.WarzoneYmlMapper;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 
 public class WarzoneConfigBag {
 
-	EnumMap<WarzoneConfig, Object> bag = new EnumMap<WarzoneConfig, Object>(WarzoneConfig.class);
 	private final Warzone warzone;
+	EnumMap<WarzoneConfig, Object> bag = new EnumMap<WarzoneConfig, Object>(WarzoneConfig.class);
 		
 	public WarzoneConfigBag(Warzone warzone) {
 		this.warzone = warzone;
@@ -23,6 +25,29 @@ public class WarzoneConfigBag {
 		this.warzone = null;
 	}
 
+	public static void afterUpdate(Warzone zone, CommandSender sender, String namedParamReturn, boolean wantsToPrint) {
+		WarzoneYmlMapper.save(zone);
+
+		String zoneReset = "Some changes may require a /resetzone. ";
+		if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONCONFIGCHANGE)) {
+			zone.reinitialize(); // bring back team spawns etc
+			zoneReset = "Zone reset. ";
+		}
+
+		if (wantsToPrint) {
+			War.war.msg(sender, "Warzone config saved. " + zoneReset + namedParamReturn + " " + War.war.printConfig(zone));
+		} else {
+			War.war.msg(sender, "Warzone config saved. " + zoneReset + namedParamReturn);
+		}
+
+		War.war.log(sender.getName() + " updated warzone " + zone.getName() + " configuration." + namedParamReturn, Level.INFO);
+
+		if (War.war.getWarHub() != null) { // maybe the zone was disabled/enabled
+			War.war.getWarHub().getVolume().resetBlocks();
+			War.war.getWarHub().initialize();
+		}
+	}
+	
 	public void put(WarzoneConfig config, Object value) {
 		bag.put(config, value);
 	}
@@ -33,7 +58,7 @@ public class WarzoneConfigBag {
 	
 	public Object getValue(WarzoneConfig config) {
 		if (bag.containsKey(config)) {
-			return bag.get(config); 
+			return bag.get(config);
 		} else {
 			// use War default config
 			return War.war.getWarzoneDefaultConfig().getValue(config);
@@ -42,16 +67,16 @@ public class WarzoneConfigBag {
 	
 	public Integer getInt(WarzoneConfig config) {
 		if (bag.containsKey(config)) {
-			return (Integer)bag.get(config); 
+			return (Integer) bag.get(config);
 		} else {
 			// use War default config
 			return War.war.getWarzoneDefaultConfig().getInt(config);
 		}
 	}
-	
+
 	public Boolean getBoolean(WarzoneConfig config) {
 		if (bag.containsKey(config)) {
-			return (Boolean)bag.get(config); 
+			return (Boolean) bag.get(config);
 		} else {
 			// use War default config
 			return War.war.getWarzoneDefaultConfig().getBoolean(config);
@@ -65,6 +90,14 @@ public class WarzoneConfigBag {
 			// use War default config
 			return War.war.getWarzoneDefaultConfig().getScoreboardType(config);
 		}
+	}
+
+	public boolean contains(WarzoneConfig config) {
+		return this.bag.containsKey(config);
+	}
+
+	public void reset() {
+		this.bag.clear();
 	}
 
 	public void loadFrom(ConfigurationSection warzoneConfigSection) {
@@ -93,12 +126,12 @@ public class WarzoneConfigBag {
 			}
 		}
 	}
-	
+
 	public String updateFromNamedParams(Map<String, String> namedParams) {
 		String returnMessage = "";
 		for (String namedParam : namedParams.keySet()) {
 			WarzoneConfig warzoneConfig = WarzoneConfig.warzoneConfigFromString(namedParam);
-			
+
 			// param update
 			if (warzoneConfig != null) {
 				if (warzoneConfig.getConfigType().equals(Integer.class)) {
@@ -115,11 +148,11 @@ public class WarzoneConfigBag {
 					String type = namedParams.get(namedParam);
 					this.bag.put(warzoneConfig, ScoreboardType.getFromString(type));
 				}
-				returnMessage += " " + warzoneConfig.toString() + " set to " + namedParams.get(namedParam); 
+				returnMessage += " " + warzoneConfig.toString() + " set to " + namedParams.get(namedParam);
 			} else if (namedParam.equals("delete")) {
 				String toDelete = namedParams.get(namedParam);
 				warzoneConfig = WarzoneConfig.warzoneConfigFromString(toDelete);
-				
+
 				// param delete (to restore inheritance)
 				if (warzoneConfig != null) {
 					this.bag.remove(warzoneConfig);

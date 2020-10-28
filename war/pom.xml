@@ -3,57 +3,44 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.tommytony</groupId>
   <artifactId>war</artifactId>
-  <version>1.9</version>
+  <version>2.0.0-RC5-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>War</name>
   <url>http://war.tommytony.com</url>
   <description>Minecraft PVP arenas (called warzones) for a fast-paced and structured PVP experience with TDM, CTF and more!</description>
-  <prerequisites>
-    <maven>2.2.1</maven>
-  </prerequisites>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <repositories>
     <repository>
+      <id>maven.cmastudios.me</id>
+      <url>https://maven.cmastudios.me/</url>
+    </repository>
+    <repository>
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
     </repository>
     <repository>
-      <id>cma-repo</id>
-      <url>http://ftp.cmastudios.me/maven/</url>
-    </repository>
-    <repository>
-      <id>tagapi-repo</id>
-      <url>http://repo.kitteh.org/content/repositories/public/</url>
-    </repository>
-    <repository>
       <id>sk89q-repo</id>
-      <url>http://maven.sk89q.com/repo/</url>
-    </repository>
-    <repository>
-      <id>mcstats</id>
-      <url>http://repo.mcstats.org/content/repositories/public/</url>
-    </repository>
-    <repository>
-      <id>vault-repo</id>
-      <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
+      <url>https://maven.sk89q.com/repo/</url>
     </repository>
   </repositories>
   <issueManagement>
     <system>Github issues</system>
     <url>https://github.com/taoneill/war/issues</url>
   </issueManagement>
-  <ciManagement>
-    <system>Jenkins</system>
-    <url>http://ci.tommytony.com</url>
-  </ciManagement>
   <scm>
     <connection>scm:git:git://github.com/taoneill/war.git</connection>
     <developerConnection>scm:git:git@github.com:taoneill/war.git</developerConnection>
     <tag>HEAD</tag>
     <url>https://github.com/taoneill/war</url>
   </scm>
+  <distributionManagement>
+    <repository>
+      <id>maven.cmastudios.me</id>
+      <url>s3://maven.cmastudios.me/</url>
+    </repository>
+  </distributionManagement>
   <build>
     <plugins>
       <plugin>
@@ -61,14 +48,14 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.0.2</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>1.7.1</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -78,13 +65,13 @@
             <configuration>
               <artifactSet>
                 <includes>
-                  <include>org.mcstats.bukkit:metrics</include>
+                  <include>org.bstats:bstats-bukkit</include>
                 </includes>
               </artifactSet>
               <minimizeJar>false</minimizeJar>
               <relocations>
                 <relocation>
-                  <pattern>org.mcstats</pattern>
+                  <pattern>org.bstats.bukkit</pattern>
                   <shadedPattern>com.tommytony.war.metrics</shadedPattern>
                 </relocation>
               </relocations>
@@ -93,6 +80,13 @@
         </executions>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.kuali.maven.wagons</groupId>
+        <artifactId>maven-s3-wagon</artifactId>
+        <version>1.2.1</version>
+      </extension>
+    </extensions>
     <resources>
       <resource>
         <filtering>true</filtering>
@@ -102,28 +96,16 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>org.spout</groupId>
-      <artifactId>spoutplugin</artifactId>
-      <version>1.5.2-R1.0</version>
-      <scope>compile</scope>
-      <type>jar</type>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.9.4-R0.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.kitteh</groupId>
-      <artifactId>tagapi</artifactId>
-      <version>2.7.1</version>
-      <scope>compile</scope>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>1.16.3-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
@@ -133,21 +115,21 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.sk89q</groupId>
-      <artifactId>worldedit</artifactId>
-      <version>5.5.8</version>
+      <groupId>com.tommytony</groupId>
+      <artifactId>worldedit-bukkit</artifactId>
+      <version>7.0.1</version>
       <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>org.mcstats.bukkit</groupId>
-      <artifactId>metrics</artifactId>
-      <version>R8-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>net.milkbowl.vault</groupId>
       <artifactId>Vault</artifactId>
       <version>1.2.32</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bstats</groupId>
+      <artifactId>bstats-bukkit</artifactId>
+      <version>1.4</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>

@@ -97,7 +97,7 @@ public class Cake {
 		current.setType(this.warzone.getWarzoneMaterials().getStandBlock().getType());
 		current.setData(this.warzone.getWarzoneMaterials().getStandBlock().getData());
 		current.update(true);
-		this.warzone.getWorld().getBlockAt(x, y + 1, z).setType(Material.CAKE_BLOCK);
+		this.warzone.getWorld().getBlockAt(x, y + 1, z).setType(Material.CAKE);
 	}
 
 	public boolean isCakeBlock(Location otherLocation) {

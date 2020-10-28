@@ -20,9 +20,6 @@ import com.tommytony.war.config.WarzoneConfig;
  */
 public class HelmetProtectionTask implements Runnable {
 
-	/**
-	 * @see Runnable.run()
-	 */
 	public void run() {
 		if (!War.war.isLoaded()) {
 			return;
@@ -47,7 +44,7 @@ public class HelmetProtectionTask implements Runnable {
 							int removed = 0;
 							for (ItemStack item : playerInv.getContents()) {
 								// remove only same colored wool
-								if (item != null && item.getType() == teamBlockMaterial && item.getData() == team.getKind().getBlockData()) {
+								if (item != null && item.getType() == teamBlockMaterial) {
 									playerInv.clear(i);
 									removed++;
 								}
@@ -66,16 +63,22 @@ public class HelmetProtectionTask implements Runnable {
 					}
 					
 					// check for thieves without their treasure in their hands
-					if (zone.isFlagThief(player.getName())) {
-						Team victim = zone.getVictimTeamForFlagThief(player.getName());
-						player.setItemInHand(null);
-						player.getInventory().addItem(victim.getKind().getBlockData().toItemStack(2240));
-					} else if (zone.isBombThief(player.getName())) {
-						player.setItemInHand(null);
+					if (zone.isFlagThief(player)) {
+						Team victim = zone.getVictimTeamForFlagThief(player);
+						player.getInventory().setItemInMainHand(null);
+						player.getInventory().setItemInOffHand(null);
+						player.getInventory().setHeldItemSlot(0);
+						player.getInventory().addItem(new ItemStack(victim.getKind().getMaterial(), 2240));
+					} else if (zone.isBombThief(player)) {
+						player.getInventory().setItemInMainHand(null);
+						player.getInventory().setItemInOffHand(null);
+						player.getInventory().setHeldItemSlot(0);
 						player.getInventory().addItem(new ItemStack(Material.TNT, 2240));
-					} else if (zone.isCakeThief(player.getName())) {
-						player.setItemInHand(null);
-						player.getInventory().addItem(new ItemStack(Material.CAKE_BLOCK, 2240));
+					} else if (zone.isCakeThief(player)) {
+						player.getInventory().setItemInMainHand(null);
+						player.getInventory().setItemInOffHand(null);
+						player.getInventory().setHeldItemSlot(0);
+						player.getInventory().addItem(new ItemStack(Material.CAKE, 2240));
 					}
 				}
 			}

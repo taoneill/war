@@ -1,16 +1,24 @@
 package com.tommytony.war.event;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.tommytony.war.Team;
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.Warzone.LeaveCause;
+import com.tommytony.war.command.ZoneSetter;
+import com.tommytony.war.config.FlagReturn;
+import com.tommytony.war.config.TeamConfig;
 import com.tommytony.war.config.WarConfig;
-
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.structure.Bomb;
+import com.tommytony.war.structure.Cake;
+import com.tommytony.war.structure.WarHub;
+import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.utility.Direction;
+import com.tommytony.war.utility.Loadout;
+import com.tommytony.war.utility.LoadoutSelection;
+import com.tommytony.war.volume.Volume;
 import org.apache.commons.lang.Validate;
-import org.bukkit.ChatColor;
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Item;
@@ -20,34 +28,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.getspout.spoutapi.SpoutManager;
-import org.getspout.spoutapi.player.SpoutPlayer;
-
-import com.tommytony.war.Team;
-import com.tommytony.war.War;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.Warzone.LeaveCause;
-import com.tommytony.war.command.ZoneSetter;
-import com.tommytony.war.config.FlagReturn;
-import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.config.WarzoneConfig;
-import com.tommytony.war.spout.SpoutDisplayer;
-import com.tommytony.war.structure.Bomb;
-import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.WarHub;
-import com.tommytony.war.structure.ZoneLobby;
-import com.tommytony.war.utility.Direction;
-import com.tommytony.war.utility.Loadout;
-import com.tommytony.war.utility.LoadoutSelection;
-import com.tommytony.war.volume.Volume;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -113,15 +104,15 @@ public class WarPlayerListener implements Listener {
 			if (team != null) {
 				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 
-				if (zone.isFlagThief(player.getName())) {
+				if (zone.isFlagThief(player)) {
 					// a flag thief can't drop his flag
 					War.war.badMsg(player, "drop.flag.disabled");
 					event.setCancelled(true);
-				} else if (zone.isBombThief(player.getName())) {
+				} else if (zone.isBombThief(player)) {
 					// a bomb thief can't drop his bomb
 					War.war.badMsg(player, "drop.bomb.disabled");
 					event.setCancelled(true);
-				} else if (zone.isCakeThief(player.getName())) {
+				} else if (zone.isCakeThief(player)) {
 					// a cake thief can't drop his cake
 					War.war.badMsg(player, "drop.cake.disabled");
 					event.setCancelled(true);
@@ -139,7 +130,8 @@ public class WarPlayerListener implements Listener {
 							return;
 						}
 
-						if (zone.isNearWall(player.getLocation()) && itemStack != null) {
+						if (zone.isNearWall(player.getLocation()) && itemStack != null
+								&& !team.getTeamConfig().resolveBoolean(TeamConfig.BORDERDROP)) {
 							War.war.badMsg(player, "drop.item.border");
 							event.setCancelled(true);
 							return;
@@ -158,7 +150,7 @@ public class WarPlayerListener implements Listener {
 
 			if (War.war.isWandBearer(player)) {
 				Item item = event.getItemDrop();
-				if (item.getItemStack().getType() == Material.WOOD_SWORD) {
+				if (item.getItemStack().getType() == Material.WOODEN_SWORD) {
 					String zoneName = War.war.getWandBearerZone(player);
 					War.war.removeWandBearer(player);
 					War.war.msg(player, "drop.wand", zoneName);
@@ -169,14 +161,17 @@ public class WarPlayerListener implements Listener {
 
 	private static final int MINIMUM_TEAM_BLOCKS = 1;
 	@EventHandler
-	public void onPlayerPickupItem(final PlayerPickupItemEvent event) {
+	public void onPlayerPickupItem(final EntityPickupItemEvent event) {
 		if (War.war.isLoaded()) {
-			Player player = event.getPlayer();
+			if (!(event.getEntity() instanceof Player)) {
+				return;
+			}
+			Player player = (Player) event.getEntity();
 			Team team = Team.getTeamByPlayerName(player.getName());
 			if (team != null) {
-				Warzone zone = Warzone.getZoneByPlayerName(player.getName());
+				Warzone zone = team.getZone();
 
-				if (zone.isFlagThief(player.getName())) {
+				if (zone.isFlagThief(player)) {
 					// a flag thief can't pick up anything
 					event.setCancelled(true);
 				} else {
@@ -237,7 +232,7 @@ public class WarPlayerListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (War.war.isLoaded()) {
 			Player player = event.getPlayer();
-			if (player.getItemInHand().getType() == Material.WOOD_SWORD && War.war.isWandBearer(player)) {
+			if (event.getItem() != null && event.getItem().getType() == Material.WOODEN_SWORD && War.war.isWandBearer(player)) {
 				String zoneName = War.war.getWandBearerZone(player);
 				ZoneSetter setter = new ZoneSetter(player, zoneName);
 				if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -268,7 +263,7 @@ public class WarPlayerListener implements Listener {
 				War.war.badMsg(player, "use.ender");
 			}
 			Team team = Team.getTeamByPlayerName(player.getName());
-			if (zone != null && team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENCHANTMENT_TABLE && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
+			if (zone != null && team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.ENCHANTING_TABLE && team.getTeamConfig().resolveBoolean(TeamConfig.XPKILLMETER)) {
 				event.setCancelled(true);
 				War.war.badMsg(player, "use.enchant");
 				if (zone.getAuthors().contains(player.getName())) {
@@ -284,9 +279,17 @@ public class WarPlayerListener implements Listener {
 			}
 			if (zone != null && team != null && event.getAction() == Action.RIGHT_CLICK_BLOCK
 					&& event.getClickedBlock().getState() instanceof InventoryHolder
-					&& zone.isFlagThief(player.getName())) {
+					&& zone.isFlagThief(player)) {
 				event.setCancelled(true);
 				War.war.badMsg(player, "drop.flag.disabled");
+			}
+			if (zone == null && event.getAction() == Action.RIGHT_CLICK_BLOCK
+					&& (event.getClickedBlock().getType() == Material.CHEST || event.getClickedBlock().getType() == Material.TRAPPED_CHEST)
+					&& Warzone.getZoneByLocation(event.getClickedBlock().getLocation()) != null
+					&& !War.war.isZoneMaker(event.getPlayer())) {
+				// prevent opening chests inside a warzone if a player is not a zone maker
+				event.setCancelled(true);
+				player.playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1, 0);
 			}
 		}
 		     
@@ -296,7 +299,7 @@ public class WarPlayerListener implements Listener {
 			Warzone zone = Warzone.getZoneByPlayerName(player.getName());
 			if (zone != null && zone.getWarzoneConfig().getBoolean(WarzoneConfig.SOUPHEALING)) {
 				ItemStack item = event.getItem();
-				if ((item != null) && (item.getType() == Material.MUSHROOM_SOUP)) {
+				if ((item != null) && (item.getType() == Material.MUSHROOM_STEW)) {
 					if (player.getHealth() < 20) {
 						player.setHealth(Math.min(20, player.getHealth() + 7));
 						item.setType(Material.BOWL);
@@ -331,7 +334,7 @@ public class WarPlayerListener implements Listener {
 		latestLocations.put(player.getName(), playerLoc);
 		
 		// Signs can automatically teleport you to specific or random warzones
-		if (playerLoc.getBlock().getType() == Material.SIGN_POST) {
+		if (playerLoc.getBlock().getType() == Material.OAK_SIGN) {
 			Sign sign = (Sign) playerLoc.getBlock().getState();
 			if (sign.getLine(0).equals("[zone]")) {
 				Warzone indicated = Warzone.getZoneByName(sign.getLine(1));
@@ -544,9 +547,9 @@ public class WarPlayerListener implements Listener {
 					return;
 				}
 			} else if (loadoutSelectionState != null && !loadoutSelectionState.isStillInSpawn()
-					&& !playerWarzone.isCakeThief(player.getName())
+					&& !playerWarzone.isCakeThief(player)
 					&& (flagReturn.equals(FlagReturn.BOTH) || flagReturn.equals(FlagReturn.SPAWN)) 
-					&& !playerWarzone.isFlagThief(player.getName())) {
+					&& !playerWarzone.isFlagThief(player)) {
 				
 				// player is in spawn, but has left already: he should NOT be let back in - kick him out gently
 				// if he sticks around too long.
@@ -571,7 +574,7 @@ public class WarPlayerListener implements Listener {
 			}
 
 			// Flag capture
-			if (playerWarzone.isFlagThief(player.getName())) {
+			if (playerWarzone.isFlagThief(player)) {
 				
 				// smoky
 				if (System.currentTimeMillis() % 13 == 0) {
@@ -619,23 +622,10 @@ public class WarPlayerListener implements Listener {
 					} else {
 						// All good - proceed with scoring
 						playerTeam.addPoint();
-						Team victim = playerWarzone.getVictimTeamForFlagThief(player.getName());
+						Team victim = playerWarzone.getVictimTeamForFlagThief(player);
 						
 						// Notify everyone
 						for (Team t : playerWarzone.getTeams()) {
-							if (War.war.isSpoutServer()) {
-								for (Player p : t.getPlayers()) {
-									SpoutPlayer sp = SpoutManager.getPlayer(p);
-									if (sp.isSpoutCraftEnabled()) {
-						                sp.sendNotification(
-						                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
-						                		SpoutDisplayer.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + " flag!"),
-						                		victim.getKind().getMaterial(),
-						                		victim.getKind().getData(),
-						                		10000);
-									}
-								}
-							}
 							t.teamcast("zone.flagcapture.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE,
 									victim.getName(), playerTeam.getName());
 						}
@@ -658,14 +648,14 @@ public class WarPlayerListener implements Listener {
 						}
 					}
 					
-					playerWarzone.removeFlagThief(player.getName());
+					playerWarzone.removeFlagThief(player);
 					
 					return;
 				}
 			}
 			
 			// Bomb detonation
-			if (playerWarzone.isBombThief(player.getName())) {
+			if (playerWarzone.isBombThief(player)) {
 				// smoky
 				playerWarzone.getWorld().playEffect(player.getLocation(), Effect.SMOKE, 0);
 				
@@ -686,7 +676,7 @@ public class WarPlayerListener implements Listener {
 				if (inEnemySpawn && playerTeam.getPlayers().contains(player)) {
 					// Made sure player is still part of team, game may have ended while waiting.
 					// Ignored the scorers that happened immediately after the game end.
-					Bomb bomb = playerWarzone.getBombForThief(player.getName());
+					Bomb bomb = playerWarzone.getBombForThief(player);
 					
 					// Boom!
 					if (!playerWarzone.getWarzoneConfig().getBoolean(WarzoneConfig.UNBREAKABLE)) {
@@ -703,19 +693,6 @@ public class WarPlayerListener implements Listener {
 						
 						// Notify everyone
 						for (Team t : playerWarzone.getTeams()) {
-							if (War.war.isSpoutServer()) {
-								for (Player p : t.getPlayers()) {
-									SpoutPlayer sp = SpoutManager.getPlayer(p);
-									if (sp.isSpoutCraftEnabled()) {
-						                sp.sendNotification(
-						                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " blew up "),
-						                		SpoutDisplayer.cleanForNotification(victim.getKind().getColor() + victim.getName() + ChatColor.YELLOW + "'s spawn!"),
-						                		victim.getKind().getMaterial(),
-						                		victim.getKind().getData(),
-						                		10000);
-									}
-								}
-							}
 							t.teamcast("zone.bomb.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE,
 									victim.getName(), playerTeam.getName());
 						}
@@ -746,14 +723,14 @@ public class WarPlayerListener implements Listener {
 						}					
 					}
 					
-					playerWarzone.removeBombThief(player.getName());
+					playerWarzone.removeBombThief(player);
 					
 					return;
 				}
 			}
 			
 			// Cake retrieval
-			if (playerWarzone.isCakeThief(player.getName())) {
+			if (playerWarzone.isCakeThief(player)) {
 				// smoky
 				if (System.currentTimeMillis() % 13 == 0) {
 					playerWarzone.getWorld().playEffect(player.getLocation(), Effect.POTION_BREAK, playerTeam.getKind().getPotionEffectColor());
@@ -775,7 +752,7 @@ public class WarPlayerListener implements Listener {
 					
 					// Don't let someone alone make points off cakes
 					if (hasOpponent) {
-						Cake cake = playerWarzone.getCakeForThief(player.getName());
+						Cake cake = playerWarzone.getCakeForThief(player);
 						
 						if (playerWarzone.isReinitializing()) {
 							// Battle already ended or interrupted
@@ -788,19 +765,6 @@ public class WarPlayerListener implements Listener {
 							
 							// Notify everyone
 							for (Team t : playerWarzone.getTeams()) {
-								if (War.war.isSpoutServer()) {
-									for (Player p : t.getPlayers()) {
-										SpoutPlayer sp = SpoutManager.getPlayer(p);
-										if (sp.isSpoutCraftEnabled()) {
-							                sp.sendNotification(
-							                		SpoutDisplayer.cleanForNotification(playerTeam.getKind().getColor() + player.getName() + ChatColor.YELLOW + " captured"),
-							                		SpoutDisplayer.cleanForNotification(ChatColor.YELLOW + "cake " + ChatColor.GREEN + cake.getName() + ChatColor.YELLOW + "!"),
-							                		playerTeam.getKind().getMaterial(),
-							                		playerTeam.getKind().getData(),
-							                		10000);
-										}
-									}
-								}
 								t.teamcast("zone.cake.broadcast", playerTeam.getKind().getColor() + player.getName() + ChatColor.WHITE,
 										ChatColor.GREEN + cake.getName() + ChatColor.WHITE, playerTeam.getName());
 							}
@@ -825,7 +789,7 @@ public class WarPlayerListener implements Listener {
 							}
 						}
 						
-						playerWarzone.removeCakeThief(player.getName());
+						playerWarzone.removeCakeThief(player);
 					}
 					
 					return;
@@ -950,15 +914,17 @@ public class WarPlayerListener implements Listener {
 		if (zone == null) {
 			return;
 		}
-		// Prevent thieves from taking their bomb/wool/cake into a chest, etc.
-		if (zone.isThief(player.getName())) {
+		if (zone.isThief(player)) {
+			// Prevent thieves from taking their bomb/wool/cake into a chest, etc.
 			event.setCancelled(true);
 			player.playSound(player.getLocation(), Sound.BLOCK_LAVA_EXTINGUISH, 10, 10);
-		} else // Magically give player a wool block when they click their helmet
-			if (event.getSlotType() == InventoryType.SlotType.ARMOR && event.getSlot() == 39
+		} else if (event.getSlotType() == InventoryType.SlotType.ARMOR && event.getSlot() == 39
 				&& zone.getWarzoneConfig().getBoolean(WarzoneConfig.BLOCKHEADS)) {
+			// Magically give player a wool block when they click their helmet
 			ItemStack teamBlock = zone.getPlayerTeam(player.getName()).getKind().getBlockHead();
 			player.getInventory().remove(teamBlock.getType());
+			// Deprecated behavior cannot be removed as it is essential to this function
+			//noinspection deprecation
 			event.setCursor(teamBlock);
 			event.setCancelled(true);
 		}

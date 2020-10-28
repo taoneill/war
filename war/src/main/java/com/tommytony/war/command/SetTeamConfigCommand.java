@@ -2,6 +2,7 @@ package com.tommytony.war.command;
 
 import java.util.logging.Level;
 
+import com.tommytony.war.config.TeamConfigBag;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -139,27 +140,7 @@ public class SetTeamConfigCommand extends AbstractOptionalZoneMakerCommand {
 			// We have a warzone, a team and indexed-from-0 arguments, let's update
 			String namedParamReturn = War.war.updateTeamFromNamedParams(team, player, this.args);
 			if (!namedParamReturn.equals("") && !namedParamReturn.equals("PARSE-ERROR")) {
-				
-				WarzoneYmlMapper.save(zone);
-				
-				String zoneReset = "Some changes may require a /resetzone. "; 
-				if (zone.getWarzoneConfig().getBoolean(WarzoneConfig.RESETONCONFIGCHANGE)) {
-					zone.reinitialize(); // bring back team spawns etc
-					zoneReset = "Zone reset. ";
-				}
-
-				if (wantsToPrint) {
-					this.msg("Team config saved. " + zoneReset + namedParamReturn + " " + War.war.printConfig(team));
-				} else {
-					this.msg("Team config saved. " + zoneReset + namedParamReturn);
-				}
-				
-				War.war.log(this.getSender().getName() + " updated team " + team.getName() + " configuration in warzone " + zone.getName() + "." + namedParamReturn, Level.INFO);
-
-				if (War.war.getWarHub() != null) { // maybe the zone was disabled/enabled
-					War.war.getWarHub().getVolume().resetBlocks();
-					War.war.getWarHub().initialize();
-				}
+				TeamConfigBag.afterUpdate(team, player, namedParamReturn, wantsToPrint);
 			} else if (namedParamReturn.equals("PARSE-ERROR")) {
 				this.badMsg("Failed to read named parameter(s).");
 			} else {

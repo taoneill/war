@@ -1,13 +1,13 @@
 package com.tommytony.war.command;
 
-import java.util.logging.Level;
-
+import com.tommytony.war.War;
+import com.tommytony.war.mapper.WarYmlMapper;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
-import com.tommytony.war.War;
-import com.tommytony.war.mapper.WarYmlMapper;
+import java.util.logging.Level;
 
 /**
  * Makes a player zonemaker and other way round.
@@ -21,8 +21,8 @@ public class ZoneMakerCommand extends AbstractWarCommand {
 
 		if (sender instanceof Player) { // i hate java for this.
 			if (!War.war.isZoneMaker((Player) sender)) {
-				for (String name : War.war.getZoneMakersImpersonatingPlayers()) {
-					if (((Player) sender).getName().equals(name)) {
+				for (OfflinePlayer offlinePlayer : War.war.getZoneMakersImpersonatingPlayers()) {
+					if (offlinePlayer.isOnline() && sender.equals(offlinePlayer.getPlayer())) {
 						return;
 					}
 				}
@@ -41,29 +41,29 @@ public class ZoneMakerCommand extends AbstractWarCommand {
 
 		if (War.war.isZoneMaker(player)) {
 			if (this.args.length == 0) {
-				War.war.getZoneMakersImpersonatingPlayers().add(player.getName());
+				War.war.getZoneMakersImpersonatingPlayers().add(player);
 				this.msg("You are now impersonating a regular player. Type /zonemaker again to toggle back to war maker mode.");
 			} else if (this.args.length == 1) {
+				OfflinePlayer other = Bukkit.getOfflinePlayer(this.args[0]);
 				// make someone zonemaker or remove the right
-				if (War.war.getZoneMakerNames().contains(this.args[0])) {
+				if (War.war.getZoneMakerNames().contains(other)) {
 					// kick
-					War.war.getZoneMakerNames().remove(this.args[0]);
+					War.war.getZoneMakerNames().remove(other);
 					this.msg(this.args[0] + " is not a zone maker anymore.");
-					Player kickedMaker = War.war.getServer().getPlayer(this.args[0]);
-					if (kickedMaker != null) {
-						War.war.msg(kickedMaker, player.getName() + " took away your warzone maker priviledges.");
-						War.war.log(player.getName() + " took away zonemaker rights from " + kickedMaker, Level.INFO);
+					if (other.isOnline()) {
+						War.war.msg(other.getPlayer(), player.getName() + " took away your warzone maker priviledges.");
+						War.war.log(player.getName() + " took away zonemaker rights from " + other.getName(), Level.INFO);
 					}
 				} else {
 					// add
-					War.war.getZoneMakerNames().add(this.args[0]);
+					War.war.getZoneMakerNames().add(other);
 					this.msg(this.args[0] + " is now a zone maker.");
-					Player newMaker = War.war.getServer().getPlayer(this.args[0]);
-					if (newMaker != null) {
-						War.war.msg(newMaker, player.getName() + " made you warzone maker.");
-						War.war.log(player.getName() + " made " + newMaker + " a zonemaker", Level.INFO);
+					if (other.isOnline()) {
+						War.war.msg(other.getPlayer(), player.getName() + " made you warzone maker.");
+						War.war.log(player.getName() + " made " + other.getName() + " a zonemaker", Level.INFO);
 					}
 				}
+				WarYmlMapper.save();
 			} else {
 				return false;
 			}
@@ -72,7 +72,7 @@ public class ZoneMakerCommand extends AbstractWarCommand {
 				return false;
 			}
 
-			War.war.getZoneMakersImpersonatingPlayers().remove(player.getName());
+			War.war.getZoneMakersImpersonatingPlayers().remove(player);
 			this.msg("You are back as a zone maker.");
 			WarYmlMapper.save();
 		}

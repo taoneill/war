@@ -1,20 +1,18 @@
 package com.tommytony.war.job;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.Locale;
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.config.WarzoneConfig;
 import com.tommytony.war.mapper.WarzoneYmlMapper;
-
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 
-import org.mcstats.Metrics;
-import org.mcstats.Metrics.Graph;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.logging.Level;
 
 public class RestoreYmlWarzonesJob implements Runnable {
 
@@ -51,59 +49,32 @@ public class RestoreYmlWarzonesJob implements Runnable {
 			}
 			if (War.war.getWarzones().size() > 0) {
 				War.war.log("Warzones ready.", Level.INFO);
-				final int zones = War.war.getWarzones().size();
-				try {
-					Metrics metrics = new Metrics(War.war);
-					Graph warzoneCount = metrics.createGraph("Warzones");
-					warzoneCount.addPlotter(new FixedPlotter("Count", zones));
-					Graph language = metrics.createGraph("Language");
-					String langName = War.war.getLoadedLocale().getDisplayLanguage(Locale.ENGLISH);
-					if (langName.isEmpty()) {
-						langName = "English";
-					}
-					language.addPlotter(new PlotterEnabled(langName));
-					Graph plugins = metrics.createGraph("Extensions");
-					if (War.war.isSpoutServer()) {
-						plugins.addPlotter(new PlotterEnabled("Spout"));
-					}
-					if (War.war.isTagServer()) {
-						plugins.addPlotter(new PlotterEnabled("TagAPI"));
-					}
-					if (Bukkit.getPluginManager().isPluginEnabled("WorldEdit")) {
-						plugins.addPlotter(new PlotterEnabled("WorldEdit"));
-					}
-					plugins.addPlotter(new PlotterEnabled("War")); // of course
-					metrics.start();
-				} catch (Exception ignored) {
-				}
 			}
 		}
+		Metrics metrics = new Metrics(War.war);
+		metrics.addCustomChart(new Metrics.SimplePie("language", () -> {
+			String lang = War.war.getLoadedLocale().getDisplayLanguage(Locale.ENGLISH);
+			if (lang == null || lang.isEmpty()) {
+				lang = "English";
+			}
+			return lang;
+		}));
+		metrics.addCustomChart(new Metrics.SingleLineChart("warzones", War.war.getWarzones()::size));
+		metrics.addCustomChart(new Metrics.DrilldownPie("extensions", () -> {
+			Map<String, Map<String, Integer>> map = new HashMap<>();
+			getExtensionEntry("WorldEdit", map);
+			getExtensionEntry("Vault", map);
+			return map;
+		}));
 	}
 
-	private static class FixedPlotter extends Metrics.Plotter {
-
-		private final int value;
-
-		public FixedPlotter(final String name, final int value) {
-			super(name);
-			this.value = value;
-		}
-
-		@Override
-		public int getValue() {
-			return value;
+	private static void getExtensionEntry(String extension, Map<String, Map<String, Integer>> output) {
+		if (Bukkit.getPluginManager().isPluginEnabled(extension)) {
+			String version = Bukkit.getPluginManager().getPlugin(extension).getDescription().getVersion();
+			Map<String, Integer> entry = new HashMap<>();
+			entry.put(version, 1);
+			output.put(extension, entry);
 		}
 	}
 
-	private static class PlotterEnabled extends Metrics.Plotter {
-
-		public PlotterEnabled(final String name) {
-			super(name);
-		}
-
-		@Override
-		public int getValue() {
-			return 1;
-		}
-	}
 }

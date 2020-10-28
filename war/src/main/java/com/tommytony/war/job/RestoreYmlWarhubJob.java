@@ -1,18 +1,16 @@
 package com.tommytony.war.job;
 
-import java.sql.SQLException;
-import java.util.logging.Level;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.ItemStack;
-
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.VolumeMapper;
 import com.tommytony.war.structure.WarHub;
 import com.tommytony.war.volume.Volume;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
+
+import java.sql.SQLException;
+import java.util.logging.Level;
 
 public class RestoreYmlWarhubJob implements Runnable {
 
@@ -22,7 +20,6 @@ public class RestoreYmlWarhubJob implements Runnable {
 		this.warhubConfig = warhubConfig;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void run() {
 		int hubX = warhubConfig.getInt("x");
 		int hubY = warhubConfig.getInt("y");
@@ -35,50 +32,18 @@ public class RestoreYmlWarhubJob implements Runnable {
 		if (warhubConfig.isItemStack("materials.floor")) {
 			War.war.getWarhubMaterials().setFloorBlock(
 					warhubConfig.getItemStack("materials.floor"));
-		} else {
-			ConfigurationSection floorMaterialSection = warhubConfig
-					.getConfigurationSection("materials.floor");
-			if (floorMaterialSection != null) {
-				War.war.getWarhubMaterials().setFloorBlock(
-					new ItemStack(floorMaterialSection.getInt("id"), 1,
-						(short) floorMaterialSection.getInt("data")));
-			}
 		}
 		if (warhubConfig.isItemStack("materials.outline")) {
 			War.war.getWarhubMaterials().setOutlineBlock(
 					warhubConfig.getItemStack("materials.outline"));
-		} else {
-			ConfigurationSection floorMaterialSection = warhubConfig
-					.getConfigurationSection("materials.outline");
-			if (floorMaterialSection != null) {
-				War.war.getWarhubMaterials().setOutlineBlock(
-					new ItemStack(floorMaterialSection.getInt("id"), 1,
-						(short) floorMaterialSection.getInt("data")));
-			}
 		}
 		if (warhubConfig.isItemStack("materials.gate")) {
 			War.war.getWarhubMaterials().setGateBlock(
 					warhubConfig.getItemStack("materials.gate"));
-		} else {
-			ConfigurationSection floorMaterialSection = warhubConfig
-					.getConfigurationSection("materials.gate");
-			if (floorMaterialSection != null) {
-				War.war.getWarhubMaterials().setGateBlock(
-					new ItemStack(floorMaterialSection.getInt("id"), 1,
-						(short) floorMaterialSection.getInt("data")));
-			}
 		}
 		if (warhubConfig.isItemStack("materials.light")) {
 			War.war.getWarhubMaterials().setLightBlock(
 					warhubConfig.getItemStack("materials.light"));
-		} else {
-			ConfigurationSection floorMaterialSection = warhubConfig
-					.getConfigurationSection("materials.light");
-			if (floorMaterialSection != null) {
-				War.war.getWarhubMaterials().setLightBlock(
-					new ItemStack(floorMaterialSection.getInt("id"), 1,
-						(short) floorMaterialSection.getInt("data")));
-			}
 		}
 		World world = War.war.getServer().getWorld(worldName);
 		if (world != null) {
@@ -87,7 +52,7 @@ public class RestoreYmlWarhubJob implements Runnable {
 			War.war.setWarHub(hub);
 			Volume vol;
 			try {
-				vol = VolumeMapper.loadVolume("warhub", "", world);
+				vol = VolumeMapper.loadSimpleVolume("warhub", world);
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}

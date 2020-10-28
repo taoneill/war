@@ -1,11 +1,14 @@
 package com.tommytony.war.command;
 
-import java.util.logging.Level;
-
+import com.tommytony.war.War;
+import com.tommytony.war.ui.WarUI;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-import com.tommytony.war.War;
+import java.util.logging.Level;
 
 
 /**
@@ -45,8 +48,11 @@ public class WarCommandHandler {
 				return true;
 			}
 		} else if (command.equals("war") || command.equals("War")) {
-			// show /war help
-			War.war.msg(sender, cmd.getUsage());
+			if (sender instanceof Player) {
+				War.war.getUIManager().assignUI((Player) sender, new WarUI());
+			} else {
+				War.war.badMsg(sender, "Use /war help for information.");
+			}
 			return true;
 		} else {
 			arguments = args;
@@ -94,6 +100,10 @@ public class WarCommandHandler {
 				commandObj = new SetMonumentCommand(this, sender, arguments);
 			} else if (command.equals("deletemonument")) {
 				commandObj = new DeleteMonumentCommand(this, sender, arguments);
+			} else if (command.equals("setcapturepoint")) {
+				commandObj = new SetCapturePointCommand(this, sender, arguments);
+			} else if (command.equals("deletecapturepoint")) {
+				commandObj = new DeleteCapturePointCommand(this, sender, arguments);
 			} else if (command.equals("setbomb")) {
 				commandObj = new SetBombCommand(this, sender, arguments);
 			} else if (command.equals("deletebomb")) {
@@ -131,8 +141,10 @@ public class WarCommandHandler {
 
 		if(commandObj != null) {
 			boolean handled = commandObj.handle();
-			if(!handled) {
-				War.war.badMsg(sender, cmd.getUsage());
+			if (!handled) {
+				String finalCommand = command;
+				War.war.getServer().getScheduler().runTaskLater(War.war, () -> sender.sendMessage(ChatColor.RED + "For more information, use" + ChatColor.YELLOW + " /help " + finalCommand + ChatColor.RED + " or visit" + ChatColor.GREEN + " https://github.com/taoneill/war/wiki/Commands"), 1);
+				return false;
 			}
 		}
 

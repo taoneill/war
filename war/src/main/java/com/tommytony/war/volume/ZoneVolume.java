@@ -1,13 +1,5 @@
 package com.tommytony.war.volume;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.logging.Level;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-
 import com.tommytony.war.Team;
 import com.tommytony.war.War;
 import com.tommytony.war.Warzone;
@@ -15,6 +7,13 @@ import com.tommytony.war.config.WarConfig;
 import com.tommytony.war.job.PartialZoneResetJob;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
 import com.tommytony.war.structure.Monument;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
 
 /**
  *
@@ -36,7 +35,7 @@ public class ZoneVolume extends Volume {
 		// Save blocks directly to disk (i.e. don't put everything in memory)
 		int saved = 0;
 		try {
-			saved = ZoneVolumeMapper.save(this, this.zone.getName());
+			saved = ZoneVolumeMapper.saveZoneBlocksAndEntities(this, this.zone.getName());
 		} catch (SQLException ex) {
 			War.war.log("Failed to save warzone " + zone.getName() + ": " + ex.getMessage(), Level.WARNING);
 			ex.printStackTrace();
@@ -51,8 +50,8 @@ public class ZoneVolume extends Volume {
 	}
 
 	public void loadCorners() throws SQLException {
-		Connection conn = ZoneVolumeMapper.getZoneConnection(this, this.zone.getName(), this.getWorld());
-		ZoneVolumeMapper.load(conn, this, this.getWorld(), true, 0, 0, null);
+		Connection conn = ZoneVolumeMapper.getZoneConnection(this, this.zone.getName());
+		ZoneVolumeMapper.loadCorners(conn, this, this.getWorld(), "");
 		this.isSaved = true;
 	}
 
@@ -60,8 +59,8 @@ public class ZoneVolume extends Volume {
 	public void resetBlocks() {
 		// Load blocks directly from disk and onto the map (i.e. no more in-memory warzone blocks)
 		try {
-			Connection conn = ZoneVolumeMapper.getZoneConnection(this, this.zone.getName(), this.getWorld());
-			ZoneVolumeMapper.load(conn, this, this.getWorld(), false, 0, Integer.MAX_VALUE, null);
+			Connection conn = ZoneVolumeMapper.getZoneConnection(this, this.zone.getName());
+			ZoneVolumeMapper.reloadZoneBlocks(conn, this, 0, Integer.MAX_VALUE, null);
 		} catch (SQLException ex) {
 			War.war.log("Failed to load warzone " + zone.getName() + ": " + ex.getMessage(), Level.WARNING);
 			ex.printStackTrace();
@@ -82,7 +81,18 @@ public class ZoneVolume extends Volume {
 	 * @throws SQLException
 	 */
 	public int resetSection(Connection conn, int start, int total, boolean[][][] changes) throws SQLException {
-		return ZoneVolumeMapper.load(conn, this, this.getWorld(), false, start, total, changes);
+		return ZoneVolumeMapper.reloadZoneBlocks(conn, this, start, total, changes);
+	}
+
+	/**
+	 * Reload all saved entities in the warzone. Consists of paintings, item frames, etc.
+	 *
+	 * @param connection Open connection to warzone database file.
+	 * @return Changed entity count.
+	 * @throws SQLException SQLite error
+	 */
+	public int resetEntities(Connection connection) throws SQLException {
+		return ZoneVolumeMapper.loadEntities(connection, this);
 	}
 
 	/**
@@ -102,7 +112,7 @@ public class ZoneVolume extends Volume {
 	public void resetBlocksAsJob() {
 		try {
 			PartialZoneResetJob job = new PartialZoneResetJob(zone, War.war.getWarConfig().getInt(WarConfig.RESETSPEED));
-			War.war.getServer().getScheduler().runTask(War.war, job);
+			job.runTask(War.war);
 		} catch (SQLException e) {
 			War.war.getLogger().log(Level.WARNING, "Failed to reset warzone - cannot get count of saved blocks", e);
 		}

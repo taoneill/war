@@ -1,5 +1,21 @@
 package com.tommytony.war.mapper;
 
+import com.tommytony.war.Team;
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
+import com.tommytony.war.config.TeamConfig;
+import com.tommytony.war.config.TeamKind;
+import com.tommytony.war.config.WarzoneConfig;
+import com.tommytony.war.structure.*;
+import com.tommytony.war.utility.Direction;
+import com.tommytony.war.volume.Volume;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -10,40 +26,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
-
-import com.tommytony.war.Team;
-import com.tommytony.war.War;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.config.TeamKind;
-import com.tommytony.war.structure.Bomb;
-import com.tommytony.war.structure.Cake;
-import com.tommytony.war.structure.Monument;
-import com.tommytony.war.structure.ZoneLobby;
-import com.tommytony.war.utility.Direction;
-import com.tommytony.war.volume.Volume;
-import com.tommytony.war.volume.ZoneVolume;
-
 public class WarzoneYmlMapper {
 
-	@SuppressWarnings("deprecation")
 	public static Warzone load(String name) { // removed createNewVolume, as it did nothing
 		File warzoneTxtFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".txt");
 		File warzoneYmlFile = new File(War.war.getDataFolder().getPath() + "/warzone-" + name + ".yml");
 		
 		// Convert from TXT to YML if needed
 		if (warzoneTxtFile.exists() && !warzoneYmlFile.exists()) {
-			// Since we're converting, WarTxtMapper didn't load the warzones. 
-			// We need to load the old-text-format-Warzone into memory.
-			Warzone zoneToConvert = WarzoneTxtMapper.load(name, false);
-			WarzoneYmlMapper.save(zoneToConvert);
-			War.war.log("Converted warzone-" + name + ".txt to warzone-" + name + ".yml", Level.INFO);
+			// dropped nimitz compatibility with the MC 1.13 update
+			War.war.log("Failed to load Warzone " + name + " - backwards compatibility was dropped with MC 1.13. Please delete this zone to continue.", Level.WARNING);
+			return null;
 		}
 		
 		if (!warzoneYmlFile.exists()) {
@@ -145,7 +138,33 @@ public class WarzoneYmlMapper {
 					}
 				}
 			}
-			
+
+			// capture points
+			if (warzoneRootSection.contains(zoneInfoPrefix + "capturepoint")) {
+				List<String> cpNames = warzoneRootSection.getStringList(zoneInfoPrefix + "capturepoint.names");
+				for (String cpName : cpNames) {
+					if (cpName != null && !cpName.equals("")) {
+						String cpPrefix = zoneInfoPrefix + "capturepoint." + cpName + ".";
+						if (!warzoneRootSection.contains(cpPrefix + "x")) {
+							// try lowercase instead
+							cpPrefix = zoneInfoPrefix + "capturepoint." + cpName.toLowerCase() + ".";
+						}
+						int cpX = warzoneRootSection.getInt(cpPrefix + "x");
+						int cpY = warzoneRootSection.getInt(cpPrefix + "y");
+						int cpZ = warzoneRootSection.getInt(cpPrefix + "z");
+						float cpYaw = (float) warzoneRootSection.getDouble(cpPrefix + "yaw");
+						TeamKind controller = null;
+						int strength = 0;
+						if (warzoneRootSection.contains(cpPrefix + "controller")) {
+							controller = TeamKind.teamKindFromString(warzoneRootSection.getString(cpPrefix + "controller"));
+							strength = warzone.getWarzoneConfig().getInt(WarzoneConfig.CAPTUREPOINTTIME);
+						}
+						CapturePoint cp = new CapturePoint(cpName, new Location(world, cpX, cpY, cpZ, cpYaw, 0), controller, strength, warzone);
+						warzone.getCapturePoints().add(cp);
+					}
+				}
+			}
+
 			// bombs
 			if (warzoneRootSection.contains(zoneInfoPrefix + "bomb")) {
 				List<String> bombNames = warzoneRootSection.getStringList(zoneInfoPrefix + "bomb.names");
@@ -283,7 +302,7 @@ public class WarzoneYmlMapper {
 			}
 			Connection connection = null;
 			try {
-				connection = ZoneVolumeMapper.getZoneConnection(warzone.getVolume(), warzone.getName(), warzone.getWorld());
+				connection = ZoneVolumeMapper.getZoneConnection(warzone.getVolume(), warzone.getName());
 			} catch (SQLException e) {
 				War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 			}
@@ -295,7 +314,16 @@ public class WarzoneYmlMapper {
 					War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 				}
 			}
-			
+
+			// capture point blocks
+			for (CapturePoint cp : warzone.getCapturePoints()) {
+				try {
+					cp.setVolume(warzone.loadStructure("cp-" + cp.getName(), connection));
+				} catch (SQLException e) {
+					War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
+				}
+			}
+
 			// bomb blocks
 			for (Bomb bomb : warzone.getBombs()) {
 				try {
@@ -352,50 +380,18 @@ public class WarzoneYmlMapper {
 			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.floor")) {
 				warzone.getLobbyMaterials().setFloorBlock(
 						warzoneRootSection.getItemStack(lobbyPrefix + "materials.floor"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(lobbyPrefix + "materials.floor");
-				if (floorMaterialSection != null) {
-					warzone.getLobbyMaterials().setFloorBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.outline")) {
 				warzone.getLobbyMaterials().setOutlineBlock(
 						warzoneRootSection.getItemStack(lobbyPrefix + "materials.outline"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(lobbyPrefix + "materials.outline");
-				if (floorMaterialSection != null) {
-					warzone.getLobbyMaterials().setOutlineBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.gate")) {
 				warzone.getLobbyMaterials().setGateBlock(
 						warzoneRootSection.getItemStack(lobbyPrefix + "materials.gate"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(lobbyPrefix + "materials.gate");
-				if (floorMaterialSection != null) {
-					warzone.getLobbyMaterials().setGateBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			if (warzoneRootSection.isItemStack(lobbyPrefix + "materials.light")) {
 				warzone.getLobbyMaterials().setLightBlock(
 						warzoneRootSection.getItemStack(lobbyPrefix + "materials.light"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(lobbyPrefix + "materials.light");
-				if (floorMaterialSection != null) {
-					warzone.getLobbyMaterials().setLightBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			
 			// lobby world
@@ -416,38 +412,14 @@ public class WarzoneYmlMapper {
 			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.main")) {
 				warzone.getWarzoneMaterials().setMainBlock(
 						warzoneRootSection.getItemStack(zoneInfoPrefix + "materials.main"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(zoneInfoPrefix + "materials.main");
-				if (floorMaterialSection != null) {
-					warzone.getWarzoneMaterials().setMainBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.stand")) {
 				warzone.getWarzoneMaterials().setStandBlock(
 						warzoneRootSection.getItemStack(zoneInfoPrefix + "materials.stand"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(zoneInfoPrefix + "materials.stand");
-				if (floorMaterialSection != null) {
-					warzone.getWarzoneMaterials().setStandBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			if (warzoneRootSection.isItemStack(zoneInfoPrefix + "materials.light")) {
 				warzone.getWarzoneMaterials().setLightBlock(
 						warzoneRootSection.getItemStack(zoneInfoPrefix + "materials.light"));
-			} else {
-				ConfigurationSection floorMaterialSection = warzoneRootSection
-						.getConfigurationSection(zoneInfoPrefix + "materials.light");
-				if (floorMaterialSection != null) {
-					warzone.getWarzoneMaterials().setLightBlock(
-						new ItemStack(floorMaterialSection.getInt("id"), 1,
-							(short) floorMaterialSection.getInt("data")));
-				}
 			}
 			try {
 				connection.close();
@@ -546,19 +518,42 @@ public class WarzoneYmlMapper {
 				monumentSection.set("yaw", toIntYaw(monument.getLocation().getYaw()));
 			}
 		}
-		
+
+		// capture points
+		if (warzone.getCapturePoints().size() > 0) {
+			ConfigurationSection cpsSection = warzoneInfoSection.createSection("capturepoint");
+
+			List<String> cpNames = new ArrayList<String>();
+			for (CapturePoint cp : warzone.getCapturePoints()) {
+				cpNames.add(cp.getName());
+			}
+			cpsSection.set("names", cpNames);
+
+			for (CapturePoint cp : warzone.getCapturePoints()) {
+
+				ConfigurationSection cpSection = cpsSection.createSection(cp.getName());
+				cpSection.set("x", cp.getLocation().getBlockX());
+				cpSection.set("y", cp.getLocation().getBlockY());
+				cpSection.set("z", cp.getLocation().getBlockZ());
+				cpSection.set("yaw", cp.getLocation().getYaw());
+				if (cp.getDefaultController() != null) {
+					cpSection.set("controller", cp.getDefaultController().name());
+				}
+			}
+		}
+
 		// bombs
 		if (warzone.getBombs().size() > 0) {
 			ConfigurationSection bombsSection = warzoneInfoSection.createSection("bomb");
-			
+
 			List<String> bombNames = new ArrayList<String>();
 			for (Bomb bomb : warzone.getBombs()) {
 				bombNames.add(bomb.getName());
 			}
 			bombsSection.set("names", bombNames);
-			
+
 			for (Bomb bomb : warzone.getBombs()) {
-				
+
 				ConfigurationSection bombSection = bombsSection.createSection(bomb.getName());
 				bombSection.set("x", bomb.getLocation().getBlockX());
 				bombSection.set("y", bomb.getLocation().getBlockY());
@@ -566,7 +561,7 @@ public class WarzoneYmlMapper {
 				bombSection.set("yaw", toIntYaw(bomb.getLocation().getYaw()));
 			}
 		}
-		
+
 		// cakes
 		if (warzone.getCakes().size() > 0) {
 			ConfigurationSection cakesSection = warzoneInfoSection.createSection("cake");
@@ -661,7 +656,7 @@ public class WarzoneYmlMapper {
 		}
 		Connection connection = null;
 		try {
-			connection = ZoneVolumeMapper.getZoneConnection(warzone.getVolume(), warzone.getName(), warzone.getWorld());
+			connection = ZoneVolumeMapper.getZoneConnection(warzone.getVolume(), warzone.getName());
 		} catch (SQLException e) {
 			War.war.getLogger().log(Level.WARNING, "Failed to load warzone structures volume", e);
 		}
@@ -673,7 +668,16 @@ public class WarzoneYmlMapper {
 				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
 			}
 		}
-		
+
+		// capture point blocks
+		for (CapturePoint cp : warzone.getCapturePoints()) {
+			try {
+				ZoneVolumeMapper.saveStructure(cp.getVolume(), connection);
+			} catch (SQLException e) {
+				War.war.getLogger().log(Level.WARNING, "Failed to save warzone structures volume", e);
+			}
+		}
+
 		// bomb blocks
 		for (Bomb bomb : warzone.getBombs()) {
 			try {

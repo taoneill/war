@@ -1,24 +1,25 @@
 package com.tommytony.war.job;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
-import java.util.*;
-import java.util.logging.Level;
-
+import com.tommytony.war.War;
+import com.tommytony.war.Warzone;
 import com.tommytony.war.mapper.ZoneVolumeMapper;
+import com.tommytony.war.structure.ZoneLobby;
+import com.tommytony.war.volume.ZoneVolume;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.tommytony.war.War;
-import com.tommytony.war.Warzone;
-import com.tommytony.war.structure.ZoneLobby;
-import com.tommytony.war.volume.ZoneVolume;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 	
@@ -61,7 +62,7 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 	public void run() {
 		try {
 			if (conn == null || conn.isClosed()) {
-				conn = ZoneVolumeMapper.getZoneConnection(volume, zone.getName(), volume.getWorld());
+				conn = ZoneVolumeMapper.getZoneConnection(volume, zone.getName());
 			}
 			if (completed >= total) {
 				int airChanges = 0;
@@ -88,6 +89,7 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 				}
 				totalChanges += airChanges;
 				if (this.doneAir()) {
+					volume.resetEntities(conn);
 					String secondsAsText = formatter.format(((double)(System.currentTimeMillis() - startTime)) / 1000);
 					String message = MessageFormat.format(
 							War.war.getString("zone.battle.resetcomplete"), secondsAsText);
@@ -98,14 +100,14 @@ public class PartialZoneResetJob extends BukkitRunnable implements Cloneable {
 							new Object[]{volume.getName(), secondsAsText});
 					conn.close();
 				} else {
-					War.war.getServer().getScheduler().runTaskLater(War.war, this.clone(), JOB_INTERVAL);
+					War.war.getServer().getScheduler().runTaskLater(War.war, (Runnable) this.clone(), JOB_INTERVAL);
 				}
 			} else {
 				int solidChanges = volume.resetSection(conn, completed, speed, changes);
 				completed += solidChanges;
 				totalChanges += solidChanges;
 				this.displayStatusMessage();
-				War.war.getServer().getScheduler().runTaskLater(War.war, this.clone(), JOB_INTERVAL);
+				War.war.getServer().getScheduler().runTaskLater(War.war, (Runnable) this.clone(), JOB_INTERVAL);
 			}
 		} catch (SQLException e) {
 			War.war.getLogger().log(Level.WARNING, "Failed to load zone during reset loop", e);

@@ -1,17 +1,9 @@
 package com.tommytony.war;
 
-import java.io.File;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.logging.Level;
-
+import com.tommytony.war.config.*;
+import com.tommytony.war.utility.Direction;
+import com.tommytony.war.volume.Volume;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,21 +14,12 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.getspout.spoutapi.SpoutManager;
-import org.getspout.spoutapi.player.SpoutPlayer;
-import org.kitteh.tag.TagAPI;
 
-import com.tommytony.war.config.InventoryBag;
-import com.tommytony.war.config.ScoreboardType;
-import com.tommytony.war.config.TeamConfig;
-import com.tommytony.war.config.TeamConfigBag;
-import com.tommytony.war.config.TeamKind;
-import com.tommytony.war.config.TeamSpawnStyle;
-import com.tommytony.war.spout.SpoutDisplayer;
-import com.tommytony.war.utility.Direction;
-import com.tommytony.war.volume.Volume;
+import java.io.File;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 
 /**
  *
@@ -44,6 +27,8 @@ import com.tommytony.war.volume.Volume;
  *
  */
 public class Team {
+	private final Warzone warzone;
+	Random teamSpawnRandomizer = new Random();
 	private List<Player> players = new ArrayList<Player>();
 	private List<Player> teamChatPlayers = new ArrayList<Player>();
 	private List<Location> teamSpawns;
@@ -53,9 +38,7 @@ public class Team {
 	private int points = 0;
 	private Map<Location, Volume> spawnVolumes;
 	private Volume flagVolume;
-	private final Warzone warzone;
 	private TeamKind kind;
-
 	private TeamConfigBag teamConfig;
 	private InventoryBag inventories;
 
@@ -82,7 +65,7 @@ public class Team {
 		}
 		return null;
 	}
-	
+
 	public Warzone getZone() {
 		return this.warzone;
 	}
@@ -119,12 +102,13 @@ public class Team {
 			initializeTeamSpawn(teamSpawn);
 		}
 	}
+
 	public void initializeTeamSpawn(Location teamSpawn) {
 		// Set the spawn
 		int x = teamSpawn.getBlockX();
 		int y = teamSpawn.getBlockY();
 		int z = teamSpawn.getBlockZ();
-		
+
 		ItemStack light = this.warzone.getWarzoneMaterials().getLightBlock();
 
 		TeamSpawnStyle style = this.getTeamConfig().resolveSpawnStyle();
@@ -342,7 +326,7 @@ public class Team {
 								this.getTeamConfig().resolveInt(
 										TeamConfig.LIFEPOOL)).split("\n");
 			}
-			signBlock.setType(Material.SIGN_POST);
+			signBlock.setType(Material.OAK_SIGN);
 			org.bukkit.block.Sign block = (org.bukkit.block.Sign) signBlock
 					.getState();
 			org.bukkit.material.Sign data = (Sign) block.getData();
@@ -353,16 +337,11 @@ public class Team {
 			}
 			block.update(true);
 		}
-		
-		if (War.war.isSpoutServer()) {
-			War.war.getSpoutDisplayer().updateStats(this.warzone);
-		}
 	}
 
 	private void setBlock(int x, int y, int z, TeamKind kind) {
 		BlockState block = this.warzone.getWorld().getBlockAt(x, y, z).getState();
 		block.setType(kind.getMaterial());
-		block.setData(kind.getBlockData());
 		block.update(true);
 	}
 
@@ -382,19 +361,16 @@ public class Team {
 		return this.teamSpawns;
 	}
 
-	Random teamSpawnRandomizer = new Random();
 	public Location getRandomSpawn() {
 		return this.teamSpawns.get(teamSpawnRandomizer.nextInt(this.teamSpawns.size()));
 	}
 
 	public void addPlayer(Player player) {
 		this.players.add(player);
-		if (War.war.isTagServer()) {
-			TagAPI.refreshPlayer(player);
-		}
 		if (this.warzone.getScoreboard() != null && this.warzone.getScoreboardType() != ScoreboardType.NONE) {
 			player.setScoreboard(this.warzone.getScoreboard());
 		}
+		warzone.updateScoreboard();
 	}
 
 	public List<Player> getPlayers() {
@@ -408,17 +384,7 @@ public class Team {
 
 	public void teamcast(String message, boolean isNotification) {
 		for (Player player : this.players) {
-			if (War.war.isSpoutServer()) {
-				SpoutPlayer sp = SpoutManager.getPlayer(player);
-				if (sp.isSpoutCraftEnabled() && isNotification) {
-					// team notifications go to the top left for Spout players to lessen War spam in chat box
-					War.war.getSpoutDisplayer().msg(sp, message);
-				} else {
-					War.war.msg(player, message);
-				}
-			} else {
-				War.war.msg(player, message);
-			}
+			War.war.msg(player, message);
 		}
 	}
 
@@ -429,17 +395,7 @@ public class Team {
 
 	public void teamcast(String message, boolean isNotification, Object... args) {
 		for (Player player : this.players) {
-			if (War.war.isSpoutServer()) {
-				SpoutPlayer sp = SpoutManager.getPlayer(player);
-				if (sp.isSpoutCraftEnabled() && isNotification) {
-					// team notifications go to the top left for Spout players to lessen War spam in chat box
-					War.war.getSpoutDisplayer().msg(sp, MessageFormat.format(message, args));
-				} else {
-					War.war.msg(player, message, args);
-				}
-			} else {
-				War.war.msg(player, message, args);
-			}
+			War.war.msg(player, message, args);
 		}
 	}
 
@@ -452,24 +408,14 @@ public class Team {
 	 * @param ticks Duration the achievement should be displayed
 	 */
 	public void sendAchievement(String line1, String line2, ItemStack icon, int ticks) {
-		if (!War.war.isSpoutServer())
-			return;
-		line1 = SpoutDisplayer.cleanForNotification(line1);
-		line2 = SpoutDisplayer.cleanForNotification(line2);
-		for (Player player : this.players) {
-			SpoutPlayer spoutPlayer = SpoutManager.getPlayer(player);
-			if (!spoutPlayer.isSpoutCraftEnabled())
-				continue;
-			spoutPlayer.sendNotification(line1, line2, icon, ticks);
-		}
 	}
 	
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getName() {
 		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void removePlayer(Player thePlayer) {
@@ -478,32 +424,22 @@ public class Team {
 			this.teamChatPlayers.remove(thePlayer);
 		}
 		this.warzone.dropAllStolenObjects(thePlayer, false);
-		if (War.war.isTagServer()) {
-			TagAPI.refreshPlayer(thePlayer);
-		}
-		if (War.war.isSpoutServer()) {
-			War.war.getSpoutDisplayer().updateStats(thePlayer);
-		}
 		thePlayer.setFireTicks(0);
 		thePlayer.setRemainingAir(300);
 		if (!this.warzone.getReallyDeadFighters().contains(thePlayer.getName())) {
 			this.warzone.restorePlayerState(thePlayer);
 		}
 		this.warzone.getLoadoutSelections().remove(thePlayer);
+		warzone.updateScoreboard();
+	}
+
+	public int getRemainingLives() {
+		return this.remainingLives;
 	}
 
 	public void setRemainingLives(int remainingLives) {
 		this.remainingLives = remainingLives;
-		if (this.warzone.getScoreboard() != null && this.warzone.getScoreboardType() == ScoreboardType.LIFEPOOL) {
-			String teamName = kind.getColor() + name + ChatColor.RESET;
-			OfflinePlayer teamPlayer = Bukkit.getOfflinePlayer(teamName);
-			Objective obj = this.warzone.getScoreboard().getObjective("Lifepool");
-			obj.getScore(teamPlayer).setScore(remainingLives);
-		}
-	}
-
-	public int getRemainingLifes() {
-		return this.remainingLives;
+		warzone.updateScoreboard();
 	}
 
 	public void addPoint() {
@@ -519,11 +455,7 @@ public class Team {
 		} else if (!atLeastOnePlayerOnOtherTeam) {
 			this.teamcast("zone.score.empty");
 		}
-		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS) {
-			String teamName = kind.getColor() + name + ChatColor.RESET;
-			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
-					.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(points);
-		}
+		this.warzone.updateScoreboard();
 	}
 
 	public int getPoints() {
@@ -554,20 +486,15 @@ public class Team {
 
 	public void resetPoints() {
 		this.points = 0;
-		if (this.warzone.getScoreboardType() == ScoreboardType.POINTS
-				&& this.warzone.getScoreboard() != null) {
-			String teamName = kind.getColor() + name + ChatColor.RESET;
-			this.warzone.getScoreboard().getObjective(DisplaySlot.SIDEBAR)
-					.getScore(Bukkit.getOfflinePlayer(teamName)).setScore(points);
-		}
-	}
-
-	public void setFlagVolume(Volume flagVolume) {
-		this.flagVolume = flagVolume;
+		warzone.updateScoreboard();
 	}
 
 	public Volume getFlagVolume() {
 		return this.flagVolume;
+	}
+
+	public void setFlagVolume(Volume flagVolume) {
+		this.flagVolume = flagVolume;
 	}
 
 	private void setFlagVolume() {
@@ -641,7 +568,6 @@ public class Team {
 		// flag
 		BlockState flagBlock = this.warzone.getWorld().getBlockAt(x, y + 1, z).getState();
 		flagBlock.setType(this.kind.getMaterial());
-		flagBlock.setData(this.kind.getBlockData());
 		flagBlock.update(true);
 
 		// Flag post using Orientation
@@ -690,16 +616,6 @@ public class Team {
 		}
 	}
 
-	public void setTeamFlag(Location teamFlag) {
-		this.teamFlag = teamFlag;
-
-		// this resets the block to old state
-		this.setFlagVolume();
-		this.getFlagVolume().saveBlocks();
-
-		this.initializeTeamFlag();
-	}
-	
 	public boolean isTeamFlagBlock(Block block) {
 		if (this.teamFlag != null) {
 			int flagX = this.teamFlag.getBlockX();
@@ -714,6 +630,16 @@ public class Team {
 
 	public Location getTeamFlag() {
 		return this.teamFlag;
+	}
+
+	public void setTeamFlag(Location teamFlag) {
+		this.teamFlag = teamFlag;
+
+		// this resets the block to old state
+		this.setFlagVolume();
+		this.getFlagVolume().saveBlocks();
+
+		this.initializeTeamFlag();
 	}
 	
 	public void deleteTeamFlag() {

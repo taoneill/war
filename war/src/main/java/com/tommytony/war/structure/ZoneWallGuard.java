@@ -29,15 +29,15 @@ public class ZoneWallGuard {
 	public static final Material[] glassifyBlocks = {
 		Material.AIR,
 		Material.WATER,
-		Material.LONG_GRASS,
+		Material.TALL_GRASS,
 		Material.VINE,
-		Material.WATER_LILY,
-		Material.YELLOW_FLOWER,
-		Material.RED_ROSE,
+		Material.LILY_PAD,
+		Material.DANDELION,
+		Material.ROSE_BUSH,
 		Material.RED_MUSHROOM,
 		Material.BROWN_MUSHROOM,
 		Material.DEAD_BUSH,
-		Material.SUGAR_CANE_BLOCK
+		Material.SUGAR_CANE
 	};
 
 	public ZoneWallGuard(Player player, War war, Warzone warzone, BlockFace wall) {
