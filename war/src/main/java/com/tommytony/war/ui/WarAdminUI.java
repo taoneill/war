@@ -19,28 +19,11 @@ public class WarAdminUI extends ChestUI {
 		int i = 0;
 
 		i = UIConfigHelper.addWarConfigOptions(this, player, inv, War.war.getWarConfig(), i);
-		item = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
+		item = new ItemStack(Material.CHEST);
 		meta = item.getItemMeta();
-		meta.setDisplayName(">>>> Warzone Default Config >>>>");
+		meta.setDisplayName("Warzone Default Config");
 		item.setItemMeta(meta);
-		this.addItem(inv, i++, item, new Runnable() {
-			@Override
-			public void run() {
-				War.war.getUIManager().assignUI(player, new WarAdminUI());
-			}
-		});
-		i = UIConfigHelper.addWarzoneConfigOptions(this, player, inv, War.war.getWarzoneDefaultConfig(), null, i);
-		item = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
-		meta = item.getItemMeta();
-		meta.setDisplayName(">>>> Team Default Config >>>>");
-		item.setItemMeta(meta);
-		this.addItem(inv, i++, item, new Runnable() {
-			@Override
-			public void run() {
-				War.war.getUIManager().assignUI(player, new WarAdminUI());
-			}
-		});
-		UIConfigHelper.addTeamConfigOptions(this, player, inv, War.war.getTeamDefaultConfig(), null, null, i);
+		this.addItem(inv, 9*(i / 9) + 8, item, () -> War.war.getUIManager().assignUI(player, new DefaultZoneConfigUI()));
 	}
 
 	@Override
@@ -50,6 +33,6 @@ public class WarAdminUI extends ChestUI {
 
 	@Override
 	public int getSize() {
-		return 9 * 7;
+		return 9 * 2;
 	}
 }
